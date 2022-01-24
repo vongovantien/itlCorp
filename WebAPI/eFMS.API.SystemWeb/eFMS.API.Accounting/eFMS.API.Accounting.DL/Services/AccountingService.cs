@@ -752,6 +752,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
                     sync.Description0 = cdNote.Note;
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
+                    sync.DataType = "CDNOTE";
 
                     int decimalRound = 0;
                     if (sync.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)
@@ -761,7 +762,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    sync.DataType = cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL) ? "VOUCHER" : "CDNOTE";
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -1053,6 +1053,7 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                     sync.Description0 = soa.Note;
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
+                    sync.DataType = "SOA";
 
                     int decimalRound = 0;
                     if (sync.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)
@@ -1062,7 +1063,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                    sync.DataType = (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)) ? "VOUCHER" : "SOA";
 
                     foreach (var surcharge in surcharges)
                     {
