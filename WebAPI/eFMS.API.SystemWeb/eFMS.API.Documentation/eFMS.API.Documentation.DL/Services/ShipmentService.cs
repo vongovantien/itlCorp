@@ -3428,7 +3428,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 data.ExchangeRate = charge.FinalExchangeRate;
-                data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
+                // [CR: cột Balance chỉ tính cho total selling - total buying]
+                data.Balance = _totalRevenue - _totalCost;
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
