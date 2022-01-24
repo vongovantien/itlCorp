@@ -26,7 +26,7 @@ using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using System.Linq.Expressions;
-using eFMS.API.Documentation.DL.Helpers;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2094,99 +2094,119 @@ namespace eFMS.API.Documentation.DL.Services
             ResultHandle hs = new ResultHandle();
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
             CatPartner partnerInternal = new CatPartner();
-            try
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
-                if (lstJobRep != null)
+                try
                 {
-                    foreach (var jobRep in lstJobRep)
+                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
+                    if (lstJobRep != null)
                     {
-                        var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
-                        if (job == null)
-                            continue;
-
-                        if (job.OfficeId != null)
+                        string logMessage = string.Format(" *  \n ListJobRep: {0} * ", JsonConvert.SerializeObject(lstJobRep));
+                        new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTJOBREP", logMessage);
+                        foreach (var jobRep in lstJobRep)
                         {
-                            var offi = GetInfoOfficeOfUser(jobRep.OfficeId);
-                            if (offi != null && string.IsNullOrEmpty(offi.InternalCode))
-                                continue;
-                            var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
-                            if (part == null)
-                                continue;
-                            if (part.Count() > 1)
+                            var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
+                            if (job == null)
                                 continue;
 
-                            if (part.FirstOrDefault() == null)
-                                continue;
-
-                            partnerInternal = part.FirstOrDefault();
-                        }
-
-                        var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId == null);
-                        if (charges != null)
-                        {
-                            foreach (var charge in charges)
+                            if (job.OfficeId != null)
                             {
-                                if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
+                                var offi = GetInfoOfficeOfUser(jobRep.OfficeId);
+                                if (offi != null && string.IsNullOrEmpty(offi.InternalCode))
+                                    continue;
+                                var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
+                                if (part == null)
+                                    continue;
+                                if (part.Count() > 1)
                                     continue;
 
-                                CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
+                                if (part.FirstOrDefault() == null)
+                                    continue;
 
-                                if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                                partnerInternal = part.FirstOrDefault();
+                            }
+
+                            var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId == null);
+                            if (charges != null)
+                            {
+                                logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
+                                new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTCHARGE", logMessage);
+                                foreach (var charge in charges)
                                 {
-                                    surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                                    var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
-                                    if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
-                                    if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                        surcharge.PaymentObjectId = partnerInternal.Id;
+                                    if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
+                                        continue;
+
+                                    CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
+
+                                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                                    {
+                                        surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                        var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                        if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
+                                        if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                            surcharge.PaymentObjectId = partnerInternal.Id;
+                                    }
+                                    else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                                    {
+                                        surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                        if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                            surcharge.PayerId = partnerInternal.Id;
+                                    }
+                                    else { continue; }
+
+                                    surcharge.LinkChargeId = charge.Id.ToString();
+                                    surcharge.Id = Guid.NewGuid();
+                                    surcharge.JobNo = job.JobNo ?? "";
+                                    surcharge.Hblid = job.Hblid;
+                                    surcharge.Hblno = job.Hwbno;
+                                    surcharge.Mblno = job.Mblno;
+
+                                    surcharge.Soano = null;
+                                    surcharge.PaySoano = null;
+                                    surcharge.CreditNo = null;
+                                    surcharge.DebitNo = null;
+                                    surcharge.SettlementCode = null;
+                                    surcharge.VoucherId = null;
+                                    surcharge.VoucherIddate = null;
+                                    surcharge.VoucherIdre = null;
+                                    surcharge.VoucherIdredate = null;
+                                    surcharge.AcctManagementId = null;
+                                    surcharge.PayerAcctManagementId = null;
+
+                                    surcharge.UserCreated = currentUser.UserID;
+                                    surcharge.DatetimeCreated = DateTime.Now;
+
+                                    surchargeAdds.Add(surcharge);
                                 }
-                                else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
-                                {
-                                    surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
-                                    if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                        surcharge.PayerId = partnerInternal.Id;
-                                }
-                                else { continue; }
-
-                                surcharge.LinkChargeId = charge.Id.ToString();
-                                surcharge.Id = Guid.NewGuid();
-                                surcharge.JobNo = job.JobNo ?? "";
-                                surcharge.Hblid = job.Hblid;
-                                surcharge.Hblno = job.Hwbno;
-                                surcharge.Mblno = job.Mblno;
-
-                                surcharge.Soano = null;
-                                surcharge.PaySoano = null;
-                                surcharge.CreditNo = null;
-                                surcharge.DebitNo = null;
-                                surcharge.SettlementCode = null;
-                                surcharge.VoucherId = null;
-                                surcharge.VoucherIddate = null;
-                                surcharge.VoucherIdre = null;
-                                surcharge.VoucherIdredate = null;
-                                surcharge.AcctManagementId = null;
-                                surcharge.PayerAcctManagementId = null;
-
-                                surcharge.UserCreated = currentUser.UserID;
-                                surcharge.DatetimeCreated = DateTime.Now;
-
-                                surchargeAdds.Add(surcharge);
                             }
                         }
-
                         if (surchargeAdds.Count > 0)
                         {
-                            foreach (var item in surchargeAdds)
-                                surchargeRepository.Add(item);
+                            surchargeRepository.Add(surchargeAdds, false);
+                            var result = surchargeRepository.SubmitChanges();
+                            if (result.Success)
+                                trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                            return new ResultHandle { Status = true, Message = "Empty ChargeFromReplicate", Data = null };
                         }
                     }
+                    return new ResultHandle { Status = true, Message = "ChargeFromReplicate sccuess", Data = null };
                 }
-                return new ResultHandle { Status = true, Message = "ChargeFromReplicate sccuess", Data = null };
-            }
-            catch (Exception ex)
-            {
-                new LogHelper("eFMS_CHARGEFROMREPLICATE", ex.ToString());
-                return new ResultHandle { Status = false, Message = "Job can't be charge from replicate !" };
+                catch (Exception ex)
+                {
+
+                    trans.Rollback();
+                    new LogHelper("eFMS_CHARGEFROMREPLICATE", ex.ToString());
+                    return new ResultHandle { Status = false, Message = "Job can't be charge from replicate !" };
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
         private SysOffice GetInfoOfficeOfUser(Guid? officeId)
