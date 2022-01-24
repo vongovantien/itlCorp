@@ -191,7 +191,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             mbls: null,
             settlementCodes: null
         };
-        if (type === 'invoice') {
+        if (type === AccountingConstants.ISSUE_TYPE.INVOICE) {
             this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
                 .subscribe(
                     (res: PartnerOfAcctManagementResult[]) => {

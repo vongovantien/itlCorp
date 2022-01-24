@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class InvoiceListModel
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public Guid? JobId { get; set; }
         public string PartnerId { get; set; }
         public string PartnerName { get; set; }
