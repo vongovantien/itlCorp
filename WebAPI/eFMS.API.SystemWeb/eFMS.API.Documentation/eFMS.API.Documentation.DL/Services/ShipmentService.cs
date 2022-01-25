@@ -4609,7 +4609,7 @@ namespace eFMS.API.Documentation.DL.Services
             if(!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4645,7 +4645,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4824,7 +4824,7 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                     }
                 }
-                commissionData.CustomerName = string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn));
+                commissionData.CustomerName = !string.IsNullOrEmpty(criteria.CustomerId) ? string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn)) : string.Empty;
             }
             if (commissionData.Details.Count() == 0)
             {
