@@ -437,7 +437,12 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-
+    cancelLinkCharge(chargId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, { chargId: chargId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     getShipmentTotalProfit(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),

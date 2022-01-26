@@ -2154,6 +2154,9 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.VoucherIdredate = null;
                                     surcharge.AcctManagementId = null;
                                     surcharge.PayerAcctManagementId = null;
+                                    surcharge.IsFromShipment = null;
+                                    surcharge.SyncedFrom = null;
+                                    surcharge.PaySyncedFrom = null;
 
                                     surcharge.UserCreated = currentUser.UserID;
                                     surcharge.DatetimeCreated = DateTime.Now;
@@ -2168,6 +2171,17 @@ namespace eFMS.API.Documentation.DL.Services
                             var result = surchargeRepository.SubmitChanges();
                             if (result.Success)
                                 trans.Commit();
+
+                            foreach (var sur in surchargeAdds)
+                            {
+                                var charge = surchargeRepository.Get(x => x.Id == Guid.Parse(sur.LinkChargeId)).FirstOrDefault();
+                                if (charge != null)
+                                {
+                                    charge.LinkChargeId = sur.Id.ToString();
+                                    var resultUpdate = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
+                                }
+                            }
+                            surchargeRepository.SubmitChanges();
                         }
                         else
                         {
