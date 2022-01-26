@@ -50,7 +50,7 @@
                                             [alwaysShowCalendars]="true" name="daterange" formControlName="createDate"
                                             placeholder="   /   /   " readonly calendar
                                             [allowRemove]="!!createDate.value && !!createDate.value.startDate"
-                                            (remove)="resetFormControl(createDate)" />
+                                            (remove)="resetFormControl(createDate)"  [singleDatePicker]="false"/>
                                     </div>
                                 </div>
                             </div>

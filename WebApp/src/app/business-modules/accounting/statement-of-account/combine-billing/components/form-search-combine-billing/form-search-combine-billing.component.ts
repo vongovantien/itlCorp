@@ -158,8 +158,8 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
     const body: ISearchDataBilling = {
       referenceNo: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
       partnerId: dataForm.partnerId,
-      createdDateFrom: (!!this.createDate.value) ? formatDate(this.createDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-      createdDateTo: (!!this.createDate.value) ? formatDate(this.createDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+      createdDateFrom: (!!this.createDate && !!this.createDate.value?.startDate) ? formatDate(this.createDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+      createdDateTo: (!!this.createDate && !!this.createDate.value?.endDate) ? formatDate(this.createDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
       creator: !!dataForm.creator ? this.getCreatorData(dataForm.creator) : null
     };
     this._store.dispatch(SearchListCombineBilling(body));
