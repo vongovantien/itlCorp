@@ -123,6 +123,44 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        public HandleState CancelLinkCharge(Guid chargeId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
+                if (charge == null)
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
+                {
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                }
+                else
+                {
+                    if (charge.LinkChargeId != null)
+                    {
+                        var chargeUpdate = DataContext.Where(x => x.Id == Guid.Parse(charge.LinkChargeId)).FirstOrDefault();
+                        chargeUpdate.LinkChargeId = null;
+                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, true);
+                    }
+                    DataContext.Delete(x => x.Id == chargeId);
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
         public List<CatPartner> GetAllParner(Guid id, bool isHouseBillID = false)
         {
             try
