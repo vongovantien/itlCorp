@@ -48,15 +48,15 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<UnlockRequestExport>>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new SettingHelper().GenerateUnlockRequestExcel(dataObjects.Result, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Unlock Request.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Unlock Request");
 
             return fileContent;
         }

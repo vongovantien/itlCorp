@@ -1,7 +1,9 @@
-﻿using eFMS.API.ReportData.Models;
+﻿using eFMS.API.Common.Helpers;
+using eFMS.API.ReportData.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.ReportData.Helpers
 {
@@ -10,18 +12,31 @@ namespace eFMS.API.ReportData.Helpers
     /// </summary>
     public class FileHelper: ControllerBase
     {
-        public FileContentResult ExportExcel(Stream stream, string fileName)
+
+        public FileContentResult ExportExcel(string refNo,Stream stream, string fileName)
         {
             var buffer = stream as MemoryStream;
+            var dateCurr = DateTime.Now.ToString("ddMMyy");
+            if (string.IsNullOrEmpty(refNo))
+            {
+
+                return File(
+                            buffer.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileName += "-" + dateCurr + "-" + refNo + ".xlsx"
+                        );
+            }
             return File(
                 buffer.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName
+                fileName += "-" + dateCurr + ".xlsx"
             );
         }
-        public FileReportUpload ReturnFormFile(Stream buffer, string fileName)
+        public FileReportUpload ReturnFormFile(string refNo, Stream buffer, string fileName)
         {
             var ms = buffer as MemoryStream;
+            var dateCurr = DateTime.Now.ToString("ddMMyy");
+            fileName +="-" + dateCurr + "-" + refNo + ".xlsx";
             try
             {
                 var file = new FileReportUpload();

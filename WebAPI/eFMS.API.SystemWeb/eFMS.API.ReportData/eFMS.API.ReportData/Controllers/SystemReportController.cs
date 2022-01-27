@@ -42,7 +42,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Company List.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Company List");
 
             return fileContent;
 
@@ -67,7 +67,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Company List.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Company List");
 
             return fileContent;
 
@@ -86,7 +86,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catDepartmentCriteria, aPis.HostStaging + Urls.System.DepartmentUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDepartmentModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateDepartmentExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
+            return new FileHelper().ExportExcel(null,stream, FilesNames.DepartmentName);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.GroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysGroupModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateGroupExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
+            return new FileHelper().ExportExcel(null,stream, FilesNames.GroupName);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream,FilesNames.UserName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream,FilesNames.UserName);
             return fileContent;
 
         }
