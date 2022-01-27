@@ -150,7 +150,8 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         var chargeUpdate = DataContext.Where(x => x.Id == Guid.Parse(charge.LinkChargeId)).FirstOrDefault();
                         chargeUpdate.LinkChargeId = null;
-                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, true);
+                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, false);
+                        DataContext.SubmitChanges();
                     }
                     DataContext.Delete(x => x.Id == chargeId);
                 }
