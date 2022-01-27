@@ -2154,7 +2154,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.VoucherIdredate = null;
                                     surcharge.AcctManagementId = null;
                                     surcharge.PayerAcctManagementId = null;
-                                    surcharge.IsFromShipment = null;
+                                    surcharge.IsFromShipment = true;
                                     surcharge.SyncedFrom = null;
                                     surcharge.PaySyncedFrom = null;
 
