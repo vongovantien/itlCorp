@@ -1113,11 +1113,13 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var it in item.Charges)
                 {
-                    if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
-                        it.NetAmount = it.Quantity * it.UnitPrice;
-                    else
-                        it.NetAmount = Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
-
+                    it.NetAmount = it.AmountVND;
+                    //if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    //    it.NetAmount = it.AmountVND;
+                    //else {
+                    //    //it.NetAmount = Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
+                    //    it.NetAmount = it.AmountUSD;
+                    //}
                     if (it.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                     {
                         it.VATAmount = it.VATAmountLocal * (-1);
@@ -1285,7 +1287,8 @@ namespace eFMS.API.Accounting.DL.Services
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? partnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
                     CombineNo = combineBillingNo,
                     CombineBillingType = soa != null ? "SOA" : "CDNOTE",
-                    BillingType = ((soa != null && !string.IsNullOrEmpty(sur.PaySoano)) || (cdNote != null && !string.IsNullOrEmpty(sur.CreditNo))) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT
+                    BillingType = soa != null ? soa.Type.ToUpper() : cdNote.Type.ToUpper()
+                    //BillingType = ((soa != null && !string.IsNullOrEmpty(sur.PaySoano)) || (cdNote != null && !string.IsNullOrEmpty(sur.CreditNo))) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT
                 };
                 result.Add(chg);
             }
