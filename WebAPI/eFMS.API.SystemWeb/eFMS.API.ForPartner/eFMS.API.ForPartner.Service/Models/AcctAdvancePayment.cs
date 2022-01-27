@@ -36,5 +36,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public string Payee { get; set; }
         public decimal? ExcRateUsdToLocal { get; set; }
         public string BankCode { get; set; }
+        public string AdvanceFor { get; set; }
     }
 }

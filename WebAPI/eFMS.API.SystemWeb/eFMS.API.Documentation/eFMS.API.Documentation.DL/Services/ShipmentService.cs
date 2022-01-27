@@ -1333,6 +1333,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         else
                         {
+                            // Amount other = sum các phí debit có charge group khác Freight,Trucking,handling,Logistics
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
                                 _totalSellAmountOther += charge.AmountUsd;
@@ -1350,10 +1351,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
-                if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
-                {
-                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
-                }
+                #region [CR: 19/01/22] Alex bo rule nay
+                //if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                //{
+                //    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                //}
+                #endregion
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1387,7 +1390,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyAmountFreight += charge.AmountVnd;
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Trucking")
+                        else if (ChargeGroupModel?.Name == "Trucking")
                         {
                             if (charge.KickBack == true)
                             {
@@ -1404,11 +1407,9 @@ namespace eFMS.API.Documentation.DL.Services
                                     _totalBuyAmountTrucking += charge.AmountVnd; // Phí Selling trước thuế
                                 }
                             }
-
                         }
-                        if (ChargeGroupModel?.Name == "Handling")
+                        else if (ChargeGroupModel?.Name == "Handling")
                         {
-
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
                                 _totalBuyAmountHandling += charge.AmountUsd;
@@ -1417,21 +1418,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
                             }
-
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" && charge.KickBack != true)
-                        {
-                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _totalBuyAmountOther += charge.AmountUsd;
-                            }
-                            else
-                            {
-                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                            }
-
-                        }
-                        if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
+                        else if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1442,9 +1430,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyAmountKB += charge.AmountVnd;
                             }
                         }
-
-                        // bổ sung total custom buy
-                        if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics")
+                        else if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics") // bổ sung total custom buy
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1455,7 +1441,19 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyCustom += charge.AmountVnd; // Phí buying trước thuế
                             }
                         }
-
+                        // Amount other = sum các phí có charge group khác Freight,Trucking,handling,Logistics,com
+                        //if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" && charge.KickBack != true)
+                        else
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
                         //END BUY
                     }
                 }
@@ -3430,7 +3428,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 data.ExchangeRate = charge.FinalExchangeRate;
-                data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
+                // [CR: cột Balance chỉ tính cho total selling - total buying]
+                data.Balance = _totalRevenue - _totalCost;
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
