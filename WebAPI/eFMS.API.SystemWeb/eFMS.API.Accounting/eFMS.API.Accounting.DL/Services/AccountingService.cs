@@ -773,7 +773,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId);
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -789,21 +789,22 @@ namespace eFMS.API.Accounting.DL.Services
                         //CR: 15500
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
-                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        // tính net amount và vat amount theo phí
+                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL) 
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
                         }
-                        else if (sync.CurrencyCode == surcharge.CurrencyId)
-                        {
-                            _netAmount = surcharge.NetAmount ?? 0;
-                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
-                        }
+                        //else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        //{
+                        //    _netAmount = surcharge.NetAmount ?? 0;
+                        //    _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        //}
                         else
                         {
                             _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
@@ -1075,7 +1076,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -1091,21 +1092,22 @@ namespace eFMS.API.Accounting.DL.Services
                         //CR:15500
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
-                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        // tính net amount và vat amount theo phí
+                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
                         }
-                        else if (sync.CurrencyCode == surcharge.CurrencyId)
-                        {
-                            _netAmount = surcharge.NetAmount ?? 0;
-                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
-                        }
+                        //else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        //{
+                        //    _netAmount = surcharge.NetAmount ?? 0;
+                        //    _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        //}
                         else
                         {
                             _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
