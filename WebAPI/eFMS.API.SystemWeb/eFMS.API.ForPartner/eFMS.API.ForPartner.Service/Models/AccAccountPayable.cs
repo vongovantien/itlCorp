@@ -8,6 +8,8 @@ namespace eFMS.API.ForPartner.Service.Models
         public Guid Id { get; set; }
         public string PartnerId { get; set; }
         public string VoucherNo { get; set; }
+        public string InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
         public string ReferenceNo { get; set; }
         public string BillingNo { get; set; }
         public string BillingType { get; set; }

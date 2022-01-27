@@ -85,6 +85,10 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
+
+                entity.Property(e => e.InvoiceNo).HasMaxLength(10);
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.Over16To30Day).HasColumnType("decimal(18, 4)");
