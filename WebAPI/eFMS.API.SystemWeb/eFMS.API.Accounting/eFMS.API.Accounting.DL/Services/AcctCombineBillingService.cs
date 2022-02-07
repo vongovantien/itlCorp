@@ -572,6 +572,9 @@ namespace eFMS.API.Accounting.DL.Services
             var existCombineNo = string.Empty;
             if (!string.IsNullOrEmpty(criteria.DocumentType) && criteria.DocumentNo != null && criteria.DocumentNo.Count > 0)
             {
+                // Get issued surcharge info with partnerId
+                var surchargeInfo = surchargeRepo.Get(x => x.Type != "OBH" && criteria.PartnerId == x.PaymentObjectId && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)));
+                var surchargeOBHInfo = surchargeRepo.Get(x => x.Type == "OBH" && ((criteria.PartnerId == x.PaymentObjectId && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.DebitNo))) || (criteria.PartnerId == x.PayerId && (!string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.CreditNo)))));
                 switch (criteria.DocumentType)
                 {
                     case "CD Note":
@@ -582,14 +585,14 @@ namespace eFMS.API.Accounting.DL.Services
                             var existingCredit = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
                             if (credit.Count() == existingCredit.Count() && existingCredit.Count() > 0)
                             {
-                                existCombineNo = item + " in CB: " + (existingCredit.FirstOrDefault().Type != "OBH" ? existingCredit.FirstOrDefault().CombineBillingNo : existingCredit.FirstOrDefault().ObhcombineBillingNo);
+                                existCombineNo = item + " has been existed in CB: " + (existingCredit.FirstOrDefault().Type != "OBH" ? existingCredit.FirstOrDefault().CombineBillingNo : existingCredit.FirstOrDefault().ObhcombineBillingNo);
                                 return existCombineNo;
                             }
                             var debit = surchargeRepo.Get(x => item.Trim() == x.DebitNo).Select(x => x.Hblid).ToList();
                             var existingDebit = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).ToList();
                             if (debit.Count == existingDebit.Count && existingDebit.Count > 0)
                             {
-                                existCombineNo = item + " in CB: " + existingDebit[0].CombineBillingNo;
+                                existCombineNo = item + " has been existed in CB: " + existingDebit[0].CombineBillingNo;
                                 return existCombineNo;
                             }
                         }
@@ -602,14 +605,14 @@ namespace eFMS.API.Accounting.DL.Services
                             var existingSoa = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
                             if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
                             {
-                                existCombineNo = item + " in CB: " + existingSoa.FirstOrDefault().CombineBillingNo;
+                                existCombineNo = item.Trim() + " has been existed in CB: " + existingSoa.FirstOrDefault().CombineBillingNo;
                                 return existCombineNo;
                             }
                             soa = surchargeRepo.Get(x => item.Trim() == x.PaySoano);
                             existingSoa = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
                             if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
                             {
-                                existCombineNo = item + " in CB: " + (existingSoa.FirstOrDefault().Type != "OBH" ? existingSoa.FirstOrDefault().CombineBillingNo : existingSoa.FirstOrDefault().ObhcombineBillingNo);
+                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingSoa.FirstOrDefault().Type != "OBH" ? existingSoa.FirstOrDefault().CombineBillingNo : existingSoa.FirstOrDefault().ObhcombineBillingNo);
                                 return existCombineNo;
                             }
                         }
@@ -617,11 +620,14 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Job No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var job = surchargeRepo.Get(x => item.Trim() == x.JobNo);
-                            var existingJobNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.JobNo);
-                            if (job.Count() == existingJobNo.Count() && existingJobNo.Count() > 0)
+                            var jobNoInfo = surchargeInfo.Where(x => item.Trim() == x.JobNo);
+                            var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo);
+
+                            var existingJobNo = jobNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            var existingJobNoObh = jobNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            if (jobNoInfo.Count() == existingJobNo.Count() && jobNoObhInfo.Count() == existingJobNoObh.Count() && (existingJobNo.Count() > 0 || existingJobNoObh.Count() > 0))
                             {
-                                existCombineNo = item + " in CB: " + existingJobNo.FirstOrDefault().CombineBillingNo;
+                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingJobNo.Count() > 0 ? existingJobNo.FirstOrDefault().CombineBillingNo : existingJobNoObh.FirstOrDefault().CombineBillingNo);
                                 return existCombineNo;
                             }
                         }
@@ -629,11 +635,14 @@ namespace eFMS.API.Accounting.DL.Services
                     case "HBL No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var hblInfo = surchargeRepo.Get(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)));
-                            var existingHblno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.Hblno);
-                            if (hblInfo.Count() == existingHblno.Count() && existingHblno.Count() > 0)
+                            var hblnoInfo = surchargeInfo.Where(x => item.Trim() == x.Hblno);
+                            var hblnoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.Hblno);
+
+                            var existingHblno = hblnoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            var existingHblnoObh = hblnoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            if (hblnoInfo.Count() == existingHblno.Count() && hblnoObhInfo.Count() == existingHblnoObh.Count() && (existingHblno.Count() > 0 || existingHblnoObh.Count() > 0))
                             {
-                                existCombineNo = item + " in CB: " + existingHblno.FirstOrDefault().CombineBillingNo;
+                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingHblno.Count() > 0 ? existingHblno.FirstOrDefault().CombineBillingNo : existingHblnoObh.FirstOrDefault().CombineBillingNo);
                                 return existCombineNo;
                             }
                         }
@@ -641,11 +650,14 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Custom No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var custom = surchargeRepo.Get(x => item.Trim() == x.ClearanceNo);
-                            var existingCusno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.ClearanceNo);
-                            if (custom.Count() == existingCusno.Count() && existingCusno.Count() > 0)
+                            var cusNoInfo = surchargeInfo.Where(x => item.Trim() == x.ClearanceNo);
+                            var cusNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.ClearanceNo);
+
+                            var existingCusNo = cusNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            var existingCusNoObh = cusNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                            if (cusNoInfo.Count() == existingCusNo.Count() && cusNoObhInfo.Count() == existingCusNoObh.Count() && (existingCusNo.Count() > 0 || existingCusNoObh.Count() > 0))
                             {
-                                existCombineNo = item + " in CB: " + existingCusno.FirstOrDefault().CombineBillingNo;
+                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingCusNo.Count() > 0 ? existingCusNo.FirstOrDefault().CombineBillingNo : existingCusNoObh.FirstOrDefault().CombineBillingNo);
                                 return existCombineNo;
                             }
                         }
