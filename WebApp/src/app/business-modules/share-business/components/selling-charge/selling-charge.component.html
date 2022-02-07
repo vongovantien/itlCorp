@@ -116,6 +116,7 @@
                                         <input type="text" class="dropdown-toggle form-control"
                                             [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
                                             [disabled]="isShowLoadingPartner ? 'disabled': null"
+
                                             (click)="loadDynamicComoGrid(charge,i)">
                                     </ng-template>
                                     <combo-grid-icon (onDelete)="charge.paymentObjectId = null;
@@ -130,6 +131,8 @@
                                         && !charge.debitNo
                                         && !charge.settlementCode
                                         && !charge.voucherId
+                                        && !charge.voucherId
+                                        && !charge.linkChargeId
                                         && !charge.voucherIddate"></combo-grid-icon>
                                     <div class="dropdown-partner__content"
                                         [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
