@@ -29,7 +29,7 @@
                         [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && typeReport.value == typeComReportList[2].id && (!this.customerActive || !this.customerActive.length))}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
-                        </label> {{isSubmitted}}
+                        </label>
                         <label *ngIf="isCommissionIncentive && typeReport.value == typeComReportList[2].id" required></label>
                         <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
