@@ -46,6 +46,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
 
+    currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
     isSearchLinkFeea:boolean = false;
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
@@ -358,5 +359,59 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
     onSelectTab(tabName:any){
         this.isSearchLinkFeea = !this.isSearchLinkFeea;
+    }
+
+    chargeFromRep() {
+        this._spinner.hide();
+        this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
+        this.loadingPopupComponent.show();
+        this._documentRepo.chargeFromReplicate()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Completed</b>";
+                        this.loadingPopupComponent.proccessCompleted();
+                    }
+                },
+            );
+    }
+
+    onSelectOps(shipment) {
+        this.selectedShipment = shipment;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    confirmReplicateJob() {
+        const currentJob = Object.assign({}, this.selectedShipment);
+
+        const confirmMessage = `Are you sure you want to replicate <span class="font-weight-bold">${currentJob?.jobNo}</span>?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Replicate job',
+            body: confirmMessage,
+            iconConfirm: 'la la-copy',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            if (!!currentJob) {
+                this._documentRepo.replicateOps([currentJob.id])
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                                this.requestSearchShipment();
+
+                            } else
+                                this._toastService.error(res.message);
+                        }
+                    )
+            }
+        });
     }
 }

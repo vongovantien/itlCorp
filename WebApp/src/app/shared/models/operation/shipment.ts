@@ -47,6 +47,8 @@ export class Shipment {
     customerName: string = '';
     isLocked: boolean = false;
 
+    replicatedId: string = null;
+    userCreatedName: string = null;
     userCreatedLinkJob: string = null;
 
     replicatedId: string = null;

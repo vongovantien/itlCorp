@@ -671,8 +671,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
-            queryDefault = QuerySearchLinkJob(queryDefault, criteria);
-            data = data.Where(queryDefault);
+            var data = DataContext.Get(queryDefault);
+            var queryPermission = QueryByPermission(criteria.RangeSearch);
+            data = data.Where(queryPermission);
 
             if (data == null) return null;
 

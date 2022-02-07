@@ -64,6 +64,7 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? IsLinkFee { get; set; }
         public string LinkSource { get; set; }
         public Guid? ReplicatedId { get; set; }
+        public bool IsReplicate { get; set; }
         public bool? IsLinkJob { get; set; }
         public string UserCreatedLinkJob { get; set; }
         public DateTime? DateCreatedLinkJob { get; set; }
