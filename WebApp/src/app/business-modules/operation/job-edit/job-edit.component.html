@@ -30,9 +30,10 @@
     </ng-container>
 
 
-    <ng-container *ngIf="(opsTransaction?.isLocked === false && !opsTransaction.replicatedId) || isDuplicate">
+    <ng-container *ngIf="(opsTransaction?.isLocked === false) || isDuplicate">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete && !isDuplicate"
+            (click)="checkDelete()"
+            *ngIf="opsTransaction.permission.allowDelete && !isDuplicate && !opsTransaction.replicatedId"
             title="Shipment was deleted">
             <span>
                 <i class="la la-trash"></i>

@@ -1856,6 +1856,8 @@ namespace eFMS.API.Documentation.DL.Services
                     model.CompanyId = currentUser.CompanyID;
 
                     model.IsLocked = false; // Luôn luôn mở job khi duplicate.
+                    model.ReplicatedId = null;
+                    model.LinkSource = null;
 
                     List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
                     if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)

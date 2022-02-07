@@ -569,7 +569,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public string CheckDocumentNoExisted(ShipmentCombineCriteria criteria)
         {
-            var existCombineNo = new List<string>();
+            var existCombineNo = string.Empty;
             if (!string.IsNullOrEmpty(criteria.DocumentType) && criteria.DocumentNo != null && criteria.DocumentNo.Count > 0)
             {
                 switch (criteria.DocumentType)
@@ -578,17 +578,19 @@ namespace eFMS.API.Accounting.DL.Services
                         var existCDNotes = cdNoteRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Code) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Code).ToList();
                         foreach (var item in existCDNotes)
                         {
-                            var credit = surchargeRepo.Get(x => item.Trim() == x.CreditNo).Select(x => x.Hblid).ToList();
-                            var existingCredit = surchargeRepo.Get(x => ((x.Type != "OBH" && !string.IsNullOrEmpty(x.CombineBillingNo)) || (x.Type == "OBH" && !string.IsNullOrEmpty(x.ObhcombineBillingNo))) && item.Trim() == x.CreditNo).Select(x => x.Hblid).ToList();
-                            if (credit.Count == existingCredit.Count && existingCredit.Count > 0)
+                            var credit = surchargeRepo.Get(x => item.Trim() == x.CreditNo).Select(x => x.Hblid);
+                            var existingCredit = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
+                            if (credit.Count() == existingCredit.Count() && existingCredit.Count() > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + (existingCredit.FirstOrDefault().Type != "OBH" ? existingCredit.FirstOrDefault().CombineBillingNo : existingCredit.FirstOrDefault().ObhcombineBillingNo);
+                                return existCombineNo;
                             }
                             var debit = surchargeRepo.Get(x => item.Trim() == x.DebitNo).Select(x => x.Hblid).ToList();
-                            var existingDebit = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).Select(x => x.Hblid).ToList();
+                            var existingDebit = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).ToList();
                             if (debit.Count == existingDebit.Count && existingDebit.Count > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + existingDebit[0].CombineBillingNo;
+                                return existCombineNo;
                             }
                         }
                         break;
@@ -596,59 +598,61 @@ namespace eFMS.API.Accounting.DL.Services
                         var existSoa = soaRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Soano) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Soano).ToList();
                         foreach (var item in existSoa)
                         {
-                            var soa = surchargeRepo.Get(x => item.Trim() == x.Soano).Select(x => x.Hblid).ToList();
-                            var existingSoa = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano).Select(x => x.Hblid).ToList();
-                            if (soa.Count == existingSoa.Count && existingSoa.Count > 0)
+                            var soa = surchargeRepo.Get(x => item.Trim() == x.Soano);
+                            var existingSoa = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
+                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + existingSoa.FirstOrDefault().CombineBillingNo;
+                                return existCombineNo;
                             }
-                            soa = surchargeRepo.Get(x => item.Trim() == x.PaySoano).Select(x => x.Hblid).ToList();
-                            existingSoa = surchargeRepo.Get(x => ((x.Type != "OBH" && !string.IsNullOrEmpty(x.CombineBillingNo)) || (x.Type == "OBH" && !string.IsNullOrEmpty(x.ObhcombineBillingNo))) && item.Trim() == x.PaySoano).Select(x => x.Hblid).ToList();
-                            if (soa.Count == existingSoa.Count && existingSoa.Count > 0)
+                            soa = surchargeRepo.Get(x => item.Trim() == x.PaySoano);
+                            existingSoa = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
+                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + (existingSoa.FirstOrDefault().Type != "OBH" ? existingSoa.FirstOrDefault().CombineBillingNo : existingSoa.FirstOrDefault().ObhcombineBillingNo);
+                                return existCombineNo;
                             }
                         }
                         break;
                     case "Job No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var job = surchargeRepo.Get(x => item.Trim() == x.JobNo).Select(x => x.Hblid).ToList();
-                            var existingJobNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.JobNo).Select(x => x.Hblid).ToList();
-                            if (job.Count == existingJobNo.Count && existingJobNo.Count > 0)
+                            var job = surchargeRepo.Get(x => item.Trim() == x.JobNo);
+                            var existingJobNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.JobNo);
+                            if (job.Count() == existingJobNo.Count() && existingJobNo.Count() > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + existingJobNo.FirstOrDefault().CombineBillingNo;
+                                return existCombineNo;
                             }
                         }
                         break;
                     case "HBL No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var existingHblno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.Hblno).Select(x => x.Hblno).Distinct().ToList();
-                            if (existingHblno.Count > 0)
+                            var hblInfo = surchargeRepo.Get(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)));
+                            var existingHblno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.Hblno);
+                            if (hblInfo.Count() == existingHblno.Count() && existingHblno.Count() > 0)
                             {
-                                existCombineNo.AddRange(existingHblno);
+                                existCombineNo = item + " in CB: " + existingHblno.FirstOrDefault().CombineBillingNo;
+                                return existCombineNo;
                             }
                         }
                         break;
                     case "Custom No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var custom = surchargeRepo.Get(x => item.Trim() == x.ClearanceNo).Select(x => x.Hblid).ToList();
-                            var existingCusno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.ClearanceNo).Select(x => x.Hblid).ToList();
-                            if (custom.Count == existingCusno.Count && existingCusno.Count > 0)
+                            var custom = surchargeRepo.Get(x => item.Trim() == x.ClearanceNo);
+                            var existingCusno = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.ClearanceNo);
+                            if (custom.Count() == existingCusno.Count() && existingCusno.Count() > 0)
                             {
-                                existCombineNo.Add(item);
+                                existCombineNo = item + " in CB: " + existingCusno.FirstOrDefault().CombineBillingNo;
+                                return existCombineNo;
                             }
                         }
                         break;
                 }
             }
-            if (existCombineNo.Count > 0)
-            {
-                return string.Join(';', existCombineNo.Distinct());
-            }
-            return string.Empty;
+            return existCombineNo;
         }
 
         /// <summary>
@@ -1604,7 +1608,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.SOANo = soaData.Soano;
                     item.FinalExchangeRate = soaData.ExcRateUsdToLocal;
                     item.CombineBillingType = "SOA";
-                    item.BillingType = !string.IsNullOrEmpty(item.PaySoaNo) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
+                    item.BillingType = soaData.Type.ToLower().Contains(AccountingConstants.ACCOUNTANT_TYPE_CREDIT.ToLower()) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
                 }
                 else
                 {
@@ -1612,7 +1616,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.CDNote = cdNote.Code;
                     item.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
                     item.CombineBillingType = "CDNOTE";
-                    item.BillingType = !string.IsNullOrEmpty(item.CreditNo) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
+                    item.BillingType = cdNote.Type.ToLower().Contains(AccountingConstants.ACCOUNTANT_TYPE_CREDIT.ToLower()) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
                 }
                 if (item.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                 {
