@@ -163,9 +163,17 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             this._toastService.warning("An existing cd note has been issued, please check it");
             return;
         }
-        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
-        if (!!cdNotes.length) {
-            this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.INVOICE);
+        const codes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
+        if (!!codes.length) {
+            const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
+                cdNotes: codes.filter(x=>x.billingType == "CdNote").map(x => x.referenceNo),
+                soaNos: codes.filter(x=>x.billingType == "Soa").map(x => x.referenceNo),
+                jobNos: null,
+                hbls: null,
+                mbls: null,
+                settlementCodes: null
+            };
+            this.searchRef(body, AccountingConstants.ISSUE_TYPE.INVOICE);
         }
     }
 
@@ -175,22 +183,22 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             this._toastService.warning("An existing cd note has been issued, please check it");
             return;
         }
-        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
-        if (!!cdNotes.length) {
-            this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.VOUCHER);
+        const codes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
+        if (!!codes.length) {
+            const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
+                cdNotes: codes.filter(x=>x.billingType == "CdNote").map(x => x.referenceNo),
+                soaNos: codes.filter(x=>x.billingType == "Soa").map(x => x.referenceNo),
+                jobNos: null,
+                hbls: null,
+                mbls: null,
+                settlementCodes: null
+            };
+            this.searchRef(body, AccountingConstants.ISSUE_TYPE.VOUCHER);
         }
     }
 
-    searchRef(cdNotes: string[], type: string) {
+    searchRef(body: AccountingInterface.IPartnerOfAccountingManagementRef, type: string) {
         this.selectedIssueType = type;
-        const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
-            cdNotes: cdNotes,
-            soaNos: null,
-            jobNos: null,
-            hbls: null,
-            mbls: null,
-            settlementCodes: null
-        };
         if (type === AccountingConstants.ISSUE_TYPE.INVOICE) {
             this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
                 .subscribe(

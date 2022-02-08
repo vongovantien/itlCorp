@@ -3452,8 +3452,9 @@ namespace eFMS.API.Documentation.DL.Services
             var currencyCombine = criteria.FirstOrDefault()?.CurrencyCombine;
 
             IQueryable<CsShipmentSurcharge> surcharges = null;
-            var surchargesCDNote = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)) && (x.PayerId == cdNotePartnerId || x.PaymentObjectId == cdNotePartnerId) && billingCodes.Any(a => a == x.CreditNo || a == x.DebitNo)).AsQueryable(); // lấy surcharge issued cdnote
-            var surchargesSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) && (x.PayerId == cdNotePartnerId || x.PaymentObjectId == cdNotePartnerId) && billingCodes.Any(a => a == x.Soano || a == x.PaySoano)).AsQueryable(); // lấy surcharge chỉ issued soa
+            var surchargesCDNote = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)) && (x.PayerId == cdNotePartnerId || x.PaymentObjectId == cdNotePartnerId || string.IsNullOrEmpty(cdNotePartnerId)) && billingCodes.Any(a => a == x.CreditNo || a == x.DebitNo)).AsQueryable(); // lấy surcharge issued cdnote
+            var surchargesSoa = surchargeRepository.Get(x => string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo) && ((x.PayerId == cdNotePartnerId) || (x.PaymentObjectId == cdNotePartnerId) || string.IsNullOrEmpty(cdNotePartnerId)) && billingCodes.Any(a => (a == x.Soano) || (a == x.PaySoano))).AsQueryable(); // lấy surcharge chỉ issued soa
+
             surcharges = surchargesCDNote;
             if (surchargesCDNote == null || surchargesCDNote.Count() == 0)
             {
