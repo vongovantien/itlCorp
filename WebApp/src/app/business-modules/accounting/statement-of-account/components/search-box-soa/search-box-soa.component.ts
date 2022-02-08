@@ -159,4 +159,13 @@ export class StatementOfAccountSearchComponent extends AppForm {
         // ? search again!
         this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
     }
+
+    resetDate(){
+        this.selectedRange = null;
+    }
+
+    resetPersonalHandle(){
+        this.currentUser = null;
+    }
+
 }
