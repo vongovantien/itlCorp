@@ -17,7 +17,7 @@ namespace eFMS.API.ReportData.Helpers
         {
             var buffer = stream as MemoryStream;
             var dateCurr = DateTime.Now.ToString("ddMMyy");
-            if (string.IsNullOrEmpty(refNo))
+            if (!string.IsNullOrEmpty(refNo))
             {
 
                 return File(
