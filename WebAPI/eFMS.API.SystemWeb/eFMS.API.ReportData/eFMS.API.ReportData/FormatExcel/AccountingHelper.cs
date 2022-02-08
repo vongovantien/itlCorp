@@ -2113,6 +2113,9 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 1].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
                     workSheet.Cells[i + addressStartContent, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                    // Ngăn tràn chữ qua cell kế bên
+                    workSheet.Cells[i + addressStartContent, 2].Style.WrapText = true;
+                    workSheet.Row(i + addressStartContent).Height = 15;
 
                     workSheet.Cells[i + addressStartContent, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 2].Style.Fill.BackgroundColor.SetColor(colFromHex);
@@ -5740,6 +5743,9 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                     workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
                     workSheet.Cells[i + addressStartContent, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                    // Ngăn tràn chữ qua cell kế bên
+                    workSheet.Cells[i + addressStartContent, 2].Style.WrapText = true;
+                    workSheet.Row(i + addressStartContent).Height = 15;
 
                     workSheet.Cells[i + addressStartContent, 4].Value = string.Empty;
 
