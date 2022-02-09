@@ -46,10 +46,6 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                if (!CheckCharge(model.ChargeBuying, model.ChargeSelling))
-                {
-                    return new HandleState(412, "Charge Buying or Selling not match Type");
-                }
                 var rule = mapper.Map<CsRuleLinkFee>(model);
                 rule.Id = Guid.NewGuid();
                 rule.UserCreated = currentUser.UserID;
