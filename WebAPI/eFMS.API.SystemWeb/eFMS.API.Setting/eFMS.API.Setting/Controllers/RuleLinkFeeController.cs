@@ -223,7 +223,7 @@ namespace eFMS.API.Setting.Controllers
                     ServiceSelling = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                     ChargeSelling = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                     PartnerSelling = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                    Status = "Active",
+                    Status = worksheet.Cells[row, 8].Value?.ToString().Trim(),
                 };
                 list.Add(rulelinkfee);
             }
