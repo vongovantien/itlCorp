@@ -54,7 +54,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     exchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'taxCode', label: 'Tax Code' },
+        { field: 'accountNo', label: 'Tax Code' },
         { field: 'shortName', label: 'Name ABBR' }
     ];
 
@@ -65,7 +65,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameVn', label: 'Partner Name' },
-        { field: 'taxCode', label: 'Tax Code' }
+        { field: 'accountNo', label: 'Tax Code' }
     ];
 
     customers: Observable<Customer[]>;
@@ -186,7 +186,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
-            customer: (this.isCommissionIncentive && (!this.typeReport || this.typeReport.value == this.typeComReportList[2].id)) ? [null, Validators.required] : [],// require customer cho report incentive
+            customer: (this.isCommissionIncentive && (!!this.typeReport && this.typeReport.value == this.typeComReportList[2].id)) ? [null, Validators.required] : [],// require customer cho report incentive
             carrier: [],
             agent: [],
             service: [this.serviceActive],
