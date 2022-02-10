@@ -93,6 +93,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                     }
                 );
         }
+        event.target.value ='';
     }
 
     checkAllChange() {
