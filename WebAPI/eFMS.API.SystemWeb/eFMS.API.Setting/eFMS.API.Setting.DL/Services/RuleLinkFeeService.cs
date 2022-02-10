@@ -414,7 +414,7 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     item.IsValid = false;
                 }
-                if (!CheckCharge(item.ChargeBuying, item.ChargeSelling) || ConvertService(item.ServiceBuying) is null ||ConvertService(item.ServiceSelling) is null)
+                if (!CheckCharge(item.ChargeBuying, item.ChargeSelling, ConvertService(item.ServiceBuying), ConvertService(item.ServiceSelling)) || ConvertService(item.ServiceBuying) is null ||ConvertService(item.ServiceSelling) is null)
                 {
                     item.IsValid = false;
                 }
@@ -452,11 +452,11 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
-        private bool CheckCharge(string chargeBuying, string chargeSelling)
+        private bool CheckCharge(string chargeBuying, string chargeSelling, string serviceBuying, string serviceSelling)
         {
             var charge = catChargeRepo.Get();
-            var buying = charge.Where(x => x.Code.Contains(chargeBuying) && x.Type == "CREDIT").FirstOrDefault();
-            var selling = charge.Where(x => x.Code.Contains(chargeSelling) && x.Type == "DEBIT").FirstOrDefault();
+            var buying = charge.Where(x => x.Code.Contains(chargeBuying) && x.Type == "CREDIT" && x.ServiceTypeId.Contains(serviceBuying)).FirstOrDefault();
+            var selling = charge.Where(x => x.Code.Contains(chargeSelling) && x.Type == "DEBIT" && x.ServiceTypeId.Contains(serviceSelling)).FirstOrDefault();
             if (buying!=null&&selling!=null)
             {
                 return true;
@@ -472,7 +472,7 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
-                    if (!CheckCharge(item.ChargeBuying,item.ChargeSelling))
+                    if (!CheckCharge(item.ChargeBuying,item.ChargeSelling, ConvertService(item.ServiceBuying), ConvertService(item.ServiceSelling)))
                     {
                         return new HandleState(false, "Charge Buying or Selling not match Type");
                     }
