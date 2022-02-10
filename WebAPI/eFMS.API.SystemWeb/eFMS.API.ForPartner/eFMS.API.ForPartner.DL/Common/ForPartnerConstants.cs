@@ -166,6 +166,7 @@
         public static readonly string PAYABLE_TRANSACTION_TYPE_COMBINE = "COMBINE";
 
         public static readonly string PAYABLE_PAYMENT_TYPE_CREDIT = "CREDIT";
+        public static readonly string PAYABLE_PAYMENT_TYPE_OBH = "OBH";
         public static readonly string PAYABLE_PAYMENT_TYPE_NETOFF = "NETOFF";
         public static readonly string PAYABLE_PAYMENT_TYPE_ADV = "ADV";
         #endregion
