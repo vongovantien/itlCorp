@@ -114,7 +114,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var yy = DateTime.Now.ToString("yy");
             var mm = DateTime.Now.ToString("MM");
-            var billingNos = DataContext.Get(x=>x.CombineBillingNo.Contains("CB")).Select(x => x.CombineBillingNo);
+            var billingNos = DataContext.Get(x => x.CombineBillingNo.Contains("CB")).Select(x => x.CombineBillingNo);
             var numOfOrder = new List<int>();
             var num = string.Empty;
             if(billingNos != null && billingNos.Count() > 0)
@@ -245,19 +245,19 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var surcharges = surchargeRepo.Get(x => model.Shipments.Any(s => s.Hblid == x.Hblid && s.JobNo == x.JobNo));
 
-                var billingNos = string.Empty;
-                var hblIds = string.Empty;
+                var shipments = string.Empty;
+                var refNos = string.Empty;
                 if (surcharges != null)
                 {
-                    billingNos = string.Join(';', model.Shipments.Select(x => x.Refno).ToList());
-                    hblIds = string.Join(';', surcharges.Select(x => x.Hblid).Distinct().ToList());
+                    shipments = string.Join('+', model.Shipments.Select(x => x.Refno + ';' + x.Hblid).ToList());
+                    refNos = string.Join(';', model.Shipments.Select(x => x.Refno).Distinct().ToList());
                 }
 
                 var dataAdd = mapper.Map<AcctCombineBilling>(model);
                 var hs = DataContext.Add(dataAdd);
-                if (hs.Success && !string.IsNullOrEmpty(hblIds))
+                if (hs.Success && !string.IsNullOrEmpty(refNos))
                 {
-                    var req = UpdateCombineNoForShipment(billingNos, hblIds, model.CombineBillingNo);
+                    var req = UpdateCombineNoForShipment(refNos, shipments, model.CombineBillingNo);
                 }
                 return hs;
             }
@@ -294,18 +294,18 @@ namespace eFMS.API.Accounting.DL.Services
                 combine.TotalAmountUsd = model.Shipments.Sum(x => x.AmountUsd ?? 0);
                 var surcharges = surchargeRepo.Get(x => model.Shipments.Any(s => s.Hblid == x.Hblid && (s.Refno == x.Soano || s.Refno == x.PaySoano || s.Refno == x.DebitNo || s.Refno == x.CreditNo)));
 
-                var billingNos = string.Empty;
-                var hblIds = string.Empty;
+                var shipments = string.Empty;
+                var refNos = string.Empty;
                 if (surcharges != null)
                 {
-                    billingNos = string.Join(';', model.Shipments.Select(x => x.Refno).ToList());
-                    hblIds = string.Join(';', surcharges.Select(x => x.Hblid).Distinct().ToList());
+                    shipments = string.Join('+', model.Shipments.Select(x => x.Refno + ';' + x.Hblid).ToList());
+                    refNos = string.Join(';', model.Shipments.Select(x => x.Refno).ToList());
                 }
 
                 var hs = DataContext.Update(combine, x => x.Id == combine.Id);
-                if (hs.Success && !string.IsNullOrEmpty(hblIds))
+                if (hs.Success && !string.IsNullOrEmpty(refNos))
                 {
-                    var req = UpdateCombineNoForShipment(billingNos, hblIds, model.CombineBillingNo);
+                    var req = UpdateCombineNoForShipment(refNos, shipments, model.CombineBillingNo);
                 }
                 return hs;
             }
@@ -354,18 +354,20 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             // Remove from soa
-                            var acctSoa = soaRepo.Get(x => x.CombineBillingNo == combineData.CombineBillingNo).ToList();
+                            var acctSoa = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(combineData.CombineBillingNo)).ToList();
                             foreach(var item in acctSoa)
                             {
-                                item.CombineBillingNo = null;
+                                item.CombineBillingNo = item.CombineBillingNo.Replace(combineData.CombineBillingNo, "");
+                                item.CombineBillingNo = string.IsNullOrEmpty(item.CombineBillingNo) ? null : string.Join(";", item.CombineBillingNo.Split(';').Where(x => !string.IsNullOrEmpty(x)));
                                 var hsUpdateSoa = soaRepo.Update(item, x => x.Id == item.Id, false);
                             }
 
                             // Remove from cdNote
-                            var cdNote = cdNoteRepo.Get(x => x.CombineBillingNo == combineData.CombineBillingNo).ToList();
+                            var cdNote = cdNoteRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(combineData.CombineBillingNo)).ToList();
                             foreach (var item in cdNote)
                             {
-                                item.CombineBillingNo = null;
+                                item.CombineBillingNo = item.CombineBillingNo.Replace(combineData.CombineBillingNo, "");
+                                item.CombineBillingNo = string.IsNullOrEmpty(item.CombineBillingNo) ? null : string.Join(";", item.CombineBillingNo.Split(';').Where(x => !string.IsNullOrEmpty(x)));
                                 var hsUpdateCdNote = cdNoteRepo.Update(item, x => x.Id == item.Id, false);
                             }
                             DataContext.SubmitChanges();
@@ -1135,21 +1137,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var it in item.Charges)
                 {
+                    it.VATAmount = it.VATAmountLocal;
                     it.NetAmount = it.AmountVND;
-                    //if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
-                    //    it.NetAmount = it.AmountVND;
-                    //else {
-                    //    //it.NetAmount = Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
-                    //    it.NetAmount = it.AmountUSD;
-                    //}
                     if (it.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                     {
-                        it.VATAmount = it.VATAmountLocal * (-1);
-                        it.NetAmount = it.NetAmount * (-1);
-                    }
-                    else
-                    {
-                        it.VATAmount = it.VATAmountLocal ;
+                        it.VATAmount *= (-1);
+                        it.NetAmount *= (-1);
                     }
                 }
             }
@@ -1244,8 +1237,8 @@ namespace eFMS.API.Accounting.DL.Services
                     _isSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE") || sur.SyncedFrom.Equals("VOUCHER") || sur.SyncedFrom.Equals("SETTLEMENT"));
                 }
 
-                var soa = soaRepo.Get(x => x.CombineBillingNo == combineBillingNo && (x.Soano == sur.Soano || x.Soano == sur.PaySoano)).FirstOrDefault();
-                var cdNote = cdNoteRepo.Get(x => x.CombineBillingNo == combineBillingNo && (x.Code == sur.CreditNo || x.Code == sur.DebitNo)).FirstOrDefault();
+                var soa = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(combineBillingNo) && (x.Soano == sur.Soano || x.Soano == sur.PaySoano)).FirstOrDefault();
+                var cdNote = cdNoteRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(combineBillingNo) && (x.Code == sur.CreditNo || x.Code == sur.DebitNo)).FirstOrDefault();
                 var exRate = soa != null ? soa.ExcRateUsdToLocal : cdNote.ExcRateUsdToLocal;
 
                 var chg = new ChargeCombineResult()
@@ -1634,7 +1627,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in dataCharges)
             {
                 item.CustomNo = item.Service == "CL" ? clearanceDatas.Where(x => x.JobNo == item.JobId).OrderBy(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo : null;
-                var soaData = soaRepo.Get(x => x.CombineBillingNo == item.CombineNo && (x.Soano == item.SOANo || x.Soano == item.PaySoaNo)).FirstOrDefault();
+                var soaData = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(item.CombineNo) && (x.Soano == item.SOANo || x.Soano == item.PaySoaNo)).FirstOrDefault();
                 if (soaData != null)
                 {
                     item.SOANo = soaData.Soano;
@@ -1644,7 +1637,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    var cdNote = cdNoteRepo.Get(x => x.CombineBillingNo == item.CombineNo && (x.Code == item.CreditNo || x.Code == item.DebitNo)).FirstOrDefault();
+                    var cdNote = cdNoteRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(item.CombineNo) && (x.Code == item.CreditNo || x.Code == item.DebitNo)).FirstOrDefault();
                     item.CDNote = cdNote.Code;
                     item.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
                     item.CombineBillingType = "CDNOTE";
