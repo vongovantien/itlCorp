@@ -2109,7 +2109,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
 
                             var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null);
-                            if (charges != null)
+                            if (charges != null && charges.Count() > 0)
                             {
                                 logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
                                 new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTCHARGE", logMessage);
