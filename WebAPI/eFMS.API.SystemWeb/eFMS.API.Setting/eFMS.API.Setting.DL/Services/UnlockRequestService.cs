@@ -116,13 +116,13 @@ namespace eFMS.API.Setting.DL.Services
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.JobIds != null && criteria.JobIds.Count > 0)
             {
-                var dataOps = opsTransactionRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo)).Select(s => new SetUnlockRequestJobModel()
+                var dataOps = opsTransactionRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo,
                     Job = s.JobNo,
                     UnlockType = _unlockType
                 });
-                var dataDoc = transRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo)).Select(s => new SetUnlockRequestJobModel()
+                var dataDoc = transRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo,
                     Job = s.JobNo,
@@ -134,13 +134,13 @@ namespace eFMS.API.Setting.DL.Services
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                var dataOps = opsTransactionRepo.Get(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mblno)).Select(s => new SetUnlockRequestJobModel()
+                var dataOps = opsTransactionRepo.Get(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mblno) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo + " - " + s.Mblno,
                     Job = s.JobNo,
                     UnlockType = _unlockType
                 });
-                var dataDoc = transRepo.Get(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mawb)).Select(s => new SetUnlockRequestJobModel()
+                var dataDoc = transRepo.Get(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mawb) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo + " - " + s.Mawb,
                     Job = s.JobNo,
@@ -152,7 +152,7 @@ namespace eFMS.API.Setting.DL.Services
 
             if (criteria.CustomNos != null && criteria.CustomNos.Count > 0)
             {
-                var dataOps = customsRepo.Get(x => criteria.CustomNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.ClearanceNo)).Select(s => new CustomsDeclaration() { ClearanceNo = s.ClearanceNo, JobNo = s.JobNo }).ToList();
+                var dataOps = customsRepo.Get(x => criteria.CustomNos.Where(w => !string.IsNullOrEmpty(w)).Contains(x.ClearanceNo) && x.OfficeId == currentUser.OfficeID).Select(s => new CustomsDeclaration() { ClearanceNo = s.ClearanceNo, JobNo = s.JobNo }).ToList();
 
                 var dataOpsGroup = dataOps.GroupBy(g => new { JobNo = g.JobNo }).Where(w => !string.IsNullOrEmpty(w.Key.JobNo)).Select(s => new SetUnlockRequestJobModel()
                 {
@@ -787,3 +787,4 @@ namespace eFMS.API.Setting.DL.Services
         #endregion -- Generate ID --
     }
 }
+GetJobToUnlockRequest
