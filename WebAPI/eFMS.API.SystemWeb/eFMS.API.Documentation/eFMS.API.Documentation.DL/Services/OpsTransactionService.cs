@@ -2108,7 +2108,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId == null);
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null);
                             if (charges != null)
                             {
                                 logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
@@ -2142,6 +2142,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.Hblid = job.Hblid;
                                     surcharge.Hblno = job.Hwbno;
                                     surcharge.Mblno = job.Mblno;
+                                    surcharge.OfficeId = job.OfficeId; 
 
                                     surcharge.Soano = null;
                                     surcharge.PaySoano = null;
