@@ -2129,8 +2129,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId == null);
-                            if (charges != null)
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null);
+                            if (charges != null && charges.Count() > 0)
                             {
                                 logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
                                 new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTCHARGE", logMessage);
@@ -2163,6 +2163,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.Hblid = job.Hblid;
                                     surcharge.Hblno = job.Hwbno;
                                     surcharge.Mblno = job.Mblno;
+                                    surcharge.OfficeId = job.OfficeId; 
 
                                     surcharge.Soano = null;
                                     surcharge.PaySoano = null;
@@ -2175,6 +2176,9 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.VoucherIdredate = null;
                                     surcharge.AcctManagementId = null;
                                     surcharge.PayerAcctManagementId = null;
+                                    surcharge.IsFromShipment = true;
+                                    surcharge.SyncedFrom = null;
+                                    surcharge.PaySyncedFrom = null;
 
                                     surcharge.UserCreated = currentUser.UserID;
                                     surcharge.DatetimeCreated = DateTime.Now;
@@ -2189,6 +2193,17 @@ namespace eFMS.API.Documentation.DL.Services
                             var result = surchargeRepository.SubmitChanges();
                             if (result.Success)
                                 trans.Commit();
+
+                            foreach (var sur in surchargeAdds)
+                            {
+                                var charge = surchargeRepository.Get(x => x.Id == Guid.Parse(sur.LinkChargeId)).FirstOrDefault();
+                                if (charge != null)
+                                {
+                                    charge.LinkChargeId = sur.Id.ToString();
+                                    var resultUpdate = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
+                                }
+                            }
+                            surchargeRepository.SubmitChanges();
                         }
                         else
                         {
