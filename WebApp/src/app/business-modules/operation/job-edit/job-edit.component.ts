@@ -360,6 +360,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
+        this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
             .subscribe(

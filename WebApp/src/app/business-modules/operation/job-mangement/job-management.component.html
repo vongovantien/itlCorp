@@ -229,6 +229,12 @@
     <div class="menu-context__item" (click)="confirmReplicateJob()">
         <span><i class="la la-copy"></i><span> Replicate job</span></span>
     </div>
+    <div class="menu-context__item" (click)="printPLSheet('VND')">
+        <span><i class="la la-print"></i><span> P/L Sheet (VND)</span></span>
+    </div>
+    <div class="menu-context__item" (click)="printPLSheet('USD')">
+        <span><i class="la la-print"></i><span> P/L Sheet (USD)</span></span>
+    </div>
 </app-context-menu>
 
 <ng-template inject></ng-template>
