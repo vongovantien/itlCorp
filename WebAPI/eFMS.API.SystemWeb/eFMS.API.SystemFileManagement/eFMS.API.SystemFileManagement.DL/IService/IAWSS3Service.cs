@@ -19,5 +19,6 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null);
         Task<HandleState> OpenFile(string moduleName, string folder, Guid objId, string fileName);
         Task<HandleState> CreateFileZip(FileDowloadZipModel model);
+        Task<byte[]> DownloadFileAsync(string moduleName, string folder, Guid objId, string fileName);
     }
 }
