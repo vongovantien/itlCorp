@@ -69,5 +69,13 @@ namespace eFMS.API.Setting.Service.Models
         public string PaySyncedFrom { get; set; }
         public decimal? NetAmount { get; set; }
         public string VatPartnerId { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
+        public string AdvanceNoFor { get; set; }
+        public bool? LinkFee { get; set; }
+        public DateTime? ModifiedDateLinkFee { get; set; }
+        public Guid? UserIdLinkFee { get; set; }
+        public string UserNameLinkFee { get; set; }
+        public string LinkChargeId { get; set; }
     }
 }
