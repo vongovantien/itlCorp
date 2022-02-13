@@ -32,7 +32,7 @@
                         </label>
                         <input type="text" class="form-control m-input m-input--square" formControlName="partnerNameEn"
                             autofocus placeholder="Please enter English Name" name="partnerNameEn" autocomplete="nope"
-                            minlength="3" maxlength="100"
+                            minlength="3" maxlength="100" [attr.disabled]="this.active.value === true ? 'disabled' : null"
                             [ngClass]="{ 'm-input--square': isSubmitted && partnerNameEn.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerNameEn.invalid">
                             English Name is required
@@ -49,6 +49,7 @@
                         </label>
                         <input type="text" class="form-control m-input m-input--square" formControlName="shortName"
                             placeholder="Please enter Abbr Name" name="shortName" autocomplete="nope"
+                            [attr.disabled]="this.active.value === true ? 'disabled' : null"
                             [ngClass]="{ 'm-input--square': isSubmitted && shortName.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && shortName.invalid">
                             Partner Name Abbreviation is required
@@ -64,7 +65,7 @@
                         <input type="text" class="form-control m-input m-input--square" formControlName="partnerNameVn"
                             placeholder="Please enter Local Name" name="partnerNameVn" autocomplete="nope" minlength="3"
                             maxlength="100" [ngClass]="{ 'm-input--square': isSubmitted && partnerNameVn.invalid }"
-                            required>
+                            required [attr.disabled]="this.active.value === true ? 'disabled' : null">
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerNameVn.invalid">
                             Partner Name Local Full is required
                         </div>
@@ -77,7 +78,8 @@
                         [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                         <label required class="form-control-label"> Partner Location </label>
                         <ng-select [items]="partnerLocations" name="partnerLocation" formControlName="partnerLocation"
-                            class="custom" placeholder="Select partner location">
+                            class="custom" placeholder="Select partner location" 
+                            [readonly]="this.active.value === true ? true : false">
                         </ng-select>
                     </div>
                 </div>
@@ -129,7 +131,8 @@
                     <div class="form-group">
                         <label class="form-control-label"> Partner Mode </label>
                         <ng-select (change)="selectedPartnerMode($event)" [items]="partnerModes" name="partnerMode"
-                            class="custom" formControlName="partnerMode" placeholder="Select partner mode">
+                            class="custom" formControlName="partnerMode" placeholder="Select partner mode"
+                            [readonly]="this.active.value === true ? true : false">
                         </ng-select>
                     </div>
                 </div>
@@ -150,7 +153,7 @@
                             [selectedDisplayFields]="['shortName']" [dataSources]="parentCustomers"
                             [displayFields]="displayFieldCustomer"
                             (remove)="resetFormControl(partnerAccountRef);onRemove()" placeholder="Select A/C Ref"
-                            [disabled]="isAddBranchSub">
+                            [disabled]="isAddBranchSub" [disabled]="this.active.value === true ? true : false">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -163,6 +166,7 @@
                             Category <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [multiple]="true" [items]="partnerGroups" placeholder="Select partner group"
+                            [readonly]="this.active.value === true ? true : false"
                             bindLabel="text" class="custom" formControlName="partnerGroup"
                             (change)="onChange($event, 'category')" (remove)="removed($event, 'category')">
                         </ng-select>
@@ -176,7 +180,7 @@
                         <label class="form-control-label" for="">
                             Airline Code/Co-Loader Code
                         </label>
-                        <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" />
+                        <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" [attr.disabled]="this.active.value === true ? 'disabled' : null" />
                     </div>
                     <div classs="form-group" *ngIf="isUpdate">
                         <div class="text-left text-underline m--margin-top-10">
@@ -192,6 +196,7 @@
                                 <label class="form-control-label"> Credit Payment </label>
                                 <ng-select [items]="creditPayments" name="creditPayment" formControlName="creditPayment"
                                     class="custom"
+                                    [readonly]="this.active.value === true ? true : false"
                                     [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
                                     placeholder="Select credit payment">
                                 </ng-select>
