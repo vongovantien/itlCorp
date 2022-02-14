@@ -138,7 +138,8 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
           return of(false);
         }
         if (!!res) {
-          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) => res.shipments.map((sh) => sh.refno).indexOf(item.refno) === -1);
+          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) => 
+            res.shipments.map((s: any) => s.hblid).indexOf(item.hblid) === -1);
           this.combineBillingListDetail.shipments = [...this.combineBillingListDetail.shipments, ...res.shipments];
           this.combineBillingListDetail.originShipments = this.combineBillingListDetail.shipments;
           this.combineBillingListDetail.calculateSumTotal();
