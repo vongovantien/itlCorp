@@ -23,7 +23,6 @@
                                     </span>
                                 </span>
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -52,8 +51,17 @@
                                             </label>
                                         </div>
                                     </td>
-                                    <td> <a [href]="file.url" target="_blank" [title]="file.name"
-                                            download>{{file.name}}</a></td>
+                                    <td> 
+                                        <a [href]="file.url" target="_blank" [title]="file.name"
+                                            download>{{file.name}}</a>
+                                    </td>
+                                    <td>
+                                        <span class="pointer text-center">
+                                            <a title="Delete" (click)="deleteFile(file)">
+                                                <i class="la la-times fa-lg text-danger"></i>
+                                            </a>
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr app-table-row-loading *ngIf="isLoading"></tr>
                                 <tr app-table-none-record *ngIf="!files.length && !isLoading"></tr>
@@ -93,3 +101,5 @@
 
     </div>
 </div>
+
+<confirm-popup #confirmDelete body="Are you sure to delete this file ?" labelConfirm="Yes" labelCancel="No" (onSubmit)="onDeleteFile()"></confirm-popup>
