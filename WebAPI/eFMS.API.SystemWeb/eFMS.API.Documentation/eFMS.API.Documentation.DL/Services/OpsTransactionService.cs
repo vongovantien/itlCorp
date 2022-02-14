@@ -561,44 +561,42 @@ namespace eFMS.API.Documentation.DL.Services
         public Expression<Func<OpsTransaction, bool>> QueryByPermission(PermissionRange range)
         {
             //IQueryable<OpsTransaction> data = null;
-            Expression<Func<OpsTransaction, bool>> query = q => true;
+            Expression<Func<OpsTransaction, bool>> query = q => (q.CurrentStatus != TermData.Canceled || q.CurrentStatus == null);
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             switch (range)
             {
                 case PermissionRange.All:
-                    query = query.And(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
+                    // query = query.And(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
-                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
-                                                 || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)
-                                                 || x.UserCreated == currentUser.UserID));
+                    query = query.And(x => ((x.BillingOpsId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
+                                                    || x.SalemanId == currentUser.UserID
+                                                    || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                    || authorizeUserIds.Contains(x.SalemanId)
+                                                    || (x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID) 
+                                            ));
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    query = query.And(x => ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || (dataUserLevel.Contains(x.SalemanId))));
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
-                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    query = query.And(x => ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
-                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    query = query.And(x => ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
-                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID
+                    query = query.And(x => (x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || x.UserCreated == currentUser.UserID));
