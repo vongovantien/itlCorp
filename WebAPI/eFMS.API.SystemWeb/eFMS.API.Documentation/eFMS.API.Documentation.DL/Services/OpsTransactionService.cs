@@ -175,7 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
 
-                    if (model.IsReplicate)
+                    if (model.IsReplicate == true)
                     {
                         SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
                         if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
@@ -564,8 +564,8 @@ namespace eFMS.API.Documentation.DL.Services
                         || !string.IsNullOrEmpty(x.VoucherId)
                         || !string.IsNullOrEmpty(x.PaySoano)
                         || !string.IsNullOrEmpty(x.SettlementCode)
-                        || !string.IsNullOrEmpty(x.SyncedFrom))
-                        || !string.IsNullOrEmpty(x.LinkChargeId)
+                        || !string.IsNullOrEmpty(x.SyncedFrom)
+                        || !string.IsNullOrEmpty(x.LinkChargeId))
                         );
             if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
             {
@@ -1920,7 +1920,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
-                    if (model.IsReplicate)
+                    if (model.IsReplicate == true)
                     {
                         SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
                         if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
