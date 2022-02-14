@@ -2217,7 +2217,7 @@ namespace eFMS.API.Accounting.DL.Services
             var paidUsd = criteria.PaidAmountUsd;
             foreach (var invoice in invoiceList)
             {
-                if (paidVnd != 0)
+                if (paidVnd > 0)
                 {
                     if (invoice.PaidAmountVnd == 0)
                     {
@@ -2250,7 +2250,7 @@ namespace eFMS.API.Accounting.DL.Services
                     invoice.PaidAmountVnd = invoice.TotalPaidVnd = 0;
                 }
 
-                if (paidUsd != 0)
+                if (paidUsd > 0)
                 {
                     if (invoice.PaidAmountUsd == 0)
                     {
