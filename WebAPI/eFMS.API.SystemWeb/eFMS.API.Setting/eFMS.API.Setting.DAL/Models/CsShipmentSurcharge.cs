@@ -56,13 +56,13 @@ namespace eFMS.API.Setting.Service.Models
         public string Hblno { get; set; }
         public Guid? AcctManagementId { get; set; }
         public Guid? PayerAcctManagementId { get; set; }
-        public Guid? ChargeGroup { get; set; }
-        public string TransactionType { get; set; }
-        public Guid? OfficeId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public decimal? AmountUsd { get; set; }
         public decimal? VatAmountUsd { get; set; }
+        public Guid? ChargeGroup { get; set; }
+        public string TransactionType { get; set; }
+        public Guid? OfficeId { get; set; }
         public string ReferenceNo { get; set; }
         public Guid? CompanyId { get; set; }
         public string SyncedFrom { get; set; }
