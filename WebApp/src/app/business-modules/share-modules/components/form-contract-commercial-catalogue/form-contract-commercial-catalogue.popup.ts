@@ -34,6 +34,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
     @ViewChild('confirmActive') confirmActiveContractPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -97,6 +98,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     fileToUpload: File = null;
     fileList: any = null;
     files: any = {};
+    selectedFile: any = {};
 
     menuSpecialPermission: Observable<any[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
@@ -942,4 +944,31 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.autoExtendDays.setValue(0);
         }
     }
+    
+    deleteFile(file: any) {
+        if (!!file) {
+            this.selectedFile = file;
+        }
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteFile() {
+        this.confirmDeletePopup.hide();
+        this._systemFileManageRepo.deleteContractFilesAttach(this.selectedContract.id, this.selectedFile.name)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success("File deleted successfully!");
+                        this.getFileContract();
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
+    }
+
+
 }
