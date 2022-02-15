@@ -201,10 +201,14 @@ export class FormRuleComponent extends PopupBase implements OnInit {
 
     enableSelling() {
         this.isSelling = false;
+        this.selectedChargeSelling = {};
+        this.resetChargeSelling();
         this.getChargeSelling();
     }
     enableBuying() {
         this.isBuying = false;
+        this.selectedChargeBuying = {};
+        this.resetChargeBuying();
         this.getChargeBuying();
     }
     onSelectDataFormInfo(data: Charge | Partner | any, key: string | any) {
