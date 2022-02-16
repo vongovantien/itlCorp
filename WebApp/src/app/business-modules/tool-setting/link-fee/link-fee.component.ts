@@ -141,6 +141,8 @@ import { I } from '@angular/cdk/keycodes';
     }
 
     getRuleDetail(id: string) {
+      this.formRule.getChargeBuying();
+      this.formRule.getChargeSelling();
       this._settingRepo.getDetailRule(id)
         .pipe()
         .subscribe(
