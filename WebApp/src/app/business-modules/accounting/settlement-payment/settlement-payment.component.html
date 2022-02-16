@@ -146,9 +146,9 @@
                                                         {{settlePayment.statusApprovalName}}</div>
                                                     <div *ngSwitchCase="'Denied'" class="text-danger">
                                                         {{settlePayment.statusApprovalName}}</div>
-                                                    <div *ngSwitchDefault class="text-primary">
+                                                    <marquee *ngSwitchDefault class="text-primary" scrolldelay="120">
                                                         {{settlePayment.statusApprovalName}}
-                                                    </div>
+                                                    </marquee>
                                                 </td>
                                                 <td>{{settlePayment.paymentMethodName}}</td>
                                                 <td class="text-primary">

@@ -1,0 +1,13 @@
+.list-template-wp {
+    .list-template-item-wp {
+        display: flex;
+        flex-wrap: nowrap;
+        list-style-type: none;
+        .list-template__item {
+            width: 140px;
+            height: 125px;
+            background: red;
+            border-radius: 10px;
+        }
+    }
+}

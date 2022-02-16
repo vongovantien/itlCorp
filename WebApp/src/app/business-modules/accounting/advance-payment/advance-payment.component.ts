@@ -20,7 +20,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom, concatMap } from 'rxjs/operators';
 import {
     LoadListAdvancePayment,
     getAdvancePaymentListState,
@@ -28,6 +28,8 @@ import {
     getAdvancePaymentListLoadingState,
     getAdvancePaymentListPagingState
 } from './store';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-advance-payment',
@@ -41,6 +43,7 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher') confirmRemoveSelectedVoucher: ConfirmPopupComponent;
     @ViewChild(AdvancePaymentsPopupComponent) advancePaymentsPopup: AdvancePaymentsPopupComponent;
+    @ViewChild(AccountingSelectAttachFilePopupComponent) selectAttachPopup: AccountingSelectAttachFilePopupComponent;
 
     @ViewChild(InjectViewContainerRefDirective) public confirmPopupContainerRef: InjectViewContainerRefDirective;
 
@@ -257,7 +260,7 @@ export class AdvancePaymentComponent extends AppList {
                             if (!adv.advanceFor || !adv.advanceFor.length) {
                                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
                             } else {
-                                
+
                                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`], {
                                     queryParams: Object.assign({}, this.action)
                                 });
@@ -450,7 +453,8 @@ export class AdvancePaymentComponent extends AppList {
             {
                 body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
-                labelConfirm: 'Yes'
+                labelConfirm: 'Yes',
+                center: true
             },
             (v: boolean) => {                                   // ? Hàm Callback khi sumit
                 this.onSyncBravo(this.advanceSyncIds);
@@ -527,6 +531,55 @@ export class AdvancePaymentComponent extends AppList {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/new`], {
             queryParams: Object.assign({}, this.action)
         });
+    }
+
+    onSelectAdv(adv: AdvancePayment) {
+        this.selectedAdv = adv;
+    }
+
+    syncAdvItem() {
+        if (!this.selectedAdv) {
+            return;
+        }
+        const currentAdv = Object.assign({}, this.selectedAdv);
+
+        this.selectAttachPopup.show();
+
+        // * listen event select file.
+        this.selectAttachPopup.onSelect
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                concatMap((value: any) => {
+                    if (!!value) {
+                        const lang: string = value === 1 ? 'VN' : 'ENG';
+                        return this._exportRepo.exportAdvancePaymentDetail(currentAdv.id, lang)
+                    }
+                    return of(false);
+                }),
+                map((exportData) => {
+                    if (!exportData) throw new Error("error: ");
+                    return exportData?.data // url preview
+                }),
+                concatMap((url: any) => {
+                    const syncModel = [currentAdv].map((x: AdvancePayment) => {
+                        return <AccountingInterface.IRequestFileType>{
+                            Id: x.id,
+                            action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+                            url: url
+                        };
+                    });
+                    return this._accoutingRepo.syncAdvanceToAccountant(syncModel)
+                }),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (value) => {
+                    console.log(value);
+                },
+                (error) => {
+                    console.log(error);
+                }
+            )
     }
 }
 

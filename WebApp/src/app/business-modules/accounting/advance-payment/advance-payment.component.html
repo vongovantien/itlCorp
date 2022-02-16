@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <app-permission-button *ngIf="menuSpecialPermission | async | specialPermission:'AdvanceCarrier'"
-             title="Add ADV Carrier" (onClick)="onCreateAdvCarrier()">
+                title="Add ADV Carrier" (onClick)="onCreateAdvCarrier()">
             </app-permission-button>
             <app-permission-button title="Add New" [routerLink]="'/home/accounting/advance-payment/new'">
             </app-permission-button>
@@ -107,7 +107,10 @@
                                     <ng-container *ngIf="!!advancePayments.length">
                                         <ng-container
                                             *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn">
-                                            <tr [class.invalid-row]="advancePayment.syncStatus === 'Rejected'">
+                                            <tr [class.invalid-row]="advancePayment.syncStatus === 'Rejected'"
+                                                [attr.title]="advancePayment.reasonReject"
+                                                [contextMenu]="advContextMenu" (onTouch)="onSelectAdv(advancePayment)"
+                                                [class.touch-row]="selectedAdv?.id === advancePayment.id">
                                                 <td>
                                                     <div class="m-checkbox-list d-flex align-items-center">
                                                         <ng-template #dblock>
@@ -144,6 +147,18 @@
                                                 <td class="text-underline text-primary pointer">
                                                     <a (click)="viewDetail(advancePayment)">{{advancePayment.advanceNo}}
                                                     </a>
+                                                    <ng-container *ngIf="advancePayment.statusApproval === 'Done'">
+                                                        <ng-container [ngSwitch]="advancePayment.syncStatus">
+                                                            <span *ngSwitchCase="'Synced'"
+                                                                class="badge badge-success m--margin-left-10">
+                                                                {{advancePayment.syncStatus}}
+                                                            </span>
+                                                            <span *ngSwitchCase="'Rejected'"
+                                                                class="badge badge-danger m--margin-left-10">
+                                                                {{advancePayment.syncStatus}}
+                                                            </span>
+                                                        </ng-container>
+                                                    </ng-container>
                                                 </td>
                                                 <td class="text-right">{{advancePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{advancePayment.advanceCurrency}}</td>
@@ -163,9 +178,9 @@
                                                         {{advancePayment.statusApprovalName}}</div>
                                                     <div *ngSwitchCase="'Denied'" class="text-danger">
                                                         {{advancePayment.statusApprovalName}}</div>
-                                                    <div *ngSwitchDefault class="text-primary">
+                                                    <marquee *ngSwitchDefault class="text-primary" scrolldelay="120">
                                                         {{advancePayment.statusApprovalName}}
-                                                    </div>
+                                                    </marquee>
                                                 </td>
                                                 <td [ngSwitch]="advancePayment.advanceStatusPayment">
                                                     <ng-container
@@ -197,11 +212,11 @@
                                                 <td class="text-info">
                                                     {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy HH:mm'}}</td>
                                                 <td [ngSwitch]="advancePayment.syncStatus">
-                                                    <div *ngSwitchCase="'Synced'" class="text-success">
+                                                    <!-- <div *ngSwitchCase="'Synced'" class="text-success">
                                                         {{advancePayment.syncStatus}}
-                                                    </div>
+                                                    </div> -->
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        {{advancePayment.syncStatus}}
+                                                        <!-- {{advancePayment.syncStatus}} -->
                                                         {{advancePayment.reasonReject ? ' - '
                                                         +advancePayment.reasonReject : ''}}
                                                     </div>
@@ -292,3 +307,53 @@
 <advance-payments-popup></advance-payments-popup>
 
 <ng-template inject></ng-template>
+
+
+<app-context-menu #advContextMenu (clickOutside)="selectedAdv = null">
+    <ng-container *ngIf="menuSpecialPermission | async | specialPermission:'SyncAcctSystem'">
+        <ng-container
+            *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo">
+            <div class="menu-context__item" (click)="syncAdvItem()">
+                <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
+            </div>
+        </ng-container>
+    </ng-container>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between">
+            <div>
+                <i class="la la-print"></i>
+                <span>Preview</span>
+            </div>
+            <div>
+                <span><i class="la la-caret-right"></i></span>
+            </div>
+        </div>
+
+    </div>
+    <hr />
+    <ng-container title="Deny" *ngIf="menuSpecialPermission | async | specialPermission:'DenyAdvance'">
+        <ng-container *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo 
+    ">
+            <div class="menu-context__item" (click)="denyAdvance()">
+                <span><i class="la la-times "></i><span> Deny</span></span>
+            </div>
+        </ng-container>
+    </ng-container>
+
+</app-context-menu>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer">
+        <span>
+            Single
+        </span>
+    </span>
+
+    <span class="dropdown-item pointer">
+        <span>
+            Multiple
+        </span>
+    </span>
+</app-dropdown>
+
+<select-attach-file-popup type="ADV"></select-attach-file-popup>
