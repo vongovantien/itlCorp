@@ -499,17 +499,15 @@ namespace eFMS.API.Accounting.DL.Services
                     soaCharge.PaySoano = soaNo;
                     soaCharge.Soano = surcharge.Soano;
                     surchargeCopy.PaySoano = soaNo;
-                    if (hasCombineValue)
+                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
                     {
-                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                        {
-                            soaCharge.CombineBillingNo = surcharge.CombineBillingNo;
-                        }
-                        else
-                        {
-                            soaCharge.ObhcombineBillingNo = surcharge.ObhcombineBillingNo;
-                        }
+                        soaCharge.CombineBillingNo = surcharge.CombineBillingNo;
                     }
+                    else
+                    {
+                        soaCharge.ObhcombineBillingNo = surcharge.ObhcombineBillingNo;
+                    }
+
                 }
                 //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
                 else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PaymentObjectId == customer))
@@ -517,10 +515,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soaCharge.Soano = soaNo;
                     soaCharge.PaySoano = surcharge.PaySoano;
                     surchargeCopy.Soano = soaNo;
-                    if (hasCombineValue)
-                    {
-                        soaCharge.CombineBillingNo = surcharge.CombineBillingNo;
-                    }
+                    soaCharge.CombineBillingNo = surcharge.CombineBillingNo;
                 }
 
                 soaCharge.ExchangeDate = surcharge.ExchangeDate;
@@ -582,6 +577,11 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         soaCharge.CombineBillingNo = listCombineNo.Any(x => x == charge.CombineBillingNo) ? null : charge.CombineBillingNo;
                         soaCharge.ObhcombineBillingNo = listCombineNo.Any(x => x == charge.ObhcombineBillingNo) ? null : charge.ObhcombineBillingNo;
+                    }
+                    else
+                    {
+                        soaCharge.CombineBillingNo = charge.CombineBillingNo;
+                        soaCharge.ObhcombineBillingNo = charge.ObhcombineBillingNo;
                     }
                     soaCharge.UserModified = currentUser.UserID;
                     soaCharge.DatetimeModified = DateTime.Now;
