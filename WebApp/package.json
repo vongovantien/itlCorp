@@ -4,7 +4,7 @@
     "scripts": {
         "ng": "ng",
         "start": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve ",
-        "start-uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve --ssl true --c=uat",
+        "start-uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve --ssl true --ssl-cert ssl/server.crt --ssl-key ssl/server.key --c=uat",
         "start-prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve --ssl true --c=prod",
         "start-stag": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve --ssl true --c=stag",
         "build": "ng build",
