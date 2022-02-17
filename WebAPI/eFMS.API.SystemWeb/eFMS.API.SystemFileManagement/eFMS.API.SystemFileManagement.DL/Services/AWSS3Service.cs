@@ -86,7 +86,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string RenameFileS3(string fileName)
         {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#?+%&]+", "") + "_" + StringHelper.RandomString(5);
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#?+%&.]+", "") + "_" + StringHelper.RandomString(5);
         }
 
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
