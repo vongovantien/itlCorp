@@ -750,15 +750,41 @@ namespace eFMS.API.Accounting.DL.Services
                                              && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId == null);
 
+            IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
+            IQueryable<CsTransaction> csJob = transactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
             models.ForEach(fe =>
             {
-                var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
-                decimal? sellingNoVat = 0;
-                foreach (var charge in _charges)
+
+                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+                if (fe.Service == "CL")
                 {
-                    sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    _charges = from ops in opsJob
+                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }else
+                {
+                    _charges = from cs in csJob
+                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
                 }
-                fe.SellingNoVat = sellingNoVat;
+                if (_charges.Count() > 0)
+                {
+                    decimal? sellingNoVat = 0;
+                    foreach (var charge in _charges)
+                    {
+                        sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    }
+                    fe.SellingNoVat = sellingNoVat;
+                }
             });
 
             return models;
