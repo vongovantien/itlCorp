@@ -50,7 +50,7 @@ export class CreateCombineBillingComponent extends AppForm implements OnInit {
         catchError(this.catchError),
         concatMap((rs: any) => {
           if (!rs.status) {
-            this._toastService.warning('Document No was existed on list as below "' + rs.message + '" Please you check again!');
+            this._toastService.warning('Document No "' + rs.message + '". Please you check again!');
           }
           return this._accountingRepo.getListShipmentInfo(body);
         })
