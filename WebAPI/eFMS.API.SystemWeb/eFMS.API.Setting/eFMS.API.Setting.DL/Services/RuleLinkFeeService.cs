@@ -388,6 +388,7 @@ namespace eFMS.API.Setting.DL.Services
         public List<RuleLinkFeeImportModel> CheckRuleLinkFeeValidImport(List<RuleLinkFeeImportModel> list)
         {
             var results = new List<RuleLinkFeeImportModel>();
+
             foreach (var item in list)
             {
                 if (string.IsNullOrEmpty(item.RuleName))
@@ -419,6 +420,19 @@ namespace eFMS.API.Setting.DL.Services
                     item.IsValid = false;
                 }
                 results.Add(item);
+            }
+
+            for(int i = 0; i < list.Count(); i++)
+            {
+                int j = i;
+                while (j < list.Count())
+                {
+                    if (list[i].RuleName == list[j].RuleName||(list[i].ServiceBuying == list[j].ServiceBuying&& list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling ))
+                    {
+                        list[i].IsValid = false;
+                    }
+                    j++;
+                }
             }
             return results;
         }
@@ -455,8 +469,8 @@ namespace eFMS.API.Setting.DL.Services
         private bool CheckCharge(string chargeBuying, string chargeSelling, string serviceBuying, string serviceSelling)
         {
             var charge = catChargeRepo.Get();
-            var buying = charge.Where(x => x.Code.Contains(chargeBuying) && x.Type == "CREDIT" && x.ServiceTypeId.Contains(serviceBuying)).FirstOrDefault();
-            var selling = charge.Where(x => x.Code.Contains(chargeSelling) && x.Type == "DEBIT" && x.ServiceTypeId.Contains(serviceSelling)).FirstOrDefault();
+            var buying = charge.Where(x => x.Code==chargeBuying && x.Type == "CREDIT" && x.ServiceTypeId.Contains(serviceBuying)).FirstOrDefault();
+            var selling = charge.Where(x => x.Code==chargeSelling && x.Type == "DEBIT" && x.ServiceTypeId.Contains(serviceSelling)).FirstOrDefault();
             if (buying!=null&&selling!=null)
             {
                 return true;
@@ -481,10 +495,10 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         Id = Guid.NewGuid(),
                         RuleName = item.RuleName,
-                        ChargeBuying = charge.Where(x => x.Code.Contains(item.ChargeBuying) && x.Type == "CREDIT").FirstOrDefault().Id.ToString(),
-                        ChargeSelling = charge.Where(x => x.Code.Contains(item.ChargeSelling) && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
-                        PartnerBuying = partner.Where(x => x.AccountNo.Contains(item.PartnerBuying)).FirstOrDefault().Id,
-                        PartnerSelling = item.PartnerSelling != null ? partner.Where(x => x.AccountNo.Contains(item.PartnerSelling)).FirstOrDefault().Id : null,
+                        ChargeBuying = charge.Where(x => x.Code==item.ChargeBuying && x.Type == "CREDIT").FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.Code==item.ChargeSelling && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
+                        PartnerBuying = partner.Where(x => x.AccountNo==item.PartnerBuying).FirstOrDefault().Id,
+                        PartnerSelling = item.PartnerSelling != null ? partner.Where(x => x.AccountNo==item.PartnerSelling).FirstOrDefault().Id : null,
                         ServiceBuying = ConvertService(item.ServiceBuying),
                         ServiceSelling = ConvertService(item.ServiceSelling),
                         EffectiveDate = DateTime.Now,
