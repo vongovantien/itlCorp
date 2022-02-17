@@ -32,6 +32,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<SetUnlockRequestJob> setUnlockRequestJobRepo;
         private readonly IContextBase<SetUnlockRequestApprove> setUnlockRequestApproveRepo;
         private readonly IContextBase<AcctAdvancePayment> advancePaymentRepo;
+        private readonly IContextBase<AcctReceipt> receiptRepo;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         private readonly IContextBase<OpsTransaction> opsTransactionRepo;
         private readonly IContextBase<CsTransaction> transRepo;
@@ -57,6 +58,7 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CsTransaction> trans,
             IContextBase<CsTransactionDetail> transDetail,
             IContextBase<CustomsDeclaration> customs,
+            IContextBase<AcctReceipt> receipt,
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> surcharge,
             IContextBase<SysAuthorizedApproval> authourizedApproval,
@@ -69,6 +71,7 @@ namespace eFMS.API.Setting.DL.Services
             setUnlockRequestApproveRepo = setUnlockRequestApprove;
             advancePaymentRepo = advancePayment;
             settlementPaymentRepo = settlementPayment;
+            receiptRepo = receipt;
             opsTransactionRepo = opsTransaction;
             transRepo = trans;
             transDetailRepo = transDetail;
@@ -743,7 +746,7 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     return new HandleState(true, (object)updatePaymentId.Message);
                 }
-                else
+                if(type==1)
                 {
                     var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
                     if (SOACurrent == null) return new HandleState("Not found SOA");
@@ -756,6 +759,27 @@ namespace eFMS.API.Setting.DL.Services
                         DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
                         JsonConvert.SerializeObject("SOA"),
                         JsonConvert.SerializeObject(SOACurrent.Id),
+                        JsonConvert.SerializeObject(newID));
+                    new LogHelper(logName, logMessage);
+                    if (!updatePaymentId.Status)
+                    {
+                        return new HandleState((object)updatePaymentId.Message);
+                    }
+                    return new HandleState(true, (object)updatePaymentId.Message);
+                }
+                else
+                {
+                    var receptCurrent = receiptRepo.Get(x => x.PaymentRefNo == paymentNo).FirstOrDefault();
+                    if (receptCurrent == null) return new HandleState("Not found Receipt");
+                    var newID = Guid.NewGuid();
+                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
+                    string logName = string.Format("UpdateReceipt_{0}_eFMS_Log", (
+                        updatePaymentId.Status ? "Success" : "Fail"
+                   ));
+                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                        JsonConvert.SerializeObject("Receipt"),
+                        JsonConvert.SerializeObject(receptCurrent.Id),
                         JsonConvert.SerializeObject(newID));
                     new LogHelper(logName, logMessage);
                     if (!updatePaymentId.Status)
