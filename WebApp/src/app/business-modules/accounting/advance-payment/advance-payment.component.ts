@@ -445,7 +445,7 @@ export class AdvancePaymentComponent extends AppList {
             return;
         }
         // this.confirmSyncAdvancePopup.show();   // ! Before
-
+        this.selectAttachPopup.show();
         // * After
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
@@ -541,18 +541,22 @@ export class AdvancePaymentComponent extends AppList {
         if (!this.selectedAdv) {
             return;
         }
-        const currentAdv = Object.assign({}, this.selectedAdv);
+        const currentAdv: AdvancePayment = Object.assign({}, this.selectedAdv);
 
         this.selectAttachPopup.show();
 
         // * listen event select file.
+        this.listenSelectFileAttachAndSyncAdv(currentAdv);
+    }
+
+    listenSelectFileAttachAndSyncAdv(adv: AdvancePayment) {
         this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 concatMap((value: any) => {
                     if (!!value) {
                         const lang: string = value === 1 ? 'VN' : 'ENG';
-                        return this._exportRepo.exportAdvancePaymentDetail(currentAdv.id, lang)
+                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang)
                     }
                     return of(false);
                 }),
@@ -561,11 +565,11 @@ export class AdvancePaymentComponent extends AppList {
                     return exportData?.data // url preview
                 }),
                 concatMap((url: any) => {
-                    const syncModel = [currentAdv].map((x: AdvancePayment) => {
+                    const syncModel = [adv].map((x: AdvancePayment) => {
                         return <AccountingInterface.IRequestFileType>{
                             Id: x.id,
                             action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
-                            url: url
+                            fileName: url
                         };
                     });
                     return this._accoutingRepo.syncAdvanceToAccountant(syncModel)

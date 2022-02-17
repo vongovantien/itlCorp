@@ -4,6 +4,7 @@ import { PopupBase } from 'src/app/popup.base';
 @Component({
     selector: 'select-attach-file-popup',
     templateUrl: './select-attach-file.popup.html',
+    styleUrls: ['./select-attach-file.popup.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountingSelectAttachFilePopupComponent extends PopupBase implements OnInit {
@@ -32,6 +33,10 @@ export class AccountingSelectAttachFilePopupComponent extends PopupBase implemen
         this.fileTemplates = this.templates.filter(x => x.type === this.type);
     }
 
+    selectTemplate(template) {
+        this.template = template;
+    }
+
     onSubmit() {
         this.isSubmitted = true;
         if (!this.template) {
@@ -39,6 +44,6 @@ export class AccountingSelectAttachFilePopupComponent extends PopupBase implemen
         }
         this.isSubmitted = true;
 
-        this.onSelect.emit(this.template);
+        this.onSelect.emit(this.template.value);
     }
 }

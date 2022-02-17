@@ -53,6 +53,6 @@ namespace AccountingInterface {
     }
 
     export interface IRequestFileType extends IRequestGuid {
-        url: string;
+        fileName: string;
     }
 }
