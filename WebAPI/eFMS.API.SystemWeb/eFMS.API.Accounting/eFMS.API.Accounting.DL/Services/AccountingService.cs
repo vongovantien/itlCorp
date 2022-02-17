@@ -731,7 +731,7 @@ namespace eFMS.API.Accounting.DL.Services
                 CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
                 if (hbl != null)
                 {
-                    string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, "VND");
+                    string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
                     sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
                         AttachDocDate = DateTime.Now,
                         AttachDocName = cdNote.Code,
@@ -882,7 +882,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
                     if (hbl != null)
                     {
-                        string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, "VND");
+                        string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
                         sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
                         AttachDocDate = DateTime.Now,
                         AttachDocName = cdNote.Code,
