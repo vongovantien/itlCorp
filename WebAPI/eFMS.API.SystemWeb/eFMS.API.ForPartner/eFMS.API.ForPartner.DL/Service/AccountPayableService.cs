@@ -27,6 +27,9 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AccAccountPayablePayment> paymentRepository;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
+        private readonly IContextBase<AcctSoa> acctSOARepository;
+        private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
         public AccountPayableService(IContextBase<AccAccountPayable> repository,
             IContextBase<CatPartner> partnerRepo,
             ICurrentUser cUser,
@@ -34,6 +37,9 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AccAccountPayablePayment> paymentRepo,
             IContextBase<SysPartnerApi> sysPartnerApiRepo,
             IContextBase<CatCharge> catChargeRepo,
+            IContextBase<AcctSoa> acctSOARepo,
+            IContextBase<AcctCdnote> acctCdNoteRepo,
+            IContextBase<AcctSettlementPayment> settlementPaymentRepo,
             IMapper mapper) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -42,6 +48,9 @@ namespace eFMS.API.ForPartner.DL.Service
             paymentRepository = paymentRepo;
             sysPartnerApiRepository = sysPartnerApiRepo;
             catChargeRepository = catChargeRepo;
+            acctSOARepository = acctSOARepo;
+            acctCdNoteRepository = acctCdNoteRepo;
+            settlementPaymentRepository = settlementPaymentRepo;
         }
 
         private SysPartnerApi GetInfoPartnerByApiKey(string apiKey)
@@ -76,6 +85,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     var paymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
 
                     var voucherDetail = model.Details.Where(x => x.TransactionType != "NONE");
+                    var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
                     if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_BANK.ToLower()
                         || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_CASH.ToLower())
                     {
@@ -107,7 +117,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DepartmentId = currentUser.DepartmentId,
                                     TransactionType = c.FirstOrDefault().TransactionType,
                                     VoucherNo = c.FirstOrDefault().VoucherNo,
-                                    BillingNo = model.DocCode,
+                                    BillingNo = billingNo,
                                     BillingType = model.DocType,
                                     ExchangeRate = c.FirstOrDefault().ExchangeRate,
                                     PaymentTerm = c.FirstOrDefault().PaymentTerm,
@@ -158,7 +168,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DepartmentId = currentUser.DepartmentId,
                                     TransactionType = c.FirstOrDefault().TransactionType,
                                     VoucherNo = c.FirstOrDefault().VoucherNo,
-                                    BillingNo = model.DocCode,
+                                    BillingNo = billingNo,
                                     BillingType = model.DocType,
                                     ExchangeRate = c.FirstOrDefault().ExchangeRate,
                                     PaymentTerm = c.FirstOrDefault().PaymentTerm,
@@ -219,7 +229,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 DepartmentId = currentUser.DepartmentId,
                                 TransactionType = c.FirstOrDefault().TransactionType,
                                 VoucherNo = c.FirstOrDefault().VoucherNo,
-                                BillingNo = model.DocCode,
+                                BillingNo = billingNo,
                                 BillingType = model.DocType,
                                 ExchangeRate = c.FirstOrDefault().ExchangeRate,
                                 PaymentTerm = c.FirstOrDefault().PaymentTerm,
@@ -281,6 +291,31 @@ namespace eFMS.API.ForPartner.DL.Service
             }
 
             return IshasPayment;
+        }
+
+        /// <summary>
+        /// Get billing name from billing id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private string GetBillingNameFromId(Guid docID, string docCode, string docType)
+        {
+            string _billingNo = string.Empty;
+            switch (docType)
+            {
+                case "SOA":
+                    _billingNo = acctSOARepository.Get(x => x.Id.ToString() == docID.ToString())?.FirstOrDefault()?.Soano;
+                    break;
+                case "CDNOTE":
+                    _billingNo = acctCdNoteRepository.Get(x => x.Id == docID)?.FirstOrDefault()?.Code;
+                    break;
+                case "SETTLEMENT":
+                    _billingNo = settlementPaymentRepository.Get(x => x.Id == docID)?.FirstOrDefault()?.SettlementNo;
+                    break;
+                default:
+                    break;
+            }
+            return _billingNo;
         }
 
         /// <summary>
