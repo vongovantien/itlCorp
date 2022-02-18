@@ -1491,11 +1491,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
                         // [CR: #16976] => Update charge cho phí USD giống với phí VND
-                        ////Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
-                        //if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
-                        //{
-                        //    cdNote.Note += " Request Voucher";
-                        //}
+                        //Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
+                        {
+                            cdNote.Note += " Request Voucher";
+                        }
                         //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
@@ -1554,10 +1554,10 @@ namespace eFMS.API.Accounting.DL.Services
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
                         // [CR: #16976] => Update charge cho phí USD giống với phí VND
                         ////Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
-                        //if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
-                        //{
-                        //    soa.Note += " Request Voucher";
-                        //}
+                        if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
+                        {
+                            soa.Note += " Request Voucher";
+                        }
                         //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
