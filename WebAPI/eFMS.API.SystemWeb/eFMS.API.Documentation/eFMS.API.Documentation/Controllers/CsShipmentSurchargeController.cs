@@ -684,6 +684,21 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+       
+        [HttpPost("RevertChargeLinkFee")]
+        [Authorize]
+        public IActionResult  RevertChargeLinkFee([FromBody] List<CsShipmentSurchargeModel> list)
+        {
+            currentUser.Action = "RevertChargeLinkFee";
+            var hs = csShipmentSurchargeService.RevertChargeLinkFee(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
 

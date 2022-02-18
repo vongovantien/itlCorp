@@ -340,7 +340,25 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 }
             );
     }
-
+    onConfirmRevertLinkFee (selectedCs:CsShipmentSurcharge){
+        let charges = [];
+        selectedCs.linkFee = false;
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._documentRepo.updateShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
     onSelectSurcharge(cs: CsShipmentSurcharge) {
         this.selectedCs = cs;
 
