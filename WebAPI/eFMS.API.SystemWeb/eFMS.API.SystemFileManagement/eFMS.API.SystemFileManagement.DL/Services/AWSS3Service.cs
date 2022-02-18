@@ -314,5 +314,97 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             input.CopyTo(ms);
             return ms.ToArray();
         }
+
+        public async Task<HandleState> CoppyObjectAsync(FileCoppyModel filecCoppyModel)
+        {
+            try
+            {
+                CopyObjectRequest request = new CopyObjectRequest
+                {
+                    SourceBucket = _bucketName,
+                    SourceKey = filecCoppyModel.srcKey,
+                    DestinationBucket = _bucketName,
+                    DestinationKey = filecCoppyModel.destKey
+                };
+                CopyObjectResponse response = await _client.CopyObjectAsync(request);
+
+                return new HandleState(true, response);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
+        private FileCoppyModel ReDirectFolder(FileCoppyModel filecCoppyModel)
+        {
+            if (filecCoppyModel.Type != null)
+            {
+                switch (filecCoppyModel.Type)
+                {
+                    case 1:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/SOA/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/SOA/" + filecCoppyModel.destKey + "/",
+                        };
+                    case 2:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/Settlement/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/Settlement/" + filecCoppyModel.destKey + "/",
+                        };
+                    case 3:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/Advance/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/Advance/" + filecCoppyModel.destKey + "/",
+                        };
+                    default:
+                        break;
+                }
+            }
+            return filecCoppyModel;
+        }
+
+        public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
+        {
+            try
+            {
+                var filecCoppyConvert = ReDirectFolder(filecCoppyModel);
+                var listObject = _client.ListObjectsAsync(_bucketName, filecCoppyConvert.srcKey).Result;
+                var listFile = listObject.S3Objects.Select(x => x.Key).ToList();
+                //listFile.RemoveAt(0);
+                foreach (var item in listFile)
+                {
+                    FileCoppyModel filecCoppy = new FileCoppyModel()
+                    {
+                        destKey = filecCoppyConvert.destKey + item.Split("/").Last(),
+                        srcKey = item,
+                    };
+                    var coppied = CoppyObjectAsync(filecCoppy);
+                    // reUpdate Image
+                    var images = _sysImageRepo.Get(x => x.ObjectId == filecCoppyModel.srcKey).ToList();
+                    foreach (var image in images)
+                    {
+                        image.Id = Guid.NewGuid();
+                        image.KeyS3 = filecCoppyConvert.destKey + image.Name;
+                        image.ObjectId = filecCoppyModel.destKey.ToLower();
+                        image.Url = "https://uat-api-efms.itlvn.com/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
+                        var updateImg = _sysImageRepo.Add(image);
+                        if (updateImg == null)
+                        {
+                            return new HandleState(false, "Update Image Error");
+                        }
+                    }
+                }
+                return new HandleState(true, listFile);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
     }
 }
