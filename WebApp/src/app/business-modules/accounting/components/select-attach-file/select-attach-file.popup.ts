@@ -45,5 +45,6 @@ export class AccountingSelectAttachFilePopupComponent extends PopupBase implemen
         this.isSubmitted = true;
 
         this.onSelect.emit(this.template.value);
+        this.hide();
     }
 }

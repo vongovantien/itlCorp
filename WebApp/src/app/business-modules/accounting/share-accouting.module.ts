@@ -7,7 +7,6 @@ import { reducers, effects } from './accounting-management/store';
 import { EffectsModule } from '@ngrx/effects';
 import { AccoutingAttachFileListComponent } from './components/attach-file/attach-file-list.component';
 import { AccountingSelectAttachFilePopupComponent } from './components/select-attach-file/select-attach-file.popup';
-import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     imports: [
@@ -15,7 +14,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
         ModalModule.forRoot(),
         StoreModule.forFeature('accounting-management', reducers),
         EffectsModule.forFeature(effects),
-        NgSelectModule,
 
     ],
     exports: [ShareAccountingManagementSelectRequesterPopupComponent, AccoutingAttachFileListComponent, AccountingSelectAttachFilePopupComponent],

@@ -212,11 +212,11 @@
                                                 <td class="text-info">
                                                     {{advancePayment.lastSyncDate | date: 'dd/MM/yyyy HH:mm'}}</td>
                                                 <td [ngSwitch]="advancePayment.syncStatus">
-                                                    <!-- <div *ngSwitchCase="'Synced'" class="text-success">
+                                                    <div *ngSwitchCase="'Synced'" class="text-success">
                                                         {{advancePayment.syncStatus}}
-                                                    </div> -->
+                                                    </div>
                                                     <div *ngSwitchDefault class="text-danger">
-                                                        <!-- {{advancePayment.syncStatus}} -->
+                                                        {{advancePayment.syncStatus}}
                                                         {{advancePayment.reasonReject ? ' - '
                                                         +advancePayment.reasonReject : ''}}
                                                     </div>
@@ -293,10 +293,10 @@
 </div>
 
 
-<confirm-popup #confirmRemoveSelectedVoucher (onSubmit)="onRemoveSelectedVoucher()" [labelConfirm]="'Yes'"
+<!-- <confirm-popup #confirmRemoveSelectedVoucher (onSubmit)="onRemoveSelectedVoucher()" [labelConfirm]="'Yes'"
     [body]="'Are you sure you want to remove selected payment vouchers?'" [labelCancel]="'No'"
     title="Confirm remove selected voucher">
-</confirm-popup>
+</confirm-popup> -->
 
 <permission-403-popup></permission-403-popup>
 
@@ -310,31 +310,37 @@
 
 
 <app-context-menu #advContextMenu (clickOutside)="selectedAdv = null">
+    <div class="menu-context__item" (click)="viewDetail(selectedAdv)">
+        <span><i class="la la-edit text-primary"></i><span> Edit</span></span>
+    </div>
     <ng-container *ngIf="menuSpecialPermission | async | specialPermission:'SyncAcctSystem'">
         <ng-container
             *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo">
             <div class="menu-context__item" (click)="syncAdvItem()">
-                <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
+                <span><i class="la la-cloud-upload text-primary"></i><span> Sync this item </span></span>
             </div>
         </ng-container>
+        <div class="menu-context__item" (click)="syncBravo()">
+            <span><i class="la la-list-alt text-primary"></i><span>Sync selected items</span></span>
+        </div>
     </ng-container>
     <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
         <div class="d-flex justify-content-between">
             <div>
-                <i class="la la-print"></i>
+                <i class="la la-print text-primary"></i>
                 <span> Preview</span>
             </div>
-            <div>
-                <span><i class="la la-caret-right"></i></span>
+            <div class="d-flex align-items-center">
+                <i class="la la-caret-right font-13"></i>
             </div>
         </div>
 
     </div>
-    <hr />
     <ng-container title="Deny" *ngIf="menuSpecialPermission | async | specialPermission:'DenyAdvance'">
         <ng-container *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo 
     ">
-            <div class="menu-context__item" (click)="denyAdvance()">
+            <hr />
+            <div class="menu-context__item text-danger" (click)="denyAdvance()">
                 <span><i class="la la-times "></i><span> Deny</span></span>
             </div>
         </ng-container>
@@ -343,12 +349,15 @@
 </app-context-menu>
 
 <app-dropdown #exportTpl>
-    <span class="dropdown-item pointer">
+    <span class="dropdown-item pointer" (click)="previewAdvPayment(selectedAdv)">
         Single
     </span>
+    <span class="dropdown-item pointer" (click)="exportAdvPayment(selectedAdv,'VN')">
+        Multiple (VN)
+    </span>
 
-    <span class="dropdown-item pointer">
-        Multiple
+    <span class="dropdown-item pointer" (click)="exportAdvPayment(selectedAdv,'EN')">
+        Multiple (EN)
     </span>
 </app-dropdown>
 
