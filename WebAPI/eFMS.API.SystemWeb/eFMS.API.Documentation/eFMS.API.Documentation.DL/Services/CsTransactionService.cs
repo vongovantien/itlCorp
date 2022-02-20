@@ -60,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IOptions<ApiUrl> apiUrl;
         private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -99,7 +100,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo,
             IOptions<ApiUrl> url,
-            ISysImageService imageService) : base(repository, mapper)
+            ISysImageService imageService,
+            IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -134,6 +136,7 @@ namespace eFMS.API.Documentation.DL.Services
             shippingInstructionServiceRepo = shippingInstruction;
             apiUrl = url;
             sysImageService = imageService;
+            opsTransactionRepository = opsTransactionRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -881,13 +884,14 @@ namespace eFMS.API.Documentation.DL.Services
 
         /// <summary>
         /// Get air/sea information when link from ops
+        /// [CR17026]: chỉ link job nội bộ cùng office
         /// </summary>
         /// <param name="mblNo">HBL No's ops</param>
         /// <param name="hblNo">HBL No's ops</param>
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
-        public LinkAirSeaInfoModel GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
+        public LinkAirSeaInfoModel GetLinkASInfomation(string jobOps, string mblNo, string hblNo, string serviceName, string serviceMode)
         {
             string jobNo = null;
             string hblid = null;
@@ -895,15 +899,29 @@ namespace eFMS.API.Documentation.DL.Services
             LinkAirSeaInfoModel result = null;
 
             string shipmentType = GetServiceType(serviceName, serviceMode);
+            // Get office trên job ops, nếu ko có lấy office current
+            var office = jobOps == null ? null : opsTransactionRepository.Get(x => x.JobNo == jobOps).FirstOrDefault()?.OfficeId;
+            office = office == null ? currentUser.OfficeID : office;
             if (!string.IsNullOrEmpty(shipmentType))
             {
-                IQueryable<CsTransactionDetail> houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
+                IQueryable<CsTransactionDetail> houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo && x.OfficeId == office); // lấy job cùng office
                 var transaction = houseDetail != null ?
                     transactionRepository
-                    .Get(x => x.TransactionType == shipmentType && x.CurrentStatus != TermData.Canceled)
+                    .Get(x => x.TransactionType == shipmentType && x.CurrentStatus != TermData.Canceled && x.OfficeId == office)
                     .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new
                     {
-                        x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty, y.CustomerId, y.SaleManId, x.ServiceDate, y.PackageContainer
+                        x.JobNo,
+                        jobId = x.Id,
+                        y.Id,
+                        x.Mawb,
+                        x.BookingNo,
+                        y.GrossWeight,
+                        y.ChargeWeight,
+                        y.PackageQty,
+                        y.CustomerId,
+                        y.SaleManId,
+                        x.ServiceDate,
+                        y.PackageContainer
                     })
                     : null;
 
@@ -953,16 +971,16 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else // không có hbl nào -> tìm theo mawb
                     {
-                        var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+                        var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo && x.CurrentStatus != TermData.Canceled && x.OfficeId == office).FirstOrDefault();  // lấy job cùng office
                         if (masDetail == null)
                         {
-                            masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+                            masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo && x.CurrentStatus != TermData.Canceled && x.OfficeId == office).FirstOrDefault();
                         }
                         jobNo = masDetail?.JobNo.ToString();
                         jobId = masDetail?.Id.ToString();
                         hblid = null;
 
-                        if(masDetail != null)
+                        if (masDetail != null)
                         {
                             result = new LinkAirSeaInfoModel
                             {
@@ -971,7 +989,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 ServiceDate = masDetail.ServiceDate,
                             };
                         }
-                        
+
                     }
                 }
             }
@@ -982,15 +1000,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (!string.IsNullOrEmpty(hblid))
                 {
-                    hbls = csTransactionDetailRepo.Get(x => x.Id.ToString() == hblid);
+                    hbls = csTransactionDetailRepo.Get(x => x.Id.ToString() == hblid && x.OfficeId == office);
 
-                    containers = csMawbcontainerRepo.Get(x => x.Hblid.ToString() == hblid).ToList();
+                    containers = hbls.Count() > 0 ? csMawbcontainerRepo.Get(x => x.Hblid.ToString() == hblid).ToList() : new List<CsMawbcontainer>();
                 }
                 else
                 {
-                    hbls = csTransactionDetailRepo.Get(x => x.JobId.ToString() == jobId);
+                    hbls = csTransactionDetailRepo.Get(x => x.JobId.ToString() == jobId && x.OfficeId == office);
 
-                    containers = csMawbcontainerRepo.Get(x => x.Mblid.ToString() == jobId).ToList();
+                    containers = hbls.Count() > 0 ? csMawbcontainerRepo.Get(x => x.Mblid.ToString() == jobId).ToList() : new List<CsMawbcontainer>();
                 }
 
                 if (hbls != null && hbls.Count() > 0)
@@ -999,7 +1017,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.CW = hbls.Sum(x => x.GrossWeight);
                     result.PackageQty = hbls.Sum(x => x.PackageQty);
 
-                    if(containers.Count > 0)
+                    if (containers.Count > 0)
                     {
                         containers.ForEach(c =>
                         {
