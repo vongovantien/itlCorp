@@ -1182,14 +1182,13 @@ namespace eFMS.API.Documentation.DL.Services
                                 // Remove combine no
                                 if (combineNoCdNote != null && combineNoCdNote.Count() > 0)
                                 {
-                                    if (combineNoCdNote.Any(x => x == item.CombineBillingNo))
-                                    {
-                                        item.CombineBillingNo = null;
-                                    }
-                                    if (combineNoCdNote.Any(x => x == item.ObhcombineBillingNo))
-                                    {
-                                        item.ObhcombineBillingNo = null;
-                                    }
+                                    item.CombineBillingNo = combineNoCdNote.Any(x => x == item.CombineBillingNo) ? null : item.CombineBillingNo;
+                                    item.ObhcombineBillingNo = combineNoCdNote.Any(x => x == item.ObhcombineBillingNo) ? null : item.ObhcombineBillingNo;
+                                }
+                                else
+                                {
+                                    item.CombineBillingNo = item.CombineBillingNo;
+                                    item.ObhcombineBillingNo = item.ObhcombineBillingNo;
                                 }
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {

@@ -178,8 +178,10 @@ export class OfficeFormApproveSettingComponent
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
                     this._toastService.success(res.message);
+                    this.getSetting(this.officeId);
                 }
             });
+
     }
 
     checkValidate() {
