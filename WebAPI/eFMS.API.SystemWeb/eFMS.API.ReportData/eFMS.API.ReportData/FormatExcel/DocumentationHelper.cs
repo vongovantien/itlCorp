@@ -4062,17 +4062,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 // TOTAL
                 listKeyData = new Dictionary<string, object>();
                 listKeyFormula = new Dictionary<string, string>();
-                if (_chargeWeight == 0 || _contQty == 0)
-                {
-                    if (_chargeWeight > 0)
-                    {
-                        listKeyData.Add("TotalCW", _chargeWeight); // Total CW
-                    }
-                    else
-                    {
-                        listKeyData.Add("TotalCW", _contQty); // Total CW
-                    }
-                }
+                listKeyData.Add("TotalCW", _chargeWeight > 0 ? _chargeWeight : (_contQty > 0 ? _contQty : (decimal?)null)); // Total CW
 
                 string lastCol = string.Empty;
                 int i = 1;

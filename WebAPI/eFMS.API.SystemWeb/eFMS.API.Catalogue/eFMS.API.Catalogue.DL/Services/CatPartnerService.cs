@@ -2283,7 +2283,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo,
                 PartnerType = x.PartnerType,
-                TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName
+                TaxCodeAbbrName = x.AccountNo + " - " + x.ShortName
             }).ToList();
             return results.AsQueryable();
         }
