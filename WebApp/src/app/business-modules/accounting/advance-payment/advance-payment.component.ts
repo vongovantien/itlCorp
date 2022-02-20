@@ -445,7 +445,7 @@ export class AdvancePaymentComponent extends AppList {
         }
 
         if (advanceSyncList.length === this.pageSize) {
-            this._toastService.warning("eExceed " + this.pageSize + " items");
+            this._toastService.warning("Exceed " + this.pageSize + " items");
             return;
         }
 
@@ -460,7 +460,7 @@ export class AdvancePaymentComponent extends AppList {
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
             {
-                body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
+                body: `Are you sure you want to sync <span class="font-weight-bold">${advanceSyncList.map(x => x.advanceNo).join()}</span> to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
                 labelConfirm: 'Yes',
                 center: true
@@ -527,27 +527,6 @@ export class AdvancePaymentComponent extends AppList {
         return url;
     }
 
-    onSyncBravo(advIds: AccountingInterface.IRequestGuid[]) {
-        this._accoutingRepo.syncAdvanceToAccountant(advIds)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success("Sync Data to Accountant System Successful");
-
-                        this.requestLoadListAdvancePayment();
-                    } else {
-                        this._toastService.error("Sync Data Fail");
-                    }
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
-    }
-
     denyAdvance() {
         const advancesDenyList = this.advancePayments.filter(x => x.isChecked && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
             && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
@@ -571,7 +550,7 @@ export class AdvancePaymentComponent extends AppList {
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,
-            { body: 'Are you sure you want to deny advance payments ?' },
+            { body: `Are you sure you want to deny <span class="font-weight-bold">${advancesDenyList.map(x => x.advanceNo).join()}</span> advance payments ?` },
             (v: boolean) => {
                 this.onDenyAdvance(advIds);
             });
@@ -615,7 +594,7 @@ export class AdvancePaymentComponent extends AppList {
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,
             {
-                body: 'Are you sure you want to sync data to accountant system ?',
+                body: `Are you sure you want to sync <span class="font-weight-bold">${currentAdv.advanceNo}</span> to accountant system ?`,
                 iconConfirm: 'la la-cloud-upload',
                 labelConfirm: 'Yes',
                 center: true
@@ -669,6 +648,26 @@ export class AdvancePaymentComponent extends AppList {
                     console.log(error);
                 }
             )
+    }
+
+    denyAdvItem() {
+        if (!this.selectedAdv) {
+            return;
+        }
+        const currentAdv: AdvancePayment = Object.assign({}, this.selectedAdv);
+
+        if (currentAdv.statusApproval === 'Denied') {
+            this._toastService.warning(`${currentAdv.advanceNo} had denied, Please recheck!`);
+
+            return;
+        }
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            { body: `Are you sure you want to deny <span class="font-weight-bold">${currentAdv.advanceNo}</span> payments ?`, center: true },
+            (v: boolean) => {
+                this.onDenyAdvance([currentAdv.id]);
+            });
     }
 
     previewAdvPayment(adv: AdvancePayment) {

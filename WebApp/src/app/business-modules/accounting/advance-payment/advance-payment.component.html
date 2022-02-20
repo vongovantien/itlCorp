@@ -340,7 +340,7 @@
         <ng-container *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo 
     ">
             <hr />
-            <div class="menu-context__item text-danger" (click)="denyAdvance()">
+            <div class="menu-context__item text-danger" (click)="denyAdvItem()">
                 <span><i class="la la-times "></i><span> Deny</span></span>
             </div>
         </ng-container>

@@ -85,7 +85,9 @@
                                     <ng-container *ngIf="!!settlements.length">
                                         <ng-container
                                             *ngFor="let settlePayment of settlements; let i = index; trackBy: trackByFn">
-                                            <tr [class.invalid-row]="settlePayment.syncStatus === 'Rejected'">
+                                            <tr [class.invalid-row]="settlePayment.syncStatus === 'Rejected'"
+                                                [contextMenu]="SmContextMenu" (onTouch)="onSelectSM(settlePayment)"
+                                                [class.touch-row]="selectedSettlement?.id === settlePayment.id">
                                                 <td>
                                                     <div class="m-checkbox-list d-flex align-items-center">
                                                         <ng-template #dblock>
@@ -108,7 +110,7 @@
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <ng-container
-                                                            *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
+                                                            *ngIf="(settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied');else dblock">
                                                             <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete"
                                                                 (click)="prepareDeleteAdvance(settlePayment)">
@@ -131,6 +133,18 @@
                                                 <td class="text-underline text-primary pointer">
                                                     <a (click)="viewDetail(settlePayment)">{{settlePayment.settlementNo}}
                                                     </a>
+                                                    <ng-container *ngIf="settlePayment.statusApproval === 'Done'">
+                                                        <ng-container [ngSwitch]="settlePayment.syncStatus">
+                                                            <span *ngSwitchCase="'Synced'"
+                                                                class="badge badge-success m--margin-left-10">
+                                                                {{settlePayment.syncStatus}}
+                                                            </span>
+                                                            <span *ngSwitchCase="'Rejected'"
+                                                                class="badge badge-danger m--margin-left-10">
+                                                                {{settlePayment.syncStatus}}
+                                                            </span>
+                                                        </ng-container>
+                                                    </ng-container>
                                                 </td>
                                                 <td class="text-right">{{settlePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{settlePayment.settlementCurrency}}</td>
@@ -245,3 +259,63 @@
 <settlement-payments-popup></settlement-payments-popup>
 
 <ng-template inject></ng-template>
+
+<app-context-menu #SmContextMenu (clickOutside)="selectedSettlement = null">
+    <div class="menu-context__item" (click)="viewDetail(selectedSettlement)">
+        <span><i class="la la-edit text-primary"></i><span> Edit</span></span>
+    </div>
+    <ng-container *ngIf="menuSpecialPermission | async | specialPermission:'SyncAcctSystem'">
+        <ng-container
+            *ngIf="selectedSettlement?.statusApproval === 'Done' && selectedSettlement?.syncStatus !== 'Synced'">
+            <div class="menu-context__item" (click)="syncSM()">
+                <span><i class="la la-cloud-upload text-primary"></i><span> Sync this item </span></span>
+            </div>
+        </ng-container>
+        <div class="menu-context__item" (click)="syncBravo()">
+            <span><i class="la la-list-alt text-primary"></i><span>Sync selected items</span></span>
+        </div>
+    </ng-container>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between">
+            <div>
+                <i class="la la-print text-primary"></i>
+                <span> Preview</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+
+    </div>
+    <ng-container title="Deny" *ngIf="menuSpecialPermission | async | specialPermission:'DenySettlement'">
+        <ng-container
+            *ngIf="selectedSettlement?.statusApproval === 'Done' && selectedSettlement?.syncStatus !== 'Synced' ">
+            <hr />
+            <div class="menu-context__item text-danger" (click)="denySettleItem()">
+                <span><i class="la la-times "></i><span> Deny</span></span>
+            </div>
+        </ng-container>
+    </ng-container>
+
+</app-context-menu>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="printSettlement(selectedSettlement.settlementNo)">
+        Single
+    </span>
+    <span class="dropdown-item pointer" (click)="previewSM(selectedSettlement,'VN','multiple')">
+        Multiple (VN)
+    </span>
+
+    <span class="dropdown-item pointer" (click)="previewSM(selectedSettlement,'EN', 'multiple')">
+        Multiple (EN)
+    </span>
+    <span class="dropdown-item pointer" (click)="previewSM(selectedSettlement,'EN', 'general')">
+        General
+    </span>
+    <span class="dropdown-item pointer" (click)="previewSM(selectedSettlement,'VN', 'payment')">
+        Payment SOA
+    </span>
+</app-dropdown>
+
+<select-attach-file-popup type="SM"></select-attach-file-popup>
