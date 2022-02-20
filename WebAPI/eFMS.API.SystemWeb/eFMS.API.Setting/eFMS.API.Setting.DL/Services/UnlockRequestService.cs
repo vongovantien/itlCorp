@@ -75,7 +75,6 @@ namespace eFMS.API.Setting.DL.Services
             setUnlockRequestApproveRepo = setUnlockRequestApprove;
             advancePaymentRepo = advancePayment;
             settlementPaymentRepo = settlementPayment;
-            receiptRepo = receipt;
             opsTransactionRepo = opsTransaction;
             transRepo = trans;
             transDetailRepo = transDetail;
