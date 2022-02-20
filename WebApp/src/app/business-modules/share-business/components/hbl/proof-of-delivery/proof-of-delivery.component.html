@@ -48,8 +48,16 @@
                         <span class="text-primary">
                             {{ !!fileList ? fileList[0].name : null}}
                         </span>
+                        <br/><br/>
                         <ng-container *ngIf="!isLoading && !!files && !!hblid">
-                            <a [href]="files.url" target="_blank" [title]="files.name" download>{{files.name}}</a>
+                            <!-- <a [href]="files.url" target="_blank" [title]="files.name" download>{{files.name}}</a> -->
+                            <li *ngFor="let file of files"><a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
+                                <span class="pointer text-center" *ngIf="!readonly">
+                                    <a title="Delete" (click)="deleteFilePOD(file.name)">
+                                        <i class="la la-times fa-lg text-danger"></i>
+                                    </a>
+                                </span>
+                            </li>
                         </ng-container>
                     </div>
                 </div>
