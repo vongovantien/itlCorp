@@ -47,4 +47,10 @@ export class SystemFileManageRepo {
         );
     }
 
+    deleteContractFilesAttach(contractId: string, fileName: string) {
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${contractId}/${fileName}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
