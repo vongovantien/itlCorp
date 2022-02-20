@@ -234,8 +234,11 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL && currencyConvert == DocumentConstants.CURRENCY_USD)
                     {
-                        var _exChangeRateUsd = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL, DocumentConstants.CURRENCY_USD);
-                        exchangeRate = _exChangeRateUsd;
+
+                        //var _exChangeRateUsd = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL, DocumentConstants.CURRENCY_USD);
+                        //exchangeRate = _exChangeRateUsd;
+
+                        exchangeRate = 1 / kickBackExcRate;
                     }
                 }
                 else
