@@ -314,7 +314,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     updateShipment() {
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
+            this._documentRepo.getASTransactionInfo(this.opsTransaction.jobNo, this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
                 .pipe(
                     catchError(this.catchError),
                     concatMap((res: ILinkAirSeaInfoModel) => {
