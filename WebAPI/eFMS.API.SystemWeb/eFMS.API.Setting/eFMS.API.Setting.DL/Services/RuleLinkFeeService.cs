@@ -421,17 +421,18 @@ namespace eFMS.API.Setting.DL.Services
                 }
                 results.Add(item);
             }
-
-            for(int i = 0; i < list.Count(); i++)
-            {
-                int j = i;
-                while (j < list.Count())
+            if (list.Count > 1) { 
+                for(int i = 0; i < list.Count(); i++)
                 {
-                    if (list[i].RuleName == list[j].RuleName||(list[i].ServiceBuying == list[j].ServiceBuying&& list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling ))
+                    int j = i;
+                    while (j < list.Count())
                     {
-                        list[i].IsValid = false;
+                        if (list[i].RuleName == list[j].RuleName||(list[i].ServiceBuying == list[j].ServiceBuying&& list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling ))
+                        {
+                            list[i].IsValid = false;
+                        }
+                        j++;
                     }
-                    j++;
                 }
             }
             return results;
