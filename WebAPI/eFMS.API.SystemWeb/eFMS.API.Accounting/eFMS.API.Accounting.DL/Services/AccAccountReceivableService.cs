@@ -410,9 +410,34 @@ namespace eFMS.API.Accounting.DL.Services
             //Get OBH charge by OBH Partner (PaymentObjectId)
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(x.ReferenceNo));
 
+            IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                          && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
+            IQueryable<CsTransaction> csJob = transactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
             models.ForEach(fe =>
             {
-                var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+
+                if (fe.Service == "CL")
+                {
+                    _charges = from ops in opsJob
+                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }
+                else
+                {
+                    _charges = from cs in csJob
+                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }
                 decimal? obhAmount = 0;
                 foreach (var charge in _charges)
                 {
@@ -750,15 +775,41 @@ namespace eFMS.API.Accounting.DL.Services
                                              && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId == null);
 
+            IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
+            IQueryable<CsTransaction> csJob = transactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
             models.ForEach(fe =>
             {
-                var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
-                decimal? sellingNoVat = 0;
-                foreach (var charge in _charges)
+
+                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+                if (fe.Service == "CL")
                 {
-                    sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    _charges = from ops in opsJob
+                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }else
+                {
+                    _charges = from cs in csJob
+                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
                 }
-                fe.SellingNoVat = sellingNoVat;
+                if (_charges.Count() > 0)
+                {
+                    decimal? sellingNoVat = 0;
+                    foreach (var charge in _charges)
+                    {
+                        sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    }
+                    fe.SellingNoVat = sellingNoVat;
+                }
             });
 
             return models;
@@ -1246,7 +1297,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
                 receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
-                receivables = CalculatorAdvanceAmount(receivables); //Advance Amount
+                // receivables = CalculatorAdvanceAmount(receivables); //Advance Amount CR: 16851
                 receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
                 receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
                 receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
@@ -1255,7 +1306,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             receivables.ForEach(fe => {
                 //Calculator Debit Amount
-                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0); // Công nợ chưa billing
+                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0); // Công nợ chưa billing
                 fe.DatetimeCreated = DateTime.Now;
                 fe.DatetimeModified = DateTime.Now;
             });
