@@ -1011,11 +1011,11 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal? _creditRate = agreement.CreditRate;
                 if (agreement.ContractType == "Trial")
                 {
-                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount - CusAdv)/TrialCreditLimit)*100
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount - CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
@@ -1465,12 +1465,12 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) /(s.First().contract.TrialCreditLimited)
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) /(s.First().contract.TrialCreditLimited)
                                                                     :0) * 100 ?? 0,3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) / (s.First().contract.CreditLimit)
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) / (s.First().contract.CreditLimit)
                                                                     : 0) * 100 ?? 0, 3):0),
                     CusAdvanceVnd = s.First().contract.CustomerAdvanceAmountVnd ?? 0,
                     CusAdvanceUsd = s.First().contract.CustomerAdvanceAmountUsd ?? 0,
@@ -1490,7 +1490,7 @@ namespace eFMS.API.Accounting.DL.Services
                     IsExpired = s.FirstOrDefault().contract.IsExpired,
                     
                 });
-
+                
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
                        join parent in acRefPartner on partner.ParentId equals parent.Id into parents
@@ -2143,6 +2143,24 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = new AccountReceivableDetailResult();
             if (arPartnerContracts == null) return new AccountReceivableDetailResult();
             var arPartners = arPartnerContracts.Where(x => x.AgreementId == argeementId);
+
+            var contractType = argeement.ContractType;
+            var _currenyContract = argeement.CreditCurrency;
+            var _cusAdvVnd = argeement.CustomerAdvanceAmountVnd ?? 0;
+            var _cusAdvUsd = argeement.CustomerAdvanceAmountUsd ?? 0;
+            var _creditLimit = contractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ? argeement.CreditLimit : argeement.TrialCreditLimited;
+            decimal cusAdvRate = 0;
+            if (contractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+            {
+                cusAdvRate = (_currenyContract == AccountingConstants.CURRENCY_LOCAL ? (_cusAdvVnd / _creditLimit) * 100 : (_cusAdvUsd / _creditLimit) * 100) ?? 0;
+            }
+            if (contractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
+            {
+                cusAdvRate = (_currenyContract == AccountingConstants.CURRENCY_LOCAL ? (_cusAdvVnd / _creditLimit) * 100 : (_cusAdvUsd / _creditLimit) * 100) ?? 0;
+
+            }
+            cusAdvRate = Math.Round(cusAdvRate, 3);
+
             detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.AgreementId }).Select(s => new AccountReceivableResult
             {
                 AgreementId = s.Key.AgreementId,
@@ -2176,7 +2194,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ObhBillingAmount = s.Sum(sum => sum.ObhBillingAmount),
                 ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
                 ObhUnPaidAmount = s.Sum(sum => sum.ObhUnPaidAmount),
-                DebitRate = s.Sum(sum => sum.DebitRate),
+                DebitRate = s.Sum(sum => sum.DebitRate) - cusAdvRate,
                 CusAdvanceVnd = s.Select(se => se.CusAdvanceVnd).FirstOrDefault(),
                 CusAdvanceUsd = s.Select(se => se.CusAdvanceUsd).FirstOrDefault(),
                 BillingAmount = s.Sum(sum => sum.BillingAmount),
