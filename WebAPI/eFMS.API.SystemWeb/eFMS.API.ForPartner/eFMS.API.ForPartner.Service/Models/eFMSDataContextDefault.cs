@@ -156,6 +156,8 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
+
                 entity.Property(e => e.VoucherNo)
                     .HasMaxLength(30)
                     .IsUnicode(false);
