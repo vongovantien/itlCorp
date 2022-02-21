@@ -711,8 +711,8 @@ namespace eFMS.API.Setting.DL.Services
             try
             {
                 HttpClient client = new HttpClient();
-                string MoveFileS3Url = _apiUrl.Value.Url.ToString() + "/api/v1/en-US/AWSS3/MoveObjectAsync/";
-                string DeleteFileS3Url = _apiUrl.Value.Url.ToString() + "/api/v1/en-US/AWSS3/DeleteAttachedFile/";
+                string MoveFileS3Url = _apiUrl.Value.Url.ToString() + "/File/api/v1/en-US/AWSS3/MoveObjectAsync/";
+                string DeleteFileS3Url = _apiUrl.Value.Url.ToString() + "/File/api/v1/en-US/AWSS3/DeleteAttachedFile/";
                 var paymentNos = paymentNo.Split('\n');
                 var hsSuccess = new HandleState(true, (object)"Updated Sucess");
                 if (type == 3)
