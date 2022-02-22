@@ -337,7 +337,7 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listAdd)
+                        foreach (var item in listUpdate)
                         {
                             string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
                             if (!string.IsNullOrEmpty(fileNameAttached))
@@ -462,7 +462,7 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listAdd)
+                        foreach (var item in listUpdate)
                         {
                             string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
                             if (!string.IsNullOrEmpty(fileNameAttached))
