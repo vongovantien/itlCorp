@@ -208,8 +208,8 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction entityReplicate = mapper.Map<OpsTransaction>(model);
                             entityReplicate.Id = Guid.NewGuid();
                             entityReplicate.Hblid = Guid.NewGuid();
-                            entityReplicate.ServiceNo = entity.JobNo;
-                            entityReplicate.ServiceHblId = entity.Hblid;
+                            entityReplicate.ServiceNo = null;
+                            entityReplicate.ServiceHblId = null;
                             entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
 
                             DataContext.Add(entityReplicate, false);
@@ -1213,8 +1213,8 @@ namespace eFMS.API.Documentation.DL.Services
                 opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
 
                 opsTransactionReplicate.JobNo = preFix + opsTransaction.JobNo;
-                opsTransactionReplicate.ServiceNo = opsTransaction.JobNo;
-                opsTransactionReplicate.ServiceHblId = opsTransaction.Hblid;
+                opsTransactionReplicate.ServiceNo = null;
+                opsTransactionReplicate.ServiceHblId = null;
                 opsTransactionReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
                 opsTransactionReplicate.OfficeId = settingFlowOffice.ReplicateOfficeId; // office của setting replicate
 
@@ -1367,14 +1367,15 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (model.ReplicatedId == null || model.ReplicatedId == Guid.Empty)
                     {
-                        if (!string.IsNullOrEmpty(model.ServiceNo))
-                        {
-                            existedMblHbl = duplicateHBLMBL.Any(x => x.ReplicatedId != model.Id);
-                        }
-                        else
-                        {
-                            existedMblHbl = true;
-                        }
+                        existedMblHbl = duplicateHBLMBL.Any(x => x.ReplicatedId != model.Id);
+                        //if (!string.IsNullOrEmpty(model.ServiceNo))
+                        //{
+                        //    existedMblHbl = duplicateHBLMBL.Any(x => x.ReplicatedId != model.Id);
+                        //}
+                        //else
+                        //{
+                        //    existedMblHbl = true;
+                        //}
                     }
                     else
                     {
@@ -2286,8 +2287,8 @@ namespace eFMS.API.Documentation.DL.Services
                     entityReplicate.JobNo = GeneratePreFixReplicate() + job.JobNo;
                     entityReplicate.Id = Guid.NewGuid();
                     entityReplicate.Hblid = Guid.NewGuid();
-                    entityReplicate.ServiceNo = job.JobNo;
-                    entityReplicate.ServiceHblId = job.Hblid;
+                    entityReplicate.ServiceNo = null;
+                    entityReplicate.ServiceHblId = null;
                     entityReplicate.OfficeId = dataUserLevel.OfficeId;
                     entityReplicate.DepartmentId = dataUserLevel.DepartmentId;
                     entityReplicate.GroupId = dataUserLevel.GroupId;
