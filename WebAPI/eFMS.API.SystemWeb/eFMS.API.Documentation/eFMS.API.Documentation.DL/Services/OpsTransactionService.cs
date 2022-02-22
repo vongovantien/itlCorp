@@ -150,6 +150,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = currentUser.OfficeID;
             model.CompanyId = currentUser.CompanyID;
 
+            model.Hwbno = model.Hwbno?.Trim();
+            model.Mblno = model.Mblno?.Trim();
 
             SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(model.SalemanId);
             model.SalesGroupId = salemanPermissionInfo.SalesGroupId;
@@ -1588,7 +1590,8 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-
+                model.Hwbno = model.Hwbno?.Trim();
+                model.Mblno = model.Mblno?.Trim();
                 OpsTransaction entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)
@@ -1861,6 +1864,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     // Create model import
                     Guid _hblId = model.Hblid;
+                    Guid? _replicateId = model.ReplicatedId;
+
                     model.Hblid = Guid.NewGuid();
                     model.JobNo = CreateJobNoOps();
                     model.UserModified = currentUser.UserID;
@@ -1874,7 +1879,8 @@ namespace eFMS.API.Documentation.DL.Services
                     model.IsLocked = false; // Luôn luôn mở job khi duplicate.
                     model.ReplicatedId = null;
                     model.LinkSource = null;
-
+                    model.Hwbno = model.Hwbno?.Trim();
+                    model.Mblno = model.Mblno?.Trim();
                     List<SysUserLevel> dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SalemanId).ToList();
                     if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                     {
@@ -1920,7 +1926,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
-                    if (model.IsReplicate == true)
+                    if (model.IsReplicate == true && _replicateId != null)
                     {
                         SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
                         if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
@@ -1931,16 +1937,22 @@ namespace eFMS.API.Documentation.DL.Services
 
                             if (dataUserLevel != null)
                             {
-                                OpsTransaction entityReplicate = MappingReplicateJob(entity, dataUserLevel);
-                                DataContext.Add(entityReplicate, false);
-
-                                entity.ReplicatedId = entityReplicate.Id;
-
-                                List<CsShipmentSurcharge> listSurChargeReplicate = CopySurChargeToNewJob(_hblId, entityReplicate);
-                                if (listSurChargeReplicate?.Count() > 0)
+                                OpsTransaction replicateJob = DataContext.Get(x => x.Id == _replicateId)?.FirstOrDefault();
+                                if(replicateJob != null)
                                 {
-                                    newSurcharges.AddRange(listSurChargeReplicate);
+                                    OpsTransaction entityReplicate = MappingReplicateJob(replicateJob, dataUserLevel);
+                                    DataContext.Add(entityReplicate, false);
+
+                                    entity.ReplicatedId = entityReplicate.Id;
+                                    entityReplicate.JobNo = GeneratePreFixReplicate() + entity.JobNo;
+
+                                    List<CsShipmentSurcharge> listSurChargeReplicate = CopySurChargeToNewJob(replicateJob.Hblid, entityReplicate);
+                                    if (listSurChargeReplicate?.Count() > 0)
+                                    {
+                                        newSurcharges.AddRange(listSurChargeReplicate);
+                                    }
                                 }
+                                
                             };
                         }
                     };
