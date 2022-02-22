@@ -161,6 +161,7 @@ import { I } from '@angular/cdk/keycodes';
               this.formRule.userNameCreated = res.userNameCreated;
               this.formRule.datetimeModified = res.datetimeModified;
               this.formRule.userNameModified = res.userNameModified;
+              this.formRule.minDateEffective=this.minDate;
               this.formRule.rule.expiredDate = res.expiredDate;
               this.formRule.rule.effectiveDate = res.effectiveDate;
               this.formRule.rule.partnerBuying = res.partnerBuying;
