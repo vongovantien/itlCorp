@@ -699,15 +699,26 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         if (listInsertPayment.Count > 0)
                         {
-                            hsPayablePM = paymentRepository.Add(listInsertPayment);
+                            foreach (var item in listInsertPayment)
+                            {
+                                hsPayablePM = paymentRepository.Add(item, false);
+                            }
                         }
                         if (!hsPayablePM.Success)
                         {
                             return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
                         }
+                        else
+                        {
+                            paymentRepository.SubmitChanges();
+                        }
+
                         if (listInsertPayable.Count > 0)
                         {
-                            hsPayable = DataContext.Add(listInsertPayable);
+                            foreach (var item in listInsertPayable)
+                            {
+                                hsPayable = DataContext.Add(item, false);
+                            }
                         }
                         if (hsPayable.Success)
                         {
@@ -720,7 +731,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    new LogHelper("CancelAccountPayablePayment", ex.ToString());
+                    new LogHelper("InsertAccountPayablePayment", ex.ToString());
                     return new HandleState((object)ex.Message);
                 }
                 finally
