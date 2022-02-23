@@ -21,6 +21,11 @@
         public string Url;
     }
 
+    public class MsWebHookUrl
+    {
+        public string Url;
+    }
+
     public class AuthenticationSetting
     {
         public string Authority;
