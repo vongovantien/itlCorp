@@ -583,7 +583,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                 {
                                     return new HandleState((object)string.Format("Chứng từ {0} và số ref {1} chưa ghi nhận.", acc.PaymentNo, detail.BravoRefNo));
                                 }
-                                var payableAdvExisted = DataContext.Get(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && x.ReferenceNo == detail.AdvRefNo && x.OfficeId == office.Id).FirstOrDefault();
+                                var payableAdvExisted = new AccAccountPayable();
+                                if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CR_COMBINE)
+                                {
+                                    payableAdvExisted = DataContext.Get(x => (x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH) && x.ReferenceNo == detail.AdvRefNo && x.OfficeId == office.Id).FirstOrDefault();
+                                }
+                                else
+                                {
+                                    payableAdvExisted = DataContext.Get(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && x.ReferenceNo == detail.AdvRefNo && x.OfficeId == office.Id).FirstOrDefault();
+                                }
                                 if (payableAdvExisted == null)
                                 {
                                     return new HandleState((object)string.Format("Chứng từ {0} và số ref {1} chưa ghi nhận.", acc.PaymentNo, detail.AdvRefNo));
@@ -638,7 +646,14 @@ namespace eFMS.API.ForPartner.DL.Service
                                 advPayment = creditPayment;
                                 advPayment.Id = Guid.NewGuid();
                                 advPayment.ReferenceNo = detail.AdvRefNo;
-                                advPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF; // type COMBINE && CRCOMBINE => ghi nhận CN để NetOff
+                                if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CR_COMBINE)
+                                {
+                                    advPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT; // type CRCOMBINE => ghi nhận CN để Credit
+                                }
+                                else
+                                {
+                                    advPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF; // type COMBINE => ghi nhận CN để NetOff
+                                }
 
                                 // Update paid amount
                                 // Type CREDIT
