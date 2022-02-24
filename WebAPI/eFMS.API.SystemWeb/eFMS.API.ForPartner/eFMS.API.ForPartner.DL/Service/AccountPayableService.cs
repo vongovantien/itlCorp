@@ -706,11 +706,20 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         if (!hsPayablePM.Success)
                         {
+                            new LogHelper("InsertAccountPayablePayment", hsPayablePM.Message?.ToString());
                             return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
+
                         }
                         else
                         {
-                            paymentRepository.SubmitChanges();
+                            HandleState hsAddP = paymentRepository.SubmitChanges();
+                            if(hsAddP.Success == false)
+                            {
+                                new LogHelper("InsertAccountPayablePayment", hsAddP.Message?.ToString());
+                                return new HandleState("Ghi nhận thất bại. " + hsAddP.Message?.ToString());
+
+
+                            }
                         }
 
                         if (listInsertPayable.Count > 0)
