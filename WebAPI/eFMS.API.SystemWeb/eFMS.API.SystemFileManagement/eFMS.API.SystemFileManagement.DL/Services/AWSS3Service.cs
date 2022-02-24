@@ -384,7 +384,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     var coppied = CoppyObjectAsync(filecCoppy);
                     // reUpdate Image
-                    var images = _sysImageRepo.Get(x => x.ObjectId == filecCoppyModel.srcKey).ToList();
+                    var images = _sysImageRepo.Get(x => x.KeyS3 == item).ToList();
                     foreach (var image in images)
                     {
                         image.Id = Guid.NewGuid();
