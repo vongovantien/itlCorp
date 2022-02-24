@@ -2332,8 +2332,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
                     if(itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
-                        _totalAmountUsd = surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd) ?? 0;
                         _totalAmountVnd = item.surcharges.Sum(x => x.AmountVnd + x.VatAmountVnd);  // có lệch giữa efms-bravo vnd vs usd?.
+                    } else
+                    {
+                        _totalAmountUsd = item.surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd);
                     }
 
                     AccAccountingManagement voucher = new AccAccountingManagement
