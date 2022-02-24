@@ -808,11 +808,19 @@ namespace eFMS.API.Setting.DL.Services
                     foreach (var cdNoteCurrent in cdNoteCurrents)
                     {
                         var newID = Guid.NewGuid();
-                        cdNoteCurrent.Id = newID;
-                        var hsCDNote = cdNoteRepo.Update(cdNoteCurrent, x => x.Id == cdNoteCurrent.Id);
-                        if (!hsCDNote.Success)
+                        var updatePaymentId = UpdatePaymentId(cdNoteCurrent.Code, type, newID);
+                        string logName = string.Format("UpdateCDNotePayment_{0}_eFMS_Log", (
+                            updatePaymentId.Status ? "Success" : "Fail"
+                       ));
+                        string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                            DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                            JsonConvert.SerializeObject("SOA"),
+                            JsonConvert.SerializeObject(cdNoteCurrent.Id),
+                            JsonConvert.SerializeObject(newID));
+                        new LogHelper(logName, logMessage);
+                        if (!updatePaymentId.Status)
                         {
-                            return new HandleState("CD Note don't Update");
+                            return new HandleState((object)updatePaymentId.Message);
                         }
                     }
                     return hsSuccess;
