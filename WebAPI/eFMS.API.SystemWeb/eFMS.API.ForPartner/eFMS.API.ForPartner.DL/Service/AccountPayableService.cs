@@ -619,22 +619,23 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                                 creditPayment.PaymentMethod = acc.PaymentMethod;
                                 creditPayment.PaymentDate = acc.PaymentDate;
-                                if (detail.PayOriginAmount != 0 && detail.RemainOriginAmount != 0)
-                                {
-                                    creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                                }
-                                else if (detail.RemainOriginAmount == 0)
-                                {
-                                    creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                                }
 
                                 creditPayment.PaymentAmount = detail.PayOriginAmount;
                                 creditPayment.PaymentAmountVnd = detail.PayAmountVND;
                                 creditPayment.PaymentAmountUsd = detail.PayAmountUSD;
 
-                                creditPayment.RemainAmount = detail.RemainOriginAmount;
-                                creditPayment.RemainAmountVnd = detail.RemainAmountVND;
-                                creditPayment.RemainAmountUsd = detail.RemainAmountUSD;
+                                creditPayment.RemainAmount = payableCreditExisted.RemainAmount - detail.PayOriginAmount;
+                                creditPayment.RemainAmountVnd = payableCreditExisted.RemainAmountVnd - detail.PayAmountVND;
+                                creditPayment.RemainAmountUsd = payableCreditExisted.RemainAmountUsd - detail.PayAmountUSD;
+                                // status credit
+                                if (payableCreditExisted.PaymentAmount != 0 && creditPayment.RemainAmount != 0)
+                                {
+                                    creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                                }
+                                else if (creditPayment.RemainAmount == 0)
+                                {
+                                    creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                                }
 
                                 creditPayment.CompanyId = currentUser.CompanyID;
                                 creditPayment.OfficeId = office.Id;
@@ -646,6 +647,19 @@ namespace eFMS.API.ForPartner.DL.Service
                                 advPayment = creditPayment;
                                 advPayment.Id = Guid.NewGuid();
                                 advPayment.ReferenceNo = detail.AdvRefNo;
+                                advPayment.RemainAmount = payableAdvExisted.RemainAmount - detail.PayOriginAmount;
+                                advPayment.RemainAmountVnd = payableAdvExisted.RemainAmountVnd - detail.PayAmountVND;
+                                advPayment.RemainAmountUsd = payableAdvExisted.RemainAmountUsd - detail.PayAmountUSD;
+                                // status adv refno
+                                if (payableAdvExisted.PaymentAmount != 0 && advPayment.RemainAmount != 0)
+                                {
+                                    advPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                                }
+                                else if (advPayment.RemainAmount == 0)
+                                {
+                                    advPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                                }
+                                // Payment Type adv refno
                                 if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CR_COMBINE)
                                 {
                                     advPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT; // type CRCOMBINE => ghi nhận CN để Credit
@@ -663,14 +677,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableCreditExisted.RemainAmount = payableCreditExisted.TotalAmount - payableCreditExisted.PaymentAmount;
                                 payableCreditExisted.RemainAmountVnd = payableCreditExisted.TotalAmountVnd - payableCreditExisted.PaymentAmountVnd;
                                 payableCreditExisted.RemainAmountUsd = payableCreditExisted.TotalAmountUsd - payableCreditExisted.PaymentAmountUsd;
-                                if (payableCreditExisted.PaymentAmount != 0 && payableCreditExisted.RemainAmount != 0)
-                                {
-                                    payableCreditExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                                }
-                                else if (payableCreditExisted.RemainAmount == 0)
-                                {
-                                    payableCreditExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                                }
+                                payableCreditExisted.Status = creditPayment.Status;
+                                //if (payableCreditExisted.PaymentAmount != 0 && payableCreditExisted.RemainAmount != 0)
+                                //{
+                                //    payableCreditExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                                //}
+                                //else if (payableCreditExisted.RemainAmount == 0)
+                                //{
+                                //    payableCreditExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                                //}
                                 payableCreditExisted.DatetimeModified = DateTime.Now;
                                 payableCreditExisted.UserModified = currentUser.UserID;
                                 // Type ADV
@@ -680,14 +695,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.RemainAmount = payableAdvExisted.TotalAmount - payableAdvExisted.PaymentAmount;
                                 payableAdvExisted.RemainAmountVnd = payableAdvExisted.TotalAmountVnd - payableAdvExisted.PaymentAmountVnd;
                                 payableAdvExisted.RemainAmountUsd = payableAdvExisted.TotalAmountUsd - payableAdvExisted.PaymentAmountUsd;
-                                if (payableAdvExisted.PaymentAmount != 0 && payableAdvExisted.RemainAmount != 0)
-                                {
-                                    payableAdvExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                                }
-                                else if (payableAdvExisted.RemainAmount == 0)
-                                {
-                                    payableAdvExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                                }
+                                payableCreditExisted.Status = advPayment.Status;
+                                //if (payableAdvExisted.PaymentAmount != 0 && payableAdvExisted.RemainAmount != 0)
+                                //{
+                                //    payableAdvExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                                //}
+                                //else if (payableAdvExisted.RemainAmount == 0)
+                                //{
+                                //    payableAdvExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                                //}
                                 payableAdvExisted.DatetimeModified = DateTime.Now;
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
