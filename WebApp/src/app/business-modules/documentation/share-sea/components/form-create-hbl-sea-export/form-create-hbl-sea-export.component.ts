@@ -100,6 +100,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     customerName: string;
     shipperName: string;
 
+    dateTimeCreated: string;
+    dateTimeModified: string;
+    userCreated: string;
+    userModified: string;
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -161,6 +166,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         } else {
             this.getShipmentDetailAndUpdateDefault();
         }
+        
     }
 
     getShipmentDetailAndUpdateDefault() {

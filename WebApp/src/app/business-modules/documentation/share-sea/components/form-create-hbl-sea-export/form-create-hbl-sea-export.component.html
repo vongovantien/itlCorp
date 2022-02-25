@@ -337,6 +337,21 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div *ngIf="isUpdate" class="col-md-12">
+                    <div class="row m--margin-top-20">
+                        <div class="col-md-6">
+                            <span>Created: {{this.dateTimeCreated | date: 'dd/MM/yyyy HH:mm'}} by</span>
+                            <span class="text-success">{{this.userCreated}}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span>Modified: {{this.dateTimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                            </span> <span class="text-success">{{this.userModified}}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </form>
     </div>
 </div>
