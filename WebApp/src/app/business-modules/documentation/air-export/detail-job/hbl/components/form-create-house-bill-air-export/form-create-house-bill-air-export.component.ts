@@ -281,8 +281,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.userModified=hbl.userNameModified;
                         this.updateFormValue(hbl);
                     }
-                    console.log('ối giời ơi nó ra '+ this.dateTimeCreated);
-                    
                 });
     }
 
