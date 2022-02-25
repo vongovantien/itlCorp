@@ -2,15 +2,49 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Report.DL.Common;
+using eFMS.API.Report.DL.IService;
+using eFMS.API.Report.DL.Models;
+using eFMS.API.Report.Infrastructure.Middlewares;
+using eFMS.API.Report.Service.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Report.Controllers
 {
+    [ApiController]
+    [ApiVersion("1.0")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class SaleReportController : Controller
     {
-        public IActionResult Index()
+        private readonly ISaleReportService saleReportService;
+        private readonly IReportLogService reportLogService;
+
+        public SaleReportController(ISaleReportService saleReportService, IReportLogService rptLogService)
         {
-            return View();
+            this.saleReportService = saleReportService;
+            reportLogService = rptLogService;
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult MonthlySalereport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
+
+            #region -- Ghi log Report --
+            var reportLogModel = new SysReportLog
+            {
+                ReportName = ReportConstants.Monthly_Sale_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ReportConstants.Crystal_Preview
+            };
+            reportLogService.Add(reportLogModel);
+            #endregion -- Ghi log Report --
+
+            return Ok(result);
         }
     }
 }

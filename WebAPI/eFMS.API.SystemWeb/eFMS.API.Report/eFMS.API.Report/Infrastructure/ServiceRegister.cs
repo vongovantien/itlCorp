@@ -30,13 +30,14 @@ namespace eFMS.API.Report.Infrastructure
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
             services.AddTransient<IReportDocumentService, ReportDocumentService>();
+            services.AddTransient<ISaleReportService, SaleReportService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(
                 options =>
                 {
-                    //options.DescribeAllEnumsAsStrings();
+                    options.DescribeAllEnumsAsStrings();
                     var provider = services.BuildServiceProvider()
                     .GetRequiredService<IApiVersionDescriptionProvider>();
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
