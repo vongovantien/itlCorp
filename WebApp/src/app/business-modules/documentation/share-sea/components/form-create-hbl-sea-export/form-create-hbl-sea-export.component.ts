@@ -159,6 +159,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     (res: CsTransactionDetail) => {
                         if (!!res) {
                             this.shipmmentDetail.id = res.jobId;
+                            this.dateTimeCreated=res.datetimeCreated;
+                            this.dateTimeModified=res.datetimeModified;
+                            this.userCreated=res.userNameCreated;
+                            this.userModified=res.userNameModified;
                             this.updateFormValue(res);
                         }
                     }
@@ -196,6 +200,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             placeReceipt: this.shipmmentDetail.polName,
                             podDescription: !!this.shipmmentDetail.podDescription ? this.shipmmentDetail.podDescription : this.shipmmentDetail.podName,
                             polDescription: !!this.shipmmentDetail.polDescription ? this.shipmmentDetail.polDescription : this.shipmmentDetail.polName,
+
                             incotermId: this.shipmmentDetail.incotermId
                         });
 
