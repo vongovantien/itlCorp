@@ -1225,6 +1225,7 @@ namespace eFMS.API.Documentation.DL.Services
                 opsTransactionReplicate.SalesDepartmentId = salemanPermissionInfoReplicate.SalesDepartmentId;
                 opsTransactionReplicate.SalesOfficeId = salemanPermissionInfoReplicate.SalesOfficeId;
                 opsTransactionReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
+                opsTransactionReplicate.SalemanId = salemanDefault.Id;
 
                 // mapping permission
                 opsTransactionReplicate.OfficeId = dataUserLevel.OfficeId;
@@ -2296,6 +2297,7 @@ namespace eFMS.API.Documentation.DL.Services
                     entityReplicate.SalesDepartmentId = salemanPermissionInfoReplicate.SalesDepartmentId;
                     entityReplicate.SalesOfficeId = salemanPermissionInfoReplicate.SalesOfficeId;
                     entityReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
+                    entityReplicate.SalemanId = salemanDefault.Id;
                     entityReplicate.IsLocked = false;
                     entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
 
