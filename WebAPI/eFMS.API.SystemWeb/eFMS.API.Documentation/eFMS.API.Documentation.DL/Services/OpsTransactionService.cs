@@ -2335,6 +2335,28 @@ namespace eFMS.API.Documentation.DL.Services
 
                             HandleState hsCd = customDeclarationRepository.Add(cdReplicate);
                         }
+
+                        // copy assignment
+                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id)?.FirstOrDefault();
+                        if(assign != null)
+                        {
+                            var opsAssignProp = assign.GetType().GetProperties();
+                            OpsStageAssigned newOpsAssigned = new OpsStageAssigned();
+
+                            foreach (var prop in opsAssignProp)
+                            {
+                                newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(assign, null), null);
+                            }
+
+                            newOpsAssigned.DatetimeCreated = DateTime.Now;
+                            newOpsAssigned.DatetimeModified = DateTime.Now;
+                            newOpsAssigned.UserCreated = currentUser.UserID;
+                            newOpsAssigned.UserModified = currentUser.UserID;
+                            newOpsAssigned.Id = Guid.NewGuid();
+                            newOpsAssigned.JobId = entityReplicate.Id;
+
+                            HandleState hsAssign = opsStageAssignedRepository.Add(newOpsAssigned);
+                        }
                     }
                 };
             }
