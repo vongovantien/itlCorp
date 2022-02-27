@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import { Shipment, CustomDeclaration } from '@models';
 import { SortService } from '@services';
 import { DocumentationRepo, OperationRepo } from '@repositories';
-import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent } from '@common';
+import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
@@ -17,6 +17,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
 import { GetCurrenctUser, getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
+import { delayTime } from '@decorators';
 
 
 
@@ -308,5 +309,45 @@ export class JobManagementComponent extends AppList implements OnInit {
                     )
             }
         });
+    }
+
+    printPLSheet(currency: string) {
+        const currentJob = Object.assign({}, this.selectedShipment);
+        this._documentRepo.previewPL(this.selectedShipment?.id, currency)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 }
