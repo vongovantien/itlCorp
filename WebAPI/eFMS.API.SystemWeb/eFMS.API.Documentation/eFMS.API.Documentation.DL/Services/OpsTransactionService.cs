@@ -258,7 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
             entityReplicate.SalesOfficeId = salemanPermissionInfoReplicate.SalesOfficeId;
             entityReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
             entityReplicate.IsLocked = false;
-            entityReplicate.SaleManId = salemanDefault.Id
+            entityReplicate.SalemanId = salemanDefault.Id;
             entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
 
             return entityReplicate;
