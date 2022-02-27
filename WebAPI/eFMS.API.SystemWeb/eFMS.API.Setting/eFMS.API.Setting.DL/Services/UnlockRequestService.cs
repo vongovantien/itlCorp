@@ -23,6 +23,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
+using eFMS.API.Common;
+using Microsoft.Extensions.Options;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -39,6 +43,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CsTransactionDetail> transDetailRepo;
         private readonly IContextBase<CustomsDeclaration> customsRepo;
         private readonly IContextBase<AcctReceipt> receiptRepo;
+        private readonly IContextBase<SysImage> sysImageRepo;
         private readonly IContextBase<AcctReceiptSync> receipSynctRepo;
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
@@ -47,6 +52,7 @@ namespace eFMS.API.Setting.DL.Services
         readonly IUserBaseService userBaseService;
         private string typeApproval = "Unlock Shipment";
         readonly IContextBase<AcctSoa> soaRepo;
+        private readonly IOptions<ApiUrl> _apiUrl;
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -63,10 +69,12 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<AcctReceiptSync> acctSyncReceipt,
             IContextBase<CustomsDeclaration> customs,
             IContextBase<AcctCdnote> cdNote,
+            IContextBase<SysImage> sysImage,
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> surcharge,
             IContextBase<SysAuthorizedApproval> authourizedApproval,
             IContextBase<AcctSoa> SOA,
+            IOptions<ApiUrl> apiUrl,
             IUnlockRequestApproveService unlockRequestApprove,
             IUserBaseService userBase) : base(repository, mapper)
         {
@@ -75,6 +83,9 @@ namespace eFMS.API.Setting.DL.Services
             setUnlockRequestApproveRepo = setUnlockRequestApprove;
             advancePaymentRepo = advancePayment;
             settlementPaymentRepo = settlementPayment;
+            sysImageRepo = sysImage;
+            _apiUrl = apiUrl;
+
             opsTransactionRepo = opsTransaction;
             transRepo = trans;
             transDetailRepo = transDetail;
@@ -695,10 +706,13 @@ namespace eFMS.API.Setting.DL.Services
         #endregion -- EXPORT --
 
         #region -- Generate ID --
-        public HandleState GenerateID(string paymentNo, int type)
+        public async Task<HandleState> GenerateID(string paymentNo, int type)
         {
             try
             {
+                HttpClient client = new HttpClient();
+                string MoveFileS3Url = _apiUrl.Value.Url.ToString() + "/File/api/v1/en-US/AWSS3/MoveObjectAsync/";
+                string DeleteFileS3Url = _apiUrl.Value.Url.ToString() + "/File/api/v1/en-US/AWSS3/DeleteAttachedFile/";
                 var paymentNos = paymentNo.Split('\n');
                 var hsSuccess = new HandleState(true, (object)"Updated Sucess");
                 if (type == 3)
@@ -713,6 +727,23 @@ namespace eFMS.API.Setting.DL.Services
                             return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
                         }
                         var newID = Guid.NewGuid();
+                        var moved = await client.GetAsync(MoveFileS3Url + advanceCurrent.Id + "/" + newID + "/" + type);
+                        if (moved.IsSuccessStatusCode)
+                        {
+                            var images = sysImageRepo.Get(x => x.ObjectId == advanceCurrent.Id.ToString().ToLower()).ToList();
+                            foreach(var image in images)
+                            {
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id);
+                                if (!delete.IsSuccessStatusCode)
+                                {
+                                    return new HandleState(false, "can't delete Folder");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState(false, "can't update Folder");
+                        }
                         var updatePaymentId = UpdatePaymentId(advanceCurrent.AdvanceNo, type, newID);
                         string logName = string.Format("UpdateAdvancePayment_{0}_eFMS_Log", (
                             updatePaymentId.Status ? "Success" : "Fail"
@@ -742,6 +773,23 @@ namespace eFMS.API.Setting.DL.Services
                             return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
                         }
                         var newID = Guid.NewGuid();
+                        var moved = await client.GetAsync(MoveFileS3Url + settlementCurrent.Id + "/" + newID + "/" + type);
+                        if (moved.IsSuccessStatusCode)
+                        {
+                            var images = sysImageRepo.Get(x => x.ObjectId == settlementCurrent.Id.ToString().ToLower()).ToList();
+                            foreach(var image in images)
+                            {
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id);
+                                if (!delete.IsSuccessStatusCode)
+                                {
+                                    return new HandleState(false, "can't delete Folder");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState(false, "can't update Folder");
+                        }
                         var updatePaymentId = UpdatePaymentId(settlementCurrent.SettlementNo, type, newID);
                         string logName = string.Format("UpdateSettlementPayment_{0}_eFMS_Log", (
                              updatePaymentId.Status ? "Success" : "Fail"
@@ -767,6 +815,23 @@ namespace eFMS.API.Setting.DL.Services
                     foreach(var SOACurrent in SOACurrents)
                     {
                         var newID = Guid.NewGuid();
+                        var moved = await client.GetAsync(MoveFileS3Url + SOACurrent.Id + "/" + newID + "/" + type);
+                        if (moved.IsSuccessStatusCode)
+                        {
+                            var images = sysImageRepo.Get(x => x.ObjectId == SOACurrent.Id.ToLower()).ToList();
+                            foreach(var image in images)
+                            {
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/SOA/" + image.Id);
+                                if (!delete.IsSuccessStatusCode)
+                                {
+                                    return new HandleState(false, "can't delete Folder");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState(false, "can't update Folder");
+                        }
                         var updatePaymentId = UpdatePaymentId(SOACurrent.Soano, type, newID);
                         string logName = string.Format("UpdateSOAPayment_{0}_eFMS_Log", (
                             updatePaymentId.Status ? "Success" : "Fail"

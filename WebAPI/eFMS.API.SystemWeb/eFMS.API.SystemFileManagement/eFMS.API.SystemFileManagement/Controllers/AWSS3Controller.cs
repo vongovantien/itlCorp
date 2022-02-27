@@ -172,5 +172,30 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpGet("MoveObjectAsync/{srcId}/{destId}/{type?}")]
+        public IActionResult MoveObjectAsync(string srcId, string destId, int? type)
+        {
+            try
+            {
+                FileCoppyModel fileCoppy = new FileCoppyModel()
+                {
+                    srcKey = srcId,
+                    destKey = destId,
+                    Type = type,
+                };
+                var document = _aWSS3Service.MoveObjectAsync(fileCoppy).Result;
+                if (!document.Success)
+                {
+                    return BadRequest();
+                }
+                return Ok(document);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }
