@@ -449,7 +449,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 //[ADD][1/11/2021][16602-Update lại tỷ giá]
-                cdNote.ExcRateUsdToLocal = model.ExcRateUsdToLocal== null?cdNote.ExcRateUsdToLocal:model.ExcRateUsdToLocal;
+                cdNote.ExcRateUsdToLocal = model.ExcRateUsdToLocal == null ? cdNote.ExcRateUsdToLocal : model.ExcRateUsdToLocal;
                 //[END]
 
                 var entity = mapper.Map<AcctCdnote>(model);
@@ -505,6 +505,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var surchargesCDNote = new List<CsShipmentSurcharge>();
                 var surchargeUpdate = new List<CsShipmentSurcharge>(); ;
                 var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                var oldChargeCopy = new List<CsShipmentSurcharge>();
+                oldChargeCopy.AddRange(chargeOfCdNote.ToList());
+                var combineNoCdNote = !string.IsNullOrEmpty(cdNote.CombineBillingNo) ? cdNote.CombineBillingNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
+                var hasCombineValue = combineNoCdNote != null && combineNoCdNote.Count() > 0;
                 //Cập nhật các credit debit note code của của các charge thành null
                 foreach (var item in chargeOfCdNote)
                 {
@@ -518,13 +522,13 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.DebitNo = null;
                     }
-                    if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                    if (hasCombineValue)
                     {
-                        if (cdNote.CombineBillingNo == item.CombineBillingNo)
+                        if (combineNoCdNote.Any(x => x == item.CombineBillingNo))
                         {
                             item.CombineBillingNo = null;
                         }
-                        if (cdNote.CombineBillingNo == item.ObhcombineBillingNo)
+                        if (combineNoCdNote.Any(x => x == item.ObhcombineBillingNo))
                         {
                             item.ObhcombineBillingNo = null;
                         }
@@ -538,20 +542,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
                     if (charge != null)
                     {
+                        var oldCharge = oldChargeCopy.Where(x => x.Hblid == charge.Hblid).FirstOrDefault();
                         if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             charge.CreditNo = model.Code;
-                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            if (hasCombineValue && oldCharge != null)
                             {
-                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                                charge.CombineBillingNo = oldCharge.CombineBillingNo;
                             }
                         }
                         else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             charge.DebitNo = model.Code;
-                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            if (hasCombineValue && oldCharge != null)
                             {
-                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                                charge.CombineBillingNo = oldCharge.CombineBillingNo;
                             }
                         }
                         else
@@ -559,17 +564,17 @@ namespace eFMS.API.Documentation.DL.Services
                             if (model.PartnerId == charge.PaymentObjectId)
                             {
                                 charge.DebitNo = model.Code;
-                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                if (hasCombineValue && oldCharge != null)
                                 {
-                                    charge.CombineBillingNo = cdNote.CombineBillingNo;
+                                    charge.CombineBillingNo = oldCharge.CombineBillingNo;
                                 }
                             }
                             if (model.PartnerId == charge.PayerId)
                             {
                                 charge.CreditNo = model.Code;
-                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                if (hasCombineValue && oldCharge != null)
                                 {
-                                    charge.ObhcombineBillingNo = cdNote.CombineBillingNo;
+                                    charge.ObhcombineBillingNo = oldCharge.ObhcombineBillingNo;
                                 }
                             }
                         }
@@ -1171,19 +1176,19 @@ namespace eFMS.API.Documentation.DL.Services
                         var surchargeUpdate = new List<CsShipmentSurcharge>();
                         if (hs.Success)
                         {
+                            var combineNoCdNote = !string.IsNullOrEmpty(cdNote.CombineBillingNo) ? cdNote.CombineBillingNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
                             foreach (var item in charges)
                             {
                                 // Remove combine no
-                                if(!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                if (combineNoCdNote != null && combineNoCdNote.Count() > 0)
                                 {
-                                    if(cdNote.CombineBillingNo == item.CombineBillingNo)
-                                    {
-                                        item.CombineBillingNo = null;
-                                    }
-                                    if(cdNote.CombineBillingNo == item.ObhcombineBillingNo)
-                                    {
-                                        item.ObhcombineBillingNo = null;
-                                    }
+                                    item.CombineBillingNo = combineNoCdNote.Any(x => x == item.CombineBillingNo) ? null : item.CombineBillingNo;
+                                    item.ObhcombineBillingNo = combineNoCdNote.Any(x => x == item.ObhcombineBillingNo) ? null : item.ObhcombineBillingNo;
+                                }
+                                else
+                                {
+                                    item.CombineBillingNo = item.CombineBillingNo;
+                                    item.ObhcombineBillingNo = item.ObhcombineBillingNo;
                                 }
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
@@ -1225,12 +1230,18 @@ namespace eFMS.API.Documentation.DL.Services
                                 cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
                             }
                             // Delete combine if exist
-                            var existingCombine = surchargeRepository.Any(x => !(x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code) && (x.CombineBillingNo == cdNote.CombineBillingNo || x.ObhcombineBillingNo == cdNote.CombineBillingNo));
-                            if (!existingCombine)
+                            if (combineNoCdNote != null && combineNoCdNote.Count() > 0)
                             {
-                                if (acctCombineBillingRepository.Any(x => x.CombineBillingNo == cdNote.CombineBillingNo))
+                                foreach (var combineNo in combineNoCdNote)
                                 {
-                                    var hsCm = acctCombineBillingRepository.Delete(x => x.CombineBillingNo == cdNote.CombineBillingNo);
+                                    var existingCombine = surchargeRepository.Any(x => !(x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code) && (x.CombineBillingNo == combineNo || x.ObhcombineBillingNo == combineNo));
+                                    if (!existingCombine)
+                                    {
+                                        if (acctCombineBillingRepository.Any(x => x.CombineBillingNo == combineNo))
+                                        {
+                                            var hsCm = acctCombineBillingRepository.Delete(x => x.CombineBillingNo == combineNo);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1600,24 +1611,44 @@ namespace eFMS.API.Documentation.DL.Services
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
 
-                    //Amount trước thuế
-                    decimal _netAmount = _unitPrice * item.Quantity;
-                    //Tiền thuế (nếu có)
-                    decimal _taxMoney = 0;
 
-                    _netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
-                    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                    _taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                    //decimal _netAmount = _unitPrice * item.Quantity;                
+                    //decimal _taxMoney = 0;
 
-                    var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
+                    //_netAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    //_taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    //_taxMoney = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
 
-                    var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
-                    var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
+                    var _totalAmountVnd = item.VatAmountVnd + item.AmountVnd; //Total Amount = Amount trước thuế + Tiền thuế #CR: 17027
+                    var _totalAmountusd = item.VatAmountUsd + item.AmountUsd;
 
-                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
-                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
-                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
-                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
+                    decimal? _credit = 0;
+                    decimal? _debit = 0;
+                    if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        _debit = _credit = _totalAmountVnd;
+                    }
+                    else
+                    {
+                        _debit = _credit = _totalAmountusd;
+                    }
+                    if (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId))
+                    {
+                        _debit = 0;
+                    }
+                    if (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId))
+                    {
+                        _credit = 0;
+                    }
+
+                    // var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
+                    // var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
+
+                    // charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    // charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+
+                    charge.Credit = _credit + _decimalNumber; //Cộng thêm phần thập phân
+                    charge.Debit = _debit + _decimalNumber; //Cộng thêm phần thập phân
 
                     charge.ExtVND = 0; //NOT USE
                     charge.Notes = string.IsNullOrEmpty(item.Notes) ? "" : "(" + item.Notes + ")";
@@ -1826,39 +1857,72 @@ namespace eFMS.API.Documentation.DL.Services
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
 
-                    //Amount trước thuế
-                    decimal _netAmount = _unitPrice * item.Quantity;
-                    //Tiền thuế (nếu có)
-                    decimal _taxMoney = 0;
+                    //decimal _netAmount = _unitPrice * item.Quantity;
+                   
+                    //decimal _taxMoney = 0;
+                    //if (isOriginCurr)
+                    //{
+                    //    _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    //    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    //    _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                    //}
+                    //else
+                    //{
+                    //    _netAmount = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    //    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    //    _taxMoney = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                    //}
+
+                    var _totalAmountVnd = item.VatAmountVnd + item.AmountVnd; //Total Amount = Amount trước thuế + Tiền thuế #CR: 17027
+                    var _totalAmountUsd = item.VatAmountUsd + item.AmountUsd;
+
+                    decimal? _credit = 0;
+                    decimal? _debit = 0;
                     if (isOriginCurr)
                     {
-                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _debit = _credit = _totalAmountVnd;
+                        }
+                        else
+                        {
+                            _debit = _credit = _totalAmountUsd;
+                        }
                     }
                     else
                     {
-                        _netAmount = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                        if (currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _debit = _credit = _totalAmountVnd;
+                        }
+                        else
+                        {
+                            _debit = _credit = _totalAmountUsd;
+                        }
+                    }
+                    if (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId))
+                    {
+                        _debit = 0;
+                    }
+                    if (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId))
+                    {
+                        _credit = 0;
                     }
 
-                    var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
-
-                    var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
-                    var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
-                    if (isOriginCurr)
-                    {
-                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
-                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
-                    }
-                    else
-                    {
-                        charge.Credit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
-                        charge.Debit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
-                    }
-                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
-                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
+                    //var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
+                    //var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
+                    //if (isOriginCurr)
+                    //{
+                    //    charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    //    charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                    //}
+                    //else
+                    //{
+                    //    charge.Credit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    //    charge.Debit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                    //}
+                    charge.Credit = _credit + _decimalNumber; //Cộng thêm phần thập phân
+                    charge.Debit = _debit + _decimalNumber; //Cộng thêm phần thập phân
 
                     listCharge.Add(charge);
                 }
@@ -2058,38 +2122,68 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
 
                     //Amount trước thuế
-                    decimal _netAmount = _unitPrice * item.Quantity;
+                    // decimal _netAmount = _unitPrice * item.Quantity;
                     //Tiền thuế (nếu có)
                     decimal _taxMoney = 0;
+                    //if (isOriginCurr)
+                    //{
+                    //    _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    //    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    //    _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                    //}
+                    //else
+                    //{
+                    //    _netAmount = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
+                    //    _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
+                    //    _taxMoney = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                    //}
+
+                    var _totalAmountVnd = item.VatAmountVnd + item.AmountVnd; //Total Amount = Amount trước thuế + Tiền thuế #CR: 17027
+                    var _totalAmountusd = item.VatAmountUsd + item.AmountUsd;
+
+                    decimal? _credit = 0;
+                    decimal? _debit = 0;
                     if (isOriginCurr)
                     {
-                        _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
-                    }
-                    else
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _debit = _credit = _totalAmountVnd;
+                        }
+                        else
+                        {
+                            _debit = _credit = _totalAmountusd;
+                        }
+                    } else
                     {
-                        _netAmount = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
-                        _taxMoney = (item.Vatrate != null) ? (item.Vatrate < 101 & item.Vatrate >= 0) ? ((item.Vatrate ?? 0) * _netAmount / 100) : Math.Abs(item.Vatrate * _exchangeRate ?? 0) : 0;
-                        _taxMoney = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_taxMoney, 0) : NumberHelper.RoundNumber(_taxMoney, 2); //Làm tròn tiền thuế
+                        if (currency == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _debit = _credit = _totalAmountVnd;
+                        }
+                        else
+                        {
+                            _debit = _credit = _totalAmountusd;
+                        }
                     }
-
-                    var _totalAmount = _netAmount + _taxMoney; //Total Amount = Amount trước thuế + Tiền thuế
-
-                    var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? _totalAmount : 0;
-                    var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? _totalAmount : 0;
-                    if (isOriginCurr)
+                    if (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId))
                     {
-                        charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
-                        charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                        _debit = 0;
                     }
-                    else
+                    if (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId))
                     {
-                        charge.Credit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
-                        charge.Debit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                        _credit = 0;
                     }
-                    charge.Credit = charge.Credit + _decimalNumber; //Cộng thêm phần thập phân
-                    charge.Debit = charge.Debit + _decimalNumber; //Cộng thêm phần thập phân
+                    //if (isOriginCurr)
+                    //{
+                    //    charge.Credit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    //    charge.Debit = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                    //}
+                    //else
+                    //{
+                    //    charge.Credit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_credit, 0) : NumberHelper.RoundNumber(_credit, 2); //Làm tròn Amount Credit
+                    //    charge.Debit = (currency == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_debit, 0) : NumberHelper.RoundNumber(_debit, 2); //Làm tròn Amount Debit
+                    //}
+                    charge.Credit = _credit + _decimalNumber; //Cộng thêm phần thập phân
+                    charge.Debit = _debit + _decimalNumber; //Cộng thêm phần thập phân
 
                     charge.ExtVND = 0; //NOT USE
                     charge.Notes = item.Notes;
@@ -3642,38 +3736,46 @@ namespace eFMS.API.Documentation.DL.Services
         /// Update Combine Billing Data
         /// </summary>
         /// <param name="combineNoUpd">combine no in cd note</param>
-        private void UpdateCombineBilling(string combineNoUpd)
+        private void UpdateCombineBilling(string combineNoUpds)
         {
-            var surchargeCmb = surchargeRepository.Get(x => x.CombineBillingNo == combineNoUpd || x.ObhcombineBillingNo == combineNoUpd);
-            var existCmb = surchargeCmb?.Count() ?? 0;
-            if (existCmb > 0)
+            if (!string.IsNullOrEmpty(combineNoUpds))
             {
-                var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
-                if (combineCurrent != null)
+                var listCombineNo = combineNoUpds.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim());
+                foreach (var combineNoUpd in listCombineNo)
                 {
-                    combineCurrent.TotalAmountVnd = combineCurrent.TotalAmountUsd = 0;
-                    foreach (var sur in surchargeCmb)
+                    var surchargeCmb = surchargeRepository.Get(x => x.CombineBillingNo == combineNoUpd || x.ObhcombineBillingNo == combineNoUpd);
+                    var existCmb = surchargeCmb?.Count() ?? 0;
+                    if (existCmb > 0)
                     {
-                        if (sur.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
+                        if (combineCurrent != null)
                         {
-                            var test = acctSoaRepo.Get(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
-                            var isCredit = acctSoaRepo.Any(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
-                            isCredit = !isCredit ? DataContext.Any(x => x.Code == sur.CreditNo && x.CombineBillingNo == combineNoUpd) : isCredit;
-                            combineCurrent.TotalAmountVnd += (isCredit ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
-                            combineCurrent.TotalAmountUsd += (isCredit ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
-                        }
-                        else
-                        {
-                            combineCurrent.TotalAmountVnd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
-                            combineCurrent.TotalAmountUsd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                            combineCurrent.TotalAmountVnd = combineCurrent.TotalAmountUsd = 0;
+                            foreach (var sur in surchargeCmb)
+                            {
+                                if (sur.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                                {
+                                    var test = acctSoaRepo.Get(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
+                                    var isCredit = acctSoaRepo.Any(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
+                                    isCredit = !isCredit ? DataContext.Any(x => x.Code == sur.CreditNo && x.CombineBillingNo == combineNoUpd) : isCredit;
+                                    combineCurrent.TotalAmountVnd += (isCredit ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                                    combineCurrent.TotalAmountUsd += (isCredit ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                                }
+                                else
+                                {
+                                    combineCurrent.TotalAmountVnd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                                    combineCurrent.TotalAmountUsd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                                }
+                            }
+                            acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo, false);
                         }
                     }
-                    acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo);
+                    else
+                    {
+                        acctCombineBillingRepository.Delete(x => x.CombineBillingNo == combineNoUpd, false);
+                    }
                 }
-            }
-            else
-            {
-                acctCombineBillingRepository.Delete(x => x.CombineBillingNo == combineNoUpd);
+                acctCombineBillingRepository.SubmitChanges();
             }
         }
     }

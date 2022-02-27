@@ -316,7 +316,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
+            this._documentRepo.getASTransactionInfo(this.jobNo.value, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
                 .subscribe((res: ILinkAirSeaInfoModel) => {
                     if (!!res?.jobNo) {

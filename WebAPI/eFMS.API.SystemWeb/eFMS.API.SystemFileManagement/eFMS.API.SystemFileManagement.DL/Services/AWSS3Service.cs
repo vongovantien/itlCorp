@@ -86,7 +86,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string RenameFileS3(string fileName)
         {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%-@$]+", "") + "_" + StringHelper.RandomString(5);
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#?+%&.]+", "") + "_" + StringHelper.RandomString(5);
         }
 
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
@@ -99,9 +99,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 foreach (var file in model.Files)
                 {
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                    var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
-                    if (fileExe != null)
-                        fileName = RenameFileS3(fileName);
+                    fileName = RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -117,6 +115,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
                         string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        if (extension == ".doc")
+                        {
+                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        }
                         var sysImage = new SysImage
                         {
                             Id = Guid.NewGuid(),
@@ -173,6 +175,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         result = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
                     }
+                    if (extension == ".doc")
+                    {
+                        result = _domainTest + "/DownloadFileAsync/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                    }
                 }
                 return result;
             }
@@ -204,6 +210,40 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             catch (Exception ex)
             {
                 return new HandleState(ex.ToString());
+            }
+        }
+        public async Task<byte[]> DownloadFileAsync(string moduleName, string folder, Guid objId, string fileName)
+        {
+            MemoryStream ms = null;
+
+            try
+            {
+                var key = moduleName + "/" + folder + "/" + objId + "/" + fileName;
+                var request = new GetObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = moduleName + "/" + folder + "/" + objId + "/" + fileName
+                };
+
+                using (var response = await _client.GetObjectAsync(request))
+                {
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        using (ms = new MemoryStream())
+                        {
+                            await response.ResponseStream.CopyToAsync(ms);
+                        }
+                    }
+                }
+
+                if (ms is null || ms.ToArray().Length < 1)
+                    throw new FileNotFoundException(string.Format("The document '{0}' is not found", fileName));
+
+                return ms.ToArray();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
         public async Task<HandleState> CreateFileZip(FileDowloadZipModel model)
@@ -261,6 +301,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return archiveFile;
         }
+
         class InMemoryFile
         {
             public string FileName { get; set; }
@@ -273,5 +314,97 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             input.CopyTo(ms);
             return ms.ToArray();
         }
+
+        public async Task<HandleState> CoppyObjectAsync(FileCoppyModel filecCoppyModel)
+        {
+            try
+            {
+                CopyObjectRequest request = new CopyObjectRequest
+                {
+                    SourceBucket = _bucketName,
+                    SourceKey = filecCoppyModel.srcKey,
+                    DestinationBucket = _bucketName,
+                    DestinationKey = filecCoppyModel.destKey
+                };
+                CopyObjectResponse response = await _client.CopyObjectAsync(request);
+
+                return new HandleState(true, response);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
+        private FileCoppyModel ReDirectFolder(FileCoppyModel filecCoppyModel)
+        {
+            if (filecCoppyModel.Type != null)
+            {
+                switch (filecCoppyModel.Type)
+                {
+                    case 1:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/SOA/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/SOA/" + filecCoppyModel.destKey + "/",
+                        };
+                    case 2:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/Settlement/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/Settlement/" + filecCoppyModel.destKey + "/",
+                        };
+                    case 3:
+                        return new FileCoppyModel()
+                        {
+                            srcKey = "Accounting/Advance/" + filecCoppyModel.srcKey.ToLower(),
+                            destKey = "Accounting/Advance/" + filecCoppyModel.destKey + "/",
+                        };
+                    default:
+                        break;
+                }
+            }
+            return filecCoppyModel;
+        }
+
+        public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
+        {
+            try
+            {
+                var filecCoppyConvert = ReDirectFolder(filecCoppyModel);
+                var listObject = _client.ListObjectsAsync(_bucketName, filecCoppyConvert.srcKey).Result;
+                var listFile = listObject.S3Objects.Select(x => x.Key).ToList();
+                //listFile.RemoveAt(0);
+                foreach (var item in listFile)
+                {
+                    FileCoppyModel filecCoppy = new FileCoppyModel()
+                    {
+                        destKey = filecCoppyConvert.destKey + item.Split("/").Last(),
+                        srcKey = item,
+                    };
+                    var coppied = CoppyObjectAsync(filecCoppy);
+                    // reUpdate Image
+                    var images = _sysImageRepo.Get(x => x.KeyS3 == item).ToList();
+                    foreach (var image in images)
+                    {
+                        image.Id = Guid.NewGuid();
+                        image.KeyS3 = filecCoppyConvert.destKey + image.Name;
+                        image.ObjectId = filecCoppyModel.destKey.ToLower();
+                        image.Url = "https://uat-api-efms.itlvn.com/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
+                        var updateImg = _sysImageRepo.Add(image);
+                        if (updateImg == null)
+                        {
+                            return new HandleState(false, "Update Image Error");
+                        }
+                    }
+                }
+                return new HandleState(true, listFile);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
     }
 }

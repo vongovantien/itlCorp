@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
@@ -20,6 +21,6 @@ namespace eFMS.API.Setting.DL.IService
         HandleState CheckExistVoucherNoOfAdvance(UnlockJobCriteria criteria);
         HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria);
         List<UnlockRequestExport> GetUnlockRequestsExport(UnlockRequestCriteria criteria);
-        HandleState GenerateID(string paymentNo, int type);
+        Task<HandleState> GenerateID(string paymentNo, int type);
     }
 }

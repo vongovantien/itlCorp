@@ -2249,6 +2249,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     invoice.PaidAmountVnd = invoice.TotalPaidVnd = 0;
                 }
+
                 if (paidUsd > 0)
                 {
                     if (invoice.PaidAmountUsd == 0)

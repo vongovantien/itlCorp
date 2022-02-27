@@ -667,6 +667,22 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpDelete]
+        [Route("CancelLinkCharge")]
+        [Authorize]
+        public IActionResult CancelLinkCharge(Guid chargId)
+        {
+            currentUser.Action = "CancelLinkCharge";
+            var hs = csShipmentSurchargeService.CancelLinkCharge(chargId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
 
