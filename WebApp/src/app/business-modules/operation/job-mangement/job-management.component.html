@@ -4,16 +4,6 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-
-            <!-- <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">More...<span
-                        class="caret"></span>
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item pointer" (click)="chargeFromRep()">Charge From Replicate</a>
-                </div>
-            </div> -->
-
             <button class="btn btn-info dropdown-toggle" [dpToggle]="dropdownMenuLinkOps" position="bottomCenter">
                 <i class="la la-refresh"></i>
                 More..
@@ -226,8 +216,18 @@
 <loading-popup></loading-popup>
 
 <app-context-menu #opsListContextMenu (clickOutside)="selectedShipment = null">
-    <div class="menu-context__item" (click)="confirmReplicateJob()">
-        <span><i class="la la-copy"></i><span> Replicate job</span></span>
+    <ng-container
+        *ngIf="!selectedShipment?.replicatedId && !selectedShipment?.isLocked && !selectedShipment?.linkSource">
+        <div class="menu-context__item" (click)="confirmReplicateJob()">
+            <span><i class="la la-copy"></i><span> Replicate job</span></span>
+        </div>
+    </ng-container>
+
+    <div class="menu-context__item" (click)="printPLSheet('VND')">
+        <span><i class="la la-print"></i><span> P/L Sheet (VND)</span></span>
+    </div>
+    <div class="menu-context__item" (click)="printPLSheet('USD')">
+        <span><i class="la la-print"></i><span> P/L Sheet (USD)</span></span>
     </div>
 </app-context-menu>
 

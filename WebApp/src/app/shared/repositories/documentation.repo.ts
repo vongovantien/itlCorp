@@ -88,10 +88,7 @@ export class DocumentationRepo {
     }
 
     insertDuplicateShipment(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body);
     }
 
     getDetailShipment(id: string) {

@@ -63,6 +63,9 @@ namespace eFMS.API.Infrastructure
             services.Configure<ESBUrl>(option => {
                 option.Url = configuration.GetSection("ESB").Value;
             });
+            services.Configure<MsWebHookUrl>(option => {
+                option.Url = configuration.GetSection("MsWebHookUrl").Value;
+            });
             services.Configure<AuthenticationSetting>(authSetting => {
 
                 authSetting.PartnerShareKey
