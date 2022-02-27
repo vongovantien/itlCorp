@@ -2841,17 +2841,26 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
                 exportSOAOPS.Charges = new List<ChargeSOAResult>();
-                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                var csTransactionInfo = csTransactionRepo.Get(x => x.JobNo == group.Key.JobId).FirstOrDefault();
+                var commodity = csTransactionInfo?.Commodity;
                 var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
                 string commodityName = string.Empty;
                 if (commodity != null)
                 {
-                    string[] commodityArr = commodity.Split(',');
-                    foreach (var item in commodityArr)
+                    // CR: 07/02/22 => air: get commodityName từ combobox, sea: get commodityName từ textbox
+                    if (csTransactionInfo.TransactionType == "AI" || csTransactionInfo.TransactionType == "AE")
                     {
-                        commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == item.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                        string[] commodityArr = commodity.Split(',');
+                        foreach (var item in commodityArr)
+                        {
+                            commodityName = commodityName + "," + catCommodityRepo.Get(x => x.Code == item.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                        }
+                        commodityName = commodityName.Substring(1);
                     }
-                    commodityName = commodityName.Substring(1);
+                    else
+                    {
+                        commodityName = commodity.Replace("\n", " ");
+                    }
                 }
                 if (commodityGroup != null)
                 {
