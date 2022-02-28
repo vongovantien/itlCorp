@@ -36,5 +36,6 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
         ResultHandle ChargeFromReplicate();
         Task<HandleState> ReplicateJobs(ReplicateIds model);
+        ResultHandle AutoRateReplicate();
     }
 }
