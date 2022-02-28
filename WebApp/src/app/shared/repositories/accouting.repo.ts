@@ -1018,6 +1018,21 @@ export class AccountingRepo {
         );
     }
 
+    payablePaging(page: number, size: number, body: any) {
+        console.log('payablePaging', body)
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getPayablePaymentByRefNo(refNo: string, type: string, invoiceNo: string, billingNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/GetBy`, { refNo: refNo, type: type, invoiceNo: invoiceNo, billingNo: billingNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

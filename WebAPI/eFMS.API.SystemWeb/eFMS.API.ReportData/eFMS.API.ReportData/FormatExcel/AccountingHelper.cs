@@ -43,12 +43,20 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
-        /// Get folder contain AR template excel
+        /// Get folder contain template excel
         /// </summary>
         /// <returns></returns>
-        private string GetARExcelFolder()
+        private string GetFolderInTemplateExport(string _moduleName)
         {
-            return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.AccountReceivablePath);
+            switch (_moduleName)
+            {
+                case "AR":
+                    return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.AccountReceivablePath);
+                case "AP":
+                    return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.AccountPayablePath);
+                default:
+                    return string.Empty;
+            }
         }
 
         /// <summary>
@@ -626,7 +634,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <returns></returns>
         public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
         {
-            var folderOfFile = GetARExcelFolder();
+            var folderOfFile = GetFolderInTemplateExport("AR");
             FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
             var path = f.FullName;
             if (!File.Exists(path))
@@ -5204,7 +5212,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             try
             {
-                var folderOfFile = GetARExcelFolder();
+                var folderOfFile = GetFolderInTemplateExport("AR");
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
                 var path = f.FullName;
                 if (!File.Exists(path))
@@ -5365,7 +5373,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             try
             {
-                var folderOfFile = GetARExcelFolder();
+                var folderOfFile = GetFolderInTemplateExport("AR");
                 var deleteDetailRow = false;
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
                 var path = f.FullName;
@@ -5485,7 +5493,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             try
             {
-                var folderOfFile = GetARExcelFolder();
+                var folderOfFile = GetFolderInTemplateExport("AR");
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
                 var path = f.FullName;
                 fileName = "AdvanceReport_" + result.TaxCode+ ".xlsx";
@@ -5937,6 +5945,129 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Column(20).Width = 20; //Cột T
                 workSheet.Column(21).Width = 16; //Cột U
                 workSheet.Cells[addressTotal].Style.Font.Bold = true;
+            }
+        }
+
+        /// <summary>
+        /// Generate Export Accounting Payable Standart Report
+        /// </summary>
+        /// <param name="acctPayables"></param>
+        /// <param name="criteria"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream GenerateExportAccountingPayableStandart(List<AcctPayablePaymentExport> acctPayables, AccountPayableCriteria criteria, string fileName)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AP");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 4;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("RangeDate", string.Format("From date: {0} To date: {0}", DateTime.Now.ToString("dd/MM/yyyy")));
+                excel.SetData(listKeyData);
+
+                startRow = 7;
+                excel.StartDetailTable = startRow;
+                if (acctPayables.Count == 0)
+                {
+                    acctPayables.Add(new AcctPayablePaymentExport());
+                }
+                var isExistGroup = true;
+                var isExistDetail = true;
+                if (acctPayables.FirstOrDefault().PaymentDetails == null || acctPayables.Count(x => x.PaymentDetails != null && x.PaymentDetails.Count() > 0) == 0)
+                {
+                    isExistDetail = false;
+                }
+                if (!isExistDetail)
+                {
+                    if (!isExistGroup)
+                    {
+                        excel.DeleteRow(7, 2);
+                    }
+                    else
+                    {
+                        excel.DeleteRow(8);
+                    }
+                }
+
+                var sumBeginAmtVnd = 0m;
+                var sumPaidVnd = 0m;
+                var sumRemainVnd = 0m;
+                for (int i = 0; i < acctPayables.Count; i++)
+                {
+                    var item = acctPayables[i];
+                    listKeyData = new Dictionary<string, object>();
+
+                    excel.SetGroupsTable();
+                    listKeyData.Add("RefNoGrp", item.AcctRefNo);
+                    listKeyData.Add("PaymentDateGrp", item.AcctDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("PartnerCodeGrp", item.AccountNo);
+                    listKeyData.Add("PartnerGrp", item.PartnerName);
+                    listKeyData.Add("TransactionTypeGrp", item.TransactionType);
+                    listKeyData.Add("InvoiceNoGrp", item.InvoiceNo);
+                    listKeyData.Add("InvDateGrp", item.Invoicedate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("DocNoGrp", item.DocNo);
+                    listKeyData.Add("BeginAmountGrp", item.BeginAmount);
+                    
+                    var _orgPaidAmount = item.PaymentDetails.Sum(x => x.OrgPaidAmount ?? 0);
+                    var _orgPaidAmountVnd = item.PaymentDetails.Sum(x => x.PaidAmountVND ?? 0);
+                    var _orgRemainAmount = item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
+                    var _orgRemainAmountVnd = item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
+                    sumBeginAmtVnd += (item.BeginAmountVND ?? 0);
+                    sumPaidVnd += _orgPaidAmountVnd;
+                    sumRemainVnd += _orgRemainAmountVnd;
+                    listKeyData.Add("OrgPaidAmountGrp", _orgPaidAmount);
+                    listKeyData.Add("OrgRemainGrp", _orgRemainAmount);
+                    listKeyData.Add("BeginVndGrp", item.BeginAmountVND);
+                    listKeyData.Add("PaidVndGrp", _orgPaidAmountVnd);
+                    listKeyData.Add("RemainVndGrp", _orgRemainAmountVnd);
+                    listKeyData.Add("OrgCurrencyGrp", item.OriginCurrency);
+                    listKeyData.Add("PMTermGrp", item.PaymentTerm?.ToString("N0"));
+                    listKeyData.Add("DueDateGrp", item.PaymentDueDate?.ToString("dd/MM/yyyy"));
+                    // Sum total
+                    excel.SetData(listKeyData);
+                    excel.Worksheet.Cells[startRow, 8, startRow, 10].Style.Numberformat.Format = item.OriginCurrency == "VND" ? numberFormat2 : numberFormat;
+                    startRow++;
+                    if (item.PaymentDetails != null)
+                    {
+                        foreach (var detail in item.PaymentDetails)
+                        {
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("RefNoDt", detail.PaymentRefNo);
+                            listKeyData.Add("PaymentDateDt", detail.PaymentDate?.ToString("dd/MM/yyyy"));
+                            listKeyData.Add("InvoiceNoDt", item.InvoiceNo);
+                            listKeyData.Add("InvDateDt", item.Invoicedate?.ToString("dd/MM/yyyy"));
+                            listKeyData.Add("DocNoDt", item.DocNo);
+
+                            listKeyData.Add("OrgPaidAmountDt", detail.OrgPaidAmount);
+                            listKeyData.Add("OrgRemainDt", detail.OriginRemainAmount);
+
+                            listKeyData.Add("PaidVndDt", detail.PaidAmountVND);
+                            listKeyData.Add("RemainVndDt", detail.RemainAmountVND);
+                            listKeyData.Add("OrgCurrencyDt", detail.OriginCurrency);
+                            excel.SetData(listKeyData);
+                            startRow++;
+                        }
+                    }
+                }
+                var listKeyTotal = new Dictionary<string, object>();
+                listKeyTotal.Add("SumBeginVndGrp", sumBeginAmtVnd);
+                listKeyTotal.Add("SumPaidVndGrp", sumPaidVnd);
+                listKeyTotal.Add("SumRemainVndGrp", sumRemainVnd);
+                excel.SetData(listKeyTotal);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
             }
         }
     }

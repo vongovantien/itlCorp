@@ -662,6 +662,45 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctPayableController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAcctPayableService)">
+            <summary>
+            
+            </summary>
+            <param name="localizer"></param>
+            <param name="curUser"></param>
+            <param name="acctPayable"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AccountPayableCriteria,System.Int32,System.Int32)">
+            <summary>
+            Load list pagine payable detail
+            </summary>
+            <param name="criteria"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetBy(System.String,System.String,System.String,System.String)">
+            <summary>
+            Get payment detail of payable transaction
+            </summary>
+            <param name="refNo"></param>
+            <param name="type"></param>
+            <param name="invoiceNo"></param>
+            <param name="billingNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetDataExportAccountingPayable(eFMS.API.Accounting.DL.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Get data export Accounting Payable Standart
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
             <summary>
             Get detail receipt

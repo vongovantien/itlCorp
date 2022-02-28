@@ -63,6 +63,8 @@
             public const string GetDataCombineOpsUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOps?combineBillingNo=";
             public const string GetDataCombineOpsByPartnerUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOpsByPartner";
             public const string UploadFileExcel = "/api/v1/en-US/AWSS3/UploadFilePreview/Accounting/";
+
+            public const string APStandartReportUrl = "/api/v1/en-US/AcctPayable/GetDataExportAccountingPayable";
         }
 
         public class Documentation

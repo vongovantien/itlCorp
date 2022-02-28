@@ -16,6 +16,7 @@ using FMS.API.ReportData.Models.Accounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace eFMS.API.ReportData.Controllers
 {
@@ -193,6 +194,16 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.CustomerPaymentUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "Statement Of Receivable Customer Report",
+                ObjectParameter = JsonConvert.SerializeObject(paymentCriteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
 
@@ -590,6 +601,39 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "SOA OPS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Accounting Payable Standart Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportAccountingPayableStandartReport")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingPayableStandartReport(AccountPayableCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.APStandartReportUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "AP Standart Report",
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AcctPayablePaymentExport>>();
+
+            var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria, "AP_Standart_Report.xlsx");
+            if (stream == null) return null;
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "AP Standart Report - eFMS.xlsx");
 
             return fileContent;
         }

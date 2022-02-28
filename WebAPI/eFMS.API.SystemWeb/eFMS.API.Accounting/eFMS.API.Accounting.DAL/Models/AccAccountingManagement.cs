@@ -54,5 +54,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? UnpaidAmountUsd { get; set; }
         public decimal? PaidAmountVnd { get; set; }
         public decimal? PaidAmountUsd { get; set; }
+        public string TransactionType { get; set; }
     }
 }
