@@ -34,8 +34,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly string _bucketName;
         private readonly string _awsSecretAccessKey;
         private readonly string _domainTest;
+        private readonly IOptions<ApiUrl> _apiUrl;
 
-        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser)
+        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl)
         {
             this.currentUser = currentUser;
 
@@ -47,6 +48,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
             _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
             _sysImageRepo = SysImageRepo;
+            _apiUrl = apiUrl;
         }
 
         public async Task<HandleState> DeleteFile(string moduleName, string folder, Guid id)
@@ -390,7 +392,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         image.Id = Guid.NewGuid();
                         image.KeyS3 = filecCoppyConvert.destKey + image.Name;
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
-                        image.Url = "https://uat-api-efms.itlvn.com/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
+                        image.Url = _apiUrl + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
                         var updateImg = _sysImageRepo.Add(image);
                         if (updateImg == null)
                         {
