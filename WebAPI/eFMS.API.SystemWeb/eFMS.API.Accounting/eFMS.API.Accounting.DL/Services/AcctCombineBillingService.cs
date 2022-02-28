@@ -1302,7 +1302,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? partnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
                     CombineNo = combineBillingNo,
                     CombineBillingType = soa != null ? "SOA" : "CDNOTE",
-                    BillingType = ((soa != null && !string.IsNullOrEmpty(sur.PaySoano)) || (cdNote != null && !string.IsNullOrEmpty(sur.CreditNo))) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT
+                    BillingType = ((soa != null && soa.Soano == sur.PaySoano) || (cdNote != null && cdNote.Code == sur.CreditNo)) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT
                 };
                 result.Add(chg);
             }
@@ -1315,7 +1315,7 @@ namespace eFMS.API.Accounting.DL.Services
             var combineBilling = DataContext.Get(x => x.CombineBillingNo == combineBillingNo).FirstOrDefault();
             if (combineBilling == null) return null;
 
-            var charges = surchargeRepo.Get(x => x.CombineBillingNo == combineBillingNo);
+            var charges = surchargeRepo.Get(x => x.CombineBillingNo == combineBillingNo || x.ObhcombineBillingNo == combineBillingNo);
             if (charges == null) return null;
             var partner = partnerRepo.Get(x => x.Id == combineBilling.PartnerId).FirstOrDefault();
             var grpInvCdNoteByHbl = charges.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
