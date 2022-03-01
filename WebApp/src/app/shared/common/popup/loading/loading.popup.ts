@@ -44,4 +44,9 @@ export class LoadingPopupComponent extends eFMSPopup {
     this.isSuccessDownload = false;
     this.isProccessComplete = true;
   }
+  proccessFail(){
+    this.isCompleted = true;
+    this.isSuccessDownload = false;
+    this.isProccessComplete = false;
+  }
 }

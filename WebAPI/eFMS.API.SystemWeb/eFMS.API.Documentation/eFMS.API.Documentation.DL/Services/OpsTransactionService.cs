@@ -2217,7 +2217,16 @@ namespace eFMS.API.Documentation.DL.Services
                                     }
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
-                                        surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                        //[01/03/2022][17133][Nếu phí OBH có Buying Mapping]
+                                        var catCharge = catChargeRepository.Get(x => x.Id == charge.ChargeId && x.CreditCharge != null).FirstOrDefault();
+                                        if (catCharge != null)
+                                        {
+                                            surcharge.ChargeId = catCharge.CreditCharge??Guid.Empty;
+                                            surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                        }
+                                        else
+                                            surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                        
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
                                             surcharge.PayerId = partnerInternal.Id;
                                     }

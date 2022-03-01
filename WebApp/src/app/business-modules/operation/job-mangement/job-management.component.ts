@@ -16,7 +16,7 @@ import { JobConstants, RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
 import { GetCurrenctUser, getCurrentUserState } from '@store';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { delayTime } from '@decorators';
 
 
@@ -258,12 +258,16 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     chargeFromRep() {
+        debugger
         this._spinner.hide();
         this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
         this.loadingPopupComponent.show();
         this._documentRepo.chargeFromReplicate()
             .pipe(
-                catchError(this.catchError),
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                    )),
                 finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
