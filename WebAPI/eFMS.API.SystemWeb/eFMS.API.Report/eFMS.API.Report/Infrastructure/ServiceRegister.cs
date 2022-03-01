@@ -31,6 +31,8 @@ namespace eFMS.API.Report.Infrastructure
 
             services.AddTransient<IReportDocumentService, ReportDocumentService>();
             services.AddTransient<ISaleReportService, SaleReportService>();
+            services.AddTransient<IReportLogService, ReportLogService>();
+
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

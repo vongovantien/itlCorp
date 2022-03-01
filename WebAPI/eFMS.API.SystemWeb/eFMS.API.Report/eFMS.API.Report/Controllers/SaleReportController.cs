@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using eFMS.API.Report.DL.Common;
 using eFMS.API.Report.DL.IService;
 using eFMS.API.Report.DL.Models;
@@ -21,7 +22,6 @@ namespace eFMS.API.Report.Controllers
     {
         private readonly ISaleReportService saleReportService;
         private readonly IReportLogService reportLogService;
-
         public SaleReportController(ISaleReportService saleReportService, IReportLogService rptLogService)
         {
             this.saleReportService = saleReportService;
@@ -34,17 +34,19 @@ namespace eFMS.API.Report.Controllers
         {
             var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
 
-            #region -- Ghi log Report --
-            var reportLogModel = new SysReportLog
+            Response.OnCompleted(async () =>
             {
-                ReportName = ReportConstants.Monthly_Sale_Report,
-                ObjectParameter = JsonConvert.SerializeObject(criteria),
-                Type = ReportConstants.Crystal_Preview
-            };
-            reportLogService.Add(reportLogModel);
-            #endregion -- Ghi log Report --
+                var reportLog = new SysReportLog
+                {
+                    ReportName = ReportConstants.Monthly_Sale_Report,
+                    ObjectParameter = JsonConvert.SerializeObject(criteria),
+                    Type = ReportConstants.Crystal_Preview
+                };
+                reportLogService.WriteLogReport(reportLog);
+            });
 
             return Ok(result);
+
         }
     }
 }

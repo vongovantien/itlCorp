@@ -33,7 +33,6 @@ namespace eFMS.API.Report.DL.Services
 
         public SaleReportService(
             ICurrentUser currentUser, 
-            decimal decimalNumber, 
             IContextBase<CsTransaction> context,
             IContextBase<SysUser> userRepository, 
             IContextBase<SysEmployee> employeeRepository, 
