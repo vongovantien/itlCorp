@@ -8,6 +8,7 @@ using eFMS.API.Report.DL.IService;
 using eFMS.API.Report.DL.Models;
 using eFMS.API.Report.Infrastructure.Middlewares;
 using eFMS.API.Report.Service.Models;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -33,7 +34,57 @@ namespace eFMS.API.Report.Controllers
         public IActionResult MonthlySalereport(SaleReportCriteria criteria)
         {
             var result = saleReportService.PreviewGetMonthlySaleReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
 
+        [HttpPost("QuaterSaleReport")]
+        [Authorize]
+        public IActionResult QuaterSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewGetQuaterSaleReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("DepartSaleReport")]
+        [Authorize]
+        public IActionResult DepartSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewGetDepartSaleReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("SummarySaleReport")]
+        [Authorize]
+        public IActionResult SummarySaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewSummarySaleReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("CombinationSaleReport")]
+        [Authorize]
+        public IActionResult CombinationSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewCombinationSaleReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("SaleKickBackReport")]
+        [Authorize]
+        public IActionResult SaleKickBackReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewSaleKickBackReport(criteria);
+            WriteLogReport(criteria);
+            return Ok(result);
+        }
+
+        private void WriteLogReport(SaleReportCriteria criteria)
+        {
             Response.OnCompleted(async () =>
             {
                 var reportLog = new SysReportLog
@@ -42,11 +93,8 @@ namespace eFMS.API.Report.Controllers
                     ObjectParameter = JsonConvert.SerializeObject(criteria),
                     Type = ReportConstants.Crystal_Preview
                 };
-                reportLogService.WriteLogReport(reportLog);
+                HandleState hs = reportLogService.WriteLogReport(reportLog);
             });
-
-            return Ok(result);
-
         }
     }
 }
