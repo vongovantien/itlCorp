@@ -64,6 +64,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -96,7 +97,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepo,
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
-            IContextBase<CatCharge> catChargeRepo
+            IContextBase<CatCharge> catChargeRepo,
+            IContextBase<CsLinkCharge> csLinkChargeRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -131,6 +133,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionRepository = transactionRepo;
             settingFlowRepository = settingFlowRepo;
             catChargeRepository = catChargeRepo;
+            csLinkChargeRepository = csLinkChargeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -2426,6 +2429,188 @@ namespace eFMS.API.Documentation.DL.Services
                 };
             }
             return hs;
+        }
+
+        public ResultHandle AutoRateReplicate()
+        {
+            CatPartner partnerInternal = new CatPartner();
+            var date = new DateTime(2022, 01, 31);
+            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
+            List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
+            var hs = new ResultHandle();
+            var surchargesAddHis = new List<CsLinkCharge>();
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var jobRep in lstJobRep)
+                    {
+                        var jobOps = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
+                        if (jobOps == null)
+                            continue;
+
+                        if (jobOps.OfficeId != null)
+                        {
+                            var offi = GetInfoOfficeOfUser(jobOps.OfficeId);
+                            if (offi != null && string.IsNullOrEmpty(offi.InternalCode))
+                                continue;
+                            var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
+                            if (part == null)
+                                continue;
+                            if (part.Count() > 1)
+                                continue;
+
+                            if (part.FirstOrDefault() == null)
+                                continue;
+
+                            partnerInternal = part.FirstOrDefault();
+                        }
+
+                        var chargeJob = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo);
+                        if (chargeJob == null)
+                            continue;
+
+                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY");
+                        if (chargeBuys == null)
+                            continue;
+
+                        foreach (var chargeBuy in chargeBuys)
+                        {
+                            if (acctSettlementPayment.Get(x => x.SettlementNo == chargeBuy.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
+                                continue;
+                            var catCharge = catChargeRepository.Get(x => x.Id == chargeBuy.ChargeId).FirstOrDefault();
+                            if (catCharge != null && catCharge.DebitCharge == null)
+                                continue;
+                            if (chargeBuys.Where(x => x.ChargeId == catCharge.DebitCharge).FirstOrDefault() != null)
+                                continue;
+                            var links = csLinkChargeRepository.Get(x => x.ChargeOrgId == chargeBuy.Id.ToString() && x.LinkChargeType == "AUTO_RATE");
+                            if (links != null)
+                            {
+                                var checkex = false;
+                                foreach (var i in links)
+                                {
+                                    if (surchargeRepository.Get(x => x.Id == Guid.Parse(i.ChargeLinkId)).FirstOrDefault() != null)
+                                        checkex = true;
+                                }
+                                if (checkex)
+                                    continue;
+                            }
+
+                            CsShipmentSurcharge surcharge = MapChargeBuytoSell(chargeBuy, jobRep, partnerInternal, catCharge);
+                            surchargeSells.Add(surcharge);
+
+                            var surchargesHis = new CsLinkCharge();
+                            surchargesHis.Id = Guid.NewGuid();
+                            surchargesHis.JobNoOrg = surcharge.JobNo;
+                            surchargesHis.ChargeOrgId = chargeBuy.Id.ToString();
+                            surchargesHis.JobNoLink = chargeBuy.JobNo;
+                            surchargesHis.ChargeLinkId = surcharge.Id.ToString();
+                            surchargesHis.DatetimeCreated = DateTime.Now;
+                            surchargesHis.UserCreated = currentUser.UserID;
+                            surchargesHis.LinkChargeType = "AUTO_RATE";
+
+                            surchargesAddHis.Add(surchargesHis);
+                        }
+                    }
+                    var result = new HandleState();
+                    if (surchargeSells.Count > 0)
+                    {
+                        surchargeRepository.Add(surchargeSells, false);
+                        result = surchargeRepository.SubmitChanges();
+                    }
+                    if (surchargesAddHis.Count > 0)
+                    {
+                        csLinkChargeRepository.Add(surchargesAddHis, false);
+                        result = csLinkChargeRepository.SubmitChanges();
+                    }
+
+                    if (result.Success)
+                    {
+                        trans.Commit();
+                        hs.Status = true;
+                        hs.Message = "AUTORATEREPLICATE SCCUESS";
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                        hs.Status = true;
+                        hs.Message = "AUTORATEREPLICATE CHARGE EMPTY";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("eFMS_AUTORATEREPLICATE", ex.ToString());
+                    hs.Status = false;
+                    hs.Message = "AUTORATEREPLICATE FALSE";
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+            return hs;
+
+        }
+        private CsShipmentSurcharge MapChargeBuytoSell(CsShipmentSurcharge chargeBuy, OpsTransaction jobRep, CatPartner partnerInternal, CatCharge catCharge)
+        {
+            CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
+
+            var propInfo = chargeBuy.GetType().GetProperties();
+            foreach (var item in propInfo)
+                surcharge.GetType().GetProperty(item.Name).SetValue(surcharge, item.GetValue(chargeBuy, null), null);
+
+            surcharge.Id = Guid.NewGuid();
+            surcharge.JobNo = jobRep.JobNo;
+            surcharge.Hblid = jobRep.Hblid;
+            surcharge.Hblno = jobRep.Hwbno;
+            surcharge.Mblno = jobRep.Mblno;
+            surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
+            surcharge.ChargeId = catCharge.DebitCharge ?? Guid.Empty;
+
+            surcharge.Quantity = 1;
+            surcharge.Vatrate = 10;
+
+            surcharge.Soano = null;
+            surcharge.PaySoano = null;
+            surcharge.CreditNo = null;
+            surcharge.DebitNo = null;
+            surcharge.SettlementCode = null;
+            surcharge.VoucherId = null;
+            surcharge.VoucherIddate = null;
+            surcharge.VoucherIdre = null;
+            surcharge.VoucherIdredate = null;
+            surcharge.AcctManagementId = null;
+            surcharge.InvoiceNo = null;
+            surcharge.InvoiceDate = null;
+            surcharge.LinkFee = null;
+            surcharge.LinkChargeId = null;
+            surcharge.Notes = null;
+            surcharge.IsFromShipment = true;
+            surcharge.SyncedFrom = null;
+            surcharge.PaySyncedFrom = null;
+
+            if (chargeBuy.CurrencyId == "VND")
+            {
+                var per = (double)chargeBuy.Total / (double)0.76;
+                surcharge.UnitPrice = Math.Round((decimal)per / 10000, 0) * 10000;
+                surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
+                surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
+            }
+            else
+            {
+                surcharge.Vatrate = chargeBuy.Vatrate;
+                surcharge.Quantity = chargeBuy.Quantity;
+            }
+
+            if (!string.IsNullOrEmpty(partnerInternal.Id))
+            {
+                surcharge.PaymentObjectId = partnerInternal.Id;
+                surcharge.OfficeId = jobRep.OfficeId;
+            }
+            surcharge.DatetimeCreated = DateTime.Now;
+            return surcharge;
         }
     }
 }

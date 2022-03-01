@@ -387,6 +387,17 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(hs);
             return Ok(hs);
         }
+
+        [HttpGet("AutoRateReplicate")]
+        public IActionResult AutoRateReplicate()
+        {
+            currentUser.Action = "AutoRateReplicate";
+            ResultHandle hs = transactionService.AutoRateReplicate();
+            if (!hs.Status)
+                return BadRequest(hs);
+            return Ok(hs);
+        }
+
         private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
         {
             string errorMsg = string.Empty;
