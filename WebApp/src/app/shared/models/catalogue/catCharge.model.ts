@@ -19,6 +19,8 @@ export class Charge {
     chargeGroup: string = null;
     productDept: string = null;
     mode: string = null;
+    creditCharge: string = null;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
