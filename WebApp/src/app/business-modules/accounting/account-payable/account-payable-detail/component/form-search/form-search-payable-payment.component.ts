@@ -226,7 +226,7 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
                     if (data) {
                         let formData: any = {
                             searchType: data.searchType,
-                            referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
+                            referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos : null,
                             partnerId: data.partnerId ? data.partnerId : null,
                             paymentDate: (!!data?.fromPaymentDate && !!data?.toPaymentDate) ?
                                 { startDate: new Date(data?.fromPaymentDate), endDate: new Date(data?.toPaymentDate) } : null,

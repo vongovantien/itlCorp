@@ -44,6 +44,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
     ) {
         super();
         this._progressRef = this._ngProgessSerice.ref();
+        this.requestList = this.loadListAccountPayableDetail;
         this.requestSort = this.sortAccPayment;
     }
 
@@ -81,6 +82,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
             { title: 'Remain AmountVND', field: 'remainAmountVnd', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },           
         ];
+        
     }
 
     ngAfterViewInit() {
@@ -95,24 +97,33 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                 (data) => {
                     if (!!data.dataSearch) {
                         this.dataSearch = data.dataSearch;
-                    } else {
-                        const loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-                        this.dataSearch = {
-                            paymentStatus: ["Unpaid", "Paid A Part"],
-                            office: [loginData.officeId],
-                            fromPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd', 'en'),
-                            toPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), 'yyyy-MM-dd', 'en'),
-                        }
+                    }else{
+                        this.initDataSearch();
                     }
 
                     this.page = data.page;
                     this.pageSize = data.pageSize;
 
-                    this._store.dispatch(LoadListAccountPayableDetail({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                    this.loadListAccountPayableDetail();
                 }
             );
+
         this.isLoading = this._store.select(getAccountPayablePaymentLoadingListState);
         this._cd.detectChanges();
+    }
+
+    initDataSearch(){
+        const loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = {
+            paymentStatus: ["Unpaid", "Paid A Part"],
+            office: [loginData.officeId],
+            fromPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd', 'en'),
+            toPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), 'yyyy-MM-dd', 'en'),
+        }
+    }
+
+    loadListAccountPayableDetail(){
+        this._store.dispatch(LoadListAccountPayableDetail({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     getPagingData() {
@@ -124,7 +135,8 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                         data: !!data.data ? data.data.map((item: any) => new AccountingPayableModel(item)) : [],
                         totalItems: data.totalItems,
                     };
-                })
+                }),
+                takeUntil(this.ngUnsubscribe)
             ).subscribe(
                 (res: any) => {
                     this.payables = res.data || [];

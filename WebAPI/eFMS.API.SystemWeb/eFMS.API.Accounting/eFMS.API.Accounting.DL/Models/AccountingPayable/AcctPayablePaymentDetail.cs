@@ -6,7 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
 {
     public class AcctPayablePaymentDetailModel
     {
-        public string RefId { get; set; }
+        public Guid? RefId { get; set; }
         public string PartnerId { get; set; }
         public string VoucherNo { get; set; }
         public DateTime? VoucherDate { get; set; }
@@ -46,5 +46,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
         public decimal? PaymentRemainAmountVnd { get; set; }
         public decimal? PaymentRemainAmountUsd { get; set; }
         public DateTime? PaymentDatetimeCreated { get; set; }
+        public string PaymentAcctId { get; set; }
     }
 }

@@ -6032,7 +6032,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("DueDateGrp", item.PaymentDueDate?.ToString("dd/MM/yyyy"));
                     // Sum total
                     excel.SetData(listKeyData);
-                    excel.Worksheet.Cells[startRow, 8, startRow, 10].Style.Numberformat.Format = item.OriginCurrency == "VND" ? numberFormat2 : numberFormat;
+                    excel.Worksheet.Cells[startRow, 9, startRow, 11].Style.Numberformat.Format = item.OriginCurrency == "VND" ? numberFormat2 : numberFormat;
                     startRow++;
                     if (item.PaymentDetails != null)
                     {
@@ -6053,6 +6053,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             listKeyData.Add("RemainVndDt", detail.RemainAmountVND);
                             listKeyData.Add("OrgCurrencyDt", detail.OriginCurrency);
                             excel.SetData(listKeyData);
+                            excel.Worksheet.Cells[startRow, 10, startRow, 11].Style.Numberformat.Format = item.OriginCurrency == "VND" ? numberFormat2 : numberFormat;
                             startRow++;
                         }
                     }

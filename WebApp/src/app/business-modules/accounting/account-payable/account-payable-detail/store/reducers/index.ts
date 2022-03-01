@@ -9,8 +9,8 @@ export interface IAccountPayablePaymentState {
 export const accountPayablePaymentState = createFeatureSelector<IAccountPayablePaymentState>('account-payable');
 export const getAccountPayablePaymentSearchState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state.account?.dataSearch);
 export const getAccountPayablePaymentPagingState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state.account?.pagingData);
-export const getAccountPayablePaymentListState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state.account?.list);
-export const getAccountPayablePaymentLoadingListState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state.account?.isLoading);
+export const getAccountPayablePaymentListState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state?.account?.list);
+export const getAccountPayablePaymentLoadingListState = createSelector(accountPayablePaymentState, (state: IAccountPayablePaymentState) => state?.account?.isLoading);
 
 export const reducers: ActionReducerMap<IAccountPayablePaymentState> = {
     account: accountPayablePaymentReducer,
