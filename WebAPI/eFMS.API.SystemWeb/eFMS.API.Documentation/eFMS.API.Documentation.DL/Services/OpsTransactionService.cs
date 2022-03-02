@@ -2167,7 +2167,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
+                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.ServiceDate.Value.Date > new DateTime(2022, 01, 31).Date);
                     if (lstJobRep != null)
                     {
                         string logMessage = string.Format(" *  \n ListJobRep: {0} * ", JsonConvert.SerializeObject(lstJobRep));
@@ -2195,7 +2195,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null);
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0);
                             if (charges != null && charges.Count() > 0)
                             {
                                 logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
@@ -2228,7 +2228,7 @@ namespace eFMS.API.Documentation.DL.Services
                                             surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
                                         
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                            surcharge.PayerId = partnerInternal.Id;
+                                            surcharge.PaymentObjectId = partnerInternal.Id;
                                     }
                                     else { continue; }
 
@@ -2480,7 +2480,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (chargeJob == null)
                             continue;
 
-                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY");
+                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice!= null && x.UnitPrice > 0));
                         if (chargeBuys == null)
                             continue;
 

@@ -980,8 +980,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
-
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1053,8 +1053,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
                                };
             var data = dataOperation.Union(dataDocument).ToList();
 
@@ -1149,7 +1149,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
 
                                 };
             var dataDocument = from sur in surcharge
@@ -1224,8 +1225,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
 
                                };
             var data = dataOperation.Union(dataDocument);

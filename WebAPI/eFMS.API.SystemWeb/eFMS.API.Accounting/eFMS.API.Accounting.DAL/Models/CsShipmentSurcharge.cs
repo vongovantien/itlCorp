@@ -72,5 +72,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string CombineBillingNo { get; set; }
         public string ObhcombineBillingNo { get; set; }
         public string AdvanceNoFor { get; set; }
+        public string LinkChargeId { get; set; }
     }
 }

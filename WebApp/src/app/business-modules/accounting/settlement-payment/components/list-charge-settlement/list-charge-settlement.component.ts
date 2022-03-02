@@ -28,6 +28,7 @@ import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSet
 import { Store } from '@ngrx/store';
 import { SystemConstants } from '@constants';
 import { getCurrentUserState } from '@store';
+import { X } from '@angular/cdk/keycodes';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -123,7 +124,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.subscriptionDuplicateChargeState();
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
-        this.detailSettlement = this._store.select(getSettlementPaymentDetailState)
+        this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
     }
 
     showExistingCharge() {
@@ -145,7 +146,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.requester = userId;
         return userId;
     }
-    
+
     showCreateCharge() {
         this.tableListChargePopup.isSubmitted = false;
         this.tableListChargePopup.isUpdate = false;
@@ -243,6 +244,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.selectedIndexSurcharge = indexSurcharge;
                 }
             }
+            if(surcharge.linkChargeId){
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
             this.selectedSurcharge = surcharge;
             this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
 
@@ -299,8 +304,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (this.TYPE === 'GROUP') {
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
-
             for (const groupShipment of this.groupShipments) {
+                let checks : any[] = groupShipment.chargeSettlements.filter((x:any)=>x.isSelected && x.linkChargeId);
+                if(!!checks.length){
+                    this._toastService.warning('Charge already linked charge');
+                    return;
+                }
                 groupShipment.chargeSettlements = this.returnChargeFromShipment(groupShipment);
             }
 
@@ -313,7 +322,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments = this.groupShipments.filter((groupItem: any) => groupItem.chargeSettlements.length);
         } else {
             const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
-
+            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.linkChargeId);
+            if (!!checkChargeLinks.length) {
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
             if (!!surchargeSelected.length) {
                 this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
             } else {
@@ -408,11 +421,17 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     updateChargeWithJob(charge: Surcharge, index?: number) {
+
         if (this.STATE !== 'WRITE') { return; }
         this.selectedIndexSurcharge = index;
         if (!charge) {
             return;
         }
+        if (charge.linkChargeId) {
+            this._toastService.warning('Charge already linked charge');
+            return;
+        }
+
         if (charge.isFromShipment) {
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
