@@ -2207,11 +2207,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                                     CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
 
-                                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                                    {
+                                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE) { 
                                         surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                                        var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
-                                        if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
+                                        var catCharge = catChargeRepository.Get(x => x.Id == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                        if (catCharge != null) { surcharge.ChargeId = catCharge.DebitCharge??Guid.Empty; } else continue;
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
                                             surcharge.PaymentObjectId = partnerInternal.Id;
                                     }
