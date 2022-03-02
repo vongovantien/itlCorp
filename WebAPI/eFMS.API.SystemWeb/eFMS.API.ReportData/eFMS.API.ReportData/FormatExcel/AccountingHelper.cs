@@ -5969,7 +5969,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 int startRow = 4;
                 var listKeyData = new Dictionary<string, object>();
-                listKeyData.Add("RangeDate", string.Format("From date: {0} To date: {0}", DateTime.Now.ToString("dd/MM/yyyy")));
+                listKeyData.Add("RangeDate", string.Format("From date: {0} To date: {0}", DateTime.Parse(criteria.FromPaymentDate).ToString("dd/MM/yyyy"), DateTime.Parse(criteria.ToPaymentDate).ToString("dd/MM/yyyy")));
                 excel.SetData(listKeyData);
 
                 startRow = 7;
@@ -6019,6 +6019,13 @@ namespace eFMS.API.ReportData.FormatExcel
                     var _orgPaidAmountVnd = item.PaymentDetails.Sum(x => x.PaidAmountVND ?? 0);
                     var _orgRemainAmount = item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
                     var _orgRemainAmountVnd = item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
+                    if (item.Status == "Unpaid")
+                    {
+                        _orgPaidAmount = 0;
+                        _orgPaidAmountVnd = 0;
+                        _orgRemainAmount = item.BeginAmount ?? 0;
+                        _orgRemainAmountVnd = item.BeginAmountVND ?? 0;
+                    }
                     sumBeginAmtVnd += (item.BeginAmountVND ?? 0);
                     sumPaidVnd += _orgPaidAmountVnd;
                     sumRemainVnd += _orgRemainAmountVnd;
@@ -6042,6 +6049,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             excel.SetDataTable();
                             listKeyData.Add("RefNoDt", detail.PaymentRefNo);
                             listKeyData.Add("PaymentDateDt", detail.PaymentDate?.ToString("dd/MM/yyyy"));
+                            listKeyData.Add("PartnerCodeDt", item.AccountNo);
                             listKeyData.Add("InvoiceNoDt", item.InvoiceNo);
                             listKeyData.Add("InvDateDt", item.Invoicedate?.ToString("dd/MM/yyyy"));
                             listKeyData.Add("DocNoDt", item.DocNo);

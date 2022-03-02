@@ -10,5 +10,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string RefId { get; set; }
         public string PartnerName { get; set; }
         public string AccountNo { get; set; }
+        public bool? NotShowDetail { get; set; }
     }
 }

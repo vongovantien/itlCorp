@@ -6,7 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
 {
     public class AcctPayablePaymentDetailModel
     {
-        public Guid? RefId { get; set; }
+        public string RefId { get; set; }
         public string PartnerId { get; set; }
         public string VoucherNo { get; set; }
         public DateTime? VoucherDate { get; set; }

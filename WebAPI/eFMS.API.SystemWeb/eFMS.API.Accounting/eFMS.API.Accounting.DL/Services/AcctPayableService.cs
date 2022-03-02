@@ -116,6 +116,7 @@ namespace eFMS.API.Accounting.DL.Services
                 acct.TotalAmountVnd = paymentAmountVnd[0];
                 acct.PaymentAmountVnd = paymentAmountVnd[1];
                 acct.RemainAmountVnd = paymentAmountVnd[2];
+                acct.NotShowDetail = item.FirstOrDefault().payable.InRangeType == "OutRange";
                 acctPayables.Add(acct);
             }
             return acctPayables.AsQueryable();
@@ -152,33 +153,54 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     break;
                 case "PMInRange":
-                    // Transaction AP phát sinh trước thời gian được chọn và có AP payment trong khoảng thời gian được chọn => lấy remain amount của payment cũ nhất
+                    // Transaction AP phát sinh trước thời gian được chọn và có AP payment trong khoảng thời gian được chọn: Begin Amount => lấy remain amount của payment gần nhất (Cận dưới from date), trường hợp không có payment => Total Amount
                     if (currency == AccountingConstants.CURRENCY_LOCAL)
                     {
-                        total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.RemainAmountVnd ?? 0;
+                        if (data.Any(x => x.PaymentRemainAmountVnd == null))
+                        {
+                            total = data.FirstOrDefault().TotalAmountVnd ?? 0;
+                        }
+                        else
+                        {
+                            total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.PaymentRemainAmountVnd ?? 0;
+                        }
                     }
                     else if (currency == AccountingConstants.CURRENCY_USD)
                     {
-                        total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.RemainAmountUsd ?? 0;
+                        if (data.Any(x => x.PaymentRemainAmountUsd == null))
+                        {
+                            total = data.FirstOrDefault().TotalAmountUsd ?? 0;
+                        }
+                        else
+                        {
+                            total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.PaymentRemainAmountUsd ?? 0;
+                        }
                     }
                     else
                     {
-                        total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.OrgRemainAmount ?? 0;
+                        if (data.Any(x => x.PaymentRemainAmount == null))
+                        {
+                            total = data.FirstOrDefault().TotalAmount ?? 0;
+                        }
+                        else
+                        {
+                            total = data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.PaymentRemainAmount ?? 0;
+                        }
                     }
                     break;
                 case "OutRange":
-                    // Transaction AP chưa trả hết(Unpaid/ Paid a Part) trước và không có payment trướcng khoảng thời được chọn => lấy remain amont current của AP đó, Trường hợp remain không có giá trị sẽ lấy Total Amount
+                    // Transaction AP chưa trả hết(Unpaid/ Paid a Part) trước và không có payment trướcng khoảng thời được chọn => lấy remain amount của AP cận trên đó, Trường hợp remain không có giá trị sẽ lấy Total Amount
                     if (currency == AccountingConstants.CURRENCY_LOCAL)
                     {
-                        total = (data.FirstOrDefault().RemainAmountVnd == null || data.FirstOrDefault().RemainAmountVnd == 0) ? data.FirstOrDefault().TotalAmountVnd : data.FirstOrDefault().RemainAmountVnd;
+                        total = (data.FirstOrDefault().RemainAmountVnd == null || data.FirstOrDefault().RemainAmountVnd == 0 || data.FirstOrDefault().PaymentRemainAmountVnd == null) ? data.FirstOrDefault().TotalAmount : data.FirstOrDefault().PaymentRemainAmountVnd;
                     }
                     else if (currency == AccountingConstants.CURRENCY_USD)
                     {
-                        total = (data.FirstOrDefault().RemainAmountUsd == null || data.FirstOrDefault().RemainAmountUsd == 0) ? data.FirstOrDefault().TotalAmountUsd : data.FirstOrDefault().RemainAmountUsd;
+                        total = (data.FirstOrDefault().RemainAmountUsd == null || data.FirstOrDefault().RemainAmountUsd == 0 || data.FirstOrDefault().PaymentRemainAmountUsd == null) ? data.FirstOrDefault().TotalAmountUsd : data.FirstOrDefault().PaymentRemainAmountUsd;
                     }
                     else
                     {
-                        total = (data.FirstOrDefault().OrgRemainAmount == null || data.FirstOrDefault().OrgRemainAmount == 0) ? data.FirstOrDefault().TotalAmount : data.FirstOrDefault().OrgRemainAmount;
+                        total = (data.FirstOrDefault().OrgRemainAmount == null || data.FirstOrDefault().OrgRemainAmount == 0 || data.FirstOrDefault().PaymentRemainAmount == null) ? data.FirstOrDefault().TotalAmount : data.FirstOrDefault().PaymentRemainAmount;
                     }
                     break;
             }
@@ -212,25 +234,31 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 remainAmount = total - paidAmount;
             }
-            // TH transaction type adv nhưng không có payment
-            if (data.FirstOrDefault().TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE && data.Any(x => string.IsNullOrEmpty(x.PaymentNo)))
+            if(type == "OutRange")
             {
-                if (currency == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    paidAmount = data.FirstOrDefault().PaymentAmountVnd;
-                    remainAmount = data.FirstOrDefault().PaymentRemainAmountVnd;
-                }
-                else if (currency == AccountingConstants.CURRENCY_USD)
-                {
-                    paidAmount = data.FirstOrDefault().PaymentAmountUsd;
-                    remainAmount = data.FirstOrDefault().PaymentRemainAmountUsd;
-                }
-                else
-                {
-                    paidAmount = data.FirstOrDefault().PaymentAmount;
-                    remainAmount = data.FirstOrDefault().PaymentRemainAmount;
-                }
+                paidAmount = null;
+                remainAmount = null;
             }
+
+            // TH transaction type adv nhưng không có payment
+            //if (data.FirstOrDefault().TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE && data.Any(x => string.IsNullOrEmpty(x.PaymentNo)))
+            //{
+            //    if (currency == AccountingConstants.CURRENCY_LOCAL)
+            //    {
+            //        paidAmount = data.FirstOrDefault().PaymentAmountVnd;
+            //        remainAmount = data.FirstOrDefault().PaymentRemainAmountVnd;
+            //    }
+            //    else if (currency == AccountingConstants.CURRENCY_USD)
+            //    {
+            //        paidAmount = data.FirstOrDefault().PaymentAmountUsd;
+            //        remainAmount = data.FirstOrDefault().PaymentRemainAmountUsd;
+            //    }
+            //    else
+            //    {
+            //        paidAmount = data.FirstOrDefault().PaymentAmount;
+            //        remainAmount = data.FirstOrDefault().PaymentRemainAmount;
+            //    }
+            //}
 
             return new[] { total, paidAmount, remainAmount };
         }
@@ -266,7 +294,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public IQueryable<AccAccountPayablePaymentModel> GetBy(string refNo, string type, string invoiceNo, string billingNo)
         {
-            var payabledata = DataContext.Get(x => x.VoucherNo == refNo && x.TransactionType == type && (string.IsNullOrEmpty(x.InvoiceNo) || x.InvoiceNo == invoiceNo) && x.BillingNo == billingNo).FirstOrDefault();
+            var payabledata = DataContext.Get(x => x.VoucherNo == refNo && x.TransactionType == type && (string.IsNullOrEmpty(x.InvoiceNo) || x.InvoiceNo == invoiceNo) && (string.IsNullOrEmpty(x.BillingNo) || x.BillingNo == billingNo)).FirstOrDefault();
             if (payabledata == null) return null;
             var paymentData = accountPayablePaymentRepository.Get(x => x.ReferenceNo == payabledata.ReferenceNo && (payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? x.PaymentType == AccountingConstants.PAYMENT_TYPE_NAME_NET_OFF : x.PaymentType == payabledata.TransactionType)).OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated)
                 .Select(x => new AccAccountPayablePaymentModel
@@ -320,10 +348,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
             }
-            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
-            {
-                query = query.And(x => criteria.PaymentStatus.Any(z => z == x.Status));
-            }
+            //if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+            //{
+            //    query = query.And(x => criteria.PaymentStatus.Any(z => z == x.Status));
+            //}
             if (criteria.TransactionType != null && criteria.TransactionType.Count > 0)
             {
                 query = query.And(x => criteria.TransactionType.Any(z => z.Contains(x.TransactionType)));
@@ -363,6 +391,8 @@ namespace eFMS.API.Accounting.DL.Services
                            PaidAmountOrg = payable.PaymentAmount,
                            PaidAmountVnd = payable.PaymentAmountVnd,
                            PaymentTerm = payable.PaymentTerm,
+                           payable.RemainAmount,
+                           payable.RemainAmountVnd,
                            payable.Status,
 
                            payment
@@ -383,21 +413,27 @@ namespace eFMS.API.Accounting.DL.Services
                 var apInRangeDates = data.Where(x => DateTime.Parse(criteria.FromPaymentDate).Date <= x.VoucherDate.Value.Date && x.VoucherDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date && x.payment != null && !string.IsNullOrEmpty(x.payment.PaymentNo)).Select(x => new { x, InRangeType = "InRange" });
                 // Lấy AP trước khoảng thời gian đã chọn nhưng payment nằm trong khoảng thời gian
                 var paymentInRangedates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && x.payment != null && DateTime.Parse(criteria.FromPaymentDate).Date <= x.payment.PaymentDate.Value.Date && x.payment.PaymentDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date).Select(x => new { x, InRangeType = "PMInRange" });
-                // Lấy AP chưa trả hết trước khoảng thời gian đã chọn và payment không nằm trong khoảng thời gian
-                var apUnpaidNotInRangeDates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && (x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID) && (x.payment == null || DateTime.Parse(criteria.FromPaymentDate).Date > x.payment.PaymentDate.Value.Date)).Select(x => new { x, InRangeType = "OutRange" });
+
                 var dataGrp = apInRangeDates;
+                if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+                {
+                    dataGrp = dataGrp.Where(d => criteria.PaymentStatus.Any(status => status == d.x.Status));
+                }
                 if (paymentInRangedates.Count() > 0)
                 {
-                    dataGrp = dataGrp.Union(paymentInRangedates);
-                }
-                if (apUnpaidNotInRangeDates.Count() > 0)
-                {
-                    dataGrp = dataGrp.Union(apUnpaidNotInRangeDates);
+                    if (dataGrp.Count() > 0)
+                    {
+                        dataGrp = dataGrp.Union(paymentInRangedates);
+                    }
+                    else
+                    {
+                        dataGrp = paymentInRangedates;
+                    }
                 }
 
                 results = dataGrp.Select(dt => new AcctPayablePaymentDetailModel
                 {
-                    RefId = dt.x.RefId,
+                    RefId = dt.x.RefId.ToString(),
                     VoucherNo = dt.x.VoucherNo,
                     ReferenceNo = dt.x.ReferenceNo,
                     VoucherDate = dt.x.VoucherDate,
@@ -413,6 +449,9 @@ namespace eFMS.API.Accounting.DL.Services
                     PaidAmountOrg = dt.x.PaidAmountOrg,
                     PaidAmountVnd = dt.x.PaidAmountVnd,
                     PaymentTerm = dt.x.PaymentTerm,
+                    OrgRemainAmount = dt.x.RemainAmount,
+                    RemainAmountVnd = dt.x.RemainAmountVnd,
+                    Status = dt.x.Status,
 
                     PaymentNo = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentNo,
                     PaymentType = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentType,
@@ -424,13 +463,64 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Status,
                     PaymentDatetimeCreated = dt.x.payment == null ? null : dt.x.payment.DatetimeCreated,
                     CurrencyPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Currency,
-                    OrgRemainAmount = dt.x.payment == null ? null : dt.x.payment.RemainAmount,
                     PaymentAcctId = dt.x.payment == null ? string.Empty : dt.x.payment.AcctId,
 
                     InRangeType = dt.InRangeType
                 });
-            }
 
+                // Lấy AP chưa trả hết trước khoảng thời gian đã chọn và payment không nằm trong khoảng thời gian
+                var apUnpaidNotInRangeDates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && (x.payment == null || (DateTime.Parse(criteria.FromPaymentDate).Date > x.payment.PaymentDate.Value.Date && x.payment.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))).Select(x => new { x, InRangeType = "OutRange" }).Select(dt => new AcctPayablePaymentDetailModel
+                {
+                    RefId = dt.x.RefId.ToString(),
+                    VoucherNo = dt.x.VoucherNo,
+                    ReferenceNo = dt.x.ReferenceNo,
+                    VoucherDate = dt.x.VoucherDate,
+                    PaymentDueDate = dt.x.PaymentDueDate,
+                    PartnerId = dt.x.PartnerId,
+                    TransactionType = dt.x.TransactionType,
+                    InvoiceNo = dt.x.InvoiceNo,
+                    InvoiceDate = dt.x.InvoiceDate,
+                    BillingNo = dt.x.BillingNo,
+                    Currency = dt.x.Currency,
+                    TotalAmount = dt.x.TotalAmount,
+                    TotalAmountVnd = dt.x.TotalAmountVnd,
+                    PaidAmountOrg = dt.x.PaidAmountOrg,
+                    PaidAmountVnd = dt.x.PaidAmountVnd,
+                    PaymentTerm = dt.x.PaymentTerm,
+                    OrgRemainAmount = dt.x.RemainAmount,
+                    RemainAmountVnd = dt.x.RemainAmountVnd,
+                    Status = dt.x.payment == null ? AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART,
+
+                    PaymentNo = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentNo,
+                    PaymentType = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentType,
+                    PaymentDate = dt.x.payment == null ? null : dt.x.payment.PaymentDate,
+                    PaymentAmount = dt.x.payment == null ? null : dt.x.payment.PaymentAmount,
+                    PaymentAmountVnd = dt.x.payment == null ? null : dt.x.payment.PaymentAmountVnd,
+                    PaymentRemainAmount = dt.x.payment == null ? null : dt.x.payment.RemainAmount,
+                    PaymentRemainAmountVnd = dt.x.payment == null ? null : dt.x.payment.RemainAmountVnd,
+                    StatusPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Status,
+                    PaymentDatetimeCreated = dt.x.payment == null ? null : dt.x.payment.DatetimeCreated,
+                    CurrencyPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Currency,
+                    PaymentAcctId = dt.x.payment == null ? string.Empty : dt.x.payment.AcctId,
+
+                    InRangeType = dt.InRangeType
+                });
+                if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+                {
+                    apUnpaidNotInRangeDates = apUnpaidNotInRangeDates.Where(d => criteria.PaymentStatus.Any(status => status == d.Status));
+                }
+                if (apUnpaidNotInRangeDates != null && apUnpaidNotInRangeDates.Count() > 0)
+                {
+                    if (results.Count() > 0)
+                    {
+                        results = results.Union(apUnpaidNotInRangeDates);
+                    }
+                    else
+                    {
+                        results = apUnpaidNotInRangeDates;
+                    }
+                }
+            }
             return results;
         }
 
@@ -442,7 +532,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria)
         {
             var data = GetDataAcctPayable(criteria);
-            var grpData = data.GroupBy(x => new { x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType }).Select(x => new { x.Key, x });
+            var grpData = data.OrderBy(x=>x.VoucherDate).GroupBy(x => new { x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType }).Select(x => new { x.Key, x });
             var result = new List<AcctPayablePaymentExport>();
             var partnerIds = data.Select(x => x.PartnerId).ToList();
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
@@ -460,6 +550,7 @@ namespace eFMS.API.Accounting.DL.Services
                 payable.DocNo = item.Key.BillingNo;
                 payable.PaymentTerm = item.x.FirstOrDefault().PaymentTerm;
                 payable.PaymentDueDate = item.x.FirstOrDefault().PaymentDueDate;
+                payable.Status = item.x.FirstOrDefault().Status;
 
                 var payableType = item.x.FirstOrDefault().InRangeType;
                 switch (payableType)
@@ -492,10 +583,18 @@ namespace eFMS.API.Accounting.DL.Services
                         OrgPaidAmount = x.FirstOrDefault().PaidAmountOrg ?? 0,
                         PaidAmountVND = x.FirstOrDefault().PaymentAmountVnd ?? 0,
                         OriginRemainAmount = payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0,
-                        RemainAmountVND = payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0,
+                        RemainAmountVND = payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0,
                         OriginCurrency = x.FirstOrDefault().CurrencyPayment
                     });
-                    payable.PaymentDetails.AddRange(paymentGrp);
+                    if (payableType == "OutRange")
+                    {
+                        payable.BeginAmount = paymentGrp.FirstOrDefault().OriginRemainAmount;
+                        payable.BeginAmountVND = paymentGrp.FirstOrDefault().RemainAmountVND;
+                    }
+                    else
+                    {
+                        payable.PaymentDetails.AddRange(paymentGrp);
+                    }
                 }
                 result.Add(payable);
             }

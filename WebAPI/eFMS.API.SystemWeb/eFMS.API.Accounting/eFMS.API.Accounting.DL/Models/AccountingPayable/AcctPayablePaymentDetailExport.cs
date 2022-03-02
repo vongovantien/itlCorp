@@ -20,6 +20,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
         public decimal? BeginAmountVND { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? PaymentDueDate { get; set; }
+        public string Status { get; set; }
 
         public List<AcctPayablePaymentDetail> PaymentDetails { get; set; }
     }
