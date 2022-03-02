@@ -44,7 +44,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: SysImage[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
-    
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
