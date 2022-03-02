@@ -56,9 +56,9 @@ namespace eFMS.API.Report.Infrastructure
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"eFMS Accounting API {description.ApiVersion}",
+                                Title = $"eFMS Report Management API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
-                                Description = "eFMS Accounting API Document"
+                                Description = "eFMS Report API Document"
                             });
                     }
 

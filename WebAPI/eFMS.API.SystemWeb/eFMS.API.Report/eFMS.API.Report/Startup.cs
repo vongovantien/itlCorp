@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using eFMS.API.Infrastructure;
 using eFMS.API.Common.Globals;
+using AutoMapper;
 
 namespace eFMS.API.Report
 {
@@ -35,15 +36,14 @@ namespace eFMS.API.Report
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAutoMapper();
             services.AddSession();
-            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddInfrastructure<LanguageSub>(Configuration);
+            services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
-            services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,12 +74,12 @@ namespace eFMS.API.Report
                     options.SwaggerEndpoint(path, description.GroupName.ToUpperInvariant());
                 }
             });
-                app.UseCors("AllowAllOrigins");
+            app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            app.UseStaticFiles();
+            app.UseRequestLocalization();
         }
     }
 }

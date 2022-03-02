@@ -12,10 +12,12 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
 using ITL.NetCore.Connection;
 using eFMS.API.Common.Helpers;
+using ITL.NetCore.Connection.BL;
+using AutoMapper;
 
 namespace eFMS.API.Report.DL.Services
 {
-    public class SaleReportService : ISaleReportService
+    public class SaleReportService : RepositoryBase<SysUser, SysUserModel>, ISaleReportService
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> userRepository;
@@ -33,6 +35,7 @@ namespace eFMS.API.Report.DL.Services
         private readonly IUserBaseService userBaseService;
 
         public SaleReportService(
+            IMapper mapper,
             ICurrentUser currentUser, 
             IContextBase<CsTransaction> context,
             IContextBase<SysUser> userRepository, 
@@ -47,7 +50,7 @@ namespace eFMS.API.Report.DL.Services
             IUserBaseService _userBaseService,
             IContextBase<CatUnit> unit,
             IContextBase<CatChargeGroup> chargeGroup
-            )
+            ): base(userRepository, mapper)
         {
             this.currentUser = currentUser;
             this.userRepository = userRepository;
