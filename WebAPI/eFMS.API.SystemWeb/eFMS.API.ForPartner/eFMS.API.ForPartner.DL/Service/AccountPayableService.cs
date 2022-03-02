@@ -134,7 +134,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     UserCreated = currentUser.UserID,
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
-                                    DatetimeModified = DateTime.Now
+                                    DatetimeModified = DateTime.Now,
+                                    Description = c.FirstOrDefault().Description
                                 };
                                 payables.Add(payable);
                             });
@@ -186,7 +187,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     UserCreated = currentUser.UserID,
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
-                                    DatetimeModified = DateTime.Now
+                                    DatetimeModified = DateTime.Now,
+                                    Description = c.FirstOrDefault().Description
                                 };
 
                                 payables.Add(payable);
@@ -248,7 +250,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 DatetimeCreated = DateTime.Now,
                                 UserModified = currentUser.UserID,
-                                DatetimeModified = DateTime.Now
+                                DatetimeModified = DateTime.Now,
+                                Description = c.FirstOrDefault().Description
                             };
                             payables.Add(payable);
                         });
@@ -576,6 +579,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
                                     DatetimeModified = DateTime.Now,
+                                    Description = null
                                 };
                                 #endregion
                                 listInsertPayment.Add(accPayablePayment);

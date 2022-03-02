@@ -2368,7 +2368,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         Status = ForPartnerConstants.ACCOUNTING_INVOICE_STATUS_NEW,
                         PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
                         SyncStatus = ForPartnerConstants.STATUS_SYNCED,
-                        Description = "Voucher được đồng bộ từ bravo",
+                        Description = itemGroup.Description,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,

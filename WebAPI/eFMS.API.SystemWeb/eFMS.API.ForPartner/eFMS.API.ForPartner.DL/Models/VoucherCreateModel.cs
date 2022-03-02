@@ -32,6 +32,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public DateTime? VoucherDate { get; set; }
         public Guid ChargeId { get; set; }
         public string Currency { get; set; }
+        public string Description { get; set; }
         public decimal ExchangeRate { get; set; }
         public decimal AmountVnd { get; set; }
         public decimal AmountUsd { get; set; }
