@@ -46,6 +46,10 @@ export class CustomDeclaration {
     companyId: string = null;
     userCreatedName: string = null;
     userModifieddName: string = null;
+
+    // custom
+    isReplicate: boolean = false;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

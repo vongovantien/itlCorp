@@ -181,7 +181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 });
 
             IQueryable<Shipments> shipments = shipmentsDocumention
-                .Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                .Where(x => x.JobId != null && x.HBL != null)
                 .Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
@@ -199,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                                              MBL = ops.Mblno,
                                          };
 
-                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
             var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
@@ -223,7 +223,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
 
             //OPS assign
             IQueryable<OpsTransaction> opstranAssign = from ops in opstransaction
@@ -289,7 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (searchOption != "ClearanceNo")
             {
-                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
                 //Transaction assign
                 IQueryable<CsTransaction> cstranAssign = from cstd in transactions
                                                          join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
@@ -337,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryUnion = shipmentOperation;
             }
-            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
@@ -714,7 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<Shipments> GetShipmentAssignPIC()
         {
             var userCurrent = currentUser.UserID;
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID); // Lấy theo office current user
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
                                join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
@@ -738,7 +738,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -776,7 +776,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var userCurrent = currentUser.UserID;
             var advanceRequestJob = acctAdvanceRequestRepository.Get().Select(x => new { x.JobId, x.Mbl, x.Hblid }).ToList();
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var customs = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
@@ -787,7 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
             //Merger Shipment Ops assign & PIC
             var shipmentsOpsMerge = from data in shipmentsOps.Union(shipmentsOpsPIC)
-                                    join cus in customs on data.Hwbno equals cus.Hblid into grpCus
+                                    join cus in customs on data.JobNo equals cus.JobNo into grpCus
                                     from cus in grpCus.DefaultIfEmpty()
                                     select new Shipments
                                     {
@@ -810,7 +810,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => new { g.MBL, g.HBLID }).Where(x => x.Count() > 1).Select(s => s.FirstOrDefault());
             }
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -1297,7 +1297,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Trucking")
+                        else if (ChargeGroupModel?.Name == "Trucking")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1308,7 +1308,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountTrucking += charge.AmountVnd;  // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Handling")
+                        else if (ChargeGroupModel?.Name == "Handling")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1319,19 +1319,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountHandling += charge.AmountVnd;  // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight")
-                        {
-                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _totalSellAmountOther += charge.AmountUsd;
-                            }
-                            else
-                            {
-                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                            }
-                        }
                         // bổ sung total custom sell
-                        if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
+                        else if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1342,6 +1331,18 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellCustom += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
+                        else
+                        {
+                            // Amount other = sum các phí debit có charge group khác Freight,Trucking,handling,Logistics
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
                         //END SEL
                     }
                 }
@@ -1350,10 +1351,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalSellHandling = _totalSellAmountHandling;
                 data.TotalSellOthers = _totalSellAmountOther;
                 data.TotalCustomSell = _totalSellCustom;
-                if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
-                {
-                    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
-                }
+                #region [CR: 19/01/22] Alex bo rule nay
+                //if (data.TotalSellOthers > 0 && data.TotalCustomSell > 0)
+                //{
+                //    data.TotalSellOthers = data.TotalSellOthers - data.TotalCustomSell;
+                //}
+                #endregion
                 data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + data.TotalCustomSell;
                 #endregion
                 #region -- Phí Buying trước thuế --
@@ -1387,7 +1390,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyAmountFreight += charge.AmountVnd;
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Trucking")
+                        else if (ChargeGroupModel?.Name == "Trucking")
                         {
                             if (charge.KickBack == true)
                             {
@@ -1404,11 +1407,9 @@ namespace eFMS.API.Documentation.DL.Services
                                     _totalBuyAmountTrucking += charge.AmountVnd; // Phí Selling trước thuế
                                 }
                             }
-
                         }
-                        if (ChargeGroupModel?.Name == "Handling")
+                        else if (ChargeGroupModel?.Name == "Handling")
                         {
-
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
                                 _totalBuyAmountHandling += charge.AmountUsd;
@@ -1417,21 +1418,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
                             }
-
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" && charge.KickBack != true)
-                        {
-                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _totalBuyAmountOther += charge.AmountUsd;
-                            }
-                            else
-                            {
-                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                            }
-
-                        }
-                        if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
+                        else if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1442,9 +1430,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyAmountKB += charge.AmountVnd;
                             }
                         }
-
-                        // bổ sung total custom buy
-                        if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics")
+                        else if (chargeObj.Type == "CREDIT" && ChargeGroupModel?.Name == "Logistics") // bổ sung total custom buy
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1455,7 +1441,19 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalBuyCustom += charge.AmountVnd; // Phí buying trước thuế
                             }
                         }
-
+                        // Amount other = sum các phí có charge group khác Freight,Trucking,handling,Logistics,com
+                        //if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" && charge.KickBack != true)
+                        else
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
                         //END BUY
                     }
                 }
@@ -3430,7 +3428,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 data.ExchangeRate = charge.FinalExchangeRate;
-                data.Balance = _totalRevenue - _totalCost - (data.TotalKickBack ?? 0);
+                // [CR: cột Balance chỉ tính cho total selling - total buying]
+                data.Balance = _totalRevenue - _totalCost;
                 data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
 
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
@@ -4610,7 +4609,7 @@ namespace eFMS.API.Documentation.DL.Services
             if(!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4646,7 +4645,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4825,7 +4824,7 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                     }
                 }
-                commissionData.CustomerName = string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn));
+                commissionData.CustomerName = !string.IsNullOrEmpty(criteria.CustomerId) ? string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn)) : string.Empty;
             }
             if (commissionData.Details.Count() == 0)
             {

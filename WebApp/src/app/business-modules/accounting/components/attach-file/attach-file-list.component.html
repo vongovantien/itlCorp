@@ -35,7 +35,7 @@
                                 <i class="la la-download"></i>
                                 <span> Download All Files</span>
                             </span>
-                        </button>  
+                        </button>
                     </div>
                     <br/>
                     <li class="list-group-item file__item m-animate-fade-in"
@@ -48,7 +48,10 @@
                                             <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i>
                                         </ng-container>
                                         <ng-container *ngSwitchCase="'doc'">
-                                            <i class="fa fa-file-doc-o fa-2x" aria-hidden="true"></i>
+                                            <i class="fa fa-file-word-o fa-2x" aria-hidden="true"></i>
+                                        </ng-container>
+                                        <ng-container *ngSwitchCase="'docx'">
+                                            <i class="fa fa-file-word-o fa-2x" aria-hidden="true"></i>
                                         </ng-container>
                                         <ng-container *ngSwitchCase="'xlsx'">
                                             <i class="fa fa-file-excel-o fa-2x" aria-hidden="true"></i>

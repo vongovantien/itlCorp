@@ -26,6 +26,7 @@ using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
 using eFMS.API.Common.Models;
 using AutoMapper.QueryableExtensions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -286,7 +287,7 @@ namespace eFMS.API.Operation.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            Expression<Func<CustomsDeclaration, bool>> query = x => (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
+            Expression<Func<CustomsDeclaration, bool>> query = x => x.Source != OperationConstants.FROM_REPLICATE && (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
@@ -776,7 +777,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = catPartnerApi.GetPartners().Result.Any(x => x.AccountNo == _partnerTaxCode);
+                    var isFound = customerRepository.Any(x => x.AccountNo == _partnerTaxCode);
                     if (!isFound)
                     {
                         item.CustomerName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -785,7 +786,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        var customer = catPartnerApi.GetPartners().Result.Where(x => x.AccountNo == _partnerTaxCode).First();
+                        var customer = customerRepository.Where(x => x.AccountNo == _partnerTaxCode).First();
                         item.CustomerName = customer.PartnerNameEn;
                         item.PartnerTaxCode = customer.TaxCode;
                     }
@@ -1308,6 +1309,14 @@ namespace eFMS.API.Operation.DL.Services
                 foreach (var item in customs)
                 {
                     var hs = Delete(x => x.Id == item.Id, false);
+
+                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id 
+                    && x.Source == OperationConstants.FROM_REPLICATE
+                    && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
+                    if(hasReplicate != null)
+                    {
+                        Delete(x => x.Id == hasReplicate.Id, false);
+                    }
                 }
                 DataContext.SubmitChanges();
             }
@@ -1323,7 +1332,7 @@ namespace eFMS.API.Operation.DL.Services
             //Get list custom có shipment operation chưa bị lock, list shipment đã được assign cho current user hoặc shipment có PIC là current user
             var userCurrent = currentUser.UserID;
             var customs = DataContext.Get(x => !string.IsNullOrEmpty(x.JobNo));
-            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var shipmentsOperation = from ops in shipments
                                      join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
                                      where osa.MainPersonInCharge == userCurrent
@@ -1508,6 +1517,84 @@ namespace eFMS.API.Operation.DL.Services
                     break;
             }
             return serviceType;
+        }
+
+        public async Task<HandleState> ReplicateCustomClearance(int Id)
+        {
+            HandleState hs = new HandleState();
+            CustomsDeclaration cd = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+            try
+            {
+                if (cd != null)
+                {
+                    if (string.IsNullOrEmpty(cd.JobNo))
+                    {
+                        throw new NullReferenceException();
+                    }
+
+                    OpsTransaction opsJob = opsTransactionRepo.Get(x => x.JobNo == cd.JobNo)?.FirstOrDefault();
+                    if (opsJob == null)
+                    {
+                        throw new NullReferenceException();
+                    }
+
+                    if(opsJob.ReplicatedId == null)
+                    {
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
+                    }
+
+                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
+                    if(opsJobReplicate == null)
+                    {
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
+                    }
+                    var existedClearance = DataContext.Any(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id && opsJobReplicate.JobNo == x.JobNo);
+                    if(existedClearance)
+                    {
+                        return new HandleState((object)string.Format("Tờ khai {0} đã được thêm vào lô replicate", cd.ClearanceNo));
+                    }
+
+                    CustomsDeclaration replicateCd = new CustomsDeclaration();
+
+                    replicateCd.JobNo = opsJobReplicate.JobNo;
+                    replicateCd.Source = OperationConstants.FROM_REPLICATE;
+                    replicateCd.DatetimeCreated = DateTime.Now;
+                    replicateCd.DatetimeModified = DateTime.Now;
+                    replicateCd.GroupId = currentUser.GroupId;
+                    replicateCd.DepartmentId = currentUser.DepartmentId;
+                    replicateCd.OfficeId = currentUser.OfficeID;
+                    replicateCd.CompanyId = currentUser.CompanyID;
+                    replicateCd.AccountNo = cd.AccountNo;
+                    replicateCd.PartnerTaxCode = cd.PartnerTaxCode;
+                    replicateCd.Mblid = cd.Mblid;
+                    replicateCd.Hblid = cd.Hblid;
+                    replicateCd.ClearanceNo = cd.ClearanceNo;
+                    replicateCd.ClearanceDate = cd.ClearanceDate;
+                    replicateCd.ServiceType = cd.ServiceType;
+                    replicateCd.PortCodeNn = cd.PortCodeNn;
+                    replicateCd.UnitCode = cd.UnitCode;
+                    replicateCd.QtyCont = cd.QtyCont;
+                    replicateCd.Pcs = cd.Pcs;
+                    replicateCd.ImportCountryCode = cd.ImportCountryCode;
+                    replicateCd.ExportCountryCode = cd.ExportCountryCode;
+                    replicateCd.GrossWeight = cd.GrossWeight;
+                    replicateCd.Cbm = cd.Cbm;
+                    replicateCd.Gateway = cd.Gateway;
+                    replicateCd.Type = cd.Type;
+                    replicateCd.CargoType = cd.CargoType;
+                    replicateCd.Route = cd.Route;
+                    replicateCd.Shipper = cd.Shipper;
+                    replicateCd.Consignee = cd.Consignee;
+
+                    hs = await DataContext.AddAsync(replicateCd);
+                }
+            }
+            catch (NullReferenceException ex)
+            {
+                return new HandleState((object)"Không tìm thấy thông tin job trong tờ khai!");
+            }
+
+            return hs;
         }
     }
 }

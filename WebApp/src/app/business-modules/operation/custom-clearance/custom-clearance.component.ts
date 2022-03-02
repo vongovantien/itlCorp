@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, map, finalize, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
-import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -30,7 +30,7 @@ export class CustomClearanceComponent extends AppList {
     messageConvertError: string = '';
     clearancesToConvert: CustomDeclaration[] = [];
     headers: CommonInterface.IHeaderTable[];
-    defaultDataSearch= {
+    defaultDataSearch = {
         fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
         toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         imPorted: null,
@@ -44,7 +44,6 @@ export class CustomClearanceComponent extends AppList {
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
-        private _catalogueRepo: CatalogueRepo,
         private _exportRepo: ExportRepo,
         private _router: Router,
     ) {
@@ -89,25 +88,25 @@ export class CustomClearanceComponent extends AppList {
 
     getListCustomsDeclaration() {
         this._store.select(getOperationClearanceDataSearch)
-        .pipe(
-            withLatestFrom(this._store.select(getOperationClearancePagingState)),
-            takeUntil(this.ngUnsubscribe),
-            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-        )
-        .subscribe(
-            (criteria: any) => {
-                if (!!criteria.dataSearch) {
-                    this.dataSearch = criteria.dataSearch;
-                }
-                else{
-                    this.dataSearch = this.defaultDataSearch;
-                }
+            .pipe(
+                withLatestFrom(this._store.select(getOperationClearancePagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria.dataSearch) {
+                        this.dataSearch = criteria.dataSearch;
+                    }
+                    else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
 
-                this.page = criteria.page;
-                this.pageSize = criteria.pageSize;
-                this.requestCustomDeclarationList();
-            }
-        );
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
+                    this.requestCustomDeclarationList();
+                }
+            );
     }
 
     requestCustomDeclarationList() {
@@ -184,7 +183,7 @@ export class CustomClearanceComponent extends AppList {
             );
     }
 
-    confirmConvert() {
+    confirmConvert(isReplicate: boolean) {
         this._toastrService.clear();
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
             this.clearancesToConvert = this.checkValidClearancesToJobs();
@@ -195,6 +194,9 @@ export class CustomClearanceComponent extends AppList {
                 this.messageConvertError = '';
                 return;
             } else {
+                this.clearancesToConvert.forEach(c => {
+                    c.isReplicate = isReplicate;
+                });
                 this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
                     .pipe(
                         catchError(this.catchError),
@@ -264,11 +266,9 @@ export class CustomClearanceComponent extends AppList {
 
     onComfirmConvertToJobs() {
         this.confirmConvertPopup.hide();
-        this._progressRef.start();
         this._documentRepo.convertExistedClearanceToJob(this.clearancesToConvert)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

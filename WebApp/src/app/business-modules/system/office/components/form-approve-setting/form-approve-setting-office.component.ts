@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { LockShipmentSetting, FlowSetting } from '@models';
+import { LockShipmentSetting, FlowSetting, Office } from '@models';
 import { ChargeConstants } from '@constants';
 import { ActivatedRoute, Params } from '@angular/router';
 import { SystemRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
     selector: "form-approve-setting-office",
@@ -12,11 +14,13 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class OfficeFormApproveSettingComponent
     extends AppForm
-    implements OnInit
-{
+    implements OnInit {
     approvePayments: FlowSetting[] = [];
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
+
+    initRepilicate = new FlowSetting({ type: 'Other', flow: 'Replicate' });
+    replicateOffice: FlowSetting = this.initRepilicate;
 
     settings: CommonInterface.ICommonTitleValue[] = [
         { title: "None", value: "None" },
@@ -43,10 +47,7 @@ export class OfficeFormApproveSettingComponent
     ];
 
     serviceLockSettings: LockShipmentSetting[] = [];
-    dates: number[] = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    ];
+    dates: number[] = Array.from({ length: 30 }, (_, i) => i + 1);
     services: string[] = [
         ChargeConstants.AE_CODE,
         ChargeConstants.AI_CODE,
@@ -59,6 +60,7 @@ export class OfficeFormApproveSettingComponent
         ChargeConstants.CL_CODE,
     ];
     officeId: string;
+    offices: Observable<Office[]>;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -73,8 +75,13 @@ export class OfficeFormApproveSettingComponent
             if (param.id) {
                 this.officeId = param.id;
                 this.getSetting(this.officeId);
+                this.offices = this._systemRepo.getAllOffice().pipe(filter((data) => {
+                    const d = data.filter(x => x.id !== this.officeId);
+                    return d;
+                }));
             }
         });
+
     }
 
     initUnlockShipmentSetting() {
@@ -109,10 +116,11 @@ export class OfficeFormApproveSettingComponent
             .getSettingFlowByOffice(officeId)
             .subscribe(
                 (res: {
-                    lockingDateShipment: LockShipmentSetting[];
-                    approvals: FlowSetting[];
-                    unlocks: FlowSetting[];
-                    account: FlowSetting;
+                    lockingDateShipment: LockShipmentSetting[],
+                    approvals: FlowSetting[],
+                    unlocks: FlowSetting[],
+                    account: FlowSetting,
+                    replicateOffice: FlowSetting
                 }) => {
                     if (!res.lockingDateShipment.length) {
                         this.initLockingShipmentSetting();
@@ -137,12 +145,13 @@ export class OfficeFormApproveSettingComponent
                     } else {
                         this.accountReceivable = res.account;
                     }
-                    if(!res.account.applyPartner){
-                        this.accountReceivable.applyPartner="None";
-                    } 
-                    if(!res.account.applyType){
-                        this.accountReceivable.applyType="None";
-                    } 
+                    if (!res.account.applyPartner) {
+                        this.accountReceivable.applyPartner = "None";
+                    }
+                    if (!res.account.applyType) {
+                        this.accountReceivable.applyType = "None";
+                    }
+                    this.replicateOffice = !!res['replicateOffice'] ? res['replicateOffice'] : this.initRepilicate;
                 }
             );
     }
@@ -161,6 +170,7 @@ export class OfficeFormApproveSettingComponent
             unlockShipments: this.unlockShipments,
             lockShipmentDate: this.serviceLockSettings,
             accountReceivable: this.accountReceivable,
+            replicateOffice: this.replicateOffice
         };
 
         this._systemRepo
@@ -168,8 +178,10 @@ export class OfficeFormApproveSettingComponent
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
                     this._toastService.success(res.message);
+                    this.getSetting(this.officeId);
                 }
             });
+
     }
 
     checkValidate() {
@@ -191,4 +203,5 @@ interface ISettingFlowEditModel {
     unlockShipments: FlowSetting[];
     lockShipmentDate: LockShipmentSetting[];
     accountReceivable: FlowSetting;
+    replicateOffice: FlowSetting;
 }

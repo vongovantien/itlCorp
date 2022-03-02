@@ -50,6 +50,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
         private readonly IContextBase<AccAccountReceivable> accReceivableRepository;
+        private readonly IAccountingPaymentService accPaymentService;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -76,7 +77,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatContract> catContractRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<AcctReceiptSync> receiptSyncRepo,
-            IContextBase<AccAccountReceivable> accReceivableRepo
+            IContextBase<AccAccountReceivable> accReceivableRepo,
+            IAccountingPaymentService accPaymentSrv
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -101,6 +103,7 @@ namespace eFMS.API.ForPartner.DL.Service
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             receiptSyncRepository = receiptSyncRepo;
             accReceivableRepository = accReceivableRepo;
+            accPaymentService = accPaymentSrv;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -680,6 +683,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         if (invoiceToDelete == null)
                         {
                             return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
+
+                        if(accPaymentService.CheckInvoicePayment(invoiceToDelete.Id))
+                        {
+                            return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
                         }
 
                         data = invoiceToDelete;

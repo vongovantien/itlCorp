@@ -20,13 +20,10 @@
     </ng-container>
     <ng-container *ngSwitchCase="'save'">
         <button type="button" NoDbClick class="btn btn-{{class ? class : 'brand'}}  m-btn--icon m-btn--uppercase"
-            *ngIf="(menuPermission | async)?.write !== 'None'" (click)="onClicked($event)">
-            <span>
-                <i class="la la-save"></i>
-                <span>
-                    {{title || "Save"}}
-                </span>
-            </span>
+            *ngIf="(menuPermission | async)?.write !== 'None'" (click)="onClicked($event)"
+            [class.dropdown-toggle]="mode === 'dropdown'">
+            <i class="la la-save"></i>
+            {{!!title ? title : 'Save'}}
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'save-and-send'">

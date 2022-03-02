@@ -59,3 +59,4 @@ ContSTC	String	255
 SpecialText	String	255	
 Service	String	50	
 AttachList	Memo		
+PackageConts	String	225	

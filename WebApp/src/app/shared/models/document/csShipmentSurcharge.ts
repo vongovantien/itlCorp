@@ -95,6 +95,8 @@ export class CsShipmentSurcharge {
     duplicateCharge: boolean = false;
     duplicateInvoice: boolean = false;
     isShowPartnerHeader: boolean = false;
+    linkFee: boolean = null;
+    linkChargeId:string = null;
 
     constructor(object?: any) {
         const self = this;

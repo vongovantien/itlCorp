@@ -8,5 +8,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string ImportCountryName { get; set; }
         public string ExportCountryName { get; set; }
         public string GatewayName { get; set; }
+        public bool IsReplicate { get; set; }
     }
 }

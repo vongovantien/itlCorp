@@ -14,33 +14,29 @@
 <div class="m-content h-100vh">
     <custom-clearance-form-detail></custom-clearance-form-detail>
     <div class="form-actions m--align-right" *ngIf="!!customDeclaration">
-        <button type="" class="btn btn-brand  m-btn--icon m-btn--uppercase"
-            *ngIf="customDeclaration.permission.allowUpdate  && customDeclaration.jobNo === null"
-            (click)="saveCustomClearance()">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
-        <button type="" class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="saveAndConvert()"
-            *ngIf="customDeclaration.permission.allowUpdate && customDeclaration.jobNo === null">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save and convert
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase"
+
+        <app-permission-button *ngIf="customDeclaration.jobNo === null" (onClick)="saveCustomClearance()" type="save">
+        </app-permission-button>
+
+        <app-permission-button *ngIf="customDeclaration.jobNo === null" title="save and convert" type="save"
+            class="success" [dpToggle]="dropdownMenuClearance" mode="dropdown" position="topCenter">
+        </app-permission-button>
+
+        <app-default-button [buttonSetting]="cancelButtonSetting" *ngIf="customDeclaration.permission.allowUpdate"
             routerLink="/home/operation/custom-clearance">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span>
-        </button>
+        </app-default-button>
     </div>
 </div>
+
+
+<app-dropdown #dropdownMenuClearance>
+    <a class="dropdown-item pointer" (click)="saveAndConvert(true)" title="Create clearance with replicate">
+        <i class="la la-copy"></i>
+        <span> Replicate</span>
+    </a>
+
+    <a class="dropdown-item pointer" (click)="saveAndConvert(false)" title="Create clearance with non-replicate">
+        <i class="la la-save"></i>
+        <span> Non-Replicate </span>
+    </a>
+</app-dropdown>

@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppForm } from '@app';
 import { JobConstants, SystemConstants } from '@constants';
@@ -20,7 +20,7 @@ import { getDataSearchCombineBillingState } from '../../store/reducers';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormSearchCombineBillingComponent extends AppForm implements OnInit {
-  // @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
+  @Input() isExport: boolean = false;
 
   referenceNo: AbstractControl;
   partnerId: AbstractControl;
@@ -116,6 +116,10 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
     switch (type) {
         case 'partner':
             this.partnerId.setValue((data as Partner).id);
+            if(!!this.partnerId.value){
+              console.log('5456')
+              this.isExport = false;
+            }
             break;
         default:
             break;
@@ -154,8 +158,8 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
     const body: ISearchDataBilling = {
       referenceNo: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
       partnerId: dataForm.partnerId,
-      createdDateFrom: (!!this.createDate.value) ? formatDate(this.createDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-      createdDateTo: (!!this.createDate.value) ? formatDate(this.createDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+      createdDateFrom: (!!this.createDate && !!this.createDate.value?.startDate) ? formatDate(this.createDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+      createdDateTo: (!!this.createDate && !!this.createDate.value?.endDate) ? formatDate(this.createDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
       creator: !!dataForm.creator ? this.getCreatorData(dataForm.creator) : null
     };
     this._store.dispatch(SearchListCombineBilling(body));
@@ -170,7 +174,6 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
 
     this._store.dispatch(SearchListCombineBilling({createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')}));
-    // this.onSubmit();
   }
 }
 

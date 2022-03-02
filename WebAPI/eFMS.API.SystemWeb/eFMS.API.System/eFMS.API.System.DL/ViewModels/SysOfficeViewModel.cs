@@ -34,7 +34,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string ShortName { get; set; }
         public string CompanyName { get; set; }
         public string UserModified { get; set; }
-
+        public string InternalCode { get; set; }
 
         public DateTime? DatetimeModified { get; set; }
     }

@@ -2,16 +2,15 @@ import { Component, ViewChild } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
 import { formatDate } from "@angular/common";
-import { NgxSpinnerService } from "ngx-spinner";
 import { InfoPopupComponent } from "@common";
 
-import { OpsTransaction } from "@models";
+import { OpsTransaction, LinkAirSeaModel } from "@models";
 import { AppForm } from "@app";
 import { DocumentationRepo } from "@repositories";
 import { RoutingConstants } from "@constants";
 import { JobManagementFormCreateComponent } from "../components/form-create/form-create-job.component";
 
-import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { takeUntil, catchError, mergeMap } from "rxjs/operators";
 import _merge from 'lodash/merge';
 
 
@@ -27,7 +26,6 @@ export class JobManagementCreateJobComponent extends AppForm {
     isSaveLink: boolean = false;
 
     constructor(
-        private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
         private _documentRepo: DocumentationRepo,
         private _router: Router
@@ -47,8 +45,16 @@ export class JobManagementCreateJobComponent extends AppForm {
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
         opsTransaction.salemanId = form.salemansId;
 
-        if (!!this.formCreateComponent.shipmentNo && form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
+        if (!!this.formCreateComponent.jobLinkAirSeaNo
+            && form.shipmentMode === 'Internal'
+            && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
+
+            opsTransaction.sumGrossWeight = this.formCreateComponent.jobLinkAirSeaInfo?.gw;
+            opsTransaction.sumChargeWeight = this.formCreateComponent.jobLinkAirSeaInfo?.cw;
+            opsTransaction.sumPackages = this.formCreateComponent.jobLinkAirSeaInfo?.packageQty;
+            opsTransaction.csMawbcontainers = this.formCreateComponent.jobLinkAirSeaInfo?.containers || [];
+            opsTransaction.containerDescription = this.formCreateComponent.jobLinkAirSeaInfo?.packageContainer
         }
         return opsTransaction;
     }
@@ -74,43 +80,37 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     saveJob(model: OpsTransaction) {
+        let objUpdateData = null;
+
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(model.mblno, model.hwbno, model.productService, model.serviceMode)
-                .subscribe((res: any) => {
-                    if (!!res) {
-                        model.serviceNo = res.jobNo;
-                        model.serviceHblId = res.id;
-                        this._documentRepo.addOPSJob(model).pipe(
-                            takeUntil(this.ngUnsubscribe),
-                            catchError(this.catchError),
-                            finalize(() => { this.spinner.hide(); })
-                        ).subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (!res.status) {
-                                    this._toaster.error(res.message);
-                                } else {
-                                    this._toaster.success(res.message);
-                                    this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
-                                }
-                            }
-                        );
-                    }
-                });
+            objUpdateData = this._documentRepo.getASTransactionInfo(null, model.mblno, model.hwbno, model.productService, model.serviceMode)
+                .pipe(
+                    mergeMap((res: LinkAirSeaModel) => {
+                        model.serviceNo = res?.jobNo;
+                        model.serviceHblId = res?.hblId;
+                        return this._documentRepo.addOPSJob(model);
+                    }),
+                )
         } else {
-            this._documentRepo.addOPSJob(model).pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError),
-                finalize(() => { this.spinner.hide(); })
-            ).subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        this._toaster.error(res.message);
-                    } else {
-                        this._toaster.success(res.message);
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+            objUpdateData = this._documentRepo.addOPSJob(model)
+        }
+
+        if (objUpdateData != null) {
+            objUpdateData
+                .pipe(
+                    takeUntil(this.ngUnsubscribe),
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toaster.error(res.message);
+                        } else {
+                            this._toaster.success(res.message);
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                        }
                     }
-                }
-            );
+                );
         }
     }
 

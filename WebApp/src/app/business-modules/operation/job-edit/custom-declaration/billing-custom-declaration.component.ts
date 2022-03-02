@@ -8,12 +8,17 @@ import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
+import { CustomDeclaration } from '@models';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-billing-custom-declaration',
     templateUrl: './billing-custom-declaration.component.html',
 })
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
+    @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
 
     @ViewChild(AddMoreModalComponent) poupAddMore: AddMoreModalComponent;
     currentJob: OpsTransaction;
@@ -24,15 +29,17 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
     searchImportedString: string = '';
     checkAllImported = false;
     dataImportedSearch: any[];
+    selectedCd: CustomDeclaration;
 
     constructor(
-        private pagerService: PagingService,
-        private _documentRepo: DocumentationRepo,
-        private _operationRepo: OperationRepo,
-        private _activedRouter: ActivatedRoute,
-        private _ngProgressService: NgProgress,
-        private _sortService: SortService,
-        private _catalogueRepo: CatalogueRepo
+        private readonly pagerService: PagingService,
+        private readonly _documentRepo: DocumentationRepo,
+        private readonly _operationRepo: OperationRepo,
+        private readonly _activedRouter: ActivatedRoute,
+        private readonly _ngProgressService: NgProgress,
+        private readonly _sortService: SortService,
+        private readonly _catalogueRepo: CatalogueRepo,
+        private readonly _toastService: ToastrService
 
     ) {
         super();
@@ -236,4 +243,35 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         const pager = this.pagerService.getPager(this.totalItems, this.page, this.pageSize);
         this.customClearances = this.dataImportedSearch.slice(pager.startIndex, pager.endIndex + 1);
     }
+
+    onSelectCd(cd: CustomDeclaration) {
+        this.selectedCd = cd;
+    }
+
+    confirmSyncCDToReplicateJob() {
+        const currentCd = Object.assign({}, this.selectedCd);
+
+        const confirmMessage = `Are you sure you want to sync <span class="font-weight-bold">${this.selectedCd?.clearanceNo}</span> to replicate job?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            title: 'Sync Clearance',
+            body: confirmMessage,
+            iconConfirm: 'la la-cloud-upload',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            if (!!currentCd) {
+                this._operationRepo.replicateClearance(currentCd.id)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                            } else
+                                this._toastService.error(res.message);
+                        }
+                    )
+            }
+        });
+    }
+
+
 }

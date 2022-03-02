@@ -432,7 +432,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 var ObjPartner = catPartnerRepository.Get(x => x.Id == contract.PartnerId).FirstOrDefault();
-                ObjPartner.PartnerGroup = ObjPartner.PartnerGroup + ";CUSTOMER";
+                ObjPartner.PartnerGroup += (ObjPartner.PartnerGroup.Contains(DataEnums.CustomerPartner) ? string.Empty : (";" + DataEnums.CustomerPartner));
                 ObjPartner.UserModified = currentUser.UserID;
                 ObjPartner.DatetimeModified = DateTime.Now;
                 ObjPartner.PartnerType = "Customer";
@@ -1736,6 +1736,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractType = x.contract.ContractType,
                             CustomerAdvanceAmountVnd = x.contract.CustomerAdvanceAmountVnd ?? 0,
                             CreditCurrency = x.contract.CreditCurrency,
+                            CurrencyId = x.contract.CurrencyId,
                             CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
                         }).OrderBy(x => x.ExpiredDate);
                     }

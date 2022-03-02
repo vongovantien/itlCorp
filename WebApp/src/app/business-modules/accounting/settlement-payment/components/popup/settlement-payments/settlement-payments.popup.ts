@@ -7,6 +7,8 @@ import { ToastrService } from "ngx-toastr";
 import { PopupBase } from "@app";
 import { SettlementPayment } from "@models";
 import { catchError, finalize, map } from "rxjs/operators";
+import { delayTime } from "@decorators";
+import { InjectViewContainerRefDirective } from "@directives";
 
 @Component({
     selector: 'settlement-payments-popup',
@@ -16,7 +18,8 @@ import { catchError, finalize, map } from "rxjs/operators";
 export class SettlementPaymentsPopupComponent extends PopupBase {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
+    
     dataSearchList: any = null;
     page: number = 1;
     pageSize: number = 15;
@@ -121,6 +124,26 @@ export class SettlementPaymentsPopupComponent extends PopupBase {
         }
     }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+    
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.confirmPopupContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.confirmPopupContainerRef.viewContainerRef.clear();
+            });
+    }
+
     previewMultiple(settlementNos: string[]) {
         this._progressRef.start();
         this._accoutingRepo.previewSettlementPaymentMultiple(settlementNos)
@@ -130,12 +153,9 @@ export class SettlementPaymentsPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: any) => {
-                    if (res != null) {
-                        this.dataReport = res;
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                            this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }

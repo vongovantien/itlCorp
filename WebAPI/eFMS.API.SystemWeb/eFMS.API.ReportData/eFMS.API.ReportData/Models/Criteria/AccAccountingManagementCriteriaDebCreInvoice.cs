@@ -20,5 +20,9 @@ namespace eFMS.API.ReportData.Models.Criteria
         public DateTime? ToExportDate { get; set; }
         public DateTime? FromAccountingDate { get; set; }
         public DateTime? ToAccountingDate { get; set; }
+
+        public DateTime? IssuedDate { get; set; }
+        public string Type { get; set; }
+        public string Status { get; set; }
     }
 }

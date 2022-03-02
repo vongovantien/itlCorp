@@ -85,9 +85,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param) => {
-                console.log('ops',param)
                 this.jobId = param.id;
-                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit': param.tab) : 'job-edit';
+                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit' : param.tab) : 'job-edit';
                 if (param.action) {
                     this.isDuplicate = param.action.toUpperCase() === 'COPY';
                     this.selectedTabSurcharge = 'BUY';
@@ -315,7 +314,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     updateShipment() {
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
+            this._documentRepo.getASTransactionInfo(this.opsTransaction.jobNo, this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
                 .pipe(
                     catchError(this.catchError),
                     concatMap((res: ILinkAirSeaInfoModel) => {
@@ -361,6 +360,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
+        this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -408,12 +408,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-                        console.log(this.opsTransaction);
 
                         this.hblid = this.opsTransaction.hblid;
 
                         this.getListContainersOfJob();
                         this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+
                         this.editForm.opsTransaction = this.opsTransaction;
                         const hbl = new CsTransactionDetail(this.opsTransaction);
                         hbl.id = this.opsTransaction.hblid;

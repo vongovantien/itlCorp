@@ -1273,8 +1273,13 @@ namespace eFMS.API.Catalogue.DL.Services
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
-                         select new { user, partner, x, agreements }
+                         from agreement in agreements.DefaultIfEmpty()
+                         select new { user, partner, x, agreement }
                         );
+            if (!string.IsNullOrEmpty(criteria.PartnerType))
+            {
+                query = query.Where(x => x.agreement != null && x.agreement.Id != null);
+            }
             if (string.IsNullOrEmpty(criteria.All))
             {
                 query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -1292,9 +1297,9 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && ((criteria.DatetimeCreatedFrom <= x.partner.DatetimeCreated && x.partner.DatetimeCreated <= criteria.DatetimeCreatedTo) || criteria.DatetimeCreatedFrom == null)
                            ));
-                if (SalemanId.Count() > 0)
+                if (SalemanId.Count() > 0 && !string.IsNullOrEmpty(criteria.PartnerType))
                 {
-                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)));
+                    query = query.Where(x => SalemanId.Any(sm => sm == x.agreement.SaleManId));
                 }
                 //else if (!string.IsNullOrEmpty(criteria.Saleman))
                 //{
@@ -1302,7 +1307,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 //}
                 if (!string.IsNullOrEmpty(ContractType))
                 {
-                    query = query.Where(x => x.agreements.Any(y => y.ContractType.ToLower().Contains(ContractType.ToLower())));
+                    query = query.Where(x => x.agreement.ContractType.ToLower().Contains(ContractType.ToLower()));
                 }
                 else if (!string.IsNullOrEmpty(criteria.ContractType))
                 {
@@ -1323,8 +1328,8 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y => y != null && SalemanId.Any(sm => sm == y.SaleManId))
-                           || x.agreements.Any(y => y != null && y.ContractType.ToLower().Contains(ContractType.ToLower()))
+                           || (x.agreement != null && SalemanId.Any(sm => sm == x.agreement.SaleManId))
+                           || (x.agreement != null && x.agreement.ContractType.ToLower().Contains(ContractType.ToLower()))
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            && (x.partner.PartnerType == criteria.PartnerType || criteria.PartnerType == null));
@@ -1335,7 +1340,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
             }
             if (query == null) return null;
-            var results = query.Select(x => new CatPartnerViewModel
+            var dataGrp = query.GroupBy(x => x.partner.Id).Select(x => x.FirstOrDefault());
+            var results = dataGrp.Select(x => new CatPartnerViewModel
             {
                 Id = x.partner.Id,
                 PartnerGroup = x.partner.PartnerGroup,
@@ -2277,7 +2283,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo,
                 PartnerType = x.PartnerType,
-                TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName
+                TaxCodeAbbrName = x.AccountNo + " - " + x.ShortName
             }).ToList();
             return results.AsQueryable();
         }

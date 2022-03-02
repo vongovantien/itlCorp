@@ -46,4 +46,6 @@ export class CustomClearance {
     accountNo: string;
 
     permission: PermissionShipment = new PermissionShipment();
+
+    isReplicate: boolean;
 }

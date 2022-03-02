@@ -51,6 +51,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     bankName: AbstractControl;
     headers: CommonInterface.IHeaderTable[];
     location: AbstractControl;
+    internalCode: AbstractControl;
     bankName_En: AbstractControl;
     bankName_Local: AbstractControl;
     officeType: AbstractControl;
@@ -184,7 +185,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             bankName_Local: [],
             officeType: ['Branch', Validators.compose([
                 Validators.required
-            ])]
+            ])],
+            internalCode: []
         });
 
         this.code = this.formGroup.controls['code'];
@@ -212,6 +214,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.bankName_En = this.formGroup.controls['bankName_En'];
         this.bankName_Local = this.formGroup.controls['bankName_Local'];
         this.officeType = this.formGroup.controls['officeType'];
+
+        this.internalCode = this.formGroup.controls['internalCode'];
     }
 }
 
@@ -245,5 +249,5 @@ export interface IFormAddOffice {
     location: string;
     bankName_En: string;
     bankName_Local
-
+    internalCode: string;
 }

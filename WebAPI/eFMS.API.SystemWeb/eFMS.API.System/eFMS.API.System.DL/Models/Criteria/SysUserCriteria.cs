@@ -19,5 +19,6 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string Title { get; set; }
         public string Company { get; set; }
         public string Office { get; set; }
+        public string StaffCode { get; set; }
     }
 }

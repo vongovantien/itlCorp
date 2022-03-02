@@ -17,6 +17,8 @@
         public static readonly string SEF_HBL = "HBL";
         public static readonly string OPS_SHIPMENT = "LOG";
         public static readonly string CLEARANCE_FROM_EFMS = "eFMS";
+        public static readonly string CLEARANCE_FROM_REPLICATE = "Replicate";
+        public static readonly string NON_CARRIER_PARTNER_CODE = "NONCARRIER";
 
         public static readonly string STATUS_APPROVAL_NEW = "New";
         public static readonly string STATUS_APPROVAL_DENIED = "Denied";
@@ -59,6 +61,8 @@
 
         public const string CODE_ITL = "ITL7939";
         public const string NO_HOUSE = "N/H";
+        public const string ITL_BOD = "ITL.BOD";
+
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
 

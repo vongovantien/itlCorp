@@ -663,6 +663,10 @@ namespace eFMS.IdentityServer.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.UserRole)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserType)
                     .HasMaxLength(50)
                     .IsUnicode(false);

@@ -216,6 +216,11 @@ export class OperationRepo {
     getListCustomNoAsignPIC(): any {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetListCustomNoAsignPIC`);
     }
+
+    replicateClearance(id: number) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/ReplicateClearance`, null, { id });
+
+    }
 }
 
 

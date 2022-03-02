@@ -3,7 +3,7 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
+                <tab heading="Invoice List" (selectTab)="onSelectTab('cdi')">
                 </tab>
                 <tab *ngIf="menuSpecialPermission | async | specialPermission: 'Invoice'" heading="VAT Invoice"
                     (selectTab)="onSelectTab('vat')"> </tab>

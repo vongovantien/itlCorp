@@ -21,8 +21,16 @@ export class ContextMenuDirective implements OnDestroy {
         }
     }
 
+    @Input() set activeMenuContext(isAllow: boolean) {
+        this._isDisabled = isAllow;
+    }
+
     get position() {
         return this._position;
+    }
+
+    get activeMenuContext() {
+        return this._isDisabled;
     }
 
     private mouseX: number;
@@ -45,6 +53,7 @@ export class ContextMenuDirective implements OnDestroy {
     private overlayRef: OverlayRef;
     private dropdownClosingActions$: Subscription = Subscription.EMPTY;
     private _position: ConnectionPositionPair = OVERLAY_POSITION_MAP.rightTop;
+    private _isDisabled: boolean = false;
 
     constructor(
         private readonly _overlay: Overlay,
@@ -52,6 +61,9 @@ export class ContextMenuDirective implements OnDestroy {
     }
 
     public open(e: MouseEvent) {
+        if (!!this._isDisabled) {
+            return;
+        }
         e.preventDefault();
         this.onTouch.emit();
         this.openContextMenu(e);

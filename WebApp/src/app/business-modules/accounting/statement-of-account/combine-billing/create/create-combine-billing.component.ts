@@ -50,7 +50,7 @@ export class CreateCombineBillingComponent extends AppForm implements OnInit {
         catchError(this.catchError),
         concatMap((rs: any) => {
           if (!rs.status) {
-            this._toastService.warning('Document No was existed on list as below "' + rs.message + '" Please you check again!');
+            this._toastService.warning('Document No "' + rs.message + '". Please you check again!');
           }
           return this._accountingRepo.getListShipmentInfo(body);
         })
@@ -61,7 +61,8 @@ export class CreateCombineBillingComponent extends AppForm implements OnInit {
           return of(false);
         }
         if (!!res) {
-          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) => res.shipments.map((sh) => sh.refno).indexOf(item.refno) === -1);
+          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) => 
+            res.shipments.map((s: any) => s.refno + s.hblid).indexOf(item.refno + item.hblid) === -1);
           this.combineBillingListDetail.shipments = [...this.combineBillingListDetail.shipments, ...res.shipments];
           this.combineBillingListDetail.originShipments = this.combineBillingListDetail.shipments;
           this.combineBillingListDetail.calculateSumTotal();

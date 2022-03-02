@@ -117,6 +117,7 @@ namespace eFMS.API.System.DL.Services
                        && (x.e.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                        && (x.u.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                        && (x.u.Active == criteria.Active)
+                       && (x.e.StaffCode ?? "").IndexOf(criteria.StaffCode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                        );
                 }
                 else
@@ -126,6 +127,7 @@ namespace eFMS.API.System.DL.Services
                               && (x.e.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                               && (x.u.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                               && (x.u.Active == criteria.Active || criteria.Active == null)
+                              && (x.e.StaffCode ?? "").IndexOf(criteria.StaffCode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                               );
                 }
             }
@@ -152,6 +154,7 @@ namespace eFMS.API.System.DL.Services
                     || (x.e.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     || (x.e.EmployeeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     || (x.u.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    || (x.e.StaffCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     ));
                     }
 

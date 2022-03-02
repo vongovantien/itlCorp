@@ -11,6 +11,8 @@ export class GenerateIdComponent implements OnInit {
         { id: 1, text: "SOA" },
         { id: 2, text: "Settlement" },
         { id: 3, text: "Advance" },
+        { id: 4, text: "Receipt" },
+        { id: 5, text: "CD Note" },
     ];
     selectedType: number = this.types[0].id;
 

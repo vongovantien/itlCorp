@@ -123,6 +123,45 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        public HandleState CancelLinkCharge(Guid chargeId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
+                if (charge == null)
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
+                {
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                }
+                else
+                {
+                    if (charge.LinkChargeId != null)
+                    {
+                        var chargeUpdate = DataContext.Where(x => x.Id == Guid.Parse(charge.LinkChargeId)).FirstOrDefault();
+                        chargeUpdate.LinkChargeId = null;
+                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, false);
+                        DataContext.SubmitChanges();
+                    }
+                    DataContext.Delete(x => x.Id == chargeId);
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
         public List<CatPartner> GetAllParner(Guid id, bool isHouseBillID = false)
         {
             try
@@ -496,6 +535,10 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            // set cứng thông tin từ lô hàng.
+                            item.JobNo = hbl.JobNo;
+                            item.Mblno = hbl.Mblno;
+                            item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
                             item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
@@ -586,6 +629,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
 
+                        // set cứng thông tin từ lô hàng.
                         surcharge.JobNo = _jobNo;
                         surcharge.Mblno = _mblNo;
                         surcharge.Hblno = _hblNo;
@@ -1319,7 +1363,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
                     {
-                        if (opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno && x.OfficeId != currentUser.OfficeID))
+                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
                         {
                             item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                             item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
@@ -1492,82 +1536,83 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 if (item.IsValid)
                 {
-                    OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).FirstOrDefault();
+                    OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim() && x.OfficeId == currentUser.OfficeID).FirstOrDefault();
+                    if(currentOpsJob != null)
+                    {
+                        string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
+                        string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
+                        Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
+                        item.ChargeId = ChargeId;
+                        short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
+                        item.UnitId = UnitId;
+                        item.PaymentObjectId = PartnerId;
+                        item.Quantity = (decimal)item.Qty;
 
-                    string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
-                    string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
-                    Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
-                    item.ChargeId = ChargeId;
-                    short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
-                    item.UnitId = UnitId;
-                    item.PaymentObjectId = PartnerId;
-                    item.Quantity = (decimal)item.Qty;
+                        item.Hblid = currentOpsJob.Hblid;
+                        item.JobNo = currentOpsJob.JobNo;
+                        item.TransactionType = "CL";
+                        string jobNo = currentOpsJob.JobNo;
+                        if (item.Type.ToLower() == "obh")
+                        {
+                            item.PaymentObjectId = obhPartnerId;
+                            item.PayerId = PartnerId;
+                        }
 
-                    item.Hblid = currentOpsJob.Hblid;
-                    item.JobNo = currentOpsJob.JobNo;
-                    item.TransactionType = "CL";
-                    string jobNo = currentOpsJob.JobNo;
-                    if (item.Type.ToLower() == "obh")
-                    {
-                        item.PaymentObjectId = obhPartnerId;
-                        item.PayerId = PartnerId;
-                    }
-                    
-                    if (item.Type.ToLower() == "buying")
-                    {
-                        TypeCompare = "BUY";
-                    }
-                    else if (item.Type.ToLower() == "selling")
-                    {
-                        TypeCompare = "SELL";
-                    }
-                    else if (item.Type.ToLower() == "obh")
-                    {
-                        TypeCompare = "OBH";
-                    }
+                        if (item.Type.ToLower() == "buying")
+                        {
+                            TypeCompare = "BUY";
+                        }
+                        else if (item.Type.ToLower() == "selling")
+                        {
+                            TypeCompare = "SELL";
+                        }
+                        else if (item.Type.ToLower() == "obh")
+                        {
+                            TypeCompare = "OBH";
+                        }
 
-                    if (string.IsNullOrEmpty(item.ObhPartner))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        if (string.IsNullOrEmpty(item.ObhPartner))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == obhPartnerId && x.PayerId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        else
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == obhPartnerId && x.PayerId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
                         }
-                    }
-                    if (!string.IsNullOrEmpty(item.SeriesNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                        if (!string.IsNullOrEmpty(item.SeriesNo))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
                         }
-                    }
-                    if (!string.IsNullOrEmpty(item.InvoiceNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == TypeCompare))
+                        if (!string.IsNullOrEmpty(item.InvoiceNo))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
                         }
-                    }
-                    if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                        if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
                         }
                     }
                 }
-
             });
             return list;
         }

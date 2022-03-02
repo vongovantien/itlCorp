@@ -65,6 +65,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+        private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -102,7 +103,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUserNotificationRepo,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
-            IUserBaseService userBase) : base(repository, mapper)
+            IUserBaseService userBase,
+            IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -137,6 +139,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserNotificationRepository = sysUserNotificationRepo;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
+            opsStageAssignedRepository = opsStageAssignedRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -927,7 +930,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.JobNo == JobId
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
-                                     && sur.AdvanceNo == AdvNo
+                                     && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
                                      && sur.ClearanceNo == clearanceNo
                                 select new ShipmentChargeSettlement
                                 {
@@ -1000,7 +1003,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cst.JobNo == JobId
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
-                                    && sur.AdvanceNo == AdvNo
+                                    && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
                                     && sur.ClearanceNo == clearanceNo
                                select new ShipmentChargeSettlement
                                {
@@ -1058,16 +1061,22 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <param name="getCopyCharge">true: function copy charge in settle, false: get detail charge no group in settle</param>
+        /// <returns></returns>
+        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool getCopyCharge = false)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var vatPartners = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransD = csTransactionDetailRepo.Get();
+            var opsTrans = opsTransactionRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
+            var csTransD = csTransactionDetailRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
             var csTrans = csTransactionRepo.Get();
             var userRepo = sysUserRepo.Get();
 
@@ -1125,8 +1134,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = sur.AdvanceNo,
-                                    OriginAdvanceNo = sur.AdvanceNo,
+                                    AdvanceNo = !getCopyCharge ? sur.AdvanceNo : GetAdvanceNoSettle(sur.AdvanceNo, opst.JobNo),
+                                    OriginAdvanceNo = !getCopyCharge ? sur.AdvanceNo : GetAdvanceNoSettle(sur.AdvanceNo, opst.JobNo),
                                     ShipmentId = opst.Id,
                                     TypeService = "OPS",
                                     IsLocked = opst.IsLocked,
@@ -1160,7 +1169,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                from user in sysUser.DefaultIfEmpty()
-                               where sur.SettlementCode == settlementNo
+                               where
+                                     sur.SettlementCode == settlementNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1199,8 +1209,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = sur.AdvanceNo,
-                                   OriginAdvanceNo = sur.AdvanceNo,
+                                   AdvanceNo = !getCopyCharge ? sur.AdvanceNo : GetAdvanceNoSettle(sur.AdvanceNo, cst.JobNo),
+                                   OriginAdvanceNo = !getCopyCharge ? sur.AdvanceNo : GetAdvanceNoSettle(sur.AdvanceNo, cst.JobNo),
                                    ShipmentId = cst.Id,
                                    TypeService = "DOC",
                                    IsLocked = cst.IsLocked,
@@ -1244,6 +1254,35 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _syncedFromBy;
         }
+
+        /// <summary>
+        /// Get advance no from adv no in surcharge with COPY CHARGE
+        /// </summary>
+        /// <param name="advanceNoCharge"></param>
+        /// <param name="requester"></param>
+        /// <returns></returns>
+        private string GetAdvanceNoSettle(string advanceNoCharge, string jobNo)
+        {
+            var jobOpsDetail = opsTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault();
+            var jobTransDetail = csTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault();
+            if(jobOpsDetail != null)
+            {
+                var personAssign = opsStageAssignedRepository.Get(x => x.JobId == jobOpsDetail.Id).Select(x => x.MainPersonInCharge).ToList();
+                if (acctAdvancePaymentRepo.Any(x => x.AdvanceNo == advanceNoCharge && (x.Requester == jobOpsDetail.UserCreated || x.Requester == jobOpsDetail.BillingOpsId || personAssign.Any(z => z == x.Requester))))
+                {
+                    return advanceNoCharge;
+                }
+            }
+            if (jobTransDetail != null)
+            {
+                var personAssign = opsStageAssignedRepository.Get(x => x.JobId == jobTransDetail.Id).Select(x => x.MainPersonInCharge).ToList();
+                if (acctAdvancePaymentRepo.Any(x => x.AdvanceNo == advanceNoCharge && (x.Requester == jobTransDetail.UserCreated || x.Requester == jobTransDetail.PersonIncharge || personAssign.Any(z => z == x.Requester))))
+                {
+                    return advanceNoCharge;
+                }
+            }
+            return string.Empty;
+        } 
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
 
@@ -1478,7 +1517,8 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@creditNo", Value = string.Join(';',criteria.creditNo) },
                 new SqlParameter(){ ParameterName = "@servicesType", Value = criteria.servicesType },
                 new SqlParameter(){ ParameterName = "@personInCharge", Value = criteria.personInCharge },
-                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester }
+                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester },
+                new SqlParameter(){ ParameterName = "@office", Value = currentUser.OfficeID }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExistsCharge>(parameters);
             return list;
@@ -2482,6 +2522,8 @@ namespace eFMS.API.Accounting.DL.Services
             var firstShipment = GetFirstShipmentOfSettlement(settlementNo);
             //Lấy thông tin các User Approve Settlement
             var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
+            // Check valid office
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
             listSettlementPayment.ForEach(fe =>
             {
                 fe.JobIdFirst = firstShipment.JobId;
@@ -2540,6 +2582,7 @@ namespace eFMS.API.Accounting.DL.Services
                         _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
                 }
                 fe.Inword = _inword;
+                fe.IsDisplayLogo = isCommonOffice;
             });
             return listSettlementPayment;
         }
@@ -2596,10 +2639,12 @@ namespace eFMS.API.Accounting.DL.Services
                 item.Debt = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false;
                 item.Currency = string.Empty;
                 item.Note = surcharge.Notes;
-                item.CompanyName = AccountingConstants.COMPANY_NAME;
-                item.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
-                item.Website = AccountingConstants.COMPANY_WEBSITE;
-                item.Tel = AccountingConstants.COMPANY_CONTACT;
+                // Get Office Info
+                var officeInfo = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+                item.CompanyName = officeInfo?.BranchNameEn?.ToUpper();
+                item.CompanyAddress = officeInfo?.AddressEn;
+                item.Website = string.IsNullOrEmpty(officeInfo?.Website) ? " www.itlvn.com" : officeInfo.Website;
+                item.Tel = "Tel‎: " + officeInfo?.Tel + "  Fax‎: " + officeInfo?.Fax;
                 item.Contact = currentUser.UserName;
 
                 data.Add(item);
@@ -3650,7 +3695,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault().Email?.Split(";").ToList();
+                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault()?.Email?.Split(";").ToList();
             }
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
             result.EmailDeputies = emailDeputies;
@@ -4087,7 +4132,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = GetListAdvanceNoForShipment(shipment.HBLID, null, null, null, true)?.FirstOrDefault();
+                var advance = GetListAdvanceNoForShipment(shipment.HBLID, null, currentUser.UserID, null, true)?.FirstOrDefault();
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
@@ -4812,8 +4857,10 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
-            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var officeName = office?.BranchNameEn?.ToUpper();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office?.Code);
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
             var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
@@ -4825,6 +4872,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
             }
+            
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4837,6 +4885,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
+                OfficeName = officeName,
                 ContactOffice = _contactOffice,
                 PaymentMethod = settlementPayment.PaymentMethod,
                 BankAccountName = settlementPayment.BankAccountName,
@@ -4850,6 +4899,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Note=settlementPayment.Note,
                 SettlementCurrency=settlementPayment.SettlementCurrency,
                 BOD = _bod,
+                IsDisplayLogo = isCommonOffice
             };
                 
             return infoSettlement;
@@ -5248,6 +5298,10 @@ namespace eFMS.API.Accounting.DL.Services
             string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
                     :
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(settlementPayment.Amount ?? 0, "") + " " + settlementPayment.SettlementCurrency;
+            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var officeName = office?.BranchNameEn?.ToUpper();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);
 
             var infoSettlement = new InfoSettlementExport
             {
@@ -5269,7 +5323,10 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = settlementPayment.BankName,
                 BankAccountName = settlementPayment.BankAccountName,
                 PayeeName = _payeeName,
-                Note = settlementPayment.Note
+                Note = settlementPayment.Note,
+                IsDisplayLogo = isCommonOffice,
+                OfficeName = officeName,
+                ContactOffice = _contactOffice
             };
             return infoSettlement;
         }
@@ -5606,19 +5663,23 @@ namespace eFMS.API.Accounting.DL.Services
             if (string.IsNullOrEmpty(payeeId))
             {
                 // TH copy charge không dùng adv no của adv carrier
-                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x=>x.RequestDate);
+                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x => x.RequestDate).ThenBy(x => x.DatetimeCreated);
             }
             else
             {
                 if (!string.IsNullOrEmpty(payeeId))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x => x.RequestDate);
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x => x.RequestDate).ThenBy(x => x.DatetimeCreated);
                 }
                 // [CR]: tam thoi bo search theo requester
                 //if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
                 //{
                 //    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
                 //}
+            }
+            if (!string.IsNullOrEmpty(requester)) // only for case copy charge get requester != null
+            {
+                advancePayments = advancePayments.Where(x => x.Requester == requester).OrderBy(x => x.RequestDate).ThenBy(x => x.DatetimeCreated);
             }
             return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
         }
