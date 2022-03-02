@@ -86,6 +86,9 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     var voucherDetail = model.Details.Where(x => x.TransactionType != "NONE");
                     var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
+                    // Update TransactionType without charge mode
+                    model.Details.ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
+
                     if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_BANK.ToLower()
                         || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_CASH.ToLower())
                     {
