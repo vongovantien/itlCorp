@@ -1944,7 +1944,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 OpsTransaction replicateJob = DataContext.Get(x => x.Id == _replicateId)?.FirstOrDefault();
                                 if(replicateJob != null)
                                 {
-                                    OpsTransaction entityReplicate = MappingReplicateJob(replicateJob, dataUserLevel);
+                                    OpsTransaction entityReplicate = MappingReplicateJob(entity, dataUserLevel);
                                     DataContext.Add(entityReplicate, false);
 
                                     entity.ReplicatedId = entityReplicate.Id;
@@ -2005,7 +2005,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, OpsTransaction shipment)
         {
             List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
-            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true);
+            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true &&  string.IsNullOrEmpty(x.LinkChargeId));
             
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
