@@ -11,6 +11,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { FormCreateUnitPopupComponent } from './components/form/form-unit.popup';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-unit',
@@ -151,8 +152,8 @@ export class UnitComponent extends AppList implements OnInit {
         this._exportRepo.exportUnit(this.dataSearch)
             .pipe((finalize(() => this._progressRef.complete())))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "eFms_Units.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }

@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -114,8 +115,8 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         } else {
             this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
                 .subscribe(
-                    (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Cash.xlsx');
+                    (res: HttpResponse<any>) => {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
                     }
                 );
         }

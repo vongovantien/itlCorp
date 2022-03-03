@@ -7,6 +7,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-group',
@@ -133,8 +134,8 @@ export class GroupComponent extends AppList implements OnInit {
     export() {
         this._exportRepo.exportGroup(this.dataSearch)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Goup.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                 },
             );
     }

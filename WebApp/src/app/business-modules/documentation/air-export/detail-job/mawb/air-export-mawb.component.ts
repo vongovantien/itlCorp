@@ -22,6 +22,7 @@ import { Observable, of, merge } from 'rxjs';
 import { map, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareAirServiceDIMVolumePopupComponent } from '../../../share-air/components/dim/dim-volume.popup';
+import { HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -828,9 +829,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - MAWB.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -846,9 +847,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - SCSC.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -864,9 +865,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - TCS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -882,9 +883,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - ACS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -900,9 +901,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NCTS & ALS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

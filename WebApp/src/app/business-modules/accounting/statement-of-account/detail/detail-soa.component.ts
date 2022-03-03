@@ -17,6 +17,7 @@ import { StatementOfAccountPaymentMethodComponent } from '../components/poup/pay
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -142,9 +143,8 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    const fileName = "Export SOA " + this.soaNO + ".xlsx";
-                    this.downLoadFile(response, "application/ms-excel", fileName);
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                 },
             );
 

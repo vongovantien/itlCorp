@@ -13,6 +13,7 @@ import { SortService } from 'src/app/shared/services';
 import { finalize, catchError } from 'rxjs/operators';
 
 import { LoadCompanyAction, ICompanyState, getCompanyState } from './store';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-company-info',
@@ -124,8 +125,8 @@ export class ComanyInformationComponent extends AppList {
     exportExcel() {
         this._exportRepo.exportCompany(this.dataSearch)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Company_List.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, "application/ms-excel",response.headers.get('efms-file-name'));
                 },
             );
     }

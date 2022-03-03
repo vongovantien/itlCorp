@@ -14,6 +14,7 @@ import { CommonEnum } from '@enums';
 
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-warehouse',
@@ -259,8 +260,8 @@ export class WarehouseComponent extends AppList implements OnInit {
         this.exportRepository.exportPortIndex(this.criteria)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Warehouse.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }

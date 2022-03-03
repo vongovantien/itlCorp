@@ -20,43 +20,43 @@ export class ExportRepo {
     }
 
     exportCustomClearance(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/CustomsDeclaration/ExportCustomClearance`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/CustomsDeclaration/ExportCustomClearance`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data: any) => data)
         );
     }
 
 
     exportCompany(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportCompany`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportCompany`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
 
     exportDepartment(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportDepartment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportDepartment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
     exportOffice(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportOffice`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportOffice`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
     exportGroup(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportGroup`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportGroup`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
 
     exportUser(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportUser`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportUser`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
     exportEManifest(hblId: string) {
@@ -80,84 +80,84 @@ export class ExportRepo {
     }
 
     exportPartner(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPartnerData`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPartnerData`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCurrency(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCurrency`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCurrency`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportPortIndex(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPortIndex`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPortIndex`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCommodity(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityList`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityList`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCommodityGroup(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityGroup`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityGroup`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCharge(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCharge`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCharge`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data: any) => data)
         );
     }
 
     exportStage(searchObject) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportStage`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportStage`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportUnit(searchObject) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportUnit`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportUnit`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCountry(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCountry`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCountry`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportProvince(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportProvince`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportProvince`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportDistrict(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportDistrict`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportDistrict`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportTownWard(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportTownWard`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportTownWard`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -227,14 +227,14 @@ export class ExportRepo {
     }
 
     exportShipmentOverview(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverview`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverview`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportShipmentOverviewWithType(searchObject: any = {}, reportType: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewWithType`, searchObject, { reportType: reportType }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewWithType`, searchObject, { reportType: reportType }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -262,42 +262,42 @@ export class ExportRepo {
     }
 
     exportAdvancePaymentShipment(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAdvancePaymentShipment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAdvancePaymentShipment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportSettlementPaymentShipment(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSettlementPaymentShipment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSettlementPaymentShipment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportSettlementPaymentShipmentDetail(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSettlementPaymentDetailSurCharges`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSettlementPaymentDetailSurCharges`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportAcountingPaymentShipment(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportStatementReceivableCustomer(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingCustomerPayment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingCustomerPayment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportSCSCAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportSCSCAirExport?jobId=${jobId}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportSCSCAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -311,79 +311,79 @@ export class ExportRepo {
     }
 
     exportACSAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportACSAirExport?jobId=${jobId}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportACSAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportNCTSALSAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportNCTSALSAirExport?jobId=${jobId}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportNCTSALSAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportAccountingPLSheet(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingPlSheet`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingPlSheet`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportJobProfitAnalysis(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportJobProfitAnalysis`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportJobProfitAnalysis`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportStandardGeneralReport(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportStandardGeneralReport`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportStandardGeneralReport`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportChartOfAccounts(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportChartOfAccounts`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportChartOfAccounts`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data: any) => data)
         );
     }
 
     exportSummaryOfCostsIncurred(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfCostsIncurred`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfCostsIncurred`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportSummaryOfRevenueIncurred(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfRevenueIncurred`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfRevenueIncurred`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportCostsByPartner(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfCostsPartner`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfCostsPartner`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportAccountingManagement(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
 
     exportAccountingManagementDebCreInvoice(body: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementDebCreInvoice`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementDebCreInvoice`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map(data => data)
+            map((data:any) => data)
         );
     }
 
@@ -395,7 +395,7 @@ export class ExportRepo {
     }
 
     exportCDNote(jobId: string, cdNo: String, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNote`, null, { jobId: jobId, cdNo: cdNo, officeId: officeId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNote`, null, { jobId: jobId, cdNo: cdNo, officeId: officeId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -409,18 +409,18 @@ export class ExportRepo {
     }
 
     exportIncentiveReport(searchObject: any = {}, currentUserId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportIncentiveReport`, searchObject, { currentUserId: currentUserId });
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportIncentiveReport`, searchObject, { currentUserId: currentUserId }, null, 'response');
     }
 
     exportCDNoteCombine(data: any[]) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNoteCombine`, data).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNoteCombine`, data, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportUnlockRequest(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SettingReport/ExportUnlockRequest`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SettingReport/ExportUnlockRequest`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -439,6 +439,7 @@ export class ExportRepo {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
 
+    
     downloadExport(url: string){
         window.open(`${url}`, '_blank');
     }
@@ -448,24 +449,27 @@ export class ExportRepo {
     }
 
     exportBank(searchObject: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportBank`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportBank`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
     exportAccountingReceivableArSumary(searchObject: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingReceivableArSumary`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingReceivableArSumary`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportAgreementInfo(partnerSearchObj: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj);
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj, null, null, 'response').pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
     }
 
     exportStatementReceivableAgency(searchObject: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingAgencyPayment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingAgencyPayment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

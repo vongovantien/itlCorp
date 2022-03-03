@@ -16,6 +16,7 @@ import { formatDate } from '@angular/common';
 import { RoutingConstants } from '@constants';
 import { getOperationClearanceDataSearch, getOperationClearanceList, getOperationClearanceLoadingState, getOperationClearancePagingState } from '../store';
 import { CustomsDeclarationLoadListAction } from '../store/actions/custom-clearance.action';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -336,8 +337,8 @@ export class CustomClearanceComponent extends AppList {
         const body = this.dataSearch || {};
         this._exportRepo.exportCustomClearance(body)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'CustomClearance.xlsx');
+                (response: HttpResponse<Blob>) => {
+                    this.downLoadFile(response, "application/ms-excel", response.headers.get('efms-file-name'));
                 },
                 (errors: any) => {
                 },

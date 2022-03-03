@@ -43,7 +43,10 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatCountry>>();
 
             var stream = helper.CreateCountryExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CountryName);
+            
+            var result =new FileHelper().ExportExcel(null,stream, FilesNames.CountryName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export warehouse
@@ -62,7 +65,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatWareHouse>>();
 
             var stream = helper.CreateWareHourseExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.WareHouse);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.WareHouse);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export portindex
@@ -82,7 +87,13 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatPortIndex>>();  
 
             var stream = helper.CreatePortIndexExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.PortIndex);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.PortIndex);
+            if (catPlaceCriteria.PlaceType.ToString() == "Warehouse")
+            {
+                result = new FileHelper().ExportExcel(null, stream, FilesNames.WareHouse);
+            }
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export partnerdata
@@ -99,7 +110,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPartner>>();  
 
             var stream = helper.CreatePartnerExcelFile(dataObjects.Result, catPartnerCriteria.PartnerType, catPartnerCriteria.Author);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.PartnerData);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.PartnerData);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -117,7 +130,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AgreementInfo>>();
 
             var stream = helper.GenerateAgreementExcel(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.PartnerData);
+            var result = new FileHelper().ExportExcel(null,stream,catPartnerCriteria.PartnerType + "Agreement");
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -132,7 +147,9 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatCommodityUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityModel>>();  
             var stream = helper.CreateCommoditylistExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CommodityList);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.CommodityList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export commodity group
@@ -146,7 +163,9 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityGroupCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatCommodityGroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityGroup>>();
             var stream = helper.CreateCommoditygroupExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CommodityGroupList);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.CommodityGroupList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export stage
@@ -163,7 +182,9 @@ namespace eFMS.API.ReportData.Controllers
 
             var stream = helper.CreateCatStateExcelFile(dataObjects.Result);
 
-            return new FileHelper().ExportExcel(null,stream, FilesNames.StageList);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.StageList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         /// <summary>
         /// export unit
@@ -180,7 +201,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatUnit>>();
 
             var stream = helper.CreateCatUnitExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.UnitList);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.UnitList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -197,7 +220,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatProvince>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateProvinceExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.ProvinceName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.ProvinceName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -214,7 +239,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDistrict>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateDistrictExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.DistrictName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.DistrictName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -231,7 +258,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatTownWard>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateTownWardExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.TowardName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.TowardName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -250,7 +279,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCharge>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateChargeExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.ChargeName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.ChargeName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -266,7 +297,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCurrency>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateCurrencyExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CurrencyName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.CurrencyName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -285,7 +318,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatChartOfAccounts>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateChartOfAccountExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CurrencyName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.CurrencyName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
         [Route("ExportIncotermList")]
         [HttpPost]
@@ -297,8 +332,10 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(catIncotermCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatIncotermListUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatIncotermModel>>();
             var stream = helper.GenerateIncotermListExcel(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.IncotermList);
-            
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.IncotermList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
+
         }
 
         [Route("ExportPotentialCustomerList")]
@@ -311,7 +348,9 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(catPotentialCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatPotentialListUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPotentialModel>>();
             var stream = helper.GeneratePotentialListExcel(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.PotentialList);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.PotentialList);
+            HeaderResponse(result.FileDownloadName);
+            return result;
 
         }
 
@@ -332,7 +371,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CustomsDeclaration>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateCustomClearanceExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.CustomClearanceName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.CustomClearanceName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         [Route("ExportBank")]
@@ -344,9 +385,17 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatBank>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateBankExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(null,stream, FilesNames.BankName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.BankName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         #endregion
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
+        }
     }
 }

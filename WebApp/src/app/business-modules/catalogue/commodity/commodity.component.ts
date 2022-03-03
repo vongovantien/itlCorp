@@ -12,6 +12,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import { catchError, finalize, map } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 
 type COMMODITY_TAB = 'Commodity list' | 'Commodity group';
 
@@ -166,8 +167,8 @@ export class CommodityComponent extends AppList {
     this._exportRepo.exportCommodity(this.dataSearch)
       .pipe(catchError(this.catchError))
       .subscribe(
-        (res: any) => {
-          this.downLoadFile(res, "application/ms-excel", "Commodity.xlsx");
+        (res: HttpResponse<any>) => {
+          this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
         },
       );
   }

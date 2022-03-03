@@ -156,8 +156,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: Blob) => {
-                    this.startDownloadReport(res, 'invoice-payment.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
                 }
             );
     }
@@ -175,8 +175,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                    (res: Blob) => {
-                        this.startDownloadReport(res, 'Statement of Receivable Customer - eFMS.xlsx');
+                    (res: HttpResponse<any>) => {
+                        this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
                     }
                 );
         // }

@@ -16,6 +16,7 @@ import { AppList } from 'src/app/app.list';
 
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { accountingManagementDataSearchState, accountingManagementListLoadingState, accountingManagementListState, LoadListAccountingMngt } from '../store';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Component({
@@ -143,9 +144,9 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'INVOICE - eFMS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no data to export', '');
                     }

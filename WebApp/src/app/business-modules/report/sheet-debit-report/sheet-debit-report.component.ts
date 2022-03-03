@@ -6,6 +6,7 @@ import { ExportRepo } from "@repositories";
 import { CommonEnum } from "@enums";
 import { catchError, finalize } from "rxjs/operators";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
+import { HttpResponse } from "@angular/common/http";
 
 @Component({
     selector: 'app-sheet-debit-report',
@@ -52,9 +53,9 @@ export class SheetDebitReportComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Accounting PL Sheet (' + data.currency + ').xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel",response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -70,9 +71,9 @@ export class SheetDebitReportComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Job Profit Analysis.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -88,9 +89,9 @@ export class SheetDebitReportComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Summary of costs incurred.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -106,9 +107,9 @@ export class SheetDebitReportComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Summary of revenue incurred.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -124,9 +125,9 @@ export class SheetDebitReportComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Costs By Partner.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

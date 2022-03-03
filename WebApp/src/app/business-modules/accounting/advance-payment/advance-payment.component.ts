@@ -28,6 +28,7 @@ import {
     getAdvancePaymentListLoadingState,
     getAdvancePaymentListPagingState
 } from './store';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-advance-payment',
@@ -273,8 +274,8 @@ export class AdvancePaymentComponent extends AppList {
     export() {
         this._exportRepo.exportAdvancePaymentShipment(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'advance-payment.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
                 }
             );
     }

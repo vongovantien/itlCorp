@@ -57,8 +57,14 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Unlock Request");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
+        }
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
         }
 
     }

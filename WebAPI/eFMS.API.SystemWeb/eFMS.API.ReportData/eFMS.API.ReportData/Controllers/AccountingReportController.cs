@@ -53,7 +53,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateAdvancePaymentExcel(dataObjects.Result);
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Advance Payment List");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -84,7 +84,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Advance Payment List Shipment");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -106,7 +106,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement Payment List");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -137,7 +137,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement Payment List");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -159,7 +159,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement-Detail Template");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -183,6 +183,7 @@ namespace eFMS.API.ReportData.Controllers
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream,
                 accountingPaymentCriteria.PaymentType == PaymentType.Invoice ?
                 "Invoice Payment List":"OBH Payment List");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -200,7 +201,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Statement of Receivable Customer - eFMS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -225,6 +226,7 @@ namespace eFMS.API.ReportData.Controllers
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoAdvance.AdvanceNo,stream, "Advance Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + advanceId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            HeaderResponse(file.FileName);
             return Ok(result);
         }
 
@@ -248,6 +250,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             string fileName = "Export SOA";
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -270,7 +273,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "SOA Bravo List");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -294,7 +297,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, "SOA OPS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -320,6 +323,7 @@ namespace eFMS.API.ReportData.Controllers
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            HeaderResponse(file.FileName);
             return Ok(result);
         }
 
@@ -345,6 +349,7 @@ namespace eFMS.API.ReportData.Controllers
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Template Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            HeaderResponse(file.FileName);
             return Ok(result);
         }
 
@@ -369,6 +374,7 @@ namespace eFMS.API.ReportData.Controllers
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.SettlementNo,stream, "Settlement General Preview - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            HeaderResponse(file.FileName);
             return Ok(result);
         }
 
@@ -395,6 +401,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             string fileName = "Export SOA Air Freight " + soaNo + "";
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -421,6 +428,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             string fileName = "Customer SOA AirFreight  With HBL";
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -448,6 +456,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             string fileName = "Export SOA Supplier Air Freight";
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -471,6 +480,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -496,7 +506,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Trial" + " - eFMS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -521,7 +531,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Form - eFMS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -540,7 +550,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Statement of Receivable Agency - eFMS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -558,11 +568,9 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateReceiptAdvance(dataObjects.Result, criteria, out string fileName);
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.TaxCode,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.TaxCode,stream, getPreName(fileName));
 
-            Response.Headers.Add("efms-file-name", fileName);
-            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -590,8 +598,20 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No,stream, "SOA OPS");
-
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
+        }
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
+        }
+
+        private string getPreName(string fileName)
+        {
+            var nameSplit = fileName.Split('_');
+            return nameSplit[0];
         }
     }
 }

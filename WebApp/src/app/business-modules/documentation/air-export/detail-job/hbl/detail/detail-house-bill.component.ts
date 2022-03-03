@@ -18,6 +18,7 @@ import { merge } from 'rxjs';
 import { catchError, takeUntil, skip, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -234,9 +235,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 catchError(this.catchError),
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no neutral hawb data to print', '');
                     }

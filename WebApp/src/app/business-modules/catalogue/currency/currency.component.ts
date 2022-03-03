@@ -11,6 +11,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { FormCreateCurrencyPopupComponent } from './components/form-create/form-create-currency.popup';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-currency',
@@ -140,8 +141,8 @@ export class CurrencyComponent extends AppList implements OnInit {
         this._exportRepo.exportCurrency(this.criteria)
             .pipe((finalize(() => this._progressRef.complete())))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "eFms_Currency.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }

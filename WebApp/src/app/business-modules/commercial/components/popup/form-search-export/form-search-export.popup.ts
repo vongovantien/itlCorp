@@ -9,6 +9,7 @@ import { SystemConstants } from '@constants';
 import { ActivatedRoute } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'form-search-export-popup',
@@ -123,11 +124,11 @@ export class FormSearchExportComponent extends PopupBase {
             this._exportRepo.exportPartner(this.dataSearch)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
-                    (res: any) => {
+                    (res: HttpResponse<any>) => {
                         if (!!this.partnerType) {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms-commercial-' + this.partnerType + '.xlsx');
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, 'eFms-commercial-' + this.partnerType + '.xlsx');
                         } else {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms-partner.xlsx');
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, 'eFms-partner.xlsx');
                         }
                         this.close();
                     }
@@ -141,8 +142,8 @@ export class FormSearchExportComponent extends PopupBase {
             this._exportRepo.exportAgreementInfo(this.dataSearch)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
-                    (res) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_agent_agreement.xlsx')
+                    (res:HttpResponse<any>) => {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'))
                     }
                 );
         }

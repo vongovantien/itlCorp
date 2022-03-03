@@ -20,6 +20,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { AccountingManagementSelectPartnerCombinePopupComponent } from '../components/popup/select-partner-combine/select-partner-combine.popup';
 import { ReportPreviewComponent } from '@common';
+import { HttpResponse } from '@angular/common/http';
 
 
 
@@ -293,9 +294,9 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'INVOICE - eFMS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('There is no data to export', '');
                     }

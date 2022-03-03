@@ -12,11 +12,31 @@ namespace eFMS.API.ReportData.Helpers
     /// </summary>
     public class FileHelper: ControllerBase
     {
+        private string preUpper(string fileName)
+        {
+            var nameSplit=fileName.Split(' ');
+            string nameResult1="";
+            string nameResult = "";
+            foreach (var name in nameSplit)
+            {
+                name[0].ToString().ToUpper();
+                nameResult1 += name;
+            }
+            var nameSplit2= nameResult1.Split('_');
+            foreach (var name in nameSplit2)
+            {
+                name[0].ToString().ToUpper();
+                nameResult += name;
+            }
+            return nameResult.Replace(".xlsx","");
+        }
 
         public FileContentResult ExportExcel(string refNo,Stream stream, string fileName)
         {
             var buffer = stream as MemoryStream;
             var dateCurr = DateTime.Now.ToString("ddMMyy");
+            fileName = preUpper(fileName);
+            
             if (!string.IsNullOrEmpty(refNo))
             {
 
@@ -36,6 +56,7 @@ namespace eFMS.API.ReportData.Helpers
         {
             var ms = buffer as MemoryStream;
             var dateCurr = DateTime.Now.ToString("ddMMyy");
+            fileName = preUpper(fileName);
             fileName +="-" + dateCurr + "-" + refNo + ".xlsx";
             try
             {
