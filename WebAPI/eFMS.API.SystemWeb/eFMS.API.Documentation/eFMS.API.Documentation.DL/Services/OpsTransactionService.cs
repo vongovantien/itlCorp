@@ -2205,14 +2205,18 @@ namespace eFMS.API.Documentation.DL.Services
                                     if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
                                         continue;
 
-                                    CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
+                                    CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
+
+                                    var propInfo = charge.GetType().GetProperties();
+                                    foreach (var item in propInfo)
+                                        surcharge.GetType().GetProperty(item.Name).SetValue(surcharge, item.GetValue(charge, null), null);
 
                                     if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE) { 
                                         surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
                                         var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
                                         if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                            surcharge.PaymentObjectId = partnerInternal.Id;
+                                            surcharge.PayerId = partnerInternal.Id;
                                     }
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
@@ -2225,9 +2229,6 @@ namespace eFMS.API.Documentation.DL.Services
                                         }
                                         else
                                             surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
-                                        
-                                        if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                            surcharge.PaymentObjectId = partnerInternal.Id;
                                     }
                                     else { continue; }
 
