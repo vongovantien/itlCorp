@@ -24,10 +24,11 @@ namespace eFMS.API.Report.Infrastructure
         public static void Register(IServiceCollection services)
         {
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+            services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddTransient<IReportDocumentService, ReportDocumentService>();
             services.AddTransient<ISaleReportService, SaleReportService>();
