@@ -1950,7 +1950,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     entity.ReplicatedId = entityReplicate.Id;
                                     entityReplicate.JobNo = GeneratePreFixReplicate() + entity.JobNo;
 
-                                    List<CsShipmentSurcharge> listSurChargeReplicate = CopySurChargeToNewJob(replicateJob.Hblid, entityReplicate);
+                                    List<CsShipmentSurcharge> listSurChargeReplicate = CopySurChargeToNewJob(replicateJob.Hblid, entityReplicate, false);
                                     if (listSurChargeReplicate?.Count() > 0)
                                     {
                                         newSurcharges.AddRange(listSurChargeReplicate);
@@ -2002,11 +2002,24 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="_oldHblId"></param>
         /// <param name="_newHblId"></param>
         /// <returns></returns>
-        private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, OpsTransaction shipment)
+        private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, OpsTransaction shipment, bool isOrigin = true)
         {
             List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
-            var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true &&  string.IsNullOrEmpty(x.LinkChargeId));
-            
+            IQueryable<CsShipmentSurcharge> charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true &&  string.IsNullOrEmpty(x.LinkChargeId));
+
+            if(isOrigin == false)
+            {
+                // Không lấy phí đã AutoRate | LINK_FEE ( phí link từ Buy(ChargeOrg) làm thanh toán qua sell (ChargeLinkId)
+                OpsTransaction JobRepOld = DataContext.Get(x => x.Hblid == _oldHblId)?.FirstOrDefault();
+                List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == JobRepOld.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_AUTO_RATE).ToList();
+                if (csLinkFee.Count() > 0)
+                {
+                    List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                    charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+                }
+
+            }
+
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {

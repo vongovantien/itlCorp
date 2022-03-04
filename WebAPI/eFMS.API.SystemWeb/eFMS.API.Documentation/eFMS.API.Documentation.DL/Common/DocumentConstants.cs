@@ -90,5 +90,8 @@
         public static readonly string CREDIT_NOTE_TYPE_CODE = "CREDITNOTE";
         public static readonly string CREDIT_SOA_TYPE_CODE = "CREDITSOA";
         #endregion
+
+        public static readonly string LINK_CHARGE_TYPE_AUTO_RATE = "AUTO_RATE";
+        public static readonly string LINK_CHARGE_TYPE_LINK_FEE = "LINK_FEE";
     }
 }
