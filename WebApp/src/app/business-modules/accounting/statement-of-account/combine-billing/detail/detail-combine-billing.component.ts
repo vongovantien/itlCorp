@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppForm } from '@app';
@@ -254,9 +254,9 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
         finalize(() => this._progressRef.complete())
       )
       .subscribe(
-        (response: ArrayBuffer) => {
-          if (response.byteLength > 0) {
-            this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+        (response: HttpResponse<any>) => {
+          if (response!=null) {
+            this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
           } else {
             this._toastService.warning('No data found');
           }

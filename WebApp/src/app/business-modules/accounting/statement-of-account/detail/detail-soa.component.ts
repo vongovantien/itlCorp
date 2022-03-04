@@ -17,7 +17,7 @@ import { StatementOfAccountPaymentMethodComponent } from '../components/poup/pay
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpResponseBase } from '@angular/common/http';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -159,9 +159,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -177,9 +177,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight With HBL.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -196,9 +196,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'AIR -SOA COST.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -239,8 +239,8 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Bravo SOA.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                 },
             );
     }
@@ -253,9 +253,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
                     }

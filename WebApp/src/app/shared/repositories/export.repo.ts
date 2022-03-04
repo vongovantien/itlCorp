@@ -7,7 +7,7 @@ import { throwError } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class ExportRepo {
     exportCombineOps(criteria: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportCombineOps`, criteria).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportCombineOps`, criteria, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -60,20 +60,20 @@ export class ExportRepo {
         );
     }
     exportEManifest(hblId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportEManifest`, null, { hblid: hblId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportEManifest`, null, { hblid: hblId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportGoodDeclare(hblId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportGoodsDeclare`, null, { hblid: hblId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportGoodsDeclare`, null, { hblid: hblId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
     exportDangerousGoods(hblId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportDangerousGoods`, null, { hblid: hblId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportDangerousGoods`, null, { hblid: hblId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -100,7 +100,7 @@ export class ExportRepo {
         );
     }
 
-    exportCommodity(searchObject: any = {}) {
+    exportPortIndexexportPortIndex(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityList`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
@@ -164,7 +164,7 @@ export class ExportRepo {
     }
 
     exportSOAOPS(soaNo: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAOPS`, null, { soaNo: soaNo }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAOPS`, null, { soaNo: soaNo }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -172,7 +172,7 @@ export class ExportRepo {
 
 
     exportBravoSOA(soaNo: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportBravoSOA`, null, { soaNo: soaNo }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportBravoSOA`, null, { soaNo: soaNo }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -185,14 +185,14 @@ export class ExportRepo {
     }
 
     exportSOAAirFreight(soaNo: string, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreight`, null, { soaNo: soaNo, officeId: officeId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreight`, null, { soaNo: soaNo, officeId: officeId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportSOAAirFreightWithHBL(soaNo: string, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreightWithHBL`, null, { soaNo: soaNo, officeId: officeId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreightWithHBL`, null, { soaNo: soaNo, officeId: officeId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

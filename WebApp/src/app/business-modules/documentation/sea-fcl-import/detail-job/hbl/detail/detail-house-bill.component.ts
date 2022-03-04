@@ -17,6 +17,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 import isUUID from 'validator/lib/isUUID';
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -302,8 +303,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         this._exportRepository.exportDangerousGoods(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }
@@ -312,8 +313,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }
@@ -322,8 +323,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }

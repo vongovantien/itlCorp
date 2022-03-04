@@ -17,6 +17,7 @@ import {
   ConfirmPopupComponent, Permission403PopupComponent
 } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
+import { HttpResponse } from '@angular/common/http';
 @Component({
   selector: 'combine-billing',
   templateUrl: './combine-billing.component.html',
@@ -193,9 +194,9 @@ deleteCombineBilling(id: string) {
             finalize(() => this._progressRef.complete())
           )
           .subscribe(
-            (response: ArrayBuffer) => {
-              if (response.byteLength > 0) {
-                this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+            (response: HttpResponse<any>) => {
+              if (response!=null) {
+                this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
               } else {
                 this._toastService.warning('No data found');
               }

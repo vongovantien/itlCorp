@@ -126,7 +126,7 @@ export class FormSearchExportComponent extends PopupBase {
                 .subscribe(
                     (res: HttpResponse<any>) => {
                         if (!!this.partnerType) {
-                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, 'eFms-commercial-' + this.partnerType + '.xlsx');
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
                         } else {
                             this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, 'eFms-partner.xlsx');
                         }

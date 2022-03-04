@@ -18,6 +18,8 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { HttpResponse } from '@angular/common/http';
+import { resourceUsage } from 'process';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -297,8 +299,8 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._exportRepository.exportDangerousGoods(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }
@@ -306,8 +308,8 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }
@@ -315,8 +317,8 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
                 },
             );
     }
