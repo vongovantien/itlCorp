@@ -410,7 +410,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.FromPaymentDate != null)
             {
                 // Lấy AP có payment trong khoảng thời gian đã chọn theo voucher date
-                var apInRangeDates = data.Where(x => DateTime.Parse(criteria.FromPaymentDate).Date <= x.VoucherDate.Value.Date && x.VoucherDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date && x.payment != null && !string.IsNullOrEmpty(x.payment.PaymentNo)).Select(x => new { x, InRangeType = "InRange" });
+                var apInRangeDates = data.Where(x => DateTime.Parse(criteria.FromPaymentDate).Date <= x.VoucherDate.Value.Date && x.VoucherDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date && (x.payment == null || !string.IsNullOrEmpty(x.payment.PaymentNo))).Select(x => new { x, InRangeType = "InRange" });
                 // Lấy AP trước khoảng thời gian đã chọn nhưng payment nằm trong khoảng thời gian
                 var paymentInRangedates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && x.payment != null && DateTime.Parse(criteria.FromPaymentDate).Date <= x.payment.PaymentDate.Value.Date && x.payment.PaymentDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date).Select(x => new { x, InRangeType = "PMInRange" });
 
