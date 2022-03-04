@@ -100,7 +100,7 @@ export class ExportRepo {
         );
     }
 
-    exportPortIndexexportPortIndex(searchObject: any = {}) {
+    exportCommodity(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportCommodityList`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
