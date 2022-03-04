@@ -2218,7 +2218,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
                                         if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                            surcharge.PayerId = partnerInternal.Id;
+                                            surcharge.PaymentObjectId = partnerInternal.Id;
                                     }
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
@@ -2228,9 +2228,15 @@ namespace eFMS.API.Documentation.DL.Services
                                         {
                                             surcharge.ChargeId = catCharge.CreditCharge??Guid.Empty;
                                             surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                            if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                                surcharge.PaymentObjectId = partnerInternal.Id;
                                         }
                                         else
+                                        {
                                             surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                            if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                                surcharge.PayerId = partnerInternal.Id;
+                                        }
                                     }
                                     else { continue; }
 
