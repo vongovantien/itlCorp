@@ -5550,6 +5550,7 @@ namespace eFMS.API.Accounting.DL.Services
              || !string.IsNullOrEmpty(x.VoucherIdre)
              || !string.IsNullOrEmpty(x.CreditNo)
              || !string.IsNullOrEmpty(x.DebitNo)
+             || !string.IsNullOrEmpty(x.LinkChargeId)
              || x.AcctManagementId != null
              || x.PayerAcctManagementId != null
              )
