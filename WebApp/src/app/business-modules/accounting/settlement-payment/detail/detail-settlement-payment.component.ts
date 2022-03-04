@@ -126,7 +126,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.formatInvoiceDateSurcharge();
         const body: any = {
             settlement: this.getBodySettlement(),
-            shipmentCharge: this.requestSurchargeListComponent.surcharges || []
+            shipmentCharge: this.requestSurchargeListComponent.surcharges.filter(m=>!m.linkChargeId) || []
         };
 
         this._accoutingRepo.updateSettlementPayment(body)
