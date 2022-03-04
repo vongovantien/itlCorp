@@ -2298,7 +2298,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             // gom các detail cùng voucherNo, voucherDate,
             var grpVoucherDetail = model.Details
-                .GroupBy(x => new { x.AcctID })
+                .GroupBy(x => new { x.AcctID, x.BravoRefNo })
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
