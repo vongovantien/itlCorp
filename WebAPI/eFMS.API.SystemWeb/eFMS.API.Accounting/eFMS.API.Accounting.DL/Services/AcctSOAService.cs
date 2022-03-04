@@ -1371,14 +1371,16 @@ namespace eFMS.API.Accounting.DL.Services
                 surcharges = csShipmentSurchargeRepo.Get(x => x.Type == typeCharge
                                                              && x.PaymentObjectId == criteria.CustomerID
                                                              && string.IsNullOrEmpty(x.SyncedFrom)
-                                                             && x.AcctManagementId == null);
+                                                             && x.AcctManagementId == null
+                                                             && x.OfficeId == currentUser.OfficeID);
                 if (criteria.IsOBH) //**
                 {
                     //SELL ~ PaymentObjectID, SOANo
                     obhSurcharges = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? x.PaymentObjectId : x.PayerId) == criteria.CustomerID
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom))
-                                                                  && (x.PayerId == criteria.CustomerID ? x.PayerAcctManagementId : x.AcctManagementId) == null );
+                                                                  && (x.PayerId == criteria.CustomerID ? x.PayerAcctManagementId : x.AcctManagementId) == null
+                                                                  && x.OfficeId == currentUser.OfficeID);
                 }
             }
             #endregion -- Search by Customer --
