@@ -56,6 +56,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
+    isReplicate: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -360,7 +361,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
-        this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
+        this.opsTransaction.isReplicate = this.isReplicate;
+        // this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -542,13 +544,18 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         return of(!isEdited);
     }
 
-    confirmDuplicate() {
+    confirmDuplicate(isReplicate: boolean = false) {
+        if (isReplicate && !this.opsTransaction.replicatedId) {
+            this._toastService.warning('This Job dont have Job Replicate')
+            return;
+        }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
             body: 'The system will open the Job Create Screen. Do you want to leave ?',
             title: 'Duplicate OPS detail',
             labelConfirm: 'Yes'
         },
             () => {
+                this.isReplicate = isReplicate;
                 this.onSubmitDuplicateConfirm();
             })
     }

@@ -535,6 +535,11 @@ namespace eFMS.API.Documentation.DL.Services
                     IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
 
                     x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
+
+                    if(x.ReplicatedId != null) {
+                        var replicateJob = DataContext.Get(d => d.Id == x.ReplicatedId)?.FirstOrDefault();
+                        x.ReplicateJobNo = replicateJob?.JobNo;
+                    }
                 });
             }
             var results = new OpsTransactionResult
