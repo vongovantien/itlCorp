@@ -110,6 +110,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     hblId: string = SystemConstants.EMPTY_GUID;
     shipmentDetail: CsTransaction;
 
+    dateTimeCreated: string;
+    dateTimeModified: string;
+    userCreated: string;
+    userModified: string;
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -190,6 +195,10 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID && hbl.id !== undefined) {
                         this.jobId = hbl.jobId;
                         this.hblId = hbl.id;
+                        this.dateTimeCreated=hbl.datetimeCreated;
+                        this.dateTimeModified=hbl.datetimeModified;
+                        this.userCreated=hbl.userNameCreated;
+                        this.userModified=hbl.userNameModified;
 
                         this.updateFormValue(hbl);
                     }

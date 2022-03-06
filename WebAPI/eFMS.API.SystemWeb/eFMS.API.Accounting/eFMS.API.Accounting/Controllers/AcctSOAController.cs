@@ -302,6 +302,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetShipmentsAndCDdNotesNotExistInResultFilter")]
+        [Authorize]
         public ActionResult GetShipmentsAndCDdNotesNotExistInResultFilter(MoreChargeShipmentCriteria criteria)
         {
             var data = acctSOAService.GetListMoreCharge(criteria);
@@ -339,6 +340,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetListMoreChargeByCondition")]
+        [Authorize]
         public IActionResult GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
         {
             var data = acctSOAService.GetListMoreCharge(criteria);
@@ -449,6 +451,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ListChargeShipment")]
+        [Authorize]
         public ChargeShipmentResult ListChargeShipment(ChargeShipmentCriteria criteria)
         {
             if (string.IsNullOrEmpty(criteria.CurrencyLocal))

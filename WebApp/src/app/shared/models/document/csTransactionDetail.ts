@@ -73,6 +73,8 @@ export class CsTransactionDetail {
   userModified: string = null;
   datetimeModified: string = null;
   csMawbcontainers: Container[] = [];
+  userNameCreated: string = null;
+  userNameModified: string = null;
 
   customerName: string = null;
   saleManName: string = null;
