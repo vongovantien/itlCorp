@@ -17,18 +17,15 @@
             </span>
         </span>
     </button>
-    <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
-        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="confirmDuplicate()">
-            <span>
-                <i class="la la-search-plus"></i>
-                <span>
-                    Duplicate
-                </span>
-            </span>
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate && opsTransaction.linkSource !== 'Replicate'">
+        <button class="btn btn-success dropdown-toggle m--margin-right-10" [dpToggle]="dropdownMenuDuplicate"
+            position="bottomCenter">
+            <i class="la la-copy"></i>
+            Duplicate
+            <span class="caret"></span>
         </button>
     </ng-container>
-
 
     <ng-container *ngIf="(opsTransaction?.isLocked === false) || isDuplicate">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
@@ -167,3 +164,9 @@
         <i class="fa fa-lock text-danger fa-3x"></i>
     </span>
 </ng-template>
+
+<app-dropdown #dropdownMenuDuplicate>
+    <a class="dropdown-item pointer" (click)="confirmDuplicate()" title="Duplicate with current job">Current Job</a>
+    <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
+        Replicate</a>
+</app-dropdown>
