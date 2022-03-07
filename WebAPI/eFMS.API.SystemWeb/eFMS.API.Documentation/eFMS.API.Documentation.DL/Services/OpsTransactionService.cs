@@ -2172,6 +2172,10 @@ namespace eFMS.API.Documentation.DL.Services
 
         public ResultHandle ChargeFromReplicate()
         {
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
+            string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
+
             ResultHandle hs = new ResultHandle();
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
             CatPartner partnerInternal = new CatPartner();
@@ -2180,11 +2184,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
+                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.ServiceDate.Value.Date > new DateTime(2022, 01, 31).Date);
                     if (lstJobRep != null)
                     {
-                        string logMessage = string.Format(" *  \n ListJobRep: {0} * ", JsonConvert.SerializeObject(lstJobRep));
-                        new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTJOBREP", logMessage);
                         foreach (var jobRep in lstJobRep)
                         {
                             var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
@@ -2208,31 +2210,46 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null);
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0);
                             if (charges != null && charges.Count() > 0)
                             {
-                                logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
-                                new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTCHARGE", logMessage);
+                                logMessage = string.Format(" *  \n [CHARGES]: {0} * ", JsonConvert.SerializeObject(charges));
+                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                                 foreach (var charge in charges)
                                 {
                                     if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
                                         continue;
 
-                                    CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
+                                    CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
 
-                                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                                    {
+                                    var propInfo = charge.GetType().GetProperties();
+                                    foreach (var item in propInfo)
+                                        surcharge.GetType().GetProperty(item.Name).SetValue(surcharge, item.GetValue(charge, null), null);
+
+                                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE) { 
                                         surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
                                         var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
-                                        if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
+                                        if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
                                         if (!string.IsNullOrEmpty(partnerInternal.Id))
                                             surcharge.PaymentObjectId = partnerInternal.Id;
                                     }
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
-                                        surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
-                                        if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                            surcharge.PayerId = partnerInternal.Id;
+                                        //[01/03/2022][17133][Nếu phí OBH có Buying Mapping]
+                                        var catCharge = catChargeRepository.Get(x => x.Id == charge.ChargeId && x.CreditCharge != null).FirstOrDefault();
+                                        if (catCharge != null)
+                                        {
+                                            surcharge.ChargeId = catCharge.CreditCharge??Guid.Empty;
+                                            surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                            if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                                surcharge.PaymentObjectId = partnerInternal.Id;
+                                        }
+                                        else
+                                        {
+                                            surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                            if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                                surcharge.PayerId = partnerInternal.Id;
+                                        }
                                     }
                                     else { continue; }
 
@@ -2268,6 +2285,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (surchargeAdds.Count > 0)
                         {
+                            logMessage = string.Format(" *  \n [SURCHARGE_ADD]: {0} * ", JsonConvert.SerializeObject(surchargeAdds));
+                            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                             surchargeRepository.Add(surchargeAdds, false);
                             var result = surchargeRepository.SubmitChanges();
                             if (result.Success)
@@ -2296,13 +2315,17 @@ namespace eFMS.API.Documentation.DL.Services
                 {
 
                     trans.Rollback();
-                    new LogHelper("eFMS_CHARGEFROMREPLICATE", ex.ToString());
+                    new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]\n[ERROR]", ex.ToString());
                     return new ResultHandle { Status = false, Message = "Job can't be charge from replicate !" };
                 }
                 finally
                 {
                     trans.Dispose();
                 }
+
+                logMessage = string.Format(" *  \n [END]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
+                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
             }
         }
         private SysOffice GetInfoOfficeOfUser(Guid? officeId)
@@ -2495,7 +2518,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (chargeJob == null)
                             continue;
 
-                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice != null && x.UnitPrice > 0));
+                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice!= null && x.UnitPrice > 0));
                         if (chargeBuys == null)
                             continue;
 

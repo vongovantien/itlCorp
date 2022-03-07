@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="text-center" *ngIf="isCompleted">
-                    <div class="confirm-text-block" *ngIf="!isSuccessDownload && !isProccessComplete" style="font-size: 16px;">
+                    <div class="confirm-text-block" *ngIf="!isSuccessDownload && !isProccessComplete && !body" style="font-size: 16px;">
                         <span class="text-danger">Download fail.</span>
                         <br>
                         <span>Your file is empty, Please re-check and try again!</span>
@@ -31,6 +31,11 @@
                     </div>
                     <div class="confirm-text-block" *ngIf="!isSuccessDownload && isProccessComplete" style="font-size: 16px;">
                         <span [innerHTML]="body"  class="text-success"></span>
+                    </div>
+                    <div class="confirm-text-block" *ngIf="!isSuccessDownload && !isProccessComplete" style="font-size: 16px;">
+                        <span class="text-danger">Proccess fail.</span>
+                        <br>
+                        <span [innerHTML]="body"></span>
                     </div>
                 </div>
             </div>

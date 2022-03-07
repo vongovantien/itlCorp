@@ -523,7 +523,7 @@
 </confirm-popup>
 
 <app-context-menu #linkFeeContextMenu >
-    <ng-container>
+    <ng-container *ngIf="selectedCs&&selectedCs.linkChargeId&&!shipment.linkSource">
         <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
             <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
         </div>

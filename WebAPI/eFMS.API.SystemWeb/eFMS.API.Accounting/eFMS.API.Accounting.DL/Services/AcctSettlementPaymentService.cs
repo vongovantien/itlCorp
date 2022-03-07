@@ -980,8 +980,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
-
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1053,8 +1053,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
                                };
             var data = dataOperation.Union(dataDocument).ToList();
 
@@ -1149,7 +1149,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
 
                                 };
             var dataDocument = from sur in surcharge
@@ -1224,8 +1225,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
 
                                };
             var data = dataOperation.Union(dataDocument);
@@ -2188,10 +2189,10 @@ namespace eFMS.API.Accounting.DL.Services
                         //End --Phí chứng từ (IsFromShipment = true)--
 
                         //Start --Phí hiện trường (IsFromShipment = false)--
-                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
+                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false && string.IsNullOrEmpty(x.LinkChargeId)).ToList();
                         var idsChargeScene = chargeScene.Select(x => x.Id);
                         //Add các phí hiện trường mới (nếu có)
-                        var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
+                        var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false && string.IsNullOrEmpty(x.LinkChargeId)).ToList();
                         if (chargeSceneAdd.Count > 0)
                         {
                             var listChargeSceneAdd = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneAdd);
@@ -2199,7 +2200,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
                                 {
-                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid)
+                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid )
                                     {
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
@@ -2238,7 +2239,8 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
-                        var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false);
+                        var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false && string.IsNullOrEmpty(x.LinkChargeId));
+
                         var idChargeSceneUpdate = chargeSceneUpdate.Select(s => s.Id).ToList();
                         if (chargeSceneUpdate.Count() > 0)
                         {
@@ -5549,6 +5551,7 @@ namespace eFMS.API.Accounting.DL.Services
              || !string.IsNullOrEmpty(x.VoucherIdre)
              || !string.IsNullOrEmpty(x.CreditNo)
              || !string.IsNullOrEmpty(x.DebitNo)
+             || !string.IsNullOrEmpty(x.LinkChargeId)
              || x.AcctManagementId != null
              || x.PayerAcctManagementId != null
              )

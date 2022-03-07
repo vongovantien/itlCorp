@@ -44,7 +44,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: SysImage[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
-    
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -126,7 +126,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.formatInvoiceDateSurcharge();
         const body: any = {
             settlement: this.getBodySettlement(),
-            shipmentCharge: this.requestSurchargeListComponent.surcharges || []
+            shipmentCharge: this.requestSurchargeListComponent.surcharges.filter(m=>!m.linkChargeId) || []
         };
 
         this._accoutingRepo.updateSettlementPayment(body)
