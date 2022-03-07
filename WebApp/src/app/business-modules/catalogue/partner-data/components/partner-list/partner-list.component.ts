@@ -2,11 +2,11 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { SortService } from '@services';
 import { Partner, Company } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { IPartnerDataState, getPartnerDataSearchParamsState } from '../../store';
+import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner } from '../../store';
 import { Store } from '@ngrx/store';
 
 
@@ -64,6 +64,22 @@ export class PartnerListComponent extends AppList implements OnInit {
 
                 }
             );
+            this._store.select(getPartnerDataListState)
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.partners = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
+            
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
@@ -181,19 +197,41 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     getPartners() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            })).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.partners = res.data || [];
-                    console.log(this.partners);
-                    this.totalItems = res.totalItems;
-                }
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListPartner(this.page, this.pageSize, this.dataSearch)
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     })).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.partners = res.data || [];
+        //             console.log(this.partners);
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+            this._store.dispatch(LoadListPartner({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+            
+        // this._store.select(getPartnerDataListState)
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => {
+        //             map((data: any) => {
+        //                 return {
+        //                     data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
+        //                     totalItems: data.totalItems,
+        //                 };
+        //             })
+        //             this._progressRef.complete();
+        //             this.isLoading = false;
+        //         })
+
+        //     ).subscribe(
+        //         (res: any) => {
+        //             this.partners = res.data || [];
+        //             this.totalItems = res.totalItems || 0;
+        //         },
+        //     );
     }
 
     sortPartners() {

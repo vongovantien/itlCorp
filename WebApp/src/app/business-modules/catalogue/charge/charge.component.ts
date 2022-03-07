@@ -13,6 +13,8 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
+import { Store } from '@ngrx/store';
+import { getChargeDataListState, IChargeState, LoadListCharge } from './store';
 
 
 @Component({
@@ -34,6 +36,7 @@ export class ChargeComponent extends AppList implements OnInit {
         private _exportRepo: ExportRepo,
         private _toastService: ToastrService,
         private _router: Router,
+        private _store: Store<IChargeState>,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -51,6 +54,21 @@ export class ChargeComponent extends AppList implements OnInit {
             { title: 'Mode', field: 'mode', sortable: true },
             { title: 'Status', field: 'active', sortable: true }
         ];
+        this._store.select(getChargeDataListState)
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Charge(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.ListCharges = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
     }
 
     sortCharge(sort: string): void {
@@ -83,24 +101,25 @@ export class ChargeComponent extends AppList implements OnInit {
     }
 
     searchCharge() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListCharge(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-                map((res: any) => {
-                    return {
-                        data: res.data != null ? res.data.map((item: any) => new Charge(item)) : [],
-                        totalItems: res.totalItems,
-                    };
-                }),
-            ).subscribe(
-                (res: any) => {
-                    this.totalItems = res.totalItems;
-                    this.ListCharges = res.data || [];
-                },
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListCharge(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+        //         map((res: any) => {
+        //             return {
+        //                 data: res.data != null ? res.data.map((item: any) => new Charge(item)) : [],
+        //                 totalItems: res.totalItems,
+        //             };
+        //         }),
+        //     ).subscribe(
+        //         (res: any) => {
+        //             this.totalItems = res.totalItems;
+        //             this.ListCharges = res.data || [];
+        //         },
+        //     );
+        this._store.dispatch(LoadListCharge({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     prepareDeleteCharge(id: any) {
