@@ -288,15 +288,14 @@ namespace eFMS.API.ForPartner.DL.Service
         {
 
             bool IshasPayment = false;
-
+            var office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
             List<AccAccountPayable> payable = DataContext.Get(x => x.VoucherNo == model.VoucherNo
             && x.BillingNo == model.DocCode
-            && x.BillingType == model.DocType).ToList();
+            && x.BillingType == model.DocType
+            && x.OfficeId == office.Id).ToList();
             if (payable.Count > 0)
             {
-                List<string> refNos = payable.Select(x => x.ReferenceNo).Distinct().ToList();
-                IshasPayment = paymentRepository.Any(x => refNos.Contains(x.ReferenceNo));
-
+                IshasPayment = paymentRepository.Any(x => payable.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF))));
             }
 
             return IshasPayment;
@@ -756,7 +755,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         else
                         {
                             HandleState hsAddP = paymentRepository.SubmitChanges();
-                            if(hsAddP.Success == false)
+                            if (hsAddP.Success == false)
                             {
                                 new LogHelper("InsertAccountPayablePayment", hsAddP.Message?.ToString());
                                 return new HandleState("Ghi nhận thất bại. " + hsAddP.Message?.ToString());
@@ -804,7 +803,7 @@ namespace eFMS.API.ForPartner.DL.Service
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.Action = "CancelAccountPayablePayment";
-            
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -879,5 +878,61 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }
         }
+
+        /// <summary>
+        /// Delete payable transaction and payment after delete voucher
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <returns></returns>
+        public async Task<HandleState> DeleteAccountPayable(VoucherSyncDeleteModel model, string apiKey)
+        {
+            HandleState hsAddPayable = new HandleState();
+            List<AccAccountPayable> payables = new List<AccAccountPayable>();
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "DeleteAccountPayable";
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
+                    var payableDelete = DataContext.Get(x => x.VoucherNo == model.VoucherNo && x.VoucherDate.Value.Date == model.VoucherDate.Date && x.BillingNo == model.DocCode && x.OfficeId == office.Id).ToList();
+                    var hsPayable = new HandleState();
+                    if (payableDelete?.Count() > 0)
+                    {
+                        var paymentDelete = paymentRepository.Get(x => payableDelete.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF)))).ToList();
+                        var hsPaymentDel = new HandleState();
+                        if (paymentDelete.Count > 0)
+                        {
+                            hsPaymentDel = await paymentRepository.DeleteAsync(x => paymentDelete.Any(pm => pm.Id == x.Id));
+                        }
+                        hsPayable = await DataContext.DeleteAsync(x => payableDelete.Any(pa => pa.Id == x.Id));
+                        if (hsPayable.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Dispose();
+                        }
+                    }
+                    return hsPayable;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
     }
 }

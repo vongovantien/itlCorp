@@ -880,9 +880,16 @@ namespace eFMS.API.ForPartner.Controllers
             }
             HandleState hs = await accountingManagementService.DeleteVoucher(model, apiKey);
 
-            string _message = hs.Success ? "Xóa voucher thành công" : string.Format("{0} Xóa voucher thất bại", hs.Message.ToString());
+            string _message = hs.Success ? "Xóa voucher thành công" : string.Format("{0} Xóa voucher thất bại", hs.Exception?.Message);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
+            if (hs.Success)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    HandleState payableDelHandle = await accPayableService.DeleteAccountPayable(model, apiKey);
+                });
+            }
             return Ok(result);
         }
     }

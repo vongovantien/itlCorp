@@ -2690,11 +2690,11 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.OfficeID = _currentUser.OfficeID;
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "SyncDeleteVoucher";
-            HandleState hs = new HandleState();
+            HandleState hsDeletVoucher = new HandleState();
 
             var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
             && x.VoucherId == model.VoucherNo
-            && x.Date == model.VoucherDate)?.FirstOrDefault();
+            && x.Date.Value.Date == model.VoucherDate.Date)?.FirstOrDefault();
 
             if (voucherToDelete != null)
             {
@@ -2765,7 +2765,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                         using (var transV = DataContext.DC.Database.BeginTransaction())
                         {
-                            HandleState hsDeletVoucher = await DataContext.DeleteAsync(x => x.Id == voucherToDelete.Id);
+                            hsDeletVoucher = await DataContext.DeleteAsync(x => x.Id == voucherToDelete.Id);
                             if (hsDeletVoucher.Success)
                             {
                                 transS.Commit();
@@ -2790,7 +2790,11 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
                 }
             }
-            return hs;
+            else
+            {
+                hsDeletVoucher = new HandleState(false);
+            }
+            return hsDeletVoucher;
         }
 
     }

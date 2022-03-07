@@ -15,5 +15,6 @@ namespace eFMS.API.ForPartner.DL.IService
         string CheckIsValidPayable(List<AccAccountPayableModel> accountPayables);
         HandleState InsertAccountPayablePayment(List<AccAccountPayableModel> accountPayables, string apiKey);
         HandleState CancelAccountPayablePayment(List<CancelPayablePayment> accountPayables, string apiKey);
+        Task<HandleState> DeleteAccountPayable(VoucherSyncDeleteModel accountPayables, string apiKey);
     }
 }
