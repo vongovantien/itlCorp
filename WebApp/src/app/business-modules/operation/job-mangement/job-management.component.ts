@@ -259,7 +259,6 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     chargeFromRep() {
-        debugger
         this._spinner.hide();
         this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
         this.loadingPopupComponent.show();
@@ -268,7 +267,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 catchError(() => of(
                     this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
                     this.loadingPopupComponent.proccessFail()
-                    )),
+                )),
                 finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
