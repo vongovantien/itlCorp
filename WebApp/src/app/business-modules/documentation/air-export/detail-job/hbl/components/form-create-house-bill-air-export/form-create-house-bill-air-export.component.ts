@@ -120,6 +120,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     isCollapsed: boolean = false;
     isUpdateOtherCharge: boolean = false;
 
+    dateTimeCreated: string;
+    dateTimeModified: string;
+    userCreated: string;
+    userModified: string;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -223,6 +228,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     } else {
                         this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
+                    
                 }
             );
     }
@@ -269,7 +275,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.jobId = hbl.jobId;
                         this.hblId = hbl.id;
                         this.hwconstant = hbl.hwConstant;
-
+                        this.dateTimeCreated=hbl.datetimeCreated;
+                        this.dateTimeModified=hbl.datetimeModified;
+                        this.userCreated=hbl.userNameCreated;
+                        this.userModified=hbl.userNameModified;
                         this.updateFormValue(hbl);
                     }
                 });

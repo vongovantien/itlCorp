@@ -574,6 +574,8 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.Permission.AllowUpdateCharge = true;
                 }
             }
+            detail.UserNameCreated = sysUserRepo.Get(x => x.Id == detail.UserCreated).FirstOrDefault().Username;
+            detail.UserNameModified = sysUserRepo.Get(x => x.Id == detail.UserModified).FirstOrDefault().Username;
             return detail;
         }
 
