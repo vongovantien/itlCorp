@@ -66,13 +66,14 @@ export class PartnerListComponent extends AppList implements OnInit {
             );
             this._store.select(getPartnerDataListState)
             .pipe(
-                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
                         totalItems: data.totalItems,
                     };
                 })
+
             ).subscribe(
                 (res: any) => {
                     this.partners = res.data || [];

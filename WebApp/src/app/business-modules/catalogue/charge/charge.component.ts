@@ -10,9 +10,9 @@ import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
-import { catchError, finalize, map } from 'rxjs/operators';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getChargeDataListState, IChargeState, LoadListCharge } from './store';
 
@@ -56,7 +56,7 @@ export class ChargeComponent extends AppList implements OnInit {
         ];
         this._store.select(getChargeDataListState)
             .pipe(
-                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new Charge(item)) : [],
