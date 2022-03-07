@@ -2433,6 +2433,9 @@ namespace eFMS.API.Documentation.DL.Services
 
         public ResultHandle AutoRateReplicate()
         {
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
+            string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             CatPartner partnerInternal = new CatPartner();
             var date = new DateTime(2022, 01, 31);
             var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
@@ -2454,16 +2457,24 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var offi = GetInfoOfficeOfUser(jobOps.OfficeId);
                             if (offi != null && string.IsNullOrEmpty(offi.InternalCode))
+                            {
+                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} - {2} * ", jobOps.JobNo, jobOps.OfficeId, "OFFICE NULL");
+                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
                                 continue;
+                            }
                             var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
                             if (part == null)
+                            {
+                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} -{2} * ", jobOps.JobNo, jobOps.OfficeId, "Partner Null");
+                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
                                 continue;
-                            if (part.Count() > 1)
-                                continue;
-
+                            }
                             if (part.FirstOrDefault() == null)
+                            {
+                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} -{2} * ", jobOps.JobNo, jobOps.OfficeId, "Partner First Null");
+                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
                                 continue;
-
+                            }
                             partnerInternal = part.FirstOrDefault();
                         }
 
@@ -2471,7 +2482,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (chargeJob == null)
                             continue;
 
-                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY");
+                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice != null && x.UnitPrice > 0));
                         if (chargeBuys == null)
                             continue;
 
@@ -2516,6 +2527,9 @@ namespace eFMS.API.Documentation.DL.Services
                     var result = new HandleState();
                     if (surchargeSells.Count > 0)
                     {
+                        logMessage = string.Format(" *  \n [SURCHARGE_SELLS]: {0} * ", JsonConvert.SerializeObject(surchargeSells));
+                        new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
+
                         surchargeRepository.Add(surchargeSells, false);
                         result = surchargeRepository.SubmitChanges();
                     }
@@ -2550,6 +2564,9 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+            logMessage = string.Format(" *  \n [END]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
+            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
             return hs;
 
         }
