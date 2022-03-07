@@ -176,7 +176,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: HttpResponse<any>) => {
+                (response: any) => {
                     this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
                 }
             );
@@ -191,7 +191,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: HttpResponse<any>) => {
+                (response: any) => {
                     this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
                 }
             );

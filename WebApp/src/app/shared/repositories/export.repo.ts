@@ -479,17 +479,11 @@ export class ExportRepo {
     }
 
     exportAcountingPayableStandart(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableStandartReport`, searchObject).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableStandartReport`, searchObject, null, {}, 'response');
     }
 
     exportAcountingTemplatePayable(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
     }
 }
 
