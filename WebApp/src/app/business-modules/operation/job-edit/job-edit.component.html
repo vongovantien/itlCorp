@@ -17,7 +17,8 @@
             </span>
         </span>
     </button>
-    <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate && opsTransaction.linkSource !== 'Replicate'">
         <button class="btn btn-success dropdown-toggle m--margin-right-10" [dpToggle]="dropdownMenuDuplicate"
             position="bottomCenter">
             <i class="la la-copy"></i>

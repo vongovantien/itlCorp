@@ -1860,7 +1860,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchargeIds = new List<Guid>(); // ds các charge phí update công nợ.
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
-            if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
+            if (code == 403 || model.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
 
             List<CsMawbcontainer> newContainers = new List<CsMawbcontainer>();
             List<CsShipmentSurcharge> newSurcharges = new List<CsShipmentSurcharge>();
