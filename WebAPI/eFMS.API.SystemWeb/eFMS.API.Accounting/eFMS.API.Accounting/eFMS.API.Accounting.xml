@@ -701,6 +701,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetDataExportAccountingTemplate(eFMS.API.Accounting.DL.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Get data export accounting template payable
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
             <summary>
             Get detail receipt

@@ -15,6 +15,7 @@ import { LoadingPopupComponent } from '@common';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { of } from 'rxjs';
 import { SortService } from '@services';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-account-payable-detail',
@@ -22,7 +23,7 @@ import { SortService } from '@services';
 })
 export class AccountPayableTabComponent extends AppList implements OnInit {
     @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
-    
+
     payables: AccountingPayableModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
@@ -80,9 +81,9 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
             { title: 'Remain Amount', field: 'remainAmount', sortable: true },
             { title: 'Paid AmountVND', field: 'paymentAmountVnd', sortable: true },
             { title: 'Remain AmountVND', field: 'remainAmountVnd', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },           
+            { title: 'Currency', field: 'currency', sortable: true },
         ];
-        
+
     }
 
     ngAfterViewInit() {
@@ -97,7 +98,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                 (data) => {
                     if (!!data.dataSearch) {
                         this.dataSearch = data.dataSearch;
-                    }else{
+                    } else {
                         this.initDataSearch();
                     }
 
@@ -112,7 +113,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
         this._cd.detectChanges();
     }
 
-    initDataSearch(){
+    initDataSearch() {
         const loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.dataSearch = {
             paymentStatus: ["Unpaid", "Paid A Part"],
@@ -122,7 +123,7 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
         }
     }
 
-    loadListAccountPayableDetail(){
+    loadListAccountPayableDetail() {
         this._store.dispatch(LoadListAccountPayableDetail({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
@@ -165,8 +166,8 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
             this.loadingPopupComponent.downloadFail();
         }
     }
-    
-    exportStandart(){
+
+    exportStandart() {
         this._spinner.hide();
         this.loadingPopupComponent.show();
         this._exportRepo.exportAcountingPayableStandart(this.dataSearch)
@@ -175,8 +176,23 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: Blob) => {
-                    this.startDownloadReport(res, 'Payable-Standart-Report.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
+                }
+            );
+    }
+
+    exportAccountingTemplate() {
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
+        this._exportRepo.exportAcountingTemplatePayable(this.dataSearch)
+            .pipe(
+                catchError(() => of(this.loadingPopupComponent.downloadFail())),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: HttpResponse<any>) => {
+                    this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
                 }
             );
     }

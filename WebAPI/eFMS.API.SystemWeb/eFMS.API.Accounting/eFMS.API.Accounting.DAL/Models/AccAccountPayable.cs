@@ -40,5 +40,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? Over1To15Day { get; set; }
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
+        public string Description { get; set; }
     }
 }

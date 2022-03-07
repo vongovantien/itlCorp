@@ -22,6 +22,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public DateTime? PaymentDueDate { get; set; }
         public decimal? PaymentTerm { get; set; }
         public string Status { get; set; }
+        public string Description { get; set; }
         public List<AcctPayablePaymentDetail> PaymentDetails { get; set; }
     }
 

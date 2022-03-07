@@ -6014,7 +6014,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("InvDateGrp", item.Invoicedate?.ToString("dd/MM/yyyy"));
                     listKeyData.Add("DocNoGrp", item.DocNo);
                     listKeyData.Add("BeginAmountGrp", item.BeginAmount);
-                    
+
                     var _orgPaidAmount = item.PaymentDetails.Sum(x => x.OrgPaidAmount ?? 0);
                     var _orgPaidAmountVnd = item.PaymentDetails.Sum(x => x.PaidAmountVND ?? 0);
                     var _orgRemainAmount = item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
@@ -6037,6 +6037,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("OrgCurrencyGrp", item.OriginCurrency);
                     listKeyData.Add("PMTermGrp", item.PaymentTerm?.ToString("N0"));
                     listKeyData.Add("DueDateGrp", item.PaymentDueDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("DescriptionGrp", item.Description);
                     // Sum total
                     excel.SetData(listKeyData);
                     excel.Worksheet.Cells[startRow, 9, startRow, 11].Style.Numberformat.Format = item.OriginCurrency == "VND" ? numberFormat2 : numberFormat;
@@ -6072,6 +6073,117 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumRemainVndGrp", sumRemainVnd);
                 excel.SetData(listKeyTotal);
                 return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
+        public Stream GenerateExportAccountingTemplateReport(List<AccountingTemplateExport> acctPayables, AccountPayableCriteria criteria, string fileName)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AP");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 1;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("CompanyName", acctPayables.FirstOrDefault()?.OfficeName);
+                listKeyData.Add("CompanyAddress", acctPayables.FirstOrDefault()?.ContactOffice);
+                listKeyData.Add("MonthYear", "Tháng " + DateTime.Now.Month + " năm " + DateTime.Now.Year);
+                excel.SetData(listKeyData);
+
+                startRow = 9;
+                excel.StartDetailTable = startRow;
+                if (acctPayables.Count == 0)
+                {
+                    excel.DeleteRow(9, 2);
+                }
+
+                decimal _sumBeginAmount = 0, _sumCreditAmount = 0, _sumAdvAmount = 0m, _sumRemainAmount = 0m;
+                decimal _sumBeginAmountVnd = 0, _sumCreditAmountVnd = 0, _sumAdvAmountVnd = 0m, _sumRemainAmountVnd = 0m;
+                var grpPbParnert = acctPayables.GroupBy(x => new { x.PartnerId, x.PartnerName });
+                foreach(var item in grpPbParnert)
+                {
+                    listKeyData = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    listKeyData.Add("PartnerNameGrp", item.Key.PartnerName);
+                    var _beginAmount = item.Sum(x => x.BeginAmount ?? 0);
+                    var _creditAmount = item.Sum(x => x.OrgCreditAmount ?? 0);
+                    var _advAmount = item.Sum(x => (x.OrgAdvAmount ?? 0));
+                    var _remainAmount = (_beginAmount + _creditAmount - _advAmount);
+                    // Total
+                    _sumBeginAmount += _beginAmount;
+                    _sumCreditAmount += _creditAmount;
+                    _sumAdvAmount += (item.Sum(x => (x.OrgAdvAmount ?? 0) * (-1)));
+                    _sumRemainAmount += _remainAmount;
+
+                    var _beginAmountVND = item.Sum(x => x.BeginAmountVND ?? 0);
+                    var _creditAmountVND = item.Sum(x => x.OrgCreditAmountVND ?? 0);
+                    var _advAmountVND = item.Sum(x => x.OrgAdvAmountVND ?? 0);
+                    var _remainAmountVND = (_beginAmountVND + _creditAmountVND - _advAmountVND);
+                    // Total VND
+                    _sumBeginAmountVnd += _beginAmountVND;
+                    _sumCreditAmountVnd += _creditAmountVND;
+                    _sumAdvAmountVnd += (item.Sum(x => (x.OrgAdvAmountVND ?? 0) * (-1)));
+                    _sumRemainAmountVnd += _remainAmountVND;
+
+                    listKeyData.Add("BeginAmountGrp", _beginAmount);
+                    listKeyData.Add("RemainGrp", _remainAmount);
+                    listKeyData.Add("BeginAmountVndGrp", _beginAmountVND);
+                    listKeyData.Add("RemainVndGrp", _remainAmountVND);
+                    excel.SetData(listKeyData);
+                    excel.Worksheet.Cells[startRow, 11, startRow, 18].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
+                    startRow++;
+                    foreach (var trans in item)
+                    {
+                        listKeyData = new Dictionary<string, object>();
+                        excel.SetDataTable();
+                        listKeyData.Add("BillingDt", trans.Code);
+                        listKeyData.Add("VoucherDateDt", trans.VoucherDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("VoucherNoDt", trans.VoucherNo);
+                        listKeyData.Add("InvDateDt", trans.InvoiceDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("InvNoDt", trans.InvoiceNo);
+                        listKeyData.Add("DocNoDt", trans.DocNo);
+                        listKeyData.Add("AccountDt", trans.AccountNo);
+                        listKeyData.Add("DescrptDt", trans.Description);
+                        listKeyData.Add("PmTermDt", trans.PaymentTerm);
+                        listKeyData.Add("PmDueDateDt", trans.PaymentDueDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("BeginAmountDt", trans.BeginAmount);
+                        listKeyData.Add("TangDt", trans.OrgCreditAmount);
+                        listKeyData.Add("GiamDt", trans.OrgAdvAmount * (-1));
+                        var remainAmount = trans.BeginAmount + trans.OrgCreditAmount - trans.OrgAdvAmount;
+                        listKeyData.Add("RemainDt", remainAmount);
+                        listKeyData.Add("BeginAmountVndDt", trans.BeginAmountVND);
+                        listKeyData.Add("TangVndDt", trans.OrgCreditAmountVND);
+                        listKeyData.Add("GiamVndDt", trans.OrgAdvAmountVND * (-1));
+                        var remainAmountVnd = trans.BeginAmountVND + trans.OrgCreditAmountVND - trans.OrgAdvAmountVND;
+                        listKeyData.Add("RemainVndDt", remainAmountVnd);
+                        excel.SetData(listKeyData);
+                        excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
+                        startRow++;
+                    }
+                }
+
+                listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("BeginAmountTotal", _sumBeginAmount);
+                listKeyData.Add("TangTotal", _sumCreditAmount);
+                listKeyData.Add("GiamTotal", _sumAdvAmount);
+                listKeyData.Add("RemainTotal", _sumRemainAmount);
+                listKeyData.Add("BeginAmountVndTotal", _sumBeginAmountVnd);
+                listKeyData.Add("TangVndTotal", _sumCreditAmountVnd);
+                listKeyData.Add("GiamVndTotal", _sumAdvAmountVnd);
+                listKeyData.Add("RemainVndTotal", _sumRemainAmountVnd);
+                excel.SetData(listKeyData);
+                return excel.ExcelStream();
+
             }
             catch (Exception ex)
             {

@@ -85,5 +85,18 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctPayableService.GetDataExportPayablePaymentDetail(criteria);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Get data export accounting template payable
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportAccountingTemplate")]
+        [Authorize]
+        public IActionResult GetDataExportAccountingTemplate(AccountPayableCriteria criteria)
+        {
+            var data = acctPayableService.GetDataExportAccountingTemplate(criteria);
+            return Ok(data);
+        }
     }
 }

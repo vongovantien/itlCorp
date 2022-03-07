@@ -146,6 +146,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableAcctTemplateReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.

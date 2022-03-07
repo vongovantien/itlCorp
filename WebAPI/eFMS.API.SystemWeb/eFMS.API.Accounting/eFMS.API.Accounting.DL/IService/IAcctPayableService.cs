@@ -15,6 +15,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         IQueryable<AccAccountPayableModel> Paging(AccountPayableCriteria criteria, int page, int size, out int rowsCount);
         List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria);
+        List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria);
         IQueryable<AccAccountPayablePaymentModel> GetBy(string refNo, string type, string invoiceNo, string billingNo);
     }
 }

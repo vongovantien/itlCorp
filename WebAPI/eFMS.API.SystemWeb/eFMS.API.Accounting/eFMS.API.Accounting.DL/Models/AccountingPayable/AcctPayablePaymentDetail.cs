@@ -29,6 +29,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
         public string TransactionType { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? PaymentDueDate { get; set; }
+        public string Description { get; set; }
         /// <summary>Type nhận dạng group AP </summary>
         public string InRangeType { get; set; }
 

@@ -35,6 +35,9 @@
      </Reference>
    </ItemGroup>
    <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\AccountPayable\AP_Account_Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\AccountPayable\AP_Standart_Report.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
