@@ -848,14 +848,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 // Update database
                 var addCreditMng = UpdateCreditManagement(acctCreditLst, acctCreditDelete, action);
-                string logName = string.Format("CreditNote_{0}_{1}AcctCreditManagementAR", creditNo, action);
-                string logMessage = string.Format(" * DataTypeCreditNote: {0} \n * Result: {1}",
-                    JsonConvert.SerializeObject(acctCreditLst),
-                    JsonConvert.SerializeObject(addCreditMng));
-                new LogHelper(logName, logMessage);
+                
                 if (!addCreditMng.Status)
                 {
                     hs = new HandleState((object)addCreditMng.Message);
+                    string logName = string.Format("CreditNote_{0}_{1}AcctCreditManagementAR", creditNo, action);
+                    string logMessage = string.Format(" * DataTypeCreditNote: {0} \n * Result: {1}",
+                        JsonConvert.SerializeObject(acctCreditLst),
+                        JsonConvert.SerializeObject(addCreditMng));
+                    new LogHelper(logName, logMessage);
                 }
             }
             return hs;

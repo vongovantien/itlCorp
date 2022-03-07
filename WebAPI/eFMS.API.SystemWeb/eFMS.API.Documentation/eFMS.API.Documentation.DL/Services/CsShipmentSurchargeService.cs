@@ -1459,7 +1459,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if (!item.UnitPrice.HasValue)
+                if (!item.UnitPrice.HasValue || item.UnitPrice == 0)
                 {
                     item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
                     item.IsValid = false;
