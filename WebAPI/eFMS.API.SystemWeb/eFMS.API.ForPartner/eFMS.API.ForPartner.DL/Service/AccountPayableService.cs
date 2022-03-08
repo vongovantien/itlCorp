@@ -492,17 +492,11 @@ namespace eFMS.API.ForPartner.DL.Service
                                 {
                                     return new HandleState((object)string.Format("Dữ liệu chứng từ {0} loại ADV chưa có ref no.", acc.PaymentNo));
                                 }
-                                // Check existed transaction adv
-                                var payableAdvExisted = DataContext.Get(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && x.ReferenceNo == detail.AdvRefNo && x.OfficeId == office.Id).FirstOrDefault();
-                                if (payableAdvExisted == null)
-                                {
-                                    return new HandleState((object)string.Format("Chứng từ {0} và số ref {1} chưa ghi nhận.", acc.PaymentNo, detail.AdvRefNo));
-                                }
                                 // Check existed adv refno payment type adv
                                 var payablePayment = paymentRepository.Get(x => x.AcctId == detail.AcctId && x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV && x.OfficeId == office.Id).FirstOrDefault();
                                 if (payablePayment != null)
                                 {
-                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}.", acc.PaymentNo, detail.BravoRefNo));
+                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}.", acc.PaymentNo, detail.AdvRefNo));
                                 }
                                 // phát sinh dòng công nợ ứng trước và dòng ghi nhận có status Unpaid
                                 var accPayablePayment = new AccAccountPayablePayment();
