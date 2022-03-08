@@ -600,7 +600,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 result.Add(payable);
             }
-            return result.OrderBy(x => x.AcctDate).ToList();
+            return result.OrderBy(x => x.AcctDate).ThenBy(x => x.AcctRefNo).ThenBy(x=>x.BillingNo).ToList();
         }
 
         /// <summary>
@@ -611,7 +611,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria)
         {
             var data = GetDataAcctPayable(criteria).ToList();
-            var grpData = data.OrderBy(x => x.VoucherDate).GroupBy(payable => new { payable.PartnerId }).Select(payable => new { payable.Key, payable });
+            var grpData = data.GroupBy(payable => new { payable.PartnerId }).Select(payable => new { payable.Key, payable });
             var result = new List<AccountingTemplateExport>();
             var partnerIds = grpData.Select(x => x.Key.PartnerId);
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
@@ -675,7 +675,7 @@ namespace eFMS.API.Accounting.DL.Services
                     result.Add(detail);
                 }
             }
-            return result;
+            return result.OrderBy(x => x.VoucherDate).ThenBy(x => x.VoucherNo).ThenBy(x => x.DocNo).ToList();
         }
     }
 }
