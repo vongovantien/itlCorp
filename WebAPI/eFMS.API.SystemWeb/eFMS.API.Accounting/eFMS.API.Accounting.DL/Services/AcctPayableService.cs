@@ -90,36 +90,39 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return null;
             }
-            var payables = from payable in data
-                           join partner in catPartnerRepository.Get(x => x.Active == true) on payable.PartnerId equals partner.Id
-                           select new { payable, partner.ShortName, partner.AccountNo };
-            var payableGrp = payables.GroupBy(x => new { x.payable.RefId, x.payable.PartnerId, x.payable.VoucherNo, x.payable.VoucherDate, x.payable.InvoiceNo, x.payable.BillingNo, x.payable.TransactionType });
+            //var payables = (from payable in data
+            //               join partner in catPartnerRepository.Get(x => x.Active == true) on payable.PartnerId equals partner.Id into grpPartner
+            //               from partner in grpPartner.DefaultIfEmpty()
+            //               select new { payable, ShortName = partner != null ? partner.ShortName : string.Empty, AccountNo = partner != null ? partner.AccountNo : string.Empty }).ToList();
+            var payableGrp = data.ToList().GroupBy(x => new { x.RefId, x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType }).ToList();
 
             var acctPayables = new List<AccAccountPayableModel>();
+            var partnerData = catPartnerRepository.Get(x => x.Active == true);
             foreach (var item in payableGrp)
             {
                 var acct = new AccAccountPayableModel();
+                var partner = partnerData.Where(x => x.Id == item.Key.PartnerId).FirstOrDefault();
                 acct.RefId = item.Key.RefId?.ToString(); ;
                 acct.ReferenceNo = item.Key.VoucherNo;
-                acct.PartnerName = item.FirstOrDefault().ShortName;
-                acct.AccountNo = item.FirstOrDefault().AccountNo;
-                acct.TransactionType = item.FirstOrDefault().payable.TransactionType;
+                acct.PartnerName = partner?.ShortName;
+                acct.AccountNo = partner?.AccountNo;
+                acct.TransactionType = item.FirstOrDefault().TransactionType;
                 acct.VoucherDate = item.Key.VoucherDate;
                 acct.InvoiceNo = item.Key.InvoiceNo;
-                acct.InvoiceDate = !string.IsNullOrEmpty(item.Key.InvoiceNo) ? item.FirstOrDefault().payable.InvoiceDate : null;
-                acct.BillingNo = item.FirstOrDefault().payable.BillingNo;
-                acct.Currency = item.FirstOrDefault().payable.Currency;
-                acct.PaymentTerm = item.FirstOrDefault().payable.PaymentTerm;
-                acct.PaymentDueDate = item.FirstOrDefault().payable.PaymentDueDate;
-                var paymentAmount = GetAmountWithCurrency(string.Empty, item.Select(z => z.payable).AsQueryable());
+                acct.InvoiceDate = !string.IsNullOrEmpty(item.Key.InvoiceNo) ? item.FirstOrDefault().InvoiceDate : null;
+                acct.BillingNo = item.FirstOrDefault().BillingNo;
+                acct.Currency = item.FirstOrDefault().Currency;
+                acct.PaymentTerm = item.FirstOrDefault().PaymentTerm;
+                acct.PaymentDueDate = item.FirstOrDefault().PaymentDueDate;
+                var paymentAmount = GetAmountWithCurrency(string.Empty, item.Select(z => z).AsQueryable());
                 acct.TotalAmount = paymentAmount[0];
                 acct.PaymentAmount = paymentAmount[1];
                 acct.RemainAmount = paymentAmount[2];
-                var paymentAmountVnd = GetAmountWithCurrency(AccountingConstants.CURRENCY_LOCAL, item.Select(z => z.payable).AsQueryable());
+                var paymentAmountVnd = GetAmountWithCurrency(AccountingConstants.CURRENCY_LOCAL, item.Select(z => z).AsQueryable());
                 acct.TotalAmountVnd = paymentAmountVnd[0];
                 acct.PaymentAmountVnd = paymentAmountVnd[1];
                 acct.RemainAmountVnd = paymentAmountVnd[2];
-                acct.NotShowDetail = item.FirstOrDefault().payable.InRangeType == "OutRange";
+                acct.NotShowDetail = item.FirstOrDefault().InRangeType == "OutRange";
                 acctPayables.Add(acct);
             }
             return acctPayables.AsQueryable();
@@ -357,7 +360,7 @@ namespace eFMS.API.Accounting.DL.Services
             //}
             if (criteria.TransactionType != null && criteria.TransactionType.Count > 0)
             {
-                query = query.And(x => criteria.TransactionType.Any(z => z.Contains(x.TransactionType)));
+                query = query.And(x => criteria.TransactionType.Any(z => z.ToLower().Contains(x.TransactionType.ToLower())));
             }
             // Lấy các dòng có refno
             {
@@ -367,7 +370,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         private IQueryable<AcctPayablePaymentDetailModel> GetDataAcctPayable(AccountPayableCriteria criteria)
-        {
+       {
             IQueryable<AcctPayablePaymentDetailModel> results = null;
 
             var payableData = DataContext.Get(QueryPayable(criteria));
@@ -427,7 +430,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
-                results = dataGrp.Select(dt => new AcctPayablePaymentDetailModel
+                results = dataGrp.Where(dt => dt.x.RefId != null).Select(dt => new AcctPayablePaymentDetailModel
                 {
                     RefId = dt.x.RefId.ToString(),
                     VoucherNo = dt.x.VoucherNo,
@@ -466,42 +469,42 @@ namespace eFMS.API.Accounting.DL.Services
                 });
 
                 // Lấy AP chưa trả hết trước khoảng thời gian đã chọn và payment không nằm trong khoảng thời gian
-                var apUnpaidNotInRangeDates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && (x.payment == null || (DateTime.Parse(criteria.FromPaymentDate).Date > x.payment.PaymentDate.Value.Date && x.payment.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))).Select(x => new { x, InRangeType = "OutRange" }).Select(dt => new AcctPayablePaymentDetailModel
+                var apUnpaidNotInRangeDates = data.Where(x => x.RefId != null && (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && (x.payment == null || (DateTime.Parse(criteria.FromPaymentDate).Date > x.payment.PaymentDate.Value.Date && x.payment.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))).Select(dt => new AcctPayablePaymentDetailModel
                 {
-                    RefId = dt.x.RefId.ToString(),
-                    VoucherNo = dt.x.VoucherNo,
-                    ReferenceNo = dt.x.ReferenceNo,
-                    VoucherDate = dt.x.VoucherDate,
-                    PaymentDueDate = dt.x.PaymentDueDate,
-                    PartnerId = dt.x.PartnerId,
-                    TransactionType = dt.x.TransactionType,
-                    InvoiceNo = dt.x.InvoiceNo,
-                    InvoiceDate = dt.x.InvoiceDate,
-                    BillingNo = dt.x.BillingNo,
-                    Currency = dt.x.Currency,
-                    TotalAmount = dt.x.TotalAmount,
-                    TotalAmountVnd = dt.x.TotalAmountVnd,
-                    PaidAmountOrg = dt.x.PaidAmountOrg,
-                    PaidAmountVnd = dt.x.PaidAmountVnd,
-                    PaymentTerm = dt.x.PaymentTerm,
-                    OrgRemainAmount = dt.x.RemainAmount,
-                    RemainAmountVnd = dt.x.RemainAmountVnd,
-                    Status = dt.x.payment == null ? AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART,
-                    Description = dt.x.Description,
+                    RefId = dt.RefId.ToString(),
+                    VoucherNo = dt.VoucherNo,
+                    ReferenceNo = dt.ReferenceNo,
+                    VoucherDate = dt.VoucherDate,
+                    PaymentDueDate = dt.PaymentDueDate,
+                    PartnerId = dt.PartnerId,
+                    TransactionType = dt.TransactionType,
+                    InvoiceNo = dt.InvoiceNo,
+                    InvoiceDate = dt.InvoiceDate,
+                    BillingNo = dt.BillingNo,
+                    Currency = dt.Currency,
+                    TotalAmount = dt.TotalAmount,
+                    TotalAmountVnd = dt.TotalAmountVnd,
+                    PaidAmountOrg = dt.PaidAmountOrg,
+                    PaidAmountVnd = dt.PaidAmountVnd,
+                    PaymentTerm = dt.PaymentTerm,
+                    OrgRemainAmount = dt.RemainAmount,
+                    RemainAmountVnd = dt.RemainAmountVnd,
+                    Status = dt.payment == null ? AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART,
+                    Description = dt.Description,
 
-                    PaymentNo = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentNo,
-                    PaymentType = dt.x.payment == null ? string.Empty : dt.x.payment.PaymentType,
-                    PaymentDate = dt.x.payment == null ? null : dt.x.payment.PaymentDate,
-                    PaymentAmount = dt.x.payment == null ? null : dt.x.payment.PaymentAmount,
-                    PaymentAmountVnd = dt.x.payment == null ? null : dt.x.payment.PaymentAmountVnd,
-                    PaymentRemainAmount = dt.x.payment == null ? null : dt.x.payment.RemainAmount,
-                    PaymentRemainAmountVnd = dt.x.payment == null ? null : dt.x.payment.RemainAmountVnd,
-                    StatusPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Status,
-                    PaymentDatetimeCreated = dt.x.payment == null ? null : dt.x.payment.DatetimeCreated,
-                    CurrencyPayment = dt.x.payment == null ? string.Empty : dt.x.payment.Currency,
-                    PaymentAcctId = dt.x.payment == null ? string.Empty : dt.x.payment.AcctId,
+                    PaymentNo = dt.payment == null ? string.Empty : dt.payment.PaymentNo,
+                    PaymentType = dt.payment == null ? string.Empty : dt.payment.PaymentType,
+                    PaymentDate = dt.payment == null ? null : dt.payment.PaymentDate,
+                    PaymentAmount = dt.payment == null ? null : dt.payment.PaymentAmount,
+                    PaymentAmountVnd = dt.payment == null ? null : dt.payment.PaymentAmountVnd,
+                    PaymentRemainAmount = dt.payment == null ? null : dt.payment.RemainAmount,
+                    PaymentRemainAmountVnd = dt.payment == null ? null : dt.payment.RemainAmountVnd,
+                    StatusPayment = dt.payment == null ? string.Empty : dt.payment.Status,
+                    PaymentDatetimeCreated = dt.payment == null ? null : dt.payment.DatetimeCreated,
+                    CurrencyPayment = dt.payment == null ? string.Empty : dt.payment.Currency,
+                    PaymentAcctId = dt.payment == null ? string.Empty : dt.payment.AcctId,
 
-                    InRangeType = dt.InRangeType
+                    InRangeType = "OutRange"
                 });
                 if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
                 {
@@ -511,7 +514,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (results.Count() > 0)
                     {
-                        results = results.Union(apUnpaidNotInRangeDates);
+                        results = results.Union(apUnpaidNotInRangeDates.ToList());
                     }
                     else
                     {
@@ -529,10 +532,10 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria)
         {
-            var data = GetDataAcctPayable(criteria);
+            var data = GetDataAcctPayable(criteria).ToList();
             var grpData = data.OrderBy(x => x.VoucherDate).GroupBy(x => new { x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType }).Select(x => new { x.Key, x });
             var result = new List<AcctPayablePaymentExport>();
-            var partnerIds = data.Select(x => x.PartnerId).ToList();
+            var partnerIds = data.Select(x => x.PartnerId);
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
             foreach (var item in grpData)
             {
@@ -607,10 +610,10 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria)
         {
-            var data = GetDataAcctPayable(criteria);
+            var data = GetDataAcctPayable(criteria).ToList();
             var grpData = data.OrderBy(x => x.VoucherDate).GroupBy(payable => new { payable.PartnerId }).Select(payable => new { payable.Key, payable });
             var result = new List<AccountingTemplateExport>();
-            var partnerIds = grpData.Select(x => x.Key.PartnerId).ToList();
+            var partnerIds = grpData.Select(x => x.Key.PartnerId);
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
             var office = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
