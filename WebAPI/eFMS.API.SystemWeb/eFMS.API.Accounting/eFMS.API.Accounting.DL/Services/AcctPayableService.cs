@@ -635,31 +635,38 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.InvoiceDate = payableItm.FirstOrDefault().InvoiceDate;
                     detail.DocNo = payableItm.Key.BillingNo;
                     detail.AccountNo = partner?.AccountNo;
+                    detail.Currency = payableItm.FirstOrDefault().Currency;
+                    detail.TransactionType = payableItm.Key.TransactionType;
                     detail.Description = payableItm.FirstOrDefault().Description;
                     detail.PaymentTerm = payableItm.FirstOrDefault().PaymentTerm;
                     detail.PaymentDueDate = payableItm.FirstOrDefault().PaymentDueDate;
                     detail.BeginAmount = payableItm.FirstOrDefault().InRangeType == "InRange" ? 0 : (payableItm.FirstOrDefault().TotalAmount ?? 0); // Hiện số dư đầu kì cho transaction ngoài kì
                     detail.BeginAmountVND = payableItm.FirstOrDefault().InRangeType == "InRange" ? 0 : (payableItm.FirstOrDefault().TotalAmountVnd ?? 0); // Hiện số dư đầu kì cho transaction ngoài kì
-                    detail.OrgCreditAmount = detail.OrgAdvAmount = detail.OrgCreditAmountVND = detail.OrgAdvAmountVND = 0;
+                    detail.OrgAmountTang = payableItm.FirstOrDefault().InRangeType != "InRange" ? 0 : (payableItm.FirstOrDefault().TotalAmount ?? 0); // Hiện số dư đầu kì cho transaction ngoài kì
+                    detail.OrgAmountTangVND = payableItm.FirstOrDefault().InRangeType != "InRange" ? 0 : (payableItm.FirstOrDefault().TotalAmountVnd ?? 0); // Hiện số dư đầu kì cho transaction ngoài kì
+                    detail.OrgAmountGiam = detail.OrgAmountGiamVND = 0;
+
                     if (payableItm.Key.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE)
                     {
-                        if (payableItm.FirstOrDefault().InRangeType == "InRange")
+                        var paymentGrp = payableItm.GroupBy(x => new { x.PaymentAcctId, x.PaymentDate, x.PaymentType }).Select(x => new { pm = x.Select(z => new { z.PaymentAmount, z.PaymentAmountVnd, z.PaymentRemainAmount, z.PaymentRemainAmountVnd }) });
+                        if (paymentGrp.Count() > 0)
                         {
-                            var paymentGrp = payableItm.GroupBy(x => new { x.PaymentAcctId, x.PaymentDate, x.PaymentType }).Select(x => new { pm = x.Select(z => new { z.PaymentAmount, z.PaymentAmountVnd, z.PaymentRemainAmount, z.PaymentRemainAmountVnd }) });
-                            if (paymentGrp.Count() > 0)
-                            {
-                                detail.OrgCreditAmount = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmount ?? 0));
-                                detail.OrgCreditAmountVND = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmountVnd ?? 0));
-                            }
+                            detail.OrgAmountGiam = paymentGrp.Sum(x => x.pm.FirstOrDefault().PaymentAmount ?? 0);
+                            detail.OrgAmountGiamVND = paymentGrp.Sum(x => x.pm.FirstOrDefault().PaymentAmountVnd ?? 0);
                         }
+
                     }
                     else
                     {
+                        detail.BeginAmount *= (-1);
+                        detail.BeginAmountVND *= (-1);
+                        detail.OrgAmountTang *= (-1);
+                        detail.OrgAmountTangVND *= (-1);
                         var paymentGrp = payableItm.Where(x => x.PaymentType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).GroupBy(x => new { x.PaymentAcctId, x.PaymentDate, x.PaymentType }).Select(x => new { pm = x.Select(z => new { z.PaymentAmount, z.PaymentAmountVnd, z.PaymentRemainAmount, z.PaymentRemainAmountVnd }) });
                         if (paymentGrp.Count() > 0)
                         {
-                            detail.OrgAdvAmount = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmount ?? 0));
-                            detail.OrgAdvAmountVND = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmountVnd ?? 0));
+                            detail.OrgAmountGiam = paymentGrp.Sum(x => x.pm.FirstOrDefault().PaymentAmount ?? 0) * (-1);
+                            detail.OrgAmountGiamVND = paymentGrp.Sum(x => x.pm.FirstOrDefault().PaymentAmountVnd ?? 0) * (-1);
                         }
                     }
                     result.Add(detail);

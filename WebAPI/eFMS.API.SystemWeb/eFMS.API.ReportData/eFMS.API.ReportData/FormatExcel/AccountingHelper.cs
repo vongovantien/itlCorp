@@ -6107,32 +6107,33 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.DeleteRow(9, 2);
                 }
 
-                decimal _sumBeginAmount = 0, _sumCreditAmount = 0, _sumAdvAmount = 0m, _sumRemainAmount = 0m;
-                decimal _sumBeginAmountVnd = 0, _sumCreditAmountVnd = 0, _sumAdvAmountVnd = 0m, _sumRemainAmountVnd = 0m;
+                decimal _sumBeginAmount = 0, _sumAmountTang = 0, _sumAmountGiam = 0m, _sumRemainAmount = 0m;
+                decimal _sumBeginAmountVnd = 0, _sumAmountTangVnd = 0, _sumAmountGiamVnd = 0m, _sumRemainAmountVnd = 0m;
                 var grpPbParnert = acctPayables.GroupBy(x => new { x.PartnerId, x.PartnerName });
                 foreach(var item in grpPbParnert)
                 {
                     listKeyData = new Dictionary<string, object>();
                     excel.SetGroupsTable();
                     listKeyData.Add("PartnerNameGrp", item.Key.PartnerName);
+                    var advValue = item.FirstOrDefault().TransactionType == "ADV" ? -1 : 1;
                     var _beginAmount = item.Sum(x => x.BeginAmount ?? 0);
-                    var _creditAmount = item.Sum(x => x.OrgCreditAmount ?? 0);
-                    var _advAmount = item.Sum(x => (x.OrgAdvAmount ?? 0));
-                    var _remainAmount = (_beginAmount + _creditAmount - _advAmount);
+                    var _tangAmount = item.Sum(x => x.OrgAmountTang ?? 0);
+                    var _giamAmount = item.Sum(x => (x.OrgAmountGiam ?? 0));
+                    var _remainAmount = (_beginAmount + _tangAmount - _giamAmount);
                     // Total
                     _sumBeginAmount += _beginAmount;
-                    _sumCreditAmount += _creditAmount;
-                    _sumAdvAmount += (item.Sum(x => (x.OrgAdvAmount ?? 0) * (-1)));
+                    _sumAmountTang += _tangAmount;
+                    _sumAmountGiam += (item.Sum(x => (x.OrgAmountGiam ?? 0) * (-1)));
                     _sumRemainAmount += _remainAmount;
 
                     var _beginAmountVND = item.Sum(x => x.BeginAmountVND ?? 0);
-                    var _creditAmountVND = item.Sum(x => x.OrgCreditAmountVND ?? 0);
-                    var _advAmountVND = item.Sum(x => x.OrgAdvAmountVND ?? 0);
-                    var _remainAmountVND = (_beginAmountVND + _creditAmountVND - _advAmountVND);
+                    var _tangAmountVND = item.Sum(x => x.OrgAmountTangVND ?? 0);
+                    var _giamAmountVND = item.Sum(x => x.OrgAmountGiamVND ?? 0);
+                    var _remainAmountVND = (_beginAmountVND + _tangAmountVND - _giamAmountVND);
                     // Total VND
                     _sumBeginAmountVnd += _beginAmountVND;
-                    _sumCreditAmountVnd += _creditAmountVND;
-                    _sumAdvAmountVnd += (item.Sum(x => (x.OrgAdvAmountVND ?? 0) * (-1)));
+                    _sumAmountTangVnd += _tangAmountVND;
+                    _sumAmountGiamVnd += (item.Sum(x => (x.OrgAmountGiamVND ?? 0) * (-1)));
                     _sumRemainAmountVnd += _remainAmountVND;
 
                     listKeyData.Add("BeginAmountGrp", _beginAmount);
@@ -6157,14 +6158,14 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("PmTermDt", trans.PaymentTerm);
                         listKeyData.Add("PmDueDateDt", trans.PaymentDueDate?.ToString("dd/MM/yyyy"));
                         listKeyData.Add("BeginAmountDt", trans.BeginAmount);
-                        listKeyData.Add("TangDt", trans.OrgCreditAmount);
-                        listKeyData.Add("GiamDt", trans.OrgAdvAmount * (-1));
-                        var remainAmount = trans.BeginAmount + trans.OrgCreditAmount - trans.OrgAdvAmount;
+                        listKeyData.Add("TangDt", trans.OrgAmountTang);
+                        listKeyData.Add("GiamDt", trans.OrgAmountGiam);
+                        var remainAmount = trans.BeginAmount + trans.OrgAmountTang - trans.OrgAmountGiam;
                         listKeyData.Add("RemainDt", remainAmount);
                         listKeyData.Add("BeginAmountVndDt", trans.BeginAmountVND);
-                        listKeyData.Add("TangVndDt", trans.OrgCreditAmountVND);
-                        listKeyData.Add("GiamVndDt", trans.OrgAdvAmountVND * (-1));
-                        var remainAmountVnd = trans.BeginAmountVND + trans.OrgCreditAmountVND - trans.OrgAdvAmountVND;
+                        listKeyData.Add("TangVndDt", trans.OrgAmountTangVND);
+                        listKeyData.Add("GiamVndDt", trans.OrgAmountGiamVND);
+                        var remainAmountVnd = trans.BeginAmountVND + trans.OrgAmountTangVND - trans.OrgAmountGiamVND;
                         listKeyData.Add("RemainVndDt", remainAmountVnd);
                         excel.SetData(listKeyData);
                         excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
@@ -6174,12 +6175,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 listKeyData = new Dictionary<string, object>();
                 listKeyData.Add("BeginAmountTotal", _sumBeginAmount);
-                listKeyData.Add("TangTotal", _sumCreditAmount);
-                listKeyData.Add("GiamTotal", _sumAdvAmount);
+                listKeyData.Add("TangTotal", _sumAmountTang);
+                listKeyData.Add("GiamTotal", _sumAmountGiam);
                 listKeyData.Add("RemainTotal", _sumRemainAmount);
                 listKeyData.Add("BeginAmountVndTotal", _sumBeginAmountVnd);
-                listKeyData.Add("TangVndTotal", _sumCreditAmountVnd);
-                listKeyData.Add("GiamVndTotal", _sumAdvAmountVnd);
+                listKeyData.Add("TangVndTotal", _sumAmountTangVnd);
+                listKeyData.Add("GiamVndTotal", _sumAmountGiamVnd);
                 listKeyData.Add("RemainVndTotal", _sumRemainAmountVnd);
                 excel.SetData(listKeyData);
                 return excel.ExcelStream();
