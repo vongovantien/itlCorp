@@ -2280,6 +2280,12 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.IsFromShipment = true;
                                     surcharge.SyncedFrom = null;
                                     surcharge.PaySyncedFrom = null;
+                                    surcharge.AdvanceNo = null;
+                                    surcharge.CombineBillingNo = null;
+                                    surcharge.AdvanceNoFor = null;
+                                    surcharge.ObhcombineBillingNo = null;
+                                    surcharge.TypeOfFee = null;
+                                    surcharge.ReferenceNo = null;
 
                                     surcharge.UserCreated = currentUser.UserID;
                                     surcharge.DatetimeCreated = DateTime.Now;
