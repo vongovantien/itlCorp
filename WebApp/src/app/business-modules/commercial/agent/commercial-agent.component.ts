@@ -12,9 +12,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchList } from './store';
+import { IAgentState, getAgentSearchParamsState, SearchList, getAgentDataListState, LoadListAgent } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
@@ -77,6 +77,21 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                     }
 
                 }
+            );
+        this._store.select(getAgentDataListState)
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.agents = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
             );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
@@ -190,6 +205,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
         this.requestList();
+        this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: this.dataSearch}));
     }
 
     getPartners() {

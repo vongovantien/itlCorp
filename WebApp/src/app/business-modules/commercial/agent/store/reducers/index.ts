@@ -1,15 +1,17 @@
 import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
-import { IAgentSearchParamsState, reducer } from "./agent.reducer";
+import { AgentListState, reducer } from "./agent.reducer";
 
 export * from './agent.reducer';
 export interface IAgentState {
-    com: IAgentSearchParamsState;
+    com: AgentListState;
 }
 
 
 // * SELECTOR
 export const commercialState = createFeatureSelector<IAgentState>('agent');
-export const getAgentSearchParamsState = createSelector(commercialState, (state: IAgentState) => state && state.com && state.com.searchParams);
+export const getAgentSearchParamsState = createSelector(commercialState, (state: IAgentState) => state && state.com && state.com.dataSearch);
+export const getAgentDataListState = createSelector(commercialState, (state: IAgentState) => state.com?.agents);
+
 
 export const reducers: ActionReducerMap<IAgentState> = {
     com: reducer
