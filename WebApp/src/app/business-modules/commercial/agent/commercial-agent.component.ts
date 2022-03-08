@@ -80,7 +80,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             );
         this._store.select(getAgentDataListState)
             .pipe(
-                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
                 map((data: any) => {
                     return {
                         data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],

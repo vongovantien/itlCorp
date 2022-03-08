@@ -13,10 +13,10 @@ import { CommonEnum } from '@enums';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsComponent } from '@common';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { SearchList } from './store/actions/customer.action';
-import { ICustomerState, getCustomerSearchParamsState } from './store';
+import { LoadListCustomer, SearchList } from './store/actions/customer.action';
+import { ICustomerState, getCustomerSearchParamsState, getCustomerListState } from './store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
@@ -80,6 +80,21 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
                 }
             );
+        this._store.select(getCustomerListState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Customer(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.customers = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Salesman', field: 'username', sortable: true },
@@ -136,11 +151,12 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         };
         this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
+
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
-
+        this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.requestList();
     }
 
