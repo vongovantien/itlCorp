@@ -738,7 +738,7 @@
             <param name="nameList"></param>
             <param name="numberFormat"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String},System.Nullable{System.Int32})">
             <summary>
             Set formula for one cell
             </summary>

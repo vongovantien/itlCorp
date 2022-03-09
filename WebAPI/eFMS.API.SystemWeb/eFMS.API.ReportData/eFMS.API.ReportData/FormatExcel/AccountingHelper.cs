@@ -6107,41 +6107,50 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.DeleteRow(9, 2);
                 }
 
-                decimal _sumBeginAmount = 0, _sumAmountTang = 0, _sumAmountGiam = 0m, _sumRemainAmount = 0m;
-                decimal _sumBeginAmountVnd = 0, _sumAmountTangVnd = 0, _sumAmountGiamVnd = 0m, _sumRemainAmountVnd = 0m;
                 var grpPbParnert = acctPayables.GroupBy(x => new { x.PartnerId, x.PartnerName });
-                foreach(var item in grpPbParnert)
+                foreach (var item in grpPbParnert)
                 {
                     listKeyData = new Dictionary<string, object>();
                     excel.SetGroupsTable();
+                    listKeyData.Add("AccountGrp", item.FirstOrDefault().AccountNo);
                     listKeyData.Add("PartnerNameGrp", item.Key.PartnerName);
-                    var advValue = item.FirstOrDefault().TransactionType == "ADV" ? -1 : 1;
-                    var _beginAmount = item.Sum(x => x.BeginAmount ?? 0);
-                    var _tangAmount = item.Sum(x => x.OrgAmountTang ?? 0);
-                    var _giamAmount = item.Sum(x => (x.OrgAmountGiam ?? 0));
-                    var _remainAmount = (_beginAmount + _tangAmount - _giamAmount);
-                    // Total
-                    _sumBeginAmount += _beginAmount;
-                    _sumAmountTang += _tangAmount;
-                    _sumAmountGiam += (item.Sum(x => (x.OrgAmountGiam ?? 0) * (-1)));
-                    _sumRemainAmount += _remainAmount;
 
-                    var _beginAmountVND = item.Sum(x => x.BeginAmountVND ?? 0);
-                    var _tangAmountVND = item.Sum(x => x.OrgAmountTangVND ?? 0);
-                    var _giamAmountVND = item.Sum(x => x.OrgAmountGiamVND ?? 0);
-                    var _remainAmountVND = (_beginAmountVND + _tangAmountVND - _giamAmountVND);
-                    // Total VND
-                    _sumBeginAmountVnd += _beginAmountVND;
-                    _sumAmountTangVnd += _tangAmountVND;
-                    _sumAmountGiamVnd += (item.Sum(x => (x.OrgAmountGiamVND ?? 0) * (-1)));
-                    _sumRemainAmountVnd += _remainAmountVND;
+                    var listKeyFormula = new Dictionary<string, string>();
+                    var startGroup = startRow;
+                    int columnNum = startRow + item.Count();
+                    var _address = excel.AddressOfKey("BeginAmountGrp");
+                    var _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("BeginAmountGrp", _statement);
 
-                    listKeyData.Add("BeginAmountGrp", _beginAmount);
-                    listKeyData.Add("RemainGrp", _remainAmount);
-                    listKeyData.Add("BeginAmountVndGrp", _beginAmountVND);
-                    listKeyData.Add("RemainVndGrp", _remainAmountVND);
+                    _address = excel.AddressOfKey("TangGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("TangGrp", _statement);
+
+                    _address = excel.AddressOfKey("GiamGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("GiamGrp", _statement);
+
+                    _address = excel.AddressOfKey("RemainGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("RemainGrp", _statement);
+
+                    _address = excel.AddressOfKey("BeginAmountVndGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("BeginAmountVndGrp", _statement);
+
+                    _address = excel.AddressOfKey("TangVndGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("TangVndGrp", _statement);
+
+                    _address = excel.AddressOfKey("GiamVndGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("GiamVndGrp", _statement);
+
+                    _address = excel.AddressOfKey("RemainVndGrp");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("RemainVndGrp", _statement);
                     excel.SetData(listKeyData);
-                    excel.Worksheet.Cells[startRow, 11, startRow, 18].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
+                    excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
                     startRow++;
                     foreach (var trans in item)
                     {
@@ -6171,18 +6180,43 @@ namespace eFMS.API.ReportData.FormatExcel
                         excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
                         startRow++;
                     }
+                    excel.SetFormula(listKeyFormula, startGroup);
                 }
 
-                listKeyData = new Dictionary<string, object>();
-                listKeyData.Add("BeginAmountTotal", _sumBeginAmount);
-                listKeyData.Add("TangTotal", _sumAmountTang);
-                listKeyData.Add("GiamTotal", _sumAmountGiam);
-                listKeyData.Add("RemainTotal", _sumRemainAmount);
-                listKeyData.Add("BeginAmountVndTotal", _sumBeginAmountVnd);
-                listKeyData.Add("TangVndTotal", _sumAmountTangVnd);
-                listKeyData.Add("GiamVndTotal", _sumAmountGiamVnd);
-                listKeyData.Add("RemainVndTotal", _sumRemainAmountVnd);
-                excel.SetData(listKeyData);
+                var listKeyFormulaTotal = new Dictionary<string, string>();
+                var _addressTotal = excel.AddressOfKey("BeginAmountTotal");
+                var _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("BeginAmountTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TangTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("TangTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("GiamTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("GiamTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("RemainTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("RemainTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("BeginAmountVndTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("BeginAmountVndTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TangVndTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("TangVndTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("GiamVndTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("GiamVndTotal", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("RemainVndTotal");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 9, startRow - 1);
+                listKeyFormulaTotal.Add("RemainVndTotal", _statementTotal);
+                excel.SetFormula(listKeyFormulaTotal);
+
                 return excel.ExcelStream();
 
             }

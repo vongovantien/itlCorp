@@ -576,16 +576,17 @@ namespace eFMS.API.Accounting.DL.Services
                 payable.OriginCurrency = item.x.FirstOrDefault()?.Currency;
 
                 payable.PaymentDetails = new List<AcctPayablePaymentDetail>();
+                var advValue = item.Key.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? (-1) : 1; // dòng adv hiện giá trị âm
                 if (item.x.Any(z => !string.IsNullOrEmpty(z.PaymentNo)))
                 {
                     var paymentGrp = item.x.Where(x => x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE || (x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE && x.PaymentType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE)).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.PaymentAcctId, x.PaymentDate, x.PaymentType }).Select(x => new AcctPayablePaymentDetail
                     {
                         PaymentRefNo = x.FirstOrDefault().PaymentNo,
                         PaymentDate = x.Key.PaymentDate,
-                        OrgPaidAmount = x.FirstOrDefault().PaidAmountOrg ?? 0,
-                        PaidAmountVND = x.FirstOrDefault().PaymentAmountVnd ?? 0,
-                        OriginRemainAmount = payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0,
-                        RemainAmountVND = payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0,
+                        OrgPaidAmount = (x.FirstOrDefault().PaidAmountOrg ?? 0) * advValue,
+                        PaidAmountVND = (x.FirstOrDefault().PaymentAmountVnd ?? 0) * advValue,
+                        OriginRemainAmount = (payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
+                        RemainAmountVND = (payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
                         OriginCurrency = x.FirstOrDefault().CurrencyPayment
                     });
                     if (payableType == "OutRange")
@@ -598,9 +599,11 @@ namespace eFMS.API.Accounting.DL.Services
                         payable.PaymentDetails.AddRange(paymentGrp);
                     }
                 }
+                payable.BeginAmount *= advValue;
+                payable.BeginAmountVND *= advValue;
                 result.Add(payable);
             }
-            return result.OrderBy(x => x.AcctDate).ThenBy(x => x.AcctRefNo).ThenBy(x=>x.BillingNo).ToList();
+            return result.OrderBy(x => x.PartnerName).ThenBy(x => x.AcctDate).ThenBy(x => x.AcctRefNo).ThenBy(x => x.BillingNo).ToList();
         }
 
         /// <summary>

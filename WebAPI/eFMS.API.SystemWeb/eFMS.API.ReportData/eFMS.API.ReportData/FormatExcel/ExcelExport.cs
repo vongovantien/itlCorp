@@ -154,12 +154,12 @@ namespace eFMS.API.ReportData.FormatExcel
         /// Set formula for one cell
         /// </summary>
         /// <param name="nameList">Licst name of cell to set value</param>
-        public void SetFormula(Dictionary<string, string> nameList)
+        public void SetFormula(Dictionary<string, string> nameList, int? _startRow = null)
         {
             foreach (var _name in nameList)
             {
                 var name = string.Format("{{{0}}}", _name.Key);
-                var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                var result = from cell in Worksheet.Cells[_startRow ?? StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
                              where cell.Value != null && cell.Value?.ToString().Contains(name) == true
                              select cell;
                 if (result.Count() > 0)

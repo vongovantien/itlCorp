@@ -4,7 +4,7 @@ export class AccountingPayableModel {
     voucherDate: Date = null;
     transactionType: string = null;
     invoiceNo: string = null;
-    invoicedate: Date = null;
+    invoiceDate: Date = null;
     partnerId: string = null;
     partnerName: string = null;
     accountNo: string = null;
