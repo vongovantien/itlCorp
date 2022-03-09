@@ -213,7 +213,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.DepartmentId == criteria.DepartmentId);
             }
-            return query;
+            return query.And(x => x.OfficeId == currentUser.OfficeID);
         }
 
         private IQueryable<AcctSettlementPayment> GetSettlementByPermission(AcctSettlementPaymentCriteria criteria)

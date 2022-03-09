@@ -202,7 +202,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.AdvanceCurrency == criteria.CurrencyID);
             }
-            return query;
+            return query.And(x=>x.OfficeId == currentUser.OfficeID);
         }
 
         private IQueryable<AcctAdvancePayment> GetAdvancesByPermission(AcctAdvancePaymentCriteria criteria)
