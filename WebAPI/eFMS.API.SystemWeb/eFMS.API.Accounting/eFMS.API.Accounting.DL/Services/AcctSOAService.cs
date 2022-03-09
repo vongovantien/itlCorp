@@ -1852,7 +1852,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soas = DataContext.Get();
                     break;
                 case PermissionRange.Owner:
-                    soas = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    soas = DataContext.Get(x => x.UserCreated == _user.UserID && x.OfficeId == _user.OfficeID);
                     break;
                 case PermissionRange.Group:
                     soas = DataContext.Get(x => x.GroupId == _user.GroupId
@@ -1947,7 +1947,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
-            return query.And(x => x.OfficeId == currentUser.OfficeID);
+            return query;
         }
 
         public IQueryable<AcctSoa> QueryDataPermission(AcctSOACriteria criteria)

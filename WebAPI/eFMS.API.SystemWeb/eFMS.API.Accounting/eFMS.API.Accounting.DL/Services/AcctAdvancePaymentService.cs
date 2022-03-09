@@ -202,7 +202,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.AdvanceCurrency == criteria.CurrencyID);
             }
-            return query.And(x=>x.OfficeId == currentUser.OfficeID);
+            return query;
         }
 
         private IQueryable<AcctAdvancePayment> GetAdvancesByPermission(AcctAdvancePaymentCriteria criteria)
@@ -230,7 +230,7 @@ namespace eFMS.API.Accounting.DL.Services
                     &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == criteria.Requester : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == criteria.Requester && x.advancePayment.OfficeId == currentUser.OfficeID : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.advancePayment.GroupId == currentUser.GroupId
                                                                         && x.advancePayment.DepartmentId == currentUser.DepartmentId
