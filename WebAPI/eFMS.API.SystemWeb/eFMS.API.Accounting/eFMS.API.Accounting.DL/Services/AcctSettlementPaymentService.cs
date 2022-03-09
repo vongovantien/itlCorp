@@ -2332,7 +2332,10 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in chargeSceneRemove)
                             {
-                                csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                                if(string.IsNullOrEmpty(item.LinkChargeId))
+                                {
+                                    csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                                }
                             }
                         }
                         //End --Phí hiện trường (IsFromShipment = false)--
