@@ -45,6 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
+        private readonly IContextBase<CatCurrency> currencyRepository;
+
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -65,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo
+            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            IContextBase<CatCurrency> currencyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -88,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             catChargeGroupRepository = catChargeGroupRepo;
+            currencyRepository = currencyRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -1468,6 +1472,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
+                } else
+                {
+                    if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_NOT_EXIST], item.CurrencyId);
+                        item.IsValid = false;
+                    }
                 }
                 if (!item.Vatrate.HasValue)
                 {

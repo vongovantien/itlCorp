@@ -79,6 +79,7 @@
   "MSG_UNIT_EMPTY": "Unit not allow emtpy!",
   "MSG_UNIT_PRICE_EMPTY": "Unit Price not allow empty",
   "MSG_CURRENCY_EMPTY": "Currency not allow empty",
+  "MSG_CURRENCY_NOT_EXIST": "Currency {0} not exist!",
   "MSG_VAT_EMPTY": "Vat not allow emtpy!",
   "MSG_TOTAL_AMOUNT_EMPTY": "Total amount not allow empty!",
   "MSG_EXCHANGE_DATE_EMPTY": "Exchange Date not allow empty!",

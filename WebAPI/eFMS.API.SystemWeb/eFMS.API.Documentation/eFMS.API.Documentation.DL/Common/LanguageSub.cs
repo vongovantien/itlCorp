@@ -84,6 +84,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_UNIT_EMPTY = "MSG_UNIT_EMPTY";
         public static readonly string MSG_UNIT_PRICE_EMPTY = "MSG_UNIT_PRICE_EMPTY";
         public static readonly string MSG_CURRENCY_EMPTY = "MSG_CURRENCY_EMPTY";
+        public static readonly string MSG_CURRENCY_NOT_EXIST = "MSG_CURRENCY_NOT_EXIST";
         public static readonly string MSG_VAT_EMPTY = "MSG_VAT_EMPTY";
         public static readonly string MSG_TOTAL_AMOUNT_EMPTY = "MSG_TOTAL_AMOUNT_EMPTY";
         public static readonly string MSG_EXCHANGE_DATE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";

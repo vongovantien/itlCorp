@@ -545,7 +545,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
-        [Authorize]
+        // [Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
