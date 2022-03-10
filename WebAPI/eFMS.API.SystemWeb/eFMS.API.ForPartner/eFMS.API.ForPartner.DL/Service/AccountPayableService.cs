@@ -30,6 +30,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctSoa> acctSOARepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
+        private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
         public AccountPayableService(IContextBase<AccAccountPayable> repository,
             IContextBase<CatPartner> partnerRepo,
             ICurrentUser cUser,
@@ -40,6 +41,7 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctSoa> acctSOARepo,
             IContextBase<AcctCdnote> acctCdNoteRepo,
             IContextBase<AcctSettlementPayment> settlementPaymentRepo,
+            IContextBase<CsShipmentSurcharge> surchargeRepo,
             IMapper mapper) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -51,6 +53,7 @@ namespace eFMS.API.ForPartner.DL.Service
             acctSOARepository = acctSOARepo;
             acctCdNoteRepository = acctCdNoteRepo;
             settlementPaymentRepository = settlementPaymentRepo;
+            surchargeRepository = surchargeRepo;
         }
 
         private SysPartnerApi GetInfoPartnerByApiKey(string apiKey)
@@ -88,6 +91,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
                     // Update TransactionType without charge mode
                     model.Details.ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
+                    // Get surcharges info => comment use case hd có tiền âm
+                    //var listCharges = model.Details.Select(x => x.ChargeId).ToList();
+                    //var sucharges = surchargeRepository.Get(x => listCharges.Any(chg => chg == x.Id));
 
                     if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_BANK.ToLower()
                         || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_CASH.ToLower())
@@ -99,6 +105,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             var grpVoucherDetail = noneRefNoVoucherDetail.GroupBy(z => new { z.VoucherNo, z.VoucherDate }).Select(z => z).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
+                                //var giamValue = sucharges.Where(x => x.Id == c.FirstOrDefault().ChargeId).FirstOrDefault().UnitPrice < 0 ? (-1) : 1;
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -110,8 +117,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     RemainAmount = 0,
                                     RemainAmountVnd = 0,
                                     RemainAmountUsd = 0,
-                                    TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd),
-                                    TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd),
+                                    TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd), // * giamValue,
+                                    TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd), // * giamValue,
                                     ReferenceNo = c.FirstOrDefault().BravoRefNo,
                                     Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID,
                                     CompanyId = currentUser.CompanyID,
