@@ -156,7 +156,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
-        this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        //this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.requestList();
     }
 
@@ -223,18 +223,19 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     getPartners() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            })).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.customers = res.data || [];
-                    this.totalItems = res.totalItems;
-                }
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     })).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.customers = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     sortPartners() {

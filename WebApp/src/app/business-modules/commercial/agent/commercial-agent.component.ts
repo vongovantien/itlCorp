@@ -205,22 +205,23 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
         this.requestList();
-        this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: this.dataSearch}));
+        //this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch)}));
     }
 
     getPartners() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            })).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.agents = res.data || [];
-                    this.totalItems = res.totalItems;
-                }
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     })).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.agents = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch)}));
     }
 
     sortPartners() {
