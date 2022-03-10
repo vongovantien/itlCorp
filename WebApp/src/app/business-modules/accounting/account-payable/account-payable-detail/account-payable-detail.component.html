@@ -59,20 +59,42 @@
                                                             <td>{{ item.invoiceDate | date: 'dd/MM/yyyy' }}</td>
                                                             <td>{{ item.billingNo }} </td>
                                                             <td class='m--align-right'>
-                                                                <span>{{ item.currency === 'USD' ? (item.totalAmount | number:'1.2-2') : (item.totalAmount |
-                                                                    number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.totalAmount >= 0 ">{{ item.currency === 'USD' ? (item.totalAmount | number:'1.2-2') :
+                                                                    (item.totalAmount | number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.totalAmount < 0">
+                                                                    ({{ item.currency === 'USD' ? (item.totalAmount | abs | number:'1.2-2') :
+                                                                    (item.totalAmount | abs | number:'1.0-0')}})
+                                                                </span>
                                                             </td>
                                                             <td class='m--align-right'>
-                                                                <span>{{ item.currency === 'USD' ? (item.paymentAmount | number:'1.2-2') : (item.paymentAmount |
-                                                                    number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.paymentAmount >= 0 ">{{ item.currency === 'USD' ? (item.paymentAmount | number:'1.2-2') :
+                                                                    (item.paymentAmount | number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.paymentAmount < 0 ">
+                                                                    ({{ item.currency === 'USD' ? (item.paymentAmount | abs | number:'1.2-2') :
+                                                                    (item.paymentAmount | abs | number:'1.0-0')}})</span>
                                                             </td>
                                                             <td class='m--align-right'>
-                                                                <span>{{ item.currency === 'USD' ? (item.remainAmount | number:'1.2-2') : (item.remainAmount |
-                                                                    number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.remainAmount >= 0 ">{{ item.currency === 'USD' ? (item.remainAmount | number:'1.2-2') :
+                                                                    (item.remainAmount | number:'1.0-0')}}</span>
+                                                                <span *ngIf="item.remainAmount < 0 ">
+                                                                    ({{ item.currency === 'USD' ? (item.remainAmount | abs | number:'1.2-2') :
+                                                                    (item.remainAmount | abs | number:'1.0-0')}})</span>
                                                             </td>
-                                                            <td class="text-right">{{ item.totalAmountVnd | number: '.0-3'}}</td>
-                                                            <td class="text-right">{{ item.paymentAmountVnd | number: '.0-3'}}</td>
-                                                            <td class="text-right">{{ item.remainAmountVnd | number: '.0-3'}}</td>
+                                                            <td class="text-right">
+                                                                <span *ngIf="item.totalAmountVnd >= 0 ">{{ item.totalAmountVnd | number: '.0-3'}}</span>
+                                                                <span *ngIf="item.totalAmountVnd < 0 ">
+                                                                    ({{ item.totalAmountVnd | abs | number: '.0-3'}})</span>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span *ngIf="item.paymentAmountVnd >= 0 ">{{ item.paymentAmountVnd | number: '.0-3'}}</span>
+                                                                <span *ngIf="item.paymentAmountVnd < 0 ">
+                                                                    ({{ item.paymentAmountVnd | abs | number: '.0-3'}})</span>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span *ngIf="item.remainAmountVnd >= 0 ">{{ item.remainAmountVnd | number: '.0-3'}}</span>
+                                                                <span *ngIf="item.remainAmountVnd < 0 ">
+                                                                    ({{ item.remainAmountVnd | abs | number: '.0-3'}})</span>
+                                                            </td>
                                                             <td class="text-right">{{ item.currency}}</td>
                                                             <td class="text-right">{{ item.paymentTerm | number: '.0-0'}}</td>
                                                             <td>{{ item.paymentDueDate | date: 'dd/MM/yyyy'}}</td>
@@ -95,16 +117,29 @@
                                                                             <td>{{ payment.invoiceDate | date: 'dd/MM/yyyy'}}</td>
                                                                             <td>{{ payment.docNo }}</td>
                                                                             <td class='m--align-right'>
-                                                                                <span>{{ payment.currency === 'USD' ? (payment.paymentAmount | number:'1.2-2') : (payment.paymentAmount |
+                                                                                <span *ngIf="payment.paymentAmount >= 0">{{ payment.currency === 'USD' ? (payment.paymentAmount | number:'1.2-2') : (payment.paymentAmount |
                                                                                     number:'1.0-0')}}</span>
+                                                                                <span *ngIf="payment.paymentAmount < 0">
+                                                                                    ({{ payment.currency === 'USD' ? (payment.paymentAmount | abs | number:'1.2-2') : (payment.paymentAmount | abs | number:'1.0-0')}})</span>
                                                                             </td>
                                                                             <td class='m--align-right'>
-                                                                                <span>{{ payment.currency === 'USD' ? (payment.remainAmount | number:'1.2-2') : (payment.remainAmount |
+                                                                                <span *ngIf="payment.remainAmount >= 0">{{ payment.currency === 'USD' ? (payment.remainAmount | number:'1.2-2') : (payment.remainAmount |
                                                                                     number:'1.0-0')}}</span>
+                                                                                <span *ngIf="payment.remainAmount < 0">
+                                                                                    ({{ payment.currency === 'USD' ? (payment.remainAmount | abs | number:'1.2-2') : (payment.remainAmount | abs |
+                                                                                        number:'1.0-0')}})</span>
                                                                             </td>
 
-                                                                            <td class="text-right">{{ payment.paymentAmountVnd| number:'.0-0' }}</td>
-                                                                            <td class="text-right">{{ payment.remainAmountVnd| number:'.0-0' }}</td>
+                                                                            <td class="text-right">
+                                                                                <span *ngIf="payment.paymentAmountVnd >= 0">{{ payment.paymentAmountVnd| number:'.0-0' }}</span>
+                                                                                <span *ngIf="payment.paymentAmountVnd < 0">
+                                                                                    ({{ payment.paymentAmountVnd | abs | number:'.0-0' }})</span>
+                                                                            </td>
+                                                                            <td class="text-right">
+                                                                                <span *ngIf="payment.remainAmountVnd >= 0">{{ payment.remainAmountVnd| number:'.0-0' }}</span>
+                                                                                <span *ngIf="payment.remainAmountVnd < 0">
+                                                                                    ({{ payment.remainAmountVnd | abs | number:'.0-0' }})</span>
+                                                                            </td>
                                                                             <td class="">{{item.currency}}</td>
                                                                         </tr>
                                                                     </ng-container>

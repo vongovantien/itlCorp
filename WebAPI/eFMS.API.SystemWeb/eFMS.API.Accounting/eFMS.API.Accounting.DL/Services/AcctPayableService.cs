@@ -101,12 +101,13 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in payableGrp)
             {
                 var acct = new AccAccountPayableModel();
+                var advValue = item.Key.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? (-1) : 1; // dòng adv hiện giá trị âm
                 var partner = partnerData.Where(x => x.Id == item.Key.PartnerId).FirstOrDefault();
                 acct.RefId = item.Key.RefId?.ToString(); ;
                 acct.ReferenceNo = item.Key.VoucherNo;
                 acct.PartnerName = partner?.ShortName;
                 acct.AccountNo = partner?.AccountNo;
-                acct.TransactionType = item.FirstOrDefault().TransactionType;
+                acct.TransactionType = item.Key.TransactionType;
                 acct.VoucherDate = item.Key.VoucherDate;
                 acct.InvoiceNo = item.Key.InvoiceNo;
                 acct.InvoiceDate = !string.IsNullOrEmpty(item.Key.InvoiceNo) ? item.FirstOrDefault().InvoiceDate : null;
@@ -115,13 +116,13 @@ namespace eFMS.API.Accounting.DL.Services
                 acct.PaymentTerm = item.FirstOrDefault().PaymentTerm;
                 acct.PaymentDueDate = item.FirstOrDefault().PaymentDueDate;
                 var paymentAmount = GetAmountWithCurrency(string.Empty, item.Select(z => z).AsQueryable());
-                acct.TotalAmount = paymentAmount[0];
-                acct.PaymentAmount = paymentAmount[1];
-                acct.RemainAmount = paymentAmount[2];
+                acct.TotalAmount = paymentAmount[0] == null ? paymentAmount[0] : paymentAmount[0] * advValue;
+                acct.PaymentAmount = paymentAmount[1] == null ? paymentAmount[1] : paymentAmount[1] * advValue;
+                acct.RemainAmount = paymentAmount[2] == null ? paymentAmount[2] : paymentAmount[2] * advValue;
                 var paymentAmountVnd = GetAmountWithCurrency(AccountingConstants.CURRENCY_LOCAL, item.Select(z => z).AsQueryable());
-                acct.TotalAmountVnd = paymentAmountVnd[0];
-                acct.PaymentAmountVnd = paymentAmountVnd[1];
-                acct.RemainAmountVnd = paymentAmountVnd[2];
+                acct.TotalAmountVnd = paymentAmountVnd[0] == null ? paymentAmountVnd[0] : paymentAmountVnd[0] * advValue;
+                acct.PaymentAmountVnd = paymentAmountVnd[1] == null ? paymentAmountVnd[1] : paymentAmountVnd[1] * advValue;
+                acct.RemainAmountVnd = paymentAmountVnd[2] == null ? paymentAmountVnd[2] : paymentAmountVnd[2] * advValue;
                 acct.NotShowDetail = item.FirstOrDefault().InRangeType == "OutRange";
                 acctPayables.Add(acct);
             }
@@ -302,6 +303,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var payabledata = DataContext.Get(x => x.VoucherNo == refNo && x.TransactionType == type && (string.IsNullOrEmpty(x.InvoiceNo) || x.InvoiceNo == invoiceNo) && (string.IsNullOrEmpty(x.BillingNo) || x.BillingNo == billingNo)).FirstOrDefault();
             if (payabledata == null) return null;
+            var advValue = payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? (-1) : 1; // dòng adv hiện giá trị âm
             var paymentData = accountPayablePaymentRepository.Get(x => x.ReferenceNo == payabledata.ReferenceNo && (payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? x.PaymentType == AccountingConstants.PAYMENT_TYPE_NAME_NET_OFF : x.PaymentType == payabledata.TransactionType)).OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated)
                 .Select(x => new AccAccountPayablePaymentModel
                 {
@@ -310,10 +312,10 @@ namespace eFMS.API.Accounting.DL.Services
                     InvoiceNo = payabledata.InvoiceNo,
                     InvoiceDate = !string.IsNullOrEmpty(payabledata.InvoiceNo) ? payabledata.InvoiceDate : null,
                     DocNo = payabledata.BillingNo,
-                    PaymentAmount = x.PaymentAmount,
-                    RemainAmount = x.RemainAmount,
-                    PaymentAmountVnd = x.PaymentAmountVnd,
-                    RemainAmountVnd = x.RemainAmountVnd,
+                    PaymentAmount = x.PaymentAmount * advValue,
+                    RemainAmount = x.RemainAmount * advValue,
+                    PaymentAmountVnd = x.PaymentAmountVnd * advValue,
+                    RemainAmountVnd = x.RemainAmountVnd * advValue,
                     Currency = x.Currency
                 });
             //var data = payabledata.Join(paymentData, pm => pm.ReferenceNo, re => re.ReferenceNo, (pm, re) => new { pm.VoucherNo, pm.TransactionType, pm.InvoiceNo, pm.InvoiceDate, pm.BillingNo, re.ReferenceNo, re.PaymentNo, re.PaymentDate, re.PaymentAmount, re.RemainAmount, re.PaymentAmountVnd, re.RemainAmountVnd, re.Currency });
@@ -325,7 +327,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private Expression<Func<AccAccountPayable, bool>> QueryPayable(AccountPayableCriteria criteria)
         {
-            Expression<Func<AccAccountPayable, bool>> query = x => true;
+            Expression<Func<AccAccountPayable, bool>> query = x => !string.IsNullOrEmpty(x.ReferenceNo);
             if (!string.IsNullOrEmpty(criteria.SearchType) && !string.IsNullOrEmpty(criteria.ReferenceNos?.Trim()))
             {
                 var searchNoList = criteria.ReferenceNos.Split('\n').Where(x => !string.IsNullOrEmpty(x?.Trim())).ToList();
