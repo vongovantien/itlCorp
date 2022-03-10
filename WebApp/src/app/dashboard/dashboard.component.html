@@ -21,7 +21,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Form-->
-            <div class="m-form">
+            <!-- <div class="m-form">
                 <div class="row">
                     <div class="col col-lg-5">
                         <div class="m-input-icon m-input-icon--right down">
@@ -55,7 +55,32 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
+       
+                <div class="form">
+                    <div class="row m-form m-form m-form--state">
+                        <div class="col">
+                            <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment" class="combogridShipmment"
+                                (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
+                                [selectedDisplayFields]="configShipment.selectedDisplayFields"
+                                [dataSources]="configShipment.dataSource"  [(ngModel)]="keyword"
+                                [displayFields]="configShipment.displayFields" [height]="200">
+                            </app-combo-grid-virtual-scroll> -->
+                                <div (clickOutside)="onClickOutsideShipmentName()">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        placeholder="Input keyword" (click)="isShow = !isShow"
+                                        (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
+                                        [ngModelOptions]="{standalone: true}">
+                                    <ng-container *ngIf="isShow">
+                                        <app-combo-grid [data]="shipments" [headers]="headersShipment"
+                                            (onClick)="onSelectDataFormInfo($event,'shipment')">
+                                        </app-combo-grid>
+                                    </ng-container>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
             <!--end::Form-->
         </div>
     </div>

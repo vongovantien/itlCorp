@@ -1183,4 +1183,8 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/ReplicateJob`, { Ids });
 
     }
+
+    getAllShipment(jobNo: string){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo:jobNo });
+    }
 }

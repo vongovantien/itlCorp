@@ -6,6 +6,7 @@ using ITL.NetCore.Common;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
 using System;
+using eFMS.API.Documentation.Service.ViewModels;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -35,5 +36,6 @@ namespace eFMS.API.Documentation.DL.IService
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
         HandleState LockShipmentList(List<string> JobIds);
         List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id);
+        List<sp_GetAllShipment> GetAllShipment(string jobNo);
     }
 }
