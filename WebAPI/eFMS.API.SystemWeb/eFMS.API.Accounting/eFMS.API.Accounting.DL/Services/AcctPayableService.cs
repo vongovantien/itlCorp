@@ -587,8 +587,10 @@ namespace eFMS.API.Accounting.DL.Services
                         PaymentDate = x.Key.PaymentDate,
                         OrgPaidAmount = (x.FirstOrDefault().PaidAmountOrg ?? 0) * advValue,
                         PaidAmountVND = (x.FirstOrDefault().PaymentAmountVnd ?? 0) * advValue,
-                        OriginRemainAmount = (payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
-                        RemainAmountVND = (payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
+                        //OriginRemainAmount = (payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
+                        //RemainAmountVND = (payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
+                        OriginRemainAmount = (x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
+                        RemainAmountVND = (x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
                         OriginCurrency = x.FirstOrDefault().CurrencyPayment
                     });
                     if (payableType == "OutRange")
