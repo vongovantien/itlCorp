@@ -476,9 +476,17 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableExisted.PaymentAmountVnd = (payableExisted.PaymentAmountVnd ?? 0) + accPayablePayment.PaymentAmountVnd;
                                 payableExisted.PaymentAmountUsd = (payableExisted.PaymentAmountUsd ?? 0) + accPayablePayment.PaymentAmountUsd;
                                 payableExisted.RemainAmount = payableExisted.TotalAmount - payableExisted.PaymentAmount;
-                                payableExisted.RemainAmountVnd = payableExisted.TotalAmountVnd - payableExisted.PaymentAmountVnd;
-                                payableExisted.RemainAmountUsd = payableExisted.TotalAmountUsd - payableExisted.PaymentAmountUsd;
-                                if (payableExisted.PaymentAmount != 0 && payableExisted.RemainAmount != 0)
+                                if (payableExisted.Currency == ForPartnerConstants.CURRENCY_LOCAL)
+                                {
+                                    payableExisted.RemainAmountVnd = payableExisted.TotalAmountVnd - payableExisted.PaymentAmountVnd;
+                                    payableExisted.RemainAmountUsd = payableExisted.RemainAmount == 0 ? 0 : (payableExisted.TotalAmountUsd - payableExisted.PaymentAmountUsd);
+                                }
+                                else
+                                {
+                                    payableExisted.RemainAmountVnd = (payableExisted.RemainAmount == 0 ? 0 : (payableExisted.TotalAmountVnd - payableExisted.PaymentAmountVnd));
+                                    payableExisted.RemainAmountUsd =  payableExisted.TotalAmountUsd - payableExisted.PaymentAmountUsd;
+                                }
+                                if (payableExisted.PaymentAmount != 0 && payableExisted.RemainAmount != 0) // Status
                                 {
                                     payableExisted.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                                 }
@@ -702,8 +710,17 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableCreditExisted.PaymentAmountVnd = (payableCreditExisted.PaymentAmountVnd ?? 0) + creditPayment.PaymentAmountVnd;
                                 payableCreditExisted.PaymentAmountUsd = (payableCreditExisted.PaymentAmountUsd ?? 0) + creditPayment.PaymentAmountUsd;
                                 payableCreditExisted.RemainAmount = payableCreditExisted.TotalAmount - payableCreditExisted.PaymentAmount;
-                                payableCreditExisted.RemainAmountVnd = payableCreditExisted.TotalAmountVnd - payableCreditExisted.PaymentAmountVnd;
-                                payableCreditExisted.RemainAmountUsd = payableCreditExisted.TotalAmountUsd - payableCreditExisted.PaymentAmountUsd;
+                                if (payableCreditExisted.Currency == ForPartnerConstants.CURRENCY_LOCAL) // clear remain usd nếu remain vnd = 0
+                                {
+                                    payableCreditExisted.RemainAmountVnd = payableCreditExisted.TotalAmountVnd - payableCreditExisted.PaymentAmountVnd;
+                                    payableCreditExisted.RemainAmountUsd = payableCreditExisted.RemainAmount == 0 ? 0 : (payableCreditExisted.TotalAmountUsd - payableCreditExisted.PaymentAmountUsd);
+                                }
+                                else // clear remain vnd nếu remain usd = 0
+                                {
+                                    payableCreditExisted.RemainAmountVnd = (payableCreditExisted.RemainAmount == 0 ? 0 : (payableCreditExisted.TotalAmountVnd - payableCreditExisted.PaymentAmountVnd));
+                                    payableCreditExisted.RemainAmountUsd = payableCreditExisted.TotalAmountUsd - payableCreditExisted.PaymentAmountUsd;
+                                }
+
                                 payableCreditExisted.Status = creditPayment.Status;
                                 //if (payableCreditExisted.PaymentAmount != 0 && payableCreditExisted.RemainAmount != 0)
                                 //{
@@ -720,8 +737,17 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.PaymentAmountVnd = (payableAdvExisted.PaymentAmountVnd ?? 0) + creditPayment.PaymentAmountVnd;
                                 payableAdvExisted.PaymentAmountUsd = (payableAdvExisted.PaymentAmountUsd ?? 0) + creditPayment.PaymentAmountUsd;
                                 payableAdvExisted.RemainAmount = payableAdvExisted.TotalAmount - payableAdvExisted.PaymentAmount;
-                                payableAdvExisted.RemainAmountVnd = payableAdvExisted.TotalAmountVnd - payableAdvExisted.PaymentAmountVnd;
-                                payableAdvExisted.RemainAmountUsd = payableAdvExisted.TotalAmountUsd - payableAdvExisted.PaymentAmountUsd;
+                                if (payableAdvExisted.Currency == ForPartnerConstants.CURRENCY_LOCAL) // clear remain usd nếu remain vnd = 0
+                                {
+                                    payableAdvExisted.RemainAmountVnd = payableAdvExisted.TotalAmountVnd - payableAdvExisted.PaymentAmountVnd;
+                                    payableAdvExisted.RemainAmountUsd = payableAdvExisted.RemainAmount == 0 ? 0 : (payableAdvExisted.TotalAmountUsd - payableAdvExisted.PaymentAmountUsd);
+                                }
+                                else // clear remain vnd nếu remain usd = 0
+                                {
+                                    payableAdvExisted.RemainAmountVnd = (payableAdvExisted.RemainAmount == 0 ? 0 : (payableAdvExisted.TotalAmountVnd - payableAdvExisted.PaymentAmountVnd));
+                                    payableAdvExisted.RemainAmountUsd = payableAdvExisted.TotalAmountUsd - payableAdvExisted.PaymentAmountUsd;
+                                }
+
                                 payableCreditExisted.Status = advPayment.Status;
                                 //if (payableAdvExisted.PaymentAmount != 0 && payableAdvExisted.RemainAmount != 0)
                                 //{
