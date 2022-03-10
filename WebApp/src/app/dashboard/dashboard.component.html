@@ -67,10 +67,17 @@
                                 [displayFields]="configShipment.displayFields" [height]="200">
                             </app-combo-grid-virtual-scroll> -->
                                 <div (clickOutside)="onClickOutsideShipmentName()">
+                                    <div class="m-input-icon m-input-icon--right down">
                                     <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        placeholder="Input keyword" (click)="isShow = !isShow"
+                                        placeholder="Enter JobId or MBL No or HBL No" (click)="isShow = !isShow"
                                         (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
                                         [ngModelOptions]="{standalone: true}">
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                            </span>
+                                        </span>
+                                    </div>
                                     <ng-container *ngIf="isShow">
                                         <app-combo-grid [data]="shipments" [headers]="headersShipment"
                                             (onClick)="onSelectDataFormInfo($event,'shipment')">

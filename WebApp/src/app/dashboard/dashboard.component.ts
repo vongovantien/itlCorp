@@ -7,7 +7,7 @@ import { AppPage } from '../app.base';
 import { Shipment } from '../shared/models/operation/shipment';
 import { DataService } from '@services';
 import { DocumentationRepo } from '@repositories';
-import { catchError, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -41,6 +41,7 @@ export class DashboardComponent extends AppPage implements OnInit {
 
         // * Search autocomplete shipment.
         this.term$.pipe(
+            filter(x=>x.length>=2),
             distinctUntilChanged(),
             this.autocomplete(500, ((keyword: string = '') => {
                 if (!!keyword) {
