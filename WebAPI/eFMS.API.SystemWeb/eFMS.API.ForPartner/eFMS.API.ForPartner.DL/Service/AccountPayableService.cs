@@ -675,11 +675,10 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPayment.GroupId = currentUser.GroupId;
                                 creditPayment.UserCreated = creditPayment.UserModified = currentUser.UserID;
                                 creditPayment.DatetimeCreated = creditPayment.DatetimeModified = DateTime.Now;
-
+                                listInsertPayment.Add(creditPayment);
 
                                 // ADV payment
-                                var advPayment = new AccAccountPayablePayment();
-                                advPayment = creditPayment;
+                                var advPayment = mapper.Map<AccAccountPayablePayment>(creditPayment);
                                 advPayment.Id = Guid.NewGuid();
                                 advPayment.ReferenceNo = detail.AdvRefNo;
                                 advPayment.RemainAmount = payableAdvExisted.RemainAmount - detail.PayOriginAmount;
@@ -760,7 +759,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.DatetimeModified = DateTime.Now;
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
-                                listInsertPayment.Add(creditPayment);
+                                
                                 listInsertPayment.Add(advPayment);
                                 var hsPayableCredit = DataContext.Update(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
                                 var hsPayableAdv = DataContext.Update(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
