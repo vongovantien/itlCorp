@@ -215,7 +215,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var item in paymentdata)
                 {
-                    paidAmount += item.FirstOrDefault().PaymentAmountVnd;
+                    paidAmount += item.Sum(x => x.PaymentAmountVnd ?? 0);
                     remainAmount += item.FirstOrDefault().PaymentRemainAmountVnd;
                 }
             }
@@ -223,7 +223,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var item in paymentdata)
                 {
-                    paidAmount += item.FirstOrDefault().PaymentAmountUsd;
+                    paidAmount += item.Sum(x => x.PaymentAmountUsd ?? 0);
                     remainAmount += item.FirstOrDefault().PaymentRemainAmountUsd;
                 }
             }
@@ -231,7 +231,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var item in paymentdata)
                 {
-                    paidAmount += item.FirstOrDefault().PaymentAmount;
+                    paidAmount += item.Sum(x => x.PaymentAmount ?? 0);
                     remainAmount += item.FirstOrDefault().PaymentRemainAmount;
                 }
             }
@@ -585,12 +585,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         PaymentRefNo = x.FirstOrDefault().PaymentNo,
                         PaymentDate = x.Key.PaymentDate,
-                        OrgPaidAmount = (x.FirstOrDefault().PaidAmountOrg ?? 0) * advValue,
-                        PaidAmountVND = (x.FirstOrDefault().PaymentAmountVnd ?? 0) * advValue,
+                        PaymentDatetimeCreated = x.FirstOrDefault().PaymentDatetimeCreated,
+                        OrgPaidAmount = (x.Sum(z => z.PaymentAmount ?? 0)) * advValue,
+                        PaidAmountVND = x.Sum(z => z.PaymentAmountVnd ?? 0) * advValue,
                         //OriginRemainAmount = (payableType == "InRange" ? (payable.BeginAmount - (x.FirstOrDefault().PaidAmountOrg ?? 0)) : x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
                         //RemainAmountVND = (payableType == "InRange" ? (payable.BeginAmountVND - (x.FirstOrDefault().PaymentAmountVnd ?? 0)) : x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
-                        OriginRemainAmount = (x.FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
-                        RemainAmountVND = (x.FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
+                        OriginRemainAmount = (x.OrderByDescending(z => z.PaymentDatetimeCreated).FirstOrDefault().PaymentRemainAmount ?? 0) * advValue,
+                        RemainAmountVND = (x.OrderByDescending(z => z.PaymentDatetimeCreated).FirstOrDefault().PaymentRemainAmountVnd ?? 0) * advValue,
                         OriginCurrency = x.FirstOrDefault().CurrencyPayment
                     });
                     if (payableType == "OutRange")
@@ -600,7 +601,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        payable.PaymentDetails.AddRange(paymentGrp);
+                        payable.PaymentDetails.AddRange(paymentGrp.OrderBy(x => x.PaymentDate).ThenBy(x => x.PaymentDatetimeCreated));
                     }
                 }
                 payable.BeginAmount *= advValue;

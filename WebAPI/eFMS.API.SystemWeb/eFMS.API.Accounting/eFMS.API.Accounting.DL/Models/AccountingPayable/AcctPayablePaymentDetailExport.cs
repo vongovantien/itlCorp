@@ -29,6 +29,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
     public class AcctPayablePaymentDetail
     {
         public string PaymentRefNo { get; set; }
+        public DateTime? PaymentDatetimeCreated { get; set; }
         public DateTime? PaymentDate { get; set; }
         public decimal? OrgPaidAmount { get; set; }
         public decimal? OriginRemainAmount { get; set; }
