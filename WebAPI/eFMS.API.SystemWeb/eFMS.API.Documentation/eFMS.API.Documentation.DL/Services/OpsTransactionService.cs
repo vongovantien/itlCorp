@@ -2530,7 +2530,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (chargeJob == null)
                             continue;
 
-                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice!= null && x.UnitPrice > 0));
+                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice != null && x.UnitPrice > 0));
                         if (chargeBuys == null)
                             continue;
 

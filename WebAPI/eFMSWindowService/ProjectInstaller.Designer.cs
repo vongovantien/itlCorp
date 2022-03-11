@@ -116,10 +116,10 @@
             // 
             // serviceInstaller7
             // 
-            this.serviceInstaller7.Description = "upAutoRateService";
-            this.serviceInstaller7.DisplayName = "upAutoRateService";
-            this.serviceInstaller7.ServiceName = "upAutoRateService";
-            this.serviceInstaller7.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.serviceInstaller7.Description = "UpAutoRateService";
+            this.serviceInstaller7.DisplayName = "eFMSWindowService.UpAutoRateService";
+            this.serviceInstaller7.ServiceName = "UpAutoRateService";
+            this.serviceInstaller7.StartType = System.ServiceProcess.ServiceStartMode.Manual;
             // 
             // ProjectInstaller
             // 
