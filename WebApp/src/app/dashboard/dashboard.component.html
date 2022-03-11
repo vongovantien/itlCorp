@@ -79,7 +79,7 @@
                                         </span>
                                     </div>
                                     <ng-container *ngIf="isShow">
-                                        <app-combo-grid [data]="shipments" [headers]="headersShipment"
+                                        <app-combo-grid [data]="shipments" [headers]="headersShipment" [hideInput]="true"
                                             (onClick)="onSelectDataFormInfo($event,'shipment')">
                                         </app-combo-grid>
                                     </ng-container>
