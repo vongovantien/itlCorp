@@ -822,6 +822,7 @@ namespace eFMS.API.ForPartner.Controllers
             HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
 
             string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
+
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
             var _endDateProgress = DateTime.Now;

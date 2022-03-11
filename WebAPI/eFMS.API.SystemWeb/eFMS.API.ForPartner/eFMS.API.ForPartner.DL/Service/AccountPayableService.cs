@@ -155,8 +155,9 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         //else => TH có số bravo no
                         {
-                            var grpVoucherDetail = voucherDetail.Where(z => !string.IsNullOrEmpty(z.BravoRefNo)).GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
-                                                        .Select(s => s).ToList();
+                            var grpVoucherDetail = voucherDetail.Where(z => !string.IsNullOrEmpty(z.BravoRefNo))
+                                                                .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
+                                                                .Select(s => s).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
                                 AccAccountPayable payable = new AccAccountPayable
@@ -850,7 +851,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         if (existPayment == null || existPayment.Count() == 0)
                         {
-                            return new HandleState((object)"Không tìm thấy hóa đơn " + acc.PaymentNo);
+                            throw new Exception("Không tìm thấy hóa đơn" + acc.PaymentNo);
                         }
                         foreach (var pm in existPayment)
                         {
@@ -864,7 +865,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             var hsUpdDatacontext = DataContext.Update(pm, x => x.Id == pm.Id, false);
                             if (!hsUpdDatacontext.Success)
                             {
-                                return new HandleState((object)"Hủy ghi nhận thất bại. " + hsUpdDatacontext.Message?.ToString());
+                                throw new Exception("Hủy ghi nhận thất bại. " + hsUpdDatacontext.Message?.ToString());  // ?? chưa submit
                             }
                         }
                         var deletePayable = new List<Guid>();
@@ -879,7 +880,8 @@ namespace eFMS.API.ForPartner.DL.Service
                         var hsDel = paymentRepository.Delete(x => deletePayable.Any(z => z == x.Id), false);
                         if (!hsDel.Success)
                         {
-                            return new HandleState((object)"Hủy ghi nhận thất bại. " + hsDel.Message?.ToString());
+                            throw new Exception("Hủy ghi nhận thất bại. " + hsDel.Message?.ToString()); // ?? chưa submit
+
                         }
                     }
 
@@ -887,7 +889,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     hs = DataContext.SubmitChanges();
                     if (!hs.Success || !hsDelPayable.Success)
                     {
-                        return new HandleState((object)"Hủy ghi nhận thất bại.");
+                        throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
                     }
                     trans.Commit();
                     return hs;
