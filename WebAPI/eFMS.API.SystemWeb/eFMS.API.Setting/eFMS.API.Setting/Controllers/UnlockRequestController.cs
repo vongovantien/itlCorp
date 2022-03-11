@@ -275,14 +275,14 @@ namespace eFMS.API.Setting.Controllers
            
             var hs = unlockRequestService.GenerateID(payment.paymentNo, payment.Type);
 
-            if (!hs.Success)
+            if (!hs.Result.Success)
             {
-                var message = HandleError.GetMessage(hs, Crud.Update);
-                ResultHandle resultError = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = payment.paymentNo };
+                var message = HandleError.GetMessage(hs.Result, Crud.Update);
+                ResultHandle resultError = new ResultHandle { Status = hs.Result.Success, Message = stringLocalizer[message].Value, Data = payment.paymentNo };
                 return BadRequest(resultError);
             }
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = payment.paymentNo };
-                return Ok(result);
+            ResultHandle result = new ResultHandle { Status = hs.Result.Success, Message = hs.Result.Message.ToString(), Data = payment.paymentNo };
+            return Ok(result);
         }
     }
 }

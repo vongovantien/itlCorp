@@ -83,7 +83,7 @@ export class JobManagementCreateJobComponent extends AppForm {
         let objUpdateData = null;
 
         if (this.isSaveLink) {
-            objUpdateData = this._documentRepo.getASTransactionInfo(model.mblno, model.hwbno, model.productService, model.serviceMode)
+            objUpdateData = this._documentRepo.getASTransactionInfo(null, model.mblno, model.hwbno, model.productService, model.serviceMode)
                 .pipe(
                     mergeMap((res: LinkAirSeaModel) => {
                         model.serviceNo = res?.jobNo;

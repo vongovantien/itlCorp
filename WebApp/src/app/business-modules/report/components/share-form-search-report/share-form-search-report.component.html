@@ -26,11 +26,11 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customerActive.length)}">
+                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && typeReport.value == typeComReportList[2].id && (!this.customerActive || !this.customerActive.length))}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
-                        <label *ngIf="isCommissionIncentive" required></label>
+                        <label *ngIf="isCommissionIncentive && typeReport.value == typeComReportList[2].id" required></label>
                         <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
@@ -41,7 +41,7 @@
                             [virtualScroll]='true' [multiple]='true' [clearable]='true' class="custom"
                             bindLabel="taxCodeAbbrName" bindValue="id" (open)="getPartnerData('customer')">
                         </ng-select>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !customerActive.length">
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && typeReport.value == typeComReportList[2].id && (!this.customerActive || !this.customerActive.length)">
                             Please select customer
                         </div>
                     </div>

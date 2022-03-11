@@ -63,5 +63,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string SyncedFrom { get; set; }
         public string PaySyncedFrom { get; set; }
         public string SyncedFromBy { get; set; }
+        public string LinkChargeId { get; set; }
     }
 }

@@ -88,10 +88,7 @@ export class DocumentationRepo {
     }
 
     insertDuplicateShipment(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body);
     }
 
     getDetailShipment(id: string) {
@@ -1117,9 +1114,9 @@ export class DocumentationRepo {
         );
     }
 
-    getASTransactionInfo(mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
+    getASTransactionInfo(jobNo: string = null, mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
-            { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
+            { jobNo: jobNo, mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
     }
 
     downloadChargeExcel() {

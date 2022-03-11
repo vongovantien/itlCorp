@@ -123,11 +123,12 @@
                                             <ng-container *ngIf="surcharge.isFromShipment;else chargeFromShipmentTpl">
                                                 <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
                                                 </ng-container>
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
-                                                        value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
-                                                    <span></span>
-                                                </label>
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                            value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                                        <span></span>
+                                                    </label>
+
                                                 <ng-container *ngIf="!surcharge.isLocked">
                                                     <ng-container *ngIf="!readonly">
                                                         <span [class.m--margin-right-20]="surcharge.isFromShipment">
@@ -144,7 +145,7 @@
                                             <!-- Phí hiện trường -->
                                             <ng-template #chargeFromShipmentTpl>
                                                 <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                    <ng-container *ngIf="!surcharge.syncedFromBy">
+                                                    <ng-container *ngIf="!surcharge.syncedFromBy && !surcharge.linkChargeId">
                                                         <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                             value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                         <span></span>

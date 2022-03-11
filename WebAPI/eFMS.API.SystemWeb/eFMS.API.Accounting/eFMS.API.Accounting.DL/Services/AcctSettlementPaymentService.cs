@@ -980,8 +980,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
-
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1053,8 +1053,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
                                };
             var data = dataOperation.Union(dataDocument).ToList();
 
@@ -1149,7 +1149,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
-                                    SyncedFromBy = GetSyncedFrom(sur)
+                                    SyncedFromBy = GetSyncedFrom(sur),
+                                    LinkChargeId = sur.LinkChargeId
 
                                 };
             var dataDocument = from sur in surcharge
@@ -1224,8 +1225,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
                                    CreditNo = sur.CreditNo,
-                                   SyncedFromBy = GetSyncedFrom(sur)
-
+                                   SyncedFromBy = GetSyncedFrom(sur),
+                                   LinkChargeId = sur.LinkChargeId
 
                                };
             var data = dataOperation.Union(dataDocument);
@@ -2188,7 +2189,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //End --Phí chứng từ (IsFromShipment = true)--
 
                         //Start --Phí hiện trường (IsFromShipment = false)--
-                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
+                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false ).ToList();
                         var idsChargeScene = chargeScene.Select(x => x.Id);
                         //Add các phí hiện trường mới (nếu có)
                         var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
@@ -2199,7 +2200,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (CsShipmentSurcharge itemSceneAdd in listChargeSceneAdd)
                                 {
-                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid)
+                                    if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid )
                                     {
                                         itemSceneAdd.JobNo = itemScene.JobId;
                                         itemSceneAdd.Mblno = itemScene.MBL;
@@ -2239,6 +2240,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
                         var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false);
+
                         var idChargeSceneUpdate = chargeSceneUpdate.Select(s => s.Id).ToList();
                         if (chargeSceneUpdate.Count() > 0)
                         {
@@ -2254,14 +2256,18 @@ namespace eFMS.API.Accounting.DL.Services
                             var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
                             foreach (ShipmentChargeSettlement itemScene in chargeSceneUpdate)
                             {
+                                
                                 foreach (CsShipmentSurcharge itemSceneUpdate in listChargeSceneUpdate)
                                 {
-                                    if (itemSceneUpdate.Id == itemScene.Id)
+                                    if (string.IsNullOrEmpty(itemScene.LinkChargeId))
                                     {
-                                        itemSceneUpdate.JobNo = itemScene.JobId;
-                                        itemSceneUpdate.Mblno = itemScene.MBL;
-                                        itemSceneUpdate.Hblno = itemScene.HBL;
-                                        itemSceneUpdate.Hblid = itemScene.Hblid;
+                                        if (itemSceneUpdate.Id == itemScene.Id)
+                                        {
+                                            itemSceneUpdate.JobNo = itemScene.JobId;
+                                            itemSceneUpdate.Mblno = itemScene.MBL;
+                                            itemSceneUpdate.Hblno = itemScene.HBL;
+                                            itemSceneUpdate.Hblid = itemScene.Hblid;
+                                        }
                                     }
                                 }
                             }
@@ -2269,34 +2275,38 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 var sceneCharge = listChargeExists.Where(x => x.Id == item.Id).FirstOrDefault();
 
-                                if (sceneCharge != null)
+                                if (sceneCharge != null )
                                 {
-                                    sceneCharge.UnitId = item.UnitId;
-                                    sceneCharge.UnitPrice = item.UnitPrice;
-                                    sceneCharge.ChargeId = item.ChargeId;
-                                    sceneCharge.Quantity = item.Quantity;
-                                    sceneCharge.CurrencyId = item.CurrencyId;
-                                    sceneCharge.Vatrate = item.Vatrate;
-                                    sceneCharge.ContNo = item.ContNo;
-                                    sceneCharge.InvoiceNo = item.InvoiceNo;
-                                    sceneCharge.InvoiceDate = item.InvoiceDate;
-                                    sceneCharge.SeriesNo = item.SeriesNo;
-                                    sceneCharge.Notes = item.Notes;
-                                    sceneCharge.PayerId = item.PayerId;
-                                    sceneCharge.PaymentObjectId = item.PaymentObjectId;
-                                    sceneCharge.Type = item.Type;
-                                    sceneCharge.ChargeGroup = item.ChargeGroup;
-                                    sceneCharge.VatPartnerId = item.VatPartnerId;
+                                    if(string.IsNullOrEmpty(item.LinkChargeId))
+                                    {
+                                        sceneCharge.UnitId = item.UnitId;
+                                        sceneCharge.UnitPrice = item.UnitPrice;
+                                        sceneCharge.ChargeId = item.ChargeId;
+                                        sceneCharge.Quantity = item.Quantity;
+                                        sceneCharge.CurrencyId = item.CurrencyId;
+                                        sceneCharge.Vatrate = item.Vatrate;
+                                        sceneCharge.ContNo = item.ContNo;
+                                        sceneCharge.InvoiceNo = item.InvoiceNo;
+                                        sceneCharge.InvoiceDate = item.InvoiceDate;
+                                        sceneCharge.SeriesNo = item.SeriesNo;
+                                        sceneCharge.Notes = item.Notes;
+                                        sceneCharge.PayerId = item.PayerId;
+                                        sceneCharge.PaymentObjectId = item.PaymentObjectId;
+                                        sceneCharge.Type = item.Type;
+                                        sceneCharge.ChargeGroup = item.ChargeGroup;
+                                        sceneCharge.VatPartnerId = item.VatPartnerId;
 
-                                    sceneCharge.ClearanceNo = item.ClearanceNo;
-                                    sceneCharge.AdvanceNo = item.AdvanceNo;
-                                    sceneCharge.JobNo = item.JobNo;
-                                    sceneCharge.Mblno = item.Mblno;
-                                    sceneCharge.Hblno = item.Hblno;
-                                    sceneCharge.Hblid = item.Hblid;
+                                        sceneCharge.ClearanceNo = item.ClearanceNo;
+                                        sceneCharge.AdvanceNo = item.AdvanceNo;
+                                        sceneCharge.JobNo = item.JobNo;
+                                        sceneCharge.Mblno = item.Mblno;
+                                        sceneCharge.Hblno = item.Hblno;
+                                        sceneCharge.Hblid = item.Hblid;
 
-                                    sceneCharge.UserModified = userCurrent;
-                                    sceneCharge.DatetimeModified = DateTime.Now;
+                                        sceneCharge.UserModified = userCurrent;
+                                        sceneCharge.DatetimeModified = DateTime.Now;
+                                    }
+                                    
 
                                     #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(sceneCharge, kickBackExcRate);
@@ -2322,7 +2332,10 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in chargeSceneRemove)
                             {
-                                csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                                if(string.IsNullOrEmpty(item.LinkChargeId))
+                                {
+                                    csShipmentSurchargeRepo.Delete(x => x.Id == item.Id);
+                                }
                             }
                         }
                         //End --Phí hiện trường (IsFromShipment = false)--
@@ -5549,6 +5562,7 @@ namespace eFMS.API.Accounting.DL.Services
              || !string.IsNullOrEmpty(x.VoucherIdre)
              || !string.IsNullOrEmpty(x.CreditNo)
              || !string.IsNullOrEmpty(x.DebitNo)
+             || !string.IsNullOrEmpty(x.LinkChargeId)
              || x.AcctManagementId != null
              || x.PayerAcctManagementId != null
              )

@@ -12,13 +12,13 @@ import { NgxSpinnerService } from 'ngx-spinner';
 
 import crypto_js from 'crypto-js';
 import { Subject } from 'rxjs';
+import { LockChanges } from '@ngrx/store-devtools/src/actions';
 
 @Component({
     selector: 'app-master-page',
     templateUrl: './master-page.component.html',
 })
 export class MasterPageComponent implements OnInit {
-
 
     selectedOffice: Office;
     selectedDepartGroup: SystemInterface.IDepartmentGroup;
@@ -69,7 +69,16 @@ export class MasterPageComponent implements OnInit {
         //                 this._toastService.warning("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
         //             }
         //         });
-
+        window.addEventListener("storage",()=>{
+            if(localStorage.getItem("isChangeOffice")==userInfo.id){
+                localStorage.removeItem("isChangeOffice");
+                return window.location.reload();
+            };
+            if(localStorage.getItem("isChangeDepartment")==userInfo.id){
+                localStorage.removeItem("isChangeDepartment");
+                return window.location.reload();
+            };
+        });
     }
 
     ngOnDestroy(): void {
@@ -111,7 +120,7 @@ export class MasterPageComponent implements OnInit {
     submitChangeOffice() {
         if (!!this.selectedOffice) {
             const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
+            localStorage.setItem("isChangeOffice",userInfoCurrent.id);
             if (!!userInfoCurrent) {
                 this.isChangeOffice = true;
                 this.isChangeDepartgroup = false;
@@ -123,7 +132,7 @@ export class MasterPageComponent implements OnInit {
     submitChangedDepartGroup() {
         if (!!this.selectedDepartGroup) {
             const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
+            localStorage.setItem("isChangeDepartment",userInfoCurrent.id);
             if (!!userInfoCurrent) {
                 this.isChangeDepartgroup = true;
                 this.isChangeOffice = false;

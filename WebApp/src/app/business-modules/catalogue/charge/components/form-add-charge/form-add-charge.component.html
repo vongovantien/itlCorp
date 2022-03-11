@@ -125,6 +125,21 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-4" *ngIf="isShowMappingBuying">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Buying Mapping
+                                </label>
+                                <app-combo-grid-virtual-scroll
+                                (itemSelected)="creditCharge.setValue($event.id); "
+                                [currentActiveItemId]="{ field: 'id', value: creditCharge.value}"
+                                [selectedDisplayFields]="['chargeNameEn']" [dataSources]="creditCharges | async"
+                                [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"
+                                placeholder="Select charge"
+                                (remove)="resetFormControl(creditCharge); generateSelling.setValue(false) ">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
                         <div class="col-lg-4" *ngIf="isShowMappingSelling">
                             <div class="form-group">
                                 <label class="form-control-label">
@@ -169,6 +184,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-lg-1" *ngIf="isShowMappingSelling ">
                             <div class="form-group">
                                 <label class="form-control-label"> Generate Selling </label>
@@ -188,6 +204,8 @@
                                 </ng-select>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>

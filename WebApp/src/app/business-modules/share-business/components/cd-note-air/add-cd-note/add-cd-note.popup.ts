@@ -51,7 +51,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
 
     flexId: AbstractControl;
     note: AbstractControl;
-    excRateUsdToLocal:AbstractControl;
+    excRateUsdToLocal: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -82,12 +82,11 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         this.formCreate = this._fb.group({
             flexId: [],
             note: [],
-            excRateUsdToLocal:[]
+            excRateUsdToLocal: []
         });
         this.flexId = this.formCreate.controls["flexId"];
         this.note = this.formCreate.controls["note"];
         this.excRateUsdToLocal = this.formCreate.controls["excRateUsdToLocal"];
-        debugger
     }
 
     setHeader() {
@@ -158,7 +157,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
                             ele.canEdit = true;
-                            const setEdit= ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo): (!!ele.creditNo || !!ele.debitNo);
+                            const setEdit = ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo) : (!!ele.creditNo || !!ele.debitNo);
                             if (setEdit) {
                                 if (!!ele.creditNo && !!ele.paySoano) {
                                     ele.canEdit = false;
@@ -308,13 +307,13 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
 
-        if (this.action !== "create"){
+        if (this.action !== "create") {
             if (this.excRateUsdToLocal.value) {
-                if (Number(this.excRateUsdToLocal.value) <=0) {
+                if (Number(this.excRateUsdToLocal.value) <= 0) {
                     this._toastService.warning(`Required to enter Excel USD greater than 0`);
                     return;
                 }
-            }else {
+            } else {
                 this._toastService.warning(`Required to enter Excel USD`);
                 return;
             }
@@ -376,9 +375,9 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
-                                    let checkSoa = this.listCharges.find(x=>x.soano !== "" && x.soano !== null);
-                                    if(!checkSoa){checkSoa = this.listCharges.find(x=>x.paySoano !== "" && x.paySoano !== null);}
-                                    if(checkSoa){
+                                    let checkSoa = this.listCharges.find(x => x.soano !== "" && x.soano !== null);
+                                    if (!checkSoa) { checkSoa = this.listCharges.find(x => x.paySoano !== "" && x.paySoano !== null); }
+                                    if (checkSoa) {
                                         this._toastService.warning("Vui lòng cập nhật SOA");
                                     }
                                     this.onUpdate.emit();

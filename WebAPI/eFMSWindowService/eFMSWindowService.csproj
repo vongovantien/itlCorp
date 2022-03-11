@@ -152,6 +152,12 @@
       <DependentUpon>SendMailToARDepartmentService.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\sp_GetOverDuePayment.cs" />
+    <Compile Include="upAutoRateService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="upAutoRateService.Designer.cs">
+      <DependentUpon>upAutoRateService.cs</DependentUpon>
+    </Compile>
     <Compile Include="UpdateOverDuePaymentService.cs">
       <SubType>Component</SubType>
     </Compile>

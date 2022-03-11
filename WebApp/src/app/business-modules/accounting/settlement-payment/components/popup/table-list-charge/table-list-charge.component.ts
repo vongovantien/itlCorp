@@ -578,6 +578,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         const formData = this.formGroup.getRawValue();
 
         for (const charge of listChargesToSave) {
+            if (charge.linkChargeId) {continue;}
             // *start: cập nhật shipment charges
             charge.clearanceNo = formData.customNo;
             // charge.advanceNo = formData.advanceNo;

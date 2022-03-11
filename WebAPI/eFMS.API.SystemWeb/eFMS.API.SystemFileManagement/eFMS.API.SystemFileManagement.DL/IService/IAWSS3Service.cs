@@ -20,5 +20,6 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> OpenFile(string moduleName, string folder, Guid objId, string fileName);
         Task<HandleState> CreateFileZip(FileDowloadZipModel model);
         Task<byte[]> DownloadFileAsync(string moduleName, string folder, Guid objId, string fileName);
+        Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel);
     }
 }

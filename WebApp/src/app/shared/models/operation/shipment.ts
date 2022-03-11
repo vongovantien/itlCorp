@@ -48,6 +48,8 @@ export class Shipment {
     isLocked: boolean = false;
     replicatedId: string = null;
     userCreatedName: string = null;
+    linkSource: string = null;
+    replicateJobNo: string = null;
 
     constructor(object?: any) {
         const self = this;
