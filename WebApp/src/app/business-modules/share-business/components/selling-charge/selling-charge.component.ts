@@ -159,6 +159,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             this._toastService.warning("Please add charge");
             return;
         }
+        for (const charge of this.charges) {
+            if(charge.invoiceNo!==null && charge.seriesNo===null){
+                this._toastService.warning("Series No Must be fill in");
+            }
+        }
         // * Update data 
         this.isSubmitted = true;
         if (!this.checkValidate()) {
