@@ -89,6 +89,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_EXCHANGE_DATE_EMPTY = "MSG_EXCHANGE_DATE_EMPTY";
         public static readonly string MSG_FINAL_EXCHANGE_EMPTY = "MSG_FINAL_EXCHANGE_EMPTY";
         public static readonly string MSG_TYPE_EMPTY = "MSG_TYPE_EMPTY";
+        public static readonly string MSG_SERIENO_EMPTY = "MSG_SERIENO_EMPTY";
 
         public static readonly string MSG_HBLNO_NOT_EXIST = "MSG_HBLNO_NOT_EXIST";
         public static readonly string MSG_MBLNO_NOT_EXIST = "MSG_MBLNO_NOT_EXIST";

@@ -1495,6 +1495,14 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
                 }
+                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                {
+                    if (string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                        item.IsValid = false;
+                    }
+                }
                 else
                 {
                     if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "selling" && item.Type.ToLower() != "obh")
