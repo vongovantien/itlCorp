@@ -42,7 +42,7 @@ namespace eFMSWindowService
                             new SendMailExceededCreditLimitService(),
                             new SendMailExpiredAgreementService(),
                             new UpdateOverDuePaymentService(),
-                            new upAutoRateService()
+                            new UpAutoRateService()
             };
             ServiceBase.Run(ServicesToRun);
             //#endif

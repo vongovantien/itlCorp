@@ -2634,7 +2634,7 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.ChargeId = catCharge.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = 1;
-            surcharge.Vatrate = 10;
+            surcharge.Vatrate = 8;
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2642,8 +2642,8 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.DebitNo = null;
             surcharge.SettlementCode = null;
             surcharge.VoucherId = null;
-            surcharge.VoucherIddate = null;
             surcharge.VoucherIdre = null;
+            surcharge.VoucherIddate = null;
             surcharge.VoucherIdredate = null;
             surcharge.AcctManagementId = null;
             surcharge.InvoiceNo = null;
@@ -2654,6 +2654,13 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.IsFromShipment = true;
             surcharge.SyncedFrom = null;
             surcharge.PaySyncedFrom = null;
+            surcharge.AdvanceNo = null;
+            surcharge.CombineBillingNo = null;
+            surcharge.AdvanceNoFor = null;
+            surcharge.ObhcombineBillingNo = null;
+            surcharge.TypeOfFee = null;
+            surcharge.ReferenceNo = null;
+            surcharge.SeriesNo = null;
 
             if (chargeBuy.CurrencyId == "VND")
             {

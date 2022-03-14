@@ -1,6 +1,6 @@
 ﻿namespace eFMSWindowService
 {
-    partial class upAutoRateService
+    partial class UpAutoRateService
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            this.ServiceName = "upAutoRateService";
+            this.ServiceName = "UpAutoRateService";
         }
 
         #endregion
