@@ -655,7 +655,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             string fileName = "OPS - DEBIT NOTE";
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(cdNo,stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -776,7 +776,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateAccountingManagementDebCreInvExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
             if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "INVOICE LIST") + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }

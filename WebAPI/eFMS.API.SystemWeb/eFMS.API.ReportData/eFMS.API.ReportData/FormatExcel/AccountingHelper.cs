@@ -422,7 +422,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 var folderOfFile = GetSettleExcelFolder();
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName;
+                var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                 {
                     return null;
@@ -628,7 +628,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             var folderOfFile = GetARExcelFolder();
             FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-            var path = f.FullName;
+            var path = f.FullName+".xlsx";
             if (!File.Exists(path))
             {
                 return null;
@@ -5203,7 +5203,7 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 var folderOfFile = GetARExcelFolder();
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName;
+                var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                     return null;
 
@@ -5365,7 +5365,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var folderOfFile = GetARExcelFolder();
                 var deleteDetailRow = false;
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName;
+                var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                 {
                     return null;

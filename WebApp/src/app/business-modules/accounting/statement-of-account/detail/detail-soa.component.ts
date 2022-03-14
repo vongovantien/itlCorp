@@ -144,7 +144,11 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    if(response!=null&&response.headers.get('efms-file-name')!=null){
+                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    }else{
+                        this._toastService.warning('No data found');
+                    }
                 },
             );
 
@@ -160,7 +164,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response!=null && response.headers.get('efms-file-name')!= null) {
                         this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
@@ -178,7 +182,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response!=null&& response.headers.get('efms-file-name')!=null) {
                         this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');
@@ -197,7 +201,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response!=null&& response.headers.get('efms-file-name')!=null) {
                         this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
                     } else {
                         this._toastService.warning('No data found');

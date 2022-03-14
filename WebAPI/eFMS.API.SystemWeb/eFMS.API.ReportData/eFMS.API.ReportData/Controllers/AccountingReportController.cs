@@ -255,7 +255,7 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
-        /// Export Bravo SOA
+        /// Export Bravo SOAExportSettlementPaymentDetailSurCharges
         /// </summary>
         /// <param name="soaNo"></param>
         /// <returns></returns>
@@ -272,7 +272,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "SOA Bravo List");
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, "SOA Bravo List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
