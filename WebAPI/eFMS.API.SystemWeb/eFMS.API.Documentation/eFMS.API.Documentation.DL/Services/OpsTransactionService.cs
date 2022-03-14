@@ -2286,7 +2286,6 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.ObhcombineBillingNo = null;
                                     surcharge.TypeOfFee = null;
                                     surcharge.ReferenceNo = null;
-                                    surcharge.SeriesNo = null;
 
                                     surcharge.UserCreated = currentUser.UserID;
                                     surcharge.DatetimeCreated = DateTime.Now;
