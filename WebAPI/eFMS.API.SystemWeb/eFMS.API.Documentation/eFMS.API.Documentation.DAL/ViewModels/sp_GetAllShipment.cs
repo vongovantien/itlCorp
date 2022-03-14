@@ -18,6 +18,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ServiceDate { get; set; }
         public string DatetimeCreated { get; set; }
         public string DatetimeModified { get; set; }
-
+        public Guid OfficeID { get; set; }
+        public string UserPermission { get; set; }
     }
 }

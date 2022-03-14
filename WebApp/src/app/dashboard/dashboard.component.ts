@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
 import Highcharts from 'highcharts/highcharts';
 import { FormGroup } from '@angular/forms';
@@ -9,8 +9,11 @@ import { DataService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { catchError, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
-import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState } from '@store';
+import { Permission403PopupComponent } from '@common';
+import { ChargeConstants } from '@constants';
 // import { Chart } from 'angular-highcharts';
 
 @Component({
@@ -20,15 +23,18 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent extends AppPage implements OnInit {
 
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     isShow: boolean = false;
     shipments: any[] = [];
     term$ = new BehaviorSubject<string>('');
     selectedShipment: Shipment = null;
     headersShipment: CommonInterface.IHeaderTable[];
+    serviceList: CommonInterface.INg2Select[] = [];
 
     constructor(private _dataService: DataService,
         private _documentRepo: DocumentationRepo,
-        private router: Router
+        private router: Router,
+        private _store: Store<any>
     ) {
         super();
         // this.keepCalendarOpeningWithRange = true;
@@ -38,7 +44,6 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     ngOnInit() {
         this.initBasicData();
-
         // * Search autocomplete shipment.
         this.term$.pipe(
             filter(x=>x.length>=2),
@@ -52,6 +57,11 @@ export class DashboardComponent extends AppPage implements OnInit {
         ).subscribe(
             (res: any) => {
                 this.shipments = res;
+                this.shipments.forEach(item => {
+                    if(this.checkAccess(item.userPermission,item.officeID)){
+                        item.Access=true;
+                    }
+                });
             },
         );
 
@@ -85,6 +95,8 @@ export class DashboardComponent extends AppPage implements OnInit {
                 { title: 'Modified Date', field: 'datetimeModified' },
             ];
 
+        this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
+
     }
 
     onSearchAutoComplete(keyword: string = '') {
@@ -96,7 +108,11 @@ export class DashboardComponent extends AppPage implements OnInit {
             case 'shipment':
                 this._isShowAutoComplete.next(false);
                 this.selectedShipment = new Shipment(data);
-                this.gotoActionLink();
+                if(data.Access===true){
+                    this.gotoActionLink(data.productService);
+                }else{
+                    this.permissionPopup.show();
+                }
                 break;
             default:
                 break;
@@ -105,10 +121,36 @@ export class DashboardComponent extends AppPage implements OnInit {
         }
     }
 
-    gotoActionLink(){
-        console.log(this.selectedShipment);
-        
-        this.router.navigate([`home/operation/job-management/job-edit/${this.selectedShipment.id}`]);
+    checkAccess(userId: string, officeId: string){
+        if(this.currentUser.id===userId&&this.currentUser.officeId===officeId){
+            return true;
+        }
+        return false;
+    }
+
+    gotoActionLink(service: string){
+        switch(service){
+            case  ChargeConstants.AE_CODE:
+                return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
+            case ChargeConstants.AI_CODE:
+                return this.router.navigate([`home/documentation/air-import/${this.selectedShipment.id}`]);
+            case ChargeConstants.IT_CODE:
+                return this.router.navigate([`home/documentation/inland-trucking/${this.selectedShipment.id}`]);
+            case ChargeConstants.SCE_CODE:
+                return this.router.navigate([`home/documentation/sea-consol-export/${this.selectedShipment.id}`]);
+            case ChargeConstants.SCI_CODE:
+                return this.router.navigate([`home/documentation/sea-consol-import/${this.selectedShipment.id}`]);
+            case ChargeConstants.SFE_CODE:
+                return this.router.navigate([`home/documentation/sea-fcl-export/${this.selectedShipment.id}`]);
+            case ChargeConstants.SFI_CODE:
+                return this.router.navigate([`home/documentation/sea-fcl-import/${this.selectedShipment.id}`]);
+            case ChargeConstants.SLE_CODE:
+                return this.router.navigate([`home/documentation/sea-lcl-export/${this.selectedShipment.id}`]);
+            case ChargeConstants.SLI_CODE:
+                return this.router.navigate([`home/documentation/sea-lcl-import/${this.selectedShipment.id}`]);
+            default:
+                this.router.navigate([`home/operation/job-management/job-edit/${this.selectedShipment.id}`]);
+        }
     }
     /**
      * Daterange picker
