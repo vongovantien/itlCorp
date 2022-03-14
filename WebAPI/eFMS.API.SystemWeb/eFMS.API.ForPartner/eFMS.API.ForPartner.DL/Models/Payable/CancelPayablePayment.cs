@@ -9,5 +9,6 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
         public string PaymentNo { get; set; }
         public string OfficeCODE { get; set; }
         public string TransactionType { get; set; }
+        public string BravoRefNo { get; set; }
     }
 }
