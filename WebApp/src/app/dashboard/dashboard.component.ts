@@ -14,6 +14,7 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
+import { serialize } from 'v8';
 // import { Chart } from 'angular-highcharts';
 
 @Component({
@@ -33,8 +34,7 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     constructor(private _dataService: DataService,
         private _documentRepo: DocumentationRepo,
-        private router: Router,
-        private _store: Store<any>
+        private router: Router
     ) {
         super();
         // this.keepCalendarOpeningWithRange = true;
@@ -90,8 +90,6 @@ export class DashboardComponent extends AppPage implements OnInit {
                 { title: 'Modified Date', field: 'datetimeModified' },
             ];
 
-        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((c) => this.currentUser = c);
-
     }
 
     onSearchAutoComplete(keyword: string = '') {
@@ -103,16 +101,39 @@ export class DashboardComponent extends AppPage implements OnInit {
             case 'shipment':
                 this._isShowAutoComplete.next(false);
                 this.selectedShipment = new Shipment(data);
-                if(data.access===true){
-                    this.gotoActionLink(data.productService);
-                }else{
-                    this.permissionPopup.show();
-                }
+                this.checkPermission(data.service,data.id,data.productService);
                 break;
             default:
                 break;
 
 
+        }
+    }
+
+    checkPermission(service: string, shipmentId: string, productService: string){
+        if(service==='OPS'){
+            this._documentRepo.checkViewDetailPermission(shipmentId)  
+            .subscribe(
+                (res: boolean) =>{
+                    if(res){
+                        this.gotoActionLink(productService);
+                    }else{
+                        this.permissionPopup.show();
+                    }
+                }
+            )
+        }
+        else if(service==='CS'){
+            this._documentRepo.checkDetailShippmentPermission(shipmentId)
+            .subscribe(
+                (res: boolean) =>{
+                    if(res){
+                        this.gotoActionLink(productService);
+                    }else{
+                        this.permissionPopup.show();
+                    }
+                }
+            )
         }
     }
 

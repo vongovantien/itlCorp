@@ -32,8 +32,6 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
             CreateMap<AcctCdnote, AcctCdnoteModel>();
             CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
-            CreateMap<sp_GetAllShipment, ShipmentGetAllResult>().ForMember(x => x.Access, opt => opt.Ignore());
-
             //map to entity model
             CreateMap<CsAirWayBillModel, CsAirWayBill>();
             CreateMap<CsTransactionEditModel, CsTransaction>();
@@ -60,7 +58,6 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<SysReportLogModel, SysReportLog>();
 
             CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
-            CreateMap<ShipmentGetAllResult, sp_GetAllShipment>();
         }
     }
 }

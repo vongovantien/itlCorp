@@ -36,6 +36,6 @@ namespace eFMS.API.Documentation.DL.IService
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
         HandleState LockShipmentList(List<string> JobIds);
         List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id);
-        List<ShipmentGetAllResult> GetAllShipment(string jobNo);
+        List<sp_GetAllShipment> GetAllShipment(string jobNo);
     }
 }
