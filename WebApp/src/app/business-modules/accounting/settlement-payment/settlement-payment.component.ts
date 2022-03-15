@@ -422,7 +422,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             });
 
 
-        this.selectAttachPopup.onSelect
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 concatMap((value: any) => {
@@ -445,7 +445,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                                 fileName: this.getFileName(data, x.id)
                             };
                         });
-                        console.log(advSyncModel);
                         return this._accoutingRepo.syncSettleToAccountant(advSyncModel);
                     }
                 }),
@@ -460,9 +459,14 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
+                    sub.unsubscribe();
+
                 },
                 (error) => {
                     console.log(error);
+                },
+                () => {
+                    sub.unsubscribe();
                 }
             )
 
@@ -573,7 +577,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     listenSelectFileAttachAndSyncSM(settle: SettlementPayment) {
-        this.selectAttachPopup.onSelect
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 concatMap((value: any) => {
@@ -608,9 +612,16 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
+                    sub.unsubscribe();
+
                 },
                 (error) => {
                     console.log(error);
+                    sub.unsubscribe();
+
+                },
+                () => {
+                    sub.unsubscribe();
                 }
             )
     }

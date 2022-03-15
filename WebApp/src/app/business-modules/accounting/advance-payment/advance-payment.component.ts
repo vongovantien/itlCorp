@@ -470,7 +470,7 @@ export class AdvancePaymentComponent extends AppList {
             });
 
 
-        this.selectAttachPopup.onSelect
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 concatMap((value: any) => {
@@ -508,9 +508,13 @@ export class AdvancePaymentComponent extends AppList {
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
+                    sub.unsubscribe();
+
                 },
                 (error) => {
                     console.log(error);
+                }, () => {
+                    sub.unsubscribe();
                 }
             )
     }
@@ -608,13 +612,13 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     listenSelectFileAttachAndSyncAdv(adv: AdvancePayment) {
-        this.selectAttachPopup.onSelect
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 concatMap((value: any) => {
                     if (!!value) {
                         const lang: string = value === 1 ? 'VN' : 'ENG';
-                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang)
+                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang);
                     }
                     return of(false);
                 }),
@@ -636,6 +640,7 @@ export class AdvancePaymentComponent extends AppList {
             )
             .subscribe(
                 (res) => {
+                    sub.unsubscribe();
                     if (((res as CommonInterface.IResult)?.status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
@@ -645,7 +650,12 @@ export class AdvancePaymentComponent extends AppList {
                     }
                 },
                 (error) => {
+                    sub.unsubscribe();
                     console.log(error);
+                },
+                () => {
+                    sub.unsubscribe();
+
                 }
             )
     }
