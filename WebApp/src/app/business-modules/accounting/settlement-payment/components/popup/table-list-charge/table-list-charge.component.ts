@@ -557,6 +557,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             return;
         }
 
+        for(let i=0;i<this.charges.length;i++){
+            if(this.charges[i].invoiceNo!==''&&this.charges[i].seriesNo===''){
+                this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+        }
+
         const error = this.checkValidate();
         if (error < 0) {
             if (error === -1) {
