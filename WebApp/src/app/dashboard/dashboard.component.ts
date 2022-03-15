@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
-import { ChargeConstants } from '@constants';
+import { ChargeConstants, RoutingConstants } from '@constants';
 // import { Chart } from 'angular-highcharts';
 
 @Component({
@@ -57,11 +57,6 @@ export class DashboardComponent extends AppPage implements OnInit {
         ).subscribe(
             (res: any) => {
                 this.shipments = res;
-                this.shipments.forEach(item => {
-                    if(this.checkAccess(item.userPermission,item.officeID)){
-                        item.Access=true;
-                    }
-                });
             },
         );
 
@@ -95,7 +90,7 @@ export class DashboardComponent extends AppPage implements OnInit {
                 { title: 'Modified Date', field: 'datetimeModified' },
             ];
 
-        this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((c) => this.currentUser = c);
 
     }
 
@@ -108,7 +103,7 @@ export class DashboardComponent extends AppPage implements OnInit {
             case 'shipment':
                 this._isShowAutoComplete.next(false);
                 this.selectedShipment = new Shipment(data);
-                if(data.Access===true){
+                if(data.access===true){
                     this.gotoActionLink(data.productService);
                 }else{
                     this.permissionPopup.show();
@@ -121,35 +116,29 @@ export class DashboardComponent extends AppPage implements OnInit {
         }
     }
 
-    checkAccess(userId: string, officeId: string){
-        if(this.currentUser.id===userId&&this.currentUser.officeId===officeId){
-            return true;
-        }
-        return false;
-    }
-
     gotoActionLink(service: string){
         switch(service){
             case  ChargeConstants.AE_CODE:
-                return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
+                //return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.AI_CODE:
-                return this.router.navigate([`home/documentation/air-import/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.IT_CODE:
-                return this.router.navigate([`home/documentation/inland-trucking/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_ASSIGNMENT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SCE_CODE:
-                return this.router.navigate([`home/documentation/sea-consol-export/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SCI_CODE:
-                return this.router.navigate([`home/documentation/sea-consol-import/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SFE_CODE:
-                return this.router.navigate([`home/documentation/sea-fcl-export/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SFI_CODE:
-                return this.router.navigate([`home/documentation/sea-fcl-import/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SLE_CODE:
-                return this.router.navigate([`home/documentation/sea-lcl-export/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.SLI_CODE:
-                return this.router.navigate([`home/documentation/sea-lcl-import/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.selectedShipment.id}`]);
             default:
-                this.router.navigate([`home/operation/job-management/job-edit/${this.selectedShipment.id}`]);
+                return this.router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.selectedShipment.id}`]);
         }
     }
     /**

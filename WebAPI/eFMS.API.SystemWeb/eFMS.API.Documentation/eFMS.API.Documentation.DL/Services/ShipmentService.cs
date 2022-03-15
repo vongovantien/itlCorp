@@ -5047,13 +5047,27 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion
 
-        public List<sp_GetAllShipment> GetAllShipment(string keyword)
+        private bool CheckAccess(string userID, Guid officeId)
+        {
+            if(currentUser.UserID == userID && currentUser.OfficeID == officeId)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public List<ShipmentGetAllResult> GetAllShipment(string keyword)
         {
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@KEYWORD", Value = keyword }
             };
-            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAllShipment>(parameters);
-            return result.ToList();
+            var shipments = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAllShipment>(parameters);
+            List<ShipmentGetAllResult> shipmentResult = new List<ShipmentGetAllResult>();
+            shipmentResult = mapper.Map<List<sp_GetAllShipment>, List<ShipmentGetAllResult>>(shipments);
+            shipmentResult.ForEach(x =>
+                x.Access = CheckAccess(x.UserPermission, x.OfficeID)
+            );
+            return shipmentResult.ToList();
         }
 
     }
