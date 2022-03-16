@@ -148,8 +148,10 @@ namespace eFMS.API.ForPartner.DL.Service
                             });
                             foreach (var item in payables)
                             {
-                                item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                                item.TotalAmount = item.PaymentAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
 
+                                item.PaymentAmountVnd = item.TotalAmountVnd;
+                                item.PaymentAmountUsd = item.TotalAmountUsd;
                                 await DataContext.AddAsync(item, false);
                             }
                         }
@@ -204,7 +206,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             foreach (var item in payables)
                             {
                                 item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
-                                item.RemainAmount = item.TotalAmountVnd; ;
+                                item.RemainAmount = item.TotalAmount;
                                 item.RemainAmountVnd = item.TotalAmountVnd;
                                 item.RemainAmountUsd = item.TotalAmountUsd;
 
@@ -266,7 +268,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         foreach (var item in payables)
                         {
                             item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
-                            item.RemainAmount = item.TotalAmountVnd; ;
+                            item.RemainAmount = item.TotalAmount; ;
                             item.RemainAmountVnd = item.TotalAmountVnd;
                             item.RemainAmountUsd = item.TotalAmountUsd;
 
@@ -572,7 +574,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     GroupId = currentUser.GroupId,
                                     DepartmentId = currentUser.DepartmentId,
                                     TransactionType = ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV,
-                                    VoucherNo = acc.PaymentNo,
+                                    VoucherNo = acc.VoucherNo,
                                     InvoiceNo = null,
                                     InvoiceDate = null,
                                     BillingNo = null,

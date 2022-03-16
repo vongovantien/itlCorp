@@ -8,6 +8,7 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
     {
         public string PaymentNo { get; set; }
         public DateTime PaymentDate { get; set; }
+        public string VoucherNo { get; set; }
         public string PaymentMethod { get; set; }
         public string CustomerCode { get; set; }
         public string OfficeCode { get; set; }
