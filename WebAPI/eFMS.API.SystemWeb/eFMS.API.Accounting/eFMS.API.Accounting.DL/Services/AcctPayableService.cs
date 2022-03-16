@@ -16,7 +16,6 @@ using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Linq.Expressions;
 using eFMS.API.Accounting.DL.Models.AccountingPayable;
-using eFMS.API.Accounting.DL.Models.AccountPayable;
 
 namespace eFMS.API.Accounting.DL.Services
 {

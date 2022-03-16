@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Accounting.DL.Models.AccountPayable
+namespace eFMS.API.Accounting.DL.Models.AccountingPayable
 {
     public class AcctPayableViewDetailCriteria
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
-using eFMS.API.Accounting.DL.Models.AccountPayable;
+using eFMS.API.Accounting.DL.Models.AccountingPayable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common.Globals;

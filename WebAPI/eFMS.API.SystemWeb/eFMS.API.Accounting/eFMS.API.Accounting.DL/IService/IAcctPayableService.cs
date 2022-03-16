@@ -1,7 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.DL.Models.AccountingPayable;
-using eFMS.API.Accounting.DL.Models.AccountPayable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
