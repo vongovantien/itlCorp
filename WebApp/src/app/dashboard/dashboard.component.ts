@@ -68,9 +68,6 @@ export class DashboardComponent extends AppPage implements OnInit {
             .subscribe((isShow: boolean) => {
                 this.isShow = isShow;
 
-                // * set again.
-                this.keyword = !!this.selectedShipment ? this.selectedShipment.jobNo : null;
-
             });
 
     }
