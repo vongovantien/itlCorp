@@ -839,31 +839,51 @@ namespace eFMS.API.ForPartner.DL.Service
                     var hsDelPayable = new HandleState();
                     foreach (var acc in accountPayables)
                     {
-                        var office = officeRepository.Get(x => x.Code == acc.OfficeCODE).FirstOrDefault();
+                        SysOffice office = officeRepository.Get(x => x.Code == acc.OfficeCODE).FirstOrDefault();
                         if(office == null)
                         {
                             throw new Exception(acc.OfficeCODE + " không tồn tại");
                         }
-                        IQueryable<AccAccountPayable> existPayment = DataContext.Get(x => x.VoucherNo == acc.PaymentNo 
+                        IQueryable<AccAccountPayablePayment> existPayment = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo 
                         && x.OfficeId == office.Id 
-                        && x.TransactionType == acc.TransactionType
                         && x.ReferenceNo == acc.BravoRefNo
+                        && x.AcctId == acc.AcctId
                         );
                         if (acc.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
                         {
-                            existPayment = existPayment.Where(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV 
-                            || x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) 
-                            || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH);
+                            existPayment = existPayment.Where(x => x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT 
+                            || x.PaymentType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) 
+                            || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF);
                         }
                         else
                         {
-                            existPayment = existPayment.Where(x => x.TransactionType == acc.TransactionType);
+                            existPayment = existPayment.Where(x => x.PaymentType == acc.TransactionType);
                         }
                         if (existPayment == null || existPayment.Count() == 0)
                         {
-                            throw new Exception("Không tìm thấy phiếu hoạch toán " + acc.PaymentNo);
+                            throw new Exception("Không tìm thấy thanh toán " + acc.PaymentNo);
                         }
-                        foreach (var pm in existPayment)
+                        List<Guid> deletePayable = existPayment.Select(x => x.Id).ToList();
+                        HandleState hsDelPayments = paymentRepository.Delete(x => deletePayable.Any(z => z == x.Id), false);
+
+                        IQueryable<AccAccountPayable> accPaybles = DataContext.Get(x => x.OfficeId == office.Id
+                        && x.ReferenceNo == acc.BravoRefNo);
+
+                        if (acc.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
+                        {
+                            accPaybles = accPaybles.Where(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV
+                            || x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT)
+                            || x.TransactionType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF);
+                        }
+                        else
+                        {
+                            accPaybles = accPaybles.Where(x => x.TransactionType == acc.TransactionType);
+                        }
+                        if (accPaybles == null || accPaybles.Count() == 0)
+                        {
+                            throw new Exception("Không tìm thấy thông tin công nợ " + acc.BravoRefNo);
+                        }
+                        foreach (var pm in accPaybles)
                         {
                             pm.PaymentAmount = pm.PaymentAmountUsd = pm.PaymentAmountVnd = 0;
                             pm.RemainAmount = pm.TotalAmount;
@@ -875,50 +895,19 @@ namespace eFMS.API.ForPartner.DL.Service
 
                             HandleState hsUpdDatacontext = DataContext.Update(pm, x => x.Id == pm.Id, false);
                         }
-
-                        List<Guid> deletePayable = new List<Guid>();
-                        if (acc.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
-                        {
-                            deletePayable = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo 
-                            && x.OfficeId == office.Id 
-                            && (
-                                x.PaymentType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT) 
-                                || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH 
-                                || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF)
-                            )
-                            .Select(x => x.Id).ToList();
-                        }
-                        else
-                        {
-                            deletePayable = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo 
-                            && x.OfficeId == office.Id 
-                            && acc.TransactionType.Contains(x.PaymentType)
-                            && x.ReferenceNo == acc.BravoRefNo
-                            ).Select(x => x.Id).ToList();
-                        }
-                        if(deletePayable.Count > 0)
-                        {
-                            HandleState hsDel = paymentRepository.Delete(x => deletePayable.Any(z => z == x.Id), false);
-                        } else
-                        {
-                            throw new Exception("Không tìm tông tin AP" + acc.BravoRefNo);
-
-                        }
                     }
 
-                    hs = DataContext.SubmitChanges();
-                    if (!hs.Success || !hsDelPayable.Success)
+                    hsDelPayable = paymentRepository.SubmitChanges();
+                    if (!hsDelPayable.Success)
                     {
                         throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
-                    } else
-                    {
-                        hsDelPayable = paymentRepository.SubmitChanges();
-                        if(!hsDelPayable.Success)
-                        {
-                            trans.Rollback();
-                            throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
-                        }
                     }
+                    hs = DataContext.SubmitChanges();
+                    if (!hs.Success)
+                    {
+                        trans.Rollback();
+                        throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
+                    } 
                     trans.Commit();
                     return hs;
                 }
