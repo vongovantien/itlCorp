@@ -6026,6 +6026,11 @@ namespace eFMS.API.ReportData.FormatExcel
                         _orgRemainAmount = item.BeginAmount ?? 0;
                         _orgRemainAmountVnd = item.BeginAmountVND ?? 0;
                     }
+                    else if(item.Status == "Paid")
+                    {
+                        _orgRemainAmountVnd = 0;
+                    }
+
                     sumBeginAmtVnd += (item.BeginAmountVND ?? 0);
                     sumPaidVnd += _orgPaidAmountVnd;
                     sumRemainVnd += _orgRemainAmountVnd;
@@ -6174,7 +6179,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("BeginAmountVndDt", trans.BeginAmountVND);
                         listKeyData.Add("TangVndDt", trans.OrgAmountTangVND);
                         listKeyData.Add("GiamVndDt", trans.OrgAmountGiamVND);
-                        var remainAmountVnd = trans.BeginAmountVND + trans.OrgAmountTangVND - trans.OrgAmountGiamVND;
+                        var remainAmountVnd = item.FirstOrDefault().Status == "Paid" ? 0 : trans.BeginAmountVND + trans.OrgAmountTangVND - trans.OrgAmountGiamVND;
                         listKeyData.Add("RemainVndDt", remainAmountVnd);
                         excel.SetData(listKeyData);
                         excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;

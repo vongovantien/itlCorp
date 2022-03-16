@@ -16,6 +16,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayable
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string DocNo { get; set; }
+        public string Status { get; set; }
         public string Currency { get; set; }
         public string AccountNo { get; set; }
         public string Description { get; set; }
