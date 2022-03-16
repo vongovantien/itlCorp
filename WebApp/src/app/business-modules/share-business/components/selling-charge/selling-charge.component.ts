@@ -160,8 +160,13 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             return;
         }
         for (const charge of this.charges) {
-            if(charge.invoiceNo!==null && charge.seriesNo===null){
+            if((charge.invoiceNo!==null||charge.invoiceNo!=='') && (charge.seriesNo===null||charge.seriesNo==='')){
                 this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+            if((charge.invoiceNo===null||charge.invoiceNo==='') && (charge.seriesNo!==null||charge.seriesNo!=='')){
+                this._toastService.warning("Invoice No Must be fill in");
+                return;
             }
         }
         // * Update data 

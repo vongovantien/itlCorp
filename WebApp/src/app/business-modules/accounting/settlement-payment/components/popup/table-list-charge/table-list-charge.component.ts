@@ -556,10 +556,14 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             this._toastService.warning("Please add charge");
             return;
         }
-
-        for(let i=0;i<this.charges.length;i++){
-            if(this.charges[i].invoiceNo!==''&&this.charges[i].seriesNo===''){
+        
+        for (const charge of this.charges) {
+            if((charge.invoiceNo!==null||charge.invoiceNo!=='') && (charge.seriesNo===null||charge.seriesNo==='')){
                 this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+            if((charge.invoiceNo===null||charge.invoiceNo==='') && (charge.seriesNo!==null||charge.seriesNo!=='')){
+                this._toastService.warning("Invoice No Must be fill in");
                 return;
             }
         }
