@@ -249,17 +249,24 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         }
     }
 
+    isWhiteSpace(input: any){
+        if(input.trim().length===0||input===null){
+            return true;
+        }
+        return false;
+    }
+
     saveOBHSurCharge() {
         if (!this.charges.length) {
             this._toastService.warning("Please add charge");
             return;
         }
         for (const charge of this.charges) {
-            if((charge.invoiceNo!==null||charge.invoiceNo!=='') && (charge.seriesNo===null||charge.seriesNo==='')){
+            if(!this.isWhiteSpace(charge.invoiceNo) &&this.isWhiteSpace(charge.seriesNo)){
                 this._toastService.warning("Series No Must be fill in");
                 return;
             }
-            if((charge.invoiceNo===null||charge.invoiceNo==='') && (charge.seriesNo!==null||charge.seriesNo!=='')){
+            if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
                 this._toastService.warning("Invoice No Must be fill in");
                 return;
             }

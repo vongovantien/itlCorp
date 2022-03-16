@@ -549,6 +549,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.charges.splice(index, 1);
     }
 
+    isWhiteSpace(input: any){
+        if(input.trim().length===0||input===null){
+            return true;
+        }
+        return false;
+    }
+
     saveChargeList() {
         this.isSubmitted = true;
 
@@ -558,11 +565,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
         
         for (const charge of this.charges) {
-            if((charge.invoiceNo!==null||charge.invoiceNo!=='') && (charge.seriesNo===null||charge.seriesNo==='')){
+            if(!this.isWhiteSpace(charge.invoiceNo )&& this.isWhiteSpace(charge.seriesNo)){
                 this._toastService.warning("Series No Must be fill in");
                 return;
             }
-            if((charge.invoiceNo===null||charge.invoiceNo==='') && (charge.seriesNo!==null||charge.seriesNo!=='')){
+            if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
                 this._toastService.warning("Invoice No Must be fill in");
                 return;
             }
