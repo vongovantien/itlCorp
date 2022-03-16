@@ -8,6 +8,7 @@ namespace eFMS.API.Accounting.DL.Models
     public class AccAccountPayableModel : AccAccountPayable
     {
         public string RefId { get; set; }
+        public string BravoRefNo { get; set; }
         public string PartnerName { get; set; }
         public string AccountNo { get; set; }
         public bool? NotShowDetail { get; set; }

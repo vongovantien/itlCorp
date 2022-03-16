@@ -205,8 +205,15 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
 
-    getPayments(refNo: string, type: string, invoiceNo: string, billingNo: string) {
-        this._accountingRepo.getPayablePaymentByRefNo(refNo, type, invoiceNo, billingNo)
+    getPayments(item: AccountingPayableModel) {
+        const criteria: any = {
+            refNo: item.referenceNo,
+            type: item.transactionType,
+            invoiceNo: item.invoiceNo,
+            billingNo: item.billingNo,
+            bravoNo: item.bravoRefNo
+        };
+        this._accountingRepo.getPayablePaymentByRefNo(criteria)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(

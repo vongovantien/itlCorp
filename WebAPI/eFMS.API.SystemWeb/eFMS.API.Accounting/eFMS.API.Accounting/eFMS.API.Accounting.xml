@@ -684,14 +684,11 @@
             <param name="pageSize"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetBy(System.String,System.String,System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetBy(eFMS.API.Accounting.DL.Models.AccountPayable.AcctPayableViewDetailCriteria)">
             <summary>
             Get payment detail of payable transaction
             </summary>
-            <param name="refNo"></param>
-            <param name="type"></param>
-            <param name="invoiceNo"></param>
-            <param name="billingNo"></param>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetDataExportAccountingPayable(eFMS.API.Accounting.DL.Models.Criteria.AccountPayableCriteria)">

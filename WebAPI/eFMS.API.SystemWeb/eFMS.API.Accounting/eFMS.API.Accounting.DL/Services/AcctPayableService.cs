@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Linq.Expressions;
 using eFMS.API.Accounting.DL.Models.AccountingPayable;
+using eFMS.API.Accounting.DL.Models.AccountPayable;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -118,6 +119,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     acct.InvoiceDate = null;
                 }
+                acct.BravoRefNo = item.FirstOrDefault().ReferenceNo;
                 acct.BillingNo = item.FirstOrDefault().BillingNo;
                 acct.Currency = item.FirstOrDefault().Currency;
                 acct.PaymentTerm = item.FirstOrDefault().PaymentTerm;
@@ -315,12 +317,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="type"></param>
         /// <param name="invoiceNo"></param>
         /// <returns></returns>
-        public IQueryable<AccAccountPayablePaymentModel> GetBy(string refNo, string type, string invoiceNo, string billingNo)
+        public IQueryable<AccAccountPayablePaymentModel> GetBy(AcctPayableViewDetailCriteria criteria)
         {
-            var payabledata = DataContext.Get(x => x.VoucherNo == refNo && x.TransactionType == type && (string.IsNullOrEmpty(x.InvoiceNo) || x.InvoiceNo == invoiceNo) && (string.IsNullOrEmpty(x.BillingNo) || x.BillingNo == billingNo)).FirstOrDefault();
+            var payabledata = DataContext.Get(x => x.VoucherNo == criteria.RefNo && x.TransactionType == criteria.Type && (string.IsNullOrEmpty(x.InvoiceNo) || x.InvoiceNo == criteria.InvoiceNo) && (string.IsNullOrEmpty(x.BillingNo) || x.BillingNo == criteria.BillingNo) && x.ReferenceNo == criteria.BravoNo).FirstOrDefault();
             if (payabledata == null) return null;
             var advValue = payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? (-1) : 1; // dòng adv hiện giá trị âm
-            var paymentData = accountPayablePaymentRepository.Get(x => x.ReferenceNo == payabledata.ReferenceNo && (payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? x.PaymentType == AccountingConstants.PAYMENT_TYPE_NAME_NET_OFF : x.PaymentType == payabledata.TransactionType)).OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated)
+            var paymentData = accountPayablePaymentRepository.Get(x => x.ReferenceNo == payabledata.ReferenceNo && (payabledata.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? x.PaymentType == AccountingConstants.PAYMENT_TYPE_NAME_NET_OFF : true)).OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated)
                 .Select(x => new AccAccountPayablePaymentModel
                 {
                     RefNo = x.PaymentNo,

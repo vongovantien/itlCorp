@@ -10,6 +10,7 @@ export class AccountingPayableModel {
     accountNo: string = null;
     billingNo: string = null;
     currency: string = null;
+    bravoRefNo: string = null;
     notShowDetail: boolean = null;
 
     paymentAmount: number = 0;

@@ -1028,8 +1028,8 @@ export class AccountingRepo {
         );
     }
 
-    getPayablePaymentByRefNo(refNo: string, type: string, invoiceNo: string, billingNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/GetBy`, { refNo: refNo, type: type, invoiceNo: invoiceNo, billingNo: billingNo }).pipe(
+    getPayablePaymentByRefNo(data: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/GetBy`, data).pipe(
             map((data: any) => data)
         );
     }

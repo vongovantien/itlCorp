@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.DL.Models.AccountingPayable;
+using eFMS.API.Accounting.DL.Models.AccountPayable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
@@ -16,6 +17,6 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<AccAccountPayableModel> Paging(AccountPayableCriteria criteria, int page, int size, out int rowsCount);
         List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria);
         List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria);
-        IQueryable<AccAccountPayablePaymentModel> GetBy(string refNo, string type, string invoiceNo, string billingNo);
+        IQueryable<AccAccountPayablePaymentModel> GetBy(AcctPayableViewDetailCriteria criteria);
     }
 }

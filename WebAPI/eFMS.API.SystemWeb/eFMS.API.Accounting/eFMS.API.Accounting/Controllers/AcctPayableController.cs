@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models.AccountPayable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common.Globals;
@@ -61,15 +62,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Get payment detail of payable transaction
         /// </summary>
-        /// <param name="refNo"></param>
-        /// <param name="type"></param>
-        /// <param name="invoiceNo"></param>
-        /// <param name="billingNo"></param>
+        /// <param name="criteria"></param>
         /// <returns></returns>
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(string refNo, string type, string invoiceNo, string billingNo)
+        [HttpPost("GetBy")]
+        public IActionResult GetBy(AcctPayableViewDetailCriteria criteria)
         {
-            var results = acctPayableService.GetBy(refNo, type, invoiceNo, billingNo);
+            var results = acctPayableService.GetBy(criteria);
             return Ok(results);
         }
 
