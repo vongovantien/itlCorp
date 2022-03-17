@@ -2604,6 +2604,50 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return models;
         }
+
+        public HandleState ValidateCheckPointPartner(Guid Id)
+        {
+            try
+            {
+                HandleState result = new HandleState();
+                bool isValid = false;
+
+                var contract = contractPartnerRepo.Get(x => x.PartnerId == Id.ToString()
+                && x.Active == true
+                && (x.IsExpired == false || x.IsExpired == null)
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))
+                .OrderBy(x => x.ContractType)
+                // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
+                .FirstOrDefault(); 
+
+                if (contract == null)
+                {
+                    throw new Exception("Partner doesn't have any agreement");
+                }
+
+                switch (contract.ContractType)  
+                {
+                    case "Cash":
+                        break;
+                    case "Cash":
+                        break;
+                    default:    
+                }
+                return result;
+            }   
+            catch (Exception ex)
+            {
+                return new HandleState(ex);
+                throw;
+            }
+        }
+
+        private bool ValidateCheckPointCashContractPartner()
+        {
+            bool valid = false;
+
+            return valid;
+        }
         #endregion
     }
 }
