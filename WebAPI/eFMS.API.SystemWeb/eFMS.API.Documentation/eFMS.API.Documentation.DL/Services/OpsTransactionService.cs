@@ -2489,7 +2489,7 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             CatPartner partnerInternal = new CatPartner();
             var date = new DateTime(2022, 01, 31);
-            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date && x.JobNo == "HMLOG2203/00163");
+            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
             List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
             var hs = new ResultHandle();
             var surchargesAddHis = new List<CsLinkCharge>();
