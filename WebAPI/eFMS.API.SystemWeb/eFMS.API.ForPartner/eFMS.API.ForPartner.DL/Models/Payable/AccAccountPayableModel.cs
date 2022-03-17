@@ -8,7 +8,6 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
     {
         public string PaymentNo { get; set; }
         public DateTime PaymentDate { get; set; }
-        public string VoucherNo { get; set; }
         public string PaymentMethod { get; set; }
         public string CustomerCode { get; set; }
         public string OfficeCode { get; set; }
@@ -17,6 +16,7 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
 
     public class PayablePaymentDetailModel
     {
+        public string VoucherNo { get; set; }
         public string TransactionType { get; set; }
         public string BravoRefNo { get; set; }
         public string AdvRefNo { get; set; }

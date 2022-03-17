@@ -553,6 +553,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 accPayablePayment.UserCreated = accPayablePayment.UserModified = currentUser.UserID;
                                 accPayablePayment.DatetimeCreated = accPayablePayment.DatetimeModified = DateTime.Now;
 
+                                var payableBillingExited = DataContext.Get(x => (x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH) && x.PartnerId == partner.Id && x.VoucherNo == detail.VoucherNo && x.OfficeId == office.Id).FirstOrDefault();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -574,14 +575,14 @@ namespace eFMS.API.ForPartner.DL.Service
                                     GroupId = currentUser.GroupId,
                                     DepartmentId = currentUser.DepartmentId,
                                     TransactionType = ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV,
-                                    VoucherNo = acc.VoucherNo,
+                                    VoucherNo = detail.VoucherNo,
                                     InvoiceNo = null,
                                     InvoiceDate = null,
-                                    BillingNo = null,
-                                    BillingType = null,
+                                    BillingNo = payableBillingExited?.BillingNo,
+                                    BillingType = payableBillingExited?.BillingType,
                                     ExchangeRate = detail.ExchangeRate,
                                     PaymentTerm = 0,
-                                    VoucherDate = acc.PaymentDate,
+                                    VoucherDate = payableBillingExited == null ? acc.PaymentDate : payableBillingExited.VoucherDate,
                                     PaymentDueDate = null,
                                     Over16To30Day = 0,
                                     Over1To15Day = 0,
