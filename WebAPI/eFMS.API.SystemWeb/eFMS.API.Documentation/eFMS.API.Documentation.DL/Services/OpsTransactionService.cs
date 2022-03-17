@@ -2189,8 +2189,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    //var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.ServiceDate.Value.Date > new DateTime(2022, 01, 31).Date);
-                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.JobNo == "HMLOG2203/00183");
+                    var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.ServiceDate.Value.Date > new DateTime(2022, 01, 31).Date);
                     if (lstJobRep != null)
                     {
                         foreach (var jobRep in lstJobRep)
@@ -2242,7 +2241,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
                                         //[17/01/2022][Nếu phí hiện trường thì set thêm sm done]
-                                        if (charge.IsFromShipment == false && acctSettlementPayment.Get(x => x.SettlementNo == charge.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
+                                        if (!string.IsNullOrEmpty( charge.SettlementCode) && charge.IsFromShipment == false && acctSettlementPayment.Get(x => x.SettlementNo == charge.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
                                             continue;
 
                                         //[01/03/2022][17133][Nếu phí OBH có Buying Mapping]
