@@ -139,8 +139,8 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.PersonInCharge == currentUser.UserID
-                        || model.UserCreated == currentUser.UserID
+                    if ((model.PersonInCharge == currentUser.UserID && model.OfficeId == currentUser.OfficeID)
+                        || (model.UserCreated == currentUser.UserID && model.OfficeId == currentUser.OfficeID)
                         || authorizeUserIds.Contains(model.PersonInCharge)
                         || model.SalemanIds.Contains(currentUser.UserID)
                         )
