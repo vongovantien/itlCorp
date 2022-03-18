@@ -1678,7 +1678,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = surcharge.Type == "OBH" ? "OBH" : "DEBIT",
                                     PaymentRefNo = rcpt == null ? null : rcpt.PaymentRefNo,
                                     PaymentDate = rcpt == null ? null : rcpt.PaymentDate,
-                                    PaymentDatetimeCreated = rcpt == null ? null : rcpt.DatetimeCreated,
+                                    PaymentDatetimeCreated = payment == null ? null : payment.DatetimeCreated,
                                     CusAdvanceAmountVnd = rcpt == null ? null : rcpt.CusAdvanceAmountVnd,
                                     CusAdvanceAmountUsd = rcpt == null ? null : rcpt.CusAdvanceAmountUsd,
                                     AgreementId = rcpt == null ? null : rcpt.AgreementId,
