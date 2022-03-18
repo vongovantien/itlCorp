@@ -105,8 +105,11 @@ export class CsTransaction extends BaseModel {
     isHawb: boolean = false;
     polDescription: string = null;
     podDescription: string = null;
-    isReplicate: boolean = false;
+
     replicatedId: string = null;
+    isLinkFee: boolean = false;
+    isLinkJob: boolean = false;
+    serviceNo: string = null;
 
     constructor(object?: any) {
         super();
