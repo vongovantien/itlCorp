@@ -178,9 +178,9 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult ValidateCheckPointPartner(Guid partnerId)
+        public IActionResult ValidateCheckPointPartner(Guid partnerId, Guid? Hblid)
         {
-            var result = accountReceivableService.ValidateCheckPointPartner(partnerId);
+            var result = accountReceivableService.ValidateCheckPointPartner(partnerId, Hblid);
             return Ok(new { valid = result });
         }
     }

@@ -222,5 +222,7 @@
         public static readonly string EMAIL_SETTING_AR_ALERT = "AR - Alert";
 
         public static readonly int MAX_CREDIT_LIMIT_RATE_CONTRACT = 120;
+
+        public static readonly string ITL_BOD = "ITL.BOD";
     }
 }

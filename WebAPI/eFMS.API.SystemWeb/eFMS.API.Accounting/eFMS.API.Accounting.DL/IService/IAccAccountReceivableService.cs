@@ -26,6 +26,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
         Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
         Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
-        HandleState ValidateCheckPointPartner(Guid Id);
+        HandleState ValidateCheckPointPartner(Guid Id, Guid HblId);
     }
 }
