@@ -69,7 +69,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         bool CheckDeletePermissionBySettlementNo(string settlementNo);
 
-        bool CheckDeletePermissionBySettlementId(Guid settlementId);
+        int CheckDeletePermissionBySettlementId(Guid settlementId);
 
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
 

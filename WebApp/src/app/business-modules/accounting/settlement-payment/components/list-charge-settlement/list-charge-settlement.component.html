@@ -146,8 +146,7 @@
                                             <!-- Phí hiện trường -->
                                             <ng-template #chargeFromShipmentTpl>
                                                 <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                    <ng-container
-                                                        *ngIf="!surcharge.syncedFromBy && !surcharge.linkChargeId">
+                                                    <ng-container *ngIf="!surcharge.syncedFrom && !surcharge.paySyncedFrom && !surcharge.linkChargeId">
                                                         <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                             value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                         <span></span>

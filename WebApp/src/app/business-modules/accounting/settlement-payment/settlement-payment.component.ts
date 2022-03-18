@@ -188,8 +188,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     prepareDeleteSettle(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
-            .subscribe((value: boolean) => {
-                if (value) {
+            .subscribe((value: any) => {
+                if (value === 0) {
                     this.selectedSettlement = settlement;
 
                     this.showPopupDynamicRender<ConfirmPopupComponent>(
@@ -202,7 +202,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         this.deleteSettlement(this.selectedSettlement.settlementNo);
                     })
                 } else {
+                    if(value === 403){
                     this.permissionPopup.show();
+                    }else{
+                        this._toastService.error("Settlement have synced charges. Please re-check.");
+                    }
                 }
             });
     }

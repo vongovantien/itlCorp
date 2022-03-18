@@ -537,6 +537,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.paySoano = null;
         newCharge.syncedFromBy = null;
         newCharge.syncedFrom = null;
+        newCharge.paySyncedFrom = null;
         if (!newCharge.invoiceDate || !newCharge.invoiceDate.startDate) {
             newCharge.invoiceDate = null;
         }

@@ -204,18 +204,19 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
 
             const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
+            const surchargeHasSynced = this.surcharges.filter(x => !!x.syncedFrom || !!x.paySyncedFrom);
             const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
-                const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment);
+                const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment && !x.syncedFrom && !x.paySyncedFrom);
                 this.surcharges = [...chargeMarkedChangeShipment];
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const jobNos: string[] = charges.map(x => x.jobNo);
 
-                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && jobNos.indexOf(x.jobId) && !x.isFromShipment);
+                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && jobNos.indexOf(x.jobId) && !x.isFromShipment && !x.syncedFrom && !x.paySyncedFrom);
             }
 
-            this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment];
+            this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
             this.surcharges.forEach(c => c.isChangeShipment = undefined)
 
         }
@@ -248,6 +249,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             }
             if (surcharge.linkChargeId) {
                 this._toastService.warning('Charge already linked charge');
+                return;
+            }
+            if(!!surcharge.syncedFrom || !!surcharge.paySyncedFrom){
+                this._toastService.warning('Charge already synced');
                 return;
             }
             this.selectedSurcharge = surcharge;
@@ -358,7 +363,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 if (charge.isFromShipment) {
                     charge.isSelected = true;
                 }
-                if (!charge.isFromShipment && !charge.isLocked) {
+                if (!charge.isFromShipment && !charge.isLocked && !charge.syncedFrom && !charge.paySyncedFrom) {
                     charge.isSelected = true;
                 }
             } else {
@@ -459,9 +464,13 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this._toastService.warning('Charge already linked charge');
             return;
         }
+        if(!!charge.syncedFrom || !!charge.paySyncedFrom){
+            this._toastService.warning('Charge already synced');
+            return;
+        }
 
         if (charge.isFromShipment) {
-            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
+            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment && (!surcharge.syncedFrom && !surcharge.paySyncedFrom));
 
             // this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             // this.listChargeFromShipmentPopup.show();
@@ -479,7 +488,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && (!surcharge.syncedFrom && !surcharge.paySyncedFrom));
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 

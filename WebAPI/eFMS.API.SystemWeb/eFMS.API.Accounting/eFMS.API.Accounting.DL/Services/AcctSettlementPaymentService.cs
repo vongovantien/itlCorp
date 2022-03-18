@@ -4180,13 +4180,15 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.PaymentRequestType = charge.PaymentRequestType;
                     chargeCopy.ClearanceNo = shipment.CustomNo; //Lấy customNo của Shipment
                     chargeCopy.ContNo = charge.ContNo;
-                    chargeCopy.Soaclosed = charge.Soaclosed;
-                    chargeCopy.Cdclosed = charge.Cdclosed;
-                    chargeCopy.CreditNo = charge.CreditNo;
-                    chargeCopy.DebitNo = charge.DebitNo;
-                    chargeCopy.Soano = charge.Soano;
+                    #region comment: copy charge without copy cdnote, soa
+                    //chargeCopy.Soaclosed = charge.Soaclosed;
+                    //chargeCopy.Cdclosed = charge.Cdclosed;
+                    //chargeCopy.CreditNo = charge.CreditNo;
+                    //chargeCopy.DebitNo = charge.DebitNo;
+                    //chargeCopy.Soano = charge.Soano;
+                    //chargeCopy.PaySoano = charge.PaySoano;
+                    #endregion
                     chargeCopy.IsFromShipment = charge.IsFromShipment;
-                    chargeCopy.PaySoano = charge.PaySoano;
                     chargeCopy.TypeOfFee = charge.TypeOfFee;
                     chargeCopy.AdvanceNo = advance;
 
@@ -4792,15 +4794,22 @@ namespace eFMS.API.Accounting.DL.Services
             return true;
         }
 
-        public bool CheckDeletePermissionBySettlementId(Guid settlementId)
+        /// <summary>
+        /// Check before delete settlement
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns>0 : delete</returns>
+        /// <returns>403 : dont have permission</returns>
+        /// <returns>-1 : add charge have synced charges</returns>
+        public int CheckDeletePermissionBySettlementId(Guid settlementId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None)
-                return false;
+                return 403;
 
             var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
-            if (detail == null) return false;
+            if (detail == null) return 403;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
@@ -4812,9 +4821,14 @@ namespace eFMS.API.Accounting.DL.Services
             };
             int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
 
-            if (code == 403) return false;
+            if (code == 403) return code;
 
-            return true;
+            if (detail.SettlementType == "DIRECT")
+            {
+                var isExistedChargeSynced = csShipmentSurchargeRepo.Any(x => x.SettlementCode == detail.SettlementNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                return isExistedChargeSynced ? -1 : 0;
+            }
+            return 0;
         }
 
         public bool CheckUpdatePermissionBySettlementId(Guid settlementId)
