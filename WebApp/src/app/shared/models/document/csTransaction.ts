@@ -23,7 +23,7 @@ export class CsTransaction extends BaseModel {
     coloaderName: string = null; //
     supplierName: string = null; //Used
     bookingNo: string = null;
-    agentId: string = null; // agent 
+    agentId: string = null; // agent
     agentName: string = null;
     pol: string = null;
     polName: string = null;
@@ -105,6 +105,9 @@ export class CsTransaction extends BaseModel {
     isHawb: boolean = false;
     polDescription: string = null;
     podDescription: string = null;
+    isReplicate: boolean = false;
+    replicatedId: string = null;
+
     constructor(object?: any) {
         super();
         const self = this;

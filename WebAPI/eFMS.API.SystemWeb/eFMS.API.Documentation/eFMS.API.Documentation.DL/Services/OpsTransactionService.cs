@@ -2178,7 +2178,7 @@ namespace eFMS.API.Documentation.DL.Services
         public ResultHandle ChargeFromReplicate()
         {
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
-            string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+            string logMessage = string.Format(" *  \n [START][USER]: {0}{1} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"),currentUser.UserName);
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
 
             ResultHandle hs = new ResultHandle();
@@ -2215,7 +2215,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0);
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0 && x.Type!="BUY");
                             if (charges != null && charges.Count() > 0)
                             {
                                 logMessage = string.Format(" *  \n [CHARGES]: {0} * ", JsonConvert.SerializeObject(charges));

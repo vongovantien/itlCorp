@@ -48,7 +48,8 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['receiverName','payerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''" [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''" [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)"
+                            [activeMenuContext]="!shipment.replicatedId&&charge.linkChargeId">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
@@ -628,9 +629,7 @@
 </confirm-popup>
 
 <app-context-menu #linkFeeContextMenu >
-    <ng-container *ngIf="selectedCs&&selectedCs.linkChargeId&&!shipment.linkSource" >
-        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
-            <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
-        </div>
-    </ng-container>
+    <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
+        <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
+    </div>
 </app-context-menu>
