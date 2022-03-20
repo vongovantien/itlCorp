@@ -1852,7 +1852,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soas = DataContext.Get();
                     break;
                 case PermissionRange.Owner:
-                    soas = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    soas = DataContext.Get(x => x.UserCreated == _user.UserID && x.OfficeId == _user.OfficeID);
                     break;
                 case PermissionRange.Group:
                     soas = DataContext.Get(x => x.GroupId == _user.GroupId

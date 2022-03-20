@@ -240,7 +240,7 @@ namespace eFMS.API.Accounting.DL.Services
                     &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.settlementPayment.UserCreated == criteria.Requester : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.settlementPayment.UserCreated == criteria.Requester && x.settlementPayment.OfficeId == currentUser.OfficeID : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.settlementPayment.GroupId == currentUser.GroupId
                                                                         && x.settlementPayment.DepartmentId == currentUser.DepartmentId
