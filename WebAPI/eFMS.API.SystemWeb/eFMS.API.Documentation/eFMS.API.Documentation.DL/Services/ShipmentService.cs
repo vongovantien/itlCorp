@@ -5047,5 +5047,14 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion
 
+        public List<sp_GetAllShipment> GetAllShipment(string keyword)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@KEYWORD", Value = keyword }
+            };
+            var shipments = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAllShipment>(parameters);
+            return shipments.ToList();
+        }
+
     }
 }

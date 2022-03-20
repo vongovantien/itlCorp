@@ -37,11 +37,20 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: DashboardComponent
+                //component: DashboardComponent
+                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                data: {
+                    name: "Dashboard",
+                }
             },
             {
+                //path: 'dashboard',
+                //component: DashboardComponent,
                 path: 'dashboard',
-                component: DashboardComponent,
+                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                data: {
+                    name: "Dashboard",
+                }
             },
             {
                 path: 'system',

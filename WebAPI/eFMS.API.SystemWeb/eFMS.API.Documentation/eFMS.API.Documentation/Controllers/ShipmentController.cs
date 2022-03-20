@@ -373,5 +373,12 @@ namespace eFMS.API.Documentation.Controllers
             var job = shipmentService.GetAdvanceSettlements(JobID);
             return Ok(job);
         }
+
+        [HttpGet("GetAllShipment")]
+        public IActionResult GetAllShipment(string JobNo)
+        {
+            var job = shipmentService.GetAllShipment(JobNo);
+            return Ok(job);
+        }
     }
 }
