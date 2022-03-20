@@ -435,11 +435,11 @@ export class ExportRepo {
             window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${id}&office=${office}`, '_blank');
     }
 
-    previewExport(url: string){
+    previewExport(url: string) {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
 
-    downloadExport(url: string){
+    downloadExport(url: string) {
         window.open(`${url}`, '_blank');
     }
 

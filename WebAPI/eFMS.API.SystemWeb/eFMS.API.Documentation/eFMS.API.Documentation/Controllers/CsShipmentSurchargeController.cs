@@ -545,7 +545,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
-        [Authorize]
+        // [Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
@@ -576,9 +576,10 @@ namespace eFMS.API.Documentation.Controllers
                     }
 
                     string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
-                    if(!string.IsNullOrEmpty(InvoiceDate))
+                    DateTime? dateToPaseInvoice = null;
+
+                    if (!string.IsNullOrEmpty(InvoiceDate))
                     {
-                        DateTime? dateToPaseInvoice = null;
                         if (DateTime.TryParse(InvoiceDate, out temp))
                         {
                             CultureInfo culture = new CultureInfo("es-ES");
@@ -616,7 +617,7 @@ namespace eFMS.API.Documentation.Controllers
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 
                         InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
+                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPaseInvoice : (DateTime?)null,
                         SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
                         Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
                         Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),

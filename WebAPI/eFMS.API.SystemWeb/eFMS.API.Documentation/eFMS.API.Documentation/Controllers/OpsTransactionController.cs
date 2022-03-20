@@ -87,6 +87,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = transactionService.CheckDetailPermission(id);
