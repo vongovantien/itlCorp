@@ -28,6 +28,7 @@ export const environment = {
                 PARTNER_API: "test.api-efms.itlvn.com/partner",
                 FILE_SYSTEM: "localhost:44369",
                 //FILE_SYSTEM: "test.api-efms.itlvn.com/file"
+                REPORT_MANAGEMENT: "test.api-efms.itlvn.com/Report"
         },
         AUTHORIZATION:
         {

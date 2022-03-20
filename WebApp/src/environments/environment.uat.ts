@@ -17,7 +17,8 @@ export const environment = {
         INDENTITY_SERVER_URL: "https://uat-api-efms.itlvn.com/identityserver",
         EXPORT_CRYSTAL: "https://uat-api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         PARTNER_API: "uat-api-efms.itlvn.com/partner",
-        FILE_SYSTEM: "uat-api-efms.itlvn.com/File"
+        FILE_SYSTEM: "uat-api-efms.itlvn.com/File",
+        REPORT_MANAGEMENT: "uat-api-efms.itlvn.com/Report"
     },
     AUTHORIZATION:
     {
