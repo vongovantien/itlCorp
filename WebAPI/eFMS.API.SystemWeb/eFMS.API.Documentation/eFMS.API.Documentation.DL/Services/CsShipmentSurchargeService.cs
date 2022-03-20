@@ -736,11 +736,11 @@ namespace eFMS.API.Documentation.DL.Services
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
-                    //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
-                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
-                    hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
+                    //hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }
             else
