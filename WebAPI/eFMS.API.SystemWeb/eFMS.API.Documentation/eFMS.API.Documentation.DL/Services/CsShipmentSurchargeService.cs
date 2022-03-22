@@ -1619,6 +1619,15 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
+                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
                     }
                 }
             });
