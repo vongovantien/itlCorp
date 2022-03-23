@@ -5989,6 +5989,18 @@ namespace eFMS.API.Accounting.DL.Services
             return _advanceAmount;
 
         }
+
+        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@SettlementNo", Value = settlementNo },
+            };
+            List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
+
+            var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
+            return data;
+        }
+       
     }
 }
 

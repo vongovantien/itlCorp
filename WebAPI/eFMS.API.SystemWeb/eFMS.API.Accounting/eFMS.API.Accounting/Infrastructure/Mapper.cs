@@ -49,6 +49,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AcctReceiptSyncModel, AcctReceiptSync>();
             CreateMap<AcctCombineBillingModel, AcctCombineBilling>();
             CreateMap<sp_GetSurchargeDetailSOA, ChargeShipmentModel>().ReverseMap();
+            CreateMap<sp_GetSurchargeDetailSettlement, ShipmentChargeSettlement>().ReverseMap();
+
         }
     }
 }
