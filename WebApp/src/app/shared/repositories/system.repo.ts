@@ -601,7 +601,7 @@ export class SystemRepo {
     }
 
     getUserPermissionByMenu(menuId: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Permissions/${menuId}`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/Permissions/${menuId}`, null, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }

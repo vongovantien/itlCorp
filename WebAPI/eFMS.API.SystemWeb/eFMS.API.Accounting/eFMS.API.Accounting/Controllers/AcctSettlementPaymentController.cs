@@ -226,7 +226,8 @@ namespace eFMS.API.Accounting.Controllers
             if (settlement != null)
             {
                 chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                // chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
             }
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
