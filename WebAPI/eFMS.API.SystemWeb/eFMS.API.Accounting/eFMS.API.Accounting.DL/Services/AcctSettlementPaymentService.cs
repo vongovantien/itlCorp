@@ -5999,15 +5999,15 @@ namespace eFMS.API.Accounting.DL.Services
             };
             if(HblId != null)
             {
-                parameters.Append(new SqlParameter() { ParameterName = "@HblId", Value = HblId });
+                parameters = parameters.Concat(new[] { new SqlParameter("@HblId", HblId) }).ToArray();
             }
             if (advanceNo != null)
             {
-                parameters.Append(new SqlParameter() { ParameterName = "@AdvanceNo", Value = advanceNo });
+                parameters = parameters.Concat(new[] { new SqlParameter("@AdvanceNo", advanceNo) }).ToArray();
             }
             if (clearanceNo != null)
             {
-                parameters.Append(new SqlParameter() { ParameterName = "@ClearanceNo", Value = clearanceNo });
+                parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
             }
             List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
 
