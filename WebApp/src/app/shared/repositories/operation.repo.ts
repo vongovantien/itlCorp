@@ -214,7 +214,7 @@ export class OperationRepo {
     }
 
     getListCustomNoAsignPIC(): any {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetListCustomNoAsignPIC`);
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetListCustomNoAsignPIC`, null, { "hideSpinner": "true" });
     }
 
     replicateClearance(id: number) {
