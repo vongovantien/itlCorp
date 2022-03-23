@@ -854,13 +854,13 @@ namespace eFMS.API.ForPartner.DL.Service
                         );
                         if (acc.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
                         {
-                            existPayment = existPayment.Where(x => x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT 
-                            || x.PaymentType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) 
+                            existPayment = existPayment.Where(x => x.PaymentType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT)
+                            || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH
                             || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF);
                         }
                         else
                         {
-                            existPayment = existPayment.Where(x => x.PaymentType == acc.TransactionType);
+                            existPayment = existPayment.Where(x => (!acc.TransactionType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT) && !acc.TransactionType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH)) ? x.PaymentType == acc.TransactionType : true);
                         }
                         if (existPayment == null || existPayment.Count() == 0)
                         {
@@ -880,7 +880,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         else
                         {
-                            accPaybles = accPaybles.Where(x => x.TransactionType == acc.TransactionType);
+                            accPaybles = accPaybles.Where(x => (!acc.TransactionType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT) && !acc.TransactionType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH)) ? x.TransactionType == acc.TransactionType : true);
                         }
                         if (accPaybles == null || accPaybles.Count() == 0)
                         {
@@ -952,7 +952,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var hsPayable = new HandleState();
                     if (payableDelete?.Count() > 0)
                     {
-                        var paymentDelete = paymentRepository.Get(x => payableDelete.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF)))).ToList();
+                        var paymentDelete = paymentRepository.Get(x => payableDelete.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType.Contains(ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT)
+                        || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH
+                        || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF)))).ToList();
                         var hsPaymentDel = new HandleState();
                         if (paymentDelete.Count > 0)
                         {
