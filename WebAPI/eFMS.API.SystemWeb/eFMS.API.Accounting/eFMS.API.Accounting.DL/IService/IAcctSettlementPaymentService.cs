@@ -103,6 +103,6 @@ namespace eFMS.API.Accounting.DL.IService
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);
-        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo);
+        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
     }
 }

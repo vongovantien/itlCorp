@@ -756,7 +756,8 @@ namespace eFMS.API.Accounting.DL.Services
                     HBL = item.HBL,
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
-                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+                    // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+                    ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
@@ -981,7 +982,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
                                     SyncedFromBy = GetSyncedFrom(sur),
-                                    LinkChargeId = sur.LinkChargeId
+                                    LinkChargeId = sur.LinkChargeId,
+                                    
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -5990,11 +5992,23 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo)
+        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null)
         {
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@SettlementNo", Value = settlementNo },
             };
+            if(HblId != null)
+            {
+                parameters.Append(new SqlParameter() { ParameterName = "@HblId", Value = HblId });
+            }
+            if (advanceNo != null)
+            {
+                parameters.Append(new SqlParameter() { ParameterName = "@AdvanceNo", Value = advanceNo });
+            }
+            if (clearanceNo != null)
+            {
+                parameters.Append(new SqlParameter() { ParameterName = "@ClearanceNo", Value = clearanceNo });
+            }
             List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
 
             var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
