@@ -2087,6 +2087,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[6, 1, rowStart, 19].Style.Border.Top.Style = ExcelBorderStyle.Thin;
 
         }
+
         private void BindingDataAccountingPLSheetExportExcel(ExcelWorksheet workSheet, List<AccountingPlSheetExport> listData, GeneralReportCriteria criteria)
         {
             SetWidthColumnExcelAccountingPLSheetExport(workSheet);
@@ -2128,7 +2129,9 @@ namespace eFMS.API.ReportData.FormatExcel
                "Cd Note", //34,
                "Creator", //35,
                "Synced", //36,
-               "Vat Partner" //37
+               "Billing No", //37
+               "Vat Partner" //38
+
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2256,7 +2259,10 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AJ7"].Value = headers[36]; //Synced
 
             workSheet.Cells["AK7:AK8"].Merge = true;
-            workSheet.Cells["AK7"].Value = headers[37]; //Vat Parter
+            workSheet.Cells["AK7"].Value = headers[37]; //Billing No
+
+            workSheet.Cells["AL7:AL8"].Merge = true;
+            workSheet.Cells["AL7"].Value = headers[37]; //Vat Parter
             //Header table
 
             //Cố định dòng thứ 8 (Freeze Row 8 and no column)
@@ -2369,7 +2375,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 34].Value = listData[i].CdNote;
                 workSheet.Cells[rowStart, 35].Value = listData[i].Creator;
                 workSheet.Cells[rowStart, 36].Value = listData[i].SyncedFrom;
-                workSheet.Cells[rowStart, 37].Value = listData[i].VatPartnerName;
+                workSheet.Cells[rowStart, 37].Value = listData[i].BillNoSynced;
+                workSheet.Cells[rowStart, 38].Value = listData[i].SyncedFrom;
                 rowStart += 1;
 
             }
@@ -2402,9 +2409,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 37].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 37].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 37].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 38].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 38].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 38].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
