@@ -1631,6 +1631,21 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
             });
+            if (list.Count > 1)
+            {
+                for (int i = 0; i < list.Count() - 1; i++)
+                {
+                    int j = i + 1;
+                    while (j < list.Count())
+                    {
+                        if (list[i].SeriesNo == list[j].SeriesNo || (list[i].InvoiceNo == list[j].InvoiceNo && list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling))
+                        {
+                            list[i].IsValid = false;
+                        }
+                        j++;
+                    }
+                }
+            }
             return list;
         }
 
