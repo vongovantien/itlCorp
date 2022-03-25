@@ -1638,7 +1638,7 @@ namespace eFMS.API.Documentation.DL.Services
                     int j = i + 1;
                     while (j < list.Count())
                     {
-                        if (list[i].SeriesNo == list[j].SeriesNo || (list[i].InvoiceNo == list[j].InvoiceNo) )
+                        if ((list[i].SeriesNo == list[j].SeriesNo && list[i].SeriesNo != null) || (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null))
                         {
                             list[i].IsValid = false;
                         }
