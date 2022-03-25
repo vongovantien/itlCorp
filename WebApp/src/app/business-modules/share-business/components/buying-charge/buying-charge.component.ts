@@ -363,7 +363,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.hblno = this.hbl.hwbno || null;
         newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
         newSurCharge.jobNo = this.shipment.jobNo || null;
-
+        newSurCharge.type = type;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -396,7 +396,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             newSurCharge.seriesNo = null;
         }
 
-        newSurCharge.linkChargeId= null;
+        newSurCharge.linkChargeId = null;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -685,44 +685,103 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData && !!chargeItem) {
-            chargeItem.partnerShortName = partnerData.shortName;
-            chargeItem.partnerName = partnerData.partnerNameEn;
-            chargeItem.paymentObjectId = partnerData.id;
-            chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
-
-            if (chargeItem.invoiceNo) {
-                chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+            console.log(partnerData, this.hbl.id);
+            if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                this._accountingRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem = this.mapValueWhenSelectPartnerSuccess(partnerData, chargeItem);
+                            } else {
+                                this._toastService.warning(res.message);
+                            }
+                        }
+                    )
+            } else {
+                chargeItem = this.mapValueWhenSelectPartnerSuccess(partnerData, chargeItem);
             }
+
         }
     }
 
-    selectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, index: number) {
-        chargeItem.objectBePaid = partnerType.fieldName;
-        chargeItem.isShowPartnerHeader = false;
-        this.selectedIndexCharge = index;
-        this.deleteComponentRef(this.selectedIndexCharge, 'partner');
+    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge,) {
+        chargeItem.partnerShortName = partnerData.shortName;
+        chargeItem.partnerName = partnerData.partnerNameEn;
+        chargeItem.paymentObjectId = partnerData.id;
+        chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
 
+        if (chargeItem.invoiceNo) {
+            chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+        }
+
+        return chargeItem;
+    }
+
+    mapValueWhenSelectPartnerTypeHeader(chargeItem: CsShipmentSurcharge, partnerType: CommonInterface.IValueDisplay) {
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                chargeItem.partnerShortName = this.hbl.customerName;
-                if (!chargeItem.partnerShortName) {
-                    chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
+                const customer = this.listPartner.find(x => x.id === this.hbl.customerId);
+                if (!!customer) {
+                    chargeItem.partnerShortName = customer.shortName;
+                    chargeItem.paymentObjectId = customer.id;
+                } else {
+                    chargeItem.partnerShortName = chargeItem.paymentObjectId = null;
                 }
-                chargeItem.paymentObjectId = this.hbl.customerId;
+
                 if (chargeItem.invoiceNo) {
                     chargeItem.vatPartnerId = chargeItem.paymentObjectId;
                 }
                 break;
             case CommonEnum.PartnerGroupEnum.CARRIER:
-                // chargeItem.partnerShortName = this.shipment.supplierName;
-                chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.shipment.coloaderId).shortName;
-                chargeItem.paymentObjectId = this.shipment.coloaderId;
+                const carrier = this.listPartner.find(p => p.id === this.shipment.coloaderId);
+                if (!!carrier) {
+                    chargeItem.partnerShortName = carrier.shortName;
+                    chargeItem.paymentObjectId = this.shipment.coloaderId;
+                }
                 break;
             case CommonEnum.PartnerGroupEnum.AGENT:
-                // chargeItem.partnerShortName = this.shipment.agentName;
-                chargeItem.paymentObjectId = this.shipment.agentId;
-                chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.shipment.agentId).shortName;
+                const agent = this.listPartner.find(p => p.id === this.shipment.agentId);
+                if (!!agent) {
+                    chargeItem.partnerShortName = agent.shortName;
+                    chargeItem.paymentObjectId = this.shipment.agentId;
+                }
+                break;
+        }
 
+
+        return chargeItem;
+    }
+
+    selectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, index: number) {
+        chargeItem.objectBePaid = partnerType.fieldName;
+        chargeItem.isShowPartnerHeader = false;
+
+        this.selectedIndexCharge = index;
+        this.deleteComponentRef(this.selectedIndexCharge, 'partner');
+
+        switch (partnerType.value) {
+            case CommonEnum.PartnerGroupEnum.CUSTOMER:
+                if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                    this._accountingRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id)
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                                } else {
+                                    this._toastService.warning(res.message);
+                                }
+                            }
+                        )
+                } else {
+                    chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                }
+
+                break;
+            case CommonEnum.PartnerGroupEnum.CARRIER:
+                chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                break;
+            case CommonEnum.PartnerGroupEnum.AGENT:
+                chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
                 break;
             default:
                 break;
@@ -1355,7 +1414,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 
-    onSelectSurcharge(index,cs:CsShipmentSurcharge){
+    onSelectSurcharge(index, cs: CsShipmentSurcharge) {
         this.selectedCs = cs;
         this.selectedIndexCharge = index;
         const qContextMenuList = this.queryListMenuContext.toArray();
@@ -1364,8 +1423,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    cancelLinkCharge (cs:CsShipmentSurcharge){
-        if(!cs.linkChargeId){
+    cancelLinkCharge(cs: CsShipmentSurcharge) {
+        if (!cs.linkChargeId) {
             this._toastService.warning("Charge without link charge");
             return;
         }

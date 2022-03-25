@@ -176,12 +176,14 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpGet("ValidateCheckPointPartner")]
         [Authorize]
-        public IActionResult ValidateCheckPointPartner(Guid partnerId, Guid? Hblid)
+        public IActionResult ValidateCheckPointPartner(string partnerId, Guid Hblid)
         {
-            var result = accountReceivableService.ValidateCheckPointPartner(partnerId, Hblid);
-            return Ok(new { valid = result });
+            HandleState hs = accountReceivableService.ValidateCheckPointPartner(partnerId, Hblid);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+            
+            return Ok(result);
         }
     }
 }

@@ -1,19 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
 import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
 import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { AccountingRepo, CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction, getCurrentUserState } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 import { JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, filter, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
@@ -102,6 +102,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
+        private _accountingRepo: AccountingRepo,
         private _toaster: ToastrService) {
         super();
     }
@@ -114,6 +115,21 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        // this.customers = this._store.select(getCurrentUserState)
+        //     .pipe(
+        //         filter(c => !!c.userName),
+        //         switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+        //             if (!!currentUser.userName) {
+        //                 return this._catalogueRepo.getPartnerByGroups(
+        //                     [CommonEnum.PartnerGroupEnum.CUSTOMER],
+        //                     true,
+        //                     'CL',
+        //                     currentUser?.officeId
+        //                 ).pipe(startWith([]))
+        //             }
+        //         }),
+        //         takeUntil(this.ngUnsubscribe),
+        //     ) as any;
         this.salesmans = this._systemRepo.getSystemUsers();
         this.ports = this._store.select(getCataloguePortState);
         this.carries = this._store.select(getCatalogueCarrierState);
@@ -265,22 +281,50 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
-                this.customerName = data.shortName;
-                this.customerId.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.salemansId.setValue(res.salemanId);
-                        } else {
-                            this.salemansId.setValue(null);
+                this._toaster.clear();
+                this._accountingRepo.validateCheckPointContractPartner(data.id, this.opsTransaction.hblid)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customerName = data.shortName;
+                                this.customerId.setValue(data.id);
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.salemansId.setValue(res.salemanId);
+                                        } else {
+                                            this.salemansId.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                                body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
+                                            })
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customerId.setValue(null);
+                                this.customerName = null;
+
+                                this._toaster.warning(res.message);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                                body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
-                            })
-                        }
-                    }
-                });
+                    )
+
+                // this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                //     if (!!res) {
+                //         if (!!res.salemanId) {
+                //             this.salemansId.setValue(res.salemanId);
+                //         } else {
+                //             this.salemansId.setValue(null);
+                //         }
+                //         if (!!res.officeNameAbbr) {
+                //             this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                //                 body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
+                //             })
+                //         }
+                //     }
+                // });
                 break;
             case 'warehouse':
                 this.warehouseId.setValue(data.id);

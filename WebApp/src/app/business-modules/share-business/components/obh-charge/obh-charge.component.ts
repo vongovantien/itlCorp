@@ -94,7 +94,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         this._catalogueRepo.getListPartner(null, null, { active: true })
             .subscribe(
                 (partners: Partner[]) => {
-                    console.log(partners)
                     this.listPartnerPayee = partners;
                 }
             );
@@ -166,19 +165,34 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'receiver':
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                        chargeItem.receiverName = this.hbl.customerName;
-                        if (!chargeItem.receiverName) {
-                            chargeItem.receiverName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
-                        }
-                        chargeItem.paymentObjectId = this.hbl.customerId;
+                        this._accountingRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id)
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        const customer = this.listPartner.find(p => p.id === this.hbl.customerId);
+                                        if (!!customer) {
+                                            chargeItem.receiverName = customer.partnerNameEn;
+                                            chargeItem.paymentObjectId = customer.id;
+                                        } else {
+                                            chargeItem.receiverName = chargeItem.paymentObjectId = null;
+                                        }
+                                    } else {
+                                        this._toastService.warning(res.message);
+                                    }
+                                }
+                            )
+
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
-                        chargeItem.receiverName = this.shipment.supplierName;
-                        chargeItem.paymentObjectId = this.shipment.coloaderId;
+                        chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType.value);
+                        // chargeItem.receiverName = this.shipment.supplierName;
+                        // chargeItem.paymentObjectId = this.shipment.coloaderId;
                         break;
                     case CommonEnum.PartnerGroupEnum.AGENT:
-                        chargeItem.receiverName = this.shipment.agentName;
-                        chargeItem.paymentObjectId = this.shipment.agentId;
+                        chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType.value);
+
+                        // chargeItem.receiverName = this.shipment.agentName;
+                        // chargeItem.paymentObjectId = this.shipment.agentId;
                         break;
                     default:
                         break;
@@ -187,7 +201,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'payer':
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                        console.log(this.hbl);
                         chargeItem.payerName = this.hbl.customerName;
                         chargeItem.payerShortName = this.listPartnerPayee.find(p => p.id === this.hbl.customerId).shortName;
                         chargeItem.payerId = this.hbl.customerId;
@@ -220,10 +233,19 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         chargeItem.objectBePaid = null;
         switch (type) {
             case 'receiver':
-                if (!!partnerData) {
-                    chargeItem.receiverName = partnerData.partnerNameEn;
-                    chargeItem.paymentObjectId = partnerData.id;
-                    chargeItem.receiverShortName = partnerData.shortName;
+                if (!!partnerData && !!this.hbl) {
+                    this._accountingRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id)
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    chargeItem.receiverName = partnerData.partnerNameEn;
+                                    chargeItem.paymentObjectId = partnerData.id;
+                                    chargeItem.receiverShortName = partnerData.shortName;
+                                } else {
+                                    this._toastService.warning(res.message);
+                                }
+                            }
+                        )
                 }
                 break;
             case 'payer':

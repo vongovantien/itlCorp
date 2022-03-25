@@ -2324,7 +2324,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- DETAIL ---
 
         #region -- Update AcctManagement and overdays AccountReceivable after change payment term contract
-       
+
         public async Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
         {
             var listInvoices = new List<AccAccountingManagement>();
@@ -2584,56 +2584,67 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion
 
-        public HandleState ValidateCheckPointPartner(Guid Id, Guid HblId)
+        public HandleState ValidateCheckPointPartner(string partnerId, Guid HblId)
         {
-            try
+
+            HandleState result = new HandleState();
+            bool isValid = false;
+
+            string salemanBOD = userRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Username;
+
+            CatContract contract = contractPartnerRepo.Get(x => x.PartnerId == partnerId
+            && x.Active == true
+            && x.SaleManId != salemanBOD
+            && (x.IsExpired == false || x.IsExpired == null)
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString()))
+            .OrderBy(x => x.ContractType)
+            // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
+            .FirstOrDefault();
+
+            CatPartner partner = partnerRepo.Get(x => x.Id == partnerId)?.FirstOrDefault();
+
+            if (contract == null)
             {
-                HandleState result = new HandleState();
-                bool isValid = false;
-
-                var salemanBOD = userRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Username;
-
-                var contract = contractPartnerRepo.Get(x => x.PartnerId == Id.ToString()
-                && x.Active == true
-                && x.SaleManId != salemanBOD
-                && (x.IsExpired == false || x.IsExpired == null)
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))
-                .OrderBy(x => x.ContractType)
-                // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
-                .FirstOrDefault();
-
-                if (contract == null)
-                {
-                    throw new Exception("Partner doesn't have any agreement");
-                }
-
-                switch (contract.ContractType)
-                {
-                    case "Cash":
-                        isValid = ValidateCheckPointCashContractPartner(Id, HblId);
-                        break;
-                    case "Official":
-                    case "Trial":
-                        isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                        break;
-                    default:
-                        break;
-                }
-                return result;
+                SysOffice office = officeRepo.Get(x => x.Id == currentUser.OfficeID)?.FirstOrDefault();
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement for service in office {1} please you check again", partner.ShortName, office.ShortName));
             }
-            catch (Exception ex)
+
+            switch (contract.ContractType)
             {
-                return new HandleState(ex);
-                throw;
+                case "Cash":
+                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId);
+                    break;
+                case "Official":
+                case "Trial":
+                    // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
+                    break;
+                default:
+                    break;
             }
+            string messError = null;
+            if (isValid == false)
+            {
+                SysUser saleman = userRepo.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
+
+                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
+                    partner?.TaxCode, partner?.ShortName, saleman.Username);
+
+                return new HandleState((object)messError);
+            }
+            return result;
         }
 
-        private bool ValidateCheckPointCashContractPartner(Guid partnerId, Guid HblId)
+        private bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId)
         {
             bool valid = true;
             var surchargeToCheck = surchargeRepo.Get(x => x.Hblid != HblId
             && x.OfficeId == currentUser.OfficeID
+            && x.PaymentObjectId == partnerId
             );
+            if(surchargeToCheck.Count() == 0)
+            {
+                return valid;
+            }
 
             var surchargeSellOBH = surchargeToCheck.Where(x =>
                 (x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.AcctManagementId == null)
@@ -2646,12 +2657,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                var accMngt = accountingManagementRepo.Get(x => x.PartnerId == partnerId.ToString()
+                var accMngt = accountingManagementRepo.Get(x => x.PartnerId == partnerId
                 && x.OfficeId == currentUser.OfficeID
-                && x.Status != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
                 && (x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART || x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                 );
-                var qInvoiceInvalid = from sur in surchargeToCheck.Where(x => x.AcctManagementId != null && x.OfficeId == currentUser.OfficeID)
+
+                var surchargeWithInvoice = surchargeToCheck.Where(x => x.AcctManagementId != null);
+                var qInvoiceInvalid = from sur in surchargeWithInvoice
                                       join invoice in accMngt on sur.AcctManagementId equals invoice.Id into invoiceGrps
                                       from invoiceGrp in invoiceGrps.DefaultIfEmpty()
                                       select invoiceGrp.Id;
@@ -2673,7 +2685,7 @@ namespace eFMS.API.Accounting.DL.Services
             && x.OfficeId == currentUser.OfficeID
             );
 
-            var setting = setting
+            // var setting = setting
             return valid;
         }
     }
