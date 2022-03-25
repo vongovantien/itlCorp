@@ -1641,6 +1641,12 @@ namespace eFMS.API.Documentation.DL.Services
                         if ((list[i].SeriesNo == list[j].SeriesNo && list[i].SeriesNo != null) || (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null))
                         {
                             list[i].IsValid = false;
+                            list[j].IsValid = false;
+                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            {
+                                list[i].IsValid = true;
+                                list[j].IsValid = true;
+                            }
                         }
                         j++;
                     }
@@ -1672,7 +1678,6 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     item.UserCreated = item.UserModified = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    item.ExchangeDate = DateTime.Now.Date;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
