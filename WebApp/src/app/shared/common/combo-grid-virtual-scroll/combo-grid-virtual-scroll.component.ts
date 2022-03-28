@@ -290,6 +290,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
             this.displaySelectedStr = val;
             this.onChange(val);
             this.onTouch(val);
+            this.cdf.markForCheck();
+
         }
     }
 
