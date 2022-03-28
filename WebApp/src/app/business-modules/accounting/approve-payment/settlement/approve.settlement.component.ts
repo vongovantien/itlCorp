@@ -48,9 +48,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     comment: string = '';
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Settlement';
+    folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
-    
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -84,7 +84,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     getDetailSettlement(settlementId: string) {
         this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }))
-        this._accoutingRepo.getDetailSettlementPayment(settlementId)
+        this._accoutingRepo.getDetailSettlementPayment(settlementId, 'GROUP')
             .pipe(
                 catchError(this.catchError),
                 tap((res: any) => {
@@ -104,7 +104,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     // * wait to currecy list api
                     this.formCreateSurcharge.form.patchValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
-                        requester: this.settlementPayment.settlement.requester,
+                        requester: this.settlementPayment.settlement.userNameCreated,
                         requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
@@ -270,7 +270,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     }
                 }
             });
-    }   
+    }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {

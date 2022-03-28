@@ -252,7 +252,7 @@ export class CatalogueRepo {
     }
 
     getListChareByServiceAccess(serviceType: string[], type: string = '') {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/GetChargesWithCurrentUserService`, serviceType, {type: type}).pipe(
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCharge/GetChargesWithCurrentUserService`, serviceType, { type: type }).pipe(
             map((data: any) => data)
         );
     }
@@ -1329,7 +1329,7 @@ export class CatalogueRepo {
                 })
             );
         } else {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/getAllByQuery`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/getAllByQuery`, body, null, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => {
                     return data;

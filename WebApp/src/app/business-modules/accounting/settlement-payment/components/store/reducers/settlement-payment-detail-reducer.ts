@@ -20,6 +20,9 @@ const reducer = createReducer(
     })),
     on(Actions.LoadDetailSettlePaymentSuccess, (state: SettlePaymentDetailState, payload: ISettlementPaymentData) => ({
         ...state, settlement: payload, isLoading: false, isLoaded: true
+    })),
+    on(Actions.LoadDetailSettlePaymentFail, (state: SettlePaymentDetailState) => ({
+        ...state, isLoading: false, isLoaded: true
     }))
 );
 
