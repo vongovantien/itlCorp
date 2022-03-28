@@ -133,6 +133,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.headerPartner = [
             { title: 'Name', field: 'partnerNameEn' },
             { title: 'Partner Code', field: 'taxCode' },
+            { title: 'Name ABBR', field: 'shortName' },
         ];
 
         this._store.dispatch(new GetCatalogueUnitAction());
