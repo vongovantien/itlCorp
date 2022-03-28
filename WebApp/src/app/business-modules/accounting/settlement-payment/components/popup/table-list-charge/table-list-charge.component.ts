@@ -549,12 +549,35 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.charges.splice(index, 1);
     }
 
+    isWhiteSpace(input: any){
+        if(input!=null){
+            if(input.trim().length===0){
+                return true;
+            }
+        }
+        if(input===null){
+            return true;
+        }
+        return false;
+    }
+
     saveChargeList() {
         this.isSubmitted = true;
 
         if (!this.charges.length) {
             this._toastService.warning("Please add charge");
             return;
+        }
+        
+        for (const charge of this.charges) {
+            if(!this.isWhiteSpace(charge.invoiceNo )&& this.isWhiteSpace(charge.seriesNo)){
+                this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+            if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
+                this._toastService.warning("Invoice No Must be fill in");
+                return;
+            }
         }
 
         const error = this.checkValidate();

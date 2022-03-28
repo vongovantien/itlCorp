@@ -1506,6 +1506,14 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
                 }
+                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                {
+                    if (string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                        item.IsValid = false;
+                    }
+                }
                 else
                 {
                     if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "selling" && item.Type.ToLower() != "obh")
@@ -1622,9 +1630,39 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
+                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
                     }
                 }
             });
+            if (list.Count > 1)
+            {
+                for (int i = 0; i < list.Count() - 1; i++)
+                {
+                    int j = i + 1;
+                    while (j < list.Count())
+                    {
+                        if (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null)
+                        {
+                            list[i].IsValid = false;
+                            list[j].IsValid = false;
+                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            {
+                                list[i].IsValid = true;
+                                list[j].IsValid = true;
+                            }
+                        }
+                        j++;
+                    }
+                }
+            }
             return list;
         }
 
@@ -1651,7 +1689,6 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     item.UserCreated = item.UserModified = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    item.ExchangeDate = DateTime.Now.Date;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
