@@ -263,42 +263,65 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         );
     }
 
+    onSelectShipmentData(data: OperationInteface.IShipment | IAdvanceShipment | any) {
+        this.serviceTypeId = data.service;
+        this.selectedShipment = data;
+
+        this.resetAdvanceData();
+
+        this.customNo.setValue(null);
+        this.getAdvances(this.selectedShipment.jobId, this.selectedShipment.hblid, true, this.settlementCode);
+
+        this.shipment.setValue(this.selectedShipment.hblid);
+
+        const _customDeclarations = this.filterCDByShipment(data);
+
+        if (_customDeclarations.length > 0) {
+            this.selectedCD = _customDeclarations[0];
+            this.customNo.setValue(_customDeclarations[0].clearanceNo);
+        }
+        if (!!this.charges.length) {
+
+            if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
+                this.getMasterCharges(this.serviceTypeId, true);
+            }
+            if (this.charges[0].hblid !== data.hblid) {
+                this.charges.forEach((charge: Surcharge) => {
+                    charge.isChangeShipment = true;
+                    charge.id = SystemConstants.EMPTY_GUID;
+                });
+            }
+            for (const charge of this.charges) {
+                charge.jobId = this.selectedShipment.jobId;
+                charge.jobNo = this.selectedShipment.jobId;
+            }
+        }
+    }
+
     onSelectDataFormInfo(data: OperationInteface.IShipment | IAdvanceShipment | any, type: string) {
+        if (this.charges.length > 0 && this.charges.filter((chg: Surcharge) => chg.isSelected).length === 0){
+            return;
+        }
         this.isSubmitted = false;
 
         switch (type) {
             case 'shipment':
-                this.serviceTypeId = data.service;
-                this.selectedShipment = data;
-
-                this.resetAdvanceData();
-
-                this.customNo.setValue(null);
-                this.getAdvances(this.selectedShipment.jobId, this.selectedShipment.hblid, true, this.settlementCode);
-
-                this.shipment.setValue(this.selectedShipment.hblid);
-
-                const _customDeclarations = this.filterCDByShipment(data);
-
-                if (_customDeclarations.length > 0) {
-                    this.selectedCD = _customDeclarations[0];
-                    this.customNo.setValue(_customDeclarations[0].clearanceNo);
-                }
-                if (!!this.charges.length) {
-
-                    if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
-                        this.getMasterCharges(this.serviceTypeId, true);
-                    }
-                    if (this.charges[0].hblid !== data.hblid) {
-                        this.charges.forEach((charge: Surcharge) => {
-                            charge.isChangeShipment = true;
-                            charge.id = SystemConstants.EMPTY_GUID;
-                        });
-                    }
-                    for (const charge of this.charges) {
-                        charge.jobId = this.selectedShipment.jobId;
-                        charge.jobNo = this.selectedShipment.jobId;
-                    }
+                if(this.charges.length > 0){
+                let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected);
+                selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
+                this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
+                    .subscribe(
+                        (res: any) => {
+                            if (!res.status) {
+                                this._toastService.warning(res.message);
+                                return;
+                            } else {
+                                this.onSelectShipmentData(data);
+                            }
+                        }
+                    );
+                }else{
+                    this.onSelectShipmentData(data);
                 }
                 break;
             case 'cd':

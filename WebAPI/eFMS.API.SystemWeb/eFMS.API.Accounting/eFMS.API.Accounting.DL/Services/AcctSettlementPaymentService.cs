@@ -2191,7 +2191,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //End --Phí chứng từ (IsFromShipment = true)--
 
                         //Start --Phí hiện trường (IsFromShipment = false)--
-                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false ).ToList();
+                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
                         var idsChargeScene = chargeScene.Select(x => x.Id);
                         //Add các phí hiện trường mới (nếu có)
                         var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
@@ -2222,6 +2222,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.TransactionType = GetTransactionTypeOfChargeByHblId(charge.Hblid);
                                 charge.OfficeId = currentUser.OfficeID;
                                 charge.CompanyId = currentUser.CompanyID;
+                                charge.CreditNo = charge.DebitNo = charge.Soano = charge.PaySoano = null;  // refresh các hđ trước đó
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
@@ -2279,7 +2280,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 if (sceneCharge != null )
                                 {
-                                    if(string.IsNullOrEmpty(item.LinkChargeId))
+                                    if(string.IsNullOrEmpty(item.LinkChargeId) && string.IsNullOrEmpty(item.SyncedFrom) && string.IsNullOrEmpty(item.PaySyncedFrom))
                                     {
                                         sceneCharge.UnitId = item.UnitId;
                                         sceneCharge.UnitPrice = item.UnitPrice;
@@ -6029,6 +6030,33 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
        
+        /// <summary>
+        /// Check allow update direct charges in list detail settle
+        /// </summary>
+        /// <param name="shipmentCharges"></param>
+        /// <returns></returns>
+        public HandleState CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
+        {
+            var chargeIds = shipmentCharges.Select(x => x.Id).ToList();
+            var surcharges = csShipmentSurchargeRepo.Get(x => chargeIds.Any(z => z == x.Id) && x.IsFromShipment == false);
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)))
+            {
+                return new HandleState((object)"You can't update charge. Charges have been issued CDNOTE");
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)))
+            {
+                return new HandleState((object)"You can't update charge. Charges have been issued SOA");
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)))
+            {
+                return new HandleState((object)"You can't update charge. Charges have been synced");
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)))
+            {
+                return new HandleState((object)"You can't update charge. Charges have been issued voucher");
+            }
+            return new HandleState();
+        }
     }
 }
 
