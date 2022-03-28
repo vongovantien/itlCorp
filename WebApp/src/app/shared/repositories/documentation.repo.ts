@@ -1183,4 +1183,8 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/ReplicateJob`, { Ids });
 
     }
+
+    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`, { partnerId: partnerId, hblId: hblId, transactionType: transactionType })
+    }
 }

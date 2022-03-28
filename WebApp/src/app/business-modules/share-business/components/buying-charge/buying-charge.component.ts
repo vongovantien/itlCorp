@@ -685,9 +685,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData && !!chargeItem) {
-            console.log(partnerData, this.hbl.id);
             if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                this._accountingRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id)
+                const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
@@ -761,8 +761,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
+                const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                 if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                    this._accountingRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id)
+                    this._documentRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id, transactionType)
                         .subscribe(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {

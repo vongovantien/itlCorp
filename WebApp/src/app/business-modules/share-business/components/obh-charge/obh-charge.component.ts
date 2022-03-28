@@ -165,7 +165,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'receiver':
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                        this._accountingRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id)
+                        const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                        this._documentRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id, transactionType)
                             .subscribe(
                                 (res: CommonInterface.IResult) => {
                                     if (res.status) {
@@ -234,7 +235,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         switch (type) {
             case 'receiver':
                 if (!!partnerData && !!this.hbl) {
-                    this._accountingRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id)
+                    const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                    this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
                         .subscribe(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {

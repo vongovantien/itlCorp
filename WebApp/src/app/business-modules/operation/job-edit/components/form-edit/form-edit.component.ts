@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
 import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
 import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { AccountingRepo, CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction, getCurrentUserState } from '@store';
 import { CommonEnum } from '@enums';
@@ -13,7 +13,7 @@ import { JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
 import { Observable } from 'rxjs';
-import { catchError, filter, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
@@ -102,7 +102,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
-        private _accountingRepo: AccountingRepo,
         private _toaster: ToastrService) {
         super();
     }
@@ -282,7 +281,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
             case 'customer':
                 this._toaster.clear();
-                this._accountingRepo.validateCheckPointContractPartner(data.id, this.opsTransaction.hblid)
+                this._documentRepo.validateCheckPointContractPartner(data.id, this.opsTransaction.hblid, 'CL')
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {

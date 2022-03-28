@@ -1017,11 +1017,6 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-
-    validateCheckPointContractPartner(partnerId: string, hblId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/ValidateCheckPointPartner`, { partnerId: partnerId, hblId: hblId })
-    }
-
 }
 
 

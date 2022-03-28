@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         private IMapper mapper;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
-
+        private readonly ICheckPointService checkPointService;
 
         /// <summary>
         /// constructor
@@ -62,6 +62,7 @@ namespace eFMS.API.Documentation.Controllers
             ICurrencyExchangeService currencyExchange,
             IMapper _mapper,
             IAccAccountReceivableService accAccountReceivable,
+            ICheckPointService checkPoint,
             IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
@@ -72,6 +73,7 @@ namespace eFMS.API.Documentation.Controllers
             mapper = _mapper;
             accAccountReceivableService = accAccountReceivable;
             apiServiceUrl = serviceUrl;
+            checkPointService = checkPoint;
 
         }
 
@@ -681,6 +683,15 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpGet("ValidateCheckPointPartner")]
+        public IActionResult ValidateCheckPointPartner(string partnerId, Guid Hblid, string transactionType)
+        {
+            HandleState hs = checkPointService.ValidateCheckPointPartner(partnerId, Hblid, transactionType);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+
             return Ok(result);
         }
     }

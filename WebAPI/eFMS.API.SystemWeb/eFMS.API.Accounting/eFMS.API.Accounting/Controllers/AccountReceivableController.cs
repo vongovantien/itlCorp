@@ -175,15 +175,5 @@ namespace eFMS.API.Accounting.Controllers
             var result = accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
             return Ok(result);
         }
-
-        [HttpGet("ValidateCheckPointPartner")]
-        [Authorize]
-        public IActionResult ValidateCheckPointPartner(string partnerId, Guid Hblid)
-        {
-            HandleState hs = accountReceivableService.ValidateCheckPointPartner(partnerId, Hblid);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
-            
-            return Ok(result);
-        }
     }
 }

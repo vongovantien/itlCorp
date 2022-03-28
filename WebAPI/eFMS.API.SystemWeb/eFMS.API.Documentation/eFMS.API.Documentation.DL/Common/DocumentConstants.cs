@@ -93,5 +93,9 @@
 
         public static readonly string LINK_CHARGE_TYPE_AUTO_RATE = "AUTO_RATE";
         public static readonly string LINK_CHARGE_TYPE_LINK_FEE = "LINK_FEE";
+
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
     }
 }

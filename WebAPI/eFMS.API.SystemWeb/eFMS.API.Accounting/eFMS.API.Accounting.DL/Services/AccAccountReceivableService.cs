@@ -47,7 +47,6 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepo;
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<AcctCdnote> cdNoteRepo;
-        private readonly IContextBase<SysSettingFlow> settingFlowRepo;
 
         public AccAccountReceivableService(IContextBase<AccAccountReceivable> repository,
             IMapper mapper,
@@ -69,7 +68,6 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctAdvanceRequest> advanceRequest,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<SysSettingFlow> settingFlow,
             IContextBase<AcctCdnote> acctCdNote) : base(repository, mapper)
         {
             currentUser = currUser;
@@ -91,7 +89,6 @@ namespace eFMS.API.Accounting.DL.Services
             employeeRepo = sysEmployee;
             officeRepo = sysOffice;
             cdNoteRepo = acctCdNote;
-            settingFlowRepo = settingFlow;
         }
 
         #region --- CALCULATOR VALUE ---
@@ -2583,110 +2580,5 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #endregion
-
-        public HandleState ValidateCheckPointPartner(string partnerId, Guid HblId)
-        {
-
-            HandleState result = new HandleState();
-            bool isValid = false;
-
-            string salemanBOD = userRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Username;
-
-            CatContract contract = contractPartnerRepo.Get(x => x.PartnerId == partnerId
-            && x.Active == true
-            && x.SaleManId != salemanBOD
-            && (x.IsExpired == false || x.IsExpired == null)
-            && x.OfficeId.Contains(currentUser.OfficeID.ToString()))
-            .OrderBy(x => x.ContractType)
-            // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
-            .FirstOrDefault();
-
-            CatPartner partner = partnerRepo.Get(x => x.Id == partnerId)?.FirstOrDefault();
-
-            if (contract == null)
-            {
-                SysOffice office = officeRepo.Get(x => x.Id == currentUser.OfficeID)?.FirstOrDefault();
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement for service in office {1} please you check again", partner.ShortName, office.ShortName));
-            }
-
-            switch (contract.ContractType)
-            {
-                case "Cash":
-                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId);
-                    break;
-                case "Official":
-                case "Trial":
-                    // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                    break;
-                default:
-                    break;
-            }
-            string messError = null;
-            if (isValid == false)
-            {
-                SysUser saleman = userRepo.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
-
-                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
-                    partner?.TaxCode, partner?.ShortName, saleman.Username);
-
-                return new HandleState((object)messError);
-            }
-            return result;
-        }
-
-        private bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId)
-        {
-            bool valid = true;
-            var surchargeToCheck = surchargeRepo.Get(x => x.Hblid != HblId
-            && x.OfficeId == currentUser.OfficeID
-            && x.PaymentObjectId == partnerId
-            );
-            if(surchargeToCheck.Count() == 0)
-            {
-                return valid;
-            }
-
-            var surchargeSellOBH = surchargeToCheck.Where(x =>
-                (x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.AcctManagementId == null)
-             || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.AcctManagementId == null)
-                );
-
-            if (surchargeSellOBH.Count() > 0)
-            {
-                valid = false;
-            }
-            else
-            {
-                var accMngt = accountingManagementRepo.Get(x => x.PartnerId == partnerId
-                && x.OfficeId == currentUser.OfficeID
-                && (x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART || x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
-                );
-
-                var surchargeWithInvoice = surchargeToCheck.Where(x => x.AcctManagementId != null);
-                var qInvoiceInvalid = from sur in surchargeWithInvoice
-                                      join invoice in accMngt on sur.AcctManagementId equals invoice.Id into invoiceGrps
-                                      from invoiceGrp in invoiceGrps.DefaultIfEmpty()
-                                      select invoiceGrp.Id;
-
-                if (qInvoiceInvalid.Count() > 0)
-                {
-                    valid = false;
-                }
-            }
-            return valid;
-        }
-
-
-        private bool ValidateCheckPointOfficialTrialContractPartner(Guid partnerId, Guid HblId)
-        {
-            bool valid = true;
-
-            var surchargeToCheck = surchargeRepo.Get(x => x.Hblid != HblId
-            && x.OfficeId == currentUser.OfficeID
-            );
-
-            // var setting = setting
-            return valid;
-        }
     }
 }
