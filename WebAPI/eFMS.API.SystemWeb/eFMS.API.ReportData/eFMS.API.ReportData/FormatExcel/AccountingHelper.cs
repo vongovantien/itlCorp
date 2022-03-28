@@ -6017,8 +6017,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     var _orgPaidAmount = item.PaymentDetails.Sum(x => x.OrgPaidAmount ?? 0);
                     var _orgPaidAmountVnd = item.PaymentDetails.Sum(x => x.PaidAmountVND ?? 0);
-                    var _orgRemainAmount = item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
-                    var _orgRemainAmountVnd = item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
+                    var _orgRemainAmount = item.BeginAmount - _orgPaidAmount; // item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
+                    var _orgRemainAmountVnd = (item.BeginAmountVND ?? 0) - _orgPaidAmountVnd; // item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
                     if (item.Status == "Unpaid")
                     {
                         _orgPaidAmount = 0;
@@ -6179,7 +6179,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("BeginAmountVndDt", trans.BeginAmountVND);
                         listKeyData.Add("TangVndDt", trans.OrgAmountTangVND);
                         listKeyData.Add("GiamVndDt", trans.OrgAmountGiamVND);
-                        var remainAmountVnd = item.FirstOrDefault().Status == "Paid" ? 0 : trans.BeginAmountVND + trans.OrgAmountTangVND - trans.OrgAmountGiamVND;
+                        var remainAmountVnd = trans.Status == "Paid" ? 0 : trans.BeginAmountVND + trans.OrgAmountTangVND - trans.OrgAmountGiamVND;
                         listKeyData.Add("RemainVndDt", remainAmountVnd);
                         excel.SetData(listKeyData);
                         excel.Worksheet.Cells[startRow, 11, startRow, 14].Style.Numberformat.Format = item.FirstOrDefault().Currency == "VND" ? numberFormat2 : numberFormat;
