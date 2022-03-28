@@ -666,7 +666,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPayment.RemainAmountVnd = payableCreditExisted.RemainAmountVnd - detail.PayAmountVND;
                                 creditPayment.RemainAmountUsd = payableCreditExisted.RemainAmountUsd - detail.PayAmountUSD;
                                 // status credit
-                                if (payableCreditExisted.PaymentAmount != 0 && creditPayment.RemainAmount != 0)
+                                if ((payableCreditExisted.PaymentAmount + creditPayment.PaymentAmount) != 0 && creditPayment.RemainAmount != 0)
                                 {
                                     creditPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                                 }
@@ -695,7 +695,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 advPayment.RemainAmountVnd = payableAdvExisted.RemainAmountVnd - advPayment.PaymentAmountVnd;
                                 advPayment.RemainAmountUsd = payableAdvExisted.RemainAmountUsd - advPayment.PaymentAmountUsd;
                                 // status adv refno
-                                if (payableAdvExisted.PaymentAmount != 0 && advPayment.RemainAmount != 0)
+                                if ((payableAdvExisted.PaymentAmount + advPayment.PaymentAmount) != 0 && advPayment.RemainAmount != 0)
                                 {
                                     advPayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                                 }
@@ -712,6 +712,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 {
                                     advPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF; // type COMBINE => ghi nhận CN để NetOff
                                 }
+                                listInsertPayment.Add(advPayment);
 
                                 // Update paid amount
                                 // Type CREDIT
@@ -770,7 +771,6 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
                                 
-                                listInsertPayment.Add(advPayment);
                                 var hsPayableCredit = DataContext.Update(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
                                 var hsPayableAdv = DataContext.Update(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
                             }
