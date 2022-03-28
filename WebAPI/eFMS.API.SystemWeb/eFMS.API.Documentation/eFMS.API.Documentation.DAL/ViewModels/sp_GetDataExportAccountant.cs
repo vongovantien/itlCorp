@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
 {
     public class sp_GetDataExportAccountant
     {
-        public Guid Id { get; set; }
+        public Guid SurChargeId { get; set; }
         public string JobNo { get; set; }
         public string HWBNo { get; set; }
         public string Service { get; set; }
