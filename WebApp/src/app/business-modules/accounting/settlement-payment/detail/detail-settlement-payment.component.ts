@@ -113,10 +113,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     updateSettlement() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
@@ -228,10 +228,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     saveAndSendRequest() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
@@ -267,10 +267,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     previewSettlementPayment() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
@@ -296,10 +296,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPayment(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -317,10 +317,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -339,10 +339,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
 
     exportGeneralPreview(typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+        //     return;
+        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(
