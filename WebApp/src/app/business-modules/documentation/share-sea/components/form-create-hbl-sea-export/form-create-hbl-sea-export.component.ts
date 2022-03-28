@@ -21,6 +21,7 @@ import { DataService } from '@services';
 
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-form-create-hbl-sea-export',
@@ -105,6 +106,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     userCreated: string;
     userModified: string;
 
+    hblId: string = '';
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -112,6 +115,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _dataService: DataService,
+        private _toast: ToastrService
     ) {
         super();
     }
@@ -159,10 +163,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     (res: CsTransactionDetail) => {
                         if (!!res) {
                             this.shipmmentDetail.id = res.jobId;
-                            this.dateTimeCreated=res.datetimeCreated;
-                            this.dateTimeModified=res.datetimeModified;
-                            this.userCreated=res.userNameCreated;
-                            this.userModified=res.userNameModified;
+                            this.dateTimeCreated = res.datetimeCreated;
+                            this.dateTimeModified = res.datetimeModified;
+                            this.userCreated = res.userNameCreated;
+                            this.userModified = res.userNameModified;
+                            this.hblId = res.id;
                             this.updateFormValue(res);
                         }
                     }
@@ -170,7 +175,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         } else {
             this.getShipmentDetailAndUpdateDefault();
         }
-        
+
     }
 
     getShipmentDetailAndUpdateDefault() {
@@ -301,10 +306,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             issueHbldate: [],
 
             // * Input
-            mawb: [null,Validators.compose([
+            mawb: [null, Validators.compose([
                 FormValidators.validateSpecialChar
             ])],
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -453,12 +458,12 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             polDescription: data.polDescription,
             podDescription: data.podDescription,
         });
-        
+
         this.ports.pipe().subscribe(
-            (ports: PortIndex[])=> {
-                let portIndex = ports.filter((x: PortIndex)=> x.id === data.pol)[0];
+            (ports: PortIndex[]) => {
+                let portIndex = ports.filter((x: PortIndex) => x.id === data.pol)[0];
                 this.onSelectDataFormInfo(portIndex, 'pol');
-                portIndex = ports.filter((x: PortIndex)=> x.id === data.pod)[0];
+                portIndex = ports.filter((x: PortIndex) => x.id === data.pod)[0];
                 this.onSelectDataFormInfo(portIndex, 'pod');
             }
         )
@@ -467,27 +472,56 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                this.customerName = data.shortName;
-                this.customer.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.saleMan.setValue(res.salemanId);
-                        } else {
-                            this.saleMan.setValue(null);
-                        }
-                        if (!!res.officeNameAbbr) {
-                            console.log(res.officeNameAbbr);
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
+                // this.customerName = data.shortName;
+                // this.customer.setValue(data.id);
+                const _hblId = this.isUpdate ? this.hblId : '';
+                this._documentRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customer.setValue(data.id);
+                                this.customerName = data.shortName;
 
-                if (!this.shipper.value) {
-                    this.shipper.setValue(data.id);
-                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                                if (!this.shipper.value) {
+                                    this.shipper.setValue(data.id);
+                                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                                }
+
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.saleMan.setValue(res.salemanId);
+                                        } else {
+                                            this.saleMan.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                                            this.infoPopup.show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customer.setValue(null);
+                                this._toast.warning(res.message);
+                            }
+                        }
+                    )
+                // this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
+                //     if (!!res) {
+                //         if (!!res.salemanId) {
+                //             this.saleMan.setValue(res.salemanId);
+                //         } else {
+                //             this.saleMan.setValue(null);
+                //         }
+                //         if (!!res.officeNameAbbr) {
+                //             console.log(res.officeNameAbbr);
+                //             this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                //             this.infoPopup.show();
+                //         }
+                //     }
+                // });
+
+
                 break;
             case 'shipper':
                 this.shipperName = data.shortName;

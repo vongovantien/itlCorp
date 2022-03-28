@@ -13,8 +13,8 @@ import { ConfirmPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from '@enums';
 
-import { forkJoin, Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, skip, map, shareReplay, mergeMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, skip, map, shareReplay } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
@@ -692,6 +692,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
                                 chargeItem = this.mapValueWhenSelectPartnerSuccess(partnerData, chargeItem);
+                                this._cd.markForCheck();
+
                             } else {
                                 this._toastService.warning(res.message);
                             }

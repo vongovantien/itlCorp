@@ -26,6 +26,7 @@ import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChang
 import { Observable, forkJoin } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -133,6 +134,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         private _documentationRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _dataService: DataService,
+        private _toast: ToastrService
     ) {
         super();
     }
@@ -228,7 +230,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     } else {
                         this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
-                    
+
                 }
             );
     }
@@ -275,10 +277,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.jobId = hbl.jobId;
                         this.hblId = hbl.id;
                         this.hwconstant = hbl.hwConstant;
-                        this.dateTimeCreated=hbl.datetimeCreated;
-                        this.dateTimeModified=hbl.datetimeModified;
-                        this.userCreated=hbl.userNameCreated;
-                        this.userModified=hbl.userNameModified;
+                        this.dateTimeCreated = hbl.datetimeCreated;
+                        this.dateTimeModified = hbl.datetimeModified;
+                        this.userCreated = hbl.userNameCreated;
+                        this.userModified = hbl.userNameModified;
                         this.updateFormValue(hbl);
                     }
                 });
@@ -293,11 +295,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formCreate = this._fb.group({
-            mawb: [null,Validators.compose([
+            mawb: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -494,25 +496,37 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-                // this.customerName = data.shortName;
+                const _hblId = this.isUpdate ? this.hblId : '';
+                this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customerId.setValue(data.id);
+                                if (!this.shipperId.value) {
+                                    this.shipperId.setValue(data.id);
+                                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                                }
 
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.saleManId.setValue(res.salemanId);
-                        } else {
-                            this.saleManId.setValue(null);
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.saleManId.setValue(res.salemanId);
+                                        } else {
+                                            this.saleManId.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                                            this.infoPopup.show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customerId.setValue(null);
+                                this._toast.warning(res.message);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
-                if (!this.shipperId.value) {
-                    this.shipperId.setValue(data.id);
-                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                    )
+
                 break;
             case 'shipper':
                 this.customerName = data.shortName;

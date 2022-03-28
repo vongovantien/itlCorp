@@ -5,7 +5,7 @@ import { CommodityGroup, Customer, PortIndex, User, LinkAirSeaModel } from '@mod
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
-import { InfoPopupComponent } from '@common';
+import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { FormValidators } from '@validators';
 import { AppForm } from '@app';
@@ -22,6 +22,8 @@ import { catchError } from 'rxjs/operators';
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
     @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
+    @ViewChild('comboGridCustomerCpn') comboGridCustomerCpn: ComboGridVirtualScrollComponent;
+
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -122,20 +124,33 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
-                this.customerId.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, null).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.salemansId.setValue(res.salemanId);
-                        } else {
-                            this.salemansId.setValue(null);
+                this._documentRepo.validateCheckPointContractPartner(data.id, '', 'CL')
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customerId.setValue(data.id);
+
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.salemansId.setValue(res.salemanId);
+                                        } else {
+                                            this.salemansId.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                                            this.infoPopup.show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customerId.setValue(null);
+                                this.comboGridCustomerCpn.displayStringValue = null;
+                                this._toaster.warning(res.message);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
+                    )
+
                 break;
             case 'salesman':
                 this.salemansId.setValue(data.id);

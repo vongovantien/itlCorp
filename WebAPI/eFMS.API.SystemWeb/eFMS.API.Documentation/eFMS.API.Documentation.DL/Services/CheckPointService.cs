@@ -45,43 +45,51 @@ namespace eFMS.API.Documentation.DL.Services
             this.opsTransactionRepository = opsTransactionRepo;
             this.csTransactionRepository = csTransactionRepo;
             this.csSurchargeRepository = csSurcharge;
-            this.csDetailSurchargeRepository = csDetailSurchargeRepo
+            this.csDetailSurchargeRepository = csDetailSurchargeRepo;
 
         }
 
         public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType)
         {
             bool valid = true;
+            IQueryable<CsShipmentSurcharge> surchargeToCheck = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
             // Những lô hàng # saleman
             var opsHblids = new List<Guid>();
             string salemanCurrent = null;
-            if (transactionType == "CL")
+            if(HblId == Guid.Empty) // Mở một lô mới
             {
-                salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-
-                opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent)
-                    .Select(x => x.Hblid)
-                    .ToList();
+                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
             } else
             {
-                salemanCurrent = csDetailSurchargeRepository.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
+                if (transactionType == "CL")
+                {
+                    salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
 
-                opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent)
-                    .Select(x => x.Id)
-                    .ToList();
+                    opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent)
+                        .Select(x => x.Hblid)
+                        .ToList();
+                }
+                else
+                {
+                    salemanCurrent = csDetailSurchargeRepository.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
+
+                    opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent)
+                        .Select(x => x.Id)
+                        .ToList();
+                }
+                if (opsHblids.Count > 0)
+                {
+                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
+                    && opsHblids.Contains(x.Hblid)
+                    && x.Hblid != HblId);
+                }
+                else
+                {
+                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
+                    && x.Hblid != HblId);
+                }
             }
-            IQueryable<CsShipmentSurcharge> surchargeToCheck = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
-            if (opsHblids.Count > 0)
-            {
-                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
-                && opsHblids.Contains(x.Hblid)
-                && x.Hblid != HblId);
-            }
-            else
-            {
-                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
-                && x.Hblid != HblId);
-            }
+           
 
             if (surchargeToCheck.Count() == 0)
             {

@@ -199,6 +199,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
                     if (!!res) {
                         this.hblDetail = res;
 
+                        this.formHouseBill.hblId = this.hblDetail.id;
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.

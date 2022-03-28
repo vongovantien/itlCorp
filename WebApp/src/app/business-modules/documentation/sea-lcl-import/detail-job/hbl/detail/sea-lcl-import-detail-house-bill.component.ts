@@ -203,6 +203,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        this.formHouseBill.hblId = this.hblDetail.id;
+
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.

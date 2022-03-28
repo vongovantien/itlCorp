@@ -2,7 +2,7 @@ import { Component, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { AppForm } from '@app';
 import { DataService } from '@services';
 import { JobConstants } from '@constants';
@@ -16,6 +16,7 @@ import * as fromShareBussiness from './../../../../share-business/store';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FormValidators } from '@validators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-form-create-hbl-sea-import',
@@ -101,12 +102,16 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     userCreated: string;
     userModified: string;
 
+    hblId: string = '';
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _dataService: DataService,
         protected _store: Store<fromShareBussiness.ITransactionState>,
+        private _document: DocumentationRepo,
+        private _toast: ToastrService
 
     ) {
         super();
@@ -128,10 +133,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                 (res: CsTransaction) => {
                     this.shipmentDetail = res;
                     this.jobId = this.shipmentDetail.id;
-                    this.dateTimeCreated=res.datetimeCreated;
-                    this.dateTimeModified=res.datetimeModified;
-                    this.userCreated=res.userNameCreated;
-                    this.userModified=res.userNameModified;
+                    this.dateTimeCreated = res.datetimeCreated;
+                    this.dateTimeModified = res.datetimeModified;
+                    this.userCreated = res.userNameCreated;
+                    this.userModified = res.userNameModified;
                     if (!this.isUpdate) {
                         const formData = {
                             masterBill: this.shipmentDetail.mawb,
@@ -215,11 +220,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             pod: [null, Validators.required],
             supplier: [],
             placeOfIssues: [],
-            masterBill: [null,Validators.compose([
+            masterBill: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
-            hbOfladingNo: [null,Validators.compose([
+            hbOfladingNo: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -376,26 +381,38 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                 this.saleMan.setValue(data.id);
                 break;
             case 'Customer':
-                this.customer.setValue(data.id);
-                if (!this.consignee.value) {
-                    this.consignee.setValue(data.id);
-                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.saleMan.setValue(res.salemanId);
-                        } else {
-                            this.saleMan.setValue(null);
-                        }
-                        if (!!res.officeNameAbbr) {
-                            console.log(res.officeNameAbbr);
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
+                const _hblId = this.isUpdate ? this.hblId : '';
+                this._document.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customer.setValue(data.id);
 
+
+                                if (!this.consignee.value) {
+                                    this.consignee.setValue(data.id);
+                                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                                }
+
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.saleMan.setValue(res.salemanId);
+                                        } else {
+                                            this.saleMan.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                                            this.infoPopup.show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customer.setValue(null);
+                                this._toast.warning(res.message);
+                            }
+                        }
+                    )
                 break;
             case 'Shipper':
                 this.shipper.setValue(data.id);

@@ -196,6 +196,8 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 (res: CommonInterface.IResult) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        this.formHouseBill.hblId = this.hblDetail.id;
+
                         // this.formHouseBill.getListSaleman();
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 

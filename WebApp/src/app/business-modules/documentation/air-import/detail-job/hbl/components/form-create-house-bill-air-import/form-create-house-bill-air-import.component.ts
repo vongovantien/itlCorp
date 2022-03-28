@@ -17,6 +17,7 @@ import { takeUntil, catchError, skip, tap, mergeMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'air-import-hbl-form-create',
@@ -121,7 +122,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         private _documentationRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _store: Store<IShareBussinessState>,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _toaster: ToastrService
     ) {
         super();
     }
@@ -146,35 +148,35 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         // * get detail shipment from store.
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
-            tap((shipment: CsTransaction) => {
-                this.shipmentDetail = new CsTransaction(shipment);
+                tap((shipment: CsTransaction) => {
+                    this.shipmentDetail = new CsTransaction(shipment);
 
-                // * set default value for controls from shipment detail.
-                if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                    this.jobId = shipment.id;
-                    this.formCreate.patchValue({
-                        mawb: shipment.mawb,
-                        pod: shipment.pod,
-                        pol: shipment.pol,
-                        arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                        eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                        flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
-                        flightNo: shipment.flightVesselName,
-                        forwardingAgentId: shipment.agentId,
-                        arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                        warehouseId: shipment.warehouseId,
-                        route: shipment.route,
-                        packageQty: shipment.packageQty,
-                        grossWeight: shipment.grossWeight,
-                        chargeWeight: shipment.chargeWeight,
-                        packageType: +shipment.packageType,
-                        incontermId: shipment.incotermId
-                    });
-                }
-            }),
-            mergeMap(
-                () => this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
-            )
+                    // * set default value for controls from shipment detail.
+                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                        this.jobId = shipment.id;
+                        this.formCreate.patchValue({
+                            mawb: shipment.mawb,
+                            pod: shipment.pod,
+                            pol: shipment.pol,
+                            arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                            eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                            flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
+                            flightNo: shipment.flightVesselName,
+                            forwardingAgentId: shipment.agentId,
+                            arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                            warehouseId: shipment.warehouseId,
+                            route: shipment.route,
+                            packageQty: shipment.packageQty,
+                            grossWeight: shipment.grossWeight,
+                            chargeWeight: shipment.chargeWeight,
+                            packageType: +shipment.packageType,
+                            incontermId: shipment.incotermId
+                        });
+                    }
+                }),
+                mergeMap(
+                    () => this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+                )
             )
             .subscribe(
                 (hawbNoGenerate: any) => {
@@ -195,10 +197,10 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID && hbl.id !== undefined) {
                         this.jobId = hbl.jobId;
                         this.hblId = hbl.id;
-                        this.dateTimeCreated=hbl.datetimeCreated;
-                        this.dateTimeModified=hbl.datetimeModified;
-                        this.userCreated=hbl.userNameCreated;
-                        this.userModified=hbl.userNameModified;
+                        this.dateTimeCreated = hbl.datetimeCreated;
+                        this.dateTimeModified = hbl.datetimeModified;
+                        this.userCreated = hbl.userNameCreated;
+                        this.userModified = hbl.userNameModified;
 
                         this.updateFormValue(hbl);
                     }
@@ -221,11 +223,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formCreate = this._fb.group({
-            mawb: [null,Validators.compose([
+            mawb: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -313,25 +315,37 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         console.log(data)
         switch (type) {
             case 'customer':
-                this.customerId.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.saleManId.setValue(res.salemanId);
-                        } else {
-                            this.saleManId.setValue(null);
+                const _hblId = this.isUpdate ? this.hblId : '';
+
+                this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.customerId.setValue(data.id);
+                                if (!this.consigneeId.value) {
+                                    this.consigneeId.setValue(data.id);
+                                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                                }
+                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                                    if (!!res) {
+                                        if (!!res.salemanId) {
+                                            this.saleManId.setValue(res.salemanId);
+                                        } else {
+                                            this.saleManId.setValue(null);
+                                        }
+                                        if (!!res.officeNameAbbr) {
+                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
+                                            this.infoPopup.show();
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.customerId.setValue(null);
+                                this._toaster.warning(res.message);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            console.log(res.officeNameAbbr);
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
-                if (!this.consigneeId.value) {
-                    this.consigneeId.setValue(data.id);
-                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                    )
+
                 break;
             case 'shipper':
                 this.shipperId.setValue(data.id);
