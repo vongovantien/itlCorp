@@ -249,13 +249,13 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         }
     }
 
-    isWhiteSpace(input: any){
-        if(input!=null){
-            if(input.trim().length===0){
+    isWhiteSpace(input: any) {
+        if (input != null) {
+            if (input.trim().length === 0) {
                 return true;
             }
         }
-        if(input===null){
+        if (input === null) {
             return true;
         }
         return false;
@@ -266,16 +266,16 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             this._toastService.warning("Please add charge");
             return;
         }
-        for (const charge of this.charges) {
-            if(!this.isWhiteSpace(charge.invoiceNo) &&this.isWhiteSpace(charge.seriesNo)){
-                this._toastService.warning("Series No Must be fill in");
-                return;
-            }
-            if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
-                this._toastService.warning("Invoice No Must be fill in");
-                return;
-            }
-        }
+        // for (const charge of this.charges) {
+        //     if(!this.isWhiteSpace(charge.invoiceNo) &&this.isWhiteSpace(charge.seriesNo)){
+        //         this._toastService.warning("Series No Must be fill in");
+        //         return;
+        //     }
+        //     if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
+        //         this._toastService.warning("Invoice No Must be fill in");
+        //         return;
+        //     }
+        // }
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -326,7 +326,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 || charge.quantity < 0
                 || charge.vatrate > 100
                 || charge.paymentObjectId === charge.payerId
-                || (charge.invoiceNo !==null && charge.seriesNo===null)
+                // || (charge.invoiceNo !== null && charge.seriesNo === null)
             ) {
                 valid = false;
                 break;
