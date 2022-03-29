@@ -3455,18 +3455,29 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.SyncedFrom = charge.SyncedFrom;
                 data.VatPartnerName = detailLookupPartner[charge.VatPartnerID].FirstOrDefault()?.ShortName;
-                data.BillNoSynced = getBillNoSynced(charge.SyncedFrom, charge.SurChargeId);
+                data.BillNoSynced = getBillNoSynced(charge.SurChargeId);
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
         }
 
-        private string getBillNoSynced(string Type, Guid surChargeid)
+        private string getBillNoSynced(Guid surChargeid)
         {
-            if (Type == "SOA"){
-                return surCharge.Get(x => x.Id == surChargeid).FirstOrDefault().Soano;
+            var Soano = surCharge.Get(x => x.Id == surChargeid).FirstOrDefault()?.Soano;
+            var SettlementCode = surCharge.Get(x => x.Id == surChargeid).FirstOrDefault()?.SettlementCode;
+            if (Soano == null && SettlementCode != null)
+            {
+                return SettlementCode;
             }
-            return surCharge.Get(x => x.Id == surChargeid).FirstOrDefault().SettlementCode;
+            if (SettlementCode == null && Soano != null)
+            {
+                return Soano;
+            }
+            if(SettlementCode == null && Soano == null)
+            {
+                return "";
+            }
+            return SettlementCode + Soano;
         }
         #endregion -- Export Accounting PL Sheet --
 
