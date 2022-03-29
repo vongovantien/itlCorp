@@ -140,7 +140,7 @@ namespace eFMS.API.Documentation.DL.Services
             HandleState result = new HandleState();
             bool isValid = false;
 
-            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Username;
+            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
             CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
             && x.Active == true
