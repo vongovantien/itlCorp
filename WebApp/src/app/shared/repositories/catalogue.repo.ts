@@ -1369,13 +1369,20 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
     upLoadBankFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/UploadFile`, files, "uploadedFile");
     }
+
     importBank(body: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/import`, body).pipe(
             map((data: any) => data)
         );
+    }
+
+    getListSalemanByPartner(partnerId: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType });
+
     }
 
 }

@@ -627,9 +627,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpGet]
         [Route("GetListSaleman")]
-        public IActionResult GetListSaleman(string partnerId, string officeId, string transactionType)
+        [Authorize]
+        public IActionResult GetListSaleman(string partnerId, string transactionType)
         {
-            var data = catPartnerService.GetListSaleman(partnerId, officeId, transactionType);
+            var data = catPartnerService.GetListSaleman(partnerId, transactionType);
             return Ok(data);
         }
     }

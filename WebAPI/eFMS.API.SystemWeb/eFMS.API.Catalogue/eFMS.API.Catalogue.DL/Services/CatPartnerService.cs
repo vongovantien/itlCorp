@@ -2461,11 +2461,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string officeId, string transactionType)
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
             var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
-            && x.OfficeId.Contains(currentUser.OfficeID) // tODO: get office with current user
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && x.SaleService.Contains(transactionType) 
             && x.Active == true);
             if(contracts.Count() > 0)
