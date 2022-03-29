@@ -56,7 +56,9 @@ namespace eFMS.API.Documentation.DL.Services
             // Những lô hàng # saleman
             var opsHblids = new List<Guid>();
             string salemanCurrent = null;
-            if(HblId == Guid.Empty) // Mở một lô mới
+            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+
+            if (HblId == Guid.Empty) // Mở một lô mới
             {
                 surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
             } else
@@ -64,15 +66,21 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transactionType == "CL")
                 {
                     salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-
+                    if (salemanCurrent == salemanBOD)
+                    {
+                        return valid;
+                    }
                     opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent)
-                        .Select(x => x.Hblid)
-                        .ToList();
+                     .Select(x => x.Hblid)
+                     .ToList();
                 }
                 else
                 {
                     salemanCurrent = csDetailSurchargeRepository.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
-
+                    if (salemanCurrent == salemanBOD)
+                    {
+                        return valid;
+                    }
                     opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent)
                         .Select(x => x.Id)
                         .ToList();
@@ -144,19 +152,19 @@ namespace eFMS.API.Documentation.DL.Services
 
             CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
             && x.Active == true
-            && x.SaleManId != salemanBOD
+            /// && x.SaleManId != salemanBOD
             && (x.IsExpired == false || x.IsExpired == null))
             .OrderBy(x => x.ContractType)
             // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
             .FirstOrDefault();
 
             CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
-
             if (contract == null)
             {
-                SysOffice office = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID)?.FirstOrDefault();
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement for service in office {1} please you check again", partner.ShortName, office.ShortName));
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
             }
+
+            if (contract.SaleManId == salemanBOD) return result;
 
             switch (contract.ContractType)
             {
