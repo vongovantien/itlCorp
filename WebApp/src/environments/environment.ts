@@ -7,8 +7,8 @@ export const environment = {
                 WEB_URL: "test.api-efms.itlvn.com",
                 ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
                 // ACCOUNTING: "localhost:44368",
-                // DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
-                DOCUMENTATION: "localhost:44366",
+                DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
+                // DOCUMENTATION: "localhost:44366",
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
                 //CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",
@@ -26,8 +26,9 @@ export const environment = {
                 // EXPORT_CRYSTAL: "localhost:53717/ExportCrystal.aspx",
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner",
-                FILE_SYSTEM: "localhost:44369",
-                //FILE_SYSTEM: "test.api-efms.itlvn.com/file"
+                // FILE_SYSTEM: "localhost:44369",
+                FILE_SYSTEM: "test.api-efms.itlvn.com/file",
+                REPORT_MANAGEMENT: "test.api-efms.itlvn.com/Report"
         },
         AUTHORIZATION:
         {

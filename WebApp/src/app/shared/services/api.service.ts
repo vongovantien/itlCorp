@@ -111,7 +111,10 @@ export class ApiService {
     }
 
     get(url: string = '', params?: any, headers: any = {}, isBaseHref: boolean = true) {
-        return this._http.get(isBaseHref ? this.setUrl(url) : url, { params, headers });
+        return this._http.get(isBaseHref ? this.setUrl(url) : url, {
+            params,
+            headers: Object.assign({}, this._headers, headers)
+        });
     }
 
     delete(url: string, params?: any, headers?: any) {

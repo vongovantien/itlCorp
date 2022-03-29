@@ -252,8 +252,8 @@ export class AccountingRepo {
             );
     }
 
-    getDetailSettlementPayment(settlementId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId }).pipe(
+    getDetailSettlementPayment(settlementId: string, viewType: string = "list") {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId, view: viewType }).pipe(
             map((data: any) => data)
         );
     }
@@ -1017,6 +1017,15 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
+    }
+
+    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
+    }
+
 }
 
 

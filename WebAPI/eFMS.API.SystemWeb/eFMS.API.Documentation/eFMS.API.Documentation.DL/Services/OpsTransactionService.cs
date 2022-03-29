@@ -2178,7 +2178,7 @@ namespace eFMS.API.Documentation.DL.Services
         public ResultHandle ChargeFromReplicate()
         {
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
-            string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
+            string logMessage = string.Format(" *  \n [START][USER]: {0}{1} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"),currentUser.UserName);
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
 
             ResultHandle hs = new ResultHandle();
@@ -2215,7 +2215,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 partnerInternal = part.FirstOrDefault();
                             }
 
-                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0);
+                            var charges = surchargeRepository.Get(x => x.Hblid == jobRep.Hblid && x.LinkChargeId == null && x.UnitPrice != null && x.UnitPrice > 0 && x.Type!="BUY");
                             if (charges != null && charges.Count() > 0)
                             {
                                 logMessage = string.Format(" *  \n [CHARGES]: {0} * ", JsonConvert.SerializeObject(charges));
@@ -2240,6 +2240,10 @@ namespace eFMS.API.Documentation.DL.Services
                                     }
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
+                                        //[17/01/2022][Nếu phí hiện trường thì set thêm sm done]
+                                        if (!string.IsNullOrEmpty( charge.SettlementCode) && charge.IsFromShipment == false && acctSettlementPayment.Get(x => x.SettlementNo == charge.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
+                                            continue;
+
                                         //[01/03/2022][17133][Nếu phí OBH có Buying Mapping]
                                         var catCharge = catChargeRepository.Get(x => x.Id == charge.ChargeId && x.CreditCharge != null).FirstOrDefault();
                                         if (catCharge != null)

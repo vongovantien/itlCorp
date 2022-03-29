@@ -45,6 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
+        private readonly IContextBase<CatCurrency> currencyRepository;
+
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -65,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo
+            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            IContextBase<CatCurrency> currencyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -88,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             catChargeGroupRepository = catChargeGroupRepo;
+            currencyRepository = currencyRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -732,11 +736,11 @@ namespace eFMS.API.Documentation.DL.Services
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
-                    //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
-                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
-                    hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
+                    //hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }
             else
@@ -1459,7 +1463,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if (!item.UnitPrice.HasValue)
+                if (!item.UnitPrice.HasValue || item.UnitPrice == 0)
                 {
                     item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
                     item.IsValid = false;
@@ -1468,6 +1472,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
+                } else
+                {
+                    if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_NOT_EXIST], item.CurrencyId);
+                        item.IsValid = false;
+                    }
                 }
                 if (!item.Vatrate.HasValue)
                 {
@@ -1494,6 +1505,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                {
+                    if (string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
@@ -1611,9 +1630,39 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
+                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
                     }
                 }
             });
+            if (list.Count > 1)
+            {
+                for (int i = 0; i < list.Count() - 1; i++)
+                {
+                    int j = i + 1;
+                    while (j < list.Count())
+                    {
+                        if (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null)
+                        {
+                            list[i].IsValid = false;
+                            list[j].IsValid = false;
+                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            {
+                                list[i].IsValid = true;
+                                list[j].IsValid = true;
+                            }
+                        }
+                        j++;
+                    }
+                }
+            }
             return list;
         }
 
@@ -1640,7 +1689,6 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     item.UserCreated = item.UserModified = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    item.ExchangeDate = DateTime.Now.Date;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;

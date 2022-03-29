@@ -7,7 +7,7 @@ export * from './export.repo';
 export * from './setting.repo';
 export * from './identity.repo';
 export * from './system-file-manage.repo';
-
+export * from './report.repo';
 
 
 

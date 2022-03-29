@@ -240,7 +240,7 @@ namespace eFMS.API.Accounting.DL.Services
                     &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.settlementPayment.UserCreated == criteria.Requester : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.settlementPayment.UserCreated == criteria.Requester && x.settlementPayment.OfficeId == currentUser.OfficeID : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.settlementPayment.GroupId == currentUser.GroupId
                                                                         && x.settlementPayment.DepartmentId == currentUser.DepartmentId
@@ -756,7 +756,8 @@ namespace eFMS.API.Accounting.DL.Services
                     HBL = item.HBL,
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
-                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+                    // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+                    ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
@@ -981,7 +982,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     DebitNo = sur.DebitNo,
                                     CreditNo = sur.CreditNo,
                                     SyncedFromBy = GetSyncedFrom(sur),
-                                    LinkChargeId = sur.LinkChargeId
+                                    LinkChargeId = sur.LinkChargeId,
+                                    
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -5989,6 +5991,30 @@ namespace eFMS.API.Accounting.DL.Services
             return _advanceAmount;
 
         }
+
+        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@SettlementNo", Value = settlementNo },
+            };
+            if(HblId != null)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@HblId", HblId) }).ToArray();
+            }
+            if (advanceNo != null)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@AdvanceNo", advanceNo) }).ToArray();
+            }
+            if (clearanceNo != null)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
+            }
+            List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
+
+            var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
+            return data;
+        }
+       
     }
 }
 

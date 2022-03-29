@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
@@ -31,7 +32,6 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
             CreateMap<AcctCdnote, AcctCdnoteModel>();
             CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
-
             //map to entity model
             CreateMap<CsAirWayBillModel, CsAirWayBill>();
             CreateMap<CsTransactionEditModel, CsTransaction>();
@@ -58,6 +58,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<SysReportLogModel, SysReportLog>();
 
             CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
+            CreateMap<sp_GetShipmentAssignPIC, Shipments>();
         }
     }
 }

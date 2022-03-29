@@ -498,11 +498,33 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
+    isWhiteSpace(input: any) {
+        if (input != null) {
+            if (input.trim().length === 0) {
+                return true;
+            }
+        }
+        if (input === null) {
+            return true;
+        }
+        return false;
+    }
+
     saveBuyingCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         if (!this.charges.length) {
             this._toastService.warning("Please add charge");
             return;
         }
+        // for (const charge of this.charges) {
+        //     if(!this.isWhiteSpace(charge.invoiceNo) && this.isWhiteSpace(charge.seriesNo)){
+        //         this._toastService.warning("Series No Must be fill in");
+        //         return;
+        //     }
+        //     if(this.isWhiteSpace(charge.invoiceNo) && !this.isWhiteSpace(charge.seriesNo)){
+        //         this._toastService.warning("Invoice No Must be fill in");
+        //         return;
+        //     }
+        // }
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -511,7 +533,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         }
-
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         this._progressRef.start();
         this._documentRepo.addShipmentSurcharges(this.charges)
@@ -813,6 +834,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || +charge.unitPrice === 0   // ! Nhưng không cho nhập 0
                 || charge.currencyId === null
                 || charge.vatrate > 100
+                // || (charge.invoiceNo !== null && charge.seriesNo === null)
+                // || (charge.invoiceNo !== null && charge.seriesNo === null)
             ) {
                 valid = false;
                 break;

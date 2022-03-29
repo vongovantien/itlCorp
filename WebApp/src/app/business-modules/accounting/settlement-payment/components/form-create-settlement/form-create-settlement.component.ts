@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
@@ -11,6 +11,7 @@ import { map, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState, IAppState } from '@store';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html',
@@ -18,7 +19,17 @@ import { getCurrentUserState, IAppState } from '@store';
 })
 
 export class SettlementFormCreateComponent extends AppForm {
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
 
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
+
+    get readonlyForm(): boolean {
+        return this._readonly;
+    }
+
+    private _readonly: boolean = false;
     @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
 
     users: Observable<User[]>;
@@ -122,11 +133,14 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
-        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res: any) => {
                 if (!!res) {
                     this.userLogged = res;
-                    this.requester.setValue(this.userLogged.id);
+                    if (!this.readonlyForm) {
+                        this.requester.setValue(this.userLogged.id);
+                    }
                 }
             })
     }
