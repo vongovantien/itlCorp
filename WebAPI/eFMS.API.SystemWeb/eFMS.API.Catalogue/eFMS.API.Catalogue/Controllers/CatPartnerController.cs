@@ -624,5 +624,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("GetListSaleman")]
+        public IActionResult GetListSaleman(string partnerId, string officeId, string transactionType)
+        {
+            var data = catPartnerService.GetListSaleman(partnerId, officeId, transactionType);
+            return Ok(data);
+        }
     }
 }

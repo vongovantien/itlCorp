@@ -2461,5 +2461,42 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string officeId, string transactionType)
+        {
+            List<SysUserViewModel> salemans = new List<SysUserViewModel>();
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
+            && x.OfficeId.Contains(currentUser.OfficeID) // tODO: get office with current user
+            && x.SaleService.Contains(transactionType) 
+            && x.Active == true);
+            if(contracts.Count() > 0)
+            {
+                var salemansIds = contracts.Select(x => x.SaleManId).ToList();
+                var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
+                var employees = sysEmployeeRepository.Get();
+
+
+                var userQ = from u in users
+                            join em in employees on u.EmployeeId equals em.Id into emGrps
+                            from emGrp in emGrps.DefaultIfEmpty()
+                            select new SysUserViewModel
+                            {
+                                Id = u.Id,
+                                Active = u.Active,
+                                EmployeeNameEn = emGrp.EmployeeNameEn,
+                                EmployeeNameVn = emGrp.EmployeeNameVn,
+                                StaffCode = emGrp.StaffCode,
+                                Status = u.WorkingStatus,
+                                Title = emGrp.Title,
+                                Username = u.Username,
+                                UserType = u.UserType
+                            };
+                if(userQ.Count() > 0)
+                {
+                    salemans = userQ.ToList();
+                }
+            }
+
+            return salemans;
+        }
     }
 }
