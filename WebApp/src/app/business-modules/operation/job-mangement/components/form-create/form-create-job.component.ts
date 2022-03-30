@@ -125,6 +125,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
+                this._toaster.clear();
                 this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
                     .pipe(
                         map((res: CommonInterface.IResult) => {
@@ -137,7 +138,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                         }),
                         switchMap((res: CommonInterface.IResult) => {
                             if (!res.status) {
-                                return of(res);
+                                return of(false);
                             }
                             this.customerId.setValue(data.id);
                             return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
@@ -149,9 +150,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                             if (!!res) {
                                 this.salesmans = res || [];
                                 if (!!this.salesmans.length) {
-                                    if ((res as any[]).length === 1) {
-                                        this.salemansId.setValue(res[0].id);
-                                    }
+                                    this.salemansId.setValue(res[0].id);
                                 } else {
                                     this.infoPopup.body = `${data.shortName} not have any agreement for service in this office <br/> please check again!`;
                                     this.infoPopup.show();
@@ -162,10 +161,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                                 this.salesmans = [];
                                 this.salemansId.setValue(null);
                             }
-
-
-                        }, (error) => {
-                            console.log(error);
                         }
                     )
                 break;

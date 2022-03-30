@@ -6,14 +6,14 @@ import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetCon
 import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction, getCurrentUserState } from '@store';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
-import { JobConstants, SystemConstants } from '@constants';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
@@ -72,7 +72,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     warehouses: Observable<Warehouse[]>;
-    salesmans: Observable<User[]>;
+    salesmans: User[];
+    users: Observable<User[]>;
     commodityGroups: Observable<CommodityGroup[]>;
     packageTypes: Observable<Unit[]>;
 
@@ -129,7 +130,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         //         }),
         //         takeUntil(this.ngUnsubscribe),
         //     ) as any;
-        this.salesmans = this._systemRepo.getSystemUsers();
+        this.users = this._systemRepo.getSystemUsers();
         this.ports = this._store.select(getCataloguePortState);
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
@@ -281,49 +282,47 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
             case 'customer':
                 this._toaster.clear();
-                this._documentRepo.validateCheckPointContractPartner(data.id, this.opsTransaction.hblid, 'CL')
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this.customerName = data.shortName;
-                                this.customerId.setValue(data.id);
-                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                                    if (!!res) {
-                                        if (!!res.salemanId) {
-                                            this.salemansId.setValue(res.salemanId);
-                                        } else {
-                                            this.salemansId.setValue(null);
-                                        }
-                                        if (!!res.officeNameAbbr) {
-                                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                                                body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
-                                            })
-                                        }
-                                    }
-                                });
-                            } else {
-                                this.customerId.setValue(null);
-                                this.customerName = null;
+                const comboGridCustomer = this.comboGrids.find(x => x.name === 'customerId');
 
+                this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
+                    .pipe(
+                        map((res: CommonInterface.IResult) => {
+                            if (!res.status) {
+                                this.customerId.setValue(null);
+                                this.customerName = data.shortName;
+                                comboGridCustomer.displayStringValue = null;
                                 this._toaster.warning(res.message);
+                            }
+                            return res;
+                        }),
+                        switchMap((res: CommonInterface.IResult) => {
+                            if (!res.status) {
+                                return of(false);
+                            }
+                            return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
+                        }),
+                        catchError((err, caught) => of(false)),
+                    )
+                    .subscribe(
+                        (res: any) => {
+                            if (!!res) {
+                                this.salesmans = res || [];
+                                if (!!this.salesmans.length) {
+                                    this.salemansId.setValue(res[0].id);
+                                } else {
+                                    this.salemansId.setValue(null);
+                                    this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                        body: `${data.shortName} not have any agreement for service in this office <br/> please check again!`
+                                    })
+
+                                }
+                            } else {
+                                this.salesmans = [];
+                                this.customerName = null;
+                                this.salemansId.setValue(null);
                             }
                         }
                     )
-
-                // this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                //     if (!!res) {
-                //         if (!!res.salemanId) {
-                //             this.salemansId.setValue(res.salemanId);
-                //         } else {
-                //             this.salemansId.setValue(null);
-                //         }
-                //         if (!!res.officeNameAbbr) {
-                //             this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                //                 body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
-                //             })
-                //         }
-                //     }
-                // });
                 break;
             case 'warehouse':
                 this.warehouseId.setValue(data.id);

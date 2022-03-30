@@ -315,6 +315,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         console.log(data)
         switch (type) {
             case 'customer':
+                this._toaster.clear();
                 const _hblId = this.isUpdate ? this.hblId : '';
 
                 this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')

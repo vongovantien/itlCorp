@@ -472,8 +472,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                // this.customerName = data.shortName;
-                // this.customer.setValue(data.id);
+                this._toast.clear();
+
                 const _hblId = this.isUpdate ? this.hblId : '';
                 this._documentRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
                     .subscribe(

@@ -124,7 +124,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.getConfigComboGrid();
 
         this.initForm();
-        console.log(this.type);
+
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
 
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
@@ -381,6 +381,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                 this.saleMan.setValue(data.id);
                 break;
             case 'Customer':
+                this._toast.clear();
+
                 const _hblId = this.isUpdate ? this.hblId : '';
                 this._document.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
                     .subscribe(

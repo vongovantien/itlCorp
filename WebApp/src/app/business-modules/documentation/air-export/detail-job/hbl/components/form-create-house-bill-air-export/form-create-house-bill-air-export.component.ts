@@ -495,8 +495,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                this._toast.clear();
                 this.customerId.setValue(data.id);
                 const _hblId = this.isUpdate ? this.hblId : '';
+
                 this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
                     .subscribe(
                         (res: CommonInterface.IResult) => {
