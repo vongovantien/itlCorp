@@ -25,9 +25,9 @@ namespace eFMS.API.Documentation.DL.Services
 
 
         public CheckPointService(ICurrentUser currUser,
-            IContextBase<SysUser> sysUserRepository, 
-            IContextBase<AccAccountingManagement> accAccountMngtRepository, 
-            IContextBase<CatPartner> catPartnerRepository, 
+            IContextBase<SysUser> sysUserRepository,
+            IContextBase<AccAccountingManagement> accAccountMngtRepository,
+            IContextBase<CatPartner> catPartnerRepository,
             IContextBase<SysOffice> sysOfficeRepository,
             IContextBase<CatContract> contractRepo,
             IContextBase<OpsTransaction> opsTransactionRepo,
@@ -54,14 +54,38 @@ namespace eFMS.API.Documentation.DL.Services
             bool valid = true;
             IQueryable<CsShipmentSurcharge> surchargeToCheck = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
             // Những lô hàng # saleman
-            var opsHblids = new List<Guid>();
+            var hblIds = new List<Guid>();
             string salemanCurrent = null;
             string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
-            if (HblId == Guid.Empty) // Mở một lô mới
+            if (HblId == Guid.Empty) // Mở một lô mới, bỏ qua những lô saleman ITL BOD
             {
-                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
-            } else
+                if (transactionType == "CL")
+                {
+                    hblIds = opsTransactionRepository.Get(x => x.CustomerId == partnerId 
+                            && x.SalemanId != salemanBOD 
+                            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                             .Select(x => x.Hblid)
+                             .ToList();
+                }
+                else
+                {
+                    hblIds = csDetailSurchargeRepository.Get(x => x.CustomerId == partnerId
+                           && x.SaleManId != salemanBOD)
+                            .Select(x => x.Id)
+                            .ToList();
+                }
+
+                if (hblIds.Count > 0)
+                {
+                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId  && hblIds.Contains(x.Hblid));
+                }
+                else
+                {
+                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
+                }
+            }
+            else // Check theo từng lô
             {
                 if (transactionType == "CL")
                 {
@@ -70,9 +94,13 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent && x.SalemanId != salemanBOD)
-                     .Select(x => x.Hblid)
-                     .ToList();
+                    hblIds = opsTransactionRepository.Get(x => x.Hblid != HblId 
+                                && x.SalemanId == salemanCurrent 
+                                && x.SalemanId != salemanBOD
+                                && x.CustomerId == partnerId
+                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                                 .Select(x => x.Hblid)
+                                 .ToList();
                 }
                 else
                 {
@@ -81,14 +109,17 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent && x.SaleManId != salemanBOD)
-                        .Select(x => x.Id)
-                        .ToList();
+                    hblIds = csDetailSurchargeRepository.Get(x => x.Id != HblId
+                                && x.SaleManId == salemanCurrent 
+                                && x.SaleManId != salemanBOD 
+                                && x.CustomerId == partnerId)
+                                    .Select(x => x.Id)
+                                    .ToList();
                 }
-                if (opsHblids.Count > 0)
+                if (hblIds.Count > 0)
                 {
                     surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
-                    && opsHblids.Contains(x.Hblid)
+                    && hblIds.Contains(x.Hblid)
                     && x.Hblid != HblId);
                 }
                 else
@@ -97,7 +128,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && x.Hblid != HblId);
                 }
             }
-           
+
 
             if (surchargeToCheck.Count() == 0)
             {
@@ -116,7 +147,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var accMngt = accAccountMngtRepository.Get(x => x.PartnerId == partnerId
-                && (x.PaymentStatus == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART 
+                && (x.PaymentStatus == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART
                 || x.PaymentStatus == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                 );
                 // Không có hoá đơn treo
@@ -171,10 +202,10 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Cash":
                     isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType);
                     break;
-                    //case "Official":
-                    //case "Trial":
-                    // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                    // break;
+                //case "Official":
+                //case "Trial":
+                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
+                // break;
                 default:
                     isValid = true;
                     break;
