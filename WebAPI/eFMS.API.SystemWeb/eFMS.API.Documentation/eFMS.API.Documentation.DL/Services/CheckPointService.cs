@@ -70,7 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent)
+                    opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId && x.SalemanId == salemanCurrent && x.SalemanId != salemanBOD)
                      .Select(x => x.Hblid)
                      .ToList();
                 }
@@ -81,7 +81,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent)
+                    opsHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId && x.SaleManId == salemanCurrent && x.SaleManId != salemanBOD)
                         .Select(x => x.Id)
                         .ToList();
                 }
@@ -171,11 +171,12 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Cash":
                     isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType);
                     break;
-                case "Official":
-                case "Trial":
+                    //case "Official":
+                    //case "Trial":
                     // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                    break;
+                    // break;
                 default:
+                    isValid = true;
                     break;
             }
             string messError = null;
