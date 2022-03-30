@@ -397,6 +397,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
 
         newSurCharge.linkChargeId = null;
+        newSurCharge.linkFee = null;
 
         this.addSurcharges(type, newSurCharge);
     }
