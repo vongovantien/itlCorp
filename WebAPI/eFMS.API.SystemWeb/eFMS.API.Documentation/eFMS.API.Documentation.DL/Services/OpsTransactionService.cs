@@ -2241,7 +2241,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                                     {
                                         //[17/01/2022][Nếu phí hiện trường thì set thêm sm done]
-                                        if (!string.IsNullOrEmpty( charge.SettlementCode) && charge.IsFromShipment == false && acctSettlementPayment.Get(x => x.SettlementNo == charge.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
+                                        if (!string.IsNullOrEmpty( charge.SettlementCode) && charge.IsFromShipment == false && acctSettlementPayment.Get(x => x.SettlementNo == charge.SettlementCode && x.StatusApproval == "Department Manager Approval").FirstOrDefault() == null)
                                             continue;
 
                                         //[01/03/2022][17133][Nếu phí OBH có Buying Mapping]
