@@ -184,6 +184,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
+        this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+            .subscribe((salesmans: any) => {
+                this.salesmans = salesmans;
+            })
     }
 
     initForm() {

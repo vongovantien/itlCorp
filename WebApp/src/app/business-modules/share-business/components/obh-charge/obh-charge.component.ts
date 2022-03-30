@@ -234,6 +234,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         chargeItem.objectBePaid = null;
         switch (type) {
             case 'receiver':
+                this._toastService.clear();
                 if (!!partnerData && !!this.hbl) {
                     const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                     this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
@@ -243,9 +244,15 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                                     chargeItem.receiverName = partnerData.partnerNameEn;
                                     chargeItem.paymentObjectId = partnerData.id;
                                     chargeItem.receiverShortName = partnerData.shortName;
+
                                 } else {
+                                    chargeItem.receiverName = null;
+                                    chargeItem.paymentObjectId = null;
+                                    chargeItem.receiverShortName = null;
                                     this._toastService.warning(res.message);
                                 }
+                                this._cd.markForCheck();
+
                             }
                         )
                 }

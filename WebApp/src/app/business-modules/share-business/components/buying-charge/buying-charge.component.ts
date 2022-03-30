@@ -707,17 +707,24 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData && !!chargeItem) {
             if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                this._toastService.clear();
+
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                 this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
                                 chargeItem = this.mapValueWhenSelectPartnerSuccess(partnerData, chargeItem);
-                                this._cd.markForCheck();
 
                             } else {
                                 this._toastService.warning(res.message);
+                                chargeItem.partnerShortName = null;
+                                chargeItem.partnerName = null;
+                                chargeItem.paymentObjectId = null;
+                                chargeItem.objectBePaid = null;
                             }
+
+                            this._cd.markForCheck();
                         }
                     )
             } else {
