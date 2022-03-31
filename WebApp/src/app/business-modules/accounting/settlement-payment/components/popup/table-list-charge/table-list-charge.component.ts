@@ -296,6 +296,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             for (const charge of selectedCharges) {
                 charge.jobId = this.selectedShipment.jobId;
                 charge.jobNo = this.selectedShipment.jobId;
+                charge.mblno = this.selectedShipment.mbl;
+                charge.mbl = this.selectedShipment.mbl;
+                charge.hblno = this.selectedShipment.hbl;
+                charge.hbl = this.selectedShipment.hbl;
+                charge.hblid = this.selectedShipment.hblid;
             }
             this.charges = [...selectedCharges, ...notSelectedCharges];
         }
@@ -323,6 +328,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 for (const charge of selectedCharges) {
                     charge.jobId = this.selectedShipment.jobId;
                     charge.jobNo = this.selectedShipment.jobId;
+                    charge.mblno = this.selectedShipment.mbl;
+                    charge.mbl = this.selectedShipment.mbl;
+                    charge.hblno = this.selectedShipment.hbl;
+                    charge.hbl = this.selectedShipment.hbl;
+                    charge.hblid = this.selectedShipment.hblid;
                     charge.clearanceNo = data.clearanceNo
                 }
                 if (selectedCharges[0].hblid !== data.hblid) {
