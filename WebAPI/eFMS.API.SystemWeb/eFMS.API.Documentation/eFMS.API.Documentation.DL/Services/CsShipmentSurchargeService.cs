@@ -683,26 +683,29 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids)
         {
             var result = new HandleState();
-            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            decimal kickBackExcRate = 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
+                        item.Vatrate = 8;
+                        item.Notes = "IT hổ trợ update vat";
                         var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
-                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                         item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                         item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = "d1bb21ea-249a-455c-a981-dcb554c3b848";
                         var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();
