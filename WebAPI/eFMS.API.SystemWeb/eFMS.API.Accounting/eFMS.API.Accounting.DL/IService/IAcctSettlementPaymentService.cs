@@ -105,6 +105,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculateBalanceSettle(List<string> settlementNo);
         List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
 
-        HandleState CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
+        ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
     }
 }

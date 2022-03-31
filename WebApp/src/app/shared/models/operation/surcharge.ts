@@ -41,6 +41,8 @@ export class Surcharge {
     paymentRequestType: string = '';
     soaclosed: boolean = false;
     soano: string = '';
+    voucherId: string = '';
+    voucherIdre: string = '';
 
     jobNo: string = null;
     mblno: string = null;

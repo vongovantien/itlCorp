@@ -280,21 +280,64 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             this.selectedCD = _customDeclarations[0];
             this.customNo.setValue(_customDeclarations[0].clearanceNo);
         }
-        if (!!this.charges.length) {
-
-            if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
+        let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.creditNo && !chg.debitNo && 
+        !chg.soano && !chg.paySoano && !chg.voucherId && !chg.voucherIdre); // Update shipment for selected charges without issued
+        let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
+        if (!!selectedCharges.length) {
+            if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
                 this.getMasterCharges(this.serviceTypeId, true);
             }
-            if (this.charges[0].hblid !== data.hblid) {
-                this.charges.forEach((charge: Surcharge) => {
+            if (selectedCharges[0].hblid !== data.hblid) {
+                selectedCharges.forEach((charge: Surcharge) => {
                     charge.isChangeShipment = true;
                     charge.id = SystemConstants.EMPTY_GUID;
                 });
             }
-            for (const charge of this.charges) {
+            for (const charge of selectedCharges) {
                 charge.jobId = this.selectedShipment.jobId;
                 charge.jobNo = this.selectedShipment.jobId;
             }
+            this.charges = [...selectedCharges, ...notSelectedCharges];
+        }
+    }
+
+    onSelectClearanceData(data: OperationInteface.IShipment | IAdvanceShipment | any) {
+        this.selectedCD = data;
+        this.customNo.setValue(data.clearanceNo);
+
+        this.resetAdvanceData();
+
+        const _shipments = this.filterShipmentByCD(data);
+        if (_shipments.length > 0) {
+            this.shipment.setValue(_shipments[0].hblid);
+            this.selectedShipment = _shipments[0];
+
+            let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.creditNo && !chg.debitNo && 
+            !chg.soano && !chg.paySoano && !chg.voucherId && !chg.voucherIdre); // Update clearance no for selected charges without issued
+            let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
+            if (!!selectedCharges.length) {
+                if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
+                    this.getMasterCharges(this.serviceTypeId, true);
+                }
+
+                for (const charge of selectedCharges) {
+                    charge.jobId = this.selectedShipment.jobId;
+                    charge.jobNo = this.selectedShipment.jobId;
+                    charge.clearanceNo = data.clearanceNo
+                }
+                if (selectedCharges[0].hblid !== data.hblid) {
+                    selectedCharges.forEach((charge: Surcharge) => {
+                        charge.isChangeShipment = true;
+                        charge.id = SystemConstants.EMPTY_GUID;
+                    });
+                }
+                this.charges = [...selectedCharges, ...notSelectedCharges]
+            }
+
+            this.getAdvances(data.jobNo, data.hblid, true, this.settlementCode);
+
+        } else {
+            this.selectedAdvance = null;
         }
     }
 
@@ -306,57 +349,39 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         switch (type) {
             case 'shipment':
+            case 'cd':
                 if(this.charges.length > 0){
-                let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected);
+                let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
+                let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
                 selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
                 this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
                     .subscribe(
                         (res: any) => {
-                            if (!res.status) {
+                            if (!!res.data) {
                                 this._toastService.warning(res.message);
-                                return;
-                            } else {
-                                this.onSelectShipmentData(data);
+                                res.data.forEach(element => {
+                                    selectedCharges.filter((chg: Surcharge)=> chg.id === element.id).map((chg: Surcharge)=> {
+                                        chg.creditNo = element.creditNo;
+                                        chg.debitNo = element.debitNo;
+                                        chg.soano = element.soano;
+                                        chg.paySoano = element.paySoano;
+                                        chg.linkChargeId = element.linkChargeId;
+                                        chg.voucherId = element.voucherId;
+                                        chg.voucherIdre = element.voucherIdre;
+                                        chg.syncedFrom = element.syncedFrom;
+                                        chg.paySyncedFrom = element.syncedFrom;
+                                    })
+                                });
+                                this.charges = [...selectedCharges, ...notSelectedCharges]
+                                type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
+                            } 
+                            else {
+                                type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
                             }
                         }
                     );
                 }else{
-                    this.onSelectShipmentData(data);
-                }
-                break;
-            case 'cd':
-                this.selectedCD = data;
-                this.customNo.setValue(data.clearanceNo);
-
-                this.resetAdvanceData();
-
-                const _shipments = this.filterShipmentByCD(data);
-                if (_shipments.length > 0) {
-                    this.shipment.setValue(_shipments[0].hblid);
-                    this.selectedShipment = _shipments[0];
-
-                    if (!!this.charges.length) {
-                        if (this.utility.getServiceType(this.charges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
-                            this.getMasterCharges(this.serviceTypeId, true);
-                        }
-
-                        for (const charge of this.charges) {
-                            charge.jobId = this.selectedShipment.jobId;
-                            charge.jobNo = this.selectedShipment.jobId;
-                            charge.clearanceNo = data.clearanceNo
-                        }
-                        if (this.charges[0].hblid !== data.hblid) {
-                            this.charges.forEach((charge: Surcharge) => {
-                                charge.isChangeShipment = true;
-                                charge.id = SystemConstants.EMPTY_GUID;
-                            });
-                        }
-                    }
-
-                    this.getAdvances(data.jobNo, data.hblid, true, this.settlementCode);
-
-                } else {
-                    this.selectedAdvance = null;
+                    type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
                 }
                 break;
             case 'advanceNo':
@@ -626,27 +651,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         const formData = this.formGroup.getRawValue();
 
         for (const charge of listChargesToSave) {
-            if (charge.linkChargeId) { continue; }
-            // *start: cập nhật shipment charges
-            charge.clearanceNo = formData.customNo;
-            // charge.advanceNo = formData.advanceNo;
-            charge.jobId = this.selectedShipment.jobId;
-            charge.jobNo = this.selectedShipment.jobId;
-            charge.mblno = this.selectedShipment.mbl;
-            charge.mbl = this.selectedShipment.mbl;
-            charge.hblno = this.selectedShipment.hbl;
-            charge.hbl = this.selectedShipment.hbl;
-            charge.hblid = this.selectedShipment.hblid;
-            // *end: cập nhật shipment charges
-            if (charge.finalExchangeRate <= 0) {
-                charge.finalExchangeRate = null;
-            }
-
-            if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
-                // swap để map field cho chage obh
-                charge.payerId = charge.paymentObjectId;
-                charge.paymentObjectId = charge.obhId;
-            }
             const date = charge.invoiceDate;
             if (typeof date !== 'string') {
                 if (!!date && !!date.startDate) {
@@ -658,6 +662,28 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     charge.invoiceDate = null;
                 }
             }
+            if (charge.finalExchangeRate <= 0) {
+                charge.finalExchangeRate = null;
+            }
+
+            if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
+                // swap để map field cho chage obh
+                charge.payerId = charge.paymentObjectId;
+                charge.paymentObjectId = charge.obhId;
+            }   
+            if (!charge.isSelected || (charge.linkChargeId || !!charge.creditNo || !!charge.debitNo || 
+                !!charge.soano || !!charge.paySoano || !!charge.voucherId || !!charge.voucherIdre)) {continue;}
+            // *start: cập nhật shipment charges
+            charge.clearanceNo = formData.customNo;
+            // charge.advanceNo = formData.advanceNo;
+            charge.jobId = this.selectedShipment.jobId;
+            charge.jobNo = this.selectedShipment.jobId;
+            charge.mblno = this.selectedShipment.mbl;
+            charge.mbl = this.selectedShipment.mbl;
+            charge.hblno = this.selectedShipment.hbl;
+            charge.hbl = this.selectedShipment.hbl;
+            charge.hblid = this.selectedShipment.hblid;
+            // *end: cập nhật shipment charges
         }
         console.log('listChargesToSave', listChargesToSave);
         if (this.isUpdate) {

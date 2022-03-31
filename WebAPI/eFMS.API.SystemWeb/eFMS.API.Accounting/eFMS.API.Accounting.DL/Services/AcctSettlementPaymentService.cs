@@ -6035,27 +6035,28 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="shipmentCharges"></param>
         /// <returns></returns>
-        public HandleState CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
+        public ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
         {
             var chargeIds = shipmentCharges.Select(x => x.Id).ToList();
             var surcharges = csShipmentSurchargeRepo.Get(x => chargeIds.Any(z => z == x.Id) && x.IsFromShipment == false);
+            var hs = new ResultHandle();
             if (surcharges.Any(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)))
             {
-                return new HandleState((object)"You can't update charge. Charges have been issued CDNOTE");
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued CDNOTE", Data = surcharges };
             }
             if (surcharges.Any(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)))
             {
-                return new HandleState((object)"You can't update charge. Charges have been issued SOA");
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued SOA", Data = surcharges };
             }
             if (surcharges.Any(x => !string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)))
             {
-                return new HandleState((object)"You can't update charge. Charges have been synced");
+                return new ResultHandle { Status = false, Message = "You can't update charges have been synced", Data = surcharges };
             }
             if (surcharges.Any(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)))
             {
-                return new HandleState((object)"You can't update charge. Charges have been issued voucher");
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued voucher", Data = surcharges };
             }
-            return new HandleState();
+            return new ResultHandle();
         }
     }
 }
