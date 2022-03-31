@@ -93,5 +93,6 @@
 
         public static readonly string LINK_CHARGE_TYPE_AUTO_RATE = "AUTO_RATE";
         public static readonly string LINK_CHARGE_TYPE_LINK_FEE = "LINK_FEE";
+        public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
     }
 }
