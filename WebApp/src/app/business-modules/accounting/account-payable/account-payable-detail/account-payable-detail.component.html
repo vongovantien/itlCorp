@@ -46,7 +46,7 @@
                                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                                         data-toggle="collapse"
                                                                         [attr.data-target]="'#id-00' + item.refId"
-                                                                        title="Collapse" (click)="!item.notShowDetail ? getPayments(item): null">
+                                                                        title="Collapse" (click)="getPayments(item)">
                                                                         <i class="la la-angle-up"></i>
                                                                     </button>
                                                                 </div>

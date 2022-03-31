@@ -684,7 +684,7 @@
             <param name="pageSize"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetBy(eFMS.API.Accounting.DL.Models.AccountPayable.AcctPayableViewDetailCriteria)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetBy(eFMS.API.Accounting.DL.Models.AccountingPayable.AcctPayableViewDetailCriteria)">
             <summary>
             Get payment detail of payable transaction
             </summary>
@@ -810,7 +810,7 @@
             <param name="settlementNo">settlementNo of existed item that want to delete</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDetailSettlementPaymentById(System.Guid)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDetailSettlementPaymentById(System.Guid,System.String)">
             <summary>
             Get details settlement payment by settlementId
             </summary>

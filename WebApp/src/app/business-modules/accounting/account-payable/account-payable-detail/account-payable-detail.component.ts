@@ -206,20 +206,23 @@ export class AccountPayableTabComponent extends AppList implements OnInit {
     }
 
     getPayments(item: AccountingPayableModel) {
-        const criteria: any = {
-            refNo: item.referenceNo,
-            type: item.transactionType,
-            invoiceNo: item.invoiceNo,
-            billingNo: item.billingNo,
-            bravoNo: item.bravoRefNo
-        };
-        this._accountingRepo.getPayablePaymentByRefNo(criteria)
-            .pipe(
-                catchError(this.catchError)
-            ).subscribe(
-                (res: []) => {
-                    this.payments = res || [];
-                },
-            );
+        this.payments = [];
+        if (!item.notShowDetail) {
+            const criteria: any = {
+                refNo: item.referenceNo,
+                type: item.transactionType,
+                invoiceNo: item.invoiceNo,
+                billingNo: item.billingNo,
+                bravoNo: item.bravoRefNo
+            };
+            this._accountingRepo.getPayablePaymentByRefNo(criteria)
+                .pipe(
+                    catchError(this.catchError)
+                ).subscribe(
+                    (res: []) => {
+                        this.payments = res || [];
+                    },
+                );
+        }
     }
 }

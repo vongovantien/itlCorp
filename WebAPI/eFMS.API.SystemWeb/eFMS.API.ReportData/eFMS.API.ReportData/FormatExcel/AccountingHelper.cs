@@ -6017,8 +6017,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     var _orgPaidAmount = item.PaymentDetails.Sum(x => x.OrgPaidAmount ?? 0);
                     var _orgPaidAmountVnd = item.PaymentDetails.Sum(x => x.PaidAmountVND ?? 0);
-                    var _orgRemainAmount = item.BeginAmount - _orgPaidAmount; // item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
-                    var _orgRemainAmountVnd = (item.BeginAmountVND ?? 0) - _orgPaidAmountVnd; // item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
+                    var _orgRemainAmount = item.PaymentDetails.FirstOrDefault() == null ? item.BeginAmount - _orgPaidAmount : (item.PaymentDetails.Last().OriginRemainAmount ?? 0); // item.PaymentDetails.Sum(x => x.OriginRemainAmount ?? 0);
+                    var _orgRemainAmountVnd = item.PaymentDetails.FirstOrDefault() == null ? ((item.BeginAmountVND ?? 0) - _orgPaidAmountVnd) : (item.PaymentDetails.Last().RemainAmountVND ?? 0); // item.PaymentDetails.Sum(x => x.RemainAmountVND ?? 0);
                     if (item.Status == "Unpaid")
                     {
                         _orgPaidAmount = 0;
