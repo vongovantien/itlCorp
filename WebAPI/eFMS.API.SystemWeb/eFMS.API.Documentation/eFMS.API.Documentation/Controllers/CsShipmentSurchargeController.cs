@@ -657,9 +657,9 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("UpdateFieldNetAmount_AmountUSD_VatAmountUSD")]
-        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField()
+        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField([FromBody] List<Guid> Ids)
         {
-            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
+            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD(Ids);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update Success" };
             if (!hs.Success)
             {
