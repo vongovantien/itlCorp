@@ -62,16 +62,14 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (transactionType == "CL")
                 {
-                    hblIds = opsTransactionRepository.Get(x => x.CustomerId == partnerId 
-                            && x.SalemanId != salemanBOD 
+                    hblIds = opsTransactionRepository.Get(x => x.SalemanId != salemanBOD 
                             && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
                              .Select(x => x.Hblid)
                              .ToList();
                 }
                 else
                 {
-                    hblIds = csDetailSurchargeRepository.Get(x => x.CustomerId == partnerId
-                           && x.SaleManId != salemanBOD)
+                    hblIds = csDetailSurchargeRepository.Get(x => x.SaleManId != salemanBOD)
                             .Select(x => x.Id)
                             .ToList();
                 }
@@ -97,7 +95,6 @@ namespace eFMS.API.Documentation.DL.Services
                     hblIds = opsTransactionRepository.Get(x => x.Hblid != HblId 
                                 && x.SalemanId == salemanCurrent 
                                 && x.SalemanId != salemanBOD
-                                && x.CustomerId == partnerId
                                 && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
                                  .Select(x => x.Hblid)
                                  .ToList();
@@ -111,8 +108,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     hblIds = csDetailSurchargeRepository.Get(x => x.Id != HblId
                                 && x.SaleManId == salemanCurrent 
-                                && x.SaleManId != salemanBOD 
-                                && x.CustomerId == partnerId)
+                                && x.SaleManId != salemanBOD)
                                     .Select(x => x.Id)
                                     .ToList();
                 }
