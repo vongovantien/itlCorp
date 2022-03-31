@@ -2489,7 +2489,7 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             CatPartner partnerInternal = new CatPartner();
             var date = new DateTime(2022, 01, 31);
-            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
+            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date );
             List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
             var hs = new ResultHandle();
             var surchargesAddHis = new List<CsLinkCharge>();
@@ -2569,7 +2569,7 @@ namespace eFMS.API.Documentation.DL.Services
                             surchargesHis.JobNoLink = chargeBuy.JobNo;
                             surchargesHis.ChargeLinkId = surcharge.Id.ToString();
                             surchargesHis.DatetimeCreated = DateTime.Now;
-                            surchargesHis.UserCreated = currentUser.UserID;
+                            surchargesHis.UserCreated = DocumentConstants.USER_EFMS_SYSTEM;
                             surchargesHis.LinkChargeType = "AUTO_RATE";
 
                             surchargesAddHis.Add(surchargesHis);
@@ -2678,6 +2678,15 @@ namespace eFMS.API.Documentation.DL.Services
                 surcharge.Vatrate = chargeBuy.Vatrate;
                 surcharge.Quantity = chargeBuy.Quantity;
             }
+
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge,0);
+            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
             if (!string.IsNullOrEmpty(partnerInternal.Id))
             {
