@@ -816,6 +816,12 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
+            if (detail.Permission.AllowDelete)
+            {
+                //[01/03/2022][Có tồn tại linkfee không cho xóa]
+                var check = csLinkChargeRepository.Get(x => x.JobNoLink == detail.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).FirstOrDefault();
+                detail.Permission.AllowDelete = check != null ? false : true;
+            }
             return detail;
         }
 
@@ -1267,6 +1273,7 @@ namespace eFMS.API.Documentation.DL.Services
             var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var creators = sysUserRepo.Get();
+            var csLinkCharges = csLinkChargeRepository.Get();
 
             masterBills.ToList().ForEach(fe => {
                 fe.SupplierName = coloaders.FirstOrDefault(x => x.Id == fe.ColoaderId)?.ShortName;
@@ -1274,6 +1281,7 @@ namespace eFMS.API.Documentation.DL.Services
                 fe.PODName = pods.FirstOrDefault(x => x.Id == fe.Pod)?.NameEn;
                 fe.POLName = pols.FirstOrDefault(x => x.Id == fe.Pol)?.NameEn;
                 fe.CreatorName = creators.FirstOrDefault(x => x.Id == fe.UserCreated)?.Username;
+                fe.IsLinkFee = csLinkCharges.Any(x => x.JobNoLink == fe.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
             });
             
             return masterBills;
@@ -2358,6 +2366,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
 
                         List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
+                        houseSurcharges = CheckChargesLinkFee(houseSurcharges, transaction);
                         if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
 
                         List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
@@ -2481,6 +2490,19 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
 
+        }
+
+        private List<CsShipmentSurcharge> CheckChargesLinkFee(List<CsShipmentSurcharge> houseSurcharges, CsTransaction transaction)
+        {
+            //[01/03/2022] Không lấy những phí đã linkFee
+            var charges = houseSurcharges;
+            List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == transaction.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
+            if (csLinkFee.Count > 0)
+            {
+                List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString())).ToList();
+            }
+            return charges;
         }
 
         private string SetDefaultOnboard(string polName, string country,DateTime? etd)

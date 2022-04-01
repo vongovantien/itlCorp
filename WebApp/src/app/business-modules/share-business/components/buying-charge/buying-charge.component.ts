@@ -1418,6 +1418,70 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 );
         }
     }
+
+    revertFeeBuy(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs.linkFee) {
+            this._toastService.warning("Charge without fee");
+            return;
+        }
+        if (selectedCs.soano != null && selectedCs.settlementCode != null && selectedCs.voucherId != null && selectedCs.creditNo != null && selectedCs.debitNo != null) {
+            this._toastService.warning("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher");
+            return;
+        }
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmRevertLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmRevertLinkFeeBuy(selectedCs))
+    }
+    onConfirmRevertLinkFeeBuy(selectedCs: CsShipmentSurcharge) {
+        let charges = [];
+        selectedCs.linkFee = false;
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+        this._documentRepo.revertShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+    detailLinkFee(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs)
+            this._toastService.error("Please Select Charge");
+        this._spinner.show(this.spinnerpartner);
+        this._documentRepo.detailLinkFee(selectedCs.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: any) => {
+                    if (result) {
+                        this._spinner.hide(this.spinnerpartner);
+                        let strBody = "<div><b>Link to Job Ops:</b><a> " + result.jobNoOrg + "</a>"
+                            + "</br><b>Link to Job Service:</b><a> " + result.jobNoLink + "</a>"
+                            + "</br><b>Partner Name Selling :</b><a> " + result.partnerNameOrg + "</a>"
+                            + "</br><b>Partner Name Buying :</b><a> " + result.partnerNameLink + "</a>"
+                            + "</br><b>Linked At:</b><a> " + formatDate(new Date(result.datetimeCreated), 'dd/MM/yyyy hh:mm:ss', 'en') + "</a>"
+                            + "</br><b>Create By:</b><a> " + result.userCreatedName + "</a>"
+                            + "<div>"
+                        this.detailLinkFeePopup.title = "Information";
+                        this.detailLinkFeePopup.body = strBody;
+                        this.detailLinkFeePopup.show();
+                    } else {
+                        this._toastService.error("No Charge Link Fee");
+                    }
+                }
+            );
+    }
 }
 
 interface IRecentlyCharge {

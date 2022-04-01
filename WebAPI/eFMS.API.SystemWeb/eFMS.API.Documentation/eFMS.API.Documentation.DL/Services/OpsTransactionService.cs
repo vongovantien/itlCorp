@@ -2025,6 +2025,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
                 }
 
+                //Phí đã link trở thành phí thường
+                charges.ToList().ForEach(x=>x.LinkFee = null);
             }
 
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
