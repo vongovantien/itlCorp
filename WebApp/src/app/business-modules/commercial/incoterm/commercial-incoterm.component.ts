@@ -10,6 +10,7 @@ import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
@@ -89,8 +90,8 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
     exportExcel() {
         this._catalogueRepo.downloadIncotermListExcel(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'incoterm-list.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
                 }
             );
     }

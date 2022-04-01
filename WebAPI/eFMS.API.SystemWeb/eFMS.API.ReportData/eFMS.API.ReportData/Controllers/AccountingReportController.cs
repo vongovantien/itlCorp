@@ -399,7 +399,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            string fileName = "Export SOA Air Freight " + soaNo + "";
+            string fileName = "Export SOA Air Freight";
             FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;

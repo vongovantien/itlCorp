@@ -199,7 +199,7 @@ export class ExportRepo {
     }
 
     exportSOASupplierAirFreight(soaNo: string, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOASupplierAirfreight`, null, { soaNo: soaNo, officeId: officeId }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOASupplierAirfreight`, null, { soaNo: soaNo, officeId: officeId }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -241,7 +241,7 @@ export class ExportRepo {
     }
 
     exportDetailSOA(soaNo: string, currency) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSOA`, null, { soaNo: soaNo, currency: currency }).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSOA`, null, { soaNo: soaNo, currency: currency },null,'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
