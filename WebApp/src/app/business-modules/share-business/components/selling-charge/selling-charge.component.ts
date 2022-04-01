@@ -159,7 +159,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             this._toastService.warning("Please add charge");
             return;
         }
-        // * Update data 
+
+
+        // * Update data
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -264,6 +266,117 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     });
 
                     // this.charges = [...this.charges, ...buyingCharges];
+                }
+            );
+    }
+
+    getSaveLinkFee() {
+        let isSubmitted = this.charges.filter(x => x.id == "00000000-0000-0000-0000-000000000000");
+        if (isSubmitted.length) {
+            this._toastService.warning("Please save charge");
+            return;
+        }
+        let links = this.charges.filter(x => x.isSelected);
+        if (!links.length) {
+            this._toastService.warning("Please select charge");
+            return;
+        }
+        links.forEach((e) => {
+            if (e.linkFee) {
+                this._toastService.warning("Select charge have linked");
+                return;
+            }
+        })
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
+
+        if (!this.checkValidate()) {
+            return;
+        }
+
+        if (!this.checkDuplicate()) {
+            return;
+        }
+        if (!this.shipment.serviceNo) {
+            this._toastService.warning("Please linked job");
+            return;
+        }
+
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmLinkFee())
+    }
+
+    onConfirmLinkFee() {
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        let links = this.charges.filter(x => x.isSelected);
+        this._documentRepo.updateShipmentSurchargesLinkFee(links)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                    } else {
+                        links.forEach(e => e.linkFee = false);
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+
+    onSelectSurcharge(cs: CsShipmentSurcharge) {
+        this.selectedCs = cs;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    revertFeeSell(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs.linkFee) {
+            this._toastService.warning("Charge without fee");
+            return;
+        }
+        if (selectedCs.soano != null&& selectedCs.settlementCode != null && selectedCs.voucherId != null && selectedCs.creditNo != null && selectedCs.debitNo != null) {
+            this._toastService.warning("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+            return;
+        }
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmRevertLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmRevertLinkFeeSell(selectedCs))
+    }
+
+    onConfirmRevertLinkFeeSell(selectedCs: CsShipmentSurcharge) {
+        let charges = [];
+        selectedCs.linkFee = false;
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._documentRepo.revertShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                    this.getProfit();
+                    this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                 }
             );
     }
