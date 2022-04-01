@@ -1909,6 +1909,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(35).Width = 24; //Cột AI
             workSheet.Column(36).Width = 24; //Cột AJ
             workSheet.Column(37).Width = 24; //Cột AK
+            workSheet.Column(38).Width = 24; //Cột AL
         }
         /// <summary>
         /// 
@@ -2167,9 +2168,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AK8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AK8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AK8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AL8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AL8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AL8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2262,7 +2263,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AK7"].Value = headers[37]; //Billing No
 
             workSheet.Cells["AL7:AL8"].Merge = true;
-            workSheet.Cells["AL7"].Value = headers[37]; //Vat Parter
+            workSheet.Cells["AL7"].Value = headers[38]; //Vat Parter
             //Header table
 
             //Cố định dòng thứ 8 (Freeze Row 8 and no column)
@@ -2376,7 +2377,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 35].Value = listData[i].Creator;
                 workSheet.Cells[rowStart, 36].Value = listData[i].SyncedFrom;
                 workSheet.Cells[rowStart, 37].Value = listData[i].BillNoSynced;
-                workSheet.Cells[rowStart, 38].Value = listData[i].SyncedFrom;
+                workSheet.Cells[rowStart, 38].Value = listData[i].VatPartnerName;
                 rowStart += 1;
 
             }
