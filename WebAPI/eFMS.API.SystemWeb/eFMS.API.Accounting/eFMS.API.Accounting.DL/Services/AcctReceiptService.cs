@@ -1386,7 +1386,6 @@ namespace eFMS.API.Accounting.DL.Services
             return _paymentStatus;
         }
 
-
         private HandleState UpdateNetOffCredit(AccAccountingPayment payment, bool isCancel = false)
         {
             HandleState hs = new HandleState();
@@ -1971,6 +1970,25 @@ namespace eFMS.API.Accounting.DL.Services
                                 throw new Exception("Có lỗi khi Add/Update Payment" + hsPaymentDelete.Message.ToString());
                             }
 
+                            // Check payment hien tai
+                            IQueryable<AccAccountingPayment> hasPayments = GetPaymentStepOrderReceipt(receiptCurrent);
+
+                            if (hasPayments.Count() > 0)
+                            {
+                                var query = from p in hasPayments
+                                            join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                            where r.Status == AccountingConstants.RECEIPT_STATUS_DRAFT
+                                            select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
+
+                                if (query != null && query.Count() > 0)
+                                {
+                                    return new HandleState((object)string.Format(
+                                        "You can not done this receipt, because {0} - {1} have payment time before than this receipt. please done the first receipts firstly!",
+                                        query.FirstOrDefault()?.InvoiceNo,
+                                        query.FirstOrDefault()?.PaymentRefNo
+                                        ));
+                                }
+                            }
                             // Done Receipt
                             HandleState hs = new HandleState();
                             if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
@@ -2019,8 +2037,6 @@ namespace eFMS.API.Accounting.DL.Services
                         trans.Dispose();
                     }
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -3911,6 +3927,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return valid;
+        }
+
+        public IQueryable<AccAccountingPayment> GetPaymentStepOrderReceipt(AcctReceipt receiptCurrent)
+        {
+            List<string> receiptCurrentPaymentInvoiceList = new List<string>();
+            DateTime receiptDatetimeCreated = DateTime.Now;
+            // IQueryable<AccAccountingPayment> hasPayments = Enumerable.Empty<AccAccountingPayment>().AsQueryable();
+
+            IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+                              && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                              && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0
+                              && receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo)
+                              );
+
+            return hasPayments;
         }
 
         public async Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
