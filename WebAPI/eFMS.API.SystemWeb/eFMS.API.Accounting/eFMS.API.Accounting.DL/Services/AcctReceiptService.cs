@@ -298,9 +298,11 @@ namespace eFMS.API.Accounting.DL.Services
                 page = 1;
                 size = rowsCount;
             }
-            IQueryable<AcctReceiptModel> result = FormatReceipt(data, criteria);
 
-            return result.Skip((page - 1) * size).Take(size);
+            var resultPaging = data.Skip((page - 1) * size).Take(size);
+            IQueryable<AcctReceiptModel> result = FormatReceipt(resultPaging, criteria);
+
+            return result;
         }
 
         public IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria)
