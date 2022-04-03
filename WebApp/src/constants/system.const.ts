@@ -142,4 +142,6 @@ export class SystemConstants {
         OK: 200
     };
 
+    public static ITL_BOD = "ITL.BOD";
+
 }

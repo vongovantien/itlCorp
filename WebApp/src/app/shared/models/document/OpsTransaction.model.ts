@@ -63,6 +63,8 @@ export class OpsTransaction extends BaseModel {
 
     // * Custom
     isReplicate: boolean = false;
+    isAllowChangeSaleman: boolean = true;
+    salesmanName: string = null;
 
     constructor(object?: any) {
         super();

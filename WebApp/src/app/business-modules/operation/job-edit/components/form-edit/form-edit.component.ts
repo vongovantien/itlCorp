@@ -97,6 +97,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     userLogged: any;
 
     containers: Observable<any>;
+    salesmanName: string = null;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -183,11 +184,15 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
+        this.salesmanName = this.opsTransaction.salesmanName;
 
-        this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
-            .subscribe((salesmans: any) => {
-                this.salesmans = salesmans;
-            })
+        if (this.opsTransaction.isAllowChangeSaleman) {
+            this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+                .subscribe((salesmans: any) => {
+                    this.salesmans = salesmans;
+                })
+        }
+
     }
 
     initForm() {
@@ -287,13 +292,19 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             case 'customer':
                 this._toaster.clear();
                 const comboGridCustomer = this.comboGrids.find(x => x.name === 'customerId');
+                const comboGridSalesman = this.comboGrids.find(x => x.name === 'salemansId');
 
+                if (!this.opsTransaction.isAllowChangeSaleman) {
+                    this.salesmanName = SystemConstants.ITL_BOD;
+
+                    return;
+                }
                 this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
                     .pipe(
                         map((res: CommonInterface.IResult) => {
                             if (!res.status) {
                                 this.customerId.setValue(null);
-                                this.customerName = data.shortName;
+                                this.customerName = null;
                                 comboGridCustomer.displayStringValue = null;
                                 this._toaster.warning(res.message);
                             }
@@ -303,6 +314,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                             if (!res.status) {
                                 return of(false);
                             }
+                            this.customerId.setValue(data.id);
+                            this.customerName = data.shortName;
                             return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
                         }),
                         catchError((err, caught) => of(false)),
@@ -313,8 +326,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                                 this.salesmans = res || [];
                                 if (!!this.salesmans.length) {
                                     this.salemansId.setValue(res[0].id);
+                                    this.salesmanName = res[0].username;
                                 } else {
                                     this.salemansId.setValue(null);
+                                    this.salesmanName = null;
                                     this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
                                         body: `${data.shortName} not have any agreement for service in this office <br/> please check again!`
                                     })
@@ -322,7 +337,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                                 }
                             } else {
                                 this.salesmans = [];
-                                this.customerName = null;
+                                this.customerName = this.salesmanName = null;
+                                comboGridSalesman.displayStringValue = null;
                                 this.salemansId.setValue(null);
                             }
                         }

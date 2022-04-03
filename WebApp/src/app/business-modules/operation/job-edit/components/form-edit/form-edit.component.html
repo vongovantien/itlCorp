@@ -156,8 +156,8 @@
 					<app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
 						[currentActiveItemId]="{ field: 'id', value: customerId.value, hardValue: customerName}"
 						[selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-						[displayFields]="displayFieldsCustomer" placeholder="Please select"
-						(remove)="resetFormControl(customerId)" name="customerId">
+						[displayFields]="displayFieldsCustomer" placeholder="Please select" name="customerId"
+						[clearable]="false">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !customerId.value">
 						Customer is required!
@@ -278,11 +278,12 @@
 					<label class="form-control-label" for="" required>
 						Salesman
 					</label>
-					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value: salemansId.value}"
+					<app-combo-grid-virtual-scroll
+						[currentActiveItemId]="{field:'id',value: salemansId.value, hardValue: salesmanName}"
 						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
 						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
-						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(salemansId)"
-						placeholder="Select salesman">
+						[displayFields]="displayFieldSalesman" placeholder="Select salesman" [clearable]="false"
+						name="salemansId">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !salemansId.value">
 						Salesman is required!
@@ -312,8 +313,7 @@
 					<app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'billingOps')"
 						[currentActiveItemId]="{ field: 'id', value: billingOpsId.value}"
 						[selectedDisplayFields]="['username']" [dataSources]="users | async"
-						[displayFields]="displayFieldSalesman" placeholder="Please select"
-						(remove)="resetFormControl(billingOpsId)">
+						[displayFields]="displayFieldSalesman" placeholder="Please select" [clearable]="false">
 					</app-combo-grid-virtual-scroll>
 				</div>
 			</div>

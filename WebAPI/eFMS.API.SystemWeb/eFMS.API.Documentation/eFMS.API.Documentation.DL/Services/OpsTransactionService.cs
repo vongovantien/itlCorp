@@ -412,6 +412,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
+
+                details.SalesmanName = userRepository.Get(x => x.Id.ToString() == details.SalemanId)?.FirstOrDefault()?.Username;
+
+                details.IsAllowChangeSaleman = !(details.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE);
             }
             return details;
         }
