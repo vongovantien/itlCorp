@@ -11,7 +11,7 @@ import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 import { catchError, finalize, map } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
 
 
@@ -139,7 +139,7 @@ export class ChargeComponent extends AppList implements OnInit {
         this._exportRepo.exportCharge(this.dataSearch)
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

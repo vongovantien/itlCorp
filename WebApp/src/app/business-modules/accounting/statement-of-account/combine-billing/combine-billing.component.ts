@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppList } from '@app';
-import {  RoutingConstants } from '@constants';
+import {  RoutingConstants, SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -196,7 +196,7 @@ deleteCombineBilling(id: string) {
           .subscribe(
             (response: HttpResponse<any>) => {
               if (response!=null) {
-                this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
               } else {
                 this._toastService.warning('No data found');
               }

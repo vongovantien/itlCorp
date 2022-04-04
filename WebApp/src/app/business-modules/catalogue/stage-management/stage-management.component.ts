@@ -12,6 +12,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-stage-management',
@@ -158,7 +159,7 @@ export class StageManagementComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

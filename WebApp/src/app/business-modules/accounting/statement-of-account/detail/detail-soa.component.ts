@@ -9,7 +9,7 @@ import { SOA, SysImage } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -144,8 +144,8 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if(response!=null&&response.headers.get('efms-file-name')!=null){
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    if(response!=null&&response.headers.get(SystemConstants.EFMS_FILE_NAME)!=null){
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }else{
                         this._toastService.warning('No data found');
                     }
@@ -164,8 +164,8 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null && response.headers.get('efms-file-name')!= null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    if (response!=null && response.headers.get(SystemConstants.EFMS_FILE_NAME)!= null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -182,8 +182,8 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null&& response.headers.get('efms-file-name')!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    if (response!=null&& response.headers.get(SystemConstants.EFMS_FILE_NAME)!=null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -201,8 +201,8 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null&& response.headers.get('efms-file-name')!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    if (response!=null&& response.headers.get(SystemConstants.EFMS_FILE_NAME)!=null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -244,7 +244,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -259,7 +259,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }

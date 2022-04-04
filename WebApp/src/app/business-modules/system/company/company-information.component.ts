@@ -14,6 +14,7 @@ import { finalize, catchError } from 'rxjs/operators';
 
 import { LoadCompanyAction, ICompanyState, getCompanyState } from './store';
 import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-company-info',
@@ -126,7 +127,7 @@ export class ComanyInformationComponent extends AppList {
         this._exportRepo.exportCompany(this.dataSearch)
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel",response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL,response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

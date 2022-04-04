@@ -111,7 +111,7 @@ export class UnlockRequestComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('Not found data to print', '');
                     }

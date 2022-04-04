@@ -261,7 +261,7 @@ export class WarehouseComponent extends AppList implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

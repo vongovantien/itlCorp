@@ -157,7 +157,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             )
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
+                    this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }
@@ -176,7 +176,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                 )
                 .subscribe(
                     (res: HttpResponse<any>) => {
-                        this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
+                        this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
                 );
         // }
@@ -205,7 +205,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             .subscribe(
                 (res: HttpResponse<any>) => {
                     if (res.body) {
-                        this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
+                        this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         return;
                     }
                     this._toastService.warning('No Data To View');

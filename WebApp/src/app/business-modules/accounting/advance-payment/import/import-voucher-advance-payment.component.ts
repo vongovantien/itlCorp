@@ -127,7 +127,7 @@ export class ImportVoucherAdvancePaymentComponent extends AppPage implements OnI
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "ImportVoucherAdvancePaymentTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "ImportVoucherAdvancePaymentTemplate.xlsx");
                 },
             );
     }

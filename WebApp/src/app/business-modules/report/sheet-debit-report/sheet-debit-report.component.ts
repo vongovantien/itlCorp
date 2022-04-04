@@ -7,6 +7,7 @@ import { CommonEnum } from "@enums";
 import { catchError, finalize } from "rxjs/operators";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 import { HttpResponse } from "@angular/common/http";
+import { SystemConstants } from "@constants";
 
 @Component({
     selector: 'app-sheet-debit-report',
@@ -55,7 +56,7 @@ export class SheetDebitReportComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel",response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL,response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -73,7 +74,7 @@ export class SheetDebitReportComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -91,7 +92,7 @@ export class SheetDebitReportComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -109,7 +110,7 @@ export class SheetDebitReportComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -127,7 +128,7 @@ export class SheetDebitReportComponent extends AppList {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

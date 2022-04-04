@@ -8,7 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -118,7 +118,7 @@ export class DepartmentComponent extends AppList {
         this._exportRepo.exportDepartment(this.dataSearch)
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                     console.log(errors);

@@ -7,7 +7,7 @@ import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { DataService } from '@services';
@@ -300,7 +300,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -309,7 +309,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -318,7 +318,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

@@ -8,7 +8,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, SystemConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -240,7 +240,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response != null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }

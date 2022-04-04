@@ -122,7 +122,7 @@ export class GeneralReportComponent extends AppList {
                 )
                 .subscribe(
                     (response: HttpResponse<any>) => {
-                        this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }
@@ -143,7 +143,7 @@ export class GeneralReportComponent extends AppList {
                 )
                 .subscribe(
                     (response: HttpResponse<any>) => {
-                        this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }
@@ -164,7 +164,7 @@ export class GeneralReportComponent extends AppList {
                 )
                 .subscribe(
                     (response: HttpResponse<any>) => {
-                        this.startDownloadReport(response.body, response.headers.get('efms-file-name'));
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }

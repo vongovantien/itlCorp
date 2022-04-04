@@ -9,7 +9,7 @@ import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { AccountingConstants, RoutingConstants } from '@constants';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 import { AccAccountingManagementCriteria, AccAccountingManagementResult } from '@models';
 
 import { AppList } from 'src/app/app.list';
@@ -141,7 +141,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no data to export', '');
                     }

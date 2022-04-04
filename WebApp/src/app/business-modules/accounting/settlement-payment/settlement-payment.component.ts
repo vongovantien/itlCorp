@@ -283,7 +283,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         this._exportRepo.exportSettlementPaymentShipment(this.dataSearch)
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }
@@ -292,7 +292,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         this._exportRepo.exportSettlementPaymentShipmentDetail(this.dataSearch)
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }

@@ -63,7 +63,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
             (response: ArrayBuffer) => {
               if (response.byteLength > 0) {
                 const fileName = "Commission PR.xlsx";
-                this.downLoadFile(response, "application/ms-excel", fileName);
+                this.downLoadFile(response, SystemConstants.FILE_EXCEL, fileName);
               } else {
                 this._toastService.warning("No data to download. Please try again.");
               }
@@ -83,7 +83,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
                 (response: ArrayBuffer) => {
                   if (response.byteLength > 0) {
                     const fileName = "Commission OPS VND.xlsx";
-                    this.downLoadFile(response, "application/ms-excel", fileName);
+                    this.downLoadFile(response, SystemConstants.FILE_EXCEL, fileName);
                   } else {
                     this._toastService.warning("No data to download. Please try again.");
                   }
@@ -102,7 +102,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
         .subscribe(
             (response: HttpResponse<any>) => {
               if (response!=null) {
-                this.downLoadFile(response, "application/ms-excel", response.headers.get('efms-file-name'));
+                this.downLoadFile(response, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
               } else {
                 this._toastService.warning("No data to download. Please try again.");
               }

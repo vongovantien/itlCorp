@@ -12,6 +12,7 @@ import { FormCreateCurrencyPopupComponent } from './components/form-create/form-
 
 import { catchError, finalize } from 'rxjs/operators';
 import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-currency',
@@ -142,7 +143,7 @@ export class CurrencyComponent extends AppList implements OnInit {
             .pipe((finalize(() => this._progressRef.complete())))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

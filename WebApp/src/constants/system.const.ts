@@ -42,6 +42,7 @@ export class SystemConstants {
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";
 
     public static readonly FILE_EXCEL: string = 'application/ms-excel';
+    public static readonly EFMS_FILE_NAME: string = 'efms-file-name';
 
     // Page size for ngx-pageination options
     public static readonly OPTIONS_PAGE_SIZE: number = 15;

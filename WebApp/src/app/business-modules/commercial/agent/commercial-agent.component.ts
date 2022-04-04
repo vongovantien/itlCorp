@@ -331,7 +331,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             .pipe(finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'))
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME))
                 }
             )
     }

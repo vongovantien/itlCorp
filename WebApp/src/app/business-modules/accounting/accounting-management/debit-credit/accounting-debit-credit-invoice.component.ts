@@ -8,7 +8,7 @@ import { DocumentationRepo, AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { PartnerOfAcctManagementResult, CDNoteViewModel, CombineBillingCriteria, Crystal } from '@models';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { AccountingConstants, RoutingConstants } from '@constants';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 import { SelectPartner } from '../store';
@@ -296,7 +296,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             .subscribe(
                 (response: HttpResponse<any>) => {
                     if (response!=null) {
-                        this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no data to export', '');
                     }

@@ -7,7 +7,7 @@ import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { DataService } from '@services';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -302,7 +302,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -312,7 +312,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -322,7 +322,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

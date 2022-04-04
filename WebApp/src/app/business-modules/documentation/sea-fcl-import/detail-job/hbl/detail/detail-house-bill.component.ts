@@ -8,7 +8,7 @@ import { Container } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { DataService } from '@services';
 
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
@@ -304,7 +304,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -314,7 +314,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -324,7 +324,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, "application/ms-excel", res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

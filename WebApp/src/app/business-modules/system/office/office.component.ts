@@ -11,7 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { ExportRepo } from 'src/app/shared/repositories';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -87,7 +87,7 @@ export class OfficeComponent extends AppList {
         this._exportRepo.exportOffice(this.criteria)
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                 },

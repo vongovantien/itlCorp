@@ -10,6 +10,7 @@ import { ChartOfAccounts } from 'src/app/shared/models/catalogue/catChartOfAccou
 import { catchError, finalize, map } from 'rxjs/operators';
 import { FormCreateChartOfAccountsPopupComponent } from './components/form-create-chart-of-accounts/form-create-chart-of-accounts.popup';
 import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-chart-of-accounts',
@@ -169,7 +170,7 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
         this._exportRepo.exportChartOfAccounts(this.dataSearch)
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    this.downLoadFile(response.body, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

@@ -91,7 +91,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
         this._catalogueRepo.downloadIncotermListExcel(this.dataSearch)
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }

@@ -125,8 +125,8 @@ export class FormSearchExportComponent extends PopupBase {
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: HttpResponse<any>) => {
-                        if (res.headers.get('efms-file-name')!=null) {
-                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'));
+                        if (res.headers.get(SystemConstants.EFMS_FILE_NAME)!=null) {
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         } else {
                             this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, 'eFms-partner.xlsx');
                         }
@@ -143,7 +143,7 @@ export class FormSearchExportComponent extends PopupBase {
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res:HttpResponse<any>) => {
-                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get('efms-file-name'))
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME))
                     }
                 );
         }

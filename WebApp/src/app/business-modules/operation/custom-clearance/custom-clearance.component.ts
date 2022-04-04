@@ -338,7 +338,7 @@ export class CustomClearanceComponent extends AppList {
         this._exportRepo.exportCustomClearance(body)
             .subscribe(
                 (response: HttpResponse<Blob>) => {
-                    this.downLoadFile(response, "application/ms-excel", response.headers.get('efms-file-name'));
+                    this.downLoadFile(response, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                 },
