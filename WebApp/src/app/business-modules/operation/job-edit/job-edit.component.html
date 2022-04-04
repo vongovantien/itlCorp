@@ -101,6 +101,8 @@
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
                                                 [showGetCharge]="true" [showSyncStandard]="false"
+                                                [allowLinkFee]="allowLinkFeeSell"
+                                                [isDuplicateJob]="isDuplicate"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>

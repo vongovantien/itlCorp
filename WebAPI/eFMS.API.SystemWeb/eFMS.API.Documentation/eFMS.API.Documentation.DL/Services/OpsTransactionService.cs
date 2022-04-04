@@ -599,9 +599,9 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     query = query.And(x => ((x.BillingOpsId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
                                                     || x.SalemanId == currentUser.UserID
-                                                    || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                    || authorizeUserIds.Contains(x.BillingOpsId)
                                                     || authorizeUserIds.Contains(x.SalemanId)
-                                                    || (x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID) 
+                                                    || (x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
                                             ));
                     break;
                 case PermissionRange.Group:
@@ -743,6 +743,19 @@ namespace eFMS.API.Documentation.DL.Services
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
+        }
+
+        private Expression<Func<OpsTransaction, bool>> QuerySearchLinkJob(Expression<Func<OpsTransaction, bool>> query, OpsTransactionCriteria criteria)
+        {
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Have Linked")
+                query = query.And(x => x.IsLinkFee == true);
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Not Link")
+                query = query.And(x => x.IsLinkFee == null || x.IsLinkFee == false);
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Have Linked")
+                query = query.And(x => String.IsNullOrEmpty(x.ServiceNo) == false);
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Not Link")
+                query = query.And(x => String.IsNullOrEmpty(x.ServiceNo) == true);
+            return query;
         }
 
         private string SetProductServiceShipment(CustomsDeclarationModel model)
@@ -1364,7 +1377,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 surchargeRepository.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
-            } 
+            }
             return result;
         }
 
@@ -1414,7 +1427,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //var existedMblHblData = DataContext.Get(x => x.Id != model.Id
                 //&& x.CurrentStatus != TermData.Canceled
-                //&& x.Hwbno == model.Hwbno 
+                //&& x.Hwbno == model.Hwbno
                 //&& x.Mblno == model.Mblno
                 //&& (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
                 //).ToList();
@@ -1928,12 +1941,16 @@ namespace eFMS.API.Documentation.DL.Services
                         List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
                         newContainers.AddRange(masterContainers);
                     }
-                    
+
                     List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
                     if (listSurCharge?.Count() > 0)
                     {
                         newSurcharges.AddRange(listSurCharge);
                     }
+
+                    model.IsLinkFee = null;
+                    model.DateCreatedLinkJob = null;
+                    model.UserCreatedLinkJob = null;
 
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
@@ -1963,7 +1980,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         newSurcharges.AddRange(listSurChargeReplicate);
                                     }
                                 }
-                                
+
                             };
                         }
                     };

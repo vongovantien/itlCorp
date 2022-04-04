@@ -1424,7 +1424,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             this._toastService.warning("Charge without fee");
             return;
         }
-        if (selectedCs.soano != null && selectedCs.settlementCode != null && selectedCs.voucherId != null && selectedCs.creditNo != null && selectedCs.debitNo != null) {
+        if (selectedCs.soano != null
+            || selectedCs.settlementCode != null
+            || selectedCs.voucherId != null
+            || selectedCs.creditNo != null
+            || selectedCs.debitNo != null) {
             this._toastService.warning("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
             return;
         }

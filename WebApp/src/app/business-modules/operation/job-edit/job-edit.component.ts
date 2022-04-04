@@ -573,6 +573,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         if (this.isDuplicate) {
             this.editForm.getBillingOpsId();
             this.headerComponent.resetBreadcrumb("Create Job");
+            if (this.selectedTabSurcharge == CommonEnum.SurchargeTypeEnum.SELLING_RATE)
+                this.getSurCharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
         }
     }
 }

@@ -2366,7 +2366,6 @@ namespace eFMS.API.Documentation.DL.Services
                         if (housebillDimensions != null) dimensionDetails.AddRange(housebillDimensions);
 
                         List<CsShipmentSurcharge> houseSurcharges = GetCharges(oldHouseId, item, transaction);
-                        houseSurcharges = CheckChargesLinkFee(houseSurcharges, transaction);
                         if (houseSurcharges != null) surcharges.AddRange(houseSurcharges);
 
                         List<CsArrivalFrieghtCharge> houseFreigcharges = GetFreightCharges(oldHouseId, item.Id);
@@ -2492,15 +2491,15 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        private List<CsShipmentSurcharge> CheckChargesLinkFee(List<CsShipmentSurcharge> houseSurcharges, CsTransaction transaction)
+        private IQueryable<CsShipmentSurcharge> CheckChargesLinkFee(IQueryable<CsShipmentSurcharge> houseSurcharges, Guid oldHouseId)
         {
             //[01/03/2022] Không lấy những phí đã linkFee
             var charges = houseSurcharges;
-            List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == transaction.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
+            List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.HbllinkId == oldHouseId.ToString() && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
             if (csLinkFee.Count > 0)
             {
                 List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
-                charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString())).ToList();
+                charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
             }
             return charges;
         }
@@ -2671,6 +2670,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             IQueryable<CsShipmentSurcharge> charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId && x.IsFromShipment == true); // Không lấy phí hiện trường
+
+            charges = CheckChargesLinkFee(charges, oldHouseId);
+
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {

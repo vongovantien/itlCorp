@@ -33,6 +33,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() showGetCharge: boolean = true;
     @Input() showSyncStandard: boolean = true;
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
+    @Input() allowLinkFee: boolean = false;
+    @Input() isDuplicateJob: boolean = false;
 
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
@@ -113,6 +115,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
+                    if (this.isDuplicateJob) {
+                        buyings.forEach(s=>s.linkFee = null);
+                    }
                     this.charges = buyings;
                     this._cd.markForCheck();
 
@@ -347,7 +352,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             this._toastService.warning("Charge without fee");
             return;
         }
-        if (selectedCs.soano != null&& selectedCs.settlementCode != null && selectedCs.voucherId != null && selectedCs.creditNo != null && selectedCs.debitNo != null) {
+        if (selectedCs.soano != null
+            || selectedCs.settlementCode != null
+            || selectedCs.voucherId != null
+            || selectedCs.creditNo != null
+            || selectedCs.debitNo != null) {
             this._toastService.warning("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
             return;
         }
