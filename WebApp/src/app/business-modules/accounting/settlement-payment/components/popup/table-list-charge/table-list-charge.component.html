@@ -103,7 +103,9 @@
                                             </td>
                                             <td>
                                                 <div class="form-group col-md-12 dropdown-partner e--combogrid " dropdown
-                                                    [isDisabled]="!!charge.syncedFromBy"
+                                                    [isDisabled]="!!charge.syncedFromBy
+                                                    || (charge.type === 'OBH' && (!!charge.creditNo || !!charge.paySoano))
+                                                    || (charge.type !== 'OBH' && (!!charge.creditNo || !!charge.debitNo || !!charge.soano || !!charge.paySoano || !!charge.voucherId || !!charge.voucherIdre))"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted
                                                     && (!charge.paymentObjectId || charge.type === 'OBH' && charge.obhId === charge.paymentObjectId)}">
                                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle
@@ -210,7 +212,7 @@
                                                         <input type="text" class="dropdown-toggle form-control"
                                                             dropdownToggle readonly placeholder="Please Select"
                                                             [(ngModel)]="charge.obhPartnerName"
-                                                            [disabled]="!charge.chargeId || charge.type !== 'OBH' ? 'disabled': null"
+                                                            [disabled]="(!charge.chargeId || charge.type !== 'OBH' || (charge.type === 'OBH' && (!!charge.soano || !!charge.debitNo))) ? 'disabled': null"
                                                             #c>
                                                         <ng-container *ngIf="!c.disabled">
                                                             <div class="e--combogrid_icon">

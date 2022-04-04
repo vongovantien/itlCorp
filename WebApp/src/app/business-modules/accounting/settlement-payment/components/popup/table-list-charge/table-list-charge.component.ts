@@ -606,6 +606,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     deleteCharge(index: number) {
         this.isSubmitted = false;
+        const chargeDelete = this.charges[index];
+            if(((chargeDelete.type === 'OBH' && (!!chargeDelete.debitNo || !!chargeDelete.soano)) 
+            || (chargeDelete.type !== 'OBH' && (!!chargeDelete.creditNo || !!chargeDelete.debitNo || !!chargeDelete.soano || !chargeDelete.paySoano || !!chargeDelete.voucherId || !!chargeDelete.voucherIdre))) ){
+                this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
+                return;
+            }
         this.charges.splice(index, 1);
     }
 
