@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { AppForm } from '@app';
 import { DataService } from '@services';
-import { JobConstants } from '@constants';
+import { JobConstants, ChargeConstants } from '@constants';
 import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer, Incoterm } from '@models';
 import { CommonEnum } from '@enums';
 import { InfoPopupComponent } from '@common';
@@ -14,16 +14,18 @@ import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAc
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, shareReplay } from 'rxjs/operators';
 import { FormValidators } from '@validators';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-form-create-hbl-sea-import',
     templateUrl: './form-create-hbl-sea-import.component.html'
 })
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     @Input() isUpdate: boolean = false;
     @Input() type: string = null;
 
@@ -197,8 +199,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     }
 
     getMasterData() {
-        this.saleMans = this._systemRepo.getListSystemUser();
-        this.ports = this._store.select(getCataloguePortState);
+        // this.saleMans = this._systemRepo.getListSystemUser();
+        this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
         this.provinces = this._catalogueRepo.getAllProvinces();
         this.suppliers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER, active: true });
@@ -373,6 +375,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             hbOfladingType: res.hbltype,
             incotermId: res.incotermId
         });
+
+        this._catalogueRepo.getListSalemanByPartner(res.customerId, this.type)
+            .subscribe((data) => {
+                this.saleMans = data || [];
+            });
     }
 
     onSelectDataFormInfo(data: any, key: string) {
@@ -383,38 +390,29 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             case 'Customer':
                 this._toast.clear();
 
-                const _hblId = this.isUpdate ? this.hblId : '';
-                this._document.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this.customer.setValue(data.id);
+                this.customer.setValue(data.id);
+                if (!this.consignee.value) {
+                    this.consignee.setValue(data.id);
+                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
 
-
-                                if (!this.consignee.value) {
-                                    this.consignee.setValue(data.id);
-                                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                                }
-
-                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                                    if (!!res) {
-                                        if (!!res.salemanId) {
-                                            this.saleMan.setValue(res.salemanId);
-                                        } else {
-                                            this.saleMan.setValue(null);
-                                        }
-                                        if (!!res.officeNameAbbr) {
-                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                                            this.infoPopup.show();
-                                        }
-                                    }
-                                });
+                this._catalogueRepo.getListSalemanByPartner(data.id, this.type)
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleMan.setValue(res[0].id);
                             } else {
-                                this.customer.setValue(null);
-                                this._toast.warning(res.message);
+                                this.saleMan.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
                             }
+                        } else {
+                            this.saleMans = [];
+                            this.saleMan.setValue(null);
                         }
-                    )
+                    });
                 break;
             case 'Shipper':
                 this.shipper.setValue(data.id);

@@ -6,7 +6,7 @@ import { formatCurrency, formatDate } from '@angular/common';
 import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse, CsOtherCharge, AirwayBill, CountryModel, Incoterm } from '@models';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { JobConstants, SystemConstants } from '@constants';
+import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { DataService } from '@services';
 import { AppForm } from '@app';
 import {
@@ -22,11 +22,12 @@ import { FormValidators } from '@validators';
 
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 
-import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap, startWith } from 'rxjs/operators';
+import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap, startWith, shareReplay } from 'rxjs/operators';
 import { Observable, forkJoin } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Component({
@@ -37,7 +38,8 @@ import { ToastrService } from 'ngx-toastr';
 export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @ViewChild(ShareAirExportOtherChargePopupComponent) otherChargePopup: ShareAirExportOtherChargePopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    // @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     formCreate: FormGroup;
     customerId: AbstractControl;
@@ -72,7 +74,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     handingInformation: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: Observable<User[]>;
+    saleMans: User[];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -240,9 +242,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }).pipe(shareReplay());;
         this.warehouses = this._store.select(getCatalogueWarehouseState);
-        this.saleMans = this._systemRepo.getListSystemUser();
+        // this.saleMans = this._systemRepo.getListSystemUser();
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
         this.currencies = this._catalogueRepo.getCurrencyBy({ active: true });
 
@@ -482,6 +484,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
 
         this.totalHeightWeight = data.hw;
+
+        this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AE_CODE)
+            .subscribe((salesmans: any) => {
+                this.saleMans = salesmans;
+            });
     }
 
     setDimensionDetails(dims: DIM[]): FormArray {
@@ -497,37 +504,27 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             case 'customer':
                 this._toast.clear();
                 this.customerId.setValue(data.id);
-                const _hblId = this.isUpdate ? this.hblId : '';
-
-                this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this.customerId.setValue(data.id);
-                                if (!this.shipperId.value) {
-                                    this.shipperId.setValue(data.id);
-                                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                                }
-
-                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                                    if (!!res) {
-                                        if (!!res.salemanId) {
-                                            this.saleManId.setValue(res.salemanId);
-                                        } else {
-                                            this.saleManId.setValue(null);
-                                        }
-                                        if (!!res.officeNameAbbr) {
-                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                                            this.infoPopup.show();
-                                        }
-                                    }
-                                });
+                if (!this.shipperId.value) {
+                    this.shipperId.setValue(data.id);
+                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
+                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.AE_CODE)
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleManId.setValue(res[0].id);
                             } else {
-                                this.customerId.setValue(null);
-                                this._toast.warning(res.message);
+                                this.saleManId.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
                             }
+                        } else {
+                            this.saleMans = [];
+                            this.saleManId.setValue(null);
                         }
-                    )
+                    });
 
                 break;
             case 'shipper':

@@ -14,7 +14,6 @@ import { Observable, of } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { I } from '@angular/cdk/keycodes';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -126,25 +125,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 break;
             case 'customer':
                 this._toaster.clear();
-                this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
-                    .pipe(
-                        map((res: CommonInterface.IResult) => {
-                            if (!res.status) {
-                                this.customerId.setValue(null);
-                                this.comboGridCustomerCpn.displayStringValue = null;
-                                this._toaster.warning(res.message);
-                            }
-                            return res;
-                        }),
-                        switchMap((res: CommonInterface.IResult) => {
-                            if (!res.status) {
-                                return of(false);
-                            }
-                            this.customerId.setValue(data.id);
-                            return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
-                        }),
-                        catchError((err, caught) => of(false)),
-                    )
+                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -163,6 +144,43 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                             }
                         }
                     )
+                // this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
+                //     .pipe(
+                //         map((res: CommonInterface.IResult) => {
+                //             if (!res.status) {
+                //                 this.customerId.setValue(null);
+                //                 this.comboGridCustomerCpn.displayStringValue = null;
+                //                 this._toaster.warning(res.message);
+                //             }
+                //             return res;
+                //         }),
+                //         switchMap((res: CommonInterface.IResult) => {
+                //             if (!res.status) {
+                //                 return of(false);
+                //             }
+                //             this.customerId.setValue(data.id);
+                //             return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
+                //         }),
+                //         catchError((err, caught) => of(false)),
+                //     )
+                //     .subscribe(
+                //         (res: any) => {
+                //             if (!!res) {
+                //                 this.salesmans = res || [];
+                //                 if (!!this.salesmans.length) {
+                //                     this.salemansId.setValue(res[0].id);
+                //                 } else {
+                //                     this.infoPopup.body = `${data.shortName} not have any agreement for service in this office <br/> please check again!`;
+                //                     this.infoPopup.show();
+                //                     this.salemansId.setValue(null);
+
+                //                 }
+                //             } else {
+                //                 this.salesmans = [];
+                //                 this.salemansId.setValue(null);
+                //             }
+                //         }
+                //     )
                 break;
             case 'salesman':
                 this.salemansId.setValue(data.id);

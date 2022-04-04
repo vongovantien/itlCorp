@@ -283,7 +283,7 @@
 						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
 						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
 						[displayFields]="displayFieldSalesman" placeholder="Select salesman" [clearable]="false"
-						name="salemansId">
+						[disabled]="!opsTransaction?.isAllowChangeSaleman" name="salemansId">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !salemansId.value">
 						Salesman is required!

@@ -433,10 +433,22 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 // chargeItem.obhPartnerName = '';
                 break;
             case 'obh':
-                chargeItem.obhPartnerName = data.shortName;
-                chargeItem.obhId = data.id;
-                chargeItem.objectBePaid = null;
-                chargeItem.payerId = chargeItem.paymentObjectId;
+                const transactionType: string = this.utility.getServiceType(chargeItem.jobId) === 'CL' ? 'CL' : 'DOC';
+                this._documentRepo.validateCheckPointContractPartner(data.id, chargeItem.hblid, transactionType)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem.obhPartnerName = data.shortName;
+                                chargeItem.obhId = data.id;
+                                chargeItem.objectBePaid = null;
+                                chargeItem.payerId = chargeItem.paymentObjectId;
+
+                            } else {
+                                this._toastService.warning(res.message);
+                                chargeItem.obhPartnerName = chargeItem.obhId = chargeItem.objectBePaid = chargeItem.payerId = null;
+                            }
+                        }
+                    )
                 break;
             default:
                 break;
@@ -445,7 +457,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':

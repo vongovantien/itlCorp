@@ -734,7 +734,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge,) {
+    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge, ) {
         chargeItem.partnerShortName = partnerData.shortName;
         chargeItem.partnerName = partnerData.partnerNameEn;
         chargeItem.paymentObjectId = partnerData.id;
@@ -801,6 +801,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 } else {
                                     this._toastService.warning(res.message);
                                 }
+                                this._cd.markForCheck();
                             }
                         )
                 } else {

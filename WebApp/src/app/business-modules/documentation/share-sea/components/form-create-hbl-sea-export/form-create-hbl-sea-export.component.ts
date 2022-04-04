@@ -29,7 +29,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) private viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     @Input() isUpdate: boolean = false;
@@ -73,7 +73,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     issueHblplace: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: Observable<User[]>;
+    saleMans: User[];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -122,7 +122,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     ngOnInit() {
         this.initForm();
-        this.getSaleMans();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
         if (this.type === ChargeConstants.SLE_CODE) {
             this.getCSBookingNotes();
@@ -401,10 +400,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
-    }
 
-    getSaleMans() {
-        this.saleMans = this._systemRepo.getListSystemUser();
+        this._catalogueRepo.getListSalemanByPartner(data.customerId, this.type)
+            .subscribe((salesmans: any) => {
+                this.saleMans = salesmans;
+            });
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
@@ -474,54 +474,30 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             case 'customer':
                 this._toast.clear();
 
-                const _hblId = this.isUpdate ? this.hblId : '';
-                this._documentRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this.customer.setValue(data.id);
-                                this.customerName = data.shortName;
+                this.customer.setValue(data.id);
+                this.customerName = data.shortName;
 
-                                if (!this.shipper.value) {
-                                    this.shipper.setValue(data.id);
-                                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                                }
-
-                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                                    if (!!res) {
-                                        if (!!res.salemanId) {
-                                            this.saleMan.setValue(res.salemanId);
-                                        } else {
-                                            this.saleMan.setValue(null);
-                                        }
-                                        if (!!res.officeNameAbbr) {
-                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                                            this.infoPopup.show();
-                                        }
-                                    }
-                                });
+                if (!this.shipper.value) {
+                    this.shipper.setValue(data.id);
+                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
+                this._catalogueRepo.getListSalemanByPartner(data.id, this.type)
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleMan.setValue(res[0].id);
                             } else {
-                                this.customer.setValue(null);
-                                this._toast.warning(res.message);
+                                this.saleMan.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
                             }
+                        } else {
+                            this.saleMans = [];
+                            this.saleMan.setValue(null);
                         }
-                    )
-                // this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
-                //     if (!!res) {
-                //         if (!!res.salemanId) {
-                //             this.saleMan.setValue(res.salemanId);
-                //         } else {
-                //             this.saleMan.setValue(null);
-                //         }
-                //         if (!!res.officeNameAbbr) {
-                //             console.log(res.officeNameAbbr);
-                //             this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                //             this.infoPopup.show();
-                //         }
-                //     }
-                // });
-
-
+                    });
                 break;
             case 'shipper':
                 this.shipperName = data.shortName;
@@ -593,7 +569,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     }
 
     showBookingNote() {
-        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.bookingNoteContainerRef.viewContainerRef);
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.viewContainerRef.viewContainerRef);
 
 
         if (!!this.componentRef) {
@@ -606,14 +582,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 (bookingNote: csBookingNote) => {
                     this.updateDataFromBookingNo(bookingNote);
                     this.subscription.unsubscribe();
-                    this.bookingNoteContainerRef.viewContainerRef.clear();
+                    this.viewContainerRef.viewContainerRef.clear();
                 });
 
             ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).clickOutSide
                 .pipe(skip(1))
                 .subscribe(
                     () => {
-                        this.bookingNoteContainerRef.viewContainerRef.clear();
+                        this.viewContainerRef.viewContainerRef.clear();
                     }
                 );
         }

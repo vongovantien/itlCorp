@@ -291,7 +291,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
             case 'customer':
                 this._toaster.clear();
-                const comboGridCustomer = this.comboGrids.find(x => x.name === 'customerId');
                 const comboGridSalesman = this.comboGrids.find(x => x.name === 'salemansId');
 
                 if (!this.opsTransaction.isAllowChangeSaleman) {
@@ -299,27 +298,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
                     return;
                 }
-                this._documentRepo.validateCheckPointContractPartner(data.id, '', ChargeConstants.CL_CODE)
-                    .pipe(
-                        map((res: CommonInterface.IResult) => {
-                            if (!res.status) {
-                                this.customerId.setValue(null);
-                                this.customerName = null;
-                                comboGridCustomer.displayStringValue = null;
-                                this._toaster.warning(res.message);
-                            }
-                            return res;
-                        }),
-                        switchMap((res: CommonInterface.IResult) => {
-                            if (!res.status) {
-                                return of(false);
-                            }
-                            this.customerId.setValue(data.id);
-                            this.customerName = data.shortName;
-                            return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
-                        }),
-                        catchError((err, caught) => of(false)),
-                    )
+                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -331,7 +310,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                                     this.salemansId.setValue(null);
                                     this.salesmanName = null;
                                     this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                                        body: `${data.shortName} not have any agreement for service in this office <br/> please check again!`
+                                        body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
                                     })
 
                                 }

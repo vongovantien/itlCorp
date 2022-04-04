@@ -9,15 +9,16 @@ import { FormValidators } from '@validators';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, GetCatalogueWarehouseAction, getCatalogueWarehouseState, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
 import { AppForm } from '@app';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from '@share-bussiness';
-import { JobConstants, SystemConstants } from '@constants';
+import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { DataService } from '@services';
 import { InfoPopupComponent } from '@common';
 
-import { takeUntil, catchError, skip, tap, mergeMap } from 'rxjs/operators';
+import { takeUntil, catchError, skip, tap, mergeMap, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'air-import-hbl-form-create',
@@ -33,6 +34,7 @@ import { ToastrService } from 'ngx-toastr';
 export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     formCreate: FormGroup;
     customerId: AbstractControl;
@@ -74,7 +76,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: Observable<User[]>;
+    saleMans: User[];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     notifies: Observable<Customer[]>;
@@ -211,9 +213,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     getMasterData() {
         this.warehouses = this._store.select(getCatalogueWarehouseState);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.saleMans = this._systemRepo.getListSystemUser();
+        // this.saleMans = this._systemRepo.getListSystemUser();
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
-        this.ports = this._store.select(getCataloguePortState);
+        this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
@@ -316,36 +318,28 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this._toaster.clear();
-                const _hblId = this.isUpdate ? this.hblId : '';
-
-                this._documentationRepo.validateCheckPointContractPartner(data.id, _hblId, 'DOC')
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this.customerId.setValue(data.id);
-                                if (!this.consigneeId.value) {
-                                    this.consigneeId.setValue(data.id);
-                                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                                }
-                                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                                    if (!!res) {
-                                        if (!!res.salemanId) {
-                                            this.saleManId.setValue(res.salemanId);
-                                        } else {
-                                            this.saleManId.setValue(null);
-                                        }
-                                        if (!!res.officeNameAbbr) {
-                                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                                            this.infoPopup.show();
-                                        }
-                                    }
-                                });
+                this.customerId.setValue(data.id);
+                if (!this.consigneeId.value) {
+                    this.consigneeId.setValue(data.id);
+                    this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
+                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.AI_CODE)
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleManId.setValue(res[0].id);
                             } else {
-                                this.customerId.setValue(null);
-                                this._toaster.warning(res.message);
+                                this.saleManId.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
                             }
+                        } else {
+                            this.saleMans = [];
+                            this.saleManId.setValue(null);
                         }
-                    )
+                    });
 
                 break;
             case 'shipper':
@@ -419,5 +413,10 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         };
 
         this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
+
+        this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AI_CODE)
+            .subscribe((salesmans: any) => {
+                this.saleMans = salesmans;
+            })
     }
 }

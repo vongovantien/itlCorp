@@ -177,6 +177,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                                         } else {
                                             chargeItem.receiverName = chargeItem.paymentObjectId = null;
                                         }
+                                        this._cd.markForCheck();
                                     } else {
                                         this._toastService.warning(res.message);
                                     }
