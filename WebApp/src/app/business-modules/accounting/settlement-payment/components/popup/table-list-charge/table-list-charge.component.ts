@@ -421,8 +421,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
                     // * Auto set cstomer for OBH Partner
                     this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
-
-
                 }
                 break;
             case 'payer':
@@ -484,20 +482,41 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         partner = this.getPartnerById(this.selectedShipment.customerId);
+
+                        const transactionType: string = this.utility.getServiceType(this.selectedShipment.jobId) === 'CL' ? 'CL' : 'DOC';
+                        this._documentRepo.validateCheckPointContractPartner(partner.id, this.selectedShipment.hblid, transactionType)
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        if (!!partner) {
+                                            chargeItem.obhId = partner.id;
+                                            chargeItem.obhPartnerName = partner.shortName;
+                                        }
+                                    } else {
+                                        this._toastService.warning(res.message);
+                                        chargeItem.obhId = chargeItem.obhPartnerName = null;
+                                    }
+                                }
+                            )
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
                         partner = this.getPartnerById(this.selectedShipment.carrierId);
+                        if (!!partner) {
+                            chargeItem.obhId = partner.id;
+                            chargeItem.obhPartnerName = partner.shortName;
+                        }
                         break;
                     case CommonEnum.PartnerGroupEnum.AGENT:
                         partner = this.getPartnerById(this.selectedShipment.agentId);
+                        if (!!partner) {
+                            chargeItem.obhId = partner.id;
+                            chargeItem.obhPartnerName = partner.shortName;
+                        }
                         break;
                     default:
                         break;
                 }
-                if (!!partner) {
-                    chargeItem.obhId = partner.id;
-                    chargeItem.obhPartnerName = partner.shortName;
-                }
+
                 break;
         }
 

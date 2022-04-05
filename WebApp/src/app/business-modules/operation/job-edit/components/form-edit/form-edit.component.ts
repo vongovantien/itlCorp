@@ -291,6 +291,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
             case 'customer':
                 this._toaster.clear();
+                this.customerId.setValue(data.id);
+                this.customerName = data.shortName;
                 const comboGridSalesman = this.comboGrids.find(x => x.name === 'salemansId');
 
                 if (!this.opsTransaction.isAllowChangeSaleman) {
@@ -298,6 +300,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
                     return;
                 }
+
                 this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
                     .subscribe(
                         (res: any) => {
