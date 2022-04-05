@@ -5300,7 +5300,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
-        public Stream GenerateAccountingReceivableDebitDetail(List<DebitDetail> result, string fileName)
+        public Stream GenerateAccountingReceivableDebitDetail(List<DebitDetail> result, string fileName, string debitType)
         {
             try
             {
@@ -5315,7 +5315,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 //Set format amount
                 var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
                 var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
-
+                //Set Title
+                excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
                 var rowStart = 4;
                 for (int i = 0; i < result.Count; i++)
                 {

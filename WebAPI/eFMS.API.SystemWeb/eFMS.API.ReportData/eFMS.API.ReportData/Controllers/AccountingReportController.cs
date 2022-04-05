@@ -510,14 +510,14 @@ namespace eFMS.API.ReportData.Controllers
         [Authorize]
         public async Task<IActionResult> ExportDebitDetail(DebitDetailCriteria criteria)
         {
-            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode;
+            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode+ "&overDueDay="+criteria.overDueDay;
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl+urlRequest);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<DebitDetail>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx");
+            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx",criteria.option);
 
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
