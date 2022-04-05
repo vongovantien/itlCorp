@@ -301,6 +301,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 charge.hblno = this.selectedShipment.hbl;
                 charge.hbl = this.selectedShipment.hbl;
                 charge.hblid = this.selectedShipment.hblid;
+                charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
             }
             this.charges = [...selectedCharges, ...notSelectedCharges];
         }
@@ -333,7 +334,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     charge.hblno = this.selectedShipment.hbl;
                     charge.hbl = this.selectedShipment.hbl;
                     charge.hblid = this.selectedShipment.hblid;
-                    charge.clearanceNo = data.clearanceNo
+                    charge.clearanceNo = data.clearanceNo;
+                    charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
                 }
                 if (selectedCharges[0].hblid !== data.hblid) {
                     selectedCharges.forEach((charge: Surcharge) => {
@@ -607,7 +609,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     deleteCharge(index: number) {
         this.isSubmitted = false;
         const chargeDelete = this.charges[index];
-            if(((chargeDelete.type === 'OBH' && (!!chargeDelete.debitNo || !!chargeDelete.soano)) 
+            if(((chargeDelete.type === 'OBH' && (!!chargeDelete.creditNo || !!chargeDelete.paySoano)) 
             || (chargeDelete.type !== 'OBH' && (!!chargeDelete.creditNo || !!chargeDelete.debitNo || !!chargeDelete.soano || !chargeDelete.paySoano || !!chargeDelete.voucherId || !!chargeDelete.voucherIdre))) ){
                 this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
                 return;

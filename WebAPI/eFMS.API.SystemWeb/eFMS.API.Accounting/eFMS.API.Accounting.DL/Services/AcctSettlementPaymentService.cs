@@ -6065,6 +6065,41 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return new ResultHandle();
         }
+
+        /// <summary>
+        /// Check allow deby settlement
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public ResultHandle CheckAllowDenySettle(List<Guid> ids)
+        {
+            #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
+            var invalidSettles = new List<Guid>();
+            var invalidCodeSettles = new List<string>();
+            foreach (var settlementId in ids)
+            {
+                var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+                if (detail == null) return null;
+
+                if (detail.SettlementType == "DIRECT")
+                {
+                    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
+                    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
+                    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
+                    if (isDebit || isSoa)
+                    {
+                        invalidSettles.Add(settlementId);
+                        invalidCodeSettles.Add(detail.SettlementNo);
+                    }
+                }
+            }
+            if(invalidSettles.Count > 0)
+            {
+                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+            }
+            #endregion
+            return new ResultHandle();
+        }
     }
 }
 

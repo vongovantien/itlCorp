@@ -1171,5 +1171,12 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSettlementPaymentService.CheckAllowUpdateDirectCharges(shipmentCharges);
             return Ok(result);
         }
+
+        [HttpPost("CheckAllowDenySettle")]
+        public IActionResult CheckAllowDenySettle(List<Guid> ids)
+        {
+            var result = acctSettlementPaymentService.CheckAllowDenySettle(ids);
+            return Ok(result);
+        }
     }
 }

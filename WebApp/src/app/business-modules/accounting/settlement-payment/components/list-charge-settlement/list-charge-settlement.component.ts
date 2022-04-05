@@ -312,7 +312,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
             for (const groupShipment of this.groupShipments) {
-                const chargeIssue = groupShipment.chargeSettlements.filter((chg: Surcharge) => chg.isSelected && ((chg.type === 'OBH' && (!!chg.debitNo || !!chg.soano)) 
+                const chargeIssue = groupShipment.chargeSettlements.filter((chg: Surcharge) => chg.isSelected && ((chg.type === 'OBH' && (!!chg.creditNo || !!chg.paySoano)) 
                 || (chg.type !== 'OBH' && (!!chg.creditNo || !!chg.debitNo || !!chg.soano || !!chg.paySoano || !!chg.voucherId || !!chg.voucherIdre))));
                 if(!!chargeIssue.length){
                     this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
@@ -336,7 +336,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments = this.groupShipments.filter((groupItem: any) => groupItem.chargeSettlements.length);
         } else {
             const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
-            const chargeIssue = surchargeSelected.filter((chg: Surcharge) => ((chg.type === 'OBH' && (!!chg.debitNo || !!chg.soano)) 
+            const chargeIssue = surchargeSelected.filter((chg: Surcharge) => ((chg.type === 'OBH' && (!!chg.creditNo || !!chg.paySoano)) 
             || (chg.type !== 'OBH' && (!!chg.creditNo || !!chg.debitNo || !!chg.soano || !chg.paySoano || !!chg.voucherId || !!chg.voucherIdre))));
             if(!!chargeIssue.length){
                 this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
