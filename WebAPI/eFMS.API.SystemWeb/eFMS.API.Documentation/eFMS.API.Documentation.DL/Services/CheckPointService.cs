@@ -98,6 +98,14 @@ namespace eFMS.API.Documentation.DL.Services
                                 && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
                                  .Select(x => x.Hblid)
                                  .ToList();
+
+                    var csHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId
+                                && x.SaleManId == salemanCurrent
+                                && x.SaleManId != salemanBOD)
+                                    .Select(x => x.Id)
+                                    .ToList();
+
+                    hblIds.AddRange(csHblids);
                 }
                 else
                 {
@@ -106,11 +114,21 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
+                    
                     hblIds = csDetailSurchargeRepository.Get(x => x.Id != HblId
                                 && x.SaleManId == salemanCurrent 
                                 && x.SaleManId != salemanBOD)
                                     .Select(x => x.Id)
                                     .ToList();
+
+                    var opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId
+                                && x.SalemanId == salemanCurrent
+                                && x.SalemanId != salemanBOD
+                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                                 .Select(x => x.Hblid)
+                                 .ToList();
+
+                    hblIds.AddRange(opsHblids);
                 }
                 if (hblIds.Count > 0)
                 {
