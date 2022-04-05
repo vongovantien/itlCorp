@@ -2410,6 +2410,7 @@ namespace eFMS.API.Documentation.DL.Services
                     entityReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
                     entityReplicate.SalemanId = salemanDefault.Id;
                     entityReplicate.IsLocked = false;
+                    entityReplicate.IsLinkFee = false;
                     entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
 
                     hs = DataContext.Add(entityReplicate);

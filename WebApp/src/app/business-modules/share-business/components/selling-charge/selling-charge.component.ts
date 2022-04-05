@@ -372,7 +372,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     onConfirmRevertLinkFeeSell(selectedCs: CsShipmentSurcharge) {
         let charges = [];
-        selectedCs.linkFee = false;
         charges.push(selectedCs);
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
         this._documentRepo.revertShipmentSurchargesLinkFee(charges)

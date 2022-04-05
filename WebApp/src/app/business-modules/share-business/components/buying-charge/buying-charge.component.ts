@@ -1443,7 +1443,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
     onConfirmRevertLinkFeeBuy(selectedCs: CsShipmentSurcharge) {
         let charges = [];
-        selectedCs.linkFee = false;
         charges.push(selectedCs);
         this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         this._documentRepo.revertShipmentSurchargesLinkFee(charges)
@@ -1470,7 +1469,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (result: any) => {
                     if (result) {
                         this._spinner.hide(this.spinnerpartner);
-                        let strBody = "<div><b>Link to Job Ops:</b><a> " + result.jobNoOrg + "</a>"
+                        let strBody = "<div class=detail-linkfee > <b>Link to Job Ops:</b><a> " + result.jobNoOrg + "</a>"
                             + "</br><b>Link to Job Service:</b><a> " + result.jobNoLink + "</a>"
                             + "</br><b>Partner Name Selling :</b><a> " + result.partnerNameOrg + "</a>"
                             + "</br><b>Partner Name Buying :</b><a> " + result.partnerNameLink + "</a>"

@@ -260,6 +260,15 @@ namespace eFMS.API.Documentation.DL.Services
                         hisLinkFees.Add(his);
 
                         var sell = _csSurchargeRepository.Where(x => x.Id == Guid.Parse(his.ChargeOrgId)).FirstOrDefault();
+                        if (sell != null&& (
+                            !string.IsNullOrEmpty(sell.Soano) 
+                            || !string.IsNullOrEmpty(sell.SettlementCode)
+                            || !string.IsNullOrEmpty(sell.VoucherId)
+                            || !string.IsNullOrEmpty(sell.CreditNo)
+                            || !string.IsNullOrEmpty(sell.DebitNo)))
+                        {
+                            return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+                        }
                         sell.LinkFee = false;
                         i.ModifiedDateLinkFee = DateTime.Now;
                         surchargesUpdate.Add(sell);
@@ -268,12 +277,23 @@ namespace eFMS.API.Documentation.DL.Services
                 else if (i.Type == "SELL")
                 {
                     var his = DataContext.Get(x => x.JobNoOrg == i.JobNo && x.ChargeOrgId == i.Id.ToString()).FirstOrDefault();
+
                     if (his != null)
                     {
+                        var buy = _csSurchargeRepository.Where(x => x.Id == Guid.Parse(his.ChargeLinkId)).FirstOrDefault();
+                        if (buy != null && (
+                            !string.IsNullOrEmpty(buy.Soano)
+                            || !string.IsNullOrEmpty(buy.SettlementCode)
+                            || !string.IsNullOrEmpty(buy.VoucherId)
+                            || !string.IsNullOrEmpty(buy.CreditNo)
+                            || !string.IsNullOrEmpty(buy.DebitNo)))
+                        {
+                            return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+                        }
                         surchargeDelIds.Add(his.ChargeLinkId);
                         hisLinkFees.Add(his);
                     }
-
+                    i.LinkFee = false;
                     i.ModifiedDateLinkFee = DateTime.Now;
                     surchargesUpdate.Add(i);
                 }
