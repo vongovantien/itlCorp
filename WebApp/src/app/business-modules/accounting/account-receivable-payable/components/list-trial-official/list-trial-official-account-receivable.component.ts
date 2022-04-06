@@ -143,7 +143,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        this.debitDetailPopupComponent.dataSearch= {agreeStr, option,officeId,serviceCode:'',overDueDay};
+                        this.debitDetailPopupComponent.dataSearch= {argeementId:agreeStr, option,officeId,serviceCode:'',overDueDay};
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }
