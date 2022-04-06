@@ -55,7 +55,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     partnerLocations: Array<string> = ['Domestic', 'Oversea'];
 
     isExistedTaxcode: boolean = false;
-    @Input() isActive: boolean = true;
+    @Input() isActive: boolean = false;
     @Input() isUpdate: boolean = false;
     @Output() partnerLocationString: EventEmitter<string> = new EventEmitter<string>();
     isBranchSub: boolean;
