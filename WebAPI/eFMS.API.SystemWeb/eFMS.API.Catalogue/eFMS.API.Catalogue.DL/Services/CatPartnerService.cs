@@ -1276,10 +1276,11 @@ namespace eFMS.API.Catalogue.DL.Services
                          from agreement in agreements.DefaultIfEmpty()
                          select new { user, partner, x, agreement }
                         );
-            if (!string.IsNullOrEmpty(criteria.PartnerType))
-            {
-                query = query.Where(x => x.agreement != null && x.agreement.Id != null);
-            }
+            // Allow search partner when don't have contract
+            //if (!string.IsNullOrEmpty(criteria.PartnerType))
+            //{
+            //    query = query.Where(x => x.agreement != null && x.agreement.Id != null);
+            //}
             if (string.IsNullOrEmpty(criteria.All))
             {
                 query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
