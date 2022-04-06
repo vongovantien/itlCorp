@@ -70,7 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
             myDict.Add("Sea LCL Import", "SLI");
             myDict.Add("Sea Export", "SCE");
             myDict.Add("Sea Import", "SCI");
-            myDict.Add("Custom Logistic", "CL");    
+            myDict.Add("Custom Logistic", "CL");
 
             var rules = _csRuleLinkFeeRepository.Get().ToList();
             var catPartners = _catPartnerRepository.Get();
@@ -84,11 +84,11 @@ namespace eFMS.API.Documentation.DL.Services
                 //Map transtype
                 var proSerVe = myDict[shipment.ProductService + " " + shipment.ServiceMode];
 
-                var rule = rules.Where(x =>  
+                var rule = rules.Where(x =>
                 x.ServiceBuying == proSerVe
                 && x.ServiceSelling == item.TransactionType
                 && x.ChargeSelling.ToLower() == item.ChargeId.ToString().ToLower()
-                && x.Status == true).OrderByDescending(x=>x.DatetimeCreated).FirstOrDefault();
+                && x.Status == true).OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
 
                 if (rule == null)
                     return new HandleState("There is no link fee rule ");
@@ -172,7 +172,7 @@ namespace eFMS.API.Documentation.DL.Services
                 csLinkCharge.HblorgId = chargeUpdate.Hblid.ToString();
                 csLinkCharge.HblnoOrg = chargeUpdate.Hblno;
                 csLinkCharge.MblnoOrg = chargeUpdate.Mblno;
-                csLinkCharge.PartnerOrgId = rule.PartnerSelling;
+                csLinkCharge.PartnerOrgId = item.PaymentObjectId;
 
                 csLinkCharge.JobNoLink = chargeBuy.JobNo;
                 csLinkCharge.ChargeLinkId = chargeBuy.Id.ToString();
@@ -182,7 +182,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 csLinkCharge.DatetimeCreated = DateTime.Now;
                 csLinkCharge.UserCreated = currentUser.UserID;
-                csLinkCharge.PartnerLinkId = rule.PartnerBuying;
+                csLinkCharge.PartnerLinkId = chargeBuy.PaymentObjectId;
                 csLinkCharge.LinkChargeType = "LINK_FEE";
 
                 csLinkCharges.Add(csLinkCharge);
@@ -240,10 +240,10 @@ namespace eFMS.API.Documentation.DL.Services
             var surchargeDelIds = new List<string>();
             var hisLinkFees = new List<CsLinkCharge>();
 
-           var shipment = _opsTransRepository.Get(x => x.JobNo == list[0].JobNo || x.ServiceNo == list[0].JobNo).FirstOrDefault();
+            var shipment = _opsTransRepository.Get(x => x.JobNo == list[0].JobNo || x.ServiceNo == list[0].JobNo).FirstOrDefault();
             if (shipment != null)
             {
-                shipment.IsLinkFee = Get(x => x.HblorgId == shipment.Hblid.ToString() || x.HbllinkId == shipment.Hblid.ToString()).Count() > 1 ? true : false;
+                shipment.IsLinkFee = Get(x => x.JobNoOrg == shipment.JobNo || x.JobNoLink == shipment.JobNo.ToString()).Count() > 1 ? true : false;
                 shipment.UserCreatedLinkJob = null;
                 shipment.DateCreatedLinkJob = null;
                 shipment.DatetimeModified = DateTime.Now;
@@ -260,8 +260,8 @@ namespace eFMS.API.Documentation.DL.Services
                         hisLinkFees.Add(his);
 
                         var sell = _csSurchargeRepository.Where(x => x.Id == Guid.Parse(his.ChargeOrgId)).FirstOrDefault();
-                        if (sell != null&& (
-                            !string.IsNullOrEmpty(sell.Soano) 
+                        if (sell != null && (
+                            !string.IsNullOrEmpty(sell.Soano)
                             || !string.IsNullOrEmpty(sell.SettlementCode)
                             || !string.IsNullOrEmpty(sell.VoucherId)
                             || !string.IsNullOrEmpty(sell.CreditNo)
@@ -349,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public CsLinkChargeModel DetailByChargeOrgId(Guid chargeId)
         {
-            var csLinkCharge = Get(x => x.ChargeOrgId == chargeId.ToString() 
+            var csLinkCharge = Get(x => x.ChargeOrgId == chargeId.ToString()
             || x.ChargeLinkId == chargeId.ToString()).FirstOrDefault();
             if (csLinkCharge == null) return null;
             var user = _sysUserRepository.Get(x => x.Id == csLinkCharge.UserCreated).FirstOrDefault();
@@ -362,7 +362,6 @@ namespace eFMS.API.Documentation.DL.Services
             csLinkCharge.PartnerNameLink = partLink != null ? partLink.PartnerNameEn : "";
             return csLinkCharge;
         }
-
         public HandleState LinkFeeJob(List<OpsTransactionModel> list)
         {
             var result = new HandleState();
@@ -396,7 +395,6 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState("No charge Link Fee");
             return result;
         }
-
         CsShipmentSurcharge mapperSurcharge(CsShipmentSurcharge modelMap)
         {
             var model = new CsShipmentSurcharge();
@@ -407,7 +405,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (p != null)
                     p.SetValue(model, item.GetValue(modelMap, null), null);
             }
-                
+
             return model;
         }
     }
