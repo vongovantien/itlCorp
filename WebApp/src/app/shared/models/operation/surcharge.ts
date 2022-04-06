@@ -76,6 +76,9 @@ export class Surcharge {
     isDuplicate: boolean = false;
     isChangeShipment: boolean = null;
     linkChargeId:string = null;
+    hasNotSynce: boolean = true; // charge chưa synce
+    hadIssued: boolean = false; // charge đã issued
+    payeeIssued: boolean = false; // đầu payee đã được issued
 
     constructor(object?: any) {
         const self = this;

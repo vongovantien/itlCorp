@@ -58,7 +58,7 @@ export class SettlementTableSurchargeComponent extends AppList {
 
     checkUncheckAllCharge() {
         for (const surcharge of this.data.chargeSettlements) {
-            if (!surcharge.syncedFromBy && (surcharge.isFromShipment || (!surcharge.isFromShipment && !surcharge.syncedFrom && !surcharge.paySyncedFrom))) {
+            if (!surcharge.syncedFromBy && (surcharge.isFromShipment || (!surcharge.isFromShipment && surcharge.hasNotSynce))) {
                 surcharge.isSelected = this.isCheckAll;
             }
         }

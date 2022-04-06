@@ -280,8 +280,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             this.selectedCD = _customDeclarations[0];
             this.customNo.setValue(_customDeclarations[0].clearanceNo);
         }
-        let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.creditNo && !chg.debitNo && 
-        !chg.soano && !chg.paySoano && !chg.voucherId && !chg.voucherIdre); // Update shipment for selected charges without issued
+        let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.hadIssued); // Update shipment for selected charges without issued
         let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
         if (!!selectedCharges.length) {
             if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
@@ -318,8 +317,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             this.shipment.setValue(_shipments[0].hblid);
             this.selectedShipment = _shipments[0];
 
-            let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.creditNo && !chg.debitNo && 
-            !chg.soano && !chg.paySoano && !chg.voucherId && !chg.voucherIdre); // Update clearance no for selected charges without issued
+            let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.hadIssued); // Update clearance no for selected charges without issued
             let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
             if (!!selectedCharges.length) {
                 if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
@@ -598,6 +596,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.syncedFromBy = null;
         newCharge.syncedFrom = null;
         newCharge.paySyncedFrom = null;
+        newCharge.hasNotSynce = true;
+        newCharge.hadIssued = false;
+        newCharge.payeeIssued = false;
         if (!newCharge.invoiceDate || !newCharge.invoiceDate.startDate) {
             newCharge.invoiceDate = null;
         }
@@ -609,12 +610,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     deleteCharge(index: number) {
         this.isSubmitted = false;
         const chargeDelete = this.charges[index];
-            if(((chargeDelete.type === 'OBH' && (!!chargeDelete.creditNo || !!chargeDelete.paySoano)) 
-            || (chargeDelete.type !== 'OBH' && (!!chargeDelete.creditNo || !!chargeDelete.debitNo || !!chargeDelete.soano || !chargeDelete.paySoano || !!chargeDelete.voucherId || !!chargeDelete.voucherIdre))) ){
-                this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
-                return;
-            }
-        this.charges.splice(index, 1);
+        if(chargeDelete.hadIssued){
+            this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
+            return;
+        } else{
+            this.charges.splice(index, 1);
+        }
     }
 
     isWhiteSpace(input: any) {
@@ -689,8 +690,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 charge.payerId = charge.paymentObjectId;
                 charge.paymentObjectId = charge.obhId;
             }   
-            if (!charge.isSelected || (charge.linkChargeId || !!charge.creditNo || !!charge.debitNo || 
-                !!charge.soano || !!charge.paySoano || !!charge.voucherId || !!charge.voucherIdre)) {continue;}
+            if (!charge.isSelected || charge.linkChargeId || charge.hadIssued) {continue;}
             // *start: cập nhật shipment charges
             charge.clearanceNo = formData.customNo;
             // charge.advanceNo = formData.advanceNo;

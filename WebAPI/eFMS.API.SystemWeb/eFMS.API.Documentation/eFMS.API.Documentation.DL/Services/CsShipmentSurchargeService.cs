@@ -262,7 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
                         // Charges IsFromShipment = true
                         var chargesFromShipment = listCharges.Where(x =>
                             x.IsFromShipment == true &&
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -272,13 +272,13 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                         ).ToList();
 
                         // Charges IsFromShipment = false 
                         var chargesNotFromShipment = listCharges.Where(x =>
                             x.IsFromShipment == false &&
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -288,7 +288,7 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                         ).ToList();
                         var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
                         listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
@@ -331,7 +331,7 @@ namespace eFMS.API.Documentation.DL.Services
                     // Charges IsFromShipment = true
                     var chargesFromShipment = listCharges.Where(x =>
                          x.IsFromShipment == true &&
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -341,13 +341,13 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                     ).ToList();
 
                     // Charges IsFromShipment = false
                     var chargesNotFromShipment = listCharges.Where(x =>
                             x.IsFromShipment == false &&
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -357,7 +357,7 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                         ).ToList();
                     var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
                     listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
