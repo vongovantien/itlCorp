@@ -213,7 +213,7 @@
                                                         <input type="text" class="dropdown-toggle form-control"
                                                             dropdownToggle readonly placeholder="Please Select"
                                                             [(ngModel)]="charge.obhPartnerName"
-                                                            [disabled]="(!charge.chargeId || charge.type !== 'OBH' || !charge.payeeIssued) ? 'disabled': null"
+                                                            [disabled]="(!charge.chargeId || charge.type !== 'OBH' || charge.obhPartnerIssued) ? 'disabled': null"
                                                             #c>
                                                         <ng-container *ngIf="!c.disabled">
                                                             <div class="e--combogrid_icon">
@@ -254,7 +254,6 @@
                                                     <ng-container *ngIf="!charge.syncedFromBy;else invoiceNoTpl">
                                                         <input type="text" class="form-control"
                                                             [(ngModel)]="charge.invoiceNo"
-                                                            [disabled]="charge.hadIssued"
                                                             (ngModelChange)="onChangeInvoiceNo(charge,$event); charge.isDuplicate = false">
                                                     </ng-container>
 
@@ -267,7 +266,6 @@
                                                 <div class="form-group ">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else seriesNoTpl ">
                                                         <input type="text" class="form-control"
-                                                            [disabled]="charge.hadIssued"
                                                             [(ngModel)]="charge.seriesNo">
                                                     </ng-container>
                                                     <ng-template #seriesNoTpl>
@@ -284,9 +282,9 @@
                                                             [autoApply]="true" [singleDatePicker]="true"
                                                             [alwaysShowCalendars]="true" [(ngModel)]="charge.invoiceDate"
                                                             calendar
-                                                            [allowRemove]="!!charge.invoiceDate && !!charge.invoiceDate.startDate && !charge.hadIssued"
+                                                            [allowRemove]="!!charge.invoiceDate && !!charge.invoiceDate.startDate"
                                                             (remove)="charge.invoiceDate = null" placeholder="DD/MM/YYYY"
-                                                            [disabled]="!!charge.syncedFromBy || charge.hadIssued" />
+                                                            [disabled]="!!charge.syncedFromBy" />
                                                     </div>
                                                 </div>
                                             </td>
@@ -314,7 +312,7 @@
                                             <td>
                                                 <div class="form-group ">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else contNoTpl ">
-                                                        <input type="text" class="form-control" [(ngModel)]="charge.contNo" [disabled]="charge.hadIssued">
+                                                        <input type="text" class="form-control" [(ngModel)]="charge.contNo">
                                                     </ng-container>
                                                     <ng-template #contNoTpl>
                                                         {{charge.contNo}}

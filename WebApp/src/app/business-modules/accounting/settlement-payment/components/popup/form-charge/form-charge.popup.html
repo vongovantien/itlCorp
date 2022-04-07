@@ -199,7 +199,6 @@
                                         <div class="form-group">
                                             <label for="">Invoice No</label>
                                             <input type="text" class="form-control" formControlName="invoiceNo"
-                                                [attr.disabled]="(selectedSurcharge && selectedSurcharge.hadIssued) ? '' : null"
                                                 placeholder="Invoice No">
                                         </div>
                                     </div>
@@ -211,7 +210,6 @@
                                         <div class="form-group">
                                             <label for="">Series No</label>
                                             <input type="text" class="form-control" formControlName="serieNo"
-                                                [attr.disabled]="(selectedSurcharge && selectedSurcharge.hadIssued) ? '' : null"
                                                 placeholder="Serie No">
                                         </div>
                                     </div>
@@ -224,11 +222,9 @@
                                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                     name="daterange" readonly [autoApply]="true"
                                                     [singleDatePicker]="true" formControlName="invoiceDate"
-                                                    [placeholder]="'Select Invoice Date'"
-                                                    [disabled]="selectedSurcharge && selectedSurcharge.hadIssued" />
+                                                    [placeholder]="'Select Invoice Date'"/>
                                                 <span class="m-input-icon_clear" (click)="resetFormControl(invoiceDate)"
-                                                    *ngIf="!!invoiceDate.value && !!invoiceDate.value.startDate"
-                                                    [disabled]="selectedSurcharge && selectedSurcharge.hadIssued">
+                                                    *ngIf="!!invoiceDate.value && !!invoiceDate.value.startDate">
                                                     <i class="la la-times"></i>
                                                 </span>
                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -260,7 +256,7 @@
                                     <label for="">Cont No</label>
                                     <input type="text" class="form-control" formControlName="contNo"
                                         placeholder="Cont No"
-                                        [attr.disabled]="(isFromshipment || isLocked || isSynced || (selectedSurcharge && selectedSurcharge.hadIssued)) ? '' : null">
+                                        [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                 </div>
                             </div>
                             <div class="col-8">

@@ -79,6 +79,7 @@ export class Surcharge {
     hasNotSynce: boolean = true; // charge chưa synce
     hadIssued: boolean = false; // charge đã issued
     payeeIssued: boolean = false; // đầu payee đã được issued
+    obhPartnerIssued: boolean = false; // đầu obh partner đã được issued
 
     constructor(object?: any) {
         const self = this;

@@ -65,5 +65,6 @@ namespace eFMS.API.Accounting.Service.ViewModels
         public bool? HasNotSynce { get; set; }
         public bool? HadIssued { get; set; }
         public bool? PayeeIssued { get; set; }
+        public bool? OBHPartnerIssued { get; set; }
     }
 }
