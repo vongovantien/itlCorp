@@ -470,9 +470,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         this._toastService.error(`Settlement was delete, Please re-load page.`);
                         return;
                     }
-                    else if (res.data.length > 0) {
-                        this._toastService.warning(res.message);
-                        settleIds = settleIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
+                    else {
+                        if(res.data.length > 0){
+                            this._toastService.warning(res.message);
+                            settleIds = settleIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
+                        }
                         if(settleIds.length > 0){
                             this.showPopupDynamicRender<ConfirmPopupComponent>(
                                 ConfirmPopupComponent,
