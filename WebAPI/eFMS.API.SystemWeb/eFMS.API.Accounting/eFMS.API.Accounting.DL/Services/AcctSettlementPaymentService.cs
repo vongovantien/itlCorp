@@ -2293,15 +2293,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         sceneCharge.InvoiceDate = item.InvoiceDate;
                                         sceneCharge.SeriesNo = item.SeriesNo;
                                         sceneCharge.Notes = item.Notes;
-                                        // không cho cập nhật payee hoặc obh partner nếu charges đã issued
-                                        if (sceneCharge.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(sceneCharge.PaySoano) && string.IsNullOrEmpty(sceneCharge.CreditNo))
-                                        {
-                                            sceneCharge.PayerId = item.PayerId;
-                                        }
-                                        if (string.IsNullOrEmpty(sceneCharge.Soano) && string.IsNullOrEmpty(sceneCharge.DebitNo) && string.IsNullOrEmpty(sceneCharge.PaySoano) && string.IsNullOrEmpty(sceneCharge.CreditNo))
-                                        {
-                                            sceneCharge.PaymentObjectId = item.PaymentObjectId;
-                                        }
+                                        sceneCharge.PayerId = item.PayerId;
+                                        sceneCharge.PaymentObjectId = item.PaymentObjectId;
                                         sceneCharge.Type = item.Type;
                                         sceneCharge.ChargeGroup = item.ChargeGroup;
                                         sceneCharge.VatPartnerId = item.VatPartnerId;
