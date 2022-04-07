@@ -558,7 +558,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria)
         {
             var data = GetDataAcctPayable(criteria).ToList();
-            var grpData = data.OrderBy(x => x.VoucherDate).GroupBy(x => new { x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType, x.ReferenceNo }).Select(x => new { x.Key, x });
+            var grpData = data.Where(x => !string.IsNullOrEmpty(x.ReferenceNo)).OrderBy(x => x.VoucherDate).GroupBy(x => new { x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType, x.ReferenceNo }).Select(x => new { x.Key, x });
             var result = new List<AcctPayablePaymentExport>();
             var partnerIds = data.Select(x => x.PartnerId);
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
@@ -654,7 +654,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria)
         {
             var data = GetDataAcctPayable(criteria).ToList();
-            var grpData = data.GroupBy(payable => new { payable.PartnerId }).Select(payable => new { payable.Key, payable });
+            var grpData = data.Where(x => !string.IsNullOrEmpty(x.ReferenceNo)).GroupBy(payable => new { payable.PartnerId }).Select(payable => new { payable.Key, payable });
             var result = new List<AccountingTemplateExport>();
             var partnerIds = grpData.Select(x => x.Key.PartnerId);
             var partnerData = catPartnerRepository.Get(x => partnerIds.Any(z => z == x.Id));
