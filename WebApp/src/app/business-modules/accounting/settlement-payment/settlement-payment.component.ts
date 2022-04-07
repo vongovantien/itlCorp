@@ -458,12 +458,12 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             return;
         }
 
-        let settleIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
-        if (!settleIds.length) {
+        let smIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
+        if (!smIds.length) {
             return;
         }
 
-        this._accoutingRepo.checkAllowDenySettlement(settleIds)
+        this._accoutingRepo.checkAllowDenySettlement(smIds)
             .subscribe(
                 (res: any) => {
                     if (!res) {
@@ -471,17 +471,17 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         return;
                     }
                     else {
-                        if(res.data.length > 0){
+                        if(!!res.data){
                             this._toastService.warning(res.message);
-                            settleIds = settleIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
+                            smIds = smIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
                         }
-                        if(settleIds.length > 0){
+                        if(smIds.length > 0){
                             this.showPopupDynamicRender<ConfirmPopupComponent>(
                                 ConfirmPopupComponent,
                                 this.confirmPopupContainerRef.viewContainerRef,
                                 { body: 'Are you sure you want to deny settle payments ?' },
                                 (v: boolean) => {
-                                    this.onDenySettlePayments(settleIds);
+                                    this.onDenySettlePayments(smIds);
                                 });
                         }
                     }
