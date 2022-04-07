@@ -158,9 +158,9 @@
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
-                                            [attr.disabled]="(isFromshipment || isLocked || isSynced || (selectedSurcharge && !selectedSurcharge.payeeIssued)) ? '' : null"
+                                            [attr.disabled]="(isFromshipment || isLocked || isSynced || (selectedSurcharge && selectedSurcharge.obhPartnerIssued)) ? '' : null"
                                             (change)="onChangeOBHPartnerCheckBox()">
-                                        OBH for Customer{{!selectedSurcharge ? null : selectedSurcharge.payeeIssued}}
+                                        OBH for Customer
                                         <span></span>
                                     </label>
                                 </div>
@@ -176,7 +176,7 @@
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
                                         [displayFields]="configPartner.displayFields"
-                                        [disabled]="isDisabledOBHPartner || (isFromshipment || isLocked || isSynced || (selectedSurcharge && !selectedSurcharge.payeeIssued))"
+                                        [disabled]="isDisabledOBHPartner || (isFromshipment || isLocked || isSynced || (selectedSurcharge && selectedSurcharge.obhPartnerIssued))"
                                         placeholder="OBH Partner">
                                     </app-combo-grid-virtual-scroll>
                                 </div>

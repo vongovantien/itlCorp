@@ -323,7 +323,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
                     this.getMasterCharges(this.serviceTypeId, true);
                 }
-
+                if (selectedCharges[0].hblid !== data.hblid) {
+                    selectedCharges.forEach((charge: Surcharge) => {
+                        charge.isChangeShipment = true;
+                        charge.id = SystemConstants.EMPTY_GUID;
+                    });
+                }
                 for (const charge of selectedCharges) {
                     charge.jobId = this.selectedShipment.jobId;
                     charge.jobNo = this.selectedShipment.jobId;
@@ -335,12 +340,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     charge.clearanceNo = data.clearanceNo;
                     charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
                 }
-                if (selectedCharges[0].hblid !== data.hblid) {
-                    selectedCharges.forEach((charge: Surcharge) => {
-                        charge.isChangeShipment = true;
-                        charge.id = SystemConstants.EMPTY_GUID;
-                    });
-                }
+                
                 this.charges = [...selectedCharges, ...notSelectedCharges]
             }
 
@@ -690,7 +690,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 // swap để map field cho chage obh
                 charge.payerId = charge.paymentObjectId;
                 charge.paymentObjectId = charge.obhId;
-            }   
+            }
             if (!charge.isSelected || charge.linkChargeId || charge.hadIssued) {continue;}
             // *start: cập nhật shipment charges
             charge.clearanceNo = formData.customNo;
@@ -702,6 +702,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             charge.hblno = this.selectedShipment.hbl;
             charge.hbl = this.selectedShipment.hbl;
             charge.hblid = this.selectedShipment.hblid;
+            charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
             // *end: cập nhật shipment charges
         }
         console.log('listChargesToSave', listChargesToSave);
