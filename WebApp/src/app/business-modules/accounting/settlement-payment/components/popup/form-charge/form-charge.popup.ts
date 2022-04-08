@@ -437,7 +437,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             isLocked: this.isLocked,
             hasNotSynce: this.selectedSurcharge.hasNotSynce,
             hadIssued: this.selectedSurcharge.hadIssued,
-            payeeIssued: this.selectedSurcharge.payeeIssued
+            payeeIssued: this.selectedSurcharge.payeeIssued,
+            obhPartnerIssued: this.selectedSurcharge.obhPartnerIssued
         });
 
         if (!!this.selectedCharge && this.selectedCharge.type === 'CREDIT') {
