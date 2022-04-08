@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, ViewChild, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
@@ -432,7 +432,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
             case 'obh':
                 const transactionType: string = this.utility.getServiceType(chargeItem.jobId) === 'CL' ? 'CL' : 'DOC';
-                this._documentRepo.validateCheckPointContractPartner(data.id, chargeItem.hblid, transactionType)
+                this._documentRepo.validateCheckPointContractPartner(data.id, chargeItem.hblid, transactionType, this.settlementCode)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
@@ -484,7 +484,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         partner = this.getPartnerById(this.selectedShipment.customerId);
 
                         const transactionType: string = this.utility.getServiceType(this.selectedShipment.jobId) === 'CL' ? 'CL' : 'DOC';
-                        this._documentRepo.validateCheckPointContractPartner(partner.id, this.selectedShipment.hblid, transactionType)
+                        this._documentRepo.validateCheckPointContractPartner(partner.id, this.selectedShipment.hblid, transactionType, this.settlementCode)
                             .subscribe(
                                 (res: CommonInterface.IResult) => {
                                     if (res.status) {

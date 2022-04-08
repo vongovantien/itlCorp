@@ -194,6 +194,15 @@ export class JobManagementFormSearchComponent extends AppForm {
             this.formSearch.patchValue(advanceSearchForm);
         }
     }
+
+    onBlurSearchText(data) {
+        this.searchText.setValue((this.searchText.value || '').trim());
+        if (this.searchText.dirty) {
+            if (!!data.target.value?.includes('LOG')) {
+                this.filterType.setValue(this.filterTypes[1]);
+            }
+        }
+    }
 }
 
 

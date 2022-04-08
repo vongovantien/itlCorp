@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType)
+        public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             bool valid = true;
             IQueryable<CsShipmentSurcharge> surchargeToCheck = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
@@ -82,6 +82,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
                 }
+
+                
             }
             else // Check theo từng lô
             {
@@ -143,6 +145,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
+            // Trường hợp nhập charge trong SM
+            if (!string.IsNullOrEmpty(settlementCode))
+            {
+                surchargeToCheck = surchargeToCheck.Where(x => x.SettlementCode != settlementCode);
+            }
 
             if (surchargeToCheck.Count() == 0)
             {
@@ -183,12 +190,12 @@ namespace eFMS.API.Documentation.DL.Services
             return valid;
         }
 
-        public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType)
+        public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             throw new NotImplementedException();
         }
 
-        public HandleState ValidateCheckPointPartner(string partnerId, Guid HblId, string transactionType)
+        public HandleState ValidateCheckPointPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             HandleState result = new HandleState();
             bool isValid = false;
@@ -214,7 +221,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType);
+                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode);
                     break;
                 //case "Official":
                 //case "Trial":

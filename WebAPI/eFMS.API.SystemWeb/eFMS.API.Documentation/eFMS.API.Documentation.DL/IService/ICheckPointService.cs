@@ -6,8 +6,8 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICheckPointService
     {
-        HandleState ValidateCheckPointPartner(string partnerId, Guid HblId, string transactionType);
-        bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType);
-        bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType);
+        HandleState ValidateCheckPointPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
+        bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
+        bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
     }
 }
