@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
+        public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType)
         {
             bool valid = true;
             IQueryable<CsShipmentSurcharge> surchargeToCheck = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
@@ -195,7 +195,17 @@ namespace eFMS.API.Documentation.DL.Services
             throw new NotImplementedException();
         }
 
-        public HandleState ValidateCheckPointPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
+        public HandleState ValidateCheckPointPartnerCd(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.DEBIT_NOTE)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.SOA)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             HandleState result = new HandleState();
             bool isValid = false;
