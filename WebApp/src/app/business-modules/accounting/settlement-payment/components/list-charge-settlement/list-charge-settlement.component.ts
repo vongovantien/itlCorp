@@ -483,7 +483,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         }
 
         if (charge.isFromShipment) {
-            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment && surcharge.hasNotSynce);
+            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
             // this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             // this.listChargeFromShipmentPopup.show();
