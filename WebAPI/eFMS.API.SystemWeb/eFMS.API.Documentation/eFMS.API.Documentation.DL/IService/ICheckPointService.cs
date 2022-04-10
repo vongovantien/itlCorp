@@ -7,11 +7,11 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICheckPointService
     {
-        HandleState ValidateCheckPointPartnerCd(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.DEBIT_NOTE);
-        HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode = "", CHECK_POINT_TYPE type = CHECK_POINT_TYPE.SURCHARGE);
-        HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.SOA);
+        HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType);
+        HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode = "");
+        HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType);
 
-        bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
+        bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
     }
 

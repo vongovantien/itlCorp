@@ -695,7 +695,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 _hblId = Guid.Parse(Hblid);
             } 
-            HandleState hs = checkPointService.ValidateCheckPointPartner(partnerId, _hblId, transactionType, settlementCode);
+            HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, settlementCode);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
 
             return Ok(result);

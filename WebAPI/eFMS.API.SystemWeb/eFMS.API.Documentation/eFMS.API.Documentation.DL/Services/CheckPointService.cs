@@ -23,6 +23,9 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> csSurchargeRepository;
         private readonly IContextBase<CsTransactionDetail> csDetailSurchargeRepository;
 
+        string salemanBOD = string.Empty;
+        IQueryable<CsTransaction> csTransactions;
+        IQueryable<OpsTransaction> opsTransactions;
 
         public CheckPointService(ICurrentUser currUser,
             IContextBase<SysUser> sysUserRepository,
@@ -47,6 +50,10 @@ namespace eFMS.API.Documentation.DL.Services
             this.csSurchargeRepository = csSurcharge;
             this.csDetailSurchargeRepository = csDetailSurchargeRepo;
 
+            salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+
+            csTransactions = csTransactionRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            opsTransactions = opsTransactionRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
         }
 
         public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType)
@@ -62,7 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (transactionType == "CL")
                 {
-                    hblIds = opsTransactionRepository.Get(x => x.SalemanId != salemanBOD 
+                    hblIds = opsTransactionRepository.Get(x => x.SalemanId != salemanBOD
                             && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
                              .Select(x => x.Hblid)
                              .ToList();
@@ -76,14 +83,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (hblIds.Count > 0)
                 {
-                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId  && hblIds.Contains(x.Hblid));
+                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblIds.Contains(x.Hblid));
                 }
                 else
                 {
                     surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
                 }
 
-                
+
             }
             else // Check theo từng lô
             {
@@ -94,20 +101,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    hblIds = opsTransactionRepository.Get(x => x.Hblid != HblId 
-                                && x.SalemanId == salemanCurrent 
-                                && x.SalemanId != salemanBOD
-                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
-                                 .Select(x => x.Hblid)
-                                 .ToList();
-
-                    var csHblids = csDetailSurchargeRepository.Get(x => x.Id != HblId
-                                && x.SaleManId == salemanCurrent
-                                && x.SaleManId != salemanBOD)
-                                    .Select(x => x.Id)
-                                    .ToList();
-
-                    hblIds.AddRange(csHblids);
                 }
                 else
                 {
@@ -116,22 +109,10 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return valid;
                     }
-                    
-                    hblIds = csDetailSurchargeRepository.Get(x => x.Id != HblId
-                                && x.SaleManId == salemanCurrent 
-                                && x.SaleManId != salemanBOD)
-                                    .Select(x => x.Id)
-                                    .ToList();
-
-                    var opsHblids = opsTransactionRepository.Get(x => x.Hblid != HblId
-                                && x.SalemanId == salemanCurrent
-                                && x.SalemanId != salemanBOD
-                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
-                                 .Select(x => x.Hblid)
-                                 .ToList();
-
-                    hblIds.AddRange(opsHblids);
                 }
+
+                hblIds = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
+
                 if (hblIds.Count > 0)
                 {
                     surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
@@ -156,7 +137,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return valid;
             }
 
-            var surchargeSellOBH = surchargeToCheck.Where(x =>
+            IQueryable<CsShipmentSurcharge> surchargeSellOBH = surchargeToCheck.Where(x =>
                 (x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.AcctManagementId == null)
              || (x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.AcctManagementId == null)
                 );
@@ -167,7 +148,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var accMngt = accAccountMngtRepository.Get(x => x.PartnerId == partnerId
+                IQueryable<AccAccountingManagement> accMngt = accAccountMngtRepository.Get(x => x.PartnerId == partnerId
                 && (x.PaymentStatus == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART
                 || x.PaymentStatus == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                 );
@@ -176,31 +157,155 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return valid;
                 }
-                var surchargeWithInvoice = surchargeToCheck.Where(x => x.AcctManagementId != null);
-                var qInvoiceInvalid = from sur in surchargeWithInvoice
-                                      join invoice in accMngt on sur.AcctManagementId equals invoice.Id into invoiceGrps
-                                      from invoiceGrp in invoiceGrps.DefaultIfEmpty()
-                                      select invoiceGrp.Id;
+                IQueryable<CsShipmentSurcharge> surchargeWithInvoice = surchargeToCheck.Where(x => x.AcctManagementId != null);
+                IQueryable<Guid> qInvoiceInvalid = from sur in surchargeWithInvoice
+                                                   join invoice in accMngt on sur.AcctManagementId equals invoice.Id into invoiceGrps
+                                                   from invoiceGrp in invoiceGrps.DefaultIfEmpty()
+                                                   select invoiceGrp.Id;
 
                 if (qInvoiceInvalid.Count() > 0)
                 {
                     valid = false;
                 }
             }
+
+            if (valid == false && checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+            {
+                IQueryable<object> groupHblIdCs = Enumerable.Empty<object>().AsQueryable();
+                IQueryable<object> groupHblIdOps = Enumerable.Empty<object>().AsQueryable();
+
+                var hblidShipments = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
+                // K check cùng service, có thể dính lô khác service
+                groupHblIdOps = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
+                   .Where(x => x.TransactionType == DocumentConstants.LG_SHIPMENT)
+                   .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
+                   .SelectMany(j => j, (j, r) => new CsShipmentSurcharge() { JobNo = r.JobNo, Hblid = r.Hblid });
+
+                groupHblIdCs = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
+                    .Where(x => x.TransactionType != DocumentConstants.LG_SHIPMENT)
+                    .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
+                    .SelectMany(x => x, (x, y) => new CsShipmentSurcharge() { JobNo = y.JobNo, Hblid = y.Hblid });
+
+                var qGrServiceDateShipmentOps = Enumerable.Empty<object>().AsQueryable();
+                var qGrServiceDateShipmentCs = Enumerable.Empty<object>().AsQueryable();
+                object oldestShipment = null;
+
+                if (groupHblIdCs.Count() > 0)
+                {
+                    qGrServiceDateShipmentCs = from sur in groupHblIdCs
+                                               join cs in csTransactions on ObjectUtility.GetValue(sur, "JobNo") equals cs.JobNo // make sur jobNo k dup, đúng vs hblId
+                                               orderby cs.ServiceDate ascending
+                                               select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), cs.ServiceDate };
+
+                    if (qGrServiceDateShipmentCs.Count() > 0)
+                    {
+                        oldestShipment = qGrServiceDateShipmentCs.FirstOrDefault();
+
+                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
+                        {
+                            valid = true;
+                        }
+                    }
+                }
+                else if (groupHblIdOps.Count() > 0)
+                {
+                    qGrServiceDateShipmentOps = from sur in groupHblIdOps
+                                                join ops in opsTransactions on ObjectUtility.GetValue(sur, "Hblid") equals ops.Hblid
+                                                orderby ops.ServiceDate ascending
+                                                select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), ops.ServiceDate };
+
+                    if (qGrServiceDateShipmentOps.Count() > 0)
+                    {
+                        oldestShipment = qGrServiceDateShipmentOps.FirstOrDefault();
+
+                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
+                        {
+                            valid = true;
+                        }
+                    }
+                }
+            }
+
             return valid;
         }
+
+        private List<Guid> GetHblIdShipmentSameSaleman(Guid hblId, string salemanHBLCurrent)
+        {
+            List<Guid> hblIds = new List<Guid>();
+
+            hblIds = csDetailSurchargeRepository.Get(x => x.SaleManId == salemanHBLCurrent
+               && x.SaleManId != salemanBOD)
+               .Select(x => x.Id)
+               .ToList();
+
+            var opsHblids = opsTransactionRepository.Get(x => x.SalemanId == salemanHBLCurrent
+                  && x.SalemanId != salemanBOD
+                  && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                   .Select(x => x.Hblid)
+                   .ToList();
+
+            hblIds.AddRange(opsHblids);
+
+            return hblIds;
+        }
+
 
         public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             throw new NotImplementedException();
         }
 
-        public HandleState ValidateCheckPointPartnerCd(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.DEBIT_NOTE)
+
+        public HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType)
         {
-            throw new NotImplementedException();
+            HandleState result = new HandleState();
+            bool isValid = false;
+
+            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+
+            CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
+            && x.Active == true
+            /// && x.SaleManId != salemanBOD
+            && (x.IsExpired == false || x.IsExpired == null))
+            .OrderBy(x => x.ContractType)
+            // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
+            .FirstOrDefault();
+
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
+            }
+
+            if (contract.SaleManId == salemanBOD) return result;
+
+            switch (contract.ContractType)
+            {
+                case "Cash":
+                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, string.Empty, CHECK_POINT_TYPE.DEBIT_NOTE);
+                    break;
+                //case "Official":
+                //case "Trial":
+                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
+                // break;
+                default:
+                    isValid = true;
+                    break;
+            }
+            string messError = null;
+            if (isValid == false)
+            {
+                SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
+
+                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
+                    partner?.TaxCode, partner?.ShortName, saleman.Username);
+
+                return new HandleState((object)messError);
+            }
+            return result;
         }
 
-        public HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE type = CHECK_POINT_TYPE.SOA)
+        public HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType)
         {
             throw new NotImplementedException();
         }
@@ -231,7 +336,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode);
+                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     break;
                 //case "Official":
                 //case "Trial":
@@ -253,5 +358,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
+
     }
 }
