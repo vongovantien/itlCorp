@@ -8,8 +8,10 @@ import { eFMSPopup } from '../popup';
 export class LoadingPopupComponent extends eFMSPopup {
   isCompleted: boolean = false;
   isSuccessDownload: boolean = false;
+  isProccessComplete: boolean = false;
+
   body: string = '';
-  constructor() { 
+  constructor() {
     super();
   }
 
@@ -35,5 +37,16 @@ export class LoadingPopupComponent extends eFMSPopup {
   resetPopup(){
     this.isCompleted = false;
     this.isSuccessDownload = false;
+  }
+
+  proccessCompleted(){
+    this.isCompleted = true;
+    this.isSuccessDownload = false;
+    this.isProccessComplete = true;
+  }
+  proccessFail(){
+    this.isCompleted = true;
+    this.isSuccessDownload = false;
+    this.isProccessComplete = false;
   }
 }

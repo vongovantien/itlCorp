@@ -56,6 +56,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
+    isReplicate: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -85,9 +86,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param) => {
-                console.log('ops',param)
                 this.jobId = param.id;
-                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit': param.tab) : 'job-edit';
+                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit' : param.tab) : 'job-edit';
                 if (param.action) {
                     this.isDuplicate = param.action.toUpperCase() === 'COPY';
                     this.selectedTabSurcharge = 'BUY';
@@ -315,7 +315,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     updateShipment() {
         if (this.isSaveLink) {
-            this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
+            this._documentRepo.getASTransactionInfo(this.opsTransaction.jobNo, this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
                 .pipe(
                     catchError(this.catchError),
                     concatMap((res: ILinkAirSeaInfoModel) => {
@@ -361,6 +361,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     insertDuplicateJob() {
+        this.opsTransaction.isReplicate = this.isReplicate;
+        // this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -408,12 +410,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-                        console.log(this.opsTransaction);
 
                         this.hblid = this.opsTransaction.hblid;
 
                         this.getListContainersOfJob();
                         this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+
                         this.editForm.opsTransaction = this.opsTransaction;
                         const hbl = new CsTransactionDetail(this.opsTransaction);
                         hbl.id = this.opsTransaction.hblid;
@@ -542,13 +544,18 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         return of(!isEdited);
     }
 
-    confirmDuplicate() {
+    confirmDuplicate(isReplicate: boolean = false) {
+        if (isReplicate && !this.opsTransaction.replicatedId) {
+            this._toastService.warning('This Job dont have Job Replicate')
+            return;
+        }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
             body: 'The system will open the Job Create Screen. Do you want to leave ?',
             title: 'Duplicate OPS detail',
             labelConfirm: 'Yes'
         },
             () => {
+                this.isReplicate = isReplicate;
                 this.onSubmitDuplicateConfirm();
             })
     }

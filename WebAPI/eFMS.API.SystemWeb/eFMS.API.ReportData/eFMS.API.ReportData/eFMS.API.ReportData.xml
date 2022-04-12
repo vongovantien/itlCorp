@@ -88,7 +88,7 @@
             Export detail settlement payment
             </summary>
             <param name="settlementId">Id of settlement payment</param>
-            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <param name="lang">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String)">
@@ -402,7 +402,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteria)">
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteriaDebCreInvoice)">
             <summary>
             Export accounting management
             </summary>
@@ -745,11 +745,20 @@
             Set detail data for table
             </summary>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32,System.Int32)">
             <summary>
             Delete row in excel file
             </summary>
             <param name="_row">row to delete</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetPicture(System.Drawing.Image,System.String,System.Int32,System.Int32)">
+            <summary>
+            Set picture with position in excel
+            </summary>
+            <param name="image"></param>
+            <param name="picName"></param>
+            <param name="row"></param>
+            <param name="column"></param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
             <summary>

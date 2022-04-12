@@ -134,7 +134,7 @@
                                 </div>
                                 <div class="col-lg-5">
                                     <div class="form-group">
-                                        <label>Auto Extend Days
+                                        <label>Auto Extend (Year)
                                         </label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
                                             class="form-control" formControlName="autoExtendDays">
@@ -419,8 +419,15 @@
                                             </span>
                                         </ng-container>
                                         <ng-container *ngIf="!isLoading && !!files && isUpdate">
-                                            <a [href]="files.url" target="_blank" [title]="files.name"
-                                                download>{{files.name}}</a>
+                                            <li *ngFor="let file of files">
+                                                <a [href]="file.url" target="_blank" [title]="file.name"
+                                                download>{{file.name}}</a>
+                                                <span class="pointer text-center">
+                                                    <a title="Delete" (click)="deleteFile(file)">
+                                                        <i class="la la-times fa-lg text-danger"></i>
+                                                    </a>
+                                                </span>    
+                                            </li>
                                         </ng-container>
                                     </div>
                                 </div>
@@ -516,3 +523,6 @@
     [body]="'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement?'"
     [labelConfirm]="'OK'" (onSubmit)="onSubmitActiveContract()">
 </confirm-popup>
+
+<confirm-popup #confirmDelete body="Are you sure to delete this file ?" labelConfirm="Yes" labelCancel="No"
+    (onSubmit)="onDeleteFile()"></confirm-popup>

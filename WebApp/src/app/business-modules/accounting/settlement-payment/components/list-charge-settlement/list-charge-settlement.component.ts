@@ -1,13 +1,13 @@
 import { Component, ViewChild, ViewChildren, QueryList, Input, Output, EventEmitter } from '@angular/core';
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, finalize } from 'rxjs/operators';
 import { AppList } from '@app';
 import { Surcharge, Partner, SysImage } from '@models';
 import { SortService, DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
 import { delayTime } from '@decorators';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, AccountingRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
@@ -82,12 +82,15 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     detailSettlement: Observable<any>;
 
+    isLoadingSurchargeList: boolean = false;
+    isLoadingGroupShipment: boolean = false;
     constructor(
-        private _sortService: SortService,
-        private _toastService: ToastrService,
-        private _documenRepo: DocumentationRepo,
-        private _dataService: DataService,
-        private _store: Store<ISettlementPaymentState>
+        private readonly _sortService: SortService,
+        private readonly _toastService: ToastrService,
+        private readonly _documenRepo: DocumentationRepo,
+        private readonly _dataService: DataService,
+        private readonly _store: Store<ISettlementPaymentState>,
+        private readonly _accountingRepo: AccountingRepo
     ) {
         super();
     }
@@ -123,7 +126,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.subscriptionDuplicateChargeState();
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
-        this.detailSettlement = this._store.select(getSettlementPaymentDetailState)
+        this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
     }
 
     showExistingCharge() {
@@ -134,18 +137,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     getUserId(userId: string) {
-        if(userId === 'undefined' || !userId){
+        if (userId === 'undefined' || !userId) {
             this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res: any) => {
                     if (!!res) {
                         userId = res.id;
                     }
                 })
-            }
+        }
         this.requester = userId;
         return userId;
     }
-    
+
     showCreateCharge() {
         this.tableListChargePopup.isSubmitted = false;
         this.tableListChargePopup.isUpdate = false;
@@ -243,6 +246,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.selectedIndexSurcharge = indexSurcharge;
                 }
             }
+            if (surcharge.linkChargeId) {
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
             this.selectedSurcharge = surcharge;
             this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
 
@@ -299,8 +306,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (this.TYPE === 'GROUP') {
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
-
             for (const groupShipment of this.groupShipments) {
+                let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId);
+                if (!!checks.length) {
+                    this._toastService.warning('Charge already linked charge');
+                    return;
+                }
                 groupShipment.chargeSettlements = this.returnChargeFromShipment(groupShipment);
             }
 
@@ -313,7 +324,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments = this.groupShipments.filter((groupItem: any) => groupItem.chargeSettlements.length);
         } else {
             const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
-
+            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.linkChargeId);
+            if (!!checkChargeLinks.length) {
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
             if (!!surchargeSelected.length) {
                 this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
             } else {
@@ -381,19 +396,45 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     switchToGroup() {
         if (this.TYPE === 'GROUP') {
             this.TYPE = 'LIST';
+            if (!!this.surcharges.length) {
+                return;
+            }
+            if (!!this.settlementCode) {
+                this.isLoadingSurchargeList = true;
+                this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode)
+                    .pipe(finalize(() => this.isLoadingSurchargeList = false))
+                    .subscribe(
+                        (surcharges: Surcharge[]) => {
+                            this.surcharges = surcharges;
+                        }
+                    )
+
+            }
         } else {
             this.TYPE = 'GROUP';
-        }
+            if (!!this.groupShipments.length) {
+                return;
+            }
+            if (!!this.settlementCode) {
+                this.isLoadingGroupShipment = true;
+                this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode)
+                    .pipe(finalize(() => this.isLoadingGroupShipment = false))
+                    .subscribe(
+                        (data: any) => {
+                            this.groupShipments = data || [];
 
-        this.selectedIndexSurcharge = null;
-        if (this.isExistingSettlement === true) {
-            this.groupShipments.forEach((groupItem: any) => {
-                groupItem.chargeSettlements.map((charge: Surcharge) => {
-                    const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
-                    charge.amountVnd = chargeInList.amountVnd;
-                    charge.vatAmountVnd = chargeInList.vatAmountVnd;
-                })
-            })
+                            this.selectedIndexSurcharge = null;
+                            if (this.isExistingSettlement === true) {
+                                this.groupShipments.forEach((groupItem: any) => {
+                                    groupItem.chargeSettlements.map((charge: Surcharge) => {
+                                        const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                                        charge.amountVnd = chargeInList.amountVnd;
+                                        charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                                    })
+                                })
+                            }
+                        });
+            }
         }
     }
 
@@ -408,11 +449,17 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     updateChargeWithJob(charge: Surcharge, index?: number) {
+
         if (this.STATE !== 'WRITE') { return; }
         this.selectedIndexSurcharge = index;
         if (!charge) {
             return;
         }
+        if (charge.linkChargeId) {
+            this._toastService.warning('Charge already linked charge');
+            return;
+        }
+
         if (charge.isFromShipment) {
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 

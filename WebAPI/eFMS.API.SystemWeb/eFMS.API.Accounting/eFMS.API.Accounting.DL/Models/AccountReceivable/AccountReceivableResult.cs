@@ -51,5 +51,8 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public DateTime? DatetimeModified { get; set; }
 
         public string OfficeContract { get; set; }
+        public bool? IsOverDue { get; set; }
+        public bool? IsExpired { get; set; }
+        public bool? IsOverLimit { get; set; }
     }
 }

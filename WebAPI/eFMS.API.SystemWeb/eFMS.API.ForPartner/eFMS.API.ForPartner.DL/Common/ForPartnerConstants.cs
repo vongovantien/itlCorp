@@ -172,5 +172,8 @@
         public static readonly string PAYABLE_PAYMENT_TYPE_ADV = "ADV";
         public static readonly string PAYABLE_PAYMENT_TYPE_CLEAR_ADV = "CLEAR_ADV";
         #endregion
+
+        public static readonly string STATUS_CANCEL_RECEIPT = "Cancel";
+        public static readonly string STATUS_DONE_RECEIPT = "Done";
     }
 }

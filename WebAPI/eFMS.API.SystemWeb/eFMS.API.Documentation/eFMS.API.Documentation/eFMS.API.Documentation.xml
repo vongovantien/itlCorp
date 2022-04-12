@@ -614,7 +614,7 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField(System.Collections.Generic.List{System.Guid})">
             <summary>
             Only Use for Dev
             </summary>
@@ -687,7 +687,7 @@
             <param name="id">id that want to retrieve transaction</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetLinkASInfomation(System.String,System.String,System.String,System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetLinkASInfomation(System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Get Air/Sea job no and hblId
             </summary>
@@ -1173,6 +1173,12 @@
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentAssignPIC">
             <summary>
             get list of shipment assign or PIC is current user
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentAssignPICCarrier(System.String)">
+            <summary>
+            get list of shipment assign or PIC is current user for adv carrier
             </summary>
             <returns></returns>
         </member>

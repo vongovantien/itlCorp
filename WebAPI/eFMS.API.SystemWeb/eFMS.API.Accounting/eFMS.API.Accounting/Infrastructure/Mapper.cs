@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.AdvancePayment;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.ViewModel;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 
 namespace eFMS.API.Accounting.Infrastructure
 {
@@ -27,7 +29,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<CatContract, CatContractModel>();
             CreateMap<AcctCombineBilling, AcctCombineBillingModel>();
             CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
-
+            CreateMap<ShipmentChargeAdvance, CsShipmentSurcharge>();
+            CreateMap<CsShipmentSurcharge, ShipmentChargeAdvance>();
 
             // Map to entity model
             CreateMap<AcctSoaModel, AcctSoa>();
@@ -45,6 +48,9 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AccAccountReceivable, ReceivableTable>();
             CreateMap<AcctReceiptSyncModel, AcctReceiptSync>();
             CreateMap<AcctCombineBillingModel, AcctCombineBilling>();
+            CreateMap<sp_GetSurchargeDetailSOA, ChargeShipmentModel>().ReverseMap();
+            CreateMap<sp_GetSurchargeDetailSettlement, ShipmentChargeSettlement>().ReverseMap();
+
         }
     }
 }

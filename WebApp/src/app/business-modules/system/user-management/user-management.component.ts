@@ -117,6 +117,10 @@ export class UserManagementComponent extends AppList {
             // this.criteria.active = this.dataSearch.keyword === "Active" ? true : false;
             // this.criteria.active = this.dataSearch.keyword;
         }
+        if (this.dataSearch.type === 'staffCode') {
+
+            this.criteria.staffCode = this.dataSearch.keyword;
+        }
         this.searchUser();
     }
 

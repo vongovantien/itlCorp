@@ -55,7 +55,7 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['partnerShortName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','paySoano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"  [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge === true">
@@ -69,7 +69,8 @@
                                         && !charge.creditNo
                                         && !charge.settlementCode
                                         && !charge.voucherId
-                                        && !charge.voucherIddate">
+                                        && !charge.voucherIddate
+                                        && !charge.linkChargeId">
                                             <button type="button" (click)="deleteCharge(charge, i, 'BUY')"
                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Remove">
@@ -86,7 +87,8 @@
                                     && !charge.creditNo
                                     && !charge.settlementCode
                                     && !charge.voucherId
-                                    && !charge.voucherIddate}"
+                                    && !charge.voucherIddate
+                                    && !charge.linkChargeId}"
                                     [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
@@ -94,6 +96,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName">
@@ -108,6 +111,7 @@
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
                                                 || !charge.isFromShipment
+                                                || !!charge.linkChargeId
                                                 || (isLocked | async) === true">
                                         <combo-grid-icon (onDelete)="charge.paymentObjectId = null;
                                                     charge.partnerShortName = null"
@@ -143,6 +147,7 @@
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
                                     || !charge.isFromShipment
+                                    || !!charge.linkChargeId
                                     || (isLocked | async) === true ;else chargeID">
                                     <div class="form-group">
                                         <input type="text" class="dropdown-toggle form-control" disabled
@@ -177,6 +182,7 @@
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
+                                                || !!charge.linkChargeId
                                                 || !charge.isFromShipment ? 'disabled': null" numeric
                                                 [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
@@ -187,6 +193,7 @@
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
                                                 || !charge.isFromShipment
+                                                || !!charge.linkChargeId
                                                 || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
@@ -217,6 +224,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true; else unit">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.unitCode">
@@ -244,6 +252,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true; else unitPrice">
                                         <input type="text" class="form-control" disabled [value]="charge.unitPrice"
                                             autoFormatCurrency>
@@ -264,6 +273,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true; else currency">
                                         <select class="form-control" disabled>
                                             <option>{{charge.currencyId}}</option>
@@ -288,6 +298,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true; else vatrate">
                                         <input type="text" class="form-control" disabled [value]="charge.vatrate">
                                     </ng-container>
@@ -312,6 +323,7 @@
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
+                                        || !!charge.linkChargeId
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -326,6 +338,7 @@
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
+                                        || !!charge.linkChargeId
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -337,6 +350,7 @@
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
+                                        || !!charge.linkChargeId
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -348,6 +362,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true;else invoiceDate">
                                         <input type="text" class="form-control" disabled
                                             [value]="!!charge.invoiceDate && charge.invoiceDate.startDate ? (charge.invoiceDate.startDate | date: 'dd/MM/yyyy') : null ">
@@ -372,6 +387,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true ;else vatPartnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.vatPartnerShortName">
@@ -394,7 +410,7 @@
                                 <div class="form-group ">
                                     <select class="form-control" [(ngModel)]="charge.chargeGroup"
                                         (ngModelChange)="handleChangeFeeType($event, charge)"
-                                        [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
+                                        [disabled]="!!charge.creditNo || !!charge.linkChargeId || !charge.isFromShipment ? 'disabled': null">
                                         <option *ngFor="let group of (listChargeGroup | async)" [ngValue]="group.id">
                                             {{group.name}}
                                         </option>
@@ -409,6 +425,7 @@
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
                                         || !charge.isFromShipment
+                                        || !!charge.linkChargeId
                                         || (isLocked | async) === true;else exchangeDate">
                                         <input type="text" class="form-control" disabled
                                             [value]="!!charge.exchangeDate && charge.exchangeDate.startDate ? (charge.exchangeDate.startDate | date: 'dd/MM/yyyy') : null ">
@@ -437,6 +454,7 @@
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
                                     || !!charge.paySoano
+                                    || !!charge.linkChargeId
                                     || !charge.isFromShipment ? 'disabled': null">
                                 </app-switch>
                             </td>
@@ -500,3 +518,15 @@
 
 <confirm-popup [body]="'Are you sure want to delete this Charge'" (onSubmit)="onDeleteShipmentSurcharge('BUY')">
 </confirm-popup>
+
+<confirm-popup #confirmCancelPopup [body]="'Are you sure want to cancel link charge'" (onSubmit)="onCancelLinkCharge('BUY')">
+</confirm-popup>
+
+<app-context-menu #linkFeeContextMenu >
+    <ng-container *ngIf="selectedCs&&selectedCs.linkChargeId&&!shipment.linkSource">
+        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
+            <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
+        </div>
+    </ng-container>
+</app-context-menu>
+

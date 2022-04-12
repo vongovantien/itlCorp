@@ -3,7 +3,7 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                         <label>MBL No</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
@@ -75,7 +75,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
                         <label required>HBL No</label>
                         <input type="text" class="form-control" formControlName="hwbno">
                     </div>
@@ -336,6 +336,21 @@
                             formControlName="onBoardStatus"></textarea>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div *ngIf="isUpdate" class="col-md-12">
+                    <div class="row m--margin-top-20">
+                        <div class="col-md-6">
+                            <span>Created: {{this.dateTimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                            <span class="text-success">{{this.userCreated}}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span>Modified: {{this.dateTimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                            </span> <span class="text-success">{{this.userModified}}</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </form>
     </div>

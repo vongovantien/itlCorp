@@ -9,6 +9,8 @@ export enum SettlementPaymentActionTypes {
 
     GET_DETAIL = '[SettlementPayment] Get Detail',
     GET_DETAIL_SUCCESS = '[SettlementPayment] Get Detail Success',
+    GET_DETAIL_FAIL = '[SettlementPayment] Get Detail Fail',
+
 
 };
 
@@ -21,3 +23,4 @@ export const LoadListSettlePaymentSuccess = createAction(SettlementPaymentAction
 
 export const LoadDetailSettlePayment = createAction(SettlementPaymentActionTypes.GET_DETAIL, props<{ id: string }>());
 export const LoadDetailSettlePaymentSuccess = createAction(SettlementPaymentActionTypes.GET_DETAIL_SUCCESS, props<ISettlementPaymentData>());
+export const LoadDetailSettlePaymentFail = createAction(SettlementPaymentActionTypes.GET_DETAIL_FAIL);

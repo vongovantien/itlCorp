@@ -50,7 +50,7 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string Bank { get; set; }
         public string BankCode { get; set; }
         public DateTime? DueDate { get; set; }
-
+        public bool? IsDisplayLogo { get; set; }
     }
 
     public class AscSettlementPaymentRequestReportParams

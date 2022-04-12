@@ -30,6 +30,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
     activeOther: boolean = false;
+    totalAr: any = 0;
 
     constructor(
         private _router: Router,

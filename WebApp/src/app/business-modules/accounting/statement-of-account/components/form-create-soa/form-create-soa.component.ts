@@ -315,6 +315,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             case 'partner':
                 this.selectedPartner = { field: data.partnerNameEn, value: data.id };
                 this.updateDataSearch('customerID', this.selectedPartner.value);
+                this.getCurrencyAgreement();
                 break;
             case 'date-mode':
                 this.selectedDateMode = data;
@@ -323,6 +324,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             case 'type':
                 this.selectedType = data;
                 this.updateDataSearch('type', this.selectedType.value);
+                this.getCurrencyAgreement();
                 break;
             case 'obh':
                 this.selectedObh = data;
@@ -519,5 +521,23 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             }
         }
         return _shipment;
+    }
+
+    getCurrencyAgreement(){
+        if(this.selectedType.value === this.types[0].value && !!this.selectedPartner.value){
+            this._catalogueRepo.getAgreement(
+                {
+                    partnerId: this.selectedPartner.value, status: true
+                }).subscribe(
+                    (agreements: any[]) => {
+                        if (!!agreements && !!agreements.length) {
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].currencyId)[0];
+                        }else{
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+                        }
+                        this.updateDataSearch('currency', this.selectedCurrency.id);
+                    }
+                );
+            }
     }
 }

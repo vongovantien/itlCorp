@@ -48,12 +48,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         private _operationRepo: OperationRepo) {
         super();
         this.requestSort = this.sortLocal;
-        this.term$.pipe(
-            debounceTime(2000),
-            distinctUntilChanged()
-        ).subscribe((text: string) => {
-            this.getListCleranceNotImported();
-        });
+
     }
     ngOnInit() {
         this.initForm();
@@ -71,6 +66,14 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         ];
 
         this.requestList = this.getListCleranceNotImported;
+
+        this.term$.pipe(
+            debounceTime(2000),
+            distinctUntilChanged(),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe((text: string) => {
+            this.getListCleranceNotImported();
+        });
     }
 
     sortLocal(sort: string): void {

@@ -6,6 +6,7 @@ export * from './operation/surcharge';
 export * from './operation/custom-declaration';
 export * from './operation/shipment';
 export * from './operation/advanceSettlement';
+export * from './operation/link-air-sea.model';
 
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';

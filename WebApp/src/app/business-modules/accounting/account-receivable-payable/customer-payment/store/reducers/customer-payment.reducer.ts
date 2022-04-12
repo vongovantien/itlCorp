@@ -102,7 +102,8 @@ export const receiptManagementReducer = createReducer(
                         totalPaidVnd: 0,
                         totalPaidUsd: 0,
                         paymentType: 'OTHER',
-                        refNo: null
+                        refNo: null,
+                        currencyId: 'VND'
                     }]
                 };
             }
@@ -117,7 +118,8 @@ export const receiptManagementReducer = createReducer(
                     totalPaidVnd: 0,
                     totalPaidUsd: 0,
                     paymentType: 'OTHER',
-                    refNo: null
+                    refNo: null,
+                    currencyId: 'USD'
                 }]
             };
         }

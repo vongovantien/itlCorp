@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace eFMS.API.Operation.DL.Helper
 {
@@ -71,6 +74,22 @@ namespace eFMS.API.Operation.DL.Helper
                 {
                     p.SetValue(item, row[c], null);
                 }
+            }
+        }
+
+        public static T CloneObject<T>(T source)
+        {
+            if (!typeof(T).IsSerializable)
+            {
+                throw new ArgumentException("The type must be serializable.", nameof(source));
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, source);
+                stream.Seek(0, SeekOrigin.Begin);
+                return (T)formatter.Deserialize(stream);
             }
         }
     }

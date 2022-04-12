@@ -6,7 +6,7 @@
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
                     <tab heading="Advance Info" [active]="true">
-                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" (onChangeAdvanceFor)="changeAdvanceFor($event)">
                         </adv-payment-form-create>
                         <div class="row" *ngIf="!!advancePayment">
                             <div class="col-6">
@@ -43,8 +43,9 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [state]="actionList" [statusApproval]="statusApproval">
+                    <adv-payment-list-request *ngIf="!isAdvCarrier" [state]="actionList" [statusApproval]="statusApproval">
                     </adv-payment-list-request>
+                    <list-advance-payment-carrier *ngIf="isAdvCarrier" [state]="actionList" [statusApproval]="statusApproval"></list-advance-payment-carrier>
                 </div>
                 <div class="row height-row-12" *ngIf="!!advancePayment">
                     <div class="col-12">
@@ -76,13 +77,13 @@
                                     <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
                                             single</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('VN')">Preview
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'preview')">Preview
                                             multiple (VN)</a>
                                         <a class="dropdown-item pointer"
-                                            (click)="previewExportAdvPayment('ENG')">Preview multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple
+                                            (click)="exportAdvPayment('ENG', 'preview')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'download')">Print multiple
                                             (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG', 'download')">Print
                                             multiple (ENG)</a>
                                     </app-dropdown>
                                 </div>

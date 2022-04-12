@@ -10,5 +10,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public List<string> Creator { get; set; }
         public DateTime? CreatedDateFrom { get; set; }
         public DateTime? CreatedDateTo { get; set; }
+        public string Currency { get; set; }
     }
 }

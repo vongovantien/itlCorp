@@ -410,9 +410,34 @@ namespace eFMS.API.Accounting.DL.Services
             //Get OBH charge by OBH Partner (PaymentObjectId)
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(x.ReferenceNo));
 
+            IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                          && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
+            IQueryable<CsTransaction> csJob = transactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
             models.ForEach(fe =>
             {
-                var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+
+                if (fe.Service == "CL")
+                {
+                    _charges = from ops in opsJob
+                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }
+                else
+                {
+                    _charges = from cs in csJob
+                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }
                 decimal? obhAmount = 0;
                 foreach (var charge in _charges)
                 {
@@ -750,15 +775,41 @@ namespace eFMS.API.Accounting.DL.Services
                                              && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId == null);
 
+            IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
+
+            IQueryable<CsTransaction> csJob = transactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
+                                           && x.ServiceDate.Value.Date <= DateTime.Now.Date);
             models.ForEach(fe =>
             {
-                var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
-                decimal? sellingNoVat = 0;
-                foreach (var charge in _charges)
+
+                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
+                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+                if (fe.Service == "CL")
                 {
-                    sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    _charges = from ops in opsJob
+                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
+                }else
+                {
+                    _charges = from cs in csJob
+                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                               from surGrp in grpOps.DefaultIfEmpty()
+                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               select surGrp;
                 }
-                fe.SellingNoVat = sellingNoVat;
+                if (_charges.Count() > 0)
+                {
+                    decimal? sellingNoVat = 0;
+                    foreach (var charge in _charges)
+                    {
+                        sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    }
+                    fe.SellingNoVat = sellingNoVat;
+                }
             });
 
             return models;
@@ -1011,11 +1062,11 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal? _creditRate = agreement.CreditRate;
                 if (agreement.ContractType == "Trial")
                 {
-                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount - CusAdv)/TrialCreditLimit)*100
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount - CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
@@ -1030,11 +1081,25 @@ namespace eFMS.API.Accounting.DL.Services
                 agreement.CreditRate = _creditRate;
                 agreement.DatetimeModified = DateTime.Now;
                 agreement.UserModified = currentUser.UserID;
+
+                if (agreement.CreditRate > AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
+                {
+                    agreement.IsOverLimit = true; // vượt hạn mức
+                }
+                else
+                {
+                    agreement.IsOverLimit = false;
+                }
+
+                agreement.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
+                );
             }
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds)
+        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1044,7 +1109,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partner.ParentId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1054,10 +1120,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+
                             hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1066,7 +1134,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds)
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1076,7 +1144,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partnerId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1086,10 +1155,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+
                             hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1115,7 +1186,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
             var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-            UpdateAgreementPartners(partnerIds);
+            var agreementIds = receivables.Select(s => s.ContractId).ToList();
+            UpdateAgreementPartners(partnerIds, agreementIds);
 
             return hs;
         }
@@ -1140,7 +1212,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                await UpdateAgreementPartnersAsync(partnerIds);
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+
+                await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
 
                 return hs;
             }
@@ -1176,7 +1250,9 @@ namespace eFMS.API.Accounting.DL.Services
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                     && x.PartnerId == model.PartnerId
                                                                     && x.OfficeId.Contains(model.Office.ToString())
-                                                                    && x.SaleService.Contains(model.Service)).FirstOrDefault();
+                                                                    && x.SaleService.Contains(model.Service)).OrderBy(x => x.ContractType)
+                                                                    .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+                                                                    .FirstOrDefault();
                     if (contractPartner == null)
                     {
                         // Lấy currency local và use created of partner gán cho Receivable
@@ -1221,7 +1297,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
                 receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
-                receivables = CalculatorAdvanceAmount(receivables); //Advance Amount
+                // receivables = CalculatorAdvanceAmount(receivables); //Advance Amount CR: 16851
                 receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
                 receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
                 receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
@@ -1230,7 +1306,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             receivables.ForEach(fe => {
                 //Calculator Debit Amount
-                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0); // Công nợ chưa billing
+                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0); // Công nợ chưa billing
                 fe.DatetimeCreated = DateTime.Now;
                 fe.DatetimeModified = DateTime.Now;
             });
@@ -1257,7 +1333,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                UpdateAgreementPartners(partnerIds);
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+
+                UpdateAgreementPartners(partnerIds, agreementIds);
 
                 return hs;
             }
@@ -1438,12 +1516,12 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) /(s.First().contract.TrialCreditLimited)
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) /(s.First().contract.TrialCreditLimited)
                                                                     :0) * 100 ?? 0,3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) / (s.First().contract.CreditLimit)
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) / (s.First().contract.CreditLimit)
                                                                     : 0) * 100 ?? 0, 3):0),
                     CusAdvanceVnd = s.First().contract.CustomerAdvanceAmountVnd ?? 0,
                     CusAdvanceUsd = s.First().contract.CustomerAdvanceAmountUsd ?? 0,
@@ -1457,9 +1535,13 @@ namespace eFMS.API.Accounting.DL.Services
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                     CreditCurrency = s.First().contract.CreditCurrency,
                     ParentNameAbbr = string.Empty, //Get data bên dưới,
-                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified
+                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified,
+                    IsOverDue = s.FirstOrDefault().contract.IsOverDue,
+                    IsOverLimit = s.FirstOrDefault().contract.IsOverLimit,
+                    IsExpired = s.FirstOrDefault().contract.IsExpired,
+                    
                 });
-
+                
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
                        join parent in acRefPartner on partner.ParentId equals parent.Id into parents
@@ -1516,6 +1598,9 @@ namespace eFMS.API.Accounting.DL.Services
                            ParentNameAbbr = parent.ShortName,
                            DatetimeModified = contract.DatetimeModified,
                            OfficeContract = contract.OfficeContract,
+                           IsOverDue = contract.IsOverDue,
+                           IsExpired = contract.IsExpired,
+                           IsOverLimit = contract.IsOverLimit
                        };
             return data;
         }
@@ -1960,6 +2045,9 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
                         DatetimeModified = s.First().DatetimeModified,
                         OfficeContract = s.First().OfficeContract,
+                        IsExpired = s.First().IsExpired,
+                        IsOverLimit = s.First().IsOverLimit,
+                        IsOverDue = s.First().IsOverDue,
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -2106,6 +2194,24 @@ namespace eFMS.API.Accounting.DL.Services
             var detail = new AccountReceivableDetailResult();
             if (arPartnerContracts == null) return new AccountReceivableDetailResult();
             var arPartners = arPartnerContracts.Where(x => x.AgreementId == argeementId);
+
+            var contractType = argeement.ContractType;
+            var _currenyContract = argeement.CreditCurrency;
+            var _cusAdvVnd = argeement.CustomerAdvanceAmountVnd ?? 0;
+            var _cusAdvUsd = argeement.CustomerAdvanceAmountUsd ?? 0;
+            var _creditLimit = contractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ? argeement.CreditLimit : argeement.TrialCreditLimited;
+            decimal cusAdvRate = 0;
+            if (contractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+            {
+                cusAdvRate = (_currenyContract == AccountingConstants.CURRENCY_LOCAL ? (_cusAdvVnd / _creditLimit) * 100 : (_cusAdvUsd / _creditLimit) * 100) ?? 0;
+            }
+            if (contractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
+            {
+                cusAdvRate = (_currenyContract == AccountingConstants.CURRENCY_LOCAL ? (_cusAdvVnd / _creditLimit) * 100 : (_cusAdvUsd / _creditLimit) * 100) ?? 0;
+
+            }
+            cusAdvRate = Math.Round(cusAdvRate, 3);
+
             detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.AgreementId }).Select(s => new AccountReceivableResult
             {
                 AgreementId = s.Key.AgreementId,
@@ -2139,7 +2245,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ObhBillingAmount = s.Sum(sum => sum.ObhBillingAmount),
                 ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
                 ObhUnPaidAmount = s.Sum(sum => sum.ObhUnPaidAmount),
-                DebitRate = s.Sum(sum => sum.DebitRate),
+                DebitRate = s.Sum(sum => sum.DebitRate) - cusAdvRate,
                 CusAdvanceVnd = s.Select(se => se.CusAdvanceVnd).FirstOrDefault(),
                 CusAdvanceUsd = s.Select(se => se.CusAdvanceUsd).FirstOrDefault(),
                 BillingAmount = s.Sum(sum => sum.BillingAmount),
@@ -2149,7 +2255,10 @@ namespace eFMS.API.Accounting.DL.Services
                 Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                 Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                 Over30Day = s.Sum(sum => sum.Over30Day),
-                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault()
+                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
+                IsExpired = s.FirstOrDefault().IsExpired,
+                IsOverLimit = s.FirstOrDefault().IsOverLimit,
+                IsOverDue = s.FirstOrDefault().IsOverDue,
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;

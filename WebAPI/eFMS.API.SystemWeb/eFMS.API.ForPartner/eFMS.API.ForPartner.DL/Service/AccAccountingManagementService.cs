@@ -55,6 +55,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<AccAccountPayable> accAccountPayableRepository;
 
+        private readonly IAccountingPaymentService accPaymentService;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -83,7 +84,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctReceiptSync> receiptSyncRepo,
             IContextBase<AccAccountReceivable> accReceivableRepo,
             IContextBase<SysOffice> officeRepo,
-            IContextBase<AccAccountPayable> accAccountPayableRepo
+            IContextBase<AccAccountPayable> accAccountPayableRepo,
+            IAccountingPaymentService accPaymentSrv
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -110,6 +112,7 @@ namespace eFMS.API.ForPartner.DL.Service
             accReceivableRepository = accReceivableRepo;
             officeRepository = officeRepo;
             accAccountPayableRepository = accAccountPayableRepo;
+            accPaymentService = accPaymentSrv;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -689,6 +692,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         if (invoiceToDelete == null)
                         {
                             return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
+
+                        if(accPaymentService.CheckInvoicePayment(invoiceToDelete.Id))
+                        {
+                            return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
                         }
 
                         data = invoiceToDelete;

@@ -7,6 +7,7 @@ import { DocumentationRepo, OperationRepo } from '@repositories';
 
 import { CustomClearanceFormDetailComponent } from '../components/form-detail-clearance/form-detail-clearance.component';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
+import { CustomDeclaration } from '@models';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -52,7 +53,8 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
     }
 
-    convertClearance() {
+    convertClearance(isReplicate: boolean) {
+        console.log(isReplicate);
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
 
@@ -62,23 +64,23 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
         } else {
-            if (this.detailComponent.mblid.value == null || this.detailComponent.mblid.value === '') {
-                return;
-            }
-            if (this.detailComponent.hblid.value == null || this.detailComponent.hblid.value === '') {
+            if (!this.detailComponent.mblid.value || !this.detailComponent.hblid.value) {
                 return;
             }
         }
         this.detailComponent.getClearance();
-        this.saveAndConvertClearance();
+        this.detailComponent.customDeclaration.isReplicate = isReplicate;
+        this.saveAndConvertClearance(this.detailComponent.customDeclaration);
     }
 
-    saveAndConvertClearance() {
-        this._documentation.convertClearanceToJob(this.detailComponent.customDeclaration).subscribe(
-            (response: any) => {
-                if (response.status) {
-                    this._location.back();
-                }
-            });
+    saveAndConvertClearance(body: CustomClearance) {
+        this._documentation.convertClearanceToJob(body)
+            .subscribe(
+                (response: any) => {
+                    if (response.status) {
+                        this._toastr.success(`Convert ${body.clearanceNo} Successfull`);
+                        this._location.back();
+                    }
+                });
     }
 }

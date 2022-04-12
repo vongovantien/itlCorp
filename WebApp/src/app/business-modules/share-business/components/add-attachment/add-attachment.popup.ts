@@ -1,12 +1,13 @@
 import { PopupBase } from "src/app/popup.base";
-import { OnInit, Component, Output, EventEmitter } from "@angular/core";
-import { DocumentationRepo } from "@repositories";
+import { OnInit, Component, Output, EventEmitter, ViewChild } from "@angular/core";
+import { DocumentationRepo, SystemFileManageRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { Params, ActivatedRoute } from "@angular/router";
+import { ConfirmPopupComponent } from "@common";
 
 
 @Component({
@@ -18,13 +19,16 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     jobId: string;
     files: IShipmentAttachFile[] = [];
     @Output() onAdd: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
+    selectedFile: IShipmentAttachFile;
 
     constructor(
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _systemFileManagerRepo:SystemFileManageRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -64,8 +68,20 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
-            this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            // this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
+            //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            //     .subscribe(
+            //         (res: CommonInterface.IResult) => {
+            //             if (res.status) {
+            //                 this._toastService.success("Upload file successfully!");
+            //                 if (!!this.jobId) {
+            //                     this.getFileShipment(this.jobId);
+            //                 }
+            //             }
+            //         }
+            //     );
+            this._systemFileManagerRepo.uploadFileShipment(this.jobId, fileList)
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -108,6 +124,30 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         this.checkAll = false;
     }
 
+    deleteFile(file: IShipmentAttachFile) {
+        if (!!file) {
+            this.selectedFile = file;
+        }
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteFile() {
+        this.confirmDeletePopup.hide();
+        this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success("File deleted successfully!");
+                        this.getFileShipment(this.jobId);
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
+    }
 
 }
 interface IShipmentAttachFile {

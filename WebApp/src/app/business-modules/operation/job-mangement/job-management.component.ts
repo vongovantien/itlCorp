@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
@@ -7,12 +7,17 @@ import { Store } from '@ngrx/store';
 import { Shipment, CustomDeclaration } from '@models';
 import { SortService } from '@services';
 import { DocumentationRepo, OperationRepo } from '@repositories';
-import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
+import { GetCurrenctUser, getCurrentUserState } from '@store';
+import { Observable, of } from 'rxjs';
+import { delayTime } from '@decorators';
 
 
 
@@ -24,6 +29,9 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
+    @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
@@ -38,6 +46,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
 
+    currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
+
     constructor(
         private sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -45,7 +55,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _toastService: ToastrService,
         private _operationRepo: OperationRepo,
         private _router: Router,
-        private _store: Store<fromOperationStore.IOperationState>
+        private _store: Store<fromOperationStore.IOperationState>,
+        private _spinner: NgxSpinnerService
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -59,6 +70,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
+            { title: 'Replicate Job', field: 'replicateJobNo', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Product Service', field: 'productService', sortable: true },
@@ -104,6 +116,8 @@ export class JobManagementComponent extends AppList implements OnInit {
                     this.requestSearchShipment();
                 }
             );
+
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     requestSearchShipment() {
@@ -244,4 +258,100 @@ export class JobManagementComponent extends AppList implements OnInit {
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
     }
 
+    chargeFromRep() {
+        this._spinner.hide();
+        this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
+        this.loadingPopupComponent.show();
+        this._documentRepo.chargeFromReplicate()
+            .pipe(
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                )),
+                finalize(() => { this._progressRef.complete(); })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Completed</b>";
+                        this.loadingPopupComponent.proccessCompleted();
+                    }
+                },
+            );
+    }
+
+    onSelectOps(shipment) {
+        this.selectedShipment = shipment;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    confirmReplicateJob() {
+        const currentJob = Object.assign({}, this.selectedShipment);
+
+        const confirmMessage = `Are you sure you want to replicate <span class="font-weight-bold">${currentJob?.jobNo}</span>?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Replicate job',
+            body: confirmMessage,
+            iconConfirm: 'la la-copy',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            if (!!currentJob) {
+                this._documentRepo.replicateOps([currentJob.id])
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                                this.requestSearchShipment();
+
+                            } else
+                                this._toastService.error(res.message);
+                        }
+                    )
+            }
+        });
+    }
+
+    printPLSheet(currency: string) {
+        const currentJob = Object.assign({}, this.selectedShipment);
+        this._documentRepo.previewPL(this.selectedShipment?.id, currency)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
 }

@@ -72,8 +72,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     ngOnInit() {
@@ -246,6 +246,20 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             });
     }
 
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.confirmPopupContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.confirmPopupContainerRef.viewContainerRef.clear();
+            });
+    }
+    
     printSettlement(settlementNo: string) {
         this._accoutingRepo.previewSettlementPayment(settlementNo)
             .pipe(
@@ -254,9 +268,9 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             )
             .subscribe(
                 (res: any) => {
-                    if (res != null) {
-                        this.dataReport = res;
-                        this.showReport();
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                            this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }

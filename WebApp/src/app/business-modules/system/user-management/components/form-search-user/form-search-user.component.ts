@@ -26,7 +26,8 @@ export class UserFormSearchComponent extends AppForm {
                 { displayName: 'Name En', fieldName: 'employeeNameEn' },
                 { displayName: 'Full Name', fieldName: 'employeeNameVn' },
                 { displayName: 'User Type', fieldName: 'userType' },
-                { displayName: 'Status', fieldName: 'active' }
+                { displayName: 'Status', fieldName: 'active' },
+                { displayName: 'StaffCode', fieldName: 'staffCode' }
             ]
         };
 

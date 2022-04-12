@@ -88,10 +88,7 @@ export class DocumentationRepo {
     }
 
     insertDuplicateShipment(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/InsertDuplicateJob`, body);
     }
 
     getDetailShipment(id: string) {
@@ -437,7 +434,12 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-
+    cancelLinkCharge(chargId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, { chargId: chargId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     getShipmentTotalProfit(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),
@@ -1008,6 +1010,10 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
     }
 
+    getShipmentAssginPICCarrier(type: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPICCarrier`, { type: type });
+    }
+
     previewHLSeaBookingNoteById(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/PreviewHBSeaBookingNote`, { id: id }).pipe(
             map((data: any) => data)
@@ -1108,9 +1114,9 @@ export class DocumentationRepo {
         );
     }
 
-    getASTransactionInfo(mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
+    getASTransactionInfo(jobNo: string = null, mblNo: string, hblNo: string, serviceName: string, serviceMode: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/GetLinkASInfomation/`,
-            { mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
+            { jobNo: jobNo, mblNo: mblNo, hblNo: hblNo, serviceName: serviceName, serviceMode: serviceMode });
     }
 
     downloadChargeExcel() {
@@ -1151,11 +1157,34 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body:any) {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`,body).pipe(
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
+    updateShipmentSurchargesLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UpdateChargeLinkFee`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    chargeFromReplicate() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    replicateOps(Ids: string[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/ReplicateJob`, { Ids });
+
+    }
+
+    getAllShipment(jobNo: string){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo:jobNo });
+    }
 }

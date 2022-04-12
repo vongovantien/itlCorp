@@ -17,6 +17,7 @@ export class AppComboGridComponent<T> extends AppList {
     @Output() clickOutSide: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() active: any;
+    @Input() hideInput: boolean=false;
 
 
     selectedItem: T = null;

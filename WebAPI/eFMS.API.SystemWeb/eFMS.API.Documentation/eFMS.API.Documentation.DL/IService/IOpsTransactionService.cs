@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -28,12 +29,13 @@ namespace eFMS.API.Documentation.DL.IService
         string CheckExist(OpsTransactionModel model, string mblNo, string hblNo);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
-        IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
-       
+        ResultHandle ChargeFromReplicate();
+        Task<HandleState> ReplicateJobs(ReplicateIds model);
+        ResultHandle AutoRateReplicate();
     }
 }

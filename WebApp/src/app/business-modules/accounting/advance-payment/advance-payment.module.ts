@@ -27,6 +27,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { AdvancePaymentShipmentExistedPopupComponent } from './components/popup/shipment-existed/shipment-existed.popup';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ShareAccountingModule } from '../share-accouting.module';
+import { ListAdvancePaymentCarrierComponent } from './components/list-advance-payment-carrier/list-advance-payment-carrier.component';
 
 const routing: Routes = [
     {
@@ -66,7 +67,8 @@ const COMPONENTS = [
     ImportVoucherAdvancePaymentComponent,
     AdvancePaymentFormsearchComponent,
     AdvancePaymentsPopupComponent,
-    AdvancePaymentShipmentExistedPopupComponent
+    AdvancePaymentShipmentExistedPopupComponent,
+    ListAdvancePaymentCarrierComponent
 ];
 
 const customCurrencyMaskConfig = {

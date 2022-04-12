@@ -33,6 +33,9 @@ export class TrialOfficialOtherModel {
     agreementCurrency: string = null;
 
     agreementSalesmanName: string = null;
+    isExpired: boolean = false;
+    isOverLimit: boolean = false;
+    isOverDue: boolean = false;
 
     constructor(data?: any) {
         const self = this;
@@ -113,6 +116,9 @@ export class AccReceivableDetailModel {
     saleDebitAmount: number = 0;
     saleDebitRate: number = 0;
     taxCode: string = null;
+    isExpired: boolean = false;
+    isOverLimit: boolean = false;
+    isOverDue: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

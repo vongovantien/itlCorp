@@ -963,6 +963,14 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ApplyPartner)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ApplyType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Bod)
                     .HasColumnName("BOD")
                     .HasMaxLength(50)
@@ -985,6 +993,10 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.ReplicatePrefix)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Type).HasMaxLength(100);
 

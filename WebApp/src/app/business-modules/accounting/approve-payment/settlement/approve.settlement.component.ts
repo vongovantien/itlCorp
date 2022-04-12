@@ -20,6 +20,8 @@ import { finalize, catchError, takeUntil, switchMap, tap, pluck } from 'rxjs/ope
 import isUUID from 'validator/lib/isUUID';
 import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -46,8 +48,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     comment: string = '';
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Settlement';
-    
+    folderModuleName: string = 'Settlement';
+    userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -72,7 +75,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.getDetailSettlement(this.settlementId);
                 }
             });
-
+        this.userLogged$ = this._store.select(getCurrentUserState);
     }
 
     onChangeCurrency(currency: string) {
@@ -81,7 +84,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     getDetailSettlement(settlementId: string) {
         this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }))
-        this._accoutingRepo.getDetailSettlementPayment(settlementId)
+        this._accoutingRepo.getDetailSettlementPayment(settlementId, 'LIST')
             .pipe(
                 catchError(this.catchError),
                 tap((res: any) => {
@@ -101,7 +104,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     // * wait to currecy list api
                     this.formCreateSurcharge.form.patchValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
-                        requester: this.settlementPayment.settlement.requester,
+                        requester: this.settlementPayment.settlement.userNameCreated,
                         requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
@@ -125,7 +128,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
-                    this.requestSurchargeListComponent.TYPE = 'GROUP'; // ? <> LIST
+                    this.requestSurchargeListComponent.TYPE = 'LIST'; // ? <> LIST
                     this.requestSurchargeListComponent.STATE = 'READ'; // ? <> WRITE
 
 
@@ -197,10 +200,10 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     previewSettlementPayment() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
@@ -227,58 +230,69 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         this.componentRef.instance.show();
     }
 
-    exportSettlementPayment(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+    exportSettlementPayment(language: string, typeExp: string) {
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
-                },
-            );
-    }
-    
-    previewExportSettlementPayment(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
-    exportGeneralPreview() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-            return;
-        }
+    exportGeneralPreview(typeExp: string) {
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+        //     return;
+        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
-    previewGeneralPreview() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
+    exportSettlementPaymentTemplate(language: string, typeExp: string) {
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
+
+        this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
-    
+
     recall() {
         this._accoutingRepo.RecallRequestSettlement(this.settlementPayment.settlement.id)
             .pipe(

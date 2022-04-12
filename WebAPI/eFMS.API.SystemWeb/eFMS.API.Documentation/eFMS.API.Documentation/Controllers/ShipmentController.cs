@@ -317,6 +317,18 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// get list of shipment assign or PIC is current user for adv carrier
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetShipmentAssignPICCarrier")]
+        [Authorize]
+        public IActionResult GetShipmentAssignPICCarrier(string type)
+        {
+            var list = shipmentService.GetShipmentAssignPICCarrier(type);
+            return Ok(list);
+        }
+
+        /// <summary>
         /// Get data for export accounting P/L
         /// </summary>
         /// <param name="criteria"></param>
@@ -359,6 +371,13 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult opsAdvanceSettlements(Guid JobID)
         {
             var job = shipmentService.GetAdvanceSettlements(JobID);
+            return Ok(job);
+        }
+
+        [HttpGet("GetAllShipment")]
+        public IActionResult GetAllShipment(string JobNo)
+        {
+            var job = shipmentService.GetAllShipment(JobNo);
             return Ok(job);
         }
     }

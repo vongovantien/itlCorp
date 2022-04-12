@@ -545,6 +545,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
+        // [Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
@@ -575,9 +576,10 @@ namespace eFMS.API.Documentation.Controllers
                     }
 
                     string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
-                    if(!string.IsNullOrEmpty(InvoiceDate))
+                    DateTime? dateToPaseInvoice = null;
+
+                    if (!string.IsNullOrEmpty(InvoiceDate))
                     {
-                        DateTime? dateToPaseInvoice = null;
                         if (DateTime.TryParse(InvoiceDate, out temp))
                         {
                             CultureInfo culture = new CultureInfo("es-ES");
@@ -615,7 +617,7 @@ namespace eFMS.API.Documentation.Controllers
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 
                         InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPase : (DateTime?)null,
+                        InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPaseInvoice : (DateTime?)null,
                         SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
                         Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
                         Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
@@ -655,14 +657,30 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("UpdateFieldNetAmount_AmountUSD_VatAmountUSD")]
-        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField()
+        public IActionResult UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField([FromBody] List<Guid> Ids)
         {
-            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD();
+            var hs = csShipmentSurchargeService.UpdateFieldNetAmount_AmountUSD_VatAmountUSD(Ids);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Update Success" };
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 return BadRequest(_result);
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("CancelLinkCharge")]
+        [Authorize]
+        public IActionResult CancelLinkCharge(Guid chargId)
+        {
+            currentUser.Action = "CancelLinkCharge";
+            var hs = csShipmentSurchargeService.CancelLinkCharge(chargId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
             }
             return Ok(result);
         }

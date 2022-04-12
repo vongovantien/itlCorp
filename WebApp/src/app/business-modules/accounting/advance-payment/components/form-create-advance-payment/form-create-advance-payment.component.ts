@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, Input, ChangeDetectionStrategy } from 
 import { User, Currency, Partner, Bank } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { AppForm } from '@app';
-import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 
 import { CommonEnum } from '@enums';
 import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueBankAction, getCatalogueBankState } from '@store';
@@ -20,6 +20,7 @@ import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/
 export class AdvancePaymentFormCreateComponent extends AppForm {
     @Input() mode: string = 'create';
     @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onChangeAdvanceFor: EventEmitter<string> = new EventEmitter<string>();
 
     methods: CommonInterface.ICommonTitleValue[] = [
         { title: 'Cash', value: 'Cash' },
@@ -28,6 +29,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     ];
     currencyList: Currency[] = [];
     userLogged: Partial<SystemInterface.IClaimUser>;
+    advanceForDatas: string[] = ["HBL"]; // update MBL sau , "MBL"
 
     users: Observable<User[]>;
     customers: Observable<Partner[]>;
@@ -46,6 +48,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     bankName: AbstractControl;
     paymentTerm: AbstractControl;
     payee: AbstractControl;
+    advanceFor: AbstractControl;
 
     selectedPayee: Partner;
     banks: Observable<Bank[]>;
@@ -54,6 +57,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name EN' },
     ];
+    isAdvCarrier: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -109,8 +113,9 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
-            payee: [],
-            bankCode: [{ value: null, disabled: true }]
+            payee: this.isAdvCarrier ? [null,  Validators.required] : [],
+            bankCode: [{ value: null, disabled: true }],
+            advanceFor: [this.advanceForDatas[0]]
         });
 
         this.advanceNo = this.formCreate.controls['advanceNo'];
@@ -127,6 +132,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.paymentTerm = this.formCreate.controls['paymentTerm'];
         this.payee = this.formCreate.controls['payee'];
         this.bankCode = this.formCreate.controls['bankCode'];
+        this.advanceFor = this.formCreate.controls['advanceFor'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(
@@ -189,6 +195,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             this.bankAccountNo.setValue(null);
             this.bankName.setValue(null);
             this.bankCode.setValue(null);
+        }
+    }
+
+    changeAdvanceFor(data: any) {
+        if (!!data) {
+            console.log('changeAdvanceFor', data)
+            this.onChangeAdvanceFor.emit(data);
         }
     }
 

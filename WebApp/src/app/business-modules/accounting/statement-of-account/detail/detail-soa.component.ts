@@ -46,6 +46,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     reasonReject: string = '';
     messageValidate: string = '';
     attachFiles: SysImage[] = [];
+    backToInv: boolean = false;
 
     userLogged: Partial<SystemInterface.IClaimUser>;
 
@@ -91,6 +92,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 this.soaNO = params.no;
                 this.currencyLocal = params.currency;
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
+            }
+            if(!!params.action && params.action === 'inv'){
+                this.backToInv = true;
             }
         });
         this._store.select(getCurrentUserState)
@@ -220,7 +224,11 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     back() {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
+        if (!this.backToInv) {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
+        } else {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/cd-invoice`]);
+        }
     }
 
     export() {

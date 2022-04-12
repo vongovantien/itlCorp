@@ -27,5 +27,7 @@ namespace eFMS.API.ReportData.Consts
         public const string SettlementPath = "SettlePayment";
         // Folder contain AR Module Template
         public const string AccountReceivablePath = "AccountReceivable";
+        // Folder upload file to aws
+        public const string FolderPreviewUploadFile = "Preview";
     }
 }

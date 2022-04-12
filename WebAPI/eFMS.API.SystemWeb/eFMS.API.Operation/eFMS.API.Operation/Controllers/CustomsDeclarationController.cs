@@ -14,6 +14,7 @@ using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -210,8 +211,22 @@ namespace eFMS.API.Operation.Controllers
         [Route("Delete")]
         public IActionResult Delete(int id)
         {
-            var hs = customsDeclarationService.Delete(x => x.Id == id);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
+            CustomsDeclarationModel currentCd = customsDeclarationService.Get(x => x.Id == id)?.FirstOrDefault();
+            if(currentCd == null)
+            {
+                return NotFound(new ResultHandle { Status = false, Message = "Not found clearance " + currentCd.ClearanceNo });
+            }
+
+            CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == currentCd.ClearanceNo && x.Id != currentCd.Id)?.FirstOrDefault() ;
+            if(HasReplicate != null)
+            {
+                return BadRequest(
+                    new ResultHandle { Status = false, Message = string.Format("Please you remove Custom Clearance {0} in {1}", currentCd.ClearanceNo, HasReplicate.JobNo)
+                });
+            }
+
+            HandleState hs = customsDeclarationService.Delete(x => x.Id == id);
+            string message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -366,10 +381,22 @@ namespace eFMS.API.Operation.Controllers
                 {
                     return BadRequest();
                 }
+
+                CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == item.ClearanceNo 
+                && x.Id != item.Id && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
+                if (HasReplicate != null && !string.IsNullOrEmpty(HasReplicate.JobNo))
+                {
+                    return BadRequest(
+                        new ResultHandle
+                        {
+                            Status = false,
+                            Message = string.Format("Please you remove Custom Clearance {0} in {1}", item.ClearanceNo, HasReplicate.JobNo)
+                        });
+                }
             }
 
-            var hs = customsDeclarationService.DeleteMultiple(listCustom);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
+            HandleState hs = customsDeclarationService.DeleteMultiple(listCustom);
+            string message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result;
             if (hs.Success)
             {
@@ -512,6 +539,22 @@ namespace eFMS.API.Operation.Controllers
         {
             var data = customsDeclarationService.GetListCustomNoAsignPIC();
             return Ok(data);
+        }
+
+        [HttpPut("ReplicateClearance")]
+        [Authorize]
+        public async Task<IActionResult> ReplicateClearance(int Id)
+        {
+            HandleState hs = await customsDeclarationService.ReplicateCustomClearance(Id);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

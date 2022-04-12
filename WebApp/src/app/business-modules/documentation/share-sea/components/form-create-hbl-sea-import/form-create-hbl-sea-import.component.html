@@ -8,7 +8,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (mtBill.dirty && !mtBill.valid) || (isSubmited && !mtBill.valid)}">
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mtBill.dirty) && !mtBill.valid }">
                                 <label class="form-control-label" for="">
                                     MBL No <span class="m--font-danger">(*)</span>
                                 </label>
@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (hwbno.dirty && !hwbno.valid) || (isSubmited && !hwbno.valid)}">
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
                                 <label class="form-control-label" for="">
                                     HBL No. <span class="m--font-danger">(*)</span>
                                 </label>
@@ -459,6 +459,21 @@
                                 <textarea class="form-control " formControlName="inWord"></textarea>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div *ngIf="isUpdate" class="col-md-12">
+                            <div class="row m--margin-top-20">
+                                <div class="col-md-6">
+                                    <span>Created: {{this.dateTimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                                    <span class="text-success">{{this.userCreated}}</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <span>Modified: {{this.dateTimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                                    </span> <span class="text-success">{{this.userModified}}</span>
+                                </div>
+                            </div>
+                        </div>
+        
                     </div>
                 </div>
             </div>

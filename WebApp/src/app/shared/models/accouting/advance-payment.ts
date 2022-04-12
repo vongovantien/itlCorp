@@ -1,3 +1,5 @@
+import { Surcharge } from "@models";
+
 export class AdvancePayment {
     id: string = '';
     customNo: string = '';
@@ -51,7 +53,8 @@ export class AdvancePayment {
     payeeName: string = null;
     bankCode: string = null;
     departmentName: string = null;
-
+    advanceFor: string = null;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -81,6 +84,8 @@ export class AdvancePaymentRequest {
     datetimeModified: string = '';
     statusPayment: string = '';
 
+    surcharge: Surcharge[] = [];
+    
     isSelected?: boolean;
 
     constructor(object?: any) {

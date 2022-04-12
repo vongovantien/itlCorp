@@ -2588,6 +2588,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("KB")
                     .HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.LinkChargeId).HasMaxLength(250);
+
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)

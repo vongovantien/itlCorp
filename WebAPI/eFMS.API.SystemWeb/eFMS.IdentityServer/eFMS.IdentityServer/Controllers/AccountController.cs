@@ -44,5 +44,13 @@ namespace eFMS.IdentityServer.Controllers
             await HttpContext.SignOutAsync();
             return Ok();
         }
+
+        [HttpPost("GetLDAPInfo")]
+        public IActionResult GetLDAPInfo([FromBody] List<string> username)
+        {
+            var data = userLogService.GetLDAPInfo(username, out List<string> userInactive);
+
+            return Ok(new { userInactive });
+        }
     }
 }

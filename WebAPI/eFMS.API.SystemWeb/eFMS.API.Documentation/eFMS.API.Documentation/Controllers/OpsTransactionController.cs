@@ -52,8 +52,8 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="curUser"></param>
         /// <param name="AccAccountReceivable"></param>
         /// <param name="menu"></param>
-        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, 
-            IOpsTransactionService service, 
+        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer,
+            IOpsTransactionService service,
             IHostingEnvironment hostingEnvironment,
             ICurrentUser curUser,
             IAccAccountReceivableService AccAccountReceivable,
@@ -87,6 +87,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = transactionService.CheckDetailPermission(id);
@@ -152,6 +153,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+
             return Ok(result);
         }
 
@@ -174,7 +176,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            string msgCheckUpdateServiceDate= CheckUpdateServiceDate(model);
+            string msgCheckUpdateServiceDate = CheckUpdateServiceDate(model);
             if (msgCheckUpdateServiceDate.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateServiceDate, Data = new { errorCode = "serviceDate" } });
@@ -221,9 +223,9 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Message });
             }
-            else if(surchargeIds.Count > 0)
+            else if (surchargeIds.Count > 0)
             {
-  
+
                 Response.OnCompleted(async () =>
                 {
                     //Tính công nợ sau khi tạo mới hóa đơn thành công
@@ -308,7 +310,7 @@ namespace eFMS.API.Documentation.Controllers
             HandleState hs = transactionService.ConvertClearanceToJob(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -375,6 +377,28 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet("ChargeFromReplicate")]
+        [Authorize]
+        public IActionResult ChargeFromReplicate()
+        {
+            currentUser.Action = "ChargeFromReplicate";
+            ResultHandle hs = transactionService.ChargeFromReplicate();
+            if (!hs.Status)
+                return BadRequest(hs);
+            return Ok(hs);
+        }
+
+        [HttpGet("AutoRateReplicate")]
+        public IActionResult AutoRateReplicate()
+        {
+            currentUser.Action = "AutoRateReplicate";
+            ResultHandle hs = transactionService.AutoRateReplicate();
+            if (!hs.Status)
+                return BadRequest(hs);
+            return Ok(hs);
+        }
+
         private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
         {
             string errorMsg = string.Empty;
@@ -403,6 +427,25 @@ namespace eFMS.API.Documentation.Controllers
             errorMsg = model.ServiceDate.Value.Month != currentJob.ServiceDate.Value.Month ? stringLocalizer[DocumentationLanguageSub.MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH].Value : errorMsg;
 
             return errorMsg;
+        }
+
+
+        [HttpPost("ReplicateJob")]
+        [Authorize]
+        public async Task<IActionResult> ReplicateJob(ReplicateIds model)
+        {
+            currentUser.Action = "ReplicateJob";
+
+            HandleState hs = await transactionService.ReplicateJobs(model);
+
+            string message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

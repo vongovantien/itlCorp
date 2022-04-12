@@ -4,7 +4,7 @@
             <div class="table-head-fixed">
                 <div class="table-filter-block">
                     <div class="search-field">
-                        <input [(ngModel)]="keyword" name="keyword" (click)="clickSearch($event)"
+                        <input [(ngModel)]="keyword" name="keyword" (click)="clickSearch($event)" [hidden]="hideInput"
                             class="form-control m-input m-input--square cbgr-input-search" type="text"
                             placeholder="Search..." #inputSearch>
                         <i class="icon-search"></i>

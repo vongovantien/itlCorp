@@ -283,7 +283,8 @@ namespace eFMS.API.Documentation.DL.Services
                     TypeOfService = item.TransactionType == "CL" ? "CL"  : (item.TypeOfService != null) ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
                     Shipper = item.TransactionType == "CL" ? item.ShipperId : partnerLookup[item.ShipperId].FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
                     Consignee = item.TransactionType == "CL" ? item.ConsigneeId : partnerLookup[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn, //CR: Get Consignee Name En [25-09-2020]
-                    LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd
+                    // LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd
+                    LoadingDate = item.ServiceDate
                 };
                 string employeeId = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
                 if (employeeId != null)
@@ -806,7 +807,8 @@ namespace eFMS.API.Documentation.DL.Services
                     NominationParty = string.Empty,
                     assigned = false,
                     TransID = string.Empty,
-                    LoadingDate = item.TransactionType == "CL" ? item.Etd : ( item.TransactionType.Contains("I") ? item.Eta : item.Etd),
+                    // LoadingDate = item.TransactionType == "CL" ? item.Etd : ( item.TransactionType.Contains("I") ? item.Eta : item.Etd),
+                    LoadingDate = item.ServiceDate,
                     HWBNO = string.Empty,
                     Volumne = string.Empty,
                     Qty20 = 0,
@@ -1482,7 +1484,8 @@ namespace eFMS.API.Documentation.DL.Services
                     TpyeofService = item.TransactionType == "CL" ? API.Common.Globals.CustomData.Services.FirstOrDefault(c => c.Value == DocumentConstants.LG_SHIPMENT)?.Value : item.TypeOfService != null ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
                     Shipper = item.ShipperDescription,
                     Consignee = item.ConsigneeDescription,
-                    LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd
+                    // LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd
+                    LoadingDate = item.ServiceDate
 
                 };
                 string employeeId = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
@@ -1750,7 +1753,8 @@ namespace eFMS.API.Documentation.DL.Services
                             TransID = item.JobNo,
                             HBLID = item.HblId,
                             HAWBNO = item.HwbNo,
-                            LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd,
+                            // LoadingDate = item.TransactionType == "CL" ? item.Etd : item.TransactionType.Contains("I") ? item.Eta : item.Etd,
+                            LoadingDate = item.ServiceDate,
                             PartnerName = partner?.PartnerNameEn,
                             Description = item.TransactionType == "CL" ? "Logistics" : API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
                             Quantity = charge.Quantity,

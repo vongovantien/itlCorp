@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { CommodityGroup, Customer, PortIndex, User } from '@models';
+import { CommodityGroup, Customer, PortIndex, User, LinkAirSeaModel } from '@models';
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
@@ -55,8 +55,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     users: Observable<User[]>;
     salesmans: Observable<User[]>;
 
-    shipmentNo: string = null;
-    shipmentInfo: string = '';
+    jobLinkAirSeaNo: string = '';
+    jobLinkAirSeaInfo: LinkAirSeaModel;
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
@@ -147,8 +147,14 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     initForm() {
         this.formCreate = this._fb.group({
-            hwbno: [null, Validators.required],
-            mblno: [null, Validators.required],
+            hwbno: [null, Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
+            mblno: [null, Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             flightVessel: [],
             purchaseOrderNo: [],
 
@@ -166,7 +172,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             supplierId: [null, Validators.required],
             agentId: [],
             billingOpsId: [this.userLogged.id, Validators.required],
-            salemansId: [null, Validators.required]
+            salemansId: [null, Validators.required],
+            isReplicate: [false]
+
         }, { validator: FormValidators.comparePort });
 
         this.hwbno = this.formCreate.controls['hwbno'];
@@ -196,17 +204,25 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
+            this._documentRepo.getASTransactionInfo(null, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
-                .subscribe((res: any) => {
-                    if (!!res) {
-                        this.shipmentNo = res.jobNo;
-                        if (!!res.jobNo) {
-                            this.shipmentInfo = res.jobNo;
-                        } else {
-                            this.shipmentInfo = null;
-                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
+                .subscribe((res: LinkAirSeaModel) => {
+                    if (!!res?.jobNo) {
+                        this.jobLinkAirSeaNo = res.jobNo;
+                        this.jobLinkAirSeaInfo = res;
+                        if (!this.customerId.value && !!res.customerId) {
+                            this.customerId.setValue(res.customerId);
                         }
+                        if (!this.salemansId.value && !!res.salemanId) {
+                            this.salemansId.setValue(res.salemanId);
+                        }
+                        if (!this.serviceDate.value?.startDate && !!res.serviceDate) {
+                            this.serviceDate.setValue({ startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) });
+                        }
+                    }
+                    else {
+                        this.jobLinkAirSeaNo = null;
+                        this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                     }
                 });
         }

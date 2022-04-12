@@ -17,6 +17,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public bool IsManagerApproved { get; set; }
         public bool IsAccountantApproved { get; set; }
         public bool IsBODApproved { get; set; }
+        public string OfficeName { get; set; }
         public string ContactOffice { get; set; }
         public string BankAccountNo { get; set; }
         public string BankName { get; set; }
@@ -28,6 +29,8 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? DueDate { get; set; }
         public DateTime? SOADate { get; set; }
         public string SOANo { get; set; }
-        public string ReasonForRequest { get; set; }
+        public string Supplier { get; set; }
+        public string BOD { get; set; }
+        public bool IsDisplayLogo { get; set; }
     }
 }

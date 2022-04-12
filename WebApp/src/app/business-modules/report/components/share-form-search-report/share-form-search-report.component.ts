@@ -54,7 +54,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     exchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'taxCode', label: 'Tax Code' },
+        { field: 'accountNo', label: 'Tax Code' },
         { field: 'shortName', label: 'Name ABBR' }
     ];
 
@@ -65,7 +65,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'partnerNameVn', label: 'Partner Name' },
-        { field: 'taxCode', label: 'Tax Code' }
+        { field: 'accountNo', label: 'Tax Code' }
     ];
 
     customers: Observable<Customer[]>;
@@ -138,6 +138,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     groupSpecial: any[] = [];
     numberOfShipment: number = 0;
     shipmentInput: OperationInteface.IInputShipment;
+    inValidIncentiveRpt: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -185,7 +186,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
-            customer: this.isCommissionIncentive ? [null, Validators.required] : [],
+            customer: (this.isCommissionIncentive && (!!this.typeReport && this.typeReport.value == this.typeComReportList[2].id)) ? [null, Validators.required] : [],// require customer cho report incentive
             carrier: [],
             agent: [],
             service: [this.serviceActive],
@@ -203,7 +204,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                 FormValidators.required,
             ])],
             exchangeRate: 20000,
-            typeReport: this.isGeneralReport ? [] : [this.typeReportActive[0].id]
+            typeReport: this.isGeneralReport ? [] : [this.typeReportActive[0].id],
         });
 
         this.serviceDate = this.formSearch.controls['serviceDate'];
@@ -636,8 +637,11 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
-        if (this.isCommissionIncentive && (!this.customerActive.length || (!this.partnerAccount.value && this.typeReport.value !== this.typeComReportList[2].id))) {
-            return;
+        // report commission thì require Beneficiary, report incentive require customer
+        if (this.isCommissionIncentive && 
+            ((!this.partnerAccount.value && this.typeReport.value !== this.typeComReportList[2].id) || 
+            ((!this.customerActive || !this.customerActive.length) && this.typeReport.value === this.typeComReportList[2].id))) {
+                return;
         }
         if (this.isGeneralReport) {
             this.onGeneralSearch.emit(this.getGeneralSearchBody());

@@ -18,11 +18,11 @@ namespace eFMSWindowService
             //#if DEBUG
             //If the mode is in debugging
             //create a new service instance
-            //SendMailExceededCreditLimitService myService = new SendMailExceededCreditLimitService();
+            //UpdateOverDuePaymentService myService = new UpdateOverDuePaymentService();
             //call the start method - this will start the Timer.
-            //myService.Start();
+            // myService.Start();
             //Set the Thread to sleep
-            //Thread.Sleep(60000);
+            // Thread.Sleep(60000);
             //Call the Stop method-this will stop the Timer.
             //myService.Stop();
             ////#else
@@ -40,7 +40,9 @@ namespace eFMSWindowService
                             new AutoLockShipmentService(),
                             new SendMailOverduePaymentService(),
                             new SendMailExceededCreditLimitService(),
-                            new SendMailExpiredAgreementService()
+                            new SendMailExpiredAgreementService(),
+                            new UpdateOverDuePaymentService(),
+                            new UpAutoRateService()
             };
             ServiceBase.Run(ServicesToRun);
             //#endif

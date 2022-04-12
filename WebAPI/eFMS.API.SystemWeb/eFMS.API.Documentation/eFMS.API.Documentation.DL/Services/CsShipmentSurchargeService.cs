@@ -45,6 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
+        private readonly IContextBase<CatCurrency> currencyRepository;
+
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -65,7 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo
+            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            IContextBase<CatCurrency> currencyRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -88,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             catChargeGroupRepository = catChargeGroupRepo;
+            currencyRepository = currencyRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -123,6 +127,45 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        public HandleState CancelLinkCharge(Guid chargeId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
+                if (charge == null)
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
+                {
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                }
+                else
+                {
+                    if (charge.LinkChargeId != null)
+                    {
+                        var chargeUpdate = DataContext.Where(x => x.Id == Guid.Parse(charge.LinkChargeId)).FirstOrDefault();
+                        chargeUpdate.LinkChargeId = null;
+                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, false);
+                        DataContext.SubmitChanges();
+                    }
+                    DataContext.Delete(x => x.Id == chargeId);
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
         public List<CatPartner> GetAllParner(Guid id, bool isHouseBillID = false)
         {
             try
@@ -496,6 +539,10 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            // set cứng thông tin từ lô hàng.
+                            item.JobNo = hbl.JobNo;
+                            item.Mblno = hbl.Mblno;
+                            item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
                             item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
@@ -586,6 +633,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
 
+                        // set cứng thông tin từ lô hàng.
                         surcharge.JobNo = _jobNo;
                         surcharge.Mblno = _mblNo;
                         surcharge.Hblno = _hblNo;
@@ -635,26 +683,29 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids)
         {
             var result = new HandleState();
-            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            decimal kickBackExcRate = 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
+                        item.Vatrate = 8;
+                        item.Notes = "IT hổ trợ update vat";
                         var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
-                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                         item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                         item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = "d1bb21ea-249a-455c-a981-dcb554c3b848";
                         var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();
@@ -688,11 +739,11 @@ namespace eFMS.API.Documentation.DL.Services
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
-                    //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
-                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
-                    hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
+                    //hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }
             else
@@ -1319,7 +1370,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
                     {
-                        if (opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno && x.OfficeId != currentUser.OfficeID))
+                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
                         {
                             item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                             item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
@@ -1415,7 +1466,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if (!item.UnitPrice.HasValue)
+                if (!item.UnitPrice.HasValue || item.UnitPrice == 0)
                 {
                     item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
                     item.IsValid = false;
@@ -1424,6 +1475,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
+                } else
+                {
+                    if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_NOT_EXIST], item.CurrencyId);
+                        item.IsValid = false;
+                    }
                 }
                 if (!item.Vatrate.HasValue)
                 {
@@ -1450,6 +1508,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                {
+                    if (string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
@@ -1492,83 +1558,114 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 if (item.IsValid)
                 {
-                    OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).FirstOrDefault();
+                    OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim() && x.OfficeId == currentUser.OfficeID).FirstOrDefault();
+                    if(currentOpsJob != null)
+                    {
+                        string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
+                        string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
+                        Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
+                        item.ChargeId = ChargeId;
+                        short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
+                        item.UnitId = UnitId;
+                        item.PaymentObjectId = PartnerId;
+                        item.Quantity = (decimal)item.Qty;
 
-                    string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
-                    string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
-                    Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
-                    item.ChargeId = ChargeId;
-                    short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
-                    item.UnitId = UnitId;
-                    item.PaymentObjectId = PartnerId;
-                    item.Quantity = (decimal)item.Qty;
+                        item.Hblid = currentOpsJob.Hblid;
+                        item.JobNo = currentOpsJob.JobNo;
+                        item.TransactionType = "CL";
+                        string jobNo = currentOpsJob.JobNo;
+                        if (item.Type.ToLower() == "obh")
+                        {
+                            item.PaymentObjectId = obhPartnerId;
+                            item.PayerId = PartnerId;
+                        }
 
-                    item.Hblid = currentOpsJob.Hblid;
-                    item.JobNo = currentOpsJob.JobNo;
-                    item.TransactionType = "CL";
-                    string jobNo = currentOpsJob.JobNo;
-                    if (item.Type.ToLower() == "obh")
-                    {
-                        item.PaymentObjectId = obhPartnerId;
-                        item.PayerId = PartnerId;
-                    }
-                    
-                    if (item.Type.ToLower() == "buying")
-                    {
-                        TypeCompare = "BUY";
-                    }
-                    else if (item.Type.ToLower() == "selling")
-                    {
-                        TypeCompare = "SELL";
-                    }
-                    else if (item.Type.ToLower() == "obh")
-                    {
-                        TypeCompare = "OBH";
-                    }
+                        if (item.Type.ToLower() == "buying")
+                        {
+                            TypeCompare = "BUY";
+                        }
+                        else if (item.Type.ToLower() == "selling")
+                        {
+                            TypeCompare = "SELL";
+                        }
+                        else if (item.Type.ToLower() == "obh")
+                        {
+                            TypeCompare = "OBH";
+                        }
 
-                    if (string.IsNullOrEmpty(item.ObhPartner))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        if (string.IsNullOrEmpty(item.ObhPartner))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
+                        }
+                        else
+                        {
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == obhPartnerId && x.PayerId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(item.SeriesNo))
+                        {
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(item.InvoiceNo))
+                        {
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
+                        {
+                            if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                                item.IsValid = false;
+                            }
+                        }
+                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
                             item.IsValid = false;
                         }
-                    }
-                    else
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == obhPartnerId && x.PayerId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
                         {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(item.SeriesNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(item.InvoiceNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.Type == TypeCompare))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(item.SeriesNo) && !string.IsNullOrEmpty(item.InvoiceNo))
-                    {
-                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.InvoiceNo == item.InvoiceNo && x.SeriesNo == item.SeriesNo && x.Type == TypeCompare))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
                             item.IsValid = false;
                         }
                     }
                 }
-
             });
+            if (list.Count > 1)
+            {
+                for (int i = 0; i < list.Count() - 1; i++)
+                {
+                    int j = i + 1;
+                    while (j < list.Count())
+                    {
+                        if (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null)
+                        {
+                            list[i].IsValid = false;
+                            list[j].IsValid = false;
+                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            {
+                                list[i].IsValid = true;
+                                list[j].IsValid = true;
+                            }
+                        }
+                        j++;
+                    }
+                }
+            }
             return list;
         }
 
@@ -1595,7 +1692,6 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     item.UserCreated = item.UserModified = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    item.ExchangeDate = DateTime.Now.Date;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;

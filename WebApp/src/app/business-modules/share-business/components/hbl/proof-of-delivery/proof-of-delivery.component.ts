@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { SystemFileManageRepo } from 'src/app/shared/repositories/system-file-manage.repo';
 @Component({
     selector: 'hbl-proof-of-delivery',
     templateUrl: './proof-of-delivery.component.html'
@@ -20,6 +21,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
     constructor(
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
+        private _systemFileManageRepo: SystemFileManageRepo,
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
         private _ngProgress: NgProgress,
@@ -87,18 +89,32 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
 
     handleFileInput(event: any) {
         this.fileList = event.target['files'];
-        if (!!this.proofOfDelievey.hblid || this.hblid != SystemConstants.EMPTY_GUID) {
-            if (!!this.files && !!this.files.id && this.fileList.length > 0) {
-                this.deleteFilePOD();
-            } else {
-                this.uploadFilePOD();
-            }
-        }
+        // if (!!this.proofOfDelievey.hblid || this.hblid != SystemConstants.EMPTY_GUID) {
+        //     if (!!this.files && !!this.files.id && this.fileList.length > 0) {
+        //         this.deleteFilePOD();
+        //     } else {
+        //         this.uploadFilePOD();
+        //     }
+        // }
+        this.uploadFilePOD();
     }
 
     uploadFilePOD() {
         const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
-        this._documentRepo.uploadFileProofOfDelivery(hblId, this.fileList)
+        // this._documentRepo.uploadFileProofOfDelivery(hblId, this.fileList)
+        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+        //     .subscribe(
+        //         (res: CommonInterface.IResult) => {
+        //             if (res.status) {
+        //                 this.fileList = null;
+        //                 this._toastService.success("Upload file successfully!");
+        //                 if (!!hblId) {
+        //                     this.getFilePOD();
+        //                 }
+        //             }
+        //         }
+        //     );
+        this._systemFileManageRepo.uploadFileShipment(hblId, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -113,19 +129,38 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             );
     }
 
-    deleteFilePOD() {
+    deleteFilePOD(fileName: string) {
         this._progressRef.start();
-        this._documentRepo.deletePODFilesAttach(this.files.id)
+        const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
+        // this._documentRepo.deletePODFilesAttach(this.files.id)
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     }))
+        //     .subscribe(
+        //         (res: any) => {
+        //             if (res.result.success) {
+        //                 this.uploadFilePOD();
+        //             } else {
+        //                 this._toastService.error("some thing wrong");
+        //             }
+        //         }
+        //     );
+        this._systemFileManageRepo.deleteShipmentFilesAttach(hblId, fileName)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
             }))
             .subscribe(
                 (res: any) => {
-                    if (res.result.success) {
-                        this.uploadFilePOD();
+                    console.log(res);
+                    
+                    if (res.status===true) {
+                        //this.uploadFilePOD();
+                        this._toastService.success("Delete Success");
+                        this.getFilePOD();
                     } else {
-                        this._toastService.error("some thing wrong");
+                        this._toastService.error("Some Thing Wrong");
                     }
                 }
             );
@@ -133,7 +168,17 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
 
     getFilePOD() {
         this.isLoading = true;
-        this._documentRepo.getPODFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
+        // this._documentRepo.getPODFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
+        //     pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     }))
+        //     .subscribe(
+        //         (res: any = []) => {
+        //             this.files = res;
+        //         }
+        //     );
+        this._systemFileManageRepo.getShipmentFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -141,6 +186,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             .subscribe(
                 (res: any = []) => {
                     this.files = res;
+                    console.log(this.files);
                 }
             );
     }

@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
@@ -34,7 +35,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
-        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
+        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool getCopyCharge = false);
 
         ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
 
@@ -95,12 +96,13 @@ namespace eFMS.API.Accounting.DL.IService
 
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
-        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode);
+        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode, bool isCopyCharge = false);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
         List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode);
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);
+        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
     }
 }

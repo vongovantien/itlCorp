@@ -1,0 +1,1092 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.SystemFileManagement</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListCdNoteToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidTypeListModel})">
+            <summary>
+            Sync list CDNote to Accountant
+            </summary>
+            <param name="requests"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListSoaToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestStringTypeListModel})">
+            <summary>
+            Sync list SOA to Accountant
+            </summary>
+            <param name="requests"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListCdNoteDebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidTypeListModel})">
+            <summary>
+            Func Test (Get List Debit Note)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListSOADebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestStringTypeListModel})">
+            <summary>
+            Func Test (Get List SOA Debit)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GiaLapDataPhieuThu(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.PaymentModel},eFMS.API.Accounting.DL.Models.Accounting.ACTION)">
+            <summary>
+            Nghiệp vụ phiếu thu - Tạo Data Giải Lập Data Test Sync Qua Bravo
+            </summary>
+            <param name="paymentModels"></param>
+            <param name="action">ADD(0) or UPDATE(1)</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListReceipt(System.Collections.Generic.List{System.Guid})">
+            <summary>
+            Func Test (Get List Receipt)
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">
+            <summary>
+            Sync list Receipt to Accountant
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptAllInToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">
+            <summary>
+            Sync list Receipt to Accountant (Option - sync đc tất cả các type trong cùng 1 phiếu thu)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IAcctDebitManagementARService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="hostingEnvironment"></param>
+            <param name="accService"></param>
+            <param name="currUser"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeSellForInvoiceByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">
+            <summary>
+            Get charges sell (Debit) to issue Invoice by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeForVoucherByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">
+            <summary>
+            Get charges to issue Voucher by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AccAccountingManagementCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Accounting Management by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Add(eFMS.API.Accounting.DL.Models.AccAccountingManagementModel)">
+            <summary>
+            Add new Accounting Management (Invoice or Voucher)
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Update(eFMS.API.Accounting.DL.Models.AccAccountingManagementModel)">
+            <summary>
+            Update Accounting Management (Invoice or Voucher)
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckVoucherIdExist(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check Exist Voucher ID of VAT Invoice
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckExistedVoucherId(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check Exist Voucher ID of VAT Invoice
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a accounting management
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.ConfirmBillingPaging(eFMS.API.Accounting.DL.Models.Criteria.ConfirmBillingCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Confirm Biling by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.UpdateConfirmBillingDate(System.Collections.Generic.List{System.Guid},System.Nullable{System.DateTime})">
+            <summary>
+            Update Confirm Billing Date for Invoice
+            </summary>
+            <param name="ids">List is of Invoice</param>
+            <param name="billingDate">Billing Date of Invoice</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDuplicateVoucherId(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check duplicate Voucher ID of Voucher
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDuplicateVoucherIdInYear(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check duplicate Voucher ID (In Year) of Voucher
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IAcctSOAService)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="paymentService"></param>
+            <param name="hostingEnvironment"></param>
+            <param name="acctManagementService"></param>
+            <param name="accountReceivableService"></param>
+            <param name="soaServiceService"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.PagingPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria,System.Int32,System.Int32)">
+            <summary>
+            query and paging VAT invoice / SOA
+            </summary>
+            <param name="criteria"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String,System.String,System.String)">
+            <summary>
+            get list payment by refNo
+            </summary>
+            <param name="refNo">Payment RefNo</param>
+            <param name="type">payment type</param>
+            <param name="invoiceNo"></param>s
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadInvoicePaymentExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadOBHPaymentExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read commodities data from file excel
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportInvoicePayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentImportModel})">
+            <summary>
+            import payments for invoice
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportSOAOBHPayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentOBHImportTemplateModel})">
+            <summary>
+            import payments for SOA(type charge is OBH)
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UpdateExtendDate(eFMS.API.Accounting.DL.Models.AccountingPayment.ExtendDateUpdatedModel)">
+            <summary>
+            update extend date
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.Delete(System.Guid)">
+            <summary>
+            Delete a payment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetInvoiceExtendedDate(System.String)">
+            <summary>
+            get extended date of an invoice
+            </summary>
+            <param name="refNo">billing no</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetOBHSOAExtendedDate(System.String)">
+            <summary>
+            get extended date of an SOA(charge type = OBH)
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UploadOBHPaymentFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            upload OBH payment template
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingCustomerPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Customers
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingAgencyPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Agency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AccountReceivableController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="accountReceivable"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetAll">
+            <summary>
+            Get All Account Receivable
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivable(eFMS.API.Accounting.DL.Models.CalculatorReceivableModel)">
+            <summary>
+            Calculator Receivable
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivableNotAuthorize(eFMS.API.Accounting.DL.Models.CalculatorReceivableNotAuthorizeModel)">
+            <summary>
+            Calculator Receivable Not Authorize
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.ObjectReceivableModel})">
+            <summary>
+            Insert Or Update Receivable
+            </summary>
+            <param name="models"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">
+            <summary>
+            Get AR detail has argeement by argeement id
+            </summary>
+            <param name="argeementId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String)">
+            <summary>
+            Get AR detail no argeement by partner id
+            </summary>
+            <param name="partnerId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AccountReceivableCriteria,System.Int32,System.Int32)">
+            <summary>
+            Paging
+            </summary>
+            <param name="criteria"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AccountReceivableCriteria)">
+            <summary>
+            Query Data
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.UpdateDueDateAndOverDaysAfterChangePaymentTerm(eFMS.API.Accounting.DL.Models.CatContractModel)">
+            <summary>
+            Update due date invoice và công nợ quá hạn sau khi update HĐ
+            </summary>
+            <param name="contractModel"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+            <param name="hostingEnvironment"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Advance Payment by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
+            <summary>
+            Query data
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceNo(System.String)">
+            <summary>
+            Get Group Requests by AdvanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceId(System.Guid)">
+            <summary>
+            Get Group Requests by AdvanceId
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetShipments">
+            <summary>
+            Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Add(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            add new advance payment (include advance request)
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckShipmentsExistInAdvancePayment(eFMS.API.Accounting.DL.Models.Criteria.ShipmentAdvancePaymentCriteria)">
+            <summary>
+            Check shipment exists in advance payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check allow delete advance payment
+            </summary>
+            <param name="id">Id of advance payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Delete(System.String)">
+            <summary>
+            delete an advance payment existed item
+            </summary>
+            <param name="advanceNo">advanceNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail advance payment
+            </summary>
+            <param name="id">Id of advance payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceNo(System.String)">
+            <summary>
+            Get Advance Payment by AdvanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve Advance Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceId(System.Guid)">
+            <summary>
+            Get Advance Payment by AdvanceId
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Advance Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Update(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Update Advance Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(System.Guid)">
+            <summary>
+            Preview Advance Payment Request By Advance Id
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.SaveAndSendRequest(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UpdateApprove(System.Guid)">
+            <summary>
+            Update Approve Advance
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DeniedApprove(System.Guid,System.String)">
+            <summary>
+            Denie Approve Advance
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Denie Approve</param>
+            <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetInfoApproveAdvanceByAdvanceNo(System.String)">
+            <summary>
+            Get information approve advance by advanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancesOfShipment(System.String,System.Guid,System.String)">
+            <summary>
+            Get list advance of shipment
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePayment(System.Collections.Generic.List{System.String})">
+            <summary>
+            Get advances to unlock
+            </summary>
+            <param name="keyWords"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UnLock(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.LockedLogModel})">
+            <summary>
+            Unlock advance
+            </summary>
+            <param name="advancePayments"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DetailAdvancePaymentExport(System.Guid,System.String)">
+            <summary>
+            Export advance payment by advance id
+            </summary>
+            <param name="advanceId">Id of advance payment</param>
+            <param name="language"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.RecallRequest(System.Guid)">
+            <summary>
+            Recall Request Advance 
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UpdatePaymentVoucher(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Update Approve Advance
+            </summary>
+            <param name="model">advanceIds that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckExistedVoucherInAdvance(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccAdvancePaymentUpdateVoucher})">
+            <summary>
+            Get advances to unlock
+            </summary>
+            <param name="lstVoucher"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DownloadExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctCombineBillingController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAcctCombineBillingService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="hostingEnvironment"></param>
+            <param name="accService"></param>
+            <param name="currUser"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctCombineBillingCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Accounting Management by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.Add(eFMS.API.Accounting.DL.Models.AcctCombineBillingModel)">
+            <summary>
+            Add new Combine Billing Data
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.Update(eFMS.API.Accounting.DL.Models.AcctCombineBillingModel)">
+            <summary>
+            Add new Combine Billing Data
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.CheckExisting(System.Guid)">
+            <summary>
+            Check combine billing is existed
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.Delete(System.Nullable{System.Guid})">
+            <summary>
+            Delete combine billing
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GenerateHBLSeaExport">
+            <summary>
+            Generate billing no
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.CheckDocumentNoExisted(eFMS.API.Accounting.DL.Models.Criteria.ShipmentCombineCriteria)">
+            <summary>
+            Check Esiting Combine No With Document No
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail
+            </summary>
+            <param name="id">Id of combine</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetListShipmentInfo(eFMS.API.Accounting.DL.Models.Criteria.ShipmentCombineCriteria)">
+            <summary>
+            Get list charge shipment by conditions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetDetailByCombineId(System.String)">
+            <summary>
+            get detail combine
+            </summary>
+            <param name="id">id of combine</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.PreviewCombineDebitTemplate(eFMS.API.Accounting.DL.Models.AcctCombineBillingModel)">
+            <summary>
+            Preview As Debit Template
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
+            <summary>
+            Get detail receipt
+            </summary>
+            <param name="id">id of receipt</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CancelReceipt(System.Guid)">
+            <summary>
+            Update Cancel Receipt
+            </summary>
+            <param name="id">id of receipt</param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveReceipt(eFMS.API.Accounting.DL.Models.AcctReceiptModel,eFMS.API.Accounting.DL.Models.SaveAction)">
+            <summary>
+            Save Receipt
+            </summary>
+            <param name="receiptModel"></param>
+            <param name="saveAction">
+            0 - Save Draft - Add
+            1 - Save Draft - Update
+            2 - Save Done
+            3 - Save Cancel
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueCustomerPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueAgencyPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetAll">
+            <summary>
+            Get all settlement payment
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Settlement Payment by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
+            <summary>
+            Query data
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">
+            <summary>
+            Get list shipment of settlement payment list by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check allow delete settlement payment
+            </summary>
+            <param name="id">Id of settlement payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail settlement payment
+            </summary>
+            <param name="id">Id of settlement payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Delete(System.String)">
+            <summary>
+            delete an settlement payment existed item
+            </summary>
+            <param name="settlementNo">settlementNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDetailSettlementPaymentById(System.Guid)">
+            <summary>
+            Get details settlement payment by settlementId
+            </summary>
+            <param name="settlementId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String,System.String)">
+            <summary>
+            Get Payment Management By Shipment
+            </summary>
+            <param name="JobId"></param>
+            <param name="MBL"></param>
+            <param name="HBL"></param>
+            <param name="requester"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria,System.String)">
+            <summary>
+            Get exists charge by shipment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckDuplicateShipmentSettlement(eFMS.API.Accounting.DL.Models.Criteria.CheckDuplicateShipmentSettlementCriteria)">
+            <summary>
+            Check duplicate shipment settlement
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Add(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            add new settlement payment
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Update(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Update Settlement Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.SaveAndSendRequest(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.UpdateApprove(System.Guid)">
+            <summary>
+            Update Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.DeniedApprove(System.Guid,System.String)">
+            <summary>
+            Denie Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Denie Approve</param>
+            <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetInfoApproveSettlementBySettlementNo(System.String)">
+            <summary>
+            Get information approve settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve approve settlement</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String)">
+            <summary>
+            Preview Settlement 
+            </summary>
+            <param name="settlementNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListSceneChargeSettlementBySettlementNo(System.String)">
+            <summary>
+            Get list scene charge of settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve list scene charge</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CopyCharges(eFMS.API.Accounting.DL.Models.Criteria.ShipmentsCopyCriteria)">
+            <summary>
+            Copy Charge from Settlement old to settlement new
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetSettlePayments(System.Collections.Generic.List{System.String})">
+            <summary>
+            Get settle payment to unlock
+            </summary>
+            <param name="keyWords"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.UnLock(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.LockedLogModel})">
+            <summary>
+            Unlock settlement payment
+            </summary>
+            <param name="settlePayments"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.DetailSettlementPaymentExport(System.Guid)">
+            <summary>
+            Export detail settlement payment by settlement id
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GeneralSettlementPaymentExport(System.Guid)">
+            <summary>
+            Get data for General Preview
+            </summary>
+            <param name="settlementId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String[])">
+             <summary>
+            Settlement export List within Shipment.
+             </summary>
+             <param name="settlementNoList"></param>
+             <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPartnerForSettlement(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+            <summary>
+            Get partners map from soa or cd note (from shipment and type = credit)
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckSoaCDNoteIsSynced(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+            <summary>
+            Check if soa or cd note existed synced charges
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String,System.String)">
+            <summary>
+            Get List AdvanceNo For Shipment
+            </summary>
+            <param name="hblId"></param>
+            <param name="payeeId">use in get existing charge</param>
+            <param name="requester">use in get existing charge</param>
+            <param name="settlementCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDataExportSettlementDetail(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
+             <summary>
+            Settlement export List within Shipment.
+             </summary>
+             <param name="criteria"></param>
+             <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.AddNew(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
+            <summary>
+            add new SOA
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.UpdateSOA(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
+            <summary>
+            Update SOA
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CheckAllowDelete(System.String)">
+            <summary>
+            Check allow delete SOA
+            </summary>
+            <param name="soaId">Id of SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CheckAllowDetail(System.String)">
+            <summary>
+            Check allow detail SOA
+            </summary>
+            <param name="soaId">Id of SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="soaId">Id of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of SOA by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria)">
+            <summary>
+            get list soa by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetBySoaNoAndCurrencyLocal(System.String,System.String)">
+            <summary>
+            get SOA by soaNo and currencyLocal
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetListStatusSoa">
+            <summary>
+            get list status of soa
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetShipmentsAndCDdNotesNotExistInResultFilter(eFMS.API.Accounting.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            Get list shipment(JobId, HBL, MBL) and list CDNotes(CreditDebitNo) not exist in result filter
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetListMoreChargeByCondition(eFMS.API.Accounting.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            get list more charge not exists in list charge on form Info
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.AddMoreCharge(eFMS.API.Accounting.DL.Models.Criteria.AddMoreChargeCriteria)">
+            <summary>
+            add more charge
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOABySOANo(System.String,System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportImportBravoFromSOA(System.String)">
+            <summary>
+            Export Import Bravo From SOA
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportAirFrieghtBySOANo(System.String,System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="officeId">soaNo that want to retrieve officeId</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOASupplierAirFrieghtBySOANo(System.String,System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="officeId">soaNo that want to retrieve officeId</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOAOPSBySOANo(System.String)">
+            <summary>
+            Export SOA OPS by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="type">soaNo that want to retrieve SOA</param>
+            
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ExportDetailSOA(eFMS.API.Accounting.DL.Models.Criteria.ExportDetailSOACriteria)">
+            <summary>
+            Data Export Details SOA
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ListChargeShipment(eFMS.API.Accounting.DL.Models.Criteria.ChargeShipmentCriteria)">
+            <summary>
+            Get list charge shipment by conditions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.PreviewAccountStatementFull(System.String)">
+            <summary>
+            Preview Account Statement Full By SOA No
+            </summary>
+            <param name="soaNo">Soa No</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.RejectSoaCredit(eFMS.API.Accounting.DL.Models.RejectSoaModel)">
+            <summary>
+            Reject SOA type Credit
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

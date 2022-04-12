@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string No { get; set; }
+        public bool IsDisplayLogo { get; set; }
         public List<ExportCombineOPS> exportOPS { get; set; }
     }
 }

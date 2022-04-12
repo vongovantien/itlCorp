@@ -14,7 +14,9 @@ export const environment = {
     SETTING: "api-efms.itlvn.com/Setting",
     INDENTITY_SERVER_URL: "https://api-efms.itlvn.com/identityserver",
     EXPORT_CRYSTAL: "https://api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
-    PARTNER_API: "api-efms.itlvn.com/partner"
+    PARTNER_API: "api-efms.itlvn.com/partner",
+    FILE_SYSTEM: "api-efms.itlvn.com/File",
+    REPORT_MANAGEMENT: "api-efms.itlvn.com/Report"
   },
   AUTHORIZATION:
   {

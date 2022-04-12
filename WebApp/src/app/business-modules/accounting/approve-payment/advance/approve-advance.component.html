@@ -72,7 +72,8 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [state]="'read'"> </adv-payment-list-request>
+                    <adv-payment-list-request *ngIf="!isAdvCarrier" [state]="'read'"> </adv-payment-list-request>
+                    <list-advance-payment-carrier *ngIf="isAdvCarrier" [state]="'read'"></list-advance-payment-carrier>
                 </div>
             </div>
         </div>
@@ -132,12 +133,10 @@
                                     <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
                                             single</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('VN')">Preview multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('ENG')">Preview multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Preview Payment SOA Template</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print Payment SOA Template</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'preview')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG', 'preview')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'download')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG', 'download')">Print multiple (ENG)</a>
                                     </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">

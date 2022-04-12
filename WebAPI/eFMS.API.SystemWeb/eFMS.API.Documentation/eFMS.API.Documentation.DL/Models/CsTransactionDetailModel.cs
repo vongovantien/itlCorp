@@ -38,6 +38,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string ShipmentPIC { get; set; }
         public string JobNo { get; set; }
         public string DeptSign { get; set; }
+        public string UserNameCreated { get; set; }
+        public string UserNameModified { get; set; }
 
         public PermissionAllowBase Permission { get; set; }
     }

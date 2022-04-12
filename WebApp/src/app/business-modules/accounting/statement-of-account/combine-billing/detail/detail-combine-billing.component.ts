@@ -127,7 +127,7 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
         catchError(this.catchError),
         concatMap((rs: any) => {
           if (!rs.status) {
-            this._toastService.warning('Document No was existed on list as below "' + rs.message + '" Please you check again!');
+            this._toastService.warning('Document No "' + rs.message + '". Please you check again!');
           }
           return this._accountingRepo.getListShipmentInfo(body);
         })
@@ -138,7 +138,8 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
           return of(false);
         }
         if (!!res) {
-          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) => res.shipments.map((sh) => sh.refno).indexOf(item.refno) === -1);
+          this.combineBillingListDetail.shipments = this.combineBillingListDetail.originShipments.filter((item: any) =>
+            res.shipments.map((s: any) => s.refno + s.hblid).indexOf(item.refno + item.hblid) === -1);
           this.combineBillingListDetail.shipments = [...this.combineBillingListDetail.shipments, ...res.shipments];
           this.combineBillingListDetail.originShipments = this.combineBillingListDetail.shipments;
           this.combineBillingListDetail.calculateSumTotal();
@@ -244,7 +245,11 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
 
   exportCombineOps() {
     this._progressRef.start();
-    this._exportRepo.exportCombineOps(this.detailCombine.combineBillingNo)
+    let criteriaExport: any = {
+      referenceNo: []
+    };
+    criteriaExport.referenceNo.push(this.detailCombine.combineBillingNo);
+    this._exportRepo.exportCombineOps(criteriaExport)
       .pipe(
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())
@@ -270,7 +275,6 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
       .subscribe(
         (res: any) => {
           this.dataReport = res;
-          debugger
           if (this.dataReport != null && res.dataSource.length > 0) {
             setTimeout(() => {
               this.previewPopup.frm.nativeElement.submit();

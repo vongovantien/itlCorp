@@ -96,6 +96,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     isLoadingPort: Observable<boolean>;
     isSubmited: boolean = false;
 
+    dateTimeCreated: string;
+    dateTimeModified: string;
+    userCreated: string;
+    userModified: string;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -123,6 +128,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                 (res: CsTransaction) => {
                     this.shipmentDetail = res;
                     this.jobId = this.shipmentDetail.id;
+                    this.dateTimeCreated=res.datetimeCreated;
+                    this.dateTimeModified=res.datetimeModified;
+                    this.userCreated=res.userNameCreated;
+                    this.userModified=res.userNameModified;
                     if (!this.isUpdate) {
                         const formData = {
                             masterBill: this.shipmentDetail.mawb,
@@ -206,14 +215,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             pod: [null, Validators.required],
             supplier: [],
             placeOfIssues: [],
-            masterBill: ['',
-
-                Validators.required
-            ],
-            hbOfladingNo: ['',
-
-                Validators.required
-            ],
+            masterBill: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
+            hbOfladingNo: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             hbOfladingType: [null,
                 Validators.required],
             finalDestination: [
