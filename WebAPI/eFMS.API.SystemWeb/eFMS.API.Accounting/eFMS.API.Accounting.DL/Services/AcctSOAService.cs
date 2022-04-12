@@ -506,7 +506,7 @@ namespace eFMS.API.Accounting.DL.Services
             surchargeSoaUpdMng = new List<CsShipmentSurcharge>();
             // Get orgin list surcharge in soa with credit type
             var surchargesUpdateSoa = new List<CsShipmentSurcharge>();
-            if (action != "New")
+            if (action != "Add")
             {
                 //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
                 var clearChargeOld = ClearSoaCharge(model.Soano, model.Type, "ClearChargeOldUpdateSOA", out surchargesUpdateSoa);
@@ -530,7 +530,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
                         surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                        if (action == "New")
+                        if (action == "Add")
                         {
                             //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             surcharge.FinalExchangeRate = null;
@@ -573,7 +573,7 @@ namespace eFMS.API.Accounting.DL.Services
                         _creditAmount += _amount;
                     }
 
-                    if (action != "New")
+                    if (action != "Add")
                     {
                         // Update combine no for old charges
                         var oldCharge = surchargesUpdateSoa.Where(x => x.Hblid == surcharge.Hblid && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo))).FirstOrDefault();
@@ -611,14 +611,16 @@ namespace eFMS.API.Accounting.DL.Services
                     surchargesSoa.Add(surcharge);
                     surchargeSoaUpdMng.Add(surchargeCopy);
                 }
-                var soaUpd = new AcctSoa();
-                soaUpd.Soano = soa.Soano;
-                soaUpd.DebitAmount = _debitAmount;
-                soaUpd.CreditAmount = _creditAmount;
-                var updSoa = DataContext.Update(soaUpd, x => x.Soano == soaUpd.Soano);
+                var soaUpd = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
+                if (soaUpd != null)
+                {
+                    soaUpd.DebitAmount = _debitAmount;
+                    soaUpd.CreditAmount = _creditAmount;
+                    var updSoa = DataContext.Update(soaUpd, x => x.Id == soaUpd.Id);
+                }
 
                 updateChargeSoa = UpdateSoaCharge(soa.Soano, surchargesSoa, action);
-                if (action != "New")
+                if (action != "Add")
                 {
                     if (updateChargeSoa.Success) // update data combine billing
                     {
