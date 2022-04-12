@@ -3455,29 +3455,46 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.SyncedFrom = charge.SyncedFrom;
                 data.VatPartnerName = detailLookupPartner[charge.VatPartnerID].FirstOrDefault()?.ShortName;
-                data.BillNoSynced = getBillNoSynced(charge.SurChargeId);
+                data.BillNoSynced = getBillNoSynced(charge);
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
         }
 
-        private string getBillNoSynced(Guid surChargeid)
+        private string getBillNoSynced(sp_GetDataExportAccountant charge)
         {
-            var Soano = surCharge.Get(x => x.Id == surChargeid).FirstOrDefault()?.Soano;
-            var SettlementCode = surCharge.Get(x => x.Id == surChargeid).FirstOrDefault()?.SettlementCode;
-            if (Soano == null && SettlementCode != null)
-            {
-                return SettlementCode;
+            //if ((Soano == null && paySoaNo==null) && SettlementCode != null)
+            //{
+            //    return SettlementCode;
+            //}
+            //if (SettlementCode == null && Soano != null)
+            //{
+            //    return Soano;
+            //}
+            //if(SettlementCode == null && Soano == null && paySoaNo == null)
+            //{
+            //    return "";
+            //}
+            //return SettlementCode + (Soano!=null?Soano:paySoaNo);
+            if(charge.SyncedFrom== "SETTLEMENT") {
+                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().SettlementCode;
             }
-            if (SettlementCode == null && Soano != null)
+            else if(charge.SyncedFrom == "SOA")
             {
-                return Soano;
+                if (charge.Type == "OBH")
+                {
+                    return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().PaySoano;
+                }
+                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().Soano;
             }
-            if(SettlementCode == null && Soano == null)
+            else if(charge.SyncedFrom == "VOUCHER")
             {
-                return "";
+                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().VoucherId;
+            }else if(charge.SyncedFrom == "CDNOTE")
+            {
+                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().CreditNo;
             }
-            return SettlementCode + Soano;
+            return "";
         }
         #endregion -- Export Accounting PL Sheet --
 
