@@ -3,31 +3,29 @@ import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { DocumentationRepo, ExportRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, switchMap, filter, takeUntil } from 'rxjs/operators';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { AccountingConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
+import { of } from 'rxjs';
+import { getCurrentUserState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
 })
 export class OpsCdNoteDetailPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent) cdNoteEditPopupComponent: OpsCdNoteAddPopupComponent;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
-    @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
-    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) public viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = null;
     cdNote: string = null;
-    confirmMessage: string = '';
     typeConfirm: string = '';
     isHouseBillID: boolean = true;
 
@@ -48,7 +46,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
         private _accountantRepo: AccountingRepo,
-        private _spinner: NgxSpinnerService,
+        private _store: Store<IAppState>
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -138,11 +136,14 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
-                        this.typeConfirm = "DELETE";
-                        this.confirmCdNotePopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`,
+                            labelConfirm: 'Ok'
+                        }, () => { this.deleteCdNote() });
                     } else {
-                        this.canNotDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'You can not delete this Credit/Debit Note. Please recheck!'
+                        });
                     }
                 },
             );
@@ -150,12 +151,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmCdNotePopup.hide();
-                })
-            ).subscribe(
+            .subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
@@ -197,7 +193,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     renderAndShowReport() {
         // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
 
         this.showReport();
@@ -205,52 +201,98 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
             (v: any) => {
                 this.subscription.unsubscribe();
-                this.reportContainerRef.viewContainerRef.clear();
+                this.viewContainerRef.viewContainerRef.clear();
             });
     }
 
     preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
+        let previewSource$ = null;
+        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
+            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
+                .pipe(
+                    switchMap((res: any) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+                )
+        } else {
+            previewSource$ = this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin);
+        }
+        previewSource$
             .subscribe(
                 (res: any) => {
-                    if (res != null && res.dataSource.length > 0) {
-                        this.dataReport = res;
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                    if (res !== false) {
+                        if (res != null && res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
     }
 
     exportCDNote() {
-        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
-        this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, userLogged.officeId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (response: ArrayBuffer) => {
+        let exportSource$ = null;
+        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
+            exportSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
+                .pipe(
+                    switchMap((res: any) => {
+                        if (res.status) {
+                            return this._store.select(getCurrentUserState)
+                                .pipe(
+                                    filter((c: any) => !!c.userName),
+                                    switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+                                        if (!!currentUser.userName) {
+                                            return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
+                                        }
+                                    }),
+                                    takeUntil(this.ngUnsubscribe),
+                                ) as any;
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+                )
+        } else {
+            exportSource$ = this._store.select(getCurrentUserState)
+                .pipe(
+                    filter((c: any) => !!c.userName),
+                    switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+                        if (!!currentUser.userName) {
+                            return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
+                        }
+                    }),
+                    takeUntil(this.ngUnsubscribe),
+                ) as any;
+        }
+        exportSource$.subscribe(
+            (response: ArrayBuffer | any) => {
+                if (response !== false) {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
                     } else {
                         this._toastService.warning('No data found');
                     }
-                },
-            );
+                }
+
+            },
+        );
     }
 
     confirmSendToAcc() {
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
-        this.typeConfirm = "CONFIRMED";
-        this.confirmCdNotePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure you want to send data to accountant system?',
+            labelConfirm: 'Ok'
+        }, () => {
+            this.syncCdNote();
+        });
     }
 
     showConfirmed() {
@@ -265,7 +307,10 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                         } else {
                             this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
-                        this.validateSyncedPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: this.messageValidate
+                        })
+
                     } else {
                         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
                             this.paymentMethodPopupComponent.show();
@@ -283,16 +328,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         this.confirmSendToAcc();
     }
 
-    onConfirmCdNote() {
-        if (this.typeConfirm === "DELETE") {
-            this.deleteCdNote();
-        } else if (this.typeConfirm === "CONFIRMED") {
-            this.syncCdNote();
-        }
-    }
-
     syncCdNote() {
-        this.confirmCdNotePopup.hide();
         const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
@@ -301,10 +337,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             paymentMethod: this.paymentMethodSelected
         };
         cdNoteIds.push(cdNoteId);
-        this._spinner.show();
         this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
             .pipe(
-                finalize(() => this._spinner.hide()),
                 catchError(this.catchError),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
@@ -324,12 +358,27 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
-        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
+        let previewSource$ = null;
+        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
+            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
+                .pipe(
+                    switchMap((res: any) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                        }
+                        this._toastService.warning(res.message);
+                        return of(null);
+                    })
+                )
+        } else {
+            previewSource$ = this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+        }
+
+        previewSource$
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (res != null && res.dataSource.length > 0) {
+                    if (res != null && res?.dataSource.length > 0) {
+                        this.dataReport = res;
                         this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');

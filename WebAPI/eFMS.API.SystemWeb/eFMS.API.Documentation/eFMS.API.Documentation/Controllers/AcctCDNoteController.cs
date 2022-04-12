@@ -52,18 +52,18 @@ namespace eFMS.API.Documentation.Controllers
             currentUser.Action = "AddNewCDNote";
             if (!ModelState.IsValid) return BadRequest();
 
-            if(model.Type != DocumentConstants.CDNOTE_TYPE_CREDIT)
-            {
-                string transctionType = model.TransactionTypeEnum == TransactionTypeEnum.CustomLogistic ? "CL" : "DOC";
-                Guid _hblId = model.listShipmentSurcharge.First()?.Hblid ?? Guid.Empty;
+            //if(model.Type != DocumentConstants.CDNOTE_TYPE_CREDIT)
+            //{
+            //    string transctionType = model.TransactionTypeEnum == TransactionTypeEnum.CustomLogistic ? "CL" : "DOC";
+            //    Guid _hblId = model.listShipmentSurcharge.First()?.Hblid ?? Guid.Empty;
 
-                HandleState validatePartnerCheckpoint = checkPointService.ValidateCheckPointPartnerDebitNote(model.PartnerId, _hblId, transctionType);
+            //    HandleState validatePartnerCheckpoint = checkPointService.ValidateCheckPointPartnerDebitNote(model.PartnerId, _hblId, transctionType);
 
-                if(validatePartnerCheckpoint.Success == false)
-                {
-                    return Ok(new ResultHandle { Status = validatePartnerCheckpoint.Success, Message = validatePartnerCheckpoint.Message?.ToString() });
-                }
-            }
+            //    if(validatePartnerCheckpoint.Success == false)
+            //    {
+            //        return Ok(new ResultHandle { Status = validatePartnerCheckpoint.Success, Message = validatePartnerCheckpoint.Message?.ToString() });
+            //    }
+            //}
           
             HandleState hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);

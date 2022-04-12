@@ -2,7 +2,7 @@ import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, switchMap } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
+import { of } from "rxjs";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
@@ -235,43 +236,77 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     previewSeaCdNote(data: string) {
-        this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
+        let previewSource$ = null;
+        if (this.CdNoteDetail?.cdNote?.type !== 'CREDIT') {
+            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'DOC')
+                .pipe(
+                    switchMap((res: any) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+                )
+        } else {
+            previewSource$ = this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+        }
+        previewSource$
             .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                (res: Crystal | any) => {
+                    if (res !== false) {
+                        if (res != null && res.dataSource.length > 0) {
+                            this.dataReport = JSON.stringify(res);
+                            setTimeout(() => {
+                                if (!this.popupReport.isShown) {
+                                    this.popupReport.config = this.options;
+                                    this.popupReport.show();
+                                }
+                                this.submitFormPreview();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
+
                 },
             );
     }
 
     previewAirCdNote(data: string) {
-        this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
+        let previewSource$ = null;
+        if (this.CdNoteDetail?.cdNote?.type !== 'CREDIT') {
+            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'DOC')
+                .pipe(
+                    switchMap((res: any) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+                )
+        } else {
+            previewSource$ = this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+        }
+        previewSource$
             .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                (res: Crystal | any) => {
+                    if (res !== false) {
+                        if (res != null && res.dataSource.length > 0) {
+                            this.dataReport = JSON.stringify(res);
+                            setTimeout(() => {
+                                if (!this.popupReport.isShown) {
+                                    this.popupReport.config = this.options;
+                                    this.popupReport.show();
+                                }
+                                this.submitFormPreview();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
+
                 },
             );
     }

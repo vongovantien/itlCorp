@@ -1,4 +1,5 @@
 ﻿
+using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using System;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType);
         HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode = "");
-        HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType);
+        HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
 
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);

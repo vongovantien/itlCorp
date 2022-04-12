@@ -182,10 +182,12 @@
                                         <span>{{item.vatrate}}</span>
                                     </td>
                                     <td class='m--align-right'>
-                                        <span>{{ item.currencyId ==='USD'? (item.credit | number:'1.2-2'):(item.credit | number:'1.0-0')}}</span>
+                                        <span>{{ item.currencyId ==='USD'? (item.credit | number:'1.2-2'):(item.credit |
+                                            number:'1.0-0')}}</span>
                                     </td>
                                     <td class='m--align-right'>
-                                        <span>{{ item.currencyId ==='USD'? (item.debit | number:'1.2-2'):(item.debit | number:'1.0-0')}}</span>
+                                        <span>{{ item.currencyId ==='USD'? (item.debit | number:'1.2-2'):(item.debit |
+                                            number:'1.0-0')}}</span>
                                     </td>
                                     <td>
                                         <span>{{item.notes}}</span>
@@ -263,12 +265,6 @@
 
 <ops-cd-note-add-popup (onUpdate)="onUpdateCdNote($event)"></ops-cd-note-add-popup>
 
-<confirm-popup (onSubmit)="onConfirmCdNote()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
-
-<info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
-
 <ng-template inject></ng-template>
 
 <payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>
-<info-popup #validateSyncedCDNotePopup [body]="messageValidate" [title]="'Alert'">
-</info-popup>

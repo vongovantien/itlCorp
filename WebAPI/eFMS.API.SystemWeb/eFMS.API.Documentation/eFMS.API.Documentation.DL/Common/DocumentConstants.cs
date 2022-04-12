@@ -101,6 +101,8 @@
         public static readonly string CDNOTE_TYPE_DEBIT = "DEBIT";
         public static readonly string CDNOTE_TYPE_CREDIT = "CREDIT";
         public static readonly string CDNOTE_TYPE_INVOICE = "INVOICE";
+        public static readonly string SOA_TYPE_DEBIT = "DEBIT";
+        public static readonly string SOA_TYPE_CREDIT = "CREDIT";
 
     }
 }

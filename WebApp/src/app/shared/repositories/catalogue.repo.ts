@@ -461,7 +461,7 @@ export class CatalogueRepo {
 
     getListPort(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body, null, { "hideSpinner": "true" }).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -537,7 +537,7 @@ export class CatalogueRepo {
 
     getPlace(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body, null, { "hideSpinner": "true" }).pipe(
                 map((res: any) => {
                     return res;
                 })

@@ -249,12 +249,21 @@ namespace eFMS.API.Documentation.DL.Services
             return hblIds;
         }
 
+        private CatContract GetContractByPartnerId(string partnerId)
+        {
+            CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
+           && x.Active == true
+            && (x.IsExpired == false || x.IsExpired == null))
+           .OrderBy(x => x.ContractType)
+           .FirstOrDefault();
+
+            return contract;
+        }
 
         public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
         {
             throw new NotImplementedException();
         }
-
 
         public HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType)
         {
@@ -263,20 +272,13 @@ namespace eFMS.API.Documentation.DL.Services
 
             string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
-            CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
-            && x.Active == true
-            /// && x.SaleManId != salemanBOD
-            && (x.IsExpired == false || x.IsExpired == null))
-            .OrderBy(x => x.ContractType)
-            // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
-            .FirstOrDefault();
-
+            CatContract contract = GetContractByPartnerId(partnerId);
             CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
+
             if (contract == null)
             {
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
             }
-
             if (contract.SaleManId == salemanBOD) return result;
 
             switch (contract.ContractType)
@@ -305,9 +307,40 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState ValidateCheckPointPartnerSOA(string partnerId, Guid HblId, string transactionType)
+        public HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa)
         {
-            throw new NotImplementedException();
+
+            HandleState result = new HandleState();
+            bool isValid = false;
+
+            if(soa.Type != DocumentConstants.SOA_TYPE_DEBIT)
+            {
+                return result;
+            }
+
+            CatContract contract = GetContractByPartnerId(partnerId);
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
+            }
+            if (contract.SaleManId == salemanBOD) return result;
+
+            switch (contract.ContractType)
+            {
+                case "Cash":
+                    isValid = false; // K cho gôm SOA debit hđ CASH
+                    break;
+                //case "Official":
+                //case "Trial":
+                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
+                // break;
+                default:
+                    isValid = true;
+                    break;
+            }
+
+            return result;
         }
 
         public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode)
@@ -315,15 +348,7 @@ namespace eFMS.API.Documentation.DL.Services
             HandleState result = new HandleState();
             bool isValid = false;
 
-            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
-
-            CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
-            && x.Active == true
-            /// && x.SaleManId != salemanBOD
-            && (x.IsExpired == false || x.IsExpired == null))
-            .OrderBy(x => x.ContractType)
-            // .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || c.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
-            .FirstOrDefault();
+            CatContract contract = GetContractByPartnerId(partnerId);
 
             CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
             if (contract == null)
