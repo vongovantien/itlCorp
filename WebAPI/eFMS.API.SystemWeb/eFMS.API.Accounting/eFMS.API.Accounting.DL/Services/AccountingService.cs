@@ -55,8 +55,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctReceiptSync> receiptSyncReposotory;
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
-
+        private readonly IContextBase<SysImage> sysFileRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
+   
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -67,7 +68,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IQueryable<CatCharge> charges;
         readonly IQueryable<CatChargeDefaultAccount> chargesDefault;
         readonly IQueryable<CatUnit> catUnits;
-
+        readonly IQueryable<SysImage> sysFiles;
 
         public AccountingService(
             ICurrencyExchangeService exchangeService,
@@ -105,6 +106,7 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
+            IContextBase<SysImage> sysFileRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -141,6 +143,7 @@ namespace eFMS.API.Accounting.DL.Services
             receiptSyncReposotory = receiptSyncRepo;
             emailSettingRepository = emailSettingRepo;
 
+            sysFileRepository = sysFileRepo;
             settlementPaymentService = settlementService;
             // ---
 
@@ -179,7 +182,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                              DocDate = ad.RequestDate.HasValue ? ad.RequestDate.Value.Date : ad.RequestDate, //Chỉ lấy Date (không lấy Time)
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
-                                                             PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod
+                                                             PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod,
+                                                             
                                                          };
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
@@ -206,6 +210,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (advRGrps.Count > 0)
                     {
                         item.Details = advRGrps;
+                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString());
                     }
                 }
                 result = data;
@@ -413,6 +418,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
+                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString());
 
                                 // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
                                 bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
@@ -592,6 +598,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
                 var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
 
+                var hblId = string.Empty;
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -711,8 +718,27 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.DueDate = _dueDate;
 
                     charges.Add(charge);
+
+                    if(string.IsNullOrEmpty(hblId))
+                    {
+                        hblId = surcharge.Hblid.ToString();
+                    }
+
                 }
+
                 sync.Details = charges;
+
+                CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
+                if (hbl != null)
+                {
+                    string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
+                    sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
+                        AttachDocDate = DateTime.Now,
+                        AttachDocName = cdNote.Code,
+                        AttachDocPath = webUrl.Value.Url.ToString() + "/en/#/" + urlPreviewCd,
+                        AttachDocRowId = cdNote.Id.ToString()
+                    }};
+                }
 
                 data.Add(sync);
             }
@@ -762,6 +788,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    string hblId = string.Empty;
+
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -845,8 +873,24 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.IsRefund = 0;
 
                         charges.Add(charge);
+                        if(string.IsNullOrEmpty(hblId))
+                        {
+                            hblId = surcharge.Hblid.ToString();
+                        }
                     }
                     sync.Details = charges;
+
+                    CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
+                    if (hbl != null)
+                    {
+                        string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
+                        sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
+                        AttachDocDate = DateTime.Now,
+                        AttachDocName = cdNote.Code,
+                        AttachDocPath = webUrl.Value.Url.ToString() + "/en/#/" + urlPreviewCd,
+                        AttachDocRowId = cdNote.Id.ToString()
+                    }};
+                    }
 
                     data.Add(sync);
                 }
@@ -1016,7 +1060,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charges.Add(charge);
                 }
                 sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
-
+                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
                 data.Add(sync);
             }
             return data;
@@ -1150,7 +1194,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charges.Add(charge);
                     }
                     sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
-
+                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
                     data.Add(sync);
                 }
             }
@@ -1673,7 +1717,7 @@ namespace eFMS.API.Accounting.DL.Services
             return customerName;
         }
 
-        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
+        private string  GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
@@ -3372,6 +3416,27 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return false;
+        }
+
+        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId)
+        {
+            List<BravoAttachDoc> results = new List<BravoAttachDoc>();
+
+            var files = sysFileRepository.Get(x => x.Folder == "Accounting/" + folder && x.ObjectId == objectId).ToList();
+            if(files.Count > 0)
+            {
+                files.ForEach(c =>
+                {
+                    results.Add(new BravoAttachDoc {
+                        AttachDocRowId = c.Id.ToString(),
+                        AttachDocName = c.Name,
+                        AttachDocPath = c.Url,
+                        AttachDocDate = c.DateTimeCreated
+                    });
+                });
+            }
+
+            return results;
         }
     }
 }

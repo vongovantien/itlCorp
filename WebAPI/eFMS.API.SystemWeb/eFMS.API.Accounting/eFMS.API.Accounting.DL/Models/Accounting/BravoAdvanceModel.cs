@@ -20,6 +20,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? DueDate { get; set; }
         public string PaymentMethod { get; set; }
         public List<BravoAdvanceRequestModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
 
     }
 
