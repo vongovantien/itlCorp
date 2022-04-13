@@ -484,5 +484,13 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportAcountingPayableStandart(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableStandartReport`, searchObject, null, {}, 'response');
+    }
+
+    exportAcountingTemplatePayable(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
+    }
 }
 

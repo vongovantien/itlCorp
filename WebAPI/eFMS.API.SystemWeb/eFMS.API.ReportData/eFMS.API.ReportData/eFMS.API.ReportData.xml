@@ -139,6 +139,20 @@
             <param name="key">String random</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableStandartReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableAcctTemplateReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -473,9 +487,9 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetARExcelFolder">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetFolderInTemplateExport(System.String)">
             <summary>
-            Get folder contain AR template excel
+            Get folder contain template excel
             </summary>
             <returns></returns>
         </member>
@@ -545,6 +559,15 @@
             Generate data to Export General Preview in Settlement detail
             </summary>
             <param name="settlementExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportAccountingPayableStandart(System.Collections.Generic.List{eFMS.API.ReportData.Models.Accounting.AcctPayablePaymentExport},eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria,System.String)">
+            <summary>
+            Generate Export Accounting Payable Standart Report
+            </summary>
+            <param name="acctPayables"></param>
+            <param name="criteria"></param>
             <param name="fileName"></param>
             <returns></returns>
         </member>
@@ -715,7 +738,7 @@
             <param name="nameList"></param>
             <param name="numberFormat"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String},System.Nullable{System.Int32})">
             <summary>
             Set formula for one cell
             </summary>
