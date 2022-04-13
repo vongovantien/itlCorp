@@ -188,8 +188,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     prepareDeleteSettle(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
-            .subscribe((value: boolean) => {
-                if (value) {
+            .subscribe((value: any) => {
+                if (value === 0) {
                     this.selectedSettlement = settlement;
 
                     this.showPopupDynamicRender<ConfirmPopupComponent>(
@@ -202,7 +202,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         this.deleteSettlement(this.selectedSettlement.settlementNo);
                     })
                 } else {
+                    if(value === 403){
                     this.permissionPopup.show();
+                    }else{
+                        this._toastService.error("Settlement have synced charges. Please re-check.");
+                    }
                 }
             });
     }
@@ -454,18 +458,35 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             return;
         }
 
-        const settleIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
-        if (!settleIds.length) {
+        let smIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
+        if (!smIds.length) {
             return;
         }
 
-        this.showPopupDynamicRender<ConfirmPopupComponent>(
-            ConfirmPopupComponent,
-            this.confirmPopupContainerRef.viewContainerRef,
-            { body: 'Are you sure you want to deny settle payments ?' },
-            (v: boolean) => {
-                this.onDenySettlePayments(settleIds);
-            });
+        this._accoutingRepo.checkAllowDenySettlement(smIds)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.error(`Settlement was delete, Please re-load page.`);
+                        return;
+                    }
+                    else {
+                        if(!!res.data){
+                            this._toastService.warning(res.message);
+                            smIds = smIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
+                        }
+                        if(smIds.length > 0){
+                            this.showPopupDynamicRender<ConfirmPopupComponent>(
+                                ConfirmPopupComponent,
+                                this.confirmPopupContainerRef.viewContainerRef,
+                                { body: 'Are you sure you want to deny settle payments ?' },
+                                (v: boolean) => {
+                                    this.onDenySettlePayments(smIds);
+                                });
+                        }
+                    }
+                },
+            )
     }
 
     onDenySettlePayments(settleIds: string[]) {

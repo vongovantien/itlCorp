@@ -389,6 +389,18 @@ export class AccountingRepo {
         );
     }
 
+    checkAllowUpdateDirectCharges(shipmentCharges: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowUpdateDirectCharges`, shipmentCharges).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDenySettlement(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDenySettle`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkAllowDeleteSOA(soaId: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDelete/${soaId}`).pipe(
             map((data: any) => data)

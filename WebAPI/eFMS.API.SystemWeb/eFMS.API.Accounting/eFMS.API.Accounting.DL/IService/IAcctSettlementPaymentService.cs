@@ -69,7 +69,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         bool CheckDeletePermissionBySettlementNo(string settlementNo);
 
-        bool CheckDeletePermissionBySettlementId(Guid settlementId);
+        int CheckDeletePermissionBySettlementId(Guid settlementId);
 
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
 
@@ -104,5 +104,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);
         List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
+
+        ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
+        ResultHandle CheckAllowDenySettle(List<Guid> ids);
     }
 }
