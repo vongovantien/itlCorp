@@ -659,7 +659,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria, "AP_Standart_Report.xlsx");
             if (stream == null) return null;
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APStandartReport");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "APStandartReport");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -692,9 +692,16 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateExportAccountingTemplateReport (dataObjects.Result, criteria, "AP_Account_Template.xlsx");
             if (stream == null) return null;
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APAccountReport");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "APAccountReport");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
+        }
+
     }
 }
