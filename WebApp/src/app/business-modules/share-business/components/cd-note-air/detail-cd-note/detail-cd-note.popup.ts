@@ -37,18 +37,13 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     isHouseBillID: boolean = false;
     transactionType: TransactionTypeEnum = 0;
 
-    headers: CommonInterface.IHeaderTable[];
-
     CdNoteDetail: any = null;
     totalCredit: string = '';
     totalDebit: string = '';
     balanceAmount: string = '';
 
-    dataReport: any = null;
-
     labelDetail: any = {};
     paymentMethodSelected: string = '';
-    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -236,77 +231,41 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     previewSeaCdNote(data: string) {
-        let previewSource$ = null;
-        if (this.CdNoteDetail?.cdNote?.type !== 'CREDIT') {
-            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'DOC')
-                .pipe(
-                    switchMap((res: any) => {
-                        if (res.status) {
-                            return this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-                        }
-                        this._toastService.warning(res.message);
-                        return of(false);
-                    })
-                )
-        } else {
-            previewSource$ = this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-        }
-        previewSource$
+        this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .subscribe(
                 (res: Crystal | any) => {
-                    if (res !== false) {
-                        if (res != null && res.dataSource.length > 0) {
-                            this.dataReport = JSON.stringify(res);
-                            setTimeout(() => {
-                                if (!this.popupReport.isShown) {
-                                    this.popupReport.config = this.options;
-                                    this.popupReport.show();
-                                }
-                                this.submitFormPreview();
-                            }, 1000);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = JSON.stringify(res);
+                        setTimeout(() => {
+                            if (!this.popupReport.isShown) {
+                                this.popupReport.config = this.options;
+                                this.popupReport.show();
+                            }
+                            this.submitFormPreview();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
-
                 },
             );
     }
 
     previewAirCdNote(data: string) {
-        let previewSource$ = null;
-        if (this.CdNoteDetail?.cdNote?.type !== 'CREDIT') {
-            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'DOC')
-                .pipe(
-                    switchMap((res: any) => {
-                        if (res.status) {
-                            return this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-                        }
-                        this._toastService.warning(res.message);
-                        return of(false);
-                    })
-                )
-        } else {
-            previewSource$ = this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-        }
-        previewSource$
+        this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .subscribe(
                 (res: Crystal | any) => {
-                    if (res !== false) {
-                        if (res != null && res.dataSource.length > 0) {
-                            this.dataReport = JSON.stringify(res);
-                            setTimeout(() => {
-                                if (!this.popupReport.isShown) {
-                                    this.popupReport.config = this.options;
-                                    this.popupReport.show();
-                                }
-                                this.submitFormPreview();
-                            }, 1000);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = JSON.stringify(res);
+                        setTimeout(() => {
+                            if (!this.popupReport.isShown) {
+                                this.popupReport.config = this.options;
+                                this.popupReport.show();
+                            }
+                            this.submitFormPreview();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
-
                 },
             );
     }
@@ -346,10 +305,11 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
+                        let messageValidate = '';
                         if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
                         this.validateSyncedPopup.show();
                     } else {

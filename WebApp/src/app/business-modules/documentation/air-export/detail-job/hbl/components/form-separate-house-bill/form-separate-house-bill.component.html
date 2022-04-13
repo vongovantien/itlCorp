@@ -23,9 +23,12 @@
         <air-export-hbl-form-create [isUpdate]="true"></air-export-hbl-form-create>
     </div>
 </div>
+
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB Separate'"></info-popup>
-<attach-list-house-bill style="display:none;"></attach-list-house-bill>
+
+<ng-template inject></ng-template>

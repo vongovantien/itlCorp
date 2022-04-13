@@ -5,19 +5,20 @@ import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { CsTransactionDetail, HouseBill } from '@models';
-import { ReportPreviewComponent } from '@common';
+import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
-import { SystemConstants, ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
 import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { merge } from 'rxjs';
-import { catchError, takeUntil, skip, tap } from 'rxjs/operators';
+import { merge, of } from 'rxjs';
+import { catchError, takeUntil, skip, tap, switchMap, filter } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -103,12 +104,20 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             );
     }
 
+    confirmSaveHBL() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update HBL',
+            body: 'You are about to update HBL. Are you sure all entered details are correct?'
+        }, () => { this.saveHBL() });
+    }
+
     saveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            });
             return;
         } else {
             this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
@@ -118,13 +127,15 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 .subscribe(
                     (res: any) => {
                         if (!!res && res.length > 0) {
-                            this.infoPopupHbl.class = 'bg-danger';
                             let jobNo = '';
                             res.forEach(element => {
                                 jobNo += element + '<br>';
                             });
-                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
-                            this.infoPopupHbl.show();
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'HAWB No Existed',
+                                body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                                class: 'bg-danger'
+                            });
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
@@ -138,7 +149,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     confirmUpdateData() {
-        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
 
         this.setDataToUpdate(modelUpdate);
@@ -194,51 +204,83 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     preview(reportType: string, separateId?: string) {
         const id = !separateId ? this.hblId : separateId;
-        this._documentationRepo.previewHouseAirwayBillLastest(id, reportType)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewHouseAirwayBillLastest(id, reportType);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
     }
 
     previewAttachList() {
-        this._documentationRepo.previewAirAttachList(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirAttachList(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
     }
 
     exportNeutralHawb() {
-        const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this._exportRepo.exportHawbAirwayBill(this.hblId, userLogged.officeId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._store.select(getCurrentUserState)
+                            .pipe(
+                                filter((c: any) => !!c.userName),
+                                switchMap((currentUser: SystemInterface.IClaimUser) => {
+                                    if (!!currentUser.userName) {
+                                        return this._exportRepo.exportHawbAirwayBill(this.hblId, currentUser.officeId)
+                                    }
+                                }),
+                                takeUntil(this.ngUnsubscribe),
+                            )
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
-                    } else {
-                        this._toastService.warning('There is no neutral hawb data to print', '');
+                (response: ArrayBuffer | any) => {
+                    if (response !== false) {
+                        if (response.byteLength > 0) {
+                            this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                        } else {
+                            this._toastService.warning('There is no neutral hawb data to print', '');
+                        }
                     }
                 },
             );

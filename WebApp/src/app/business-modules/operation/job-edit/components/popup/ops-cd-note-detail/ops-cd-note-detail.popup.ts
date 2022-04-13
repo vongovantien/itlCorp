@@ -11,7 +11,6 @@ import { AccountingConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
-import { of } from 'rxjs';
 import { getCurrentUserState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 @Component({
@@ -29,16 +28,12 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     typeConfirm: string = '';
     isHouseBillID: boolean = true;
 
-    headers: CommonInterface.IHeaderTable[];
-
     CdNoteDetail: any = null;
     totalCredit: string = '';
     totalDebit: string = '';
     balanceAmount: string = '';
 
-    dataReport: any = null;
     paymentMethodSelected: string = '';
-    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -208,82 +203,38 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     preview(isOrigin: boolean) {
         this.CdNoteDetail.totalCredit = this.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
         this.CdNoteDetail.totalDebit = this.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        let previewSource$ = null;
-        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
-            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
-                .pipe(
-                    switchMap((res: any) => {
-                        if (res.status) {
-                            return this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
-                        }
-                        this._toastService.warning(res.message);
-                        return of(false);
-                    })
-                )
-        } else {
-            previewSource$ = this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin);
-        }
-        previewSource$
+        this._documentationRepo.previewCDNote(this.CdNoteDetail, isOrigin)
             .subscribe(
                 (res: any) => {
-                    if (res !== false) {
-                        if (res != null && res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
+                    if (res != null && res?.dataSource?.length > 0) {
+                        this.dataReport = res;
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
     }
 
     exportCDNote() {
-        let exportSource$ = null;
-        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
-            exportSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
-                .pipe(
-                    switchMap((res: any) => {
-                        if (res.status) {
-                            return this._store.select(getCurrentUserState)
-                                .pipe(
-                                    filter((c: any) => !!c.userName),
-                                    switchMap((currentUser: SystemInterface.IClaimUser | any) => {
-                                        if (!!currentUser.userName) {
-                                            return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
-                                        }
-                                    }),
-                                    takeUntil(this.ngUnsubscribe),
-                                ) as any;
-                        }
-                        this._toastService.warning(res.message);
-                        return of(false);
-                    })
-                )
-        } else {
-            exportSource$ = this._store.select(getCurrentUserState)
-                .pipe(
-                    filter((c: any) => !!c.userName),
-                    switchMap((currentUser: SystemInterface.IClaimUser | any) => {
-                        if (!!currentUser.userName) {
-                            return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
-                        }
-                    }),
-                    takeUntil(this.ngUnsubscribe),
-                ) as any;
-        }
-        exportSource$.subscribe(
-            (response: ArrayBuffer | any) => {
-                if (response !== false) {
+        this._store.select(getCurrentUserState)
+            .pipe(
+                filter((c: any) => !!c.userName),
+                switchMap((currentUser: SystemInterface.IClaimUser) => {
+                    if (!!currentUser.userName) {
+                        return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
+                    }
+                }),
+                takeUntil(this.ngUnsubscribe),
+            ).subscribe(
+                (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
                     } else {
                         this._toastService.warning('No data found');
                     }
-                }
-
-            },
-        );
+                },
+            );
     }
 
     confirmSendToAcc() {
@@ -302,13 +253,14 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
+                        let messageValidate = '';
                         if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
                         this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                            body: this.messageValidate
+                            body: messageValidate
                         })
 
                     } else {
@@ -358,23 +310,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     }
 
     previewCdNote(data: string) {
-        let previewSource$ = null;
-        if (this.CdNoteDetail.cdNote?.type !== 'CREDIT') {
-            previewSource$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId, this.CdNoteDetail.listSurcharges[0].hblid, 'CL')
-                .pipe(
-                    switchMap((res: any) => {
-                        if (res.status) {
-                            return this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-                        }
-                        this._toastService.warning(res.message);
-                        return of(null);
-                    })
-                )
-        } else {
-            previewSource$ = this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-        }
-
-        previewSource$
+        this._documentationRepo.previewOPSCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
             .subscribe(
                 (res: any) => {
                     if (res != null && res?.dataSource.length > 0) {
