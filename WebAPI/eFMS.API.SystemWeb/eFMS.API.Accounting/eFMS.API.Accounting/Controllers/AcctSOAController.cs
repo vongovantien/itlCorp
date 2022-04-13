@@ -12,6 +12,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
 using System.Collections.Generic;
+using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -56,28 +57,28 @@ namespace eFMS.API.Accounting.Controllers
             currentUser.Action = "AddAcctSoaPayment";
             if (!ModelState.IsValid) return BadRequest();
             var hs = acctSOAService.AddSOA(model);
-            if (hs.Code == 403)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
 
-            //if (hs.Success)
-            //{
-            //    // Tính công nợ sau khi Add SOA thành công
-            //    acctSOAService.CalculatorReceivableSoa(model.Soano);
-            //}
-
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
+            ResultHandle result = new ResultHandle();
+            if (!hs.Status)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
-                return BadRequest(_result);
+                if (hs.Message == "403")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
+                result = new ResultHandle { Status = hs.Status, Message = hs.Message.ToString(), Data = model };
+                return BadRequest(result);
             }
             else
             {
+                result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
+                    if (hs.Data != null)
+                    {
+                        // Update table acctCreditManagementAR
+                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
+                    }
+
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
 
@@ -107,28 +108,26 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = acctSOAService.UpdateSOA(model);
-            if (hs.Code == 403)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
 
-            //if (hs.Success)
-            //{
-            //    // Tính công nợ sau khi Update SOA thành công
-            //    acctSOAService.CalculatorReceivableSoa(model.Soano);
-            //}
-
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
+            ResultHandle result = new ResultHandle();
+            if (!hs.Status)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
-                return BadRequest(_result);
+                if (hs.Message == "403")
+                {
+                    return BadRequest(new ResultHandle { Status = hs.Status, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
+                result = new ResultHandle { Status = hs.Status, Message = hs.Message.ToString(), Data = model };
+                return BadRequest(result);
             }
             else
             {
+                result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
+                    if (hs.Data != null)
+                    {
+                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
+                    }
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
 
@@ -180,31 +179,25 @@ namespace eFMS.API.Accounting.Controllers
             }
             var soaNo = acctSOAService.Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
             var hs = acctSOAService.DeleteSOA(soaId);
-            if (hs.Code == 403)
+
+            ResultHandle result = new ResultHandle { Status = hs.Status, Message = hs.Message };
+            if (!hs.Status)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
-
-            //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge (Đã xử lý bên trong hàm DeleteSOA)
-            //acctSOAService.UpdateSOASurCharge(soaNo);
-
-            //if (hs.Success)
-            //{
-            //    // Tính công nợ sau khi Delete SOA thành công
-                
-            //    acctSOAService.CalculatorReceivableSoa(soaNo);
-            //}
-
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
+                if (hs.Message == "403")
+                {
+                    return BadRequest(new ResultHandle { Status = hs.Status, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
                 return BadRequest(result);
             }
             else
             {
+                result = new ResultHandle { Status = hs.Status, Message = hs.Message };
                 Response.OnCompleted(async () =>
                 {
+                    if (hs.Data != null)
+                    {
+                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
+                    }
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(soaNo);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
 
