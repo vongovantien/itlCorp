@@ -54,6 +54,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -80,6 +81,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
@@ -106,6 +108,7 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctCombineBillingRepository = acctCombineBillingRepo;
+            acctApproveSettlementRepository = acctApproveSettlementRepo;
         }
 
         #region -- Insert & Update SOA
@@ -1241,7 +1244,18 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (obhSurcharges != null && surcharges != null)
                 {
-                    surcharges = surcharges.Union(obhSurcharges);
+                    // Filter phí OBH hiện trường nếu gom soa thì settle phải được approve bởi manager
+                    var chargesSoaDebitSettle = obhSurcharges.Where(x => x.IsFromShipment ==  false && x.PaymentObjectId == criteria.CustomerID && x.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano));
+                    var obhSurchargesApply = obhSurcharges.Except(chargesSoaDebitSettle);
+
+                    var settleInCharge = chargesSoaDebitSettle.Select(x => x.SettlementCode).ToList();
+                    var validSettleDebit = acctApproveSettlementRepository.Get(x => settleInCharge.Any(z => z == x.SettlementNo) && x.IsDeny == false && !string.IsNullOrEmpty(x.ManagerApr) && x.ManagerAprDate != null).Select(x => x.SettlementNo).ToList();
+                    if (chargesSoaDebitSettle.Count() > 0)
+                    {
+                        obhSurchargesApply = obhSurchargesApply.Union(chargesSoaDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
+                    }
+
+                    surcharges = surcharges.Union(obhSurchargesApply);
                 }
             }
             #endregion -- Get more OBH charge --

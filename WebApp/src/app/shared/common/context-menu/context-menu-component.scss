@@ -17,11 +17,15 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 13px;
         &:hover {
             background: #3966b6;
             color: #fff;
             &.disabled {
                 background: unset;
+            }
+            i {
+                color: #fff !important;
             }
         }
 

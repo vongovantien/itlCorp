@@ -16,6 +16,7 @@ using FMS.API.ReportData.Models.Accounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace eFMS.API.ReportData.Controllers
 {
@@ -193,6 +194,16 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.CustomerPaymentUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "Statement Of Receivable Customer Report",
+                ObjectParameter = JsonConvert.SerializeObject(paymentCriteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
 
@@ -501,6 +512,32 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export debit detail
+        /// </summary>
+        /// <param name="criteria">AccountReceivableCriteria</param>
+        /// <returns></returns>
+        [Route("ExportDebitDetail")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportDebitDetail(DebitDetailCriteria criteria)
+        {
+            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode+ "&overDueDay="+criteria.overDueDay;
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl+urlRequest);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<DebitDetail>>();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+
+            //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx",criteria.option);
+
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DebitDetail-eFMS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export detail settlement payment
         /// </summary>
         /// <param name="settlementId">Id of settlement payment</param>
@@ -591,6 +628,72 @@ namespace eFMS.API.ReportData.Controllers
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "SOA OPS.xlsx");
 
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Accounting Payable Standart Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportAccountingPayableStandartReport")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingPayableStandartReport(AccountPayableCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.APStandartReportUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "AP Standart Report",
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AcctPayablePaymentExport>>();
+
+            var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria, "AP_Standart_Report.xlsx");
+            if (stream == null) return null;
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APStandartReport");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Accounting Payable Standart Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportAccountingPayableAcctTemplateReport")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingPayableAcctTemplateReport(AccountPayableCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.APAcctTemplateReportUrl, accessToken);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "AP Standart Report",
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingTemplateExport>>();
+
+            var stream = new AccountingHelper().GenerateExportAccountingTemplateReport (dataObjects.Result, criteria, "AP_Account_Template.xlsx");
+            if (stream == null) return null;
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APAccountReport");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
     }

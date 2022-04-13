@@ -24,6 +24,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string PaymentMethod { get; set; }
         public decimal? PaymentTerm { get; set; }
         public List<BravoVoucherChargeModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
+
     }
 
     public class BravoVoucherChargeModel

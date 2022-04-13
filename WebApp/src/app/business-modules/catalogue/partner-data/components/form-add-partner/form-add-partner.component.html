@@ -139,7 +139,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label"> Internal Code </label>
-                        <input [attr.disabled]="isDisabledInternalCode ? 'disabled' : null" type="text"
+                        <input [attr.disabled]="isDisabledInternalCode||this.active.value === true ? 'disabled' : null" type="text"
                             name="internalCode" class="form-control" formControlName="internalCode" />
                     </div>
                 </div>

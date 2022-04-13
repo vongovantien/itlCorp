@@ -64,5 +64,9 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string PaySyncedFrom { get; set; }
         public string SyncedFromBy { get; set; }
         public string LinkChargeId { get; set; }
+        public bool? HasNotSynce { get; set; }
+        public bool? HadIssued { get; set; }
+        public bool? PayeeIssued { get; set; }
+        public bool? OBHPartnerIssued { get; set; }
     }
 }

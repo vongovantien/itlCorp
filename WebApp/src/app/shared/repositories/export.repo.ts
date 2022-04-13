@@ -460,6 +460,13 @@ export class ExportRepo {
         );
     }
 
+    exportAccountingReceivableDebitDetail(searchObject: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitDetail`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAgreementInfo(partnerSearchObj: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj);
     }
@@ -476,6 +483,14 @@ export class ExportRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    exportAcountingPayableStandart(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableStandartReport`, searchObject, null, {}, 'response');
+    }
+
+    exportAcountingTemplatePayable(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
     }
 }
 

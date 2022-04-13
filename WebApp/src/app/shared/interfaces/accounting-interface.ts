@@ -18,9 +18,9 @@ namespace AccountingInterface {
         agreementExpiredDay: string;
         salesmanId: string;
         officeId: string[];
-        fromOverdueDays:number;
-        toOverdueDays:number;
-        debitRate:number;
+        fromOverdueDays: number;
+        toOverdueDays: number;
+        debitRate: number;
         partnerType: string;
         officeIds: string[];
         staffs: string[];
@@ -50,5 +50,9 @@ namespace AccountingInterface {
     export interface IRequestStringType extends IRequestString {
         type: string;
         paymentMethod: string;
+    }
+
+    export interface IRequestFileType extends IRequestGuid {
+        fileName: string;
     }
 }

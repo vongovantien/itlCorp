@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string DataType { get; set; }
         public string EmailEInvoice { get; set; }
         public List<ChargeSyncModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
     }
 
     public class ChargeSyncModel
@@ -67,6 +68,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string DataType { get; set; }
         public string PaymentMethod { get; set; }
         public List<ChargeCreditSyncModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
     }
 
     public class ChargeCreditSyncModel

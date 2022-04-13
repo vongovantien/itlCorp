@@ -188,6 +188,9 @@
                             ]
                         },
                         "uat-debug": {
+                            "sourceMap": true,
+                            "extractCss": true,
+                            "namedChunks": true,
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/environment.ts",

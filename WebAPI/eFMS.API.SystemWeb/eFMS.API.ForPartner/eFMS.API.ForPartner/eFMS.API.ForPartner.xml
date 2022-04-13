@@ -9,7 +9,7 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.ForPartner.DL.IService.IActionFuncLogService,Microsoft.Extensions.Options.IOptions{eFMS.API.Common.ApiUrl})">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.ForPartner.DL.IService.IActionFuncLogService,eFMS.API.ForPartner.DL.IService.IAccountPayableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Common.ApiUrl})">
             <summary>
             Accounting Contructor
             </summary>
@@ -96,9 +96,54 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.InsertPayablePayment(System.Collections.Generic.List{eFMS.API.ForPartner.DL.Models.Payable.AccAccountPayableModel},System.String,System.String)">
+            <summary>
+            Ghi nhận công nợ phải trả
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey">API Key</param>
+            <param name="hash">Hash Value</param>s
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CancelPayablePayment(System.Collections.Generic.List{eFMS.API.ForPartner.DL.Models.Payable.CancelPayablePayment},System.String,System.String)">
+            <summary>
+            Hủy thanh toán giảm trừ công nợ phải trả
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.UpdateVoucherExpense(eFMS.API.ForPartner.DL.Models.VoucherExpense,System.String,System.String)">
             <summary>
             Cập nhật thông tin phiếu chi và số HT
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.CreateVoucher(eFMS.API.ForPartner.DL.Models.VoucherSyncCreateModel,System.String,System.String)">
+            <summary>
+            Cập nhật thông tin tạo voucher
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.UpdateVoucher(eFMS.API.ForPartner.DL.Models.VoucherSyncUpdateModel,System.String,System.String)">
+            <summary>
+            Cập nhật thông tin  voucher cho voucher dc sync từ efms
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.DeleteVoucher(eFMS.API.ForPartner.DL.Models.VoucherSyncDeleteModel,System.String,System.String)">
+            <summary>
+            Hóa voucher đc tạo từ bravo trước đó
             </summary>
             <param name="model"></param>
             <param name="apiKey"></param>
