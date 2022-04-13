@@ -33,6 +33,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string UserCreated { get; set; }
         public string SyncedFrom { get; set; }
         public string VatPartnerID { get; set; }
-
+        public string BillNoSynced { get; set; }
     }
 }

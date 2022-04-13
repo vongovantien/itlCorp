@@ -3455,47 +3455,48 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.SyncedFrom = charge.SyncedFrom;
                 data.VatPartnerName = detailLookupPartner[charge.VatPartnerID].FirstOrDefault()?.ShortName;
-                data.BillNoSynced = getBillNoSynced(charge);
+                //data.BillNoSynced = getBillNoSynced(charge);
+                data.BillNoSynced = charge.BillNoSynced;
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
         }
 
-        private string getBillNoSynced(sp_GetDataExportAccountant charge)
-        {
-            //if ((Soano == null && paySoaNo==null) && SettlementCode != null)
-            //{
-            //    return SettlementCode;
-            //}
-            //if (SettlementCode == null && Soano != null)
-            //{
-            //    return Soano;
-            //}
-            //if(SettlementCode == null && Soano == null && paySoaNo == null)
-            //{
-            //    return "";
-            //}
-            //return SettlementCode + (Soano!=null?Soano:paySoaNo);
-            if(charge.SyncedFrom== "SETTLEMENT") {
-                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().SettlementCode;
-            }
-            else if(charge.SyncedFrom == "SOA")
-            {
-                if (charge.Type == "OBH")
-                {
-                    return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().PaySoano;
-                }
-                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().Soano;
-            }
-            else if(charge.SyncedFrom == "VOUCHER")
-            {
-                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().VoucherId;
-            }else if(charge.SyncedFrom == "CDNOTE")
-            {
-                return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().CreditNo;
-            }
-            return "";
-        }
+        //private string getBillNoSynced(sp_GetDataExportAccountant charge)
+        //{
+        //    //if ((Soano == null && paySoaNo==null) && SettlementCode != null)
+        //    //{
+        //    //    return SettlementCode;
+        //    //}
+        //    //if (SettlementCode == null && Soano != null)
+        //    //{
+        //    //    return Soano;
+        //    //}
+        //    //if(SettlementCode == null && Soano == null && paySoaNo == null)
+        //    //{
+        //    //    return "";
+        //    //}
+        //    //return SettlementCode + (Soano!=null?Soano:paySoaNo);
+        //    if(charge.SyncedFrom== "SETTLEMENT") {
+        //        return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().SettlementCode;
+        //    }
+        //    else if(charge.SyncedFrom == "SOA")
+        //    {
+        //        if (charge.Type == "OBH")
+        //        {
+        //            return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().PaySoano;
+        //        }
+        //        return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().Soano;
+        //    }
+        //    else if(charge.SyncedFrom == "VOUCHER")
+        //    {
+        //        return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().VoucherId;
+        //    }else if(charge.SyncedFrom == "CDNOTE")
+        //    {
+        //        return surCharge.Get(x => x.Id == charge.SurChargeId).FirstOrDefault().CreditNo;
+        //    }
+        //    return "";
+        //}
         #endregion -- Export Accounting PL Sheet --
 
 
