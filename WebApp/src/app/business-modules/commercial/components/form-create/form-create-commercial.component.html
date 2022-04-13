@@ -12,21 +12,21 @@
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameEn.dirty) && !partnerNameEn.valid }">
                         <label required>English Name</label>
-                        <input type="text" class="form-control" formControlName="partnerNameEn">
+                        <input type="text" class="form-control" formControlName="partnerNameEn" [attr.disabled]="this.isActive === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || shortName.dirty) && !shortName.valid }">
                         <label required>ABBR Name</label>
-                        <input type="text" class="form-control" formControlName="shortName">
+                        <input type="text" class="form-control" formControlName="shortName" [attr.disabled]="this.isActive === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-8">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameVn.dirty) && !partnerNameVn.valid }">
                         <label required>Local Name</label>
-                        <input type="text" class="form-control" formControlName="partnerNameVn">
+                        <input type="text" class="form-control" formControlName="partnerNameVn" [attr.disabled]="this.isActive === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -36,7 +36,7 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                                 <label required class="form-control-label"> Partner Location </label>
                                 <ng-select (change)="selectedPartnerLocation($event)" [items]="partnerLocations"
-                                    class="custom" name="partnerLocation" [clearable]="false"
+                                    class="custom" name="partnerLocation" [clearable]="false" [readonly]="this.isActive === true ? true : false" 
                                     formControlName="partnerLocation" placeholder="Partner location">
                                 </ng-select>
                             </div>
@@ -88,7 +88,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: parentId.value, hardValue: parentName }"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="acRefCustomers | async"
                                     [displayFields]="displayFieldCustomer" placeholder="Select partner"
-                                    (remove)="resetFormControl(parentId);onRemove()" [disabled]="isBranchSub">
+                                    (remove)="resetFormControl(parentId);onRemove()" [disabled]="isBranchSub||(this.isActive === true ? true : false)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
