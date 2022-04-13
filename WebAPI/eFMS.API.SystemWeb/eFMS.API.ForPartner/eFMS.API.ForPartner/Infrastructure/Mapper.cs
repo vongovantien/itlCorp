@@ -19,6 +19,7 @@ namespace eFMS.API.ForPartner.Infrastructure
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
             CreateMap<CsShipmentSurcharge, ChargeInvoiceUpdateTable>();
             CreateMap<AccAccountingManagement, InvoiceTable>();
+            CreateMap<AccAccountPayablePayment, AccAccountPayablePayment>();
         }
     }
 }
