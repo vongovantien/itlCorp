@@ -5300,6 +5300,58 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
+        public Stream GenerateAccountingReceivableDebitDetail(List<DebitDetail> result, string fileName, string debitType)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 4;
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                //Set Title
+                excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                var rowStart = 4;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", i + 1);
+                    listKeyData.Add("BillingNo", item.BillingNo);
+                    listKeyData.Add("Type", item.Type);
+                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                    listKeyData.Add("TotalVND", item.TotalAmountVND);
+                    listKeyData.Add("TotalUSD", item.TotalAmountUSD);
+                    listKeyData.Add("PaidVND", item.PaidAmountVND);
+                    listKeyData.Add("PaidUSD", item.PaidAmountUSD);
+                    listKeyData.Add("UnpaidVND", item.UnpaidAmountVND);
+                    listKeyData.Add("UnpaidUSD", item.UnpaidAmountUSD);
+                    listKeyData.Add("OverdueDays", item.OverdueDays);
+                    listKeyData.Add("DueDate", item.PaymentDueDate);
+                    listKeyData.Add("Office", item.Code);
+                    listKeyData.Add("PaymentStatus", item.PaymentStatus);
+                    excel.SetData(listKeyData);
+                    rowStart++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+
+
+        }
+
         private void BindingDataAccoutingReceivableListOrtherExcel(ExcelWorksheet workSheet, List<AccountReceivableResultExport> acctMngts)
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
