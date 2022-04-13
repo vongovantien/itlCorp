@@ -43,6 +43,16 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
+        /// Get folder contain AR template excel
+        /// </summary>
+        /// <returns></returns>
+        private string GetARExcelFolder()
+        {
+            return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.AccountReceivablePath);
+        }
+
+
+        /// <summary>
         /// Get folder contain template excel
         /// </summary>
         /// <returns></returns>
