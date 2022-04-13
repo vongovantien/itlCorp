@@ -484,7 +484,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Delete Credit AR
             if (soa.Type == "Credit" && hs.Success)
             {
-                return new ResultHandle() { Status = true, Data = surcharges };
+                return new ResultHandle() { Status = true, Message = "Data delete success", Data = surcharges };
                 //UpdateAcctCreditManagement(surcharges, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Delete");
             }
             return new ResultHandle() { Status = true, Message = "Data delete success" };
