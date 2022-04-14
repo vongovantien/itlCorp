@@ -14,9 +14,10 @@ import { ICrystalReport } from '@interfaces';
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
+import { catchError, skip, takeUntil, tap, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-consol-export',
@@ -159,35 +160,52 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
     }
 
     preview(reportType: string) {
-        this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
+
                 },
             );
     }
 
     previewAttachList() {
-        this._documentationRepo.previewAirAttachList(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirAttachList(this.hblId);
                     }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+
                 },
             );
     }

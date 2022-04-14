@@ -14,8 +14,9 @@ import { delayTime } from '@decorators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { skip, catchError, takeUntil } from 'rxjs/operators';
+import { skip, catchError, takeUntil, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { of } from 'rxjs';
 
 
 enum HBL_TAB {
@@ -218,11 +219,16 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     preview(reportType: string) {
-        this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
@@ -241,11 +247,16 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency })
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency });
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
@@ -256,7 +267,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
-    showPreviewSignature(type: string, withSign: boolean){
+    showPreviewSignature(type: string, withSign: boolean) {
         this.isClickSubMenu = false;
         if (type === 'AUTHORIZE_LETTER1') {
             this.previewAuthorizeLetter1(withSign);
@@ -285,54 +296,83 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         //     this.previewAuthorizeLetter2();
         // }
     }
-    
+
     previewAuthorizeLetter2(withSign: boolean) {
-        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId, withSign)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId, withSign);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        this.dataReport = res;
+                        this.showReport();
+                    }
                 },
             );
     }
     previewAuthorizeLetter1(withSign: boolean) {
-        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        this.dataReport = res;
+                        this.showReport();
+                    }
                 },
             );
     }
 
     previewProofOfDelivery() {
-        this._documentationRepo.previewAirProofofDelivery(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirProofofDelivery(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        this.dataReport = res;
+                        this.showReport();
+                    }
                 },
             );
     }
 
     previewAirDocumentRelease() {
-        this._documentationRepo.previewAirDocumentRelease(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirDocumentRelease(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        this.dataReport = res;
+                        this.showReport();
+                    }
                 },
             );
     }

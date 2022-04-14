@@ -15,9 +15,10 @@ import { DataService } from '@services';
 import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { of } from 'rxjs/internal/observable/of';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -246,79 +247,134 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         }
     }
     previewProofOfDelivery() {
-        this._documentationRepo.previewProofofDelivery(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewProofofDelivery(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        }
                     }
                 },
             );
     }
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency });
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data charge to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
                     }
                 },
             );
     }
+
     previewDeliveryOrder() {
         if (this.hblDetail.deliveryOrderNo === null) {
             this._toastService.warning('There is no delivery order information. You must save delivery order information');
             return;
         }
-        this._documentationRepo.previewDeliveryOrder(this.hblId)
+
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewDeliveryOrder(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no container data to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.showReport();
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
                     }
                 },
             );
     }
+
     exportDangerousGoods() {
-        this._exportRepository.exportDangerousGoods(this.hblId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._exportRepository.exportDangerousGoods(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
+                    if (res !== false) {
+                        this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
+                    }
                 },
             );
     }
+
     exportGoodsDeclare() {
-        this._exportRepository.exportGoodDeclare(this.hblId)
-            .pipe(catchError(this.catchError))
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._exportRepository.exportGoodDeclare(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                    if (res !== false) {
+                        this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                    }
                 },
             );
     }
+
     exportEManifest() {
-        this._exportRepository.exportEManifest(this.hblId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._exportRepository.exportEManifest(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                    if (res !== false) {
+                        this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                    }
                 },
             );
     }
