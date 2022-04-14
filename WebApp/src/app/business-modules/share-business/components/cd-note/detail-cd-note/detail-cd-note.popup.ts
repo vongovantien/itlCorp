@@ -15,6 +15,7 @@ import { NgProgress } from "@ngx-progressbar/core";
 import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
+import { ShareBussinessAdjustDebitValuePopupComponent } from "../../adjust-debit-value/adjust-debit-value.popup";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -29,6 +30,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
     @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -374,5 +376,15 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
                     console.log(error);
                 }
             );
+    }
+    adjustDebitValue(){
+        this.adjustDebitValuePopup.action='CDNOTE';
+        this.adjustDebitValuePopup.jodId=this.jobId;
+        this.adjustDebitValuePopup.cdNote=this.cdNote;
+        this.adjustDebitValuePopup.active();
+    }
+
+    onSaveAdjustDebit(){
+        this.getDetailCdNote(this.jobId, this.cdNote)
     }
 }

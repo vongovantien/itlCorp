@@ -209,6 +209,19 @@
                         </div>
                     </div>
 
+                    <ng-container *ngIf="!!cdnoteDetail
+                    &&cdnoteDetail.cdNote.type === 'DEBIT'
+                    &&cdnoteDetail.cdNote.syncStatus !== 'Synced'
+                    &&cdnoteDetail.cdNote.currencyId === 'VND'
+                    &&cdnoteDetail.listSurcharges.length > 0">
+                        <div class="div-inside">
+                            <div class="m--align-right foat-right">
+                                <button class="btn btn-success m-btn--icon m-btn--uppercase" (click)="adjustDebitValue()" title=" Adjust Debit Value">
+                                     <span><i class="la la-edit"></i><span>Adjust Debit Value</span></span>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
                     <!--begin: Datatable-->
                     <div class="table-wrapper fit-height-div">
                         <table class="table table-striped table-brand dataTable">
@@ -308,3 +321,5 @@
 
 <confirm-popup (onSubmit)="onConfirmed()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 <reason-reject-popup (onApply)="onApplyReasonReject($event)"></reason-reject-popup>
+
+<adjust-debit-value-popup (onSave)="onSaveAdjustDebit($event)" (action)="CDNOTE" ></adjust-debit-value-popup>

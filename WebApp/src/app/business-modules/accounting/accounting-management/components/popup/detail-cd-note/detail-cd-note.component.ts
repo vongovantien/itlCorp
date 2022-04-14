@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-business/components';
 
 @Component({
     selector: 'accounting-detail-cd-note',
@@ -19,6 +20,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+
     cdnoteDetail: any = null;
     jobId: string = '';
     type: string = 'AIR';
@@ -149,7 +152,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         for (const charge of this.cdnoteDetail.listSurcharges) {
             listCharge.push(charge);
         }
-        // List currency unique      
+        // List currency unique
         const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
@@ -272,5 +275,15 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
                     console.log(error);
                 }
             );
+    }
+
+    adjustDebitValue(){
+        this.adjustDebitValuePopup.action='CDNOTE';
+        this.adjustDebitValuePopup.jodId=this.jobId;
+        this.adjustDebitValuePopup.cdNote=this.cdNote;
+        this.adjustDebitValuePopup.active();
+    }
+    onSaveAdjustDebit(){
+        this.getDetailCdNote(this.jobId,this.cdNote);
     }
 }

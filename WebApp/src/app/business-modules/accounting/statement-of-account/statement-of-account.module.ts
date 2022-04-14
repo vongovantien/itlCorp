@@ -28,6 +28,7 @@ import { ConfirmBillingListChargeComponent } from './components/list-charge-conf
 import { ConfirmBillingDatePopupComponent } from './components/poup/confirm-billing-date/confirm-billing-date.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 
 const routing: Routes = [
     {
@@ -83,7 +84,7 @@ const COMPONENTS = [
     StatementOfAccountPaymentMethodComponent,
     ConfirmBillingFormSearchComponent,
     ConfirmBillingListChargeComponent,
-    ConfirmBillingDatePopupComponent
+    ConfirmBillingDatePopupComponent,
 ];
 
 @NgModule({
@@ -109,7 +110,8 @@ const COMPONENTS = [
         NgProgressModule,
         ShareAccountingModule,
         BsDropdownModule.forRoot(),
-        ShareModulesModule
+        ShareModulesModule,
+        ShareBussinessModule
     ],
     exports: [],
     providers: [

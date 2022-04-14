@@ -1053,6 +1053,24 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getListSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
+    }
+
+    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
+    }
+    getAdjustDebitValue(model: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetAdjustDebitValue`, model).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateAdjustDebitValue(data: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateAdjustDebitValue`, data).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

@@ -13,6 +13,8 @@ import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modu
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpResponse } from '@angular/common/http';
+import { ShareBussinessAdjustDebitValuePopupComponent } from '@share-bussiness';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -25,6 +27,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
     @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -50,9 +53,11 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _exportRepo: ExportRepo,
         private _accountantRepo: AccountingRepo,
         private _spinner: NgxSpinnerService,
+        private _progressService: NgProgress,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -337,5 +342,16 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                     }
                 },
             );
+    }
+
+    adjustDebitValue(){
+        this.adjustDebitValuePopup.action='CDNOTE';
+        this.adjustDebitValuePopup.jodId=this.jobId;
+        this.adjustDebitValuePopup.cdNote=this.cdNote;
+        this.adjustDebitValuePopup.active();
+    }
+
+    onSaveAdjustDebit(){
+        this.getDetailCdNote(this.jobId, this.cdNote)
     }
 }
