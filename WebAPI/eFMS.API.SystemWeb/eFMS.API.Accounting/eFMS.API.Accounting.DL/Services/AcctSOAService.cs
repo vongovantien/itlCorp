@@ -3836,6 +3836,7 @@ namespace eFMS.API.Accounting.DL.Services
             var listChargeUpdate = new List<CsShipmentSurcharge>();
             decimal _amount = 0;
             decimal _debitAmount = 0;
+            var listId = new List<Guid>();
 
             foreach (var item in model.listChargeGrp)
             {
@@ -3848,10 +3849,22 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AmountVnd = it.AmountVND;
                         charge.Notes = it.Note;
                         _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
-                        charge.Total = _amount;
                         _debitAmount += _amount;
                         listChargeUpdate.Add(charge);
+                        listId.Add(charge.Id);
                     }
+                }
+            }
+
+            if (_debitAmount > 0 && model.Action == "SOA")
+            {
+                var charges = GetChargesForDetailSoa(model.CODE);
+                var chargeFilter = charges.Where(x => !listId.Contains(x.ID)).ToList().Select(x=>x.ID);
+                foreach (var c in chargeFilter)
+                {
+                    var charge = csShipmentSurchargeRepo.Get(x => x.Id == c).FirstOrDefault();
+                    _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
+                    _debitAmount += _amount;
                 }
             }
 
@@ -3873,7 +3886,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var soa = Get(x => x.Soano == model.CODE).FirstOrDefault();
                         if (soa != null)
                         {
-                            soa.DebitAmount = _debitAmount;
+                            soa.DebitAmount += _debitAmount;
                             hs = DataContext.Update(soa, x => x.Id == soa.Id);
                         }
                     }
