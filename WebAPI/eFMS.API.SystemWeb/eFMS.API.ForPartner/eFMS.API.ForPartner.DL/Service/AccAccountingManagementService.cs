@@ -2306,13 +2306,14 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             // gom các detail cùng voucherNo, voucherDate,
             var grpVoucherDetail = model.Details
-                .GroupBy(x => new { x.AcctID, x.BravoRefNo })
+                .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
                     // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
                     surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
-                    .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
+                    .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
+                        c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo }).ToList()
                 })
                 .ToList();
             if (grpVoucherDetail.Count > 0)
@@ -2429,18 +2430,18 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.VoucherIddate = voucher.Date;
                                                     surcharge.AcctManagementId = voucher.Id;
                                                 }
-
-                                                surcharge.InvoiceNo = itemGrp.voucherData.InvoiceNo;
-                                                surcharge.InvoiceDate = itemGrp.voucherData.InvoiceDate;
-                                                surcharge.SeriesNo = itemGrp.voucherData.SerieNo;
+                                                var surChargeBravo = itemGrp.surcharges.FirstOrDefault(x => x.ChargeId == surcharge.Id); // make sure ID sync về = ID trên phí
+                                                surcharge.InvoiceNo = surChargeBravo.InvoiceNo;
+                                                surcharge.InvoiceDate = surChargeBravo.InvoiceDate;
+                                                surcharge.SeriesNo = surChargeBravo.SerieNo;
                                                 surcharge.DatetimeModified = voucher.DatetimeCreated;
                                                 surcharge.UserModified = currentUser.UserID;
-                                                surcharge.ReferenceNo = itemGrp.voucherData.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                surcharge.VatAmountVnd = itemGrp.voucherData.VatAmountVnd;
-                                                surcharge.AmountVnd = itemGrp.voucherData.AmountVnd;
-                                                // surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;  // giữ nguyên trên phí
-                                                // surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
-                                                surcharge.FinalExchangeRate = itemGrp.voucherData.ExchangeRate;
+                                                surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
+                                                surcharge.VatAmountVnd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
+                                                surcharge.AmountVnd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
+                                                surcharge.VatAmountUsd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
+                                                surcharge.AmountUsd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
+                                                surcharge.FinalExchangeRate = surChargeBravo.ExchangeRate;
 
                                                 AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
                                                 surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
