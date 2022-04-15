@@ -249,17 +249,17 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         }
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     saveOBHSurCharge() {
         if (!this.charges.length) {
@@ -276,6 +276,17 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         //         return;
         //     }
         // }
+        for (const charge of this.charges) {
+            if(!this.utility.isWhiteSpace(charge.invoiceNo) &&this.utility.isWhiteSpace(charge.seriesNo)){
+                this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+            if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+                this._toastService.warning("Invoice No Must be fill in");
+                return;
+            }
+        }
+
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;

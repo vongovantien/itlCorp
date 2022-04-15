@@ -66,6 +66,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[] = [];
 
+    isJobOPS: boolean=false;
+    isOBH: boolean=false;
+
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
@@ -364,6 +368,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
                 let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
                 selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
+                if(this.selectedShipment.service==='CL'){
+                    this.isJobOPS=true;
+                }
                 this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
                     .subscribe(
                         (res: any) => {
@@ -482,6 +489,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
 
                 }
+                if(data.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+                    this.isOBH=true;
+                }
+
                 break;
             case 'payer':
                 chargeItem.payer = data.shortName;
@@ -619,17 +630,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     saveChargeList() {
         this.isSubmitted = true;
@@ -649,6 +660,20 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         //         return;
         //     }
         // }
+
+        if(this.isJobOPS&&this.isOBH){
+            for (const charge of this.charges) {
+                if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+                    this._toastService.warning("Series No Must be fill in");
+                    return;
+                }
+                if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+                    this._toastService.warning("Invoice No Must be fill in");
+                    return;
+                }
+            }
+        }
+
 
         const error = this.checkValidate();
         if (error < 0) {

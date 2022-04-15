@@ -394,6 +394,16 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                 .map((surcharge: Surcharge) => this.selectedCharge.push(new Surcharge(surcharge)))
         );
+        var someResult = this.selectedCharge.some(x => {
+            if (x.type === 'OBH' && x.jobId.includes('LOG')) {
+                return (!this.utility.isWhiteSpace(x.invoiceNo) && this.utility.isWhiteSpace(x.seriesNo)) || (this.utility.isWhiteSpace(x.invoiceNo) && !this.utility.isWhiteSpace(x.seriesNo))
+            }
+        })
+        if(someResult){
+            this._toastService.warning("Series No and Invoice No Must be fill in");
+            return;
+        }
+
         if (this.selectedCharge.length === 0) {
             this._toastService.warning(`None of charges are selected, Please recheck again! `);
             return;

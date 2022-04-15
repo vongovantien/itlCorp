@@ -498,17 +498,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     saveBuyingCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         if (!this.charges.length) {
