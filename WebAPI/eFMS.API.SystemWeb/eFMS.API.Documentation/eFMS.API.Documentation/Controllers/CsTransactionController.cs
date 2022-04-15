@@ -176,9 +176,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet("GetLinkASInfomation")]
         [Authorize]
-        public IActionResult GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
+        public IActionResult GetLinkASInfomation(string jobNo, string mblNo, string hblNo, string serviceName, string serviceMode)
         {
-            var data = csTransactionService.GetLinkASInfomation(mblNo, hblNo, serviceName, serviceMode);
+            var data = csTransactionService.GetLinkASInfomation(jobNo, mblNo, hblNo, serviceName, serviceMode);
             return Ok(data);
         }
         #region -- INSERT & UPDATE

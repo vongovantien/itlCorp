@@ -92,7 +92,6 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.flexId = this.formCreate.controls["flexId"];
         this.excRateUsdToLocal = this.formCreate.controls["excRateUsdToLocal"];
         this.referenceNoLst = [];
-        debugger
     }
 
     setHeader() {
@@ -314,13 +313,13 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
 
-        if (this.action !== "create"){
+        if (this.action !== "create") {
             if (this.excRateUsdToLocal.value) {
-                if (Number(this.excRateUsdToLocal.value) <=0) {
+                if (Number(this.excRateUsdToLocal.value) <= 0) {
                     this._toastService.warning(`Required to enter Excel USD greater than 0`);
                     return;
                 }
-            }else {
+            } else {
                 this._toastService.warning(`Required to enter Excel USD`);
                 return;
             }
@@ -381,9 +380,9 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
-                                    let checkSoa = this.listCharges.find(x=>x.soano !== "" && x.soano !== null);
-                                    if(!checkSoa){checkSoa = this.listCharges.find(x=>x.paySoano !== "" && x.paySoano !== null);}
-                                    if(checkSoa){
+                                    let checkSoa = this.listCharges.find(x => x.soano !== "" && x.soano !== null);
+                                    if (!checkSoa) { checkSoa = this.listCharges.find(x => x.paySoano !== "" && x.paySoano !== null); }
+                                    if (checkSoa) {
                                         this._toastService.warning("Vui lòng cập nhật SOA");
                                     }
                                     this.onUpdate.emit();

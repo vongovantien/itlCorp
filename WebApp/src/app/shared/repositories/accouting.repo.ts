@@ -252,8 +252,8 @@ export class AccountingRepo {
             );
     }
 
-    getDetailSettlementPayment(settlementId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId }).pipe(
+    getDetailSettlementPayment(settlementId: string, viewType: string = "list") {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId, view: viewType }).pipe(
             map((data: any) => data)
         );
     }
@@ -385,6 +385,18 @@ export class AccountingRepo {
 
     checkAllowGetDetailSettlement(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowUpdateDirectCharges(shipmentCharges: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowUpdateDirectCharges`, shipmentCharges).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDenySettlement(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDenySettle`, ids).pipe(
             map((data: any) => data)
         );
     }
@@ -1018,6 +1030,29 @@ export class AccountingRepo {
         );
     }
 
+    getListSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
+    }
+
+    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
+    }
+
+    payablePaging(page: number, size: number, body: any) {
+        console.log('payablePaging', body)
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getPayablePaymentByRefNo(data: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/GetBy`, data).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

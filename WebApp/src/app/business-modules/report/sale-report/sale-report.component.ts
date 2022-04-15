@@ -2,7 +2,7 @@ import { AppList } from "src/app/app.list";
 import { Component, ViewChild } from "@angular/core";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
-import { DocumentationRepo } from "@repositories";
+import { ReportManagementRepo } from "@repositories";
 import { catchError, finalize } from "rxjs/operators";
 import { ReportPreviewComponent } from "@common";
 import { CommonEnum } from "@enums";
@@ -21,7 +21,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
     constructor(
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _documentationRepo: DocumentationRepo,
+        private _reportRepo: ReportManagementRepo,
         private _spinnerService: NgxSpinnerService
     ) {
         super();
@@ -39,7 +39,6 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
     }
 
     onSearchSaleReport(data: ReportInterface.ISaleReportCriteria) {
-        console.log(data);
         switch (data.typeReport) {
             case CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY:
                 this.previewMonthlyReport(data);
@@ -62,7 +61,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
         }
     }
     previewMonthlyReport(data: ReportInterface.ISaleReportCriteria) {
-        this._documentationRepo.previewSaleMonthlyReport(data)
+        this._reportRepo.previewSaleMonthlyReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })
@@ -83,7 +82,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
 
     previewQuaterReport(data: ReportInterface.ISaleReportCriteria) {
         this._spinnerService.show();
-        this._documentationRepo.previewSaleQuaterReport(data)
+        this._reportRepo.previewSaleQuaterReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })
@@ -104,7 +103,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
 
     previewDepartmentReport(data: ReportInterface.ISaleReportCriteria) {
         this._spinnerService.show();
-        this._documentationRepo.previewSaleDepartmentReport(data)
+        this._reportRepo.previewSaleDepartmentReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })
@@ -125,7 +124,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
 
     previewSummaryReport(data: ReportInterface.ISaleReportCriteria) {
         this._spinnerService.show();
-        this._documentationRepo.previewSaleSummaryReport(data)
+        this._reportRepo.previewSaleSummaryReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })
@@ -146,7 +145,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
 
     previewCombinationStatictisReport(data: ReportInterface.ISaleReportCriteria) {
         this._spinnerService.show();
-        this._documentationRepo.previewCombinationSalesReport(data)
+        this._reportRepo.previewCombinationSalesReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })
@@ -167,7 +166,7 @@ export class SaleReportComponent extends AppList implements ICrystalReport {
 
     previewSaleKickBackReport(data: ReportInterface.ISaleReportCriteria) {
         this._spinnerService.show();
-        this._documentationRepo.previewSaleKickBackReport(data)
+        this._reportRepo.previewSaleKickBackReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._spinnerService.hide(); })

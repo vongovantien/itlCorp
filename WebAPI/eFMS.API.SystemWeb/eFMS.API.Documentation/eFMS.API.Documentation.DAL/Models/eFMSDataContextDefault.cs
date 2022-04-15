@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CsArrivalFrieghtChargeDefault> CsArrivalFrieghtChargeDefault { get; set; }
         public virtual DbSet<CsBookingNote> CsBookingNote { get; set; }
         public virtual DbSet<CsDimensionDetail> CsDimensionDetail { get; set; }
+        public virtual DbSet<CsLinkCharge> CsLinkCharge { get; set; }
         public virtual DbSet<CsManifest> CsManifest { get; set; }
         public virtual DbSet<CsMawbcontainer> CsMawbcontainer { get; set; }
         public virtual DbSet<CsShipmentOtherCharge> CsShipmentOtherCharge { get; set; }
@@ -80,7 +81,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -2399,6 +2400,46 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Width).HasColumnType("decimal(18, 4)");
             });
 
+            modelBuilder.Entity<CsLinkCharge>(entity =>
+            {
+                entity.ToTable("csLinkCharge");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeLinkId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChargeOrgId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.JobNoLink)
+                    .HasColumnName("JobNoLInk")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.JobNoOrg)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LinkChargeType).HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<CsManifest>(entity =>
             {
                 entity.HasKey(e => e.JobId);
@@ -3680,6 +3721,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DateCreatedLinkJob).HasColumnType("datetime");
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -3813,6 +3856,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreatedLinkJob)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

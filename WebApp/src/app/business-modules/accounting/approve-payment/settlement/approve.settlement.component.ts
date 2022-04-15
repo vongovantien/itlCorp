@@ -48,9 +48,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     comment: string = '';
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Settlement';
+    folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
-    
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -84,7 +84,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     getDetailSettlement(settlementId: string) {
         this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }))
-        this._accoutingRepo.getDetailSettlementPayment(settlementId)
+        this._accoutingRepo.getDetailSettlementPayment(settlementId, 'LIST')
             .pipe(
                 catchError(this.catchError),
                 tap((res: any) => {
@@ -104,7 +104,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     // * wait to currecy list api
                     this.formCreateSurcharge.form.patchValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
-                        requester: this.settlementPayment.settlement.requester,
+                        requester: this.settlementPayment.settlement.userNameCreated,
                         requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
@@ -128,7 +128,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
-                    this.requestSurchargeListComponent.TYPE = 'GROUP'; // ? <> LIST
+                    this.requestSurchargeListComponent.TYPE = 'LIST'; // ? <> LIST
                     this.requestSurchargeListComponent.STATE = 'READ'; // ? <> WRITE
 
 
@@ -154,10 +154,26 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     showDenyPopup() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.containerRef.viewContainerRef, {
-            body: 'Do you want to deny this settlement payment ?',
-            labelConfirm: 'Yes',
-        }, () => this.openModalDeny(this.templateModalDeny))
+        this._accoutingRepo.checkAllowDenySettlement([this.settlementPayment.settlement.id])
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.error(`Settlement was delete, Please re-load page.`);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
+                        return;
+                    }
+                    else {
+                        if (!!res.data) {
+                            this._toastService.warning(res.message);
+                        } else {
+                            this.showPopupDynamicRender(ConfirmPopupComponent, this.containerRef.viewContainerRef, {
+                                body: 'Do you want to deny this settlement payment ?',
+                                labelConfirm: 'Yes',
+                            }, () => this.openModalDeny(this.templateModalDeny))
+                        }
+                    }
+                },
+            );
     }
 
     openModalDeny(template: TemplateRef<any>) {
@@ -200,10 +216,10 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     previewSettlementPayment() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
@@ -231,10 +247,10 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     exportSettlementPayment(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -252,10 +268,10 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     exportGeneralPreview(typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+        //     return;
+        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(
@@ -270,13 +286,13 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     }
                 }
             });
-    }   
+    }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
             .pipe(

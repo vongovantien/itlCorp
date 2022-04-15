@@ -87,6 +87,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("CheckPermission/{id}")]
+        [Authorize]
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = transactionService.CheckDetailPermission(id);
@@ -387,6 +388,17 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(hs);
             return Ok(hs);
         }
+
+        [HttpGet("AutoRateReplicate")]
+        public IActionResult AutoRateReplicate()
+        {
+            currentUser.Action = "AutoRateReplicate";
+            ResultHandle hs = transactionService.AutoRateReplicate();
+            if (!hs.Status)
+                return BadRequest(hs);
+            return Ok(hs);
+        }
+
         private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
         {
             string errorMsg = string.Empty;

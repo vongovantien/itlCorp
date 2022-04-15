@@ -22,7 +22,7 @@ import { SettlementFormCreateComponent } from '../components/form-create-settlem
 import { catchError, pluck, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
-import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment } from '../components/store';
+import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment, LoadDetailSettlePaymentFail } from '../components/store';
 import { Observable } from 'rxjs';
 import { getCurrentUserState } from '@store';
 @Component({
@@ -44,7 +44,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: SysImage[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
-    
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -113,10 +113,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     updateSettlement() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
@@ -134,7 +134,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.getDetailSettlement(this.settlementId, 'GROUP');
+                        this.getDetailSettlement(this.settlementId, 'LIST');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -151,7 +151,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
     getDetailSettlement(settlementId: string, typeCharge: string) {
         this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }));
-        this._accoutingRepo.getDetailSettlementPayment(settlementId)
+        this._accoutingRepo.getDetailSettlementPayment(settlementId, typeCharge)
             .pipe(
                 catchError(this.catchError),
             )
@@ -221,14 +221,17 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     //     this.requestSurchargeListComponent.openAllCharge.next(true);
                     // }
                 },
+                () => {
+                    this._store.dispatch(LoadDetailSettlePaymentFail());
+                }
             );
     }
 
     saveAndSendRequest() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
@@ -264,10 +267,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     previewSettlementPayment() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
@@ -293,10 +296,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPayment(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -314,10 +317,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+        //     return;
+        // }
 
         this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -336,10 +339,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
 
     exportGeneralPreview(typeExp: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-            return;
-        }
+        // if (!this.requestSurchargeListComponent.surcharges.length) {
+        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+        //     return;
+        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(

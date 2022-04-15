@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
@@ -68,7 +69,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         bool CheckDeletePermissionBySettlementNo(string settlementNo);
 
-        bool CheckDeletePermissionBySettlementId(Guid settlementId);
+        int CheckDeletePermissionBySettlementId(Guid settlementId);
 
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
 
@@ -102,5 +103,9 @@ namespace eFMS.API.Accounting.DL.IService
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);
+        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
+
+        ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
+        ResultHandle CheckAllowDenySettle(List<Guid> ids);
     }
 }

@@ -204,7 +204,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
-            this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
+            this._documentRepo.getASTransactionInfo(null, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
                 .subscribe((res: LinkAirSeaModel) => {
                     if (!!res?.jobNo) {

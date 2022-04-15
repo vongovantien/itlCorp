@@ -298,9 +298,11 @@ namespace eFMS.API.Accounting.DL.Services
                 page = 1;
                 size = rowsCount;
             }
-            IQueryable<AcctReceiptModel> result = FormatReceipt(data, criteria);
 
-            return result.Skip((page - 1) * size).Take(size);
+            var resultPaging = data.Skip((page - 1) * size).Take(size);
+            IQueryable<AcctReceiptModel> result = FormatReceipt(resultPaging, criteria);
+
+            return result;
         }
 
         public IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria)
@@ -1384,7 +1386,6 @@ namespace eFMS.API.Accounting.DL.Services
             return _paymentStatus;
         }
 
-
         private HandleState UpdateNetOffCredit(AccAccountingPayment payment, bool isCancel = false)
         {
             HandleState hs = new HandleState();
@@ -1899,6 +1900,28 @@ namespace eFMS.API.Accounting.DL.Services
                             receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
 
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
+                            var listInvoice = receiptModel.Payments
+                                .Where(x =>(x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                                .Select(x => x.InvoiceNo).ToList();
+                            // Check payment hien tai
+                            IQueryable<AccAccountingPayment> hasPayments = GetPaymentStepOrderReceipt(receiptData, listInvoice);
+
+                            if (hasPayments.Count() > 0)
+                            {
+                                var query = from p in hasPayments
+                                            join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                            where r.Status == AccountingConstants.RECEIPT_STATUS_DRAFT
+                                            select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
+
+                                if (query != null && query.Count() > 0)
+                                {
+                                    throw new Exception(string.Format(
+                                        "You can not done this receipt, because {0} - {1} have payment time before than this receipt. please done the first receipts firstly!",
+                                        query.FirstOrDefault()?.InvoiceNo,
+                                        query.FirstOrDefault()?.PaymentRefNo
+                                        ));
+                                }
+                            }
                             HandleState hs = DataContext.Add(receiptData);
                             if (hs.Success)
                             {
@@ -1969,6 +1992,25 @@ namespace eFMS.API.Accounting.DL.Services
                                 throw new Exception("Có lỗi khi Add/Update Payment" + hsPaymentDelete.Message.ToString());
                             }
 
+                            // Check payment hien tai
+                            IQueryable<AccAccountingPayment> hasPayments = GetPaymentStepOrderReceipt(receiptCurrent);
+
+                            if (hasPayments.Count() > 0)
+                            {
+                                var query = from p in hasPayments
+                                            join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                            where r.Status == AccountingConstants.RECEIPT_STATUS_DRAFT
+                                            select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
+
+                                if (query != null && query.Count() > 0)
+                                {
+                                    return new HandleState((object)string.Format(
+                                        "You can not done this receipt, because {0} - {1} have payment time before than this receipt. please done the first receipts firstly!",
+                                        query.FirstOrDefault()?.InvoiceNo,
+                                        query.FirstOrDefault()?.PaymentRefNo
+                                        ));
+                                }
+                            }
                             // Done Receipt
                             HandleState hs = new HandleState();
                             if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
@@ -2017,8 +2059,6 @@ namespace eFMS.API.Accounting.DL.Services
                         trans.Dispose();
                     }
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -2249,6 +2289,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     invoice.PaidAmountVnd = invoice.TotalPaidVnd = 0;
                 }
+
                 if (paidUsd > 0)
                 {
                     if (invoice.PaidAmountUsd == 0)
@@ -3908,6 +3949,27 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return valid;
+        }
+
+        private IQueryable<AccAccountingPayment> GetPaymentStepOrderReceipt(AcctReceipt receiptCurrent, List<string> invoice = null)
+        {
+            List<string> receiptCurrentPaymentInvoiceList = new List<string>();
+            if (invoice != null)
+            {
+                receiptCurrentPaymentInvoiceList = invoice;
+            } else
+            {
+                receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id
+                && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)).Select(x => x.InvoiceNo).ToList();
+            }
+           
+            IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+                              && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                              && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0
+                              && receiptCurrentPaymentInvoiceList.Any(inv => inv == x.InvoiceNo)
+                              );
+
+            return hasPayments;
         }
 
         public async Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)

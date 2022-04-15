@@ -20,5 +20,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string UserModifiedName { get; set; }
         public string ProductService { get; set; }
         public bool IsReplicate { get; set; }
+        public string ReplicateJobNo { get; set; }
     }
 }

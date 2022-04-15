@@ -166,6 +166,8 @@ export class HouseBill extends BaseModel {
     note: string = null;
     referenceNoProof = null;
     incotermId: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
     constructor(object?: any) {
         super();
         const self = this;

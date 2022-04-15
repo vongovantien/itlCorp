@@ -212,7 +212,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet]
         [Route("GetDetailSettlementPaymentById")]
         [Authorize]
-        public IActionResult GetDetailSettlementPaymentById(Guid settlementId)
+        public IActionResult GetDetailSettlementPaymentById(Guid settlementId, string view)
         {
             var isAllowViewDetail = acctSettlementPaymentService.CheckDetailPermissionBySettlementId(settlementId);
             if (isAllowViewDetail == false)
@@ -225,8 +225,16 @@ namespace eFMS.API.Accounting.Controllers
             List<ShipmentChargeSettlement> chargeNoGrpSettlement = new List<ShipmentChargeSettlement>();
             if (settlement != null)
             {
-                chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                if(view == "GROUP")
+                {
+                    chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                } else
+                {
+                    chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
+                }
+                // chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                // chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                // chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
             }
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
@@ -1137,6 +1145,38 @@ namespace eFMS.API.Accounting.Controllers
         {
             var data = acctSettlementPaymentService.GetDataExportSettlementDetail(criteria);
             return Ok(data);
+        }
+
+        [HttpGet]
+        [Route("GetListSurchargeDetailSettlement")]
+        public IActionResult GetListSurchargeDetailSettlement(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo);
+
+            return Ok(data);
+        }
+
+        [HttpGet]
+        [Route("GetListJobGroupSurchargeDetailSettlement")]
+        public IActionResult GetListJobGroupSurchargeDetailSettlement(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo);
+
+            return Ok(data);
+        }
+        
+        [HttpPost("CheckAllowUpdateDirectCharges")]
+        public IActionResult CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
+        {
+            var result = acctSettlementPaymentService.CheckAllowUpdateDirectCharges(shipmentCharges);
+            return Ok(result);
+        }
+
+        [HttpPost("CheckAllowDenySettle")]
+        public IActionResult CheckAllowDenySettle(List<Guid> ids)
+        {
+            var result = acctSettlementPaymentService.CheckAllowDenySettle(ids);
+            return Ok(result);
         }
     }
 }

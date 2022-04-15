@@ -1,5 +1,5 @@
 import { PopupBase } from "src/app/popup.base";
-import { OnInit, Component, Output, EventEmitter } from "@angular/core";
+import { OnInit, Component, Output, EventEmitter, ViewChild } from "@angular/core";
 import { DocumentationRepo, SystemFileManageRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
@@ -7,6 +7,7 @@ import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { Params, ActivatedRoute } from "@angular/router";
+import { ConfirmPopupComponent } from "@common";
 
 
 @Component({
@@ -18,6 +19,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     jobId: string;
     files: IShipmentAttachFile[] = [];
     @Output() onAdd: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
+    selectedFile: IShipmentAttachFile;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -90,6 +93,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                     }
                 );
         }
+        event.target.value ='';
     }
 
     checkAllChange() {
@@ -121,6 +125,30 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         this.checkAll = false;
     }
 
+    deleteFile(file: IShipmentAttachFile) {
+        if (!!file) {
+            this.selectedFile = file;
+        }
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteFile() {
+        this.confirmDeletePopup.hide();
+        this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success("File deleted successfully!");
+                        this.getFileShipment(this.jobId);
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
+    }
 
 }
 interface IShipmentAttachFile {

@@ -15,9 +15,14 @@
                     <label class="form-control-label">
                         Requester:
                     </label>
-                    <select class="form-control" formControlName="requester">
-                        <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}</option>
-                    </select>
+                    <ng-container *ngIf="!readonlyForm; else userTpl">
+                        <select class="form-control" formControlName="requester">
+                            <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}</option>
+                        </select>
+                    </ng-container>
+                    <ng-template #userTpl>
+                        <input type="text" class="form-control" formControlName="requester">
+                    </ng-template>
                 </div>
             </div>
             <div class="col-lg-4">
@@ -151,13 +156,18 @@
                             <label class="form-control-label">
                                 Bank Name:
                             </label>
-                            <app-combo-grid-virtual-scroll
-                                (itemSelected)="onSelectDataFormInfo($event, 'bankName'); mapBankCode($event.code)"
-                                [dataSources]="banks | async" formControlName="bankNameDescription"
-                                [displayFields]="displayFieldBank" [selectedDisplayFields]="['bankNameEn']"
-                                allowFreeText [disabled]="isDisabled" placeholder="Select partner"
-                                (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)">
-                            </app-combo-grid-virtual-scroll>
+                            <ng-container *ngIf="!readonlyForm; else bankTpl">
+                                <app-combo-grid-virtual-scroll
+                                    (itemSelected)="onSelectDataFormInfo($event, 'bankName'); mapBankCode($event.code)"
+                                    [dataSources]="banks | async" formControlName="bankNameDescription"
+                                    [displayFields]="displayFieldBank" [selectedDisplayFields]="['bankNameEn']"
+                                    allowFreeText [disabled]="isDisabled" placeholder="Select partner"
+                                    (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)">
+                                </app-combo-grid-virtual-scroll>
+                            </ng-container>
+                            <ng-template #bankTpl>
+                                <input type="text" class="form-control" formControlName="bankNameDescription">
+                            </ng-template>
                         </div>
                     </div>
                     <div class="col-lg-6">

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
@@ -12,15 +12,15 @@ import { SortService } from '@services';
 import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingConstants, SystemConstants } from '@constants';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
+import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
 
 
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom, concatMap } from 'rxjs/operators';
 import {
     LoadListAdvancePayment,
     getAdvancePaymentListState,
@@ -28,6 +28,9 @@ import {
     getAdvancePaymentListLoadingState,
     getAdvancePaymentListPagingState
 } from './store';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
+import { of, forkJoin } from 'rxjs';
+import { delayTime } from '@decorators';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
@@ -40,10 +43,12 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(UpdatePaymentVoucherPopupComponent) popupUpdateVoucher: UpdatePaymentVoucherPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild('confirmRemoveSelectedVoucher') confirmRemoveSelectedVoucher: ConfirmPopupComponent;
+    // @ViewChild('confirmRemoveSelectedVoucher') confirmRemoveSelectedVoucher: ConfirmPopupComponent;
     @ViewChild(AdvancePaymentsPopupComponent) advancePaymentsPopup: AdvancePaymentsPopupComponent;
+    @ViewChild(AccountingSelectAttachFilePopupComponent) selectAttachPopup: AccountingSelectAttachFilePopupComponent;
 
     @ViewChild(InjectViewContainerRefDirective) public confirmPopupContainerRef: InjectViewContainerRefDirective;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
@@ -258,7 +263,7 @@ export class AdvancePaymentComponent extends AppList {
                             if (!adv.advanceFor || !adv.advanceFor.length) {
                                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
                             } else {
-                                
+
                                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`], {
                                     queryParams: Object.assign({}, this.action)
                                 });
@@ -351,7 +356,21 @@ export class AdvancePaymentComponent extends AppList {
             this.infoPopup.show();
             return;
         } else if (objChecked.voucherNo != null) {
-            this.confirmRemoveSelectedVoucher.show();
+
+            // this.confirmRemoveSelectedVoucher.show();
+            this.showPopupDynamicRender<ConfirmPopupComponent>(
+                ConfirmPopupComponent,
+                this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
+                {
+                    title: 'Confirm remove selected voucher',
+                    body: 'Are you sure you want to remove selected payment vouchers?',   // ? Config confirm popup
+                    iconConfirm: 'la la-cloud-upload',
+                    labelConfirm: 'Yes',
+                    center: true
+                },
+                (v: boolean) => {                                   // ? Hàm Callback khi sumit
+                    this.onRemoveSelectedVoucher();
+                });
         } else {
             this.infoPopup.title = 'Not Have Voucher!';
             this.infoPopup.body = 'Opps, Advance do not have voucher';
@@ -360,7 +379,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     onRemoveSelectedVoucher() {
-        this.confirmRemoveSelectedVoucher.hide();
+        // this.confirmRemoveSelectedVoucher.hide();
         this.advancePaymentIds = [];
         this.advancePayments.forEach(item => {
             if (item.isChecked) {
@@ -426,6 +445,11 @@ export class AdvancePaymentComponent extends AppList {
             return;
         }
 
+        if (advanceSyncList.length === this.pageSize) {
+            this._toastService.warning("Exceed " + this.pageSize + " items");
+            return;
+        }
+
         const hasSynced: boolean = advanceSyncList.some(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED);
         if (hasSynced) {
             const advanceHasSynced: string = advanceSyncList.filter(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED).map(a => a.advanceNo).toString();
@@ -433,51 +457,79 @@ export class AdvancePaymentComponent extends AppList {
             return;
         }
 
-        this.advanceSyncIds = advanceSyncList.map((x: AdvancePayment) => {
-            return <AccountingInterface.IRequestGuid>{
-                Id: x.id,
-                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD'
-            };
-        });
-        if (!this.advanceSyncIds.length) {
-            return;
-        }
-        // this.confirmSyncAdvancePopup.show();   // ! Before
-
-        // * After
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
             {
-                body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
+                body: `Are you sure you want to sync <span class="font-weight-bold">${advanceSyncList.map(x => x.advanceNo).join()}</span> to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
-                labelConfirm: 'Yes'
+                labelConfirm: 'Yes',
+                center: true
             },
             (v: boolean) => {                                   // ? Hàm Callback khi sumit
-                this.onSyncBravo(this.advanceSyncIds);
+                this.selectAttachPopup.show();
             });
 
-    }
 
-    onSyncBravo(advIds: AccountingInterface.IRequestGuid[]) {
-        this._accoutingRepo.syncAdvanceToAccountant(advIds)
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
+                takeUntil(this.ngUnsubscribe),
+                concatMap((value: any) => {
+                    if (!!value) {
+                        const advSyncIds: string[] = advanceSyncList.map(x => x.id);
+                        const mapV: { lang: string, id: string }[] = Array(advanceSyncList.length).fill(value).map((value, i) => {
+                            return { lang: value === 1 ? 'VN' : 'ENG', id: advSyncIds[i] }
+                        })
+                        const source = mapV.map(x => this._exportRepo.exportAdvancePaymentDetail(x.id, x.lang))
+                        return forkJoin(source);
+                    }
+                    return of(false);
+                }),
+                concatMap((data: CommonInterface.IResult[]) => {
+                    if (!!data.length) {
+                        const advSyncModel = advanceSyncList.map((x: AdvancePayment) => {
+                            return <AccountingInterface.IRequestFileType>{
+                                Id: x.id,
+                                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+                                fileName: this.getFileName(data, x.id)
+                            };
+                        });
+                        console.log(advSyncModel);
+                        return this._accoutingRepo.syncAdvanceToAccountant(advSyncModel);
+                    }
+                }),
                 catchError(this.catchError)
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (((res as CommonInterface.IResult).status)) {
+                (res) => {
+                    if (((res as CommonInterface.IResult)?.status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
                         this.requestLoadListAdvancePayment();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
+                    sub.unsubscribe();
+
                 },
                 (error) => {
                     console.log(error);
+                }, () => {
+                    sub.unsubscribe();
                 }
-            );
+            )
+    }
+
+    getFileName(data: CommonInterface.IResult[], id: string) {
+        let url: string = '';
+        data.forEach(x => {
+            const advId: string[] = x.data.match(SystemConstants.CPATTERN.GUID)
+            if (advId[0] === id) {
+                url = x.data;
+            }
+        })
+
+        return url;
     }
 
     denyAdvance() {
@@ -503,7 +555,7 @@ export class AdvancePaymentComponent extends AppList {
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,
-            { body: 'Are you sure you want to deny advance payments ?' },
+            { body: `Are you sure you want to deny <span class="font-weight-bold">${advancesDenyList.map(x => x.advanceNo).join()}</span> advance payments ?` },
             (v: boolean) => {
                 this.onDenyAdvance(advIds);
             });
@@ -528,6 +580,155 @@ export class AdvancePaymentComponent extends AppList {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/new`], {
             queryParams: Object.assign({}, this.action)
         });
+    }
+
+    onSelectAdv(adv: AdvancePayment) {
+        this.selectedAdv = adv;
+
+        this.clearMenuContext(this.queryListMenuContext);
+
+    }
+
+    syncAdvItem() {
+        if (!this.selectedAdv) {
+            return;
+        }
+        const currentAdv: AdvancePayment = Object.assign({}, this.selectedAdv);
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            {
+                body: `Are you sure you want to sync <span class="font-weight-bold">${currentAdv.advanceNo}</span> to accountant system ?`,
+                iconConfirm: 'la la-cloud-upload',
+                labelConfirm: 'Yes',
+                center: true
+            },
+            (v: boolean) => {
+                this.selectAttachPopup.show();
+            });
+
+        // * listen event select file.
+        this.listenSelectFileAttachAndSyncAdv(currentAdv);
+    }
+
+    listenSelectFileAttachAndSyncAdv(adv: AdvancePayment) {
+        let sub = this.selectAttachPopup.onSelect
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                concatMap((value: any) => {
+                    if (!!value) {
+                        const lang: string = value === 1 ? 'VN' : 'ENG';
+                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang);
+                    }
+                    return of(false);
+                }),
+                map((exportData) => {
+                    if (!exportData) throw new Error("error: ");
+                    return exportData?.data // url preview
+                }),
+                concatMap((url: any) => {
+                    const syncModel = [adv].map((x: AdvancePayment) => {
+                        return <AccountingInterface.IRequestFileType>{
+                            Id: x.id,
+                            action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+                            fileName: url
+                        };
+                    });
+                    return this._accoutingRepo.syncAdvanceToAccountant(syncModel)
+                }),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res) => {
+                    sub.unsubscribe();
+                    if (((res as CommonInterface.IResult)?.status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+
+                        this.requestLoadListAdvancePayment();
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                },
+                (error) => {
+                    sub.unsubscribe();
+                    console.log(error);
+                },
+                () => {
+                    sub.unsubscribe();
+
+                }
+            )
+    }
+
+    denyAdvItem() {
+        if (!this.selectedAdv) {
+            return;
+        }
+        const currentAdv: AdvancePayment = Object.assign({}, this.selectedAdv);
+
+        if (currentAdv.statusApproval === 'Denied') {
+            this._toastService.warning(`${currentAdv.advanceNo} had denied, Please recheck!`);
+
+            return;
+        }
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            { body: `Are you sure you want to deny <span class="font-weight-bold">${currentAdv.advanceNo}</span> payments ?`, center: true },
+            (v: boolean) => {
+                this.onDenyAdvance([currentAdv.id]);
+            });
+    }
+
+    previewAdvPayment(adv: AdvancePayment) {
+        this._accoutingRepo
+            .previewAdvancePayment(adv.id)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.confirmPopupContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.confirmPopupContainerRef.viewContainerRef.clear();
+            });
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    exportAdvPayment(adv: AdvancePayment, lang: string) {
+        this._exportRepo
+            .exportAdvancePaymentDetail(adv.id, lang)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe((response: any) => {
+                if (response?.data) {
+                    this._exportRepo.previewExport(response.data);
+                }
+            });
     }
 }
 

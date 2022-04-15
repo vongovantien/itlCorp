@@ -41,7 +41,8 @@ namespace eFMSWindowService
                             new SendMailOverduePaymentService(),
                             new SendMailExceededCreditLimitService(),
                             new SendMailExpiredAgreementService(),
-                            new UpdateOverDuePaymentService()
+                            new UpdateOverDuePaymentService(),
+                            new UpAutoRateService()
             };
             ServiceBase.Run(ServicesToRun);
             //#endif

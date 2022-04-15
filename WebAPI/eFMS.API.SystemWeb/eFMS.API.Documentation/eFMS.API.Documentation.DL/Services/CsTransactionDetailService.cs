@@ -574,6 +574,8 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.Permission.AllowUpdateCharge = true;
                 }
             }
+            detail.UserNameCreated = sysUserRepo.Get(x => x.Id == detail.UserCreated).FirstOrDefault().Username;
+            detail.UserNameModified = sysUserRepo.Get(x => x.Id == detail.UserModified).FirstOrDefault().Username;
             return detail;
         }
 
@@ -699,7 +701,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipment = csTransactionRepo.Get(x => x.Id == criteria.JobId).FirstOrDefault();
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
             if (shipment == null) return null;
-            var houseBills = GetHouseBill(shipment.TransactionType).Where(x => x.ParentId == null);
+            var houseBills = GetHouseBill(shipment.TransactionType, shipment).Where(x => x.ParentId == null);
 
             var query = (from detail in houseBills//DataContext.Get()
                          join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
@@ -863,7 +865,7 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
-        public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType)
+        public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, CsTransaction shipment = null)
         {
             ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
@@ -880,11 +882,23 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.All:
                     break;
                 case PermissionRange.Owner:
-                    houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
+                    if(shipment == null)
+                    {
+                        houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 );
+                    } else
+                    {
+                        houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
+                                                || authorizeUserIds.Contains(x.UserCreated)
+                                                || x.UserCreated == currentUser.UserID
+                                                || x.SaleManId == currentUser.UserID
+                                                || (shipment.PersonIncharge == currentUser.UserID && x.JobId == shipment.Id)
+                                                );
+                    }
+                    
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();

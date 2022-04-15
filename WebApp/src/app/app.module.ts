@@ -60,7 +60,7 @@ const authConfig: AuthConfig = {
         HeaderComponent,
         FooterComponent,
         PageSidebarComponent,
-        DashboardComponent,
+        //DashboardComponent,
         ForbiddenPageComponent
     ],
     imports: [
@@ -82,7 +82,7 @@ const authConfig: AuthConfig = {
             }
         }),
         NgxDaterangepickerMd.forRoot(),
-        HighchartsChartModule,
+        //HighchartsChartModule,
         NgProgressModule,
 
         StoreModule.forRoot(reducers),

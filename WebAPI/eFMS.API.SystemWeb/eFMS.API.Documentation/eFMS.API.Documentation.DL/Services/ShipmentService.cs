@@ -713,59 +713,68 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<Shipments> GetShipmentAssignPIC()
         {
-            var userCurrent = currentUser.UserID;
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID); // Lấy theo office current user
-            // Shipment ops assign is current user
-            var shipmentsOps = from ops in operations
-                               join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
-                               where osa.MainPersonInCharge == userCurrent
-                               select ops;
-            //Shipment ops PIC is current user
-            var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
-            //Merger Shipment Ops assign & PIC
-            var shipmentsOpsMerge = shipmentsOps.Union(shipmentsOpsPIC).Select(s => new Shipments
-            {
-                Id = s.Id,
-                JobId = s.JobNo,
-                HBL = s.Hwbno,
-                MBL = s.Mblno,
-                CustomerId = s.CustomerId,
-                AgentId = s.AgentId,
-                CarrierId = s.SupplierId,
-                HBLID = s.Hblid,
-                Service = "CL"
-            }).Distinct();
+            #region del chuyển => store
+            //var userCurrent = currentUser.UserID;
+            //var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID); // Lấy theo office current user
+            //// Shipment ops assign is current user
+            //var shipmentsOps = from ops in operations
+            //                   join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
+            //                   where osa.MainPersonInCharge == userCurrent
+            //                   select ops;
+            ////Shipment ops PIC is current user
+            //var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
+            ////Merger Shipment Ops assign & PIC
+            //var shipmentsOpsMerge = shipmentsOps.Union(shipmentsOpsPIC).Select(s => new Shipments
+            //{
+            //    Id = s.Id,
+            //    JobId = s.JobNo,
+            //    HBL = s.Hwbno,
+            //    MBL = s.Mblno,
+            //    CustomerId = s.CustomerId,
+            //    AgentId = s.AgentId,
+            //    CarrierId = s.SupplierId,
+            //    HBLID = s.Hblid,
+            //    Service = "CL"
+            //}).Distinct();
 
-            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
+            //var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
-            //Shipment doc assign is current user
-            var shipmentsDoc = from cst in transactions
-                               join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
-                               where osa.MainPersonInCharge == userCurrent
-                               select cst;
-            //Shipment doc PIC is current user
-            var shipmentsDocPIC = transactions.Where(x => x.PersonIncharge == userCurrent);
-            //Merge shipment Doc assign & PIC
-            var shipmentsDocMerge = shipmentsDoc.Union(shipmentsDocPIC);
-            shipmentsDocMerge = shipmentsDocMerge.Distinct();
+            //var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            ////Shipment doc assign is current user
+            //var shipmentsDoc = from cst in transactions
+            //                   join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
+            //                   where osa.MainPersonInCharge == userCurrent
+            //                   select cst;
+            ////Shipment doc PIC is current user
+            //var shipmentsDocPIC = transactions.Where(x => x.PersonIncharge == userCurrent);
+            ////Merge shipment Doc assign & PIC
+            //var shipmentsDocMerge = shipmentsDoc.Union(shipmentsDocPIC);
+            //shipmentsDocMerge = shipmentsDocMerge.Distinct();
 
-            var shipmentsDocumention = shipmentsDocMerge.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
-            {
-                Id = x.x.Id,
-                JobId = x.x.JobNo,
-                HBL = x.y.Hwbno,
-                MBL = x.x.Mawb,
-                CustomerId = x.y.CustomerId,
-                AgentId = x.x.AgentId,
-                CarrierId = x.x.ColoaderId,
-                HBLID = x.y.Id,
-                Service = x.x.TransactionType
-            });
-            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
+            //var shipmentsDocumention = shipmentsDocMerge.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
+            //{
+            //    Id = x.x.Id,
+            //    JobId = x.x.JobNo,
+            //    HBL = x.y.Hwbno,
+            //    MBL = x.x.Mawb,
+            //    CustomerId = x.y.CustomerId,
+            //    AgentId = x.x.AgentId,
+            //    CarrierId = x.x.ColoaderId,
+            //    HBLID = x.y.Id,
+            //    Service = x.x.TransactionType
+            //});
+            //var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
-            var result = _shipmentsOperation.Union(_shipmentsDocumention);
-            return result.OrderByDescending(o => o.MBL);
+            //var result = _shipmentsOperation.Union(_shipmentsDocumention);
+            //return result.OrderByDescending(o => o.MBL);
+            #endregion
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@currentUserId", Value = currentUser.UserID },
+                new SqlParameter(){ ParameterName = "@currentOfficeId", Value = currentUser.OfficeID }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetShipmentAssignPIC>(parameters);
+            var result = mapper.Map<List<Shipments>>(list);
+            return result.AsQueryable();
         }
 
         /// <summary>
@@ -4609,7 +4618,7 @@ namespace eFMS.API.Documentation.DL.Services
             if(!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4645,7 +4654,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid
-                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+                             && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
             }
             else
             {
@@ -4824,7 +4833,7 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                     }
                 }
-                commissionData.CustomerName = string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn));
+                commissionData.CustomerName = !string.IsNullOrEmpty(criteria.CustomerId) ? string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn)) : string.Empty;
             }
             if (commissionData.Details.Count() == 0)
             {
@@ -5046,6 +5055,15 @@ namespace eFMS.API.Documentation.DL.Services
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAdvanceSettleOpsTransaction>(parameters);
         }
         #endregion
+
+        public List<sp_GetAllShipment> GetAllShipment(string keyword)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@KEYWORD", Value = keyword }
+            };
+            var shipments = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAllShipment>(parameters);
+            return shipments.ToList();
+        }
 
     }
 }

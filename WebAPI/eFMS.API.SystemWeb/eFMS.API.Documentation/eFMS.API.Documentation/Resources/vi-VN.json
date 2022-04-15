@@ -69,5 +69,8 @@
 
   "MSG_ETD_CANNOT_CHANGE_MONTH": "Ngày ETD Không được đổi sang tháng khác",
   "MSG_ETA_CANNOT_CHANGE_MONTH": "Ngày ETA Không được đổi sang tháng khác",
-  "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH": "Ngày Service Không được đổi sang tháng khác"
+  "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH": "Ngày Service Không được đổi sang tháng khác",
+
+  "MSG_CURRENCY_EMPTY": "Currency không được để trống!",
+  "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!"
 }

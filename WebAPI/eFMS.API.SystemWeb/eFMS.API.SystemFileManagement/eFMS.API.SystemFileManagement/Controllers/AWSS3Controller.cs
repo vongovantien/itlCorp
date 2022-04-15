@@ -159,5 +159,43 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return File((byte[])hs.Message, "application/zip", m.FileName);
             return BadRequest(hs);
         }
+
+        [HttpGet("DownloadFile/{moduleName}/{folder}/{objId}/{fileName}")]
+        public IActionResult DownloadFile(string moduleName, string folder, Guid objId, string fileName)
+        {
+            try
+            {
+                var document = _aWSS3Service.DownloadFileAsync(moduleName, folder, objId, fileName).Result;
+                return File(document, "application/octet-stream", fileName);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpGet("MoveObjectAsync/{srcId}/{destId}/{type?}")]
+        public IActionResult MoveObjectAsync(string srcId, string destId, int? type)
+        {
+            try
+            {
+                FileCoppyModel fileCoppy = new FileCoppyModel()
+                {
+                    srcKey = srcId,
+                    destKey = destId,
+                    Type = type,
+                };
+                var document = _aWSS3Service.MoveObjectAsync(fileCoppy).Result;
+                if (!document.Success)
+                {
+                    return BadRequest();
+                }
+                return Ok(document);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

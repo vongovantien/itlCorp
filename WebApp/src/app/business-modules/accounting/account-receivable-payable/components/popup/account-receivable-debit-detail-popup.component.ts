@@ -1,4 +1,6 @@
-import { Component, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { SystemConstants } from '@constants';
+import { ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { PopupBase } from 'src/app/popup.base';
 import { AccReceivableDebitDetailModel } from 'src/app/shared/models/accouting/accounting-receivable.model';
@@ -9,6 +11,7 @@ import { AccReceivableDebitDetailModel } from 'src/app/shared/models/accouting/a
 })
 export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements OnInit {
     @Output() dataDebitList: AccReceivableDebitDetailModel[] = []
+    @Input() dataSearch: {};
     headers = [
         { title: 'No', field: '', sortable: true },
         { title: 'Biiling no', field: 'billingNo', sortable: true },
@@ -36,6 +39,7 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
 
     constructor(
         private _sortService: SortService,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this.requestSort = this.sortTrialOfficalList;
@@ -75,5 +79,14 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
             this.sumTotalObj.totalunpaidUSD += (+item.unpaidAmountUSD ?? 0)
         }
     }
+
+    exportExcel() {
+            this._exportRepo.exportAccountingReceivableDebitDetail(this.dataSearch)
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'DebitDetail.xlsx');
+                    }
+                );
+        }
 
 }

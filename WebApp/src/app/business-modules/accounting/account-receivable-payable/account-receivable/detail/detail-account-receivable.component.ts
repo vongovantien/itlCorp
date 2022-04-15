@@ -149,8 +149,8 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     showDebitDetail(option,officeId,serviceCode) {
-        var agreId = this.accReceivableDetail.agreementId;
-        this._accoutingRepo.getDataDebitDetail(agreId, option,officeId,serviceCode)
+        var argeementId = this.accReceivableDetail.agreementId;
+        this._accoutingRepo.getDataDebitDetail(argeementId, option,officeId,serviceCode)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -158,6 +158,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
+                        this.debitDetailPopupComponent.dataSearch= {argeementId, option,officeId,serviceCode};
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }

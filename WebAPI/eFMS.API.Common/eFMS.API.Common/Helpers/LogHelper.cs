@@ -1,8 +1,12 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals.Configs;
+using eFMS.API.Common.Models;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Common.Helpers
 {
@@ -67,5 +71,81 @@ namespace eFMS.API.Common.Helpers
             {
             }
         }
+
+        public async Task PushWebhook(string url, ResponseExModel model)
+        {
+            try
+            {
+                MessageCardWebHook wh = BuildMessageCard(model);
+                var data = await HttpClientService.PostAPI(url, wh, null);
+            }
+            catch (Exception ex)
+            {
+                LogWrite("Webhook Log", ex.ToString());
+            }
+        }
+        public async Task PushWebhook(string url, MessageCardWebHook model)
+        {
+            try
+            {
+                var data = await HttpClientService.PostAPI(url, model, null);
+            }
+            catch (Exception ex)
+            {
+                LogWrite("Webhook Log", ex.ToString());
+            }
+        }
+
+        private MessageCardWebHook BuildMessageCard(ResponseExModel model)
+        {
+            return new MessageCardWebHook
+            {
+                Type = "MessageCard",
+                ThemeColor = "0076D7",
+                Summary = model.Name,
+                Sections = new List<MessageCardActivitySection> {
+                    new MessageCardActivitySection
+                    {
+                        ActivityTitle = model.Name,
+                        ActivitySubtitle = model.Source,
+                        ActivityImage = "https://efms.itlvn.com/en/assets/demo/default/media/img/logo/logo-web.png",
+                        Facts = new List<ValueName>
+                        {
+                            new ValueName
+                            {
+                                Name = "Code",
+                                Value = model.Code.ToString()
+                            },
+                            new ValueName
+                            {
+                                Name = "Name",
+                                Value = model.Message
+                            },
+                            new ValueName
+                            {
+                                Name = "Path",
+                                Value = model.Path
+                            },
+                            new ValueName
+                            {
+                                Name = "Body",
+                                Value = model.Body
+                            },
+                            new ValueName
+                            {
+                                Name = "Date",
+                                Value = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+                            },
+                            new ValueName
+                            {
+                                Name = "Status",
+                                Value = "False"
+                            },
+                        }
+                    }
+                }
+            };
+        }
+
     }
 }

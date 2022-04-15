@@ -435,7 +435,7 @@ export class ExportRepo {
             window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${id}&office=${office}`, '_blank');
     }
 
-    previewExport(url: string){
+    previewExport(url: string) {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
 
@@ -461,6 +461,13 @@ export class ExportRepo {
         );
     }
 
+    exportAccountingReceivableDebitDetail(searchObject: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitDetail`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAgreementInfo(partnerSearchObj: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
@@ -480,6 +487,14 @@ export class ExportRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    exportAcountingPayableStandart(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableStandartReport`, searchObject, null, {}, 'response');
+    }
+
+    exportAcountingTemplatePayable(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
     }
 }
 

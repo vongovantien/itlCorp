@@ -90,11 +90,12 @@
                             </table-surcharge-settlement>
                         </accordion-group>
                     </accordion>
-                    <div class="table-wrapper" *ngIf="!(isLoading | async) && !groupShipments.length">
+                    <div class="table-wrapper">
                         <table class="table table-brand table-hover dataTable table-striped">
                             <tbody class="tbody-group">
-                                <tr *ngIf="!(isLoading | async) && !groupShipments.length" app-table-none-record
-                                    [colspan]="headers.length + 2"></tr>
+                                <tr *ngIf="(!(isLoading | async) && !isLoadingGroupShipment) && !groupShipments.length"
+                                    app-table-none-record [colspan]="headers.length + 2"></tr>
+                                <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingGroupShipment"></tr>
                             </tbody>
                         </table>
                     </div>
@@ -128,6 +129,7 @@
                                                         value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                     <span></span>
                                                 </label>
+
                                                 <ng-container *ngIf="!surcharge.isLocked">
                                                     <ng-container *ngIf="!readonly">
                                                         <span [class.m--margin-right-20]="surcharge.isFromShipment">
@@ -144,7 +146,7 @@
                                             <!-- Phí hiện trường -->
                                             <ng-template #chargeFromShipmentTpl>
                                                 <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                    <ng-container *ngIf="!surcharge.syncedFromBy">
+                                                    <ng-container *ngIf="surcharge.hasNotSynce && !surcharge.linkChargeId">
                                                         <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                             value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                         <span></span>
@@ -237,9 +239,9 @@
                                         (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
                             </ng-container>
-                            <tr *ngIf="!(isLoading | async) && !surcharges.length" app-table-none-record
-                                [colspan]="headers.length + 2"></tr>
-                            <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+                            <tr *ngIf="(!(isLoading | async) && !isLoadingSurchargeList) && !surcharges.length"
+                                app-table-none-record [colspan]="headers.length + 2"></tr>
+                            <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingSurchargeList"></tr>
                         </tbody>
                     </table>
                 </div>

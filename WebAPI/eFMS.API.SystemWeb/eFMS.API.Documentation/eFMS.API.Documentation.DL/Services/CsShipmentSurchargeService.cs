@@ -45,6 +45,9 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
+        private readonly IContextBase<CatCurrency> currencyRepository;
+
+        private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -65,7 +68,9 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo
+            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            IContextBase<CatCurrency> currencyRepo,
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -88,6 +93,8 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             catChargeGroupRepository = catChargeGroupRepo;
+            currencyRepository = currencyRepo;
+            acctApproveSettlementRepository = acctApproveSettlementRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -123,6 +130,45 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        public HandleState CancelLinkCharge(Guid chargeId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
+                if (charge == null)
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
+                {
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                }
+                else
+                {
+                    if (charge.LinkChargeId != null)
+                    {
+                        var chargeUpdate = DataContext.Where(x => x.Id == Guid.Parse(charge.LinkChargeId)).FirstOrDefault();
+                        chargeUpdate.LinkChargeId = null;
+                        DataContext.Update(chargeUpdate, x => x.Id == chargeUpdate.Id, false);
+                        DataContext.SubmitChanges();
+                    }
+                    DataContext.Delete(x => x.Id == chargeId);
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
         public List<CatPartner> GetAllParner(Guid id, bool isHouseBillID = false)
         {
             try
@@ -213,8 +259,10 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        listCharges = listCharges.Where(x =>
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                        // Charges IsFromShipment = true
+                        var chargesFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == true &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -224,8 +272,31 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                         ).ToList();
+
+                        // Charges IsFromShipment = false 
+                        var chargesNotFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == false &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
+                        ).ToList();
+                        var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
+                        listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
+
+                        var settleInCharge = chargesDebitSettle.Select(x => x.SettlementCode).ToList();
+                        var validSettleDebit = acctApproveSettlementRepository.Get(x => settleInCharge.Any(z => z == x.SettlementNo) && x.IsDeny == false && !string.IsNullOrEmpty(x.ManagerApr) && x.ManagerAprDate != null).Select(x => x.SettlementNo).ToList();
+                        listCharges.AddRange(chargesDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
+                        listCharges.AddRange(chargesFromShipment);
                     }
                     listCharges.ForEach(fe =>
                     {
@@ -257,8 +328,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    listCharges = listCharges.Where(x =>
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                    // Charges IsFromShipment = true
+                    var chargesFromShipment = listCharges.Where(x =>
+                         x.IsFromShipment == true &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -268,8 +341,31 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                     ).ToList();
+
+                    // Charges IsFromShipment = false
+                    var chargesNotFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == false &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
+                        ).ToList();
+                    var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
+                    listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
+
+                    var settleInCharge = chargesDebitSettle.Select(x => x.SettlementCode).ToList();
+                    var validSettleDebit = acctApproveSettlementRepository.Get(x => settleInCharge.Any(z => z == x.SettlementNo) && x.IsDeny == false && !string.IsNullOrEmpty(x.ManagerApr) && x.ManagerAprDate != null).Select(x => x.SettlementNo).ToList();
+                    listCharges.AddRange(chargesDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
+                    listCharges.AddRange(chargesFromShipment);
                 }
                 listCharges.ForEach(fe =>
                 {
@@ -640,26 +736,29 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids)
         {
             var result = new HandleState();
-            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            decimal kickBackExcRate = 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
+                        item.Vatrate = 8;
+                        item.Notes = "IT hổ trợ update vat";
                         var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
-                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                         item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                         item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = "d1bb21ea-249a-455c-a981-dcb554c3b848";
                         var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();
@@ -693,11 +792,11 @@ namespace eFMS.API.Documentation.DL.Services
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
-                    IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
-                    //hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
-                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
-                    hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //IQueryable<CsTransactionDetail> houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
+                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
+                    //hblids = houseBills.Where(x => x.JobId == csShipment.Id && x.ParentId == null).Select(x =>
+                    //                new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }
             else
@@ -1420,7 +1519,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if (!item.UnitPrice.HasValue)
+                if (!item.UnitPrice.HasValue || item.UnitPrice == 0)
                 {
                     item.UnitPriceError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_UNIT_PRICE_EMPTY]);
                     item.IsValid = false;
@@ -1429,6 +1528,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
+                } else
+                {
+                    if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
+                    {
+                        item.UnitError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_NOT_EXIST], item.CurrencyId);
+                        item.IsValid = false;
+                    }
                 }
                 if (!item.Vatrate.HasValue)
                 {
@@ -1455,6 +1561,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                {
+                    if (string.IsNullOrEmpty(item.SeriesNo))
+                    {
+                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
@@ -1572,9 +1686,39 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
+                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
                     }
                 }
             });
+            if (list.Count > 1)
+            {
+                for (int i = 0; i < list.Count() - 1; i++)
+                {
+                    int j = i + 1;
+                    while (j < list.Count())
+                    {
+                        if (list[i].InvoiceNo == list[j].InvoiceNo && list[i].InvoiceNo != null)
+                        {
+                            list[i].IsValid = false;
+                            list[j].IsValid = false;
+                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            {
+                                list[i].IsValid = true;
+                                list[j].IsValid = true;
+                            }
+                        }
+                        j++;
+                    }
+                }
+            }
             return list;
         }
 
@@ -1601,7 +1745,6 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     item.UserCreated = item.UserModified = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    item.ExchangeDate = DateTime.Now.Date;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;

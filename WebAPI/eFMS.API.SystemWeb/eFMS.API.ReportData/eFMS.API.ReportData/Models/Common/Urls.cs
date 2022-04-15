@@ -45,6 +45,7 @@
 
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
+            public const string GetDebitDetailUrl = "/api/v1/en-US/AccountReceivable/GetDebitDetail";
 
             public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
             public const string SettlementPaymentDetailListUrl = "/api/v1/en-US/AcctSettlementPayment/GetDataExportSettlementDetail";
@@ -63,6 +64,9 @@
             public const string GetDataCombineOpsUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOps?combineBillingNo=";
             public const string GetDataCombineOpsByPartnerUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOpsByPartner";
             public const string UploadFileExcel = "/api/v1/en-US/AWSS3/UploadFilePreview/Accounting/";
+
+            public const string APStandartReportUrl = "/api/v1/en-US/AcctPayable/GetDataExportAccountingPayable";
+            public const string APAcctTemplateReportUrl = "/api/v1/en-US/AcctPayable/GetDataExportAccountingTemplate";
         }
 
         public class Documentation

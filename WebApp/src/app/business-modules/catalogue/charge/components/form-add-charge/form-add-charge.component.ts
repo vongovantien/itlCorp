@@ -28,6 +28,8 @@ export class FormAddChargeComponent extends AppForm {
     type: AbstractControl;
     service: AbstractControl;
     debitCharge: AbstractControl;
+    creditCharge: AbstractControl;
+
     chargeGroup: AbstractControl;
     active: AbstractControl;
     generateSelling: AbstractControl;
@@ -45,6 +47,7 @@ export class FormAddChargeComponent extends AppForm {
     requiredService: boolean = false;
     isSubmitted: boolean = false;
     isShowMappingSelling: boolean = false;
+    isShowMappingBuying: boolean = false;
 
     ngDataType: Array<string> = ["CREDIT", "DEBIT", "OBH", "OTHER"];
 
@@ -62,6 +65,8 @@ export class FormAddChargeComponent extends AppForm {
     ];
 
     debitCharges: Observable<Charge[]>;
+    creditCharges: Observable<Charge[]>;
+
     modes: string[] = [
         "INTERNAL", "N.INV"
     ];
@@ -79,6 +84,7 @@ export class FormAddChargeComponent extends AppForm {
         this.getChargeGroup();
         this.initForm();
         this.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
+        this.creditCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT });
     }
 
     initForm() {
@@ -97,7 +103,9 @@ export class FormAddChargeComponent extends AppForm {
             active: [true],
             generateSelling: [true],
             productDept: [],
-            mode: []
+            mode: [],
+            creditCharge: [],
+
         });
 
         this.code = this.formGroup.controls["code"];
@@ -114,6 +122,7 @@ export class FormAddChargeComponent extends AppForm {
         this.active = this.formGroup.controls["active"];
         this.generateSelling = this.formGroup.controls["generateSelling"];
         this.mode = this.formGroup.controls["mode"];
+        this.creditCharge = this.formGroup.controls["creditCharge"];
 
         this.type.valueChanges
             .subscribe(
@@ -123,6 +132,11 @@ export class FormAddChargeComponent extends AppForm {
                             this.isShowMappingSelling = true;
                         } else {
                             this.isShowMappingSelling = false;
+                        }
+                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
+                            this.isShowMappingBuying = true;
+                        } else {
+                            this.isShowMappingBuying = false;
                         }
                     }
                 }
@@ -210,7 +224,8 @@ export class FormAddChargeComponent extends AppForm {
             active: res.charge.active,
             productDept: res.charge.productDept,
             unit: res.charge.unitId,
-            mode: res.charge.mode
+            mode: res.charge.mode,
+            creditCharge: res.charge.creditCharge,
         });
     }
 }
