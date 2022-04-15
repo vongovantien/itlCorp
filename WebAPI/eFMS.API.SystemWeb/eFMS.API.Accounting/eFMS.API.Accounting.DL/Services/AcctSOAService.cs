@@ -3886,7 +3886,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var soa = Get(x => x.Soano == model.CODE).FirstOrDefault();
                         if (soa != null)
                         {
-                            soa.DebitAmount += _debitAmount;
+                            soa.DebitAmount = _debitAmount;
                             hs = DataContext.Update(soa, x => x.Id == soa.Id);
                         }
                     }
