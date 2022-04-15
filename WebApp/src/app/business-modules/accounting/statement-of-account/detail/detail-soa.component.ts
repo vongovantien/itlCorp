@@ -19,7 +19,7 @@ import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { HttpResponse, HttpResponseBase } from '@angular/common/http';
 import { cloneDeep } from 'lodash';
-import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-business/components/adjust-debit-value/adjust-debit-value.popup';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
 
 @Component({
     selector: 'app-statement-of-account-detail',

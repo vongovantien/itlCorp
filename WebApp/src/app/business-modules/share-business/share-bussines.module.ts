@@ -62,8 +62,7 @@ import {
     ShareBusinessAttachListHouseBillComponent,
     ShareBussinessInputDailyExportPopupComponent,
     ShareBussinessPaymentMethodPopupComponent,
-    ShareBussinessJobDetailButtonListComponent,
-    ShareBussinessAdjustDebitValuePopupComponent
+    ShareBussinessJobDetailButtonListComponent
 } from './components';
 
 
@@ -75,6 +74,7 @@ import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareBusinessProofOfDelieveyComponent } from './components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { ShareModulesModule } from '../share-modules/share-modules.module';
 
 
 
@@ -124,8 +124,7 @@ const COMPONENTS = [
     ShareBussinessInputDailyExportPopupComponent,
     ShareBussinessPaymentMethodPopupComponent,
     ShareBussinessJobDetailButtonListComponent,
-    ShareBusinessProofOfDelieveyComponent,
-    ShareBussinessAdjustDebitValuePopupComponent
+    ShareBusinessProofOfDelieveyComponent
 ];
 
 
@@ -166,7 +165,7 @@ const customCurrencyMaskConfig = {
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
         NgxSpinnerModule,
-
+        ShareModulesModule
     ],
     exports: [
         ...COMPONENTS

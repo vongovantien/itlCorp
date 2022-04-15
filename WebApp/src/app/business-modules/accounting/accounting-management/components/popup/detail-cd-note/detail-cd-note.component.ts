@@ -10,7 +10,7 @@ import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-business/components';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
 
 @Component({
     selector: 'accounting-detail-cd-note',
