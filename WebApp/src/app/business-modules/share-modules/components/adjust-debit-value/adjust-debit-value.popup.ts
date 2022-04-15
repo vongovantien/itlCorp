@@ -134,11 +134,8 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
             let el = this.data.listChargeGrp[i];
             for (let j = 0; j < this.data.listChargeGrp[i].listCharges.length; j++) {
                 let el2 = this.data.listChargeGrp[i].listCharges[j];
-                if ((el2.amountVND + el2.vatAmountVND) > el2.adjustedVND) {
-                    this._toastService.warning(`${el2.chargeCode} not cover Org Adjusted`);
-                    return false;
-                }
-                if (el2.adjustedVND - (el2.amountVND + el2.vatAmountVND) > 10000) {
+                let total = el2.adjustedVND - (el2.amountVND + el2.vatAmountVND);
+                if (total > 10000 || total < -10000) {
                     this._toastService.warning(`${el2.chargeCode} cannot enter too 10.000`);
                     return false;
                 }

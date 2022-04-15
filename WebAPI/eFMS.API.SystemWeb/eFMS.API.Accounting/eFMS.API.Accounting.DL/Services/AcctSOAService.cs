@@ -3704,6 +3704,7 @@ namespace eFMS.API.Accounting.DL.Services
                     adj.AmountUSD = it.AmountUsd ?? 0;
                     adj.ExchangeRate = it.ExchangeRate;
                     adj.Note = it.Notes;
+                    adj.Type = it.Type;
                     o.listCharges.Add(adj);
                 }
                 o.TotalOrgAmountVND = o.listCharges.Where(x => x.Currency == "VND").Sum(x => x.OrgAmount);

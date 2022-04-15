@@ -52,5 +52,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string ChargeCode { get; set; }
         public string ChargeName { get; set; }
         public string Note { get; set; }
+        public string Type { get; set; }
     }
 }
