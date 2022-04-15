@@ -463,7 +463,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.adjustDebitValuePopup.action = "SOA";
         this.adjustDebitValuePopup.active();
     }
-    onSaveAdjustDebit(data){
+    onSaveAdjustDebit(){
         this.getDetailSOA(this.soaNO, this.currencyLocal);
     }
 }
