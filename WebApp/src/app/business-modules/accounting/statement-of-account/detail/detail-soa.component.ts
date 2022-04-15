@@ -77,8 +77,8 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'No.', field: 'i', sortable: false },
-            { title: 'Charge Code', field: 'chargeCode', sortable: true },
-            { title: 'Charge Name', field: 'chargeName', sortable: true },
+            { title: 'Charge Code', field: 'chargeCode',width:200, sortable: true },
+            { title: 'Charge Name', field: 'chargeName',width:200, sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'MBL', field: 'mbl', sortable: true },
