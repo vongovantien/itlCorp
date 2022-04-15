@@ -24,6 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string Payee { get; set; }
         public decimal? SettleAmount { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
 
     }
 

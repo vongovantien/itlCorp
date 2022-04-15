@@ -2,7 +2,17 @@
 
 namespace eFMS.API.Accounting.DL.Models.Accounting
 {
-    public class RequestGuidListModel
+    public class RequestGuidListModel: RequestListModel
+    {
+        
+    }
+
+    public class RequestGuidAndFileListModel : RequestListModel
+    {
+        public string fileName { get; set; }
+    }
+
+    public class RequestListModel
     {
         public Guid Id { get; set; }
         public ACTION Action { get; set; }

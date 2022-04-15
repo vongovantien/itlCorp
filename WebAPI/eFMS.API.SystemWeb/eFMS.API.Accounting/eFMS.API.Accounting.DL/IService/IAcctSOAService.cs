@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -14,9 +15,9 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IAcctSOAService : IRepositoryBase<AcctSoa, AcctSoaModel>
     {
-        HandleState AddSOA(AcctSoaModel model);
-        HandleState UpdateSOA(AcctSoaModel model);
-        HandleState DeleteSOA(string soaId);
+        ResultHandle AddSOA(AcctSoaModel model);
+        ResultHandle UpdateSOA(AcctSoaModel model);
+        ResultHandle DeleteSOA(string soaId);
         IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount);
         object GetListStatusSoa();
         IQueryable<ChargeShipmentModel> GetListMoreCharge(MoreChargeShipmentCriteria criteria);
@@ -38,5 +39,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo);
         AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results);
         HandleState ValidateCheckPointPartnerSOA(AcctSoa soa);
+        HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string action);
+        Task<HandleState> UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string action);
     }
 }

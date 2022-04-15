@@ -10,6 +10,7 @@ namespace OperationInteface {
         hblid?: string;
         service?: string;
         customNo?: string;
+        advanceNo?: string;
     }
 
     export interface IInputShipment {

@@ -47,6 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
         private readonly IContextBase<CatCurrency> currencyRepository;
 
+        private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -68,7 +69,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IContextBase<CatChargeGroup> catChargeGroupRepo,
-            IContextBase<CatCurrency> currencyRepo
+            IContextBase<CatCurrency> currencyRepo,
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -92,6 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             customsDeclarationRepository = customsDeclarationRepo;
             catChargeGroupRepository = catChargeGroupRepo;
             currencyRepository = currencyRepo;
+            acctApproveSettlementRepository = acctApproveSettlementRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -256,8 +259,10 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        listCharges = listCharges.Where(x =>
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                        // Charges IsFromShipment = true
+                        var chargesFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == true &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -267,8 +272,31 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                         ).ToList();
+
+                        // Charges IsFromShipment = false 
+                        var chargesNotFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == false &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
+                        ).ToList();
+                        var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
+                        listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
+
+                        var settleInCharge = chargesDebitSettle.Select(x => x.SettlementCode).ToList();
+                        var validSettleDebit = acctApproveSettlementRepository.Get(x => settleInCharge.Any(z => z == x.SettlementNo) && x.IsDeny == false && !string.IsNullOrEmpty(x.ManagerApr) && x.ManagerAprDate != null).Select(x => x.SettlementNo).ToList();
+                        listCharges.AddRange(chargesDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
+                        listCharges.AddRange(chargesFromShipment);
                     }
                     listCharges.ForEach(fe =>
                     {
@@ -300,8 +328,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    listCharges = listCharges.Where(x =>
-                            x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                    // Charges IsFromShipment = true
+                    var chargesFromShipment = listCharges.Where(x =>
+                         x.IsFromShipment == true &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
                             (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
@@ -311,8 +341,31 @@ namespace eFMS.API.Documentation.DL.Services
                                      : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
                                 )
                             )
-                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
                     ).ToList();
+
+                    // Charges IsFromShipment = false
+                    var chargesNotFromShipment = listCharges.Where(x =>
+                            x.IsFromShipment == false &&
+                            (x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
+                                string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
+                                :
+                                (
+                                    string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) ?
+                                        string.IsNullOrEmpty(x.DebitNo) && x.PaymentObjectId == partnerId
+                                     : string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo)
+                                )
+                            )
+                            : string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))
+                        ).ToList();
+                    var chargesDebitSettle = chargesNotFromShipment.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.PaymentObjectId == partnerId && !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.DebitNo));
+                    listCharges = chargesNotFromShipment.Except(chargesDebitSettle).ToList();
+
+                    var settleInCharge = chargesDebitSettle.Select(x => x.SettlementCode).ToList();
+                    var validSettleDebit = acctApproveSettlementRepository.Get(x => settleInCharge.Any(z => z == x.SettlementNo) && x.IsDeny == false && !string.IsNullOrEmpty(x.ManagerApr) && x.ManagerAprDate != null).Select(x => x.SettlementNo).ToList();
+                    listCharges.AddRange(chargesDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
+                    listCharges.AddRange(chargesFromShipment);
                 }
                 listCharges.ForEach(fe =>
                 {
@@ -683,26 +736,29 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD()
+        public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids)
         {
             var result = new HandleState();
-            var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
-            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            decimal kickBackExcRate = 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
+                        item.Vatrate = 8;
+                        item.Notes = "IT hổ trợ update vat";
                         var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
-                        item.AmountVnd = item.AmountVnd == null ? amountSurcharge.AmountVnd : item.AmountVnd; //Thành tiền trước thuế (Local)
-                        item.VatAmountVnd = item.VatAmountVnd == null ? amountSurcharge.VatAmountVnd : item.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                         item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                         item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = "d1bb21ea-249a-455c-a981-dcb554c3b848";
                         var d = DataContext.Update(item, x => x.Id == item.Id, false);
                     }
                     DataContext.SubmitChanges();

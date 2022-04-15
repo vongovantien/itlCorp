@@ -614,7 +614,7 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.UpdatUpdateFieldNetAmount_AmountUSD_VatAmountUSDeField(System.Collections.Generic.List{System.Guid})">
             <summary>
             Only Use for Dev
             </summary>

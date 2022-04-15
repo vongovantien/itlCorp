@@ -104,5 +104,6 @@
         public static readonly string SOA_TYPE_DEBIT = "DEBIT";
         public static readonly string SOA_TYPE_CREDIT = "CREDIT";
 
+        public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
     }
 }

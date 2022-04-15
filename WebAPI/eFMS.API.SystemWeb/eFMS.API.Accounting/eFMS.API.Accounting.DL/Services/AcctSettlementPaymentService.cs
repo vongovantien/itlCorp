@@ -2191,7 +2191,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //End --Phí chứng từ (IsFromShipment = true)--
 
                         //Start --Phí hiện trường (IsFromShipment = false)--
-                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false ).ToList();
+                        var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
                         var idsChargeScene = chargeScene.Select(x => x.Id);
                         //Add các phí hiện trường mới (nếu có)
                         var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
@@ -2222,6 +2222,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.TransactionType = GetTransactionTypeOfChargeByHblId(charge.Hblid);
                                 charge.OfficeId = currentUser.OfficeID;
                                 charge.CompanyId = currentUser.CompanyID;
+                                charge.CreditNo = charge.DebitNo = charge.Soano = charge.PaySoano = null;  // refresh các hđ trước đó
 
                                 #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
@@ -2279,7 +2280,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 if (sceneCharge != null )
                                 {
-                                    if(string.IsNullOrEmpty(item.LinkChargeId))
+                                    if(string.IsNullOrEmpty(item.LinkChargeId) && string.IsNullOrEmpty(item.SyncedFrom) && string.IsNullOrEmpty(item.PaySyncedFrom))
                                     {
                                         sceneCharge.UnitId = item.UnitId;
                                         sceneCharge.UnitPrice = item.UnitPrice;
@@ -4180,13 +4181,15 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.PaymentRequestType = charge.PaymentRequestType;
                     chargeCopy.ClearanceNo = shipment.CustomNo; //Lấy customNo của Shipment
                     chargeCopy.ContNo = charge.ContNo;
-                    chargeCopy.Soaclosed = charge.Soaclosed;
-                    chargeCopy.Cdclosed = charge.Cdclosed;
-                    chargeCopy.CreditNo = charge.CreditNo;
-                    chargeCopy.DebitNo = charge.DebitNo;
-                    chargeCopy.Soano = charge.Soano;
+                    #region comment: copy charge without copy cdnote, soa
+                    //chargeCopy.Soaclosed = charge.Soaclosed;
+                    //chargeCopy.Cdclosed = charge.Cdclosed;
+                    //chargeCopy.CreditNo = charge.CreditNo;
+                    //chargeCopy.DebitNo = charge.DebitNo;
+                    //chargeCopy.Soano = charge.Soano;
+                    //chargeCopy.PaySoano = charge.PaySoano;
+                    #endregion
                     chargeCopy.IsFromShipment = charge.IsFromShipment;
-                    chargeCopy.PaySoano = charge.PaySoano;
                     chargeCopy.TypeOfFee = charge.TypeOfFee;
                     chargeCopy.AdvanceNo = advance;
 
@@ -4792,15 +4795,22 @@ namespace eFMS.API.Accounting.DL.Services
             return true;
         }
 
-        public bool CheckDeletePermissionBySettlementId(Guid settlementId)
+        /// <summary>
+        /// Check before delete settlement
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns>0 : delete</returns>
+        /// <returns>403 : dont have permission</returns>
+        /// <returns>-1 : add charge have synced charges</returns>
+        public int CheckDeletePermissionBySettlementId(Guid settlementId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None)
-                return false;
+                return 403;
 
             var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
-            if (detail == null) return false;
+            if (detail == null) return 403;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
@@ -4812,9 +4822,14 @@ namespace eFMS.API.Accounting.DL.Services
             };
             int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
 
-            if (code == 403) return false;
+            if (code == 403) return code;
 
-            return true;
+            if (detail.SettlementType == "DIRECT")
+            {
+                var isExistedChargeSynced = csShipmentSurchargeRepo.Any(x => x.SettlementCode == detail.SettlementNo && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
+                return isExistedChargeSynced ? -1 : 0;
+            }
+            return 0;
         }
 
         public bool CheckUpdatePermissionBySettlementId(Guid settlementId)
@@ -6015,6 +6030,69 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
        
+        /// <summary>
+        /// Check allow update direct charges in list detail settle
+        /// </summary>
+        /// <param name="shipmentCharges"></param>
+        /// <returns></returns>
+        public ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
+        {
+            var chargeIds = shipmentCharges.Select(x => x.Id).ToList();
+            var surcharges = csShipmentSurchargeRepo.Get(x => chargeIds.Any(z => z == x.Id) && x.IsFromShipment == false);
+            var hs = new ResultHandle();
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo)))
+            {
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued CDNOTE", Data = surcharges };
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)))
+            {
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued SOA", Data = surcharges };
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)))
+            {
+                return new ResultHandle { Status = false, Message = "You can't update charges have been synced", Data = surcharges };
+            }
+            if (surcharges.Any(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)))
+            {
+                return new ResultHandle { Status = false, Message = "You can't update charges have been issued voucher", Data = surcharges };
+            }
+            return new ResultHandle();
+        }
+
+        /// <summary>
+        /// Check allow deby settlement
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public ResultHandle CheckAllowDenySettle(List<Guid> ids)
+        {
+            #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
+            var invalidSettles = new List<Guid>();
+            var invalidCodeSettles = new List<string>();
+            foreach (var settlementId in ids)
+            {
+                var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+                if (detail == null) return null;
+
+                if (detail.SettlementType == "DIRECT")
+                {
+                    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
+                    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
+                    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
+                    if (isDebit || isSoa)
+                    {
+                        invalidSettles.Add(settlementId);
+                        invalidCodeSettles.Add(detail.SettlementNo);
+                    }
+                }
+            }
+            if(invalidSettles.Count > 0)
+            {
+                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+            }
+            #endregion
+            return new ResultHandle();
+        }
     }
 }
 
