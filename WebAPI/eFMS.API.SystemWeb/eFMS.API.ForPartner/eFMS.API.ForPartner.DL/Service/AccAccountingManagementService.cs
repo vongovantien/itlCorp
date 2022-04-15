@@ -2310,7 +2310,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
-                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
+                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
+                    surcharges = s.Where(x => x.TransactionType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_OBH || x.TransactionType.Contains(ForPartnerConstants.TYPE_CREDIT)).Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
                 })
                 .ToList();
             if (grpVoucherDetail.Count > 0)
