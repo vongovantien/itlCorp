@@ -41,6 +41,8 @@ export abstract class AppForm extends AppPage {
     digitDecimal: number = 5;
 
     confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";
+    confirmUpdateHblText: string = 'You are about to update HBL, are you sure all entered details are correct?';
+    confirmCreateHblText: string = 'Are you sure you want to create HBL?';
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
     errorETA: string = 'ETA must be greater than or equal ETD';
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
