@@ -2,10 +2,10 @@ import { Component, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo } from '@repositories';
 import { AppForm } from '@app';
 import { DataService } from '@services';
-import { JobConstants, ChargeConstants } from '@constants';
+import { JobConstants } from '@constants';
 import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer, Incoterm } from '@models';
 import { CommonEnum } from '@enums';
 import { InfoPopupComponent } from '@common';
@@ -109,10 +109,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo,
         private _dataService: DataService,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        private _document: DocumentationRepo,
         private _toast: ToastrService
 
     ) {

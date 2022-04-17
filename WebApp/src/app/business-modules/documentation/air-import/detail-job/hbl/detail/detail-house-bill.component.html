@@ -26,13 +26,17 @@
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER1', false)">A.L (Form
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="showPreviewSignature('AUTHORIZE_LETTER1', false)">A.L (Form
                                     1)</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER1', true)">A.L (Form
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="showPreviewSignature('AUTHORIZE_LETTER1', true)">A.L (Form
                                     1) with Signature</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER2', false)">A.L (Form
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="showPreviewSignature('AUTHORIZE_LETTER2', false)">A.L (Form
                                     2)</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER2', true)">A.L (Form
+                            <li role="menuitem"><a class="dropdown-item pointer"
+                                    (click)="showPreviewSignature('AUTHORIZE_LETTER2', true)">A.L (Form
                                     2) with Signature</a></li>
                         </ul>
                     </li>
@@ -44,7 +48,7 @@
             </div>
 
             <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
-                (onClick)="confirmSave.show()">
+                (onClick)="showCreatepoup()">
             </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
@@ -71,18 +75,7 @@
     </div>
 </div>
 
-<confirm-popup #confirmSave body="You are about to update HBL. Are you sure all entered details are correct?"
-    (onSubmit)="onSaveHBLDetail()"></confirm-popup>
-
-<info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update HB'"></info-popup>
-
-<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
-    (onSubmit)="confirmUpdateData()" title="HAWB Existed"></confirm-popup>
-
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>
 
 <ul class="m-nav-sticky fms-shipment-sidebar">
     <li class="m-nav-sticky__item">

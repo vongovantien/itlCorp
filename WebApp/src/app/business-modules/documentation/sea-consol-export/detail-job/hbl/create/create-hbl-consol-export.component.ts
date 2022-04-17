@@ -22,6 +22,7 @@ import { catchError, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-create-hbl-consol-export',
@@ -30,13 +31,13 @@ import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/
 
 export class SeaConsolExportCreateHBLComponent extends AppForm {
 
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string;
     containers: Container[] = [];
@@ -101,15 +102,21 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     }
 
     showCreatepoup() {
-        this.confirmPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
     onSaveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            });
             return;
         }
 

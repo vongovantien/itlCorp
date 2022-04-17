@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -6,27 +6,22 @@ import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { CsTransactionDetail } from '@models';
-import { ReportPreviewComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { ChargeConstants } from '@constants';
-import { delayTime } from '@decorators';
-import { ICrystalReport } from '@interfaces';
 
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, skip, takeUntil, tap, switchMap } from 'rxjs/operators';
+import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
-import { of } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-consol-export',
     templateUrl: './detail-hbl-consol-export.component.html'
 })
 
-export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
-
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLComponent implements OnInit, AfterViewInit {
 
     hblId: string;
     hblDetail: CsTransactionDetail;
@@ -112,11 +107,12 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
     }
 
     onSaveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -159,61 +155,63 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
             );
     }
 
-    preview(reportType: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
-                    }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.showReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
-
-                },
-            );
+    showCreatepoup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmUpdateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
-    previewAttachList() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        return this._documentationRepo.previewAirAttachList(this.hblId);
-                    }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
-            ).subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.showReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
+    // preview(reportType: string) {
+    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+    //         .pipe(
+    //             switchMap((res: CommonInterface.IResult) => {
+    //                 if (res.status) {
+    //                     return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
+    //                 }
+    //                 this._toastService.warning(res.message);
+    //                 return of(false);
+    //             })
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (res !== false) {
+    //                     if (res?.dataSource?.length > 0) {
+    //                         this.dataReport = res;
+    //                         this.showReport();
+    //                     } else {
+    //                         this._toastService.warning('There is no data to display preview');
+    //                     }
+    //                 }
 
-                },
-            );
-    }
+    //             },
+    //         );
+    // }
 
-    @delayTime(1000)
-    showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
-    }
+    // previewAttachList() {
+    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+    //         .pipe(
+    //             switchMap((res: CommonInterface.IResult) => {
+    //                 if (res.status) {
+    //                     return this._documentationRepo.previewAirAttachList(this.hblId);
+    //                 }
+    //                 this._toastService.warning(res.message);
+    //                 return of(false);
+    //             })
+    //         ).subscribe(
+    //             (res: any) => {
+    //                 if (res !== false) {
+    //                     if (res?.dataSource?.length > 0) {
+    //                         this.dataReport = res;
+    //                         this.showReport();
+    //                     } else {
+    //                         this._toastService.warning('There is no data to display preview');
+    //                     }
+    //                 }
 
+    //             },
+    //         );
+    // }
 }

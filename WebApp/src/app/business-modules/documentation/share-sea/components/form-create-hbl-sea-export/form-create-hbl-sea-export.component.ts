@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote, Incoterm } from '@models';
 import { JobConstants, ChargeConstants, SystemConstants } from '@constants';
@@ -110,7 +110,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -369,7 +368,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.podDescription = this.formCreate.controls["podDescription"];
 
         this.hwbno.valueChanges
-            .pipe(startWith(this.hwbno.value))
+            .pipe(startWith(this.hwbno.value), takeUntil(this.ngUnsubscribe))
             .subscribe((hwbno: string) => {
                 this._dataService.setData('formHBLData', { hblNo: hwbno, etd: '', eta: '' });
             });
@@ -459,7 +458,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             podDescription: data.podDescription,
         });
 
-        this.ports.pipe().subscribe(
+        this.ports.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
             (ports: PortIndex[]) => {
                 let portIndex = ports.filter((x: PortIndex) => x.id === data.pol)[0];
                 this.onSelectDataFormInfo(portIndex, 'pol');

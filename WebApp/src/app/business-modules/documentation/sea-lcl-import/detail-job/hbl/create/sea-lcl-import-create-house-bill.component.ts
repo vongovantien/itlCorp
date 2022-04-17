@@ -28,6 +28,7 @@ import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -43,13 +44,12 @@ enum HBL_TAB {
 export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = '';
     shipmentDetail: CsTransaction;
@@ -155,20 +155,20 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         return valid;
     }
 
-    oncreate() {
-        this.confirmCreatePopup.hide();
+    onSaveHBL() {
         this.formHouseBill.isSubmited = true;
         this.hblGoodsSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.arrivalNoteComponent.isSubmitted = true;
             this.deliveryComponent.isSubmitted = true;
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot create HBL',
+                body: this.invalidFormText
+            });
         } else {
             const body = this.onsubmitData();
-
             this.createHbl(body);
-
         }
     }
 
@@ -180,7 +180,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     showCreatePpoup() {
-        this.confirmCreatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
     combackToHBLList() {
@@ -278,7 +282,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
             etd: !!this.formHouseBill.etd.value && this.formHouseBill.etd.value.startDate != null ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
-            eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
+            eta: !!this.formHouseBill.eta.value?.startDate ? formatDate(this.formHouseBill.eta.value.startDate, 'yyyy-MM-dd', 'en') : null,
             etawarehouse: !!this.formHouseBill.etawarehouse.value && this.formHouseBill.etawarehouse.value.startDate != null ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!this.formHouseBill.issueHBLDate.value && this.formHouseBill.issueHBLDate.value.startDate != null ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
             documentDate: !!this.formHouseBill.documentDate.value && this.formHouseBill.documentDate.value.startDate != null ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,

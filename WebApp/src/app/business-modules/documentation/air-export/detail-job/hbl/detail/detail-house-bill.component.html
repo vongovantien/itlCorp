@@ -55,16 +55,6 @@
     </div>
 </div>
 
-
-
-
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
-
-<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
-    (onSubmit)="confirmUpdateData()" title="HAWB Existed"></confirm-popup>
-
 <ng-template inject></ng-template>
 
 <input-booking-note-popup></input-booking-note-popup>

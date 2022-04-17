@@ -30,12 +30,9 @@
         </tabset>
     </div>
 </div>
+
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="8">
 </import-house-bill-detail>
 
-<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create HBL'"></info-popup>
 
-<confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct ?'"
-    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'" [title]="'Save HBL'">
-</confirm-popup>
+<ng-template inject></ng-template>

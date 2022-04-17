@@ -28,6 +28,7 @@ import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -42,13 +43,12 @@ enum HBL_TAB {
 })
 export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = '';
     selectedHbl: any = {}; // TODO model.
@@ -144,12 +144,14 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     oncreate() {
-        this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.arrivalNoteComponent.isSubmitted = true;
             this.deliveryComponent.isSubmitted = true;
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create HBL',
+                body: this.invalidFormText
+            });
         } else {
             const body = this.onsubmitData();
             this.createHbl(body);
@@ -164,7 +166,13 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     showCreatePpoup() {
-        this.confirmCreatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+
+        }, () => { this.oncreate() });
     }
 
     showImportPopup() {
@@ -179,8 +187,6 @@ export class CreateHouseBillComponent extends AppForm {
     combackToHBLList() {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl`]);
     }
-
-
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
@@ -220,6 +226,7 @@ export class CreateHouseBillComponent extends AppForm {
                 );
         }
     }
+
     onsubmitData() {
         const body = {
             id: SystemConstants.EMPTY_GUID,

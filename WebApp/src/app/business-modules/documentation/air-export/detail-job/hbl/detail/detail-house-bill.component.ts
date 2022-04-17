@@ -25,7 +25,6 @@ import { getCurrentUserState } from '@store';
     templateUrl: './detail-house-bill.component.html',
 })
 export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
     @ViewChild(InputBookingNotePopupComponent) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
 
     hblId: string;
@@ -219,7 +218,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.showReport();
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -244,7 +243,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.showReport();
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -299,7 +298,21 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     @delayTime(1000)
     showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 }

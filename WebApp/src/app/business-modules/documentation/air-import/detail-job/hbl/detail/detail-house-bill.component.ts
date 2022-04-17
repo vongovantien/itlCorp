@@ -4,7 +4,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
-import { ReportPreviewComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
 import { CsTransactionDetail, HouseBill } from '@models';
 import { ChargeConstants } from '@constants';
 import { DataService } from '@services';
@@ -31,7 +31,6 @@ enum HBL_TAB {
     templateUrl: './detail-house-bill.component.html',
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     hblDetail: any;
@@ -89,8 +88,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     @delayTime(1000)
     showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     getDetailHbl() {
@@ -117,7 +116,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
             // * Update Arrival Note.    
             case HBL_TAB.ARRIVAL: {
-                this.confirmPopup.hide();
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {
                     return;
@@ -128,7 +126,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             }
             // * Update Delivery Order.
             case HBL_TAB.AUTHORIZE: {
-                this.confirmPopup.hide();
                 this.deliveryComponent.isSubmitted = true;
                 if (!!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
                     this.deliveryComponent.saveDeliveryOrder();
@@ -139,7 +136,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             }
             // * Update Proof Of Delivery.
             case HBL_TAB.PROOF: {
-                this.confirmPopup.hide();
                 this.proofOfDeliveryComponent.saveProofOfDelivery();
                 break;
             }
@@ -149,21 +145,22 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     saveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
+                title: 'Cannot update HBL'
+            });
             return;
         } else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
-                .pipe(
-                    catchError(this.catchError),
-                )
                 .subscribe(
                     (res: any) => {
                         if (res) {
-                            this.confirmExistedHbl.show();
+                            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: 'HAWB No has existed, do you want to continue saving?',
+                                title: 'HAWB Existed'
+                            }, () => { this.confirmUpdateData() });
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
@@ -176,7 +173,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     confirmUpdateData() {
-        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
         this.setDataToUpdate(modelUpdate);
         this.updateHbl(modelUpdate);
@@ -230,12 +226,15 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
+
                 },
             );
     }
@@ -258,12 +257,15 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data charge to display preview');
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
                     }
+
                 },
             );
     }
@@ -311,8 +313,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             .subscribe(
                 (res: any) => {
                     if (res !== false) {
-                        this.dataReport = res;
-                        this.showReport();
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
@@ -330,8 +336,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
-                        this.dataReport = res;
-                        this.showReport();
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
@@ -350,8 +360,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
-                        this.dataReport = res;
-                        this.showReport();
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
@@ -370,10 +384,37 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
-                        this.dataReport = res;
-                        this.showReport();
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+    showCreatepoup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmUpdateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.saveHBL() });
     }
 }
