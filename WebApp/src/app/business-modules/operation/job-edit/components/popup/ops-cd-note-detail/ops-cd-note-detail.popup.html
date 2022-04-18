@@ -201,6 +201,14 @@
                                     <td class='m--align-right'>
                                         <span>{{ item.currencyId ==='USD'? (item.debit | number:'1.2-2'):(item.debit | number:'1.0-0')}}</span>
                                     </td>
+                                    <ng-container *ngIf="CdNoteDetail.cdNote.type === 'DEBIT'">
+                                        <td>
+                                            <span>{{item.amountVnd+item.vatAmountVnd | number:'1.2-2'}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{item.amountUsd+item.vatAmountUsd | number:'1.2-2'}}</span>
+                                        </td>
+                                    </ng-container>
                                     <td>
                                         <span>{{item.notes}}</span>
                                     </td>
@@ -224,6 +232,15 @@
                                 <div class="col-md-auto">
                                     <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit}}</span>
                                 </div>
+                                <ng-container *ngIf="!!CdNoteDetail
+                                &&CdNoteDetail.cdNote.type === 'DEBIT'
+                                &&CdNoteDetail.cdNote.syncStatus !== 'Synced'
+                                &&CdNoteDetail.cdNote.currencyId ==='VND'
+                                &&CdNoteDetail.listSurcharges.length > 0">
+                                    <div class="col-md-auto">
+                                        <strong>Total Adjust:</strong> <span class="m--margin-left-5">{{totalAdjustVND}}</span>
+                                    </div>
+                                </ng-container>
                             </div>
                         </div>
                         <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">

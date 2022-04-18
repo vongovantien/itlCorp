@@ -122,7 +122,7 @@
                                                 <span>{{(charge.amountVND + charge.vatAmountVND)| number: '.0-3' }}</span>
                                             </td>
                                             <td class="text-right">
-                                                <span>{{(charge.adjustedVND)| number: '.0-3' }}</span>
+                                                <span>{{charge.orgAmountVND | number: '.0-3'}}</span>
                                             </td>
                                             <td class="text-right">
                                                 <span>{{charge.exchangeRate | number: '.0-3'}}</span>

@@ -53,5 +53,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string ChargeName { get; set; }
         public string Note { get; set; }
         public string Type { get; set; }
+        public decimal OrgAmountVND { get; set; }
+
     }
 }

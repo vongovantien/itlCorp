@@ -23,7 +23,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     headers = [
         { title: 'No.', field: 'i', sortable: false, },
         { title: 'Charge Code', field: 'chargeCode', sortable: false },
-        { title: 'Charge Name', field: 'chargeName', sortable: false },
+        { title: 'Charge Name', field: 'chargeName',width:300, sortable: false },
         { title: 'Org Net', field: 'netAmount', sortable: false },
         { title: 'VAT', field: 'vatrate', sortable: false },
         { title: 'Org Amount', field: 'total', sortable: false },
@@ -134,8 +134,16 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
             let el = this.data.listChargeGrp[i];
             for (let j = 0; j < this.data.listChargeGrp[i].listCharges.length; j++) {
                 let el2 = this.data.listChargeGrp[i].listCharges[j];
-                let total = el2.adjustedVND - (el2.amountVND + el2.vatAmountVND);
-                if (total > 10000 || total < -10000) {
+                if (!el2.amountVND&&el2.amountVND!=0) {
+                    this._toastService.warning(`${el2.chargeCode} cannot empty NetDebit`);
+                    return false;
+                }
+                if (!el2.vatAmountVND && el2.vatAmountVND!=0) {
+                    this._toastService.warning(`${el2.chargeCode} cannot empty Vat`);
+                    return false;
+                }
+                let total = el2.orgAmountVND - (el2.amountVND + el2.vatAmountVND);
+                if (total >= 10000 || total <=-10000) {
                     this._toastService.warning(`${el2.chargeCode} cannot enter too 10.000`);
                     return false;
                 }

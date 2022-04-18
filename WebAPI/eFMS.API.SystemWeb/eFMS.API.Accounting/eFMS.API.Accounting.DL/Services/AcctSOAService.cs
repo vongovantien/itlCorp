@@ -3685,7 +3685,7 @@ namespace eFMS.API.Accounting.DL.Services
                 o.MBLNo = cd.Key.Mblno;
                 o.CustomNo = cd.Key.ClearanceNo;
                 o.Pic = cd.Key.Pic;
-                foreach (var it in cd)
+                foreach (var it in cd.OrderByDescending(x => x.DatetimeModified))
                 {
                     var adj = new AdjustListChargeModel();
                     adj.ID = it.Id;
@@ -3696,6 +3696,13 @@ namespace eFMS.API.Accounting.DL.Services
                     adj.OrgNet = it.NetAmount ?? 0;
                     adj.VatRate = it.Vatrate ?? 0;
                     adj.OrgAmount = it.Total;
+                    if (it.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                        adj.OrgAmountVND = it.Total;
+                    else
+                    {
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(it, AccountingConstants.CURRENCY_LOCAL, 0);
+                        adj.OrgAmountVND = amountLocal.NetAmount+ amountLocal.VatAmount;
+                    }
                     adj.Currency = it.CurrencyId;
                     adj.AmountVND = it.AmountVnd ?? 0;
                     adj.VatAmountVND = it.VatAmountVnd ?? 0;
@@ -3789,7 +3796,7 @@ namespace eFMS.API.Accounting.DL.Services
                 o.MBLNo = item.Key.MBL;
                 o.CustomNo = item.Key.CustomNo;
                 o.Pic = item.Key.PIC;
-                foreach (var it in item)
+                foreach (var it in item.OrderByDescending(x => x.DatetimeModifiedSurcharge))
                 {
                     var adj = new AdjustListChargeModel();
                     adj.ID = it.ID;
@@ -3800,6 +3807,16 @@ namespace eFMS.API.Accounting.DL.Services
                     adj.OrgNet = it.NetAmount;
                     adj.VatRate = it.VATRate;
                     adj.OrgAmount = it.Total;
+
+                    if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
+                        adj.OrgAmountVND = it.Total;
+                    else
+                    {
+                        var c = csShipmentSurchargeRepo.Get(x => x.Id == it.ID).FirstOrDefault();
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(c, AccountingConstants.CURRENCY_LOCAL, 0);
+                        adj.OrgAmountVND = amountLocal.NetAmount + amountLocal.VatAmount;
+                    }
+
                     adj.Currency = it.Currency;
                     adj.AmountVND = it.AmountVND;
                     adj.VatAmountVND = it.VatAmountVND;
@@ -3808,6 +3825,7 @@ namespace eFMS.API.Accounting.DL.Services
                     adj.AmountUSD = it.AmountUSD;
                     adj.ExchangeRate = it.ExchangeRate;
                     adj.Note = it.Note;
+                    adj.Type = it.Type;
                     o.listCharges.Add(adj);
                 }
 
@@ -3848,23 +3866,11 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.VatAmountVnd = it.VatAmountVND;
                         charge.AmountVnd = it.AmountVND;
                         charge.Notes = it.Note;
-                        _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
+                        _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, AccountingConstants.CURRENCY_LOCAL);
                         _debitAmount += _amount;
                         listChargeUpdate.Add(charge);
                         listId.Add(charge.Id);
                     }
-                }
-            }
-
-            if (_debitAmount > 0 && model.Action == "SOA")
-            {
-                var charges = GetChargesForDetailSoa(model.CODE);
-                var chargeFilter = charges.Where(x => !listId.Contains(x.ID)).ToList().Select(x=>x.ID);
-                foreach (var c in chargeFilter)
-                {
-                    var charge = csShipmentSurchargeRepo.Get(x => x.Id == c).FirstOrDefault();
-                    _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
-                    _debitAmount += _amount;
                 }
             }
 
