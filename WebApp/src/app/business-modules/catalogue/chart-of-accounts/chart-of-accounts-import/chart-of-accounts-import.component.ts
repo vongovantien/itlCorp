@@ -125,7 +125,7 @@ export class ChartOfAccountsImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "ImportChartOfAccountsTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "ImportChartOfAccountsTemplate.xlsx");
                 },
             );
     }

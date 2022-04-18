@@ -8,6 +8,7 @@ import { SettingRepo, ExportRepo } from "@repositories";
 import { UnlockRequestResult, User } from "@models";
 import { catchError, finalize, map } from "rxjs/operators";
 import { RoutingConstants, SystemConstants } from "@constants";
+import { HttpResponse } from "@angular/common/http";
 
 @Component({
     selector: 'app-unlock-request',
@@ -108,10 +109,9 @@ export class UnlockRequestComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        const fileName = "Unlock Request.xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('Not found data to print', '');
                     }

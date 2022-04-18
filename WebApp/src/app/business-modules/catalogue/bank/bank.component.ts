@@ -12,6 +12,8 @@ import { FormCreateBankPopupComponent } from './components/form-create/form-crea
 
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-bank',
@@ -145,8 +147,8 @@ export class BankComponent extends AppList implements OnInit {
         this._exportRepo.exportBank(this.criteria)
             .pipe((finalize(() => this._progressRef.complete())))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "eFms_Bank.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

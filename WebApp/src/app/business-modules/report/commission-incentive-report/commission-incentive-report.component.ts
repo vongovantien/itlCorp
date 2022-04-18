@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ExportRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-commission-incentive-report',
@@ -62,7 +63,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
             (response: ArrayBuffer) => {
               if (response.byteLength > 0) {
                 const fileName = "Commission PR.xlsx";
-                this.downLoadFile(response, "application/ms-excel", fileName);
+                this.downLoadFile(response, SystemConstants.FILE_EXCEL, fileName);
               } else {
                 this._toastService.warning("No data to download. Please try again.");
               }
@@ -82,7 +83,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
                 (response: ArrayBuffer) => {
                   if (response.byteLength > 0) {
                     const fileName = "Commission OPS VND.xlsx";
-                    this.downLoadFile(response, "application/ms-excel", fileName);
+                    this.downLoadFile(response, SystemConstants.FILE_EXCEL, fileName);
                   } else {
                     this._toastService.warning("No data to download. Please try again.");
                   }
@@ -99,10 +100,9 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
             finalize(() => this._progressRef.complete())
         )
         .subscribe(
-            (response: ArrayBuffer) => {
-              if (response.byteLength > 0) {
-                const fileName = "Incentive.xlsx";
-                this.downLoadFile(response, "application/ms-excel", fileName);
+            (response: HttpResponse<any>) => {
+              if (response!=null) {
+                this.downLoadFile(response, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
               } else {
                 this._toastService.warning("No data to download. Please try again.");
               }

@@ -7,7 +7,7 @@ import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { DataService } from '@services';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -16,6 +16,7 @@ import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-c
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import { HttpResponse } from '@angular/common/http';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -300,8 +301,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._exportRepository.exportDangerousGoods(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -310,8 +311,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._exportRepository.exportGoodDeclare(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -320,8 +321,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._exportRepository.exportEManifest(this.hblId)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
