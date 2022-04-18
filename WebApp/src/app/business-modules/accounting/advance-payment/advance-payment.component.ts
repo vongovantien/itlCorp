@@ -31,6 +31,7 @@ import {
 import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
 import { of, forkJoin } from 'rxjs';
 import { delayTime } from '@decorators';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-advance-payment',
@@ -278,8 +279,8 @@ export class AdvancePaymentComponent extends AppList {
     export() {
         this._exportRepo.exportAdvancePaymentShipment(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'advance-payment.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }

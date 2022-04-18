@@ -8,10 +8,11 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { OpsCdNoteAddPopupComponent } from '../ops-cd-note-add/ops-cd-note-add.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, SystemConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -237,9 +238,9 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }

@@ -12,6 +12,7 @@ import moment from "moment/moment";
 import { PermissionShipment } from "./shared/models/document/permissionShipment";
 import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
 import { environment } from 'src/environments/environment';
+import { SystemConstants } from '@constants';
 
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
@@ -217,7 +218,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         }
     }
 
-    downLoadFile(data: any, type: string = "application/ms-excel", filename: string = 'undefine.xlsx') {
+    downLoadFile(data: any, type: string = SystemConstants.FILE_EXCEL, filename: string = 'undefine.xlsx') {
         const blob: Blob = new Blob([data], { type: type });
         const fileName: string = filename;
         const objectUrl: string = URL.createObjectURL(blob);

@@ -2313,7 +2313,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
                     surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
                     .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
-                        c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo }).ToList()
+                        c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
                 })
                 .ToList();
             if (grpVoucherDetail.Count > 0)
@@ -2437,15 +2437,18 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.DatetimeModified = voucher.DatetimeCreated;
                                                 surcharge.UserModified = currentUser.UserID;
                                                 surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                surcharge.VatAmountVnd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
-                                                surcharge.AmountVnd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
-                                                surcharge.VatAmountUsd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
-                                                surcharge.AmountUsd = surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
-                                                surcharge.FinalExchangeRate = surChargeBravo.ExchangeRate;
+                                                if(surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
+                                                {
+                                                    surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
+                                                    surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
+                                                    surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
+                                                    surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
+                                                    surcharge.FinalExchangeRate = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.ExchangeRate : surcharge.FinalExchangeRate;
 
-                                                AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
-                                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                                surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                                    AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
+                                                    surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                                    surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                                }
 
                                                 surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
 

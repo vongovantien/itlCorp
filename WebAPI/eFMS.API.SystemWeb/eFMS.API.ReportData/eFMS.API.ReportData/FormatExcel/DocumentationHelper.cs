@@ -1325,7 +1325,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
-                var path = f.FullName;
+                var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                 {
                     return null;
@@ -2597,7 +2597,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
-                var path = f.FullName;
+                var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                 {
                     return null;

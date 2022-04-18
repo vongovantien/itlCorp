@@ -18,6 +18,8 @@ import { Crystal } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { delayTime } from '@decorators';
 import { combineLatest } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -326,9 +328,9 @@ export class OpsCDNoteComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'OPS - DEBIT NOTE.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response!=null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }

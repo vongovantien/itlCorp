@@ -126,7 +126,7 @@ export class PortIndexImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "PortIndexImportTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "PortIndexImportTemplate.xlsx");
                 },
             );
     }

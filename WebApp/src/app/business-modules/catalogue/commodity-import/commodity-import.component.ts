@@ -127,7 +127,7 @@ export class CommodityImportComponent extends AppPage implements OnInit {
 			.pipe(catchError(this.catchError))
 			.subscribe(
 				(res: any) => {
-					this.downLoadFile(res, "application/ms-excel", "CommodityTemplate.xlsx");
+					this.downLoadFile(res, SystemConstants.FILE_EXCEL, "CommodityTemplate.xlsx");
 				},
 			);
 	}

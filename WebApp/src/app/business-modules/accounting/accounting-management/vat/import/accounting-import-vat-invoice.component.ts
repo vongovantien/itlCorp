@@ -9,6 +9,7 @@ import { PagingService } from '@services';
 
 import { catchError, finalize } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-accounting-import-vat-invoice',
@@ -52,7 +53,7 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "VatInvoiceImportTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "VatInvoiceImportTemplate.xlsx");
                 },
             );
     }
