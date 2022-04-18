@@ -170,7 +170,7 @@
         public static readonly string PAYABLE_PAYMENT_TYPE_OBH = "OBH";
         public static readonly string PAYABLE_PAYMENT_TYPE_NETOFF = "NETOFF";
         public static readonly string PAYABLE_PAYMENT_TYPE_ADV = "ADV";
-        public static readonly string PAYABLE_PAYMENT_TYPE_CLEAR_ADV = "CLEAR_ADV";
+        public static readonly string PAYABLE_PAYMENT_TYPE_CLEAR_ADV = "CLEAR_ADVANCE";
         public static readonly string TRANSACTION_TYPE_BALANCE = "BALANCE";
         #endregion
 
