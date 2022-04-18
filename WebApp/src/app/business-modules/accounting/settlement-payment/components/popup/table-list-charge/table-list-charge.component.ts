@@ -66,9 +66,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[] = [];
 
-    isJobOPS: boolean=false;
-    isOBH: boolean=false;
-
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -368,9 +365,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
                 let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
                 selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
-                if(this.selectedShipment.service==='CL'){
-                    this.isJobOPS=true;
-                }
                 this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
                     .subscribe(
                         (res: any) => {
@@ -488,9 +482,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
 
 
-                }
-                if(data.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
-                    this.isOBH=true;
                 }
 
                 break;
@@ -660,16 +651,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         //         return;
         //     }
         // }
-
-        if(this.isJobOPS&&this.isOBH){
+        //}
+        if(this.selectedShipment.service==='CL'){
             for (const charge of this.charges) {
-                if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
-                    this._toastService.warning("Series No Must be fill in");
-                    return;
-                }
-                if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
-                    this._toastService.warning("Invoice No Must be fill in");
-                    return;
+                if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+                    if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Series No Must be fill in");
+                        return;
+                    }
+                    if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Invoice No Must be fill in");
+                        return;
+                    }
                 }
             }
         }

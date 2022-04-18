@@ -22,6 +22,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     @Input() state: string = 'create';
 
     isShow: boolean = false;
+    isOPS: boolean = false;
 
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
