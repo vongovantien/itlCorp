@@ -52,8 +52,8 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentModel>>();
 
             var stream = new AccountingHelper().GenerateAdvancePaymentExcel(dataObjects.Result);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Advance Payment List");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Advance Payment List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -82,9 +82,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentRequestModel>>();
 
             var stream = new AccountingHelper().GenerateAdvancePaymentShipmentExcel(dataObjects.Result);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Advance Payment List Shipment");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Advance Payment List Shipment");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -104,9 +104,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementPaymentModel>>();
 
             var stream = new AccountingHelper().GenerateSettlementPaymentExcel(dataObjects.Result);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement Payment List");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Settlement Payment List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -135,9 +135,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementExportGroupDefault>>();
 
             var stream = new AccountingHelper().GenerateSettlementPaymentShipmentExcel(dataObjects.Result);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement Payment List");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Settlement Payment List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -157,9 +157,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingSettlementExportGroup>>();
 
             var stream = new AccountingHelper().ExportSettlementPaymentDetailSurCharges(dataObjects.Result, "Settlement-Detail Template");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Settlement-Detail Template");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Settlement-Detail Template");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -180,10 +180,10 @@ namespace eFMS.API.ReportData.Controllers
             var stream = accountingPaymentCriteria.PaymentType == PaymentType.Invoice ?
                 new AccountingHelper().GenerateInvoicePaymentShipmentExcel(accountingPayments.Result) :
                 new AccountingHelper().GenerateOBHPaymentShipmentExcel(accountingPayments.Result);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream,
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream,
                 accountingPaymentCriteria.PaymentType == PaymentType.Invoice ?
-                "Invoice Payment List":"OBH Payment List");
+                "Invoice Payment List" : "OBH Payment List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -209,9 +209,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
 
             var stream = new AccountingHelper().GenerateExportCustomerHistoryPayment(dataObjects.Result, paymentCriteria, "Statement_of_Receivable-Customer");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Statement of Receivable Customer - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Customer - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -226,15 +226,15 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
-         {
+        {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + lang, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
 
             var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, lang);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoAdvance.AdvanceNo,stream, "Advance Form - eFMS");
+            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoAdvance.AdvanceNo, stream, "Advance Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + advanceId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
@@ -250,7 +250,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportDetailSOA(string soaNo, string currency)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSOAExportUrl + soaNo + "&&currencyLocal="  + currency);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSOAExportUrl + soaNo + "&&currencyLocal=" + currency);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<DetailSOAModel>();
 
@@ -260,7 +260,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             string fileName = "Export SOA";
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -274,7 +274,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportBravoSOA(string soaNo)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi( aPis.AccountingAPI + Urls.Accounting.GetDataBravoSOAUrl + soaNo) ;
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataBravoSOAUrl + soaNo);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportBravoSOAModel>>();
 
@@ -283,7 +283,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, "SOA Bravo List");
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, "SOA Bravo List");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -307,7 +307,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, "SOA OPS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, "SOA OPS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -329,9 +329,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
             var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Form - eFMS");
+            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
@@ -355,9 +355,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
             var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "SettlementPaymentTemplate");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Template Form - eFMS");
+            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Template Form - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
@@ -380,9 +380,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<InfoSettlementExport>();
 
             var stream = new AccountingHelper().GenerateExportGeneralSettlementPayment(dataObjects.Result, "Settlement-General-Preview");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(dataObjects.Result.SettlementNo,stream, "Settlement General Preview - eFMS");
+            var file = new FileHelper().ReturnFormFile(dataObjects.Result.SettlementNo, stream, "Settlement General Preview - eFMS");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
@@ -401,17 +401,17 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
-            if(dataObjects.Result.HawbAirFrieghts == null)
+            if (dataObjects.Result.HawbAirFrieghts == null)
             {
                 return Ok();
             }
-            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result,null,null);
+            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result, null, null);
             if (stream == null)
             {
                 return null;
             }
             string fileName = "Export SOA Air Freight";
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -438,7 +438,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             string fileName = "Customer SOA AirFreight  With HBL";
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -466,7 +466,7 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             string fileName = "Export SOA Supplier Air Freight";
-            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo,stream, fileName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(soaNo, stream, fileName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -488,9 +488,9 @@ namespace eFMS.API.ReportData.Controllers
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             var stream = new AccountingHelper().GenerateAccountingManagementExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -514,9 +514,9 @@ namespace eFMS.API.ReportData.Controllers
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
             var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result, "AR_SUMMARY_TEMPLATE");
 
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Trial" + " - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Trial" + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -531,18 +531,18 @@ namespace eFMS.API.ReportData.Controllers
         [Authorize]
         public async Task<IActionResult> ExportDebitDetail(DebitDetailCriteria criteria)
         {
-            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode+ "&overDueDay="+criteria.overDueDay;
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl+urlRequest);
+            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode + "&overDueDay=" + criteria.overDueDay;
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl + urlRequest);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<DebitDetail>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx",criteria.option);
+            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx", criteria.option);
 
-            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DebitDetail-eFMS.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "DebitDetail-eFMS.xlsx");
 
             return fileContent;
         }
@@ -557,7 +557,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPreview")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPreview(Guid settlementId, string lang,string key)
+        public async Task<IActionResult> ExportDetailSettlementPreview(Guid settlementId, string lang, string key)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
@@ -565,9 +565,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
             var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.InfoSettlement.SettlementNo,stream, "Settlement Form - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -579,14 +579,14 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
-             
+
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
-            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency",paymentCriteria);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency", paymentCriteria);
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Statement of Receivable Agency - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Agency - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -600,12 +600,12 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataExportReceiptAdvance, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<AcctReceiptAdvanceModelExport>();
-            if (dataObjects.Result == null)  return Ok(null);
+            if (dataObjects.Result == null) return Ok(null);
 
             var stream = new AccountingHelper().GenerateReceiptAdvance(dataObjects.Result, criteria, out string fileName);
-            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.TaxCode,stream, getPreName(fileName));
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.TaxCode, stream, getPreName(fileName));
 
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
@@ -634,17 +634,8 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No,stream, "SOA OPS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No, stream, "SOA OPS");
             HeaderResponse(fileContent.FileDownloadName);
-            return fileContent;
-        }
-
-        //private void HeaderResponse(string fileName)
-        //{
-        //    Response.Headers.Add("efms-file-name", fileName);
-        //    Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
-        //}
-
             return fileContent;
         }
 
@@ -676,7 +667,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria, "AP_Standart_Report.xlsx");
             if (stream == null) return null;
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "APStandartReport");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APStandartReport");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -706,10 +697,10 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingTemplateExport>>();
 
-            var stream = new AccountingHelper().GenerateExportAccountingTemplateReport (dataObjects.Result, criteria, "AP_Account_Template.xlsx");
+            var stream = new AccountingHelper().GenerateExportAccountingTemplateReport(dataObjects.Result, criteria, "AP_Account_Template.xlsx");
             if (stream == null) return null;
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "APAccountReport");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APAccountReport");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -720,5 +711,10 @@ namespace eFMS.API.ReportData.Controllers
             Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
         }
 
+        private string getPreName(string fileName)
+        {
+            var nameSplit = fileName.Split('_');
+            return nameSplit[0];
+        }
     }
 }

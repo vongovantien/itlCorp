@@ -130,6 +130,13 @@
             <param name="criteria">AccountReceivableCriteria</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDebitDetail(eFMS.API.ReportData.Models.Criteria.DebitDetailCriteria)">
+            <summary>
+            Export debit detail
+            </summary>
+            <param name="criteria">AccountReceivableCriteria</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPreview(System.Guid,System.String,System.String)">
             <summary>
             Export detail settlement payment
@@ -484,6 +491,12 @@
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetSettleExcelFolder">
             <summary>
             Get folder contain settlement payment template excel
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetARExcelFolder">
+            <summary>
+            Get folder contain AR template excel
             </summary>
             <returns></returns>
         </member>
