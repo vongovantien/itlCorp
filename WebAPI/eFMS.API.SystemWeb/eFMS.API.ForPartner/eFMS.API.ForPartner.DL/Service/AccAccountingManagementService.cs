@@ -2310,8 +2310,10 @@ namespace eFMS.API.ForPartner.DL.Service
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
-                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
-                    surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
+                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
+                    surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  
+                    && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
                     .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
                         c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
                 })
