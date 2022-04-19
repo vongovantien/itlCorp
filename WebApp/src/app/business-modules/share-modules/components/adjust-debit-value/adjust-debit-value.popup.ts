@@ -23,7 +23,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     headers = [
         { title: 'No.', field: 'i', sortable: false, },
         { title: 'Charge Code', field: 'chargeCode', sortable: false },
-        { title: 'Charge Name', field: 'chargeName',width:300, sortable: false },
+        { title: 'Charge Name', field: 'chargeName', sortable: false },
         { title: 'Org Net', field: 'netAmount', sortable: false },
         { title: 'VAT', field: 'vatrate', sortable: false },
         { title: 'Org Amount', field: 'total', sortable: false },

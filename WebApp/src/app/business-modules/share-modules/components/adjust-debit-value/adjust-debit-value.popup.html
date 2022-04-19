@@ -96,8 +96,8 @@
                                 <tbody>
                                     <tr class="child" *ngFor="let charge of chargeGrp.listCharges; let j = index; trackBy: trackByFn">
                                             <td class="text-center">{{j + 1}}</td>
-                                            <td class="text-center">{{charge.chargeCode}}</td>
-                                            <td class="text-center " style="min-width: 170px; white-space:initial">{{charge.chargeName}}</td>
+                                            <td class="text-left">{{charge.chargeCode}}</td>
+                                            <td class="text-left " style="min-width: 150px; white-space:initial">{{charge.chargeName}}</td>
                                             <td class="text-right">
                                                 <span>{{charge.orgNet | number: '.0-3'}} {{charge.currency}}</span>
                                             </td>
@@ -127,10 +127,10 @@
                                             <td class="text-right">
                                                 <span>{{charge.exchangeRate | number: '.0-3'}}</span>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-left">
                                                 <span><input type="text"
                                                     [disabled]="charge.type=='OBH' ? 'disabled': null"
-                                                     class="form-control text-right" (ngModelChange)="onChangeNote(i,j,$event)"  [(ngModel)]="charge.note"/></span>
+                                                     class="form-control text-left" (ngModelChange)="onChangeNote(i,j,$event)"  [(ngModel)]="charge.note"/></span>
                                             </td>
                                     </tr>
                                 </tbody>
