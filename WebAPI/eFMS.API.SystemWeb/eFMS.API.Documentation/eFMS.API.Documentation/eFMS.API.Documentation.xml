@@ -930,6 +930,19 @@
             <param name="serviceId">Type of sea service</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.SendMailContractCashWithOutstandingDebit">
+            <summary>
+            Send mail alert to customer cash with outstanding debit
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetDataOustandingDebit(System.String)">
+            <summary>
+            Get detail shipment oustanding debit for saleman
+            </summary>
+            <param name="salemanId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
             <summary>
             A base class for an MVC controller without view support.

@@ -111,5 +111,28 @@ namespace eFMS.API.Documentation.Controllers
             var data = sendMailService.GetInfoMailHBLSeaImport(hblId, serviceId);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Send mail alert to customer cash with outstanding debit
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("SendMailContractCashWithOutstandingDebit")]
+        public IActionResult SendMailContractCashWithOutstandingDebit()
+        {
+            var hs = sendMailService.SendMailContractCashWithOutstandingDebit();
+            return Ok(hs);
+        }
+
+        /// <summary>
+        /// Get detail shipment oustanding debit for saleman
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        [HttpGet("GetDataOustandingDebit")]
+        public IActionResult GetDataOustandingDebit(string salemanId)
+        {
+            var hs = sendMailService.GetDataOustandingDebit(salemanId);
+            return Ok(hs);
+        }
     }
 }

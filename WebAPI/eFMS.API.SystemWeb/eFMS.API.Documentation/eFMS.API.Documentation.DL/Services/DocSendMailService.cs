@@ -1,15 +1,22 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -25,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> unitRepository;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -37,7 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShippingInstruction> csShippingInstruction,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CsMawbcontainer> csMawbcontainer,
-            IContextBase<SysSentEmailHistory> sentEmailHistory) : base(repository, mapper)
+            IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
             catPartnerRepo = catPartner;
@@ -49,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             csMawbcontainerRepo = csMawbcontainer;
             sentEmailHistoryRepo = sentEmailHistory;
+            apiServiceUrl = serviceUrl;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -371,5 +381,119 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool SendMailContractCashWithOutstandingDebit()
+        {
+            try
+            {
+                var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
+                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
+                {
+                    x.SaleManId
+                });
+                string subject = "AR Alert - Customers With Agreement Cash Have Outstanding Debit ";
+                string footerBody = " </br></br>Anh/chị vui lòng liên hệ Khách hàng đề nghị thanh toán ngay để tránh ảnh hưởng đến việc nhận hàng theo quy định Công ty.</br>"
+                                 + "Please you contact the Customer to request immediate payment to avoid affecting the receipt of cargo according to the Company's regulations.</br></br>"
+                                 + "Many thanks and Best Regards,</br>"
+                                 + "<b> eFMS System, </b>"
+                                 + "</br>"
+                                 + "<p><img src = 'https://api-efms.itlvn.com/ReportPreview/Images/logo-eFMS.png' /></p> " + " </div>";
+                var detailLink = "</br><p>" + "<div><i>You can <span><a href='{0}' target='_blank'>click here</a></span> to view detail.</i></div>"
+                                        + "<div><i>Bạn click <span><a href='{0}' target='_blank'>vào đây</a></span> để xem chi tiết.</i></div>"
+                                        + "</p>";
+                var urlInfo = apiServiceUrl.Value.ApiUrlExport + "/api/v1/VN/Documentation/ExportShipmentOutstandingDebit?settlementId={0}";
+                foreach (var saleman in dtGrp)
+                {
+                    string tableBody = @"<table style='width: 100%; border: 1px solid #dddddd; border-collapse: collapse;'>"
+                                 + @"<tr>"
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>STT </th>"
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Khách Hàng </th>"
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>C.Nhánh </th>"                                 
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Số Tiên Cần Thanh Toán </th>"
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Tiền Tệ </th>"
+                                 + @"</tr>"
+                                 + @"[content]"
+                                 + @"</table>";
+                    string headerBody = string.Format(@"<strong>Dear {0},</strong></br></br>"
+                                     + "<p>Dưới đây là danh sách Khách hàng có Agreement Cash có dư nợ chưa thanh toán</br>"
+                                     + "<i>There are  Customers with Agreement Cash that have outstanding Debit</i></p>", saleman.FirstOrDefault().SalemanName);
+                    urlInfo = string.Format(urlInfo, saleman.Key.SaleManId);
+                    int number = 0;
+                    
+                    StringBuilder content = new StringBuilder();
+                    var contractGrp = saleman.GroupBy(x => new { x.AccountNo, x.ContractId });
+                    foreach (var item in contractGrp)
+                    {
+                        string formatCurrency = item.FirstOrDefault().CreditCurrency == "VND" ? "N0" : "N02";
+                        var office = string.Join(";", item.GroupBy(x => x.OfficeName).Select(x => x.Key));
+                        content.Append(@"<tr>");
+                        content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center; vertical-align: top;'>" + (number + 1) + "</td>");
+                        content.Append(@"<td style='width: 30%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName + "</td>");
+                        content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + office + "</td>");
+                        content.Append(@"<td style='width: 14%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right; vertical-align: top;'>" + item.FirstOrDefault().DebitAmount?.ToString(formatCurrency) + "</td>");
+                        content.Append(@"<td style='width: 10%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().CreditCurrency + "</td>");
+                        content.Append(@"</tr>");
+                        number++;
+                    }
+                    detailLink = string.Format(detailLink, urlInfo);
+                    // Mail to
+                    var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
+                    var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
+                    // Bcc
+                    //List<string> emailBCCs = new List<string> { "daniel.khoa@itlvn.com,kenny.thuong@itlvn.com,lynne.loc@itlvn.com" };
+                    List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com" };
+                    if (saleman.Count() > 0)
+                    {
+                        tableBody = tableBody.Replace("[content]", content.ToString());
+                        string body = headerBody + tableBody + detailLink + footerBody;
+                        body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
+
+                        var s = SendMail.Send(subject, body, mailTo, null, mailCC, emailBCCs);
+
+                        #region --- Ghi Log Send Mail ---
+                        var logSendMail = new SysSentEmailHistory
+                        {
+                            SentUser = SendMail._emailFrom,
+                            Receivers = string.Join("; ", mailTo),
+                            Subject = subject,
+                            Sent = s,
+                            SentDateTime = DateTime.Now,
+                            Body = body,
+                            Ccs = string.Join("; ", mailCC),
+                            Bccs = string.Join("; ", emailBCCs)
+                        };
+                        var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+                        var hsSm = sentEmailHistoryRepo.SubmitChanges();
+                        #endregion --- Ghi Log Send Mail ---
+                    }
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                var logMessage = string.Format(" *  \n [END]: {0} * ,\n Exception message: {1}", DateTime.Now.ToString(), ex.ToString());
+                logMessage += "\n END LOG SENDMAILCONTRACTCASHWITHOUTSTANDINGDEBIT-------------------------------------------------------------------------\n";
+                new LogHelper("[EFMS_SENDMAILCONTRACTCASHWITHOUTSTANDINGDEBIT]", logMessage);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        public List<sp_GetShipmentDataWithOutstandingDebit> GetDataOustandingDebit(string salemanId)
+        {
+            var parameter = new[]{
+                new SqlParameter(){ ParameterName = "@salemanId", Value = salemanId }
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetShipmentDataWithOutstandingDebit>(parameter);
+            return data;
+        }
     }
 }

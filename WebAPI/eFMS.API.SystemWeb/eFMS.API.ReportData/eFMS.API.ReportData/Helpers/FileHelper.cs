@@ -1,6 +1,7 @@
 ﻿using eFMS.API.ReportData.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace eFMS.API.ReportData.Helpers
@@ -37,6 +38,22 @@ namespace eFMS.API.ReportData.Helpers
             finally
             {
                 ms.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Preview file with open tab
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void PreviewEcxelInTab(string fileName)
+        {
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                var url = "https://gbc-excel.officeapps.live.com/op/view.aspx?src=" + fileName;
+                var psi = new ProcessStartInfo();
+                psi.UseShellExecute = true;
+                psi.FileName = url;
+                Process.Start(psi);
             }
         }
     }
