@@ -22,10 +22,11 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<CsShipmentSurcharge> csSurchargeRepository;
         private readonly IContextBase<CsTransactionDetail> csDetailSurchargeRepository;
+        private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
 
-        string salemanBOD = string.Empty;
-        IQueryable<CsTransaction> csTransactions;
-        IQueryable<OpsTransaction> opsTransactions;
+        readonly string salemanBOD = string.Empty;
+        readonly IQueryable<CsTransaction> csTransactions;
+        readonly IQueryable<OpsTransaction> opsTransactions;
 
         public CheckPointService(ICurrentUser currUser,
             IContextBase<SysUser> sysUserRepository,
@@ -36,7 +37,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> opsTransactionRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<CsShipmentSurcharge> csSurcharge,
-            IContextBase<CsTransactionDetail> csDetailSurchargeRepo
+            IContextBase<CsTransactionDetail> csDetailSurchargeRepo,
+            IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
             this.currentUser = currUser;
@@ -49,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             this.csTransactionRepository = csTransactionRepo;
             this.csSurchargeRepository = csSurcharge;
             this.csDetailSurchargeRepository = csDetailSurchargeRepo;
+            sysSettingFlowRepository = sysSettingFlow;
 
             salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
@@ -382,6 +385,20 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState((object)messError);
             }
             return result;
+        }
+
+        private SysSettingFlow getSettingFlowApplyContract(string type, Guid officeId)
+        {
+            var settingFlow = sysSettingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable");
+
+            return settingFlow;
+        }
+
+        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, string applyContractType)
+        {
+            bool isApply = false;
+
+            return isApply;
         }
 
     }

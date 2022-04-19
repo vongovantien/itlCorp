@@ -105,5 +105,9 @@
         public static readonly string SOA_TYPE_CREDIT = "CREDIT";
 
         public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_CHECK_POINT = "Check Point";
+        public static readonly string SETTING_FLOW_APPLY_PARTNER_TYPE_CUSTOMER = "Customer";
+        public static readonly string SETTING_FLOW_APPLY_PARTNER_TYPE_AGENT = "Agent";
+        public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_CASH = "Agent";
     }
 }

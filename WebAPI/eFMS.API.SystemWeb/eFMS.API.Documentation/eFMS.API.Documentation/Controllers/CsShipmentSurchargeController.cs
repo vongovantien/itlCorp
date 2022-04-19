@@ -688,6 +688,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("ValidateCheckPointPartner")]
+        [Authorize]
         public IActionResult ValidateCheckPointPartner(string partnerId, string Hblid, string transactionType, string settlementCode)
         {
             Guid _hblId = Guid.Empty;
@@ -695,6 +696,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 _hblId = Guid.Parse(Hblid);
             } 
+
             HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, settlementCode);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
 

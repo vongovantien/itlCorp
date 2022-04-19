@@ -24,5 +24,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string ApplyPartner { get; set; }
         public Guid? ReplicateOfficeId { get; set; }
         public string ReplicatePrefix { get; set; }
+        public string ApplyContract { get; set; }
     }
 }
