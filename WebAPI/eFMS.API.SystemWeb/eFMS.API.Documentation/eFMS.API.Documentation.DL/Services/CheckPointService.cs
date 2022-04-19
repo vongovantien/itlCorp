@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<CsShipmentSurcharge> csSurchargeRepository;
-        private readonly IContextBase<CsTransactionDetail> csDetailSurchargeRepository;
+        private readonly IContextBase<CsTransactionDetail> csTransactionDetail;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
 
         readonly string salemanBOD = string.Empty;
@@ -37,7 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> opsTransactionRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<CsShipmentSurcharge> csSurcharge,
-            IContextBase<CsTransactionDetail> csDetailSurchargeRepo,
+            IContextBase<CsTransactionDetail> csTransactionDetailRepo,
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
@@ -50,7 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
             this.opsTransactionRepository = opsTransactionRepo;
             this.csTransactionRepository = csTransactionRepo;
             this.csSurchargeRepository = csSurcharge;
-            this.csDetailSurchargeRepository = csDetailSurchargeRepo;
+            this.csTransactionDetail = csTransactionDetailRepo;
             sysSettingFlowRepository = sysSettingFlow;
 
             salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
@@ -66,67 +66,35 @@ namespace eFMS.API.Documentation.DL.Services
             // Những lô hàng # saleman
             var hblIds = new List<Guid>();
             string salemanCurrent = null;
-            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
-
-            if (HblId == Guid.Empty) // Mở một lô mới, bỏ qua những lô saleman ITL BOD
+            if (transactionType == "CL")
             {
-                if (transactionType == "CL")
+                salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
+                if (salemanCurrent == salemanBOD)
                 {
-                    hblIds = opsTransactionRepository.Get(x => x.SalemanId != salemanBOD
-                            && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
-                             .Select(x => x.Hblid)
-                             .ToList();
+                    return valid;
                 }
-                else
-                {
-                    hblIds = csDetailSurchargeRepository.Get(x => x.SaleManId != salemanBOD)
-                            .Select(x => x.Id)
-                            .ToList();
-                }
-
-                if (hblIds.Count > 0)
-                {
-                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblIds.Contains(x.Hblid));
-                }
-                else
-                {
-                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId);
-                }
-
-
             }
-            else // Check theo từng lô
+            else
             {
-                if (transactionType == "CL")
+                salemanCurrent = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
+                if (salemanCurrent == salemanBOD)
                 {
-                    salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-                    if (salemanCurrent == salemanBOD)
-                    {
-                        return valid;
-                    }
+                    return valid;
                 }
-                else
-                {
-                    salemanCurrent = csDetailSurchargeRepository.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
-                    if (salemanCurrent == salemanBOD)
-                    {
-                        return valid;
-                    }
-                }
+            }
 
-                hblIds = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
+            hblIds = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
 
-                if (hblIds.Count > 0)
-                {
-                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
-                    && hblIds.Contains(x.Hblid)
-                    && x.Hblid != HblId);
-                }
-                else
-                {
-                    surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
-                    && x.Hblid != HblId);
-                }
+            if (hblIds.Count > 0)
+            {
+                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
+                && hblIds.Contains(x.Hblid)
+                && x.Hblid != HblId);
+            }
+            else
+            {
+                surchargeToCheck = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId
+                && x.Hblid != HblId);
             }
 
             // Trường hợp nhập charge trong SM
@@ -172,6 +140,8 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
+            /*
+            // Tạm thời pending check issue debit
             if (valid == false && checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
             {
                 IQueryable<object> groupHblIdCs = Enumerable.Empty<object>().AsQueryable();
@@ -228,15 +198,138 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
             }
+            */
+            return valid;
+        }
+
+        public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType)
+        {
+            // Hết hạn, vượt hạn mức, treo công nợ
+            bool valid = true;
+
 
             return valid;
+        }
+
+        public HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa)
+        {
+
+            HandleState result = new HandleState();
+            bool isValid = false;
+
+            if (soa.Type != DocumentConstants.SOA_TYPE_DEBIT)
+            {
+                return result;
+            }
+
+            CatContract contract = GetContractByPartnerId(partnerId);
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement or agreement have expired", partner.ShortName));
+            }
+            if (contract.SaleManId == salemanBOD) return result;
+
+            switch (contract.ContractType)
+            {
+                case "Cash":
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                    {
+                        isValid = false;
+                    }
+                    else
+                        isValid = true; // K cho gôm SOA debit hđ CASH
+                    break;
+                case "Trial":
+                case "Official":
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                    {
+                        isValid = true;
+                    }
+                    else
+                        isValid = true;
+                    break;
+                default:
+                    isValid = true;
+                    break;
+            }
+
+            return result;
+        }
+
+        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode)
+        {
+            HandleState result = new HandleState();
+            bool isValid = false;
+            string currentSaleman = string.Empty;
+            CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
+            CatContract contract;
+
+            if (transactionType == "DOC")
+            {
+                currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
+                contract = GetContractByPartnerId(partnerId, currentSaleman);
+            }
+            else
+            {
+                currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
+                contract = GetContractByPartnerId(partnerId, currentSaleman);
+            }
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+            }
+            switch (contract.ContractType)
+            {
+                case "Cash":
+                   
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                    {
+                        isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+                    break;
+                case "Trial":
+                case "Official":
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                    {
+                        isValid = ValidateCheckPointOfficialTrialContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+                    break;
+                default:
+                    isValid = true;
+                    break;
+            }
+            string messError = null;
+            if (isValid == false)
+            {
+                SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
+
+                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
+                    partner?.TaxCode, partner?.ShortName, saleman.Username);
+
+                return new HandleState((object)messError);
+            }
+            return result;
         }
 
         private List<Guid> GetHblIdShipmentSameSaleman(Guid hblId, string salemanHBLCurrent)
         {
             List<Guid> hblIds = new List<Guid>();
 
-            hblIds = csDetailSurchargeRepository.Get(x => x.SaleManId == salemanHBLCurrent
+            hblIds = csTransactionDetail.Get(x => x.SaleManId == salemanHBLCurrent
                && x.SaleManId != salemanBOD)
                .Select(x => x.Id)
                .ToList();
@@ -252,154 +345,72 @@ namespace eFMS.API.Documentation.DL.Services
             return hblIds;
         }
 
-        private CatContract GetContractByPartnerId(string partnerId)
+        private CatContract GetContractByPartnerId(string partnerId, string saleman = "")
         {
-            CatContract contract = contractRepository.Get(x => x.PartnerId == partnerId
-           && x.Active == true
-            && (x.IsExpired == false || x.IsExpired == null))
-           .OrderBy(x => x.ContractType)
-           .FirstOrDefault();
-
+            CatContract contract = null;
+            if (string.IsNullOrEmpty(saleman))
+            {
+                contract = contractRepository.Get(x => x.PartnerId == partnerId
+                                       && x.Active == true
+                                       && (x.IsExpired == false || x.IsExpired == null))
+                .OrderBy(x => x.ContractType)
+                .FirstOrDefault();
+            }
+            else
+            {
+                contract = contractRepository.Get(x => x.PartnerId == partnerId
+                                       && x.Active == true
+                                       && x.SaleManId == saleman
+                                       && (x.IsExpired == false || x.IsExpired == null))
+                .OrderBy(x => x.ContractType)
+                .FirstOrDefault();
+            }
             return contract;
         }
 
-        public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode)
+        private bool IsSettingFlowApplyContract(string ContractType, Guid officeId, string partnerType)
         {
-            throw new NotImplementedException();
-        }
-
-        public HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType)
-        {
-            HandleState result = new HandleState();
-            bool isValid = false;
-
-            string salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
-
-            CatContract contract = GetContractByPartnerId(partnerId);
-            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
-
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
-            }
-            if (contract.SaleManId == salemanBOD) return result;
-
-            switch (contract.ContractType)
+            bool IsApplySetting = false;
+            var settingFlow = sysSettingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable"
+            && x.ApplyType != DocumentConstants.SETTING_FLOW_APPLY_TYPE_NONE
+            && x.ApplyPartner != DocumentConstants.SETTING_FLOW_APPLY_TYPE_NONE);
+            if (settingFlow == null) return IsApplySetting;
+            switch (ContractType)
             {
                 case "Cash":
-                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, string.Empty, CHECK_POINT_TYPE.DEBIT_NOTE);
+                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
                     break;
-                //case "Official":
-                //case "Trial":
-                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                // break;
+                case "Trial":
+                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow.ApplyType, settingFlow.ApplyPartner, partnerType);
+                    break;
+                case "Official":
+                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow.ApplyType, settingFlow.ApplyPartner, partnerType);
+                    break;
                 default:
-                    isValid = true;
                     break;
             }
-            string messError = null;
-            if (isValid == false)
-            {
-                SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
 
-                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
-                    partner?.TaxCode, partner?.ShortName, saleman.Username);
-
-                return new HandleState((object)messError);
-            }
-            return result;
+            return IsApplySetting;
         }
 
-        public HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa)
-        {
-
-            HandleState result = new HandleState();
-            bool isValid = false;
-
-            if(soa.Type != DocumentConstants.SOA_TYPE_DEBIT)
-            {
-                return result;
-            }
-
-            CatContract contract = GetContractByPartnerId(partnerId);
-            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
-            }
-            if (contract.SaleManId == salemanBOD) return result;
-
-            switch (contract.ContractType)
-            {
-                case "Cash":
-                    isValid = false; // K cho gôm SOA debit hđ CASH
-                    break;
-                //case "Official":
-                //case "Trial":
-                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                // break;
-                default:
-                    isValid = true;
-                    break;
-            }
-
-            return result;
-        }
-
-        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode)
-        {
-            HandleState result = new HandleState();
-            bool isValid = false;
-
-            CatContract contract = GetContractByPartnerId(partnerId);
-
-            CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement  please you check again", partner.ShortName));
-            }
-
-            if (contract.SaleManId == salemanBOD) return result;
-
-            switch (contract.ContractType)
-            {
-                case "Cash":
-                    isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
-                    break;
-                //case "Official":
-                //case "Trial":
-                // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
-                // break;
-                default:
-                    isValid = true;
-                    break;
-            }
-            string messError = null;
-            if (isValid == false)
-            {
-                SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
-
-                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
-                    partner?.TaxCode, partner?.ShortName, saleman.Username);
-
-                return new HandleState((object)messError);
-            }
-            return result;
-        }
-
-        private SysSettingFlow getSettingFlowApplyContract(string type, Guid officeId)
-        {
-            var settingFlow = sysSettingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable");
-
-            return settingFlow;
-        }
-
-        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, string applyContractType)
+        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, bool? isApplyContract, string partnerType)
         {
             bool isApply = false;
+            isApply = applyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
+                && isApplyContract == true
+                && (applyPartnerType == partnerType || applyPartnerType == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
 
             return isApply;
         }
 
+        private bool IsApplySettingFlowContractTrialOfficial(string applyType, string applyPartnerType, string partnerType)
+        {
+            bool isApply = false;
+            isApply = applyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
+                && applyType != DocumentConstants.SETTING_FLOW_APPLY_TYPE_NONE
+                && (applyPartnerType == partnerType || applyPartnerType == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+
+            return isApply;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
 
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
-        bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode);
+        bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
     }
 
     public enum CHECK_POINT_TYPE
