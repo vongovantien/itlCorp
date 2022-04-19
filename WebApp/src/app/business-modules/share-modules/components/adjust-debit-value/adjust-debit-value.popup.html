@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
-                    <div class="m-portlet__body">
+                    <div class="m-portlet__body" style="overflow-y: scroll;overflow-x: hidden;">
                         <div class="div-inside bg-jagged-ice">
                             <div class="row">
                                 <ng-container *ngIf="action === 'SOA'" >
@@ -61,11 +61,6 @@
                                 </ng-container>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <br/>
-                <div class="m-form m-form--state">
-                    <div class="m-portlet__body">
                         <ng-container *ngFor="let chargeGrp of data.listChargeGrp ; let i = index; trackBy: trackByFn">
                             <div class="div-inside bg-bizare">
                                 <div class="row">
