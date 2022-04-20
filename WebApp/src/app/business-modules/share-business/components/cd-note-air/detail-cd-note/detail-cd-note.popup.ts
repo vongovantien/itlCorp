@@ -15,7 +15,7 @@ import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of } from "rxjs";
-import { ShareBussinessAdjustDebitValuePopupComponent } from "../../adjust-debit-value/adjust-debit-value.popup";
+import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
 
 @Component({
     selector: 'cd-note-detail-air-popup',

@@ -3641,20 +3641,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results)
-        {
-            if (results.GroupShipments.Count > 0)
-            {
-                var cd = results.GroupShipments.FirstOrDefault()?.ChargeShipments.Where(x => !string.IsNullOrEmpty(x.CDNote)).FirstOrDefault();
-                if (cd != null)
-                {
-                    var acctCdnote = acctCdnoteRepo.Get(x => x.Code == cd.CDNote).FirstOrDefault();
-                    if (acctCdnote != null) { results.ExcRateUsdToLocal = acctCdnote.ExcRateUsdToLocal; }
-                }
-            }
-            return results;
-        }
-
         public AdjustModel GetAdjustDebitValue(AdjustModel model)
         {
             var res = new AdjustModel();

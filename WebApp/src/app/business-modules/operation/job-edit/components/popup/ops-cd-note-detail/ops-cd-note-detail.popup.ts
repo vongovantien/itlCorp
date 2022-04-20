@@ -12,12 +12,12 @@ import { AccountingConstants, SystemConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
-import { ShareBussinessAdjustDebitValuePopupComponent } from '@share-bussiness';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { IAppState, getCurrentUserState } from '@store';
 import { of } from 'rxjs';
 import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'

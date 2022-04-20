@@ -1424,3 +1424,14 @@ button {
 .modal {
     z-index: 1043;
 }
+
+.bg-jagged-ice{
+    background: rgb(193, 233, 225) !important;
+}
+.bg-bizare{
+    background: rgb(242, 222, 223) !important;
+}
+
+.modal-list{
+    overflow-y: scroll;overflow-x: hidden;
+}

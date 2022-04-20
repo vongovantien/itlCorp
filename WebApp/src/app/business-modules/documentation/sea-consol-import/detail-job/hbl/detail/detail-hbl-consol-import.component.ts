@@ -19,7 +19,6 @@ import { catchError, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
-import { resourceUsage } from 'process';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -96,7 +95,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 this.onUpdateHblDetail();
                 break;
 
-            // * Update Arrival Note.    
+            // * Update Arrival Note.
             case HBL_TAB.ARRIVAL: {
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {

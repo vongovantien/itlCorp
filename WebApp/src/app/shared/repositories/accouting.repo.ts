@@ -1030,13 +1030,7 @@ export class AccountingRepo {
         );
     }
 
-    getListSurchargeDetailSettlement(settleNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
-    }
-
-    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
-    }
+ 
 
     payablePaging(page: number, size: number, body: any) {
         console.log('payablePaging', body)
