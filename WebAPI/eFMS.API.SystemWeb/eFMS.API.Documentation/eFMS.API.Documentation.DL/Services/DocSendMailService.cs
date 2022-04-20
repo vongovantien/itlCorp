@@ -8,6 +8,7 @@ using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -16,7 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -402,18 +405,18 @@ namespace eFMS.API.Documentation.DL.Services
                                  + "<b> eFMS System, </b>"
                                  + "</br>"
                                  + "<p><img src = 'https://api-efms.itlvn.com/ReportPreview/Images/logo-eFMS.png' /></p> " + " </div>";
-                var detailLink = "</br><p>" + "<div><i>You can <span><a href='{0}' target='_blank'>click here</a></span> to view detail.</i></div>"
-                                        + "<div><i>Bạn click <span><a href='{0}' target='_blank'>vào đây</a></span> để xem chi tiết.</i></div>"
+                var detailLink = "</br><p>" + "<div><i>You can click file below to view detail.</i></div>"
+                                        + "<div><i>Click vào file trên để xem chi tiết.</i></div>"
                                         + "</p>";
-                var urlInfo = apiServiceUrl.Value.ApiUrlExport + "/api/v1/VN/Documentation/ExportShipmentOutstandingDebit?settlementId={0}";
                 foreach (var saleman in dtGrp)
                 {
+                    var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
                     string tableBody = @"<table style='width: 100%; border: 1px solid #dddddd; border-collapse: collapse;'>"
                                  + @"<tr>"
                                  + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>STT </th>"
                                  + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Khách Hàng </th>"
                                  + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>C.Nhánh </th>"                                 
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Số Tiên Cần Thanh Toán </th>"
+                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Số Tiền Cần Thanh Toán </th>"
                                  + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Tiền Tệ </th>"
                                  + @"</tr>"
                                  + @"[content]"
@@ -421,7 +424,6 @@ namespace eFMS.API.Documentation.DL.Services
                     string headerBody = string.Format(@"<strong>Dear {0},</strong></br></br>"
                                      + "<p>Dưới đây là danh sách Khách hàng có Agreement Cash có dư nợ chưa thanh toán</br>"
                                      + "<i>There are  Customers with Agreement Cash that have outstanding Debit</i></p>", saleman.FirstOrDefault().SalemanName);
-                    urlInfo = string.Format(urlInfo, saleman.Key.SaleManId);
                     int number = 0;
                     
                     StringBuilder content = new StringBuilder();
@@ -431,28 +433,27 @@ namespace eFMS.API.Documentation.DL.Services
                         string formatCurrency = item.FirstOrDefault().CreditCurrency == "VND" ? "N0" : "N02";
                         var office = string.Join(";", item.GroupBy(x => x.OfficeName).Select(x => x.Key));
                         content.Append(@"<tr>");
-                        content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center; vertical-align: top;'>" + (number + 1) + "</td>");
-                        content.Append(@"<td style='width: 30%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName + "</td>");
+                        content.Append(@"<td style='width: 5%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center; vertical-align: top;'>" + (number + 1) + "</td>");
+                        content.Append(@"<td style='width: 33%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName + "</td>");
                         content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + office + "</td>");
-                        content.Append(@"<td style='width: 14%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right; vertical-align: top;'>" + item.FirstOrDefault().DebitAmount?.ToString(formatCurrency) + "</td>");
+                        content.Append(@"<td style='width: 12%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right; vertical-align: top;'>" + item.FirstOrDefault().DebitAmount?.ToString(formatCurrency) + "</td>");
                         content.Append(@"<td style='width: 10%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().CreditCurrency + "</td>");
                         content.Append(@"</tr>");
                         number++;
                     }
-                    detailLink = string.Format(detailLink, urlInfo);
                     // Mail to
                     var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
                     var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
                     // Bcc
-                    //List<string> emailBCCs = new List<string> { "daniel.khoa@itlvn.com,kenny.thuong@itlvn.com,lynne.loc@itlvn.com" };
-                    List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com" };
-                    if (saleman.Count() > 0)
+                    List<string> emailBCCs = new List<string> { "daniel.khoa@itlvn.com,kenny.thuong@itlvn.com,lynne.loc@itlvn.com" };
+                    if (saleman.Count() > 0 && attachFile.Status)
                     {
                         tableBody = tableBody.Replace("[content]", content.ToString());
                         string body = headerBody + tableBody + detailLink + footerBody;
                         body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
 
-                        var s = SendMail.Send(subject, body, mailTo, null, mailCC, emailBCCs);
+                        List<string> pathFile = new List<string>() { attachFile.Data.ToString() };
+                        var s = SendMail.Send(subject, body, mailTo, pathFile, mailCC, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
                         var logSendMail = new SysSentEmailHistory
@@ -494,6 +495,15 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetShipmentDataWithOutstandingDebit>(parameter);
             return data;
+        }
+
+        private async Task<ResultHandle> GetAttachExportShipmentOutstandingDebit(string salemanId)
+        {
+            Uri urlExport = new Uri(apiServiceUrl.Value.ApiUrlExport);
+
+            HttpResponseMessage resquest = await HttpClientService.GetApi(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
+            var response = await resquest.Content.ReadAsAsync<ResultHandle>();
+            return response;
         }
     }
 }

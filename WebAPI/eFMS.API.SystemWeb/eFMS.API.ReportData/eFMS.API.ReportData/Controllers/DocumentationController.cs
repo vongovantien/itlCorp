@@ -791,13 +791,12 @@ namespace eFMS.API.ReportData.Controllers
 
             var salemanName = string.Empty;
             var stream = new DocumentationHelper().GenerateExportShipmentOutstandingDebit(dataObjects.Result, "Shipment-Oustanding-Debit-Template.xlsx", out salemanName);
-            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(stream, salemanName + "-OustandingDebit-eFMS.xlsx");
+            var file = new FileHelper().ReturnFormFile("eFMS", stream, salemanName + "-OustandingDebit");
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + salemanId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
-            new FileHelper().PreviewEcxelInTab(result.Data?.ToString());
-            return Ok();
+            return Ok(result);
         }
     }
 }

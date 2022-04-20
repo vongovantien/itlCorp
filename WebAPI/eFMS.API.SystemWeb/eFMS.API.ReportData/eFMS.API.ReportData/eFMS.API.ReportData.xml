@@ -794,12 +794,6 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.ReportData.Helpers.FileHelper.PreviewEcxelInTab(System.String)">
-            <summary>
-            Preview file with open tab
-            </summary>
-            <param name="fileName"></param>
-        </member>
         <member name="T:eFMS.API.ReportData.Models.FilesNames">
             <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
         </member>

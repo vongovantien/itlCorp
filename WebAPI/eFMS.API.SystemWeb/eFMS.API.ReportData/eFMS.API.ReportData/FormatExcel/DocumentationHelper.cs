@@ -4195,6 +4195,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var contractGrp = result.GroupBy(x => new { x.SaleManId, x.SalemanName, x.SalemanEmail, x.AccountNo, x.CustomerName, x.ContractId, x.DebitAmount, x.CreditCurrency });
                 int? stt = 1;
                 salemanName = result.FirstOrDefault().SalemanName;
+                var isExistDetail = false;
                 foreach (var contract in contractGrp)
                 {
                     var groupIndex = stt;
@@ -4217,6 +4218,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         shipmentInfo = shipmentInfo.Skip(1);
                         foreach (var shipment in shipmentInfo)
                         {
+                            isExistDetail = true;
                             listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
                             listKeyData.Add("JobNoDt", shipment.Key.JobNo);
@@ -4226,6 +4228,11 @@ namespace eFMS.API.ReportData.FormatExcel
                         groupIndex++;
                     }
                     stt++;
+                }
+                if (!isExistDetail)
+                {
+                    var cell = excel.AddressOfKey("JobNoDt");
+                    excel.DeleteRow(cell.Row);
                 }
 
                 return excel.ExcelStream();

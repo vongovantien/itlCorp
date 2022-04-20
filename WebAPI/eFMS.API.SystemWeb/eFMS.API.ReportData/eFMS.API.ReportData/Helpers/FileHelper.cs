@@ -40,21 +40,5 @@ namespace eFMS.API.ReportData.Helpers
                 ms.Dispose();
             }
         }
-
-        /// <summary>
-        /// Preview file with open tab
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void PreviewEcxelInTab(string fileName)
-        {
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                var url = "https://gbc-excel.officeapps.live.com/op/view.aspx?src=" + fileName;
-                var psi = new ProcessStartInfo();
-                psi.UseShellExecute = true;
-                psi.FileName = url;
-                Process.Start(psi);
-            }
-        }
     }
 }
