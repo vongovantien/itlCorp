@@ -2710,6 +2710,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
             var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
             && x.VoucherId == model.VoucherNo
+            && x.SourceCreated == "Bravo"
             && x.Date.Value.Date == model.VoucherDate.Date)?.FirstOrDefault();
 
             if (voucherToDelete != null)
