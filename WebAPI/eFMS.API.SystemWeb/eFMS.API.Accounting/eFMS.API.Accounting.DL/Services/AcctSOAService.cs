@@ -1159,7 +1159,7 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion -- Search by Customer --
 
             #region -- Search by Services --
-            if (!string.IsNullOrEmpty(criteria.StrServices))
+            
             {
                 surcharges = surcharges.Where(x => criteria.StrServices.Contains(x.TransactionType));
                 if (criteria.IsOBH) //**
@@ -1177,13 +1177,13 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID
-                    );
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
+                    ); ; ;
                     if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                     {
                         transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                         && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                        && x.OfficeId == currentUser.OfficeID
+                        && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
                         );
                     }
                 }
@@ -1191,7 +1191,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
                     );
                 }
             }
@@ -1203,7 +1203,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                     && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
                     );
                 }
                 if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
@@ -1211,7 +1211,7 @@ namespace eFMS.API.Accounting.DL.Services
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                                                       && (x.ServiceDate.HasValue ? (criteria.FromDate.Date <= x.ServiceDate && x.ServiceDate <= criteria.ToDate.Date)
                                                          : false)
-                                                      && x.OfficeId == currentUser.OfficeID); //Import - ETA, Export - ETD
+                                                      && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)); //Import - ETA, Export - ETD
                 }
             }
 
@@ -1521,7 +1521,6 @@ namespace eFMS.API.Accounting.DL.Services
             charges = data.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
             return charges;
         }
-
         public ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria)
         {
             var chargeShipmentList = GetChargeForIssueSoaByCriteria(criteria);
@@ -1599,6 +1598,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Created Date of Job
             if (criteria.DateType == "CreatedDate")
             {
+
                 if (criteria.StrServices.Contains("CL"))
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
@@ -1606,16 +1606,16 @@ namespace eFMS.API.Accounting.DL.Services
                     && x.OfficeId == currentUser.OfficeID);
                     if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                     {
-                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
+                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                         && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                        && x.OfficeId == currentUser.OfficeID);
+                        && (x.OfficeId == currentUser.OfficeID));
                     }
                 }
                 else
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID
+                    && (x.OfficeId == currentUser.OfficeID)
                     );
                 }
             }
@@ -1625,16 +1625,16 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (criteria.StrServices.Contains("CL"))
                 {
-                    operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
+                    operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                     && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID);
+                    && (x.OfficeId == currentUser.OfficeID));
                 }
                 if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                                                       && (x.ServiceDate.HasValue ? (criteria.FromDate.Date <= x.ServiceDate && x.ServiceDate <= criteria.ToDate.Date)
                                                          : false)
-                                                      && x.OfficeId == currentUser.OfficeID); //Import - ETA, Export - ETD
+                                                      && (x.OfficeId == currentUser.OfficeID)); //Import - ETA, Export - ETD
                 }
             }
 
