@@ -1178,7 +1178,7 @@ namespace eFMS.API.Accounting.DL.Services
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
                     && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
-                    ); ; ;
+                    );
                     if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                     {
                         transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
