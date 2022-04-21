@@ -394,6 +394,8 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
+                var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+                
                 var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
                 {
                     x.SaleManId
@@ -408,6 +410,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var detailLink = "</br><p>" + "<div><i>You can click file below to view detail.</i></div>"
                                         + "<div><i>Click vào file trên để xem chi tiết.</i></div>"
                                         + "</p>";
+                List<string> emailBCCs = new List<string>();
+                if (emailBcc != null)
+                {
+                    emailBCCs = emailBcc.ToString().Split(";").ToList();
+                }
                 foreach (var saleman in dtGrp)
                 {
                     var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
@@ -445,7 +452,6 @@ namespace eFMS.API.Documentation.DL.Services
                     var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
                     var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
                     // Bcc
-                    List<string> emailBCCs = new List<string> { "daniel.khoa@itlvn.com,kenny.thuong@itlvn.com,lynne.loc@itlvn.com" };
                     if (saleman.Count() > 0 && attachFile.Status)
                     {
                         tableBody = tableBody.Replace("[content]", content.ToString());
