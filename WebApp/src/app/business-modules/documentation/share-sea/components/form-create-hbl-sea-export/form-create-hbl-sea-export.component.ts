@@ -29,7 +29,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective) private viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     @Input() isUpdate: boolean = false;

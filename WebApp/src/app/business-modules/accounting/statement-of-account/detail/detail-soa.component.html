@@ -198,8 +198,7 @@
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
                         <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
-                            [folderModuleName]="folderModuleName" [objId]="soa.id"
-                            [readOnly]="soa.syncStatus === 'Synced'?'':null">
+                            folderModuleName="SOA" [objId]="soa.id" [readOnly]="soa.syncStatus === 'Synced'?'':null">
                         </accounting-attach-file-list>
                     </tab>
                 </tabset>
@@ -420,13 +419,9 @@
     </div>
 </div>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
 
-<confirm-popup (onSubmit)="onConfirmSoa()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>
 <soa-payment-method-popup (onApply)="onApplyPaymentMethod($event)"></soa-payment-method-popup>
+
 <reason-reject-popup (onApply)="onApplyReasonReject($event)"></reason-reject-popup>
 
-<info-popup #validateSyncedSOAPopup [body]="messageValidate" [title]="'Alert'">
-</info-popup>
+<ng-template inject></ng-template>
