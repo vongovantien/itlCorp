@@ -342,7 +342,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode, //[06/01/2021]
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
-                                                                       LocalBranchCode = partner != null ? (partner.InternalCode == "Internal" ? partner.InternalCode : null) : null, //Parnter mode là internal => Internal Code
+                                                                       LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null, //Parnter mode là internal => Internal Code
                                                                        Payee = settle.Payee,
                                                                        CurrencyCode = settle.SettlementCurrency,
                                                                        SettleAmount = settle.Amount,
