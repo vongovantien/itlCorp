@@ -579,7 +579,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                 sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
                 sync.CustomerMode = cdNotePartner?.PartnerMode;
-                sync.LocalBranchCode = cdNotePartner?.InternalCode == "Internal" ? cdNotePartner.InternalCode : null; //Parnter mode là internal => Internal Code
+                sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
