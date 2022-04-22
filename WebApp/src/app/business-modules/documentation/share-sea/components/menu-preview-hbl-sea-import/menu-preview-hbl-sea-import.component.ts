@@ -8,6 +8,7 @@ import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-menu-preview-hbl-sea-import',
@@ -153,7 +154,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -170,7 +171,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -187,7 +188,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
