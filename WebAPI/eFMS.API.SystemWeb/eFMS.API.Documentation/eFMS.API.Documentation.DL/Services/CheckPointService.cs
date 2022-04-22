@@ -270,7 +270,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
 
-            if (transactionType == "DOC")
+            if (transactionType == "CL")
             {
                 currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
                 contract = GetContractByPartnerId(partnerId, currentSaleman);
@@ -284,29 +284,30 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
+            int errorCode = -1;
             switch (contract.ContractType)
             {
                 case "Cash":
-                   
+
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
                         isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
-                    else
-                    {
-                        isValid = true;
-                    }
+                    else isValid = true;
+                    if (!isValid) errorCode = 1;
+
                     break;
                 case "Trial":
                 case "Official":
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        isValid = ValidateCheckPointOfficialTrialContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        if (contract.IsExpired == true || contract.IsOverLimit == true || contract.IsOverDue == true)
+                        {
+                            isValid = false;
+                        }
                     }
-                    else
-                    {
-                        isValid = true;
-                    }
+                    else isValid = true;
+                    if (!isValid) errorCode = 2;
                     break;
                 default:
                     isValid = true;
@@ -316,10 +317,16 @@ namespace eFMS.API.Documentation.DL.Services
             if (isValid == false)
             {
                 SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
-
-                messError = string.Format(@"{0} - {1} cash agreement of {2} have shipment that not paid yet, please you check it again!",
-                    partner?.TaxCode, partner?.ShortName, saleman.Username);
-
+                if (errorCode == 1)
+                {
+                    messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please you check it again!",
+                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                }
+                else if (errorCode == 2)
+                {
+                    messError = string.Format(@"{0} - {1} {2} agreement of {3} have over due or over credit limit, please you check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                }
                 return new HandleState((object)messError);
             }
             return result;
@@ -352,7 +359,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
                                        && x.Active == true
-                                       && (x.IsExpired == false || x.IsExpired == null))
                 .OrderBy(x => x.ContractType)
                 .FirstOrDefault();
             }
@@ -361,7 +367,7 @@ namespace eFMS.API.Documentation.DL.Services
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
                                        && x.Active == true
                                        && x.SaleManId == saleman
-                                       && (x.IsExpired == false || x.IsExpired == null))
+                                       )
                 .OrderBy(x => x.ContractType)
                 .FirstOrDefault();
             }
