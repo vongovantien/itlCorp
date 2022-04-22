@@ -93,7 +93,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                 (res: any) => {
                     this.customers = res.data || [];
                     this.totalItems = res.totalItems || 0;
-                },
+                }
             );
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
@@ -134,7 +134,6 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.dataSearch.partnerType = 'Customer';
         // this.getPartners();
         this.onSearch(this.dataSearch);
-
     }
 
     onSearch(event: CommonInterface.ISearchOption) {
@@ -149,8 +148,23 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             type: !!event.field ? event.field : this.dataSearchs.type,
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
-        this.page = 1;
+        //this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
+        this._store.select(getCustomerListState)
+        .pipe(
+            takeUntil(this.ngUnsubscribe),
+            map((data: any) => {
+                return {
+                    page:data.page,
+                    pageSize:data.size
+                };
+            })
+        ).subscribe(
+            (res: any) => {
+                this.page=!!res.page?res.page:1,
+                this.pageSize=!!res.pageSize?res.pageSize:15
+            }
+        );
 
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
@@ -235,6 +249,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         //             this.totalItems = res.totalItems;
         //         }
         //     );
+
         this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
