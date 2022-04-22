@@ -1603,19 +1603,19 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                    && x.OfficeId == currentUser.OfficeID);
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null));
                     if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                     {
                         transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                         && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                        && (x.OfficeId == currentUser.OfficeID));
+                        && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null));
                     }
                 }
                 else
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled 
                     && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.FromDate.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Date : false)
-                    && (x.OfficeId == currentUser.OfficeID)
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)
                     );
                 }
             }
@@ -1627,14 +1627,14 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                     && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false)
-                    && (x.OfficeId == currentUser.OfficeID));
+                    && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null));
                 }
                 if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
                                                       && (x.ServiceDate.HasValue ? (criteria.FromDate.Date <= x.ServiceDate && x.ServiceDate <= criteria.ToDate.Date)
                                                          : false)
-                                                      && (x.OfficeId == currentUser.OfficeID)); //Import - ETA, Export - ETD
+                                                      && (criteria.StaffType != "Salesman" ? x.OfficeId == currentUser.OfficeID : x.OfficeId != null)); //Import - ETA, Export - ETD
                 }
             }
 
