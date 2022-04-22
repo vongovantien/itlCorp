@@ -1465,5 +1465,13 @@ namespace eFMS.API.Accounting.Controllers
                 return File((MemoryStream)res.Message, "application/zip", m.FileName);
             return BadRequest(res);
         }
+
+        [HttpPost("TestSendMail")]
+        public ActionResult TestSendMail(string subject, string body, [FromBody] List<string> emails)
+        {
+            var listcc = new List<string> {"lynne.loc@itlvn.com","alex.phuong@itlvn.com", "paulchen.bao@itlvn.com" };
+            var sendSuccess = SendMail.Send(subject, body, emails, null, listcc, null);
+            return Ok( new { sendSuccess } );
+        }
     }
 }

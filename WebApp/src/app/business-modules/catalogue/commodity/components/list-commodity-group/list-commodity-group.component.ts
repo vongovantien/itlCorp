@@ -10,6 +10,8 @@ import { CommonEnum } from "@enums";
 
 import { CommodityGroupAddPopupComponent } from "../form-create-commodity-group/form-create-commodity-group.popup";
 import { catchError, finalize, map } from "rxjs/operators";
+import { HttpResponse } from "@angular/common/http";
+import { SystemConstants } from "@constants";
 @Component({
     selector: 'commodity-group-list',
     templateUrl: './list-commodity-group.component.html',
@@ -149,8 +151,8 @@ export class CommodityGroupListComponent extends AppList {
         this._exportRepo.exportCommodityGroup(this.dataSearch)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "CommodityGroup.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

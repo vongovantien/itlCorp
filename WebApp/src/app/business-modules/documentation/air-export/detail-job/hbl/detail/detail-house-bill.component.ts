@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CsTransactionDetail, HouseBill } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -19,6 +19,7 @@ import { catchError, takeUntil, skip, tap, switchMap, filter } from 'rxjs/operat
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { getCurrentUserState } from '@store';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -276,12 +277,12 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (response: ArrayBuffer | any) => {
                     if (response !== false) {
                         if (response.byteLength > 0) {
-                            this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                            this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                         } else {
                             this._toastService.warning('There is no neutral hawb data to print', '');
                         }
                     }
-                },
+                }
             );
     }
 

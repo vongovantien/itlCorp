@@ -8,6 +8,7 @@ import { AppList } from 'src/app/app.list';
 
 import cloneDeep from 'lodash/cloneDeep';
 import { finalize, catchError } from 'rxjs/operators';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-history-payment-import',
@@ -120,7 +121,7 @@ export class ARHistoryPaymentImportComponent extends AppList implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "InvoicePaymentImportFile.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "InvoicePaymentImportFile.xlsx");
                 },
             );
     }

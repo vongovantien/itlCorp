@@ -32,6 +32,7 @@ import { catchError, finalize, map, } from 'rxjs/operators';
 import { ContextMenuDirective } from '@directives';
 import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
 import { of, forkJoin } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -289,8 +290,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     export() {
         this._exportRepo.exportSettlementPaymentShipment(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'settlement-payment.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }
@@ -298,8 +299,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     accountingeExport() {
         this._exportRepo.exportSettlementPaymentShipmentDetail(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Settlement-Detail Template.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }

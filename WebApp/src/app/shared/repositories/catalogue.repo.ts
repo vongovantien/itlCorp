@@ -1234,7 +1234,7 @@ export class CatalogueRepo {
     }
     //
     downloadIncotermListExcel(body: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body,null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1299,7 +1299,7 @@ export class CatalogueRepo {
     }
     //
     downloadPotentialCustomerListExcel(body: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPotentialCustomerList`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPotentialCustomerList`, body,null,null,'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

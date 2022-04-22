@@ -24,6 +24,7 @@ import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { FormSearchExportComponent } from '../../commercial/components/popup/form-search-export/form-search-export.popup';
+import { HttpResponse } from '@angular/common/http';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
 
@@ -364,8 +365,8 @@ export class PartnerComponent extends AppList implements OnInit {
         this._exportRepo.exportAgreementInfo(this.criteria)
             .pipe(finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_agreement_info.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             )
     }

@@ -9,6 +9,7 @@ import { LoadingPopupComponent } from "@common";
 import { NgxSpinnerService } from "ngx-spinner";
 import { SystemConstants } from "@constants";
 import { of } from "rxjs";
+import { HttpResponse } from "@angular/common/http";
 
 @Component({
     selector: 'app-general-report',
@@ -120,9 +121,8 @@ export class GeneralReportComponent extends AppList {
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                    (response: ArrayBuffer) => {
-                        const fileName = "Export ShipmentOverview.xlsx";
-                        this.startDownloadReport(response, fileName);
+                    (response: HttpResponse<any>) => {
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }
@@ -142,9 +142,8 @@ export class GeneralReportComponent extends AppList {
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                    (response: ArrayBuffer) => {
-                        const fileName = reportType == 'FCL' ? "Export ShipmentOverview FCL.xlsx" : "Shipment Overview-LCL.xlsx";
-                        this.startDownloadReport(response, fileName);
+                    (response: HttpResponse<any>) => {
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }
@@ -164,9 +163,8 @@ export class GeneralReportComponent extends AppList {
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                    (response: ArrayBuffer) => {
-                        const fileName = "Standard Report (" + this.dataSearch.currency + ").xlsx";
-                        this.startDownloadReport(response, fileName);
+                    (response: HttpResponse<any>) => {
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     },
                 );
         }

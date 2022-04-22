@@ -125,7 +125,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "LogisticsImportChargeTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "LogisticsImportChargeTemplate.xlsx");
                 },
             );
     }

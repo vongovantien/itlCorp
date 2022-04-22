@@ -71,7 +71,7 @@
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSOA(System.String,System.String)" -->
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
             <summary>
-            Export Bravo SOA
+            Export Bravo SOAExportSettlementPaymentDetailSurCharges
             </summary>
             <param name="soaNo"></param>
             <returns></returns>
@@ -126,6 +126,13 @@
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingReceivableArSumary(eFMS.API.ReportData.Models.Accounting.AccountReceivableCriteria)">
             <summary>
             Export accounting receivable
+            </summary>
+            <param name="criteria">AccountReceivableCriteria</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDebitDetail(eFMS.API.ReportData.Models.Criteria.DebitDetailCriteria)">
+            <summary>
+            Export debit detail
             </summary>
             <param name="criteria">AccountReceivableCriteria</param>
             <returns></returns>
@@ -484,6 +491,12 @@
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetSettleExcelFolder">
             <summary>
             Get folder contain settlement payment template excel
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetARExcelFolder">
+            <summary>
+            Get folder contain AR template excel
             </summary>
             <returns></returns>
         </member>

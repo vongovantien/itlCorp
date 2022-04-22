@@ -19,6 +19,7 @@ import { FormContractCommercialPopupComponent } from '../../share-modules/compon
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Component({
@@ -329,8 +330,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this._exportRepo.exportAgreementInfo(this.dataSearch)
             .pipe(finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_agent_agreement.xlsx')
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME))
                 }
             )
     }

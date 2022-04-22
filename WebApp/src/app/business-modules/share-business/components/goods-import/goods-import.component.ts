@@ -8,6 +8,7 @@ import { finalize, catchError } from 'rxjs/operators';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 import * as fromStore from '../../store';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'goods-import-popup',
     templateUrl: './goods-import.component.html'
@@ -110,7 +111,7 @@ export class ShareGoodsImportComponent extends PopupBase implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "ContainerImportTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "ContainerImportTemplate.xlsx");
                 },
             );
     }

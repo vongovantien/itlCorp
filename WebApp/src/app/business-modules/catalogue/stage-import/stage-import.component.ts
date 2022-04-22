@@ -124,7 +124,7 @@ export class StageImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "ImportStageTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "ImportStageTemplate.xlsx");
                 },
             );
     }

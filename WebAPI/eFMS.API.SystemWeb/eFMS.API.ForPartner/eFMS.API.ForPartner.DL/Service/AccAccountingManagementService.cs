@@ -2306,13 +2306,16 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             // gom các detail cùng voucherNo, voucherDate,
             var grpVoucherDetail = model.Details
-                .GroupBy(x => new { x.AcctID, x.BravoRefNo })
+                .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
-                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
-                    surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
-                    .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
+                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
+                    surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  
+                    && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
+                    .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
+                        c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
                 })
                 .ToList();
             if (grpVoucherDetail.Count > 0)
@@ -2429,22 +2432,25 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.VoucherIddate = voucher.Date;
                                                     surcharge.AcctManagementId = voucher.Id;
                                                 }
-
-                                                surcharge.InvoiceNo = itemGrp.voucherData.InvoiceNo;
-                                                surcharge.InvoiceDate = itemGrp.voucherData.InvoiceDate;
-                                                surcharge.SeriesNo = itemGrp.voucherData.SerieNo;
+                                                var surChargeBravo = itemGrp.surcharges.FirstOrDefault(x => x.ChargeId == surcharge.Id); // make sure ID sync về = ID trên phí
+                                                surcharge.InvoiceNo = surChargeBravo.InvoiceNo;
+                                                surcharge.InvoiceDate = surChargeBravo.InvoiceDate;
+                                                surcharge.SeriesNo = surChargeBravo.SerieNo;
                                                 surcharge.DatetimeModified = voucher.DatetimeCreated;
                                                 surcharge.UserModified = currentUser.UserID;
-                                                surcharge.ReferenceNo = itemGrp.voucherData.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                surcharge.VatAmountVnd = itemGrp.voucherData.VatAmountVnd;
-                                                surcharge.AmountVnd = itemGrp.voucherData.AmountVnd;
-                                                // surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;  // giữ nguyên trên phí
-                                                // surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
-                                                surcharge.FinalExchangeRate = itemGrp.voucherData.ExchangeRate;
+                                                surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
+                                                if(surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
+                                                {
+                                                    surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
+                                                    surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
+                                                    surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
+                                                    surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
+                                                    surcharge.FinalExchangeRate = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.ExchangeRate : surcharge.FinalExchangeRate;
 
-                                                AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
-                                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                                                surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                                    AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
+                                                    surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                                    surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                                }
 
                                                 surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
 
@@ -2704,6 +2710,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
             var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
             && x.VoucherId == model.VoucherNo
+            && x.SourceCreated == "Bravo"
             && x.Date.Value.Date == model.VoucherDate.Date)?.FirstOrDefault();
 
             if (voucherToDelete != null)
