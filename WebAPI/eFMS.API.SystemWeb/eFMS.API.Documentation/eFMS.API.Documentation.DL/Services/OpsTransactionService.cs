@@ -67,6 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
+        private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
+        private readonly ICsTransactionService csTransactionServe;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -100,7 +102,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
             IContextBase<CatCharge> catChargeRepo,
-            IContextBase<CsLinkCharge> csLinkChargeRepo
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
+            ICsShipmentSurchargeService csShipmentSurchargeService,
+            ICsTransactionService csTransactionService
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -136,6 +140,8 @@ namespace eFMS.API.Documentation.DL.Services
             settingFlowRepository = settingFlowRepo;
             catChargeRepository = catChargeRepo;
             csLinkChargeRepository = csLinkChargeRepo;
+            csShipmentSurchargeServe = csShipmentSurchargeService;
+            csTransactionServe = csTransactionService;
         }
         public override HandleState Add(OpsTransactionModel model)
         {

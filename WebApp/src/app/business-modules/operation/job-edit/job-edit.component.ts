@@ -363,6 +363,22 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     insertDuplicateJob() {
         this.opsTransaction.isReplicate = this.isReplicate;
         // this.opsTransaction.isReplicate = !!this.opsTransaction.replicatedId;
+        if(this.isSaveLink){
+            this._documentRepo.getASTransactionInfo(this.opsTransaction.jobNo, this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
+            .pipe(catchError(this.catchError))
+            .subscribe((res: ILinkAirSeaInfoModel) => {
+                if (!!res?.jobNo) {
+                    this.opsTransaction.serviceNo = res.jobNo;
+                    this.opsTransaction.serviceHblId = res.hblId;
+                    this.opsTransaction.isLinkJob = true;
+                    this.insertDuplicateShipment();
+                }
+            });
+        }else {
+            this.insertDuplicateShipment();
+        }
+    }
+    insertDuplicateShipment(){
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -568,8 +584,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.tab = 'job-edit'
         this.isDuplicate = true;
         this.editForm.isJobCopy = this.isDuplicate;
+        this.editForm.opsTransaction.serviceNo = null;
         this.editForm.setFormValue();
-
         if (this.isDuplicate) {
             this.editForm.getBillingOpsId();
             this.headerComponent.resetBreadcrumb("Create Job");

@@ -239,20 +239,37 @@ namespace eFMS.API.Documentation.DL.Services
             var surchargesUpdate = new List<CsShipmentSurcharge>();
             var surchargeDelIds = new List<string>();
             var hisLinkFees = new List<CsLinkCharge>();
+            var shipment = new OpsTransaction();
 
-            var shipment = _opsTransRepository.Get(x => x.JobNo == list[0].JobNo || x.ServiceNo == list[0].JobNo).FirstOrDefault();
-            if (shipment != null)
+            var listID = list.Select(x => x.Id.ToString());
+            var ls = Get(x=>listID.Contains(x.ChargeLinkId)||listID.Contains(x.ChargeOrgId)).FirstOrDefault();
+         
+            if (ls != null)
             {
-                shipment.IsLinkFee = Get(x => x.JobNoOrg == shipment.JobNo || x.JobNoLink == shipment.JobNo.ToString()).Count() > 1 ? true : false;
-                shipment.UserCreatedLinkJob = null;
-                shipment.DateCreatedLinkJob = null;
-                shipment.DatetimeModified = DateTime.Now;
+                shipment = _opsTransRepository.Get(x=>x.JobNo == ls.JobNoOrg).FirstOrDefault();
+                if (shipment != null)
+                {
+                    shipment.IsLinkFee = Get(x => x.JobNoOrg == shipment.JobNo).Count() > 1 ? true : false;
+                    shipment.UserCreatedLinkJob = null;
+                    shipment.DateCreatedLinkJob = null;
+                    shipment.DatetimeModified = DateTime.Now;
+                }
             }
 
             foreach (var i in list)
             {
                 if (i.Type == "BUY")
                 {
+                    if (!string.IsNullOrEmpty(i.Soano)
+                        || !string.IsNullOrEmpty(i.PaySoano)
+                        || !string.IsNullOrEmpty(i.SettlementCode)
+                        || !string.IsNullOrEmpty(i.VoucherId)
+                        || !string.IsNullOrEmpty(i.CreditNo)
+                        || !string.IsNullOrEmpty(i.DebitNo))
+                    {
+                        return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+                    }
+
                     var his = DataContext.Get(x => x.ChargeLinkId == i.Id.ToString()).FirstOrDefault();
                     if (his != null)
                     {
@@ -260,15 +277,6 @@ namespace eFMS.API.Documentation.DL.Services
                         hisLinkFees.Add(his);
 
                         var sell = _csSurchargeRepository.Where(x => x.Id == Guid.Parse(his.ChargeOrgId)).FirstOrDefault();
-                        if (sell != null && (
-                            !string.IsNullOrEmpty(sell.Soano)
-                            || !string.IsNullOrEmpty(sell.SettlementCode)
-                            || !string.IsNullOrEmpty(sell.VoucherId)
-                            || !string.IsNullOrEmpty(sell.CreditNo)
-                            || !string.IsNullOrEmpty(sell.DebitNo)))
-                        {
-                            return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
-                        }
                         sell.LinkFee = false;
                         i.ModifiedDateLinkFee = DateTime.Now;
                         surchargesUpdate.Add(sell);
@@ -282,11 +290,12 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         var buy = _csSurchargeRepository.Where(x => x.Id == Guid.Parse(his.ChargeLinkId)).FirstOrDefault();
                         if (buy != null && (
-                            !string.IsNullOrEmpty(buy.Soano)
-                            || !string.IsNullOrEmpty(buy.SettlementCode)
-                            || !string.IsNullOrEmpty(buy.VoucherId)
-                            || !string.IsNullOrEmpty(buy.CreditNo)
-                            || !string.IsNullOrEmpty(buy.DebitNo)))
+                          !string.IsNullOrEmpty(buy.Soano)
+                          || !string.IsNullOrEmpty(buy.PaySoano)
+                          || !string.IsNullOrEmpty(buy.SettlementCode)
+                          || !string.IsNullOrEmpty(buy.VoucherId)
+                          || !string.IsNullOrEmpty(buy.CreditNo)
+                          || !string.IsNullOrEmpty(buy.DebitNo)))
                         {
                             return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
                         }
@@ -297,7 +306,6 @@ namespace eFMS.API.Documentation.DL.Services
                     i.ModifiedDateLinkFee = DateTime.Now;
                     surchargesUpdate.Add(i);
                 }
-
             }
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
