@@ -250,7 +250,7 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateACSAirExportExcel(dataObject.Result, "PHIEU-CAN-ACS-Template");
+            var stream = new DocumentationHelper().GenerateACSAirExportExcel(dataObject.Result);
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
@@ -277,7 +277,7 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateNCTSALSAirExportExcel(dataObject.Result, "Air Export - NCTS & ALS");
+            var stream = new DocumentationHelper().GenerateNCTSALSAirExportExcel(dataObject.Result);
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
@@ -361,7 +361,7 @@ namespace eFMS.API.ReportData.Controllers
             Stream stream;
             if (reportType == "FCL")
             {
-               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment-Overview-FCL");
+               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria);
             }
             else
             {
@@ -681,11 +681,11 @@ namespace eFMS.API.ReportData.Controllers
             Stream stream;
             if (rptType == "OPS")
             {
-                stream = new DocumentationHelper().BindingDataCommissionPROpsReport(dataObjects.Result, "Commission-OPS-VND");
+                stream = new DocumentationHelper().BindingDataCommissionPROpsReport(dataObjects.Result);
             }
             else
             {
-                stream = new DocumentationHelper().BindingDataCommissionPRReport(dataObjects.Result, "Commission-PR"); // truyền data và tên file
+                stream = new DocumentationHelper().BindingDataCommissionPRReport(dataObjects.Result); // truyền data và tên file
             }
 
             if (stream == null)
@@ -720,7 +720,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            var stream = new DocumentationHelper().BindingDataIncentiveReport(dataObjects.Result, "Incentive");
+            var stream = new DocumentationHelper().BindingDataIncentiveReport(dataObjects.Result);
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");

@@ -13,6 +13,7 @@ using System.Linq;
 using Microsoft.Office;
 using Font = System.Drawing.Font;
 using Microsoft.Office.Interop.Excel;
+using eFMS.API.ReportData.Consts;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
@@ -1234,11 +1235,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="airwayBillExport"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateACSAirExportExcel(AirwayBillExportResult airwayBillExport, string fileName)
+        public Stream GenerateACSAirExportExcel(AirwayBillExportResult airwayBillExport)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.PHIEU_CAN_ACS_Template));
                 var path = f.FullName;
                 if (!File.Exists(path))
                 {
@@ -1269,11 +1270,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="airwayBillExport"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateNCTSALSAirExportExcel(AirwayBillExportResult airwayBillExport, string fileName)
+        public Stream GenerateNCTSALSAirExportExcel(AirwayBillExportResult airwayBillExport)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, "Air Export - NCTS & ALS"));
                 var path = f.FullName;
                 if (!File.Exists(path))
                 {
@@ -1320,11 +1321,11 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             return null;
         }
-        public Stream GenerateShipmentOverviewFCLExcell(List<ExportShipmentOverviewFCL> overviews, GeneralReportCriteria criteria, string fileName)
+        public Stream GenerateShipmentOverviewFCLExcell(List<ExportShipmentOverviewFCL> overviews, GeneralReportCriteria criteria)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.Shipment_Overview_FCL));
                 var path = f.FullName+".xlsx";
                 if (!File.Exists(path))
                 {
@@ -3844,11 +3845,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="resultData"></param>
         /// <param name="fileName"></param>
-        public Stream BindingDataCommissionPROpsReport(CommissionExportResult resultData, string fileName)
+        public Stream BindingDataCommissionPROpsReport(CommissionExportResult resultData)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));  // Read file template
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.Commission_OPS_VND));  // Read file template
                 var path = f.FullName;
                 if (!File.Exists(path)) // Check Exist file
                 {
@@ -3955,11 +3956,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="resultData"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream BindingDataCommissionPRReport(CommissionExportResult resultData, string fileName)
+        public Stream BindingDataCommissionPRReport(CommissionExportResult resultData)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));  // Read file template
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.Commission_PR));  // Read file template
                 var path = f.FullName;
                 if (!File.Exists(path)) // Check Exist file
                 {
@@ -4105,11 +4106,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="resultData"></param>
         /// <param name="fileName"></param>
-        public Stream BindingDataIncentiveReport(CommissionExportResult resultData, string fileName)
+        public Stream BindingDataIncentiveReport(CommissionExportResult resultData)
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));  // Read file template
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.Incentive));  // Read file template
                 var path = f.FullName;
                 if (!File.Exists(path)) // Check Exist file
                 {

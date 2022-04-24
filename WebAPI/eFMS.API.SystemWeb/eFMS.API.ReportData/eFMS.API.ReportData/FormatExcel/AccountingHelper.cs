@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Criteria;
@@ -434,13 +435,13 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="settlementList"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream ExportSettlementPaymentDetailSurCharges(List<AccountingSettlementExportGroup> settlementList, string fileName)
+        public Stream ExportSettlementPaymentDetailSurCharges(List<AccountingSettlementExportGroup> settlementList)
         {
             try
             {
                 var folderOfFile = GetSettleExcelFolder();
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName+".xlsx";
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.Settlement_Detail_Template));
+                var path = f.FullName;
                 if (!File.Exists(path))
                 {
                     return null;
@@ -642,11 +643,11 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="customerPayment"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
+        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AR");
-            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-            var path = f.FullName+".xlsx";
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.Statement_of_Receivable_Customer));
+            var path = f.FullName;
             if (!File.Exists(path))
             {
                 return null;
@@ -4825,12 +4826,12 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="settlementExport"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportGeneralSettlementPayment(InfoSettlementExport settlementExport, string fileName)
+        public Stream GenerateExportGeneralSettlementPayment(InfoSettlementExport settlementExport)
         {
             try
             {
                 var folderOfFile = GetSettleExcelFolder();
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.Settlement_General_Preview));
                 var path = f.FullName;
                 if (!File.Exists(path))
                 {
@@ -5218,13 +5219,13 @@ namespace eFMS.API.ReportData.FormatExcel
         //    return null;
         //}
 
-        public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result, string fileName)
+        public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result)
         {
             try
             {
                 var folderOfFile = GetFolderInTemplateExport("AR");
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName+".xlsx";
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AR_SUMMARY_TEMPLATE));
+                var path = f.FullName;
                 if (!File.Exists(path))
                     return null;
 
@@ -5318,12 +5319,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
-        public Stream GenerateAccountingReceivableDebitDetail(List<DebitDetail> result, string fileName, string debitType)
+        public Stream GenerateAccountingReceivableDebitDetail(List<DebitDetail> result, string debitType)
         {
             try
             {
                 var folderOfFile = GetARExcelFolder();
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AR_DebitDetail_Template));
                 var path = f.FullName;
                 if (!File.Exists(path))
                     return null;
@@ -5431,14 +5432,14 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         #endregion --- ACCOUTING MANAGEMENT ---
 
-        public Stream GenerateExportAgencyHistoryPayment(List<AccountingAgencyPaymentExport> result, string fileName, AccountingPaymentCriteria paymentCriteria)
+        public Stream GenerateExportAgencyHistoryPayment(List<AccountingAgencyPaymentExport> result, AccountingPaymentCriteria paymentCriteria)
         {
             try
             {
                 var folderOfFile = GetFolderInTemplateExport("AR");
                 var deleteDetailRow = false;
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName+".xlsx";
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.Statement_of_Receivable_Agency));
+                var path = f.FullName;
                 if (!File.Exists(path))
                 {
                     return null;
@@ -5556,7 +5557,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 var folderOfFile = GetFolderInTemplateExport("AR");
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.Receipt_Advance_Report_Teamplate));
                 var path = f.FullName;
                 fileName = "AdvanceReport_" + result.TaxCode+ ".xlsx";
 
@@ -6017,10 +6018,10 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="criteria"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportAccountingPayableStandart(List<AcctPayablePaymentExport> acctPayables, AccountPayableCriteria criteria, string fileName)
+        public Stream GenerateExportAccountingPayableStandart(List<AcctPayablePaymentExport> acctPayables, AccountPayableCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AP");
-            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AP_Standart_Report));
             var path = f.FullName;
             if (!File.Exists(path))
             {
@@ -6148,10 +6149,10 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
-        public Stream GenerateExportAccountingTemplateReport(List<AccountingTemplateExport> acctPayables, AccountPayableCriteria criteria, string fileName)
+        public Stream GenerateExportAccountingTemplateReport(List<AccountingTemplateExport> acctPayables, AccountPayableCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AP");
-            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AP_Account_Template));
             var path = f.FullName;
             if (!File.Exists(path))
             {

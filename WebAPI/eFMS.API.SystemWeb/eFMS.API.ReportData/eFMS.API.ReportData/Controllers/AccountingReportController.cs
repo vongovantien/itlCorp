@@ -156,7 +156,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.SettlementPaymentDetailListUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingSettlementExportGroup>>();
 
-            var stream = new AccountingHelper().ExportSettlementPaymentDetailSurCharges(dataObjects.Result, "Settlement-Detail Template");
+            var stream = new AccountingHelper().ExportSettlementPaymentDetailSurCharges(dataObjects.Result);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Settlement-Detail Template");
@@ -208,7 +208,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
 
-            var stream = new AccountingHelper().GenerateExportCustomerHistoryPayment(dataObjects.Result, paymentCriteria, "Statement_of_Receivable-Customer");
+            var stream = new AccountingHelper().GenerateExportCustomerHistoryPayment(dataObjects.Result, paymentCriteria);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Customer - eFMS");
@@ -379,7 +379,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<InfoSettlementExport>();
 
-            var stream = new AccountingHelper().GenerateExportGeneralSettlementPayment(dataObjects.Result, "Settlement-General-Preview");
+            var stream = new AccountingHelper().GenerateExportGeneralSettlementPayment(dataObjects.Result);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.SettlementNo, stream, "Settlement General Preview - eFMS");
@@ -512,7 +512,7 @@ namespace eFMS.API.ReportData.Controllers
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result, "AR_SUMMARY_TEMPLATE");
+            var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
@@ -538,7 +538,7 @@ namespace eFMS.API.ReportData.Controllers
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, "AR_DebitDetail_Template.xlsx", criteria.option);
+            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, criteria.option);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
@@ -583,7 +583,7 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
-            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency", paymentCriteria);
+            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, paymentCriteria);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Agency - eFMS");
@@ -664,7 +664,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AcctPayablePaymentExport>>();
 
-            var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria, "AP_Standart_Report.xlsx");
+            var stream = new AccountingHelper().GenerateExportAccountingPayableStandart(dataObjects.Result, criteria);
             if (stream == null) return null;
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APStandartReport");
@@ -697,7 +697,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingTemplateExport>>();
 
-            var stream = new AccountingHelper().GenerateExportAccountingTemplateReport(dataObjects.Result, criteria, "AP_Account_Template.xlsx");
+            var stream = new AccountingHelper().GenerateExportAccountingTemplateReport(dataObjects.Result, criteria);
             if (stream == null) return null;
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APAccountReport");
