@@ -11,8 +11,9 @@ import { AccountingConstants, SystemConstants } from '@constants';
 import { ShareBussinessPaymentMethodPopupComponent } from 'src/app/business-modules/share-business/components/payment-method/payment-method.popup';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
-import { getCurrentUserState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+import { IAppState, getCurrentUserState } from '@store';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -22,6 +23,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
 
     jobId: string = null;
     cdNote: string = null;
@@ -31,6 +33,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     CdNoteDetail: any = null;
     totalCredit: string = '';
     totalDebit: string = '';
+    totalAdjustVND: string = '';
     balanceAmount: string = '';
 
     paymentMethodSelected: string = '';
@@ -41,7 +44,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
         private _accountantRepo: AccountingRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -74,8 +77,28 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                     dataCdNote.listSurcharges.forEach(element => {
                         element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total : null;
                         element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total : null;
+                        element.adjustVND = element.amountVnd + element.vatAmountVnd;
                     });
                     this.CdNoteDetail = dataCdNote;
+                    if (this.CdNoteDetail.cdNote.type == "DEBIT") {
+                        this.headers = [
+                            { title: 'HBL No', field: 'hwbno', sortable: true },
+                            { title: 'Code', field: 'chargeCode', sortable: true },
+                            { title: 'Charge Name', field: 'nameEn', sortable: true },
+                            { title: 'Quantity', field: 'quantity', sortable: true },
+                            { title: 'Unit', field: 'unit', sortable: true },
+                            { title: 'Unit Price', field: 'unitPrice', sortable: true },
+                            { title: 'Currency', field: 'currency', sortable: true },
+                            { title: 'VAT', field: 'vatrate', sortable: true },
+                            { title: "Credit Value", field: 'credit', sortable: true },
+                            { title: "Debit Value", field: 'debit', sortable: true },
+                            { title: 'Total VND', field: 'totalVND', sortable: true },
+                            { title: 'Total USD', field: 'totalUSD', sortable: true },
+                            { title: 'Note', field: 'notes', sortable: true },
+                            { title: 'Exc Rate', field: 'exchangeRate', sortable: true },
+                            { title: 'Synced From', field: 'syncedFromBy', sortable: true }
+                        ];
+                    }
                     // Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -97,9 +120,13 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
+        this.totalAdjustVND = '';
+        const adjustVND = listCharge.reduce((adjustVND, charge) => adjustVND + charge.adjustVND, 0);
+        this.totalAdjustVND += this.formatNumberCurrency(adjustVND) + ' ' + 'VND';
         for (const currency of uniqueCurrency) {
             const _credit = listCharge.filter(f => f.currencyId === currency).reduce((credit, charge) => credit + charge.credit, 0);
             const _debit = listCharge.filter(f => f.currencyId === currency).reduce((debit, charge) => debit + charge.debit, 0);
+
             const _balance = _debit - _credit;
             this.totalCredit += this.formatNumberCurrency(_credit) + ' ' + currency + ' | ';
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
@@ -321,5 +348,16 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                     }
                 },
             );
+    }
+
+    adjustDebitValue() {
+        this.adjustDebitValuePopup.action = 'CDNOTE';
+        this.adjustDebitValuePopup.jodId = this.jobId;
+        this.adjustDebitValuePopup.cdNote = this.cdNote;
+        this.adjustDebitValuePopup.active();
+    }
+
+    onSaveAdjustDebit() {
+        this.getDetailCdNote(this.jobId, this.cdNote)
     }
 }

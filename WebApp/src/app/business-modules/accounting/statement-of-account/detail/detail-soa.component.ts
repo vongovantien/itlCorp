@@ -15,10 +15,12 @@ import { StatementOfAccountPaymentMethodComponent } from '../components/poup/pay
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState, getCurrentUserState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
-import { HttpResponse, HttpResponseBase } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
+
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -27,6 +29,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
 
     soaNO: string = '';
 
@@ -71,7 +74,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
         this.headers = [
             { title: 'No.', field: 'i', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
-            { title: 'Charge Name', field: 'chargeName', sortable: true },
+            { title: 'Charge Name', field: 'chargeName', width: 400, sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'MBL', field: 'mbl', sortable: true },
@@ -79,7 +82,12 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             { title: 'Debit', field: 'debit', sortable: true },
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Total VND', field: 'totalVND', sortable: true },
+            { title: 'Total USD', field: 'totalUSD', sortable: true },
             { title: 'C/D Note', field: 'cdNote', sortable: true },
+            { title: 'Unit Price', field: 'unitPrice', sortable: true },
+            { title: 'Quantity', field: 'quantity', sortable: true },
+            { title: 'VAT', field: 'vatRate', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
@@ -443,6 +451,15 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                 this.viewContainerRef.viewContainerRef.clear();
             });
     }
+
+    adjustDebitValue() {
+        this.adjustDebitValuePopup.soano = this.soaNO;
+        this.adjustDebitValuePopup.action = "SOA";
+        this.adjustDebitValuePopup.active();
+    }
+    onSaveAdjustDebit() {
+        this.getDetailSOA(this.soaNO, 'VND');
+    }
 }
 
 interface ISOAExport {
@@ -456,3 +473,5 @@ interface ISOAExport {
     customerName: string;
     listCharges: any[];
 }
+
+

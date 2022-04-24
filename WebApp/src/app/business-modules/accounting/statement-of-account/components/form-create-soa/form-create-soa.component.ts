@@ -202,7 +202,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         //
-                        // sort A -> Z theo text services 
+                        // sort A -> Z theo text services
                         this.sortIncreaseServices('text', true);
 
                         this.services.unshift({ id: 'All', text: 'All' });
@@ -531,7 +531,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }).subscribe(
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
-                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].currencyId)[0];
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].creditCurrency)[0];
                         }else{
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
                         }
