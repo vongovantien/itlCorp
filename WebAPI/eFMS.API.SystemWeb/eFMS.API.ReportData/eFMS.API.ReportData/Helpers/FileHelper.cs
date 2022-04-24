@@ -36,7 +36,6 @@ namespace eFMS.API.ReportData.Helpers
             var buffer = stream as MemoryStream;
             var dateCurr = DateTime.Now.ToString("ddMMyy");
             fileName = preUpper(fileName);
-            
             if (!string.IsNullOrEmpty(refNo))
             {
 
@@ -57,7 +56,14 @@ namespace eFMS.API.ReportData.Helpers
             var ms = buffer as MemoryStream;
             var dateCurr = DateTime.Now.ToString("ddMMyy");
             fileName = preUpper(fileName);
-            fileName +="-" + dateCurr + "-" + refNo + ".xlsx";
+            if (!string.IsNullOrEmpty(refNo))
+            {
+                fileName += "-" + dateCurr + "-" + refNo + ".xlsx";
+            }
+            else
+            {
+                fileName += "-" + dateCurr + ".xlsx";
+            }
             try
             {
                 var file = new FileReportUpload();

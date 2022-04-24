@@ -39,6 +39,8 @@ namespace eFMS.API.Accounting.DL.IService
         List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo);
         AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results);
         HandleState ValidateCheckPointPartnerSOA(AcctSoa soa);
+        AdjustModel GetAdjustDebitValue(AdjustModel model);
+        HandleState UpdateAdjustDebitValue(AdjustModel model);
         HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string action);
         Task<HandleState> UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string action);
     }

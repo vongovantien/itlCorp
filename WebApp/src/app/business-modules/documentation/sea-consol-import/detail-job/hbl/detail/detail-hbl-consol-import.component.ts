@@ -90,7 +90,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 this.onUpdateHblDetail();
                 break;
 
-            // * Update Arrival Note.    
+            // * Update Arrival Note.
             case HBL_TAB.ARRIVAL: {
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {

@@ -36,5 +36,14 @@ namespace eFMS.API.Accounting.DL.Models
         public bool IsSynced { get; set; }
         public string SyncedFromBy { get; set; }
         public decimal? ExchangeRate { get; set; }
+        public decimal NetAmount { get; set; }
+        public decimal Total { get; set; }
+        public decimal AmountVND { get; set; }
+        public decimal AmountUSD { get; set; }
+        public decimal VatAmountVND { get; set; }
+        public decimal VatAmountUSD { get; set; }
+        public decimal FinalExchangeRate { get; set; }
+        public decimal AdjustedVND { get; set; }
+        public decimal AdjustedUSD { get; set; }
     }
 }
