@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
+import { Component, ViewChild, Output, EventEmitter, ElementRef, Inject } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
@@ -11,30 +11,27 @@ import { ModalDirective } from "ngx-bootstrap/modal";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
 import { environment } from 'src/environments/environment';
-import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
+import { InjectViewContainerRefDirective } from "@directives";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
 export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddAirPopupComponent) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
     @ViewChild('formPreviewCdNote') formPreviewCdNote: ElementRef;
     @ViewChild("popupReport") popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
-    @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = null;
     cdNote: string = null;
-    confirmMessage: string = '';
     typeConfirm: string = '';
     isHouseBillID: boolean = false;
     transactionType: TransactionTypeEnum = 0;
@@ -47,7 +44,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     labelDetail: any = {};
     paymentMethodSelected: string = '';
-    messageValidate: string;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -55,7 +51,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
         private _accountantRepo: AccountingRepo,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -195,11 +190,15 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
                         this.typeConfirm = "DELETE";
-                        this.confirmCdNotePopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`,
+                            labelConfirm: 'Ok'
+                        }, () => { this.onConfirmCdNote(); });
                     } else {
-                        this.canNotDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `You can not delete this Credit/Debit Note. Please recheck!`
+                        });
                     }
                 },
             );
@@ -207,12 +206,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmCdNotePopup.hide();
-                })
-            ).subscribe(
+            .subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
@@ -337,9 +331,11 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     confirmSendToAcc() {
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
-        this.confirmCdNotePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure you want to send data to accountant system?`,
+            labelConfirm: 'Ok'
+        }, () => { this.onConfirmCdNote(); });
     }
 
     showConfirmed() {
@@ -349,12 +345,16 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
+                        let messageValidate: string;
                         if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
-                        this.validateSyncedPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Alert',
+                            body: messageValidate
+                        });
                     } else {
                         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
                             this.paymentMethodPopupComponent.show();
@@ -381,7 +381,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     syncCdNote() {
-        this.confirmCdNotePopup.hide();
         const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
@@ -390,12 +389,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             paymentMethod: this.paymentMethodSelected
         };
         cdNoteIds.push(cdNoteId);
-        this._spinner.show();
         this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
-            .pipe(
-                finalize(() => this._spinner.hide()),
-                catchError(this.catchError),
-            ).subscribe(
+            .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");

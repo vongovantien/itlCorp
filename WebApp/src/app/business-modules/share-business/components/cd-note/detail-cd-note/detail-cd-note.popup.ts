@@ -17,21 +17,20 @@ import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
+import { InjectViewContainerRefDirective } from "@directives";
 
 @Component({
     selector: 'cd-note-detail-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
 export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(ShareBussinessCdNoteAddPopupComponent) cdNoteEditPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @ViewChild('formPreviewCdNote') formPreviewCdNote: ElementRef;
     @ViewChild("popupReport") popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
-    @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = null;
     cdNote: string = null;
@@ -197,11 +196,15 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
                         this.typeConfirm = "DELETE";
-                        this.confirmCdNotePopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`,
+                            labelConfirm: 'Ok'
+                        }, () => { this.onConfirmCdNote(); });
                     } else {
-                        this.canNotDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'You can not delete this Credit/Debit Note. Please recheck!'
+                        });
                     }
                 },
             );
@@ -209,12 +212,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
 
     deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmCdNotePopup.hide();
-                })
-            ).subscribe(
+            .subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
@@ -321,9 +319,11 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     confirmSendToAcc() {
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
-        this.confirmCdNotePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure you want to send data to accountant system?`,
+            labelConfirm: 'Ok'
+        }, () => { this.onConfirmCdNote(); });
     }
 
     showConfirmed() {
@@ -339,7 +339,10 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
                         } else {
                             messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
-                        this.validateSyncedPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Alert',
+                            body: messageValidate,
+                        });
                     } else {
                         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
                             this.paymentMethodPopupComponent.show();
@@ -366,7 +369,6 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
     }
 
     syncCdNote() {
-        this.confirmCdNotePopup.hide();
         const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
