@@ -38,6 +38,7 @@ namespace eFMSWindowService.Models
         public decimal Over1To15Day { get; set; }
         public decimal Over16To30Day { get; set; }
         public decimal Over30Day { get; set; }
+        public string TaxCode { get; set; }
     }
 
 
@@ -48,6 +49,7 @@ namespace eFMSWindowService.Models
         public string PartnerName_EN { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public string TaxCode { get; set; }
         public decimal CreditRate { get; set; }
         public decimal? CreditLimit { get; set; }
         public decimal DebitAmount { get; set; }

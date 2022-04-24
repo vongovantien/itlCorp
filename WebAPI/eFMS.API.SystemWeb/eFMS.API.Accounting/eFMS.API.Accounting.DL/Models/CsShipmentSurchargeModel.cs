@@ -7,6 +7,9 @@ namespace eFMS.API.Accounting.DL.Models
 {
     public class CsShipmentSurchargeModel:CsShipmentSurcharge
     {
-
+        public string Pic { get; set; }
+        public string ChargeCode { get; set; }
+        public string ChargeNameEn { get; set; }
+        public decimal ExchangeRate { get; set; }
     }
 }

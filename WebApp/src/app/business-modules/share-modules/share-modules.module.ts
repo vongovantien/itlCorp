@@ -18,6 +18,7 @@ import { NgSelectModule } from "@ng-select/ng-select";
 import { CommercialEmailListComponent } from '../commercial/components/email/commercial-email-list.component';
 import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
 import { FormSearchExportComponent } from '../commercial/components/popup/form-search-export/form-search-export.popup';
+import { ShareBussinessAdjustDebitValuePopupComponent } from './components/adjust-debit-value/adjust-debit-value.popup';
 
 const COMPONENTS = [
     ShareModulesInputShipmentPopupComponent,
@@ -29,7 +30,8 @@ const COMPONENTS = [
     CommercialEmailListComponent,
     FormUpdateEmailCommercialCatalogueComponent,
     ShareModulesReasonRejectPopupComponent,
-    FormSearchExportComponent
+    FormSearchExportComponent,
+    ShareBussinessAdjustDebitValuePopupComponent
 ];
 @NgModule({
     declarations: [

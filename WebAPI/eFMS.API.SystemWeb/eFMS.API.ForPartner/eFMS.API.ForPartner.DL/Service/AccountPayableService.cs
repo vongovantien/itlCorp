@@ -419,8 +419,10 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var partner = partnerRepository.Get(x => x.AccountNo == acc.CustomerCode).FirstOrDefault();
                         var office = officeRepository.Get(x => x.Code == acc.OfficeCode).FirstOrDefault();
-                        foreach (var detail in acc.Details)
+                        var detailGroup = acc.Details.GroupBy(x => new { VoucherNo = string.IsNullOrEmpty(x.VoucherNo) ? null : x.VoucherNo, x.TransactionType, x.BravoRefNo, x.AdvRefNo, x.AcctId, x.Currency, x.ExchangeRate });
+                        foreach (var acctPM in detailGroup)
                         {
+                            var detail = acctPM.Key;
                             // Transaction type = OBH sẽ tính như CREDIT
                             if (detail.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) || detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH)
                             {
@@ -451,22 +453,22 @@ namespace eFMS.API.ForPartner.DL.Service
                                 accPayablePayment.PaymentMethod = acc.PaymentMethod;
                                 accPayablePayment.PaymentDate = acc.PaymentDate;
 
-                                if (detail.PayOriginAmount != 0 && detail.RemainOriginAmount != 0)
+                                if (acctPM.Sum(x => x.PayOriginAmount) != 0 && acctPM.Sum(x => x.RemainOriginAmount) != 0)
                                 {
                                     accPayablePayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                                 }
-                                else if (detail.RemainOriginAmount == 0)
+                                else if (acctPM.Sum(x => x.RemainOriginAmount) == 0)
                                 {
                                     accPayablePayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
                                 }
 
-                                accPayablePayment.PaymentAmount = detail.PayOriginAmount != 0 ? (Math.Abs(detail.PayOriginAmount) * creditPos) : detail.PayOriginAmount;
-                                accPayablePayment.PaymentAmountVnd = detail.PayAmountVND != 0 ? (Math.Abs(detail.PayAmountVND) * creditPos) : detail.PayAmountVND;
-                                accPayablePayment.PaymentAmountUsd = detail.PayAmountUSD != 0 ? (Math.Abs(detail.PayAmountUSD) * creditPos) : detail.PayAmountUSD;
+                                accPayablePayment.PaymentAmount = acctPM.Sum(x => x.PayOriginAmount) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayOriginAmount)) * creditPos) : acctPM.Sum(x => x.PayOriginAmount);
+                                accPayablePayment.PaymentAmountVnd = acctPM.Sum(x => x.PayAmountVND) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountVND)) * creditPos) : acctPM.Sum(x => x.PayAmountVND);
+                                accPayablePayment.PaymentAmountUsd = acctPM.Sum(x => x.PayAmountUSD) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountUSD)) * creditPos) : acctPM.Sum(x => x.PayAmountUSD);
 
-                                accPayablePayment.RemainAmount = detail.RemainOriginAmount != 0 ? (Math.Abs(detail.RemainOriginAmount) * creditPos) : detail.RemainOriginAmount;
-                                accPayablePayment.RemainAmountVnd = detail.RemainAmountVND != 0 ? (Math.Abs(detail.RemainAmountVND) * creditPos) : detail.RemainAmountVND;
-                                accPayablePayment.RemainAmountUsd = detail.RemainAmountUSD != 0 ? (Math.Abs(detail.RemainAmountUSD) * creditPos) : detail.RemainAmountUSD;
+                                accPayablePayment.RemainAmount = acctPM.Sum(x => x.RemainOriginAmount) != 0 ? (Math.Abs(acctPM.Sum(x => x.RemainOriginAmount)) * creditPos) : acctPM.Sum(x => x.RemainOriginAmount);
+                                accPayablePayment.RemainAmountVnd = acctPM.Sum(x => x.RemainAmountVND) != 0 ? (Math.Abs(acctPM.Sum(x => x.RemainAmountVND)) * creditPos) : acctPM.Sum(x => x.RemainAmountVND);
+                                accPayablePayment.RemainAmountUsd = acctPM.Sum(x => x.RemainAmountUSD) != 0 ? (Math.Abs(acctPM.Sum(x => x.RemainAmountUSD)) * creditPos) : acctPM.Sum(x => x.RemainAmountUSD);
 
                                 accPayablePayment.CompanyId = currentUser.CompanyID;
                                 accPayablePayment.OfficeId = office.Id;
@@ -488,7 +490,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 else
                                 {
                                     payableExisted.RemainAmountVnd = (payableExisted.RemainAmount == 0 ? 0 : (payableExisted.TotalAmountVnd - payableExisted.PaymentAmountVnd));
-                                    payableExisted.RemainAmountUsd =  payableExisted.TotalAmountUsd - payableExisted.PaymentAmountUsd;
+                                    payableExisted.RemainAmountUsd = payableExisted.TotalAmountUsd - payableExisted.PaymentAmountUsd;
                                 }
                                 if (payableExisted.PaymentAmount != 0 && payableExisted.RemainAmount != 0) // Status
                                 {
@@ -539,13 +541,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                 //    accPayablePayment.Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
                                 //}
 
-                                accPayablePayment.PaymentAmount = detail.PayOriginAmount;
-                                accPayablePayment.PaymentAmountVnd = detail.PayAmountVND;
-                                accPayablePayment.PaymentAmountUsd = detail.PayAmountUSD;
+                                accPayablePayment.PaymentAmount = acctPM.Sum(x => x.PayOriginAmount);
+                                accPayablePayment.PaymentAmountVnd = acctPM.Sum(x => x.PayAmountVND);
+                                accPayablePayment.PaymentAmountUsd = acctPM.Sum(x => x.PayAmountUSD);
 
-                                accPayablePayment.RemainAmount = detail.RemainOriginAmount;
-                                accPayablePayment.RemainAmountVnd = detail.RemainAmountVND;
-                                accPayablePayment.RemainAmountUsd = detail.RemainAmountUSD;
+                                accPayablePayment.RemainAmount = acctPM.Sum(x => x.RemainOriginAmount);
+                                accPayablePayment.RemainAmountVnd = acctPM.Sum(x => x.RemainAmountVND);
+                                accPayablePayment.RemainAmountUsd = acctPM.Sum(x => x.RemainAmountUSD);
 
                                 accPayablePayment.CompanyId = currentUser.CompanyID;
                                 accPayablePayment.OfficeId = office.Id;
@@ -554,7 +556,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 accPayablePayment.UserCreated = accPayablePayment.UserModified = currentUser.UserID;
                                 accPayablePayment.DatetimeCreated = accPayablePayment.DatetimeModified = DateTime.Now;
 
-                                var payableBillingExited = DataContext.Get(x => (x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH) && x.PartnerId == partner.Id && x.VoucherNo == detail.VoucherNo && x.OfficeId == office.Id).FirstOrDefault();
+                                var payableBillingExited = DataContext.Get(x => (x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_OBH) && x.PartnerId == partner.Id && x.VoucherNo == (string.IsNullOrEmpty(detail.VoucherNo) ? acc.PaymentNo : detail.VoucherNo) && x.OfficeId == office.Id).FirstOrDefault();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -563,12 +565,12 @@ namespace eFMS.API.ForPartner.DL.Service
                                     PaymentAmount = 0,
                                     PaymentAmountVnd = 0,
                                     PaymentAmountUsd = 0,
-                                    RemainAmount = detail.PayOriginAmount + detail.RemainOriginAmount,
-                                    RemainAmountVnd = detail.PayAmountVND + detail.RemainAmountVND,
-                                    RemainAmountUsd = detail.PayAmountUSD + detail.RemainAmountUSD,
-                                    TotalAmount = detail.PayOriginAmount + detail.RemainOriginAmount,
-                                    TotalAmountVnd = detail.PayAmountVND + detail.RemainAmountVND,
-                                    TotalAmountUsd = detail.PayAmountUSD + detail.RemainAmountUSD,
+                                    RemainAmount = acctPM.Sum(x => x.PayOriginAmount) + acctPM.Sum(x => x.RemainOriginAmount),
+                                    RemainAmountVnd = acctPM.Sum(x => x.PayAmountVND) + acctPM.Sum(x => x.RemainAmountVND),
+                                    RemainAmountUsd = acctPM.Sum(x => x.PayAmountUSD) + acctPM.Sum(x => x.RemainAmountUSD),
+                                    TotalAmount = acctPM.Sum(x => x.PayOriginAmount) + acctPM.Sum(x => x.RemainOriginAmount),
+                                    TotalAmountVnd = acctPM.Sum(x => x.PayAmountVND) + acctPM.Sum(x => x.RemainAmountVND),
+                                    TotalAmountUsd = acctPM.Sum(x => x.PayAmountUSD) + acctPM.Sum(x => x.RemainAmountUSD),
                                     ReferenceNo = detail.AdvRefNo,
                                     Status = accPayablePayment.Status,
                                     CompanyId = currentUser.CompanyID,
@@ -576,7 +578,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     GroupId = currentUser.GroupId,
                                     DepartmentId = currentUser.DepartmentId,
                                     TransactionType = ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV,
-                                    VoucherNo = detail.VoucherNo,
+                                    VoucherNo = string.IsNullOrEmpty(detail.VoucherNo) ? acc.PaymentNo : detail.VoucherNo,
                                     InvoiceNo = null,
                                     InvoiceDate = null,
                                     BillingNo = payableBillingExited?.BillingNo,
@@ -658,13 +660,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPayment.PaymentMethod = acc.PaymentMethod;
                                 creditPayment.PaymentDate = acc.PaymentDate;
 
-                                creditPayment.PaymentAmount = detail.PayOriginAmount != 0 ? (Math.Abs(detail.PayOriginAmount) * creditPos) : detail.PayOriginAmount;
-                                creditPayment.PaymentAmountVnd = detail.PayAmountVND != 0 ? (Math.Abs(detail.PayAmountVND) * creditPos) : detail.PayAmountVND;
-                                creditPayment.PaymentAmountUsd = detail.PayAmountUSD != 0 ? (Math.Abs(detail.PayAmountUSD) * creditPos) : detail.PayAmountUSD;
+                                creditPayment.PaymentAmount = acctPM.Sum(x => x.PayOriginAmount) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayOriginAmount)) * creditPos) : acctPM.Sum(x => x.PayOriginAmount);
+                                creditPayment.PaymentAmountVnd = acctPM.Sum(x => x.PayAmountVND) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountVND)) * creditPos) : acctPM.Sum(x => x.PayAmountVND);
+                                creditPayment.PaymentAmountUsd = acctPM.Sum(x => x.PayAmountUSD) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountUSD)) * creditPos) : acctPM.Sum(x => x.PayAmountUSD);
 
                                 creditPayment.RemainAmount = payableCreditExisted.RemainAmount - creditPayment.PaymentAmount;
-                                creditPayment.RemainAmountVnd = payableCreditExisted.RemainAmountVnd - detail.PayAmountVND;
-                                creditPayment.RemainAmountUsd = payableCreditExisted.RemainAmountUsd - detail.PayAmountUSD;
+                                creditPayment.RemainAmountVnd = payableCreditExisted.RemainAmountVnd - acctPM.Sum(x => x.PayAmountVND);
+                                creditPayment.RemainAmountUsd = payableCreditExisted.RemainAmountUsd - acctPM.Sum(x => x.PayAmountUSD);
                                 // status credit
                                 if ((payableCreditExisted.PaymentAmount + creditPayment.PaymentAmount) != 0 && creditPayment.RemainAmount != 0)
                                 {
@@ -688,9 +690,9 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPos = payableAdvExisted.TotalAmount < 0 ? (-1) : 1; // Xét credit âm
                                 advPayment.Id = Guid.NewGuid();
                                 advPayment.ReferenceNo = detail.AdvRefNo;
-                                advPayment.PaymentAmount = detail.PayOriginAmount != 0 ? (Math.Abs(detail.PayOriginAmount) * creditPos) : detail.PayOriginAmount;
-                                advPayment.PaymentAmountVnd = detail.PayAmountVND != 0 ? (Math.Abs(detail.PayAmountVND) * creditPos) : detail.PayAmountVND;
-                                advPayment.PaymentAmountUsd = detail.PayAmountUSD != 0 ? (Math.Abs(detail.PayAmountUSD) * creditPos) : detail.PayAmountUSD;
+                                advPayment.PaymentAmount = acctPM.Sum(x => x.PayOriginAmount) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayOriginAmount)) * creditPos) : acctPM.Sum(x => x.PayOriginAmount);
+                                advPayment.PaymentAmountVnd = acctPM.Sum(x => x.PayAmountVND) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountVND)) * creditPos) : acctPM.Sum(x => x.PayAmountVND);
+                                advPayment.PaymentAmountUsd = acctPM.Sum(x => x.PayAmountUSD) != 0 ? (Math.Abs(acctPM.Sum(x => x.PayAmountUSD)) * creditPos) : acctPM.Sum(x => x.PayAmountUSD);
                                 advPayment.RemainAmount = payableAdvExisted.RemainAmount - advPayment.PaymentAmount;
                                 advPayment.RemainAmountVnd = payableAdvExisted.RemainAmountVnd - advPayment.PaymentAmountVnd;
                                 advPayment.RemainAmountUsd = payableAdvExisted.RemainAmountUsd - advPayment.PaymentAmountUsd;
@@ -770,7 +772,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.DatetimeModified = DateTime.Now;
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
-                                
+
                                 var hsPayableCredit = DataContext.Update(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
                                 var hsPayableAdv = DataContext.Update(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
                             }

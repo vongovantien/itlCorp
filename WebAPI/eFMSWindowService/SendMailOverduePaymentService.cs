@@ -72,7 +72,7 @@ namespace eFMSWindowService
 
                         string tableBody = @"<table style='width: 100%; border: 1px solid #dddddd; border-collapse: collapse;'>"
                                          + @"<tr>"
-                                         + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Chi nhánh <br/> <i style='font-weight: normal'>Branch</br></th>"
+                                         + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Mã số thuế <br/> <i style='font-weight: normal'>Tax Code</br></th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Khách hàng <br/> <i style='font-weight: normal'>Customer</br></th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Non - overdue</th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Overdue <br/> 01-15 days</th>"
@@ -86,8 +86,8 @@ namespace eFMSWindowService
                         foreach (var overduePayment in item)
                         {
                             content.Append(@"<tr>");
-                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + overduePayment.BranchName_EN + "</td>");
-                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + overduePayment.PartnerName_EN + "</td>");
+                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: center'>;" + overduePayment.TaxCode + "</td>");
+                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: center'>;" + overduePayment.PartnerName_EN + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + (overduePayment.NonOverdue > 0 ? string.Format("{0:#,##0.00}", overduePayment.NonOverdue) : string.Empty) + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", overduePayment.Over1To15Day) + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", overduePayment.Over16To30Day) + "</td>");
