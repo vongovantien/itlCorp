@@ -9,7 +9,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICheckPointService
     {
         HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType);
-        HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode = "");
+        HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode);
         HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
 
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
@@ -27,6 +27,6 @@ namespace eFMS.API.Documentation.DL.IService
         [Description("Credit")]
         CREDIT_NOTE = 4,
         [Description("Surcharge")]
-        SURCHARGE = 5 // ràng khi nhập phí
+        SURCHARGE = 5,// ràng khi nhập phí
     }
 }

@@ -44,6 +44,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     labelDetail: any = {};
     paymentMethodSelected: string = '';
+    messageValidate: string;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -225,8 +226,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     previewCdNote(data: string) {
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this.previewAirCdNote(data);
-        } else {
-            this.previewSeaCdNote(data);
         }
     }
 
@@ -251,7 +250,26 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     previewAirCdNote(data: string) {
-        this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+        let sourcePreview$;
+        if (this.CdNoteDetail.cdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId,
+                this.CdNoteDetail.listSurcharges[0].hblid,
+                'DOC',
+                null,
+                3).pipe(
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+
+                )
+        } else {
+            sourcePreview$ = this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+        }
+        sourcePreview$
             .subscribe(
                 (res: Crystal | any) => {
                     if (res != null && res.dataSource.length > 0) {
@@ -305,11 +323,10 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        let messageValidate = '';
                         if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
-                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
                         this.validateSyncedPopup.show();
                     } else {

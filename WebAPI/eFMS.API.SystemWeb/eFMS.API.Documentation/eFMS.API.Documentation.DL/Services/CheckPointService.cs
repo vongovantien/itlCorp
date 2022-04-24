@@ -262,7 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, string settlementCode)
+        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode)
         {
             HandleState result = new HandleState();
             bool isValid = false;
@@ -288,7 +288,10 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-
+                    if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                    {
+                        break;
+                    }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
                         isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
@@ -358,7 +361,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(saleman))
             {
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
-                                       && x.Active == true
+                                       && x.Active == true)
                 .OrderBy(x => x.ContractType)
                 .FirstOrDefault();
             }
