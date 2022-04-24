@@ -225,6 +225,20 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="m--align-right foat-right">
+                            <ng-container *ngIf="
+                            soa.type==='Debit'
+                            &&soa.syncStatus !== 'Synced'
+                            &&soa.currency === 'VND'
+                            &&soa.groupShipments.length > 0">
+                                <button class="btn btn-success m-btn--icon m-btn--uppercase" (click)="adjustDebitValue()" title="">
+                                    <span>
+                                        <i class="la la-edit"></i>
+                                        <span>
+                                            Adjust Debit Value
+                                        </span>
+                                    </span>
+                                </button>
+                            </ng-container>
                             <a class="pointer icon-switch" (click)="switchToGroup()">
                                 <i class="la la-list" *ngIf="TYPE === 'GROUP' else list"></i>
                                 <ng-template #list> <i class="la la-sitemap"></i></ng-template>
@@ -249,7 +263,7 @@
                                     </td>
                                 </tr>
                                 <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="16">
+                                    <td colspan="19">
                                         <div class='row'>
                                             <div class="col-5">
                                                 <span class='text-danger'>{{i + 1}}.</span> Shipment:
@@ -278,7 +292,7 @@
                                     <td>
                                         <span>{{charge.chargeCode}}</span>
                                     </td>
-                                    <td>
+                                    <td style="min-width: 300px; white-space:initial">
                                         <span>{{charge.chargeName}}</span>
                                     </td>
                                     <td>
@@ -302,8 +316,23 @@
                                     <td>
                                         <span>{{charge.currency}}</span>
                                     </td>
+                                    <td>
+                                        <span>{{charge.amountVND+charge.vatAmountVND | number: '.0-3'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.amountUSD+charge.vatAmountUSD | number: '.0-3'}}</span>
+                                    </td>
                                     <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
                                         <span>{{charge.cdNote}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.unitPrice | number: '.0-3'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.quantity}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.vatRate}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.invoiceNo}}</span>
@@ -347,7 +376,7 @@
                                 <td>
                                     <span>{{charge.chargeCode}}</span>
                                 </td>
-                                <td>
+                                <td style="min-width: 300px; white-space:initial">
                                     <span>{{charge.chargeName}}</span>
                                 </td>
                                 <td>
@@ -371,8 +400,23 @@
                                 <td>
                                     <span>{{charge.currency}}</span>
                                 </td>
+                                <td>
+                                    <span>{{charge.amountVND+charge.vatAmountVND | number: '.0-3'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.amountUSD + charge.vatAmountUSD | number: '.0-3'}}</span>
+                                </td>
                                 <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
                                     <span>{{charge.cdNote}}</span>
+                                </td>
+                                 <td>
+                                    <span>{{charge.unitPrice | number: '.0-3'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.quantity}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.vatRate}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.invoiceNo}}</span>
@@ -430,3 +474,5 @@
 
 <info-popup #validateSyncedSOAPopup [body]="messageValidate" [title]="'Alert'">
 </info-popup>
+
+<adjust-debit-value-popup (onSave)="onSaveAdjustDebit()" ></adjust-debit-value-popup>

@@ -14,7 +14,6 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
-import { serialize } from 'v8';
 // import { Chart } from 'angular-highcharts';
 
 @Component({
@@ -109,7 +108,7 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     checkPermission(service: string, shipmentId: string, productService: string){
         if(service==='OPS'){
-            this._documentRepo.checkViewDetailPermission(shipmentId)  
+            this._documentRepo.checkViewDetailPermission(shipmentId)
             .subscribe(
                 (res: boolean) =>{
                     if(res){

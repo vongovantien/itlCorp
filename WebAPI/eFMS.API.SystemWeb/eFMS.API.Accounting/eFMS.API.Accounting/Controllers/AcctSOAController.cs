@@ -486,5 +486,22 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(new ResultHandle { Status = reject.Success, Message = "Reject SOA successful.", Data = model });
         }
+        [HttpPost]
+        [Route("GetAdjustDebitValue")]
+        [Authorize]
+        public IActionResult GetAdjustDebitValue(AdjustModel model)
+        {
+            var dt = acctSOAService.GetAdjustDebitValue(model);
+            return Ok(dt);
+        }
+
+        [HttpPost("UpdateAdjustDebitValue")]
+        [Authorize]
+        public IActionResult UpdateAdjustDebitValue(AdjustModel model)
+        {
+            currentUser.Action = "UpdateAdjustDebitValue";
+            var dt = acctSOAService.UpdateAdjustDebitValue(model);
+            return Ok(dt);
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.Infrastructure
 
             // Map to entity model
             CreateMap<AcctSoaModel, AcctSoa>();
-            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
+            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>().ReverseMap(); 
             CreateMap<AcctAdvanceRequestModel, AcctAdvanceRequest>();
             CreateMap<AcctApproveAdvanceModel, AcctApproveAdvance>();
             CreateMap<AcctApproveSettlementModel, AcctApproveSettlement>();
@@ -50,7 +50,6 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AcctCombineBillingModel, AcctCombineBilling>();
             CreateMap<sp_GetSurchargeDetailSOA, ChargeShipmentModel>().ReverseMap();
             CreateMap<sp_GetSurchargeDetailSettlement, ShipmentChargeSettlement>().ReverseMap();
-
         }
     }
 }

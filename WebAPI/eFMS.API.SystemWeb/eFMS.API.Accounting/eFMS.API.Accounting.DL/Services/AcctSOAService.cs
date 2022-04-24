@@ -3640,5 +3640,261 @@ namespace eFMS.API.Accounting.DL.Services
                 acctCombineBillingRepository.SubmitChanges();
             }
         }
+
+        public AdjustModel GetAdjustDebitValue(AdjustModel model)
+        {
+            var res = new AdjustModel();
+            if (model.Action == "SOA")
+                res = GetAdjustDebitValueSOA(model.CODE);
+            else if(model.Action == "CDNOTE")
+                res = GetAdjustDebitValueCDNOTE(new Guid(model.JodId),model.CODE);
+            return res;
+        }
+
+        private AdjustModel GetAdjustDebitValueCDNOTE(Guid jobId, string cdNoteNo)
+        {
+            var lst = new List<AdjustListChargeGrpModel>();
+            var res = new AdjustModel();
+            res.listChargeGrp = new List<AdjustListChargeGrpModel>();
+            var lstCharges = GetChargeByCdNote(jobId,cdNoteNo);
+            var cdNote = acctCdnoteRepo.Get(x => x.Code == cdNoteNo).FirstOrDefault();
+            var transaction = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
+            var opsTransaction = opsTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
+            var partner = catPartnerRepo.Get(x => x.Id == cdNote.PartnerId).FirstOrDefault();
+            var chargeGrp = lstCharges.GroupBy(x => new { x.JobNo, x.Hblno, x.Mblno, x.ClearanceNo, x.Pic }).ToList();
+            foreach (var cd in chargeGrp)
+            {
+                var o = new AdjustListChargeGrpModel();
+                o.listCharges = new List<AdjustListChargeModel>();
+                o.JobNo = cd.Key.JobNo;
+                o.HBLNo = cd.Key.Hblno;
+                o.MBLNo = cd.Key.Mblno;
+                o.CustomNo = cd.Key.ClearanceNo;
+                o.Pic = cd.Key.Pic;
+                foreach (var it in cd.OrderByDescending(x => x.DatetimeModified))
+                {
+                    var adj = new AdjustListChargeModel();
+                    adj.ID = it.Id;
+                    adj.ChargeCode = it.ChargeCode;
+                    adj.ChargeName = it.ChargeNameEn;
+                    adj.AdjustedVND = (it.AmountVnd ?? 0) + (it.VatAmountVnd ?? 0);
+                    adj.AdjustedUSD = (it.AmountUsd ?? 0) + (it.VatAmountUsd ?? 0);
+                    adj.OrgNet = it.NetAmount ?? 0;
+                    adj.VatRate = it.Vatrate ?? 0;
+                    adj.OrgAmount = it.Total;
+                    if (it.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                        adj.OrgAmountVND = it.Total;
+                    else
+                    {
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(it, AccountingConstants.CURRENCY_LOCAL, 0);
+                        adj.OrgAmountVND = amountLocal.NetAmount+ amountLocal.VatAmount;
+                    }
+                    adj.Currency = it.CurrencyId;
+                    adj.AmountVND = it.AmountVnd ?? 0;
+                    adj.VatAmountVND = it.VatAmountVnd ?? 0;
+                    adj.AmountUSD = it.AmountUsd ?? 0;
+                    adj.VatAmountUSD = it.VatAmountUsd ?? 0;
+                    adj.AmountUSD = it.AmountUsd ?? 0;
+                    adj.ExchangeRate = it.ExchangeRate;
+                    adj.Note = it.Notes;
+                    adj.Type = it.Type;
+                    o.listCharges.Add(adj);
+                }
+                o.TotalOrgAmountVND = o.listCharges.Where(x => x.Currency == "VND").Sum(x => x.OrgAmount);
+                o.TotalOrgAmountUSD = o.listCharges.Where(x => x.Currency == "USD").Sum(x => x.OrgAmount);
+                o.TotalNetDebit = o.listCharges.Sum(x => x.AmountVND);
+                o.TotalVat = o.listCharges.Sum(x => x.VatAmountVND);
+                o.TotalAdjustedVND = o.listCharges.Sum(x => x.AdjustedVND);
+                o.TotalAdjustedUSD = o.listCharges.Sum(x => x.AdjustedUSD);
+                lst.Add(o);
+            }
+
+            res.CODE = cdNoteNo;
+            res.ExchangeRate = cdNote.ExcRateUsdToLocal ?? 0;
+            res.PartnerName = partner.PartnerNameEn;
+            res.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo; ;
+            res.TotalUSD = lst.Sum(x => x.TotalAdjustedUSD);
+            res.TotalVND = lst.Sum(x => x.TotalAdjustedVND);
+            res.listChargeGrp = lst;
+
+            return res;
+        }
+        private List<CsShipmentSurchargeModel> GetChargeByCdNote(Guid jobId, string cdNoteNo)
+        {
+            var lstCharge = new List<CsShipmentSurchargeModel>();
+            var charges = csShipmentSurchargeRepo.Get(x => x.CreditNo == cdNoteNo || x.DebitNo == cdNoteNo).ToList();
+            foreach (var item in charges)
+            {
+                //var c = mapper.Map<CsShipmentSurchargeModel>(item);
+                var c = new CsShipmentSurchargeModel(); ;
+
+                var propInfo = item.GetType().GetProperties();
+                foreach (var i in propInfo)
+                    c.GetType().GetProperty(i.Name).SetValue(c, i.GetValue(item, null), null);
+
+                var pic = "";
+                if (c.TransactionType == "CL")
+                {
+                    var ops = opsTransactionRepo.Get(x => x.Hblid == c.Hblid).FirstOrDefault();
+                    if (ops!= null)
+                    {
+                        var u = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
+                        pic = u != null ? u.Username : "";
+                    }
+                }
+                else
+                {
+                    var cs = csTransactionRepo.Get(x => x.JobNo == c.JobNo).FirstOrDefault();
+                    if (cs != null)
+                    {
+                        var u = sysUserRepo.Get(x => x.Id == cs.PersonIncharge).FirstOrDefault();
+                        pic = u != null ? u.Username : "";
+                    }
+                }
+                c.Pic = pic;
+                c.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate, item.CurrencyId, "VND");
+                var catCharge = catChargeRepo.Get(x => x.Id == c.ChargeId).FirstOrDefault();
+                if (catCharge != null)
+                {
+                    c.ChargeCode = catCharge.Code;
+                    c.ChargeNameEn = catCharge.ChargeNameEn;
+                }
+                lstCharge.Add(c);
+            }
+            return lstCharge;
+        }
+        public AdjustModel GetAdjustDebitValueSOA(string soaNo)
+        {
+            var lst = new List<AdjustListChargeGrpModel>();
+            var res = new AdjustModel();
+            res.listChargeGrp = new List<AdjustListChargeGrpModel>();
+
+            var soaDetail = GetSoaBySoaNo(soaNo);
+            var charges = GetChargesForDetailSoa(soaNo);
+            var chargeGrps = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CustomNo, x.PIC }).AsQueryable();
+            foreach (var item in chargeGrps)
+            {
+                var o = new AdjustListChargeGrpModel();
+                o.listCharges = new List<AdjustListChargeModel>();
+
+                o.JobNo = item.Key.JobId;
+                o.HBLNo = item.Key.HBL;
+                o.MBLNo = item.Key.MBL;
+                o.CustomNo = item.Key.CustomNo;
+                o.Pic = item.Key.PIC;
+                foreach (var it in item.OrderByDescending(x => x.DatetimeModifiedSurcharge))
+                {
+                    var adj = new AdjustListChargeModel();
+                    adj.ID = it.ID;
+                    adj.ChargeCode = it.ChargeCode;
+                    adj.ChargeName = it.ChargeName;
+                    adj.AdjustedVND = it.AmountVND + it.VatAmountVND;
+                    adj.AdjustedUSD = it.AmountUSD + it.VatAmountUSD;
+                    adj.OrgNet = it.NetAmount;
+                    adj.VatRate = it.VATRate;
+                    adj.OrgAmount = it.Total;
+
+                    if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
+                        adj.OrgAmountVND = it.Total;
+                    else
+                    {
+                        var c = csShipmentSurchargeRepo.Get(x => x.Id == it.ID).FirstOrDefault();
+                        var amountLocal = currencyExchangeService.CalculatorAmountAccountingByCurrency(c, AccountingConstants.CURRENCY_LOCAL, 0);
+                        adj.OrgAmountVND = amountLocal.NetAmount + amountLocal.VatAmount;
+                    }
+
+                    adj.Currency = it.Currency;
+                    adj.AmountVND = it.AmountVND;
+                    adj.VatAmountVND = it.VatAmountVND;
+                    adj.AmountUSD = it.AmountUSD;
+                    adj.VatAmountUSD = it.VatAmountUSD;
+                    adj.AmountUSD = it.AmountUSD;
+                    adj.ExchangeRate = it.ExchangeRate;
+                    adj.Note = it.Note;
+                    adj.Type = it.Type;
+                    o.listCharges.Add(adj);
+                }
+
+                o.TotalOrgAmountVND = o.listCharges.Where(x => x.Currency == "VND").Sum(x => x.OrgAmount);
+                o.TotalOrgAmountUSD = o.listCharges.Where(x => x.Currency == "USD").Sum(x => x.OrgAmount);
+                o.TotalNetDebit = o.listCharges.Sum(x => x.AmountVND);
+                o.TotalVat = o.listCharges.Sum(x => x.VatAmountVND);
+                o.TotalAdjustedVND = o.listCharges.Sum(x => x.AdjustedVND);
+                o.TotalAdjustedUSD = o.listCharges.Sum(x => x.AdjustedUSD);
+                lst.Add(o);
+            }
+
+            res.CODE = soaDetail.Soano;
+            res.ExchangeRate = soaDetail.ExcRateUsdToLocal ?? 0;
+            res.PartnerName = soaDetail.PartnerName;
+            res.TotalShipment = soaDetail.Shipment ?? 0;
+            res.TotalCharge = soaDetail.TotalCharge;
+            res.TotalUSD = lst.Sum(x => x.TotalAdjustedUSD);
+            res.TotalVND = lst.Sum(x => x.TotalAdjustedVND);
+            res.listChargeGrp = lst;
+
+            return res;
+        }
+        public HandleState UpdateAdjustDebitValue(AdjustModel model)
+        {
+            var listChargeUpdate = new List<CsShipmentSurcharge>();
+            decimal _amount = 0;
+            decimal _debitAmount = 0;
+            var listId = new List<Guid>();
+
+            foreach (var item in model.listChargeGrp)
+            {
+                foreach (var it in item.listCharges)
+                {
+                    var charge = csShipmentSurchargeRepo.Get(x => x.Id == it.ID).FirstOrDefault();
+                    if (charge != null)
+                    {
+                        charge.VatAmountVnd = it.VatAmountVND;
+                        charge.AmountVnd = it.AmountVND;
+                        charge.Notes = it.Note;
+                        _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, AccountingConstants.CURRENCY_LOCAL);
+                        _debitAmount += _amount;
+                        listChargeUpdate.Add(charge);
+                        listId.Add(charge.Id);
+                    }
+                }
+            }
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = new HandleState();
+                    if (listChargeUpdate.Count > 0)
+                    {
+                        foreach (var item in listChargeUpdate)
+                        {
+                            hs = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                        }
+                        csShipmentSurchargeRepo.SubmitChanges();
+                    }
+                    if (_debitAmount > 0 && model.Action == "SOA")
+                    {
+                        var soa = Get(x => x.Soano == model.CODE).FirstOrDefault();
+                        if (soa != null)
+                        {
+                            soa.DebitAmount = _debitAmount;
+                            hs = DataContext.Update(soa, x => x.Id == soa.Id);
+                        }
+                    }
+                    trans.Commit();
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
     }
 }
