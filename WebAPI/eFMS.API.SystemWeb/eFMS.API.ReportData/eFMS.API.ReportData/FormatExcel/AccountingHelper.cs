@@ -3158,7 +3158,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[i + addressStartContent, 5].Value = item.Mawb;
 
-                //workSheet.Cells[i + addressStartContent, 6].Value = item.AOL;
+                workSheet.Cells[i + addressStartContent, 6].Value = item.AOL;
                 workSheet.Cells[i + addressStartContent, 7].Value = item.AOD;
                 //workSheet.Cells[i + addressStartContent, 8].Value = item.Service;
                 workSheet.Cells[i + addressStartContent, 8].Value = item.Pcs;
