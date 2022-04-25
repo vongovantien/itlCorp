@@ -308,6 +308,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             isValid = false;
                         }
+                        else isValid = true;
                     }
                     else isValid = true;
                     if (!isValid) errorCode = 2;
@@ -369,7 +370,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
                                        && x.Active == true
-                                       && x.SaleManId == saleman
+                                       //&& x.SaleManId == saleman
                                        )
                 .OrderBy(x => x.ContractType)
                 .FirstOrDefault();
