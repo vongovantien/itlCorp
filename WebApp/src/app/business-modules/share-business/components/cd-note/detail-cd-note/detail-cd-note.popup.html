@@ -294,11 +294,11 @@
                                 <div class="col-md-auto">
                                     <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit}}</span>
                                 </div>
-                                <ng-container *ngIf="!!CdnoteDetail
-                                &&CdnoteDetail.cdNote.type === 'DEBIT'
-                                &&CdnoteDetail.cdNote.syncStatus !== 'Synced'
-                                &&CdnoteDetail.cdNote.currencyId === 'VND'
-                                &&CdnoteDetail.listSurcharges.length > 0">
+                                <ng-container *ngIf="!!CdNoteDetail
+                                &&CdNoteDetail.cdNote.type === 'DEBIT'
+                                &&CdNoteDetail.cdNote.syncStatus !== 'Synced'
+                                &&CdNoteDetail.cdNote.currencyId === 'VND'
+                                &&CdNoteDetail.listSurcharges.length > 0">
                                     <div class="col-md-auto">
                                         <strong>Total Adjust:</strong> <span
                                             class="m--margin-left-5">{{totalAdjustVND}}</span>
@@ -360,7 +360,7 @@
 
 <cd-note-add-popup (onUpdate)="onUpdateCdNote()"></cd-note-add-popup>
 
-<div class="modal fade" role="dialog" bsModal #popupReport="bs-modal" (onHide)="onHide($event)">
+<!-- <div class="modal fade" role="dialog" bsModal #popupReport="bs-modal" (onHide)="onHide($event)">
     <div class="modal-dialog modal-report" role="document">
         <div class="modal-content" [ngClass]="!!dataReport && dataReport.isLandscape === true ? '' : 'modal-lg__width'">
             <div class="modal-header">
@@ -389,7 +389,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <payment-method-popup (onApply)="onApplyPaymentMethod($event)"></payment-method-popup>
 
