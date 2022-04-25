@@ -19,8 +19,17 @@ namespace eFMS.API.ReportData.Helpers
             string nameResult = "";
             foreach (var name in nameSplit)
             {
-                name[0].ToString().ToUpper();
-                nameResult1 += name;
+                var isWhiteSpace = string.IsNullOrWhiteSpace(name);
+                if (isWhiteSpace)
+                {
+                    nameResult1 += "";
+                }
+                else
+                {
+                    var upper = name[0].ToString().ToUpper() + name.Substring(1);
+                    nameResult1 += upper;
+                }
+                
             }
             var nameSplit2= nameResult1.Split('_');
             foreach (var name in nameSplit2)
