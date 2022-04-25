@@ -291,11 +291,11 @@
                                 <div class="col-md-auto">
                                     <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit}}</span>
                                 </div>
-                                <ng-container *ngIf="!!CdnoteDetail
-                                &&CdnoteDetail.cdNote.type === 'DEBIT'
-                                &&CdnoteDetail.cdNote.syncStatus !== 'Synced'
-                                &&CdnoteDetail.cdNote.currencyId === 'VND'
-                                &&CdnoteDetail.listSurcharges.length > 0">
+                                <ng-container *ngIf="!!CdNoteDetail
+                                &&CdNoteDetail.cdNote.type === 'DEBIT'
+                                &&CdNoteDetail.cdNote.syncStatus !== 'Synced'
+                                &&CdNoteDetail.cdNote.currencyId === 'VND'
+                                &&CdNoteDetail.listSurcharges.length > 0">
                                     <div class="col-md-auto">
                                         <strong>Total Adjust:</strong> <span class="m--margin-left-5">{{totalAdjustVND}}</span>
                                     </div>
