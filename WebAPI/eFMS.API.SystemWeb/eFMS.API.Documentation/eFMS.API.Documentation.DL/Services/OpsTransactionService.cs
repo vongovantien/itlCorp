@@ -2670,7 +2670,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (chargeBuy.CurrencyId == "VND")
             {
                 var per = (double)chargeBuy.Total / (double)0.76;
-                surcharge.UnitPrice = Math.Round((decimal)per / 10000, 0) * 10000;
+                surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
             }
