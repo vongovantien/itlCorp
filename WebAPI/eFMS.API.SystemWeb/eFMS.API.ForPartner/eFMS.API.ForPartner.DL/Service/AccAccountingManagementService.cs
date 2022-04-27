@@ -2304,17 +2304,19 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 return new HandleState((object)"Đối tượng " + model.OfficeCode + " không tồn tại");
             }
-            // gom các detail cùng voucherNo, voucherDate,
+            // gom các detail cùng voucherNo, voucherDate, 
+            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
             var grpVoucherDetail = model.Details
+                .Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
+                    && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                    && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
+                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
                 .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
-                    // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
-                    surcharges = s.Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV  
-                    && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
-                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
-                    .Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
+                   
+                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
                         c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
                 })
                 .ToList();

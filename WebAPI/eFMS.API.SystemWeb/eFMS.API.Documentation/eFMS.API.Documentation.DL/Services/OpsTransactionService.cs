@@ -2312,10 +2312,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     trans.Dispose();
                 }
-
-                logMessage = string.Format(" *  \n [END]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
-                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
-                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
             }
         }
         private SysOffice GetInfoOfficeOfUser(Guid? officeId)
