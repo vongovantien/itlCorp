@@ -2203,7 +2203,8 @@ namespace eFMS.API.Documentation.DL.Services
                             if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                             {
                                 charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                                if (charge.DebitCharge != null) { charge.ChargeId = charge.DebitCharge ?? new Guid(); } else continue;
+                                var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
                                 if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
                                     charge.PaymentObjectId = charge.PartnerInternal_Id;
                             }
