@@ -23,9 +23,9 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 
 import _merge from 'lodash/merge';
-import { catchError, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
+import { catchError, takeUntil, map, tap, mergeMap, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { merge } from 'rxjs';
+import { merge, of } from 'rxjs';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';
 
@@ -226,16 +226,31 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
         house.deliveryDate = deliveryDate;
-        this._documentationRepo.createHousebill(Object.assign({}, house, deliveryDate))
+
+        this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
             .pipe(
-                tap((result: any) => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.hblid = result.data;
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(Object.assign({}, house, deliveryDate))
+                            .pipe(
+                                tap((result: any) => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                                        this.proofOfDeliveryComponent.hblid = result.data;
+                                        if (this.proofOfDeliveryComponent.fileList.length > 0) {
+                                            this.proofOfDeliveryComponent.uploadFilePOD();
+                                        }
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            ).subscribe(
+                )
+            )
+            .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');

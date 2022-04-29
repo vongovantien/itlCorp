@@ -19,11 +19,12 @@ import {
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
-import { takeUntil, catchError, finalize, tap } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-create-hbl-fcl-export',
@@ -233,16 +234,27 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-        this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
+
+        this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
             .pipe(
-                tap((result: any) => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.hblid = result.data;
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
+                            .pipe(
+                                tap((result: any) => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                                        this.proofOfDeliveryComponent.hblid = result.data;
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                )
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

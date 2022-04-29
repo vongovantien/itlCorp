@@ -21,8 +21,8 @@ import {
 
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 
-import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { catchError, takeUntil, mergeMap, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
@@ -194,37 +194,50 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
 
-            this._documentationRepo.createHousebill(body)
+            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
                 .pipe(
-                    mergeMap((res: CommonInterface.IResult) => {
-                        const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
-                        const printedDate = {
-                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.deliveryComponent.deliveryOrder.hblid = res.data;
-                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
 
-                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        const deliveryDate = {
-                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
-                        return forkJoin([arrival, delivery, proof]);
-                    }),
-                    catchError(this.catchError),
-                ).subscribe(result => {
-                    this._toastService.success(result[0].message, '');
-                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                        return this._documentationRepo.createHousebill(body)
+                            .pipe(
+                                mergeMap((res: CommonInterface.IResult) => {
+                                    const dateNotice = {
+                                        arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+                                        arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                                    const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                                    const printedDate = {
+                                        deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.deliveryComponent.deliveryOrder.hblid = res.data;
+                                    const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                                    this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                                    const deliveryDate = {
+                                        deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+                                    return forkJoin([arrival, delivery, proof]);
+                                }),
+                                catchError(this.catchError),
+                            )
+                    })
+                )
+                .subscribe(result => {
+                    if (!!result) {
+                        this._toastService.success(result[0].message, '');
+                        if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                            this.proofOfDeliveryComponent.uploadFilePOD();
+                        }
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
-                }
-                );
+
+                });
         }
     }
 

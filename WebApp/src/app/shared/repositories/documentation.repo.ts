@@ -1195,6 +1195,7 @@ export class DocumentationRepo {
             3 - DEBIT
             4 - CREDIT
             5 - SURCHARGE
+            6 - HBL
         */
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
             { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type });
