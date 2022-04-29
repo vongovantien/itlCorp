@@ -2604,6 +2604,116 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return models;
         }
+
+        public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds)
+        {
+            HandleState hs = new HandleState();
+            // Get công nợ quá hạn từ 1->15 ngày của ds đối tượng xác định hoặc lấy hết
+            var invoiceOverDue1To15 = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
+            var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+
+            if (partnerIds.Count() > 0)
+            {
+                invoiceOverDue1To15 = accountingManagementRepo.Where(x => x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
+                                                      && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                                      && x.PaymentDueDate != null
+                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16
+                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0
+                                                      && partnerIds.Contains(x.PartnerId)
+                                                      );
+
+                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                             && x.AcctManagementId != null && partnerIds.Contains(x.PaymentObjectId));
+            } else
+            {
+                invoiceOverDue1To15 = accountingManagementRepo.Where(x => x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
+                                                      && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                                      && x.PaymentDueDate != null
+                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16
+                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
+
+                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                            && x.AcctManagementId != null);
+
+            }
+          
+            
+
+            var invoices = from acctMngt in invoiceOverDue1To15
+                           join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
+                           select new ReceivableInvoice
+                           {
+                               Office = surcharge.OfficeId,
+                               PartnerId = surcharge.PaymentObjectId,
+                               Service = surcharge.TransactionType,
+                               Invoice = acctMngt
+                           };
+           
+            if (invoices.Count() > 0)
+            {
+                //Group by Office, PartnerId, Service
+                var grpInvoices = invoices
+                    .GroupBy(g => new { g.Office,  g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
+                    {
+                        Office = s.Key.Office,
+                        PartnerId = s.Key.PartnerId,
+                        Service = s.Key.Service,
+                        Invoices = s.Select(se => se.Invoice).ToList()
+                    }).ToList();
+
+                if(grpInvoices.Count() > 0)
+                {
+                    foreach (var item in grpInvoices)
+                    {
+                        AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
+                        && x.Office == item.Office
+                        && x.Service == item.Service);
+                        if(ar != null)
+                        {
+                            var totalUnpaidAmountVnd = item.Invoices.Sum(x => x.UnpaidAmountVnd);
+                            var totalUnpaidAmountUsd = item.Invoices.Sum(x => x.UnpaidAmountUsd);
+                            if(ar.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                            {
+                                ar.Over1To15Day = totalUnpaidAmountVnd;
+                            } else
+                            {
+                                ar.Over1To15Day = totalUnpaidAmountUsd;
+                            }
+
+                            DataContext.Update(ar, x => x.Id == ar.Id, false);
+                        }
+                    }
+                    hs = DataContext.SubmitChanges();
+                }
+            }
+            else
+            {
+                var arDatas = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
+                // Nếu không có phát sinh hóa đơn nào đang nợ theo ds đối tượng hoặc toán hệ thống k còn ai nợ
+                if (partnerIds.Count() > 0)
+                {
+                    arDatas = DataContext.Get(x => partnerIds.Contains(x.PartnerId));
+                    if (arDatas.Count() > 0)
+                    {
+                        foreach (var item in arDatas)
+                        {
+                            item.Over1To15Day = 0;
+                        }
+                    }
+                } else
+                {
+                    arDatas = DataContext.Get(x => x.Over1To15Day != 0 && x.Over1To15Day != null);
+                    if (arDatas.Count() > 0)
+                    {
+                        foreach (var item in arDatas)
+                        {
+                            item.Over1To15Day = 0;
+                        }
+                    }
+                }
+            }
+            return hs;
+        }
         #endregion
     }
 }
