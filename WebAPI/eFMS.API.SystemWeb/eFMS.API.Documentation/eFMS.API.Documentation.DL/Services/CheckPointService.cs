@@ -269,17 +269,23 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
-
-            if (transactionType == "CL")
+            if(HblId == Guid.Empty)
             {
-                currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
-                contract = GetContractByPartnerId(partnerId, currentSaleman);
-            }
-            else
+                contract = GetContractByPartnerId(partnerId);
+            } else
             {
-                currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
-                contract = GetContractByPartnerId(partnerId, currentSaleman);
+                if (transactionType == "CL")
+                {
+                    currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
+                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                }
+                else
+                {
+                    currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
+                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                }
             }
+           
             if (contract == null)
             {
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
@@ -288,8 +294,9 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-                    if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                    if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE || checkPointType == CHECK_POINT_TYPE.HBL)
                     {
+                        isValid = true;
                         break;
                     }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
@@ -304,10 +311,17 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Official":
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        if (contract.IsExpired == true || contract.IsOverLimit == true || contract.IsOverDue == true)
+                        if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        {
+                            if (contract.IsOverDue == true || contract.IsExpired == true)
+                            {
+                                isValid = false;
+                            } else isValid = true;
+                        }
+                        else if (contract.IsOverDue == true || contract.IsExpired == true || contract.IsOverLimit == true)
                         {
                             isValid = false;
-                        }
+                        } 
                         else isValid = true;
                     }
                     else isValid = true;

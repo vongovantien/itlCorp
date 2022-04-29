@@ -21,12 +21,14 @@ namespace eFMS.API.Documentation.DL.IService
         [Description("Shipment")]
         SHIPMENT = 1,  
         [Description("SOA")]
-        SOA = 2, // ràng khi issue SOA DEBIT
+        SOA = 2,
         [Description("Debit")]
-        DEBIT_NOTE = 3, // ràng khi issue DEBIT NOTE
+        DEBIT_NOTE = 3, 
         [Description("Credit")]
         CREDIT_NOTE = 4,
         [Description("Surcharge")]
-        SURCHARGE = 5,// ràng khi nhập phí
+        SURCHARGE = 5,
+        [Description("HBL")]
+        HBL = 6,
     }
 }
