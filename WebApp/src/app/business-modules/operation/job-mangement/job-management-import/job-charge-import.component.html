@@ -255,9 +255,12 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <span *ngIf="item.invoiceNoError === null">
                                         {{item.invoiceNo}}
                                     </span>
+                                    <span class="m--font-danger"
+                                    *ngIf="item.invoiceNoError !== null">{{item.invoiceNoError
+                                    }}</span>
                                 </td>
                                 <td>
                                     <span>
@@ -265,9 +268,12 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span>
+                                    <span *ngIf="item.serieNoError === null">
                                         {{item.seriesNo}}
                                     </span>
+                                    <span class="m--font-danger"
+                                    *ngIf="item.serieNoError !== null">{{item.serieNoError
+                                    }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.typeError === null">{{ item.type }}</span>
