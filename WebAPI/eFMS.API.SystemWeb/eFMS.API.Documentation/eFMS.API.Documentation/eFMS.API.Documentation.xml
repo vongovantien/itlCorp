@@ -1205,6 +1205,13 @@
             <param name="userId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.InsertDataToDatabase(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="table"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             
