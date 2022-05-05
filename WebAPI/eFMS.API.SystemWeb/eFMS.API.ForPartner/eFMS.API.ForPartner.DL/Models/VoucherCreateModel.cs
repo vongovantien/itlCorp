@@ -44,12 +44,12 @@ namespace eFMS.API.ForPartner.DL.Models
         public string SerieNo { get; set; }
         public string AccountNo { get; set; }
         public string VoucherType { get; set; }
-        [StringContainAttribute(AllowableValues = new string[] {
-            "CREDIT",
-            "ADV",
-            "OBH",
-            "NONE"
-        })]
+        //[StringContainAttribute(AllowableValues = new string[] {
+        //    "CREDIT",
+        //    "ADV",
+        //    "OBH",
+        //    "NONE",
+        //})]
         public string TransactionType { get; set; }
         public string JobNo { get; set; }
         public string MblNo { get; set; }
