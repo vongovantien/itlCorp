@@ -2657,87 +2657,7 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
 
             invoiceOverDue = GetOverDuePartnerWithType(partnerIds, type);
-            if (partnerIds.Count() > 0)
-            {
-                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                             && x.AcctManagementId != null && partnerIds.Contains(x.PaymentObjectId));
-            }
-            else
-            {
-              
-                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                            && x.AcctManagementId != null);
-            }
-
-            var invoices = from acctMngt in invoiceOverDue
-                           join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
-                           select new ReceivableInvoice
-                           {
-                               Office = surcharge.OfficeId,
-                               PartnerId = surcharge.PaymentObjectId,
-                               Service = surcharge.TransactionType,
-                               Invoice = acctMngt
-                           };
-
-            if (invoices.Count() > 0)
-            {
-                //Group by Office, PartnerId, Service
-                var grpInvoices = invoices
-                    .GroupBy(g => new { g.Office, g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
-                    {
-                        Office = s.Key.Office,
-                        PartnerId = s.Key.PartnerId,
-                        Service = s.Key.Service,
-                        Invoices = s.Select(se => se.Invoice).GroupBy(x => x.Id).Select(grp => new AccAccountingManagement
-                        {
-                            Id = grp.Key,
-                            DatetimeCreated = grp.FirstOrDefault().DatetimeCreated,
-                            TotalAmount = grp.FirstOrDefault().TotalAmount,
-                            TotalAmountVnd = grp.FirstOrDefault().TotalAmountVnd,
-                            TotalAmountUsd = grp.FirstOrDefault().TotalAmountUsd,
-
-                            PaidAmount = grp.FirstOrDefault().PaidAmount,
-                            PaidAmountUsd = grp.FirstOrDefault().PaidAmountUsd,
-                            PaidAmountVnd = grp.FirstOrDefault().PaidAmountVnd,
-
-                            UnpaidAmount = grp.FirstOrDefault().UnpaidAmount,
-                            UnpaidAmountVnd = grp.FirstOrDefault().UnpaidAmountVnd,
-                            UnpaidAmountUsd = grp.FirstOrDefault().UnpaidAmountUsd,
-                            ServiceType = grp.FirstOrDefault().ServiceType
-                        }).ToList()
-                    }).ToList();
-
-
-                if (grpInvoices.Count() > 0)
-                {
-                    foreach (var item in grpInvoices)
-                    {
-                        AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
-                        && x.Office == item.Office
-                        && x.Service == item.Service);
-                        if (ar != null)
-                        {
-                            switch (type)
-                            {
-                                case 1: // 1 - 15
-                                    ar.Over1To15Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
-                                    break;
-                                case 2: // 15 - 30
-                                    ar.Over16To30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
-                                    break;
-                                case 3: // 30
-                                    ar.Over30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            DataContext.Update(ar, x => x.Id == ar.Id, false);
-                        }
-                    }
-                    hs = DataContext.SubmitChanges();
-                }
-            }
-            else
+            if(invoiceOverDue.Count() == 0)
             {
                 var arDatas = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
                 // Nếu không có phát sinh hóa đơn nào đang nợ theo ds đối tượng hoặc toán hệ thống k còn ai nợ
@@ -2815,6 +2735,86 @@ namespace eFMS.API.Accounting.DL.Services
                             break;
                         default:
                             break;
+                    }
+                    hs = DataContext.SubmitChanges();
+                }
+            }
+
+            if (partnerIds.Count() > 0)
+            {
+                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                             && x.AcctManagementId != null && partnerIds.Contains(x.PaymentObjectId));
+            }
+            else
+            {
+                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                            && x.AcctManagementId != null);
+            }
+
+            var invoices = from acctMngt in invoiceOverDue
+                           join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
+                           select new ReceivableInvoice
+                           {
+                               Office = surcharge.OfficeId,
+                               PartnerId = surcharge.PaymentObjectId,
+                               Service = surcharge.TransactionType,
+                               Invoice = acctMngt
+                           };
+
+            if (invoices.Count() > 0)
+            {
+                //Group by Office, PartnerId, Service
+                var grpInvoices = invoices
+                    .GroupBy(g => new { g.Office, g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
+                    {
+                        Office = s.Key.Office,
+                        PartnerId = s.Key.PartnerId,
+                        Service = s.Key.Service,
+                        Invoices = s.Select(se => se.Invoice).GroupBy(x => x.Id).Select(grp => new AccAccountingManagement
+                        {
+                            Id = grp.Key,
+                            DatetimeCreated = grp.FirstOrDefault().DatetimeCreated,
+                            TotalAmount = grp.FirstOrDefault().TotalAmount,
+                            TotalAmountVnd = grp.FirstOrDefault().TotalAmountVnd,
+                            TotalAmountUsd = grp.FirstOrDefault().TotalAmountUsd,
+
+                            PaidAmount = grp.FirstOrDefault().PaidAmount,
+                            PaidAmountUsd = grp.FirstOrDefault().PaidAmountUsd,
+                            PaidAmountVnd = grp.FirstOrDefault().PaidAmountVnd,
+
+                            UnpaidAmount = grp.FirstOrDefault().UnpaidAmount,
+                            UnpaidAmountVnd = grp.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountUsd = grp.FirstOrDefault().UnpaidAmountUsd,
+                            ServiceType = grp.FirstOrDefault().ServiceType
+                        }).ToList()
+                    }).ToList();
+
+
+                if (grpInvoices.Count() > 0)
+                {
+                    foreach (var item in grpInvoices)
+                    {
+                        AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
+                        && x.Office == item.Office
+                        && x.Service == item.Service);
+                        if (ar != null)
+                        {
+                            switch (type)
+                            {
+                                case 1: // 1 - 15
+                                    ar.Over1To15Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                case 2: // 15 - 30
+                                    ar.Over16To30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                case 3: // 30
+                                    ar.Over30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            DataContext.Update(ar, x => x.Id == ar.Id, false);
+                        }
                     }
                     hs = DataContext.SubmitChanges();
                 }
