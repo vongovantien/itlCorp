@@ -27,5 +27,8 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
         Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
         HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds);
+        HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds);
+        HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds);
+
     }
 }

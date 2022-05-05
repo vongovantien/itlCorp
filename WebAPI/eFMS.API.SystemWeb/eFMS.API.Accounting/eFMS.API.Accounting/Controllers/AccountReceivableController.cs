@@ -189,5 +189,33 @@ namespace eFMS.API.Accounting.Controllers
             }
             return BadRequest(message);
         }
+
+        [HttpPut("CalculateOverDue15To30")]
+        public IActionResult CalculateOverDue15To30([FromBody] List<string> partnerIds)
+        {
+            var hs = accountReceivableService.CalculatorReceivableOverDue15To30Day(partnerIds);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
+
+        [HttpPut("CalculateOverDue30")]
+        public IActionResult CalculateOverDue30([FromBody] List<string> partnerIds)
+        {
+            var hs = accountReceivableService.CalculatorReceivableOverDue30Day(partnerIds);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
     }
 }

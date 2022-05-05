@@ -1290,8 +1290,8 @@ namespace eFMS.API.Accounting.DL.Services
                 //List Invoice (Type = Invoice or InvoiceTemp)
                 var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
 
-                receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmo
-                                                                                          //receivables = CalculatorBillingUnpaid(receivables, surcharges, invoices); //Billing Unpaid
+                receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
+                //receivables = CalculatorBillingUnpaid(receivables, surcharges, invoices); //Billing Unpaid
                 receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
                 receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
@@ -2607,39 +2607,69 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds)
         {
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 1);
+            return hs;
+        }
+        #endregion
+
+        public HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds)
+        {
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 2);
+            return hs;
+        }
+        public HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds)
+        {
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 3);
+            return hs;
+        }
+
+        private IQueryable<AccAccountingManagement> GetOverDuePartnerWithType(List<string> partnerIds, int type)
+        {
+            var invoiceOverDue = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
+            Expression<Func<AccAccountingManagement, bool>> query = x => (x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
+                                                      && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                                      && x.PaymentDueDate != null
+                                                      && partnerIds.Count() > 0 ? partnerIds.Contains(x.PartnerId) : false);
+            switch (type)
+            {
+                case 1: // 1 - 15
+                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
+                    break;
+                case 2: // 15 - 30
+                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days <= 30 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15);
+                    break;
+                case 3: // 30
+                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 30);
+                    break;
+                default:
+                    break;
+            }
+
+            invoiceOverDue = accountingManagementRepo.Get(query);
+            return invoiceOverDue;
+        }
+
+        private HandleState CalculatorReceivableOverDue(List<string> partnerIds, int type)
+        {
             HandleState hs = new HandleState();
             // Get công nợ quá hạn từ 1->15 ngày của ds đối tượng xác định hoặc lấy hết
-            var invoiceOverDue1To15 = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
+            var invoiceOverDue = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
 
+            invoiceOverDue = GetOverDuePartnerWithType(partnerIds, type);
             if (partnerIds.Count() > 0)
             {
-                invoiceOverDue1To15 = accountingManagementRepo.Where(x => x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
-                                                      && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
-                                                      && x.PaymentDueDate != null
-                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16
-                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0
-                                                      && partnerIds.Contains(x.PartnerId)
-                                                      );
-
                 surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                              && x.AcctManagementId != null && partnerIds.Contains(x.PaymentObjectId));
-            } else
+            }
+            else
             {
-                invoiceOverDue1To15 = accountingManagementRepo.Where(x => x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
-                                                      && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
-                                                      && x.PaymentDueDate != null
-                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16
-                                                      && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
-
+              
                 surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                             && x.AcctManagementId != null);
-
             }
-          
-            
 
-            var invoices = from acctMngt in invoiceOverDue1To15
+            var invoices = from acctMngt in invoiceOverDue
                            join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
                            select new ReceivableInvoice
                            {
@@ -2648,38 +2678,59 @@ namespace eFMS.API.Accounting.DL.Services
                                Service = surcharge.TransactionType,
                                Invoice = acctMngt
                            };
-           
+
             if (invoices.Count() > 0)
             {
                 //Group by Office, PartnerId, Service
                 var grpInvoices = invoices
-                    .GroupBy(g => new { g.Office,  g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
+                    .GroupBy(g => new { g.Office, g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
                     {
                         Office = s.Key.Office,
                         PartnerId = s.Key.PartnerId,
                         Service = s.Key.Service,
-                        Invoices = s.Select(se => se.Invoice).ToList()
+                        Invoices = s.Select(se => se.Invoice).GroupBy(x => x.Id).Select(grp => new AccAccountingManagement
+                        {
+                            Id = grp.Key,
+                            DatetimeCreated = grp.FirstOrDefault().DatetimeCreated,
+                            TotalAmount = grp.FirstOrDefault().TotalAmount,
+                            TotalAmountVnd = grp.FirstOrDefault().TotalAmountVnd,
+                            TotalAmountUsd = grp.FirstOrDefault().TotalAmountUsd,
+
+                            PaidAmount = grp.FirstOrDefault().PaidAmount,
+                            PaidAmountUsd = grp.FirstOrDefault().PaidAmountUsd,
+                            PaidAmountVnd = grp.FirstOrDefault().PaidAmountVnd,
+
+                            UnpaidAmount = grp.FirstOrDefault().UnpaidAmount,
+                            UnpaidAmountVnd = grp.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountUsd = grp.FirstOrDefault().UnpaidAmountUsd,
+                            ServiceType = grp.FirstOrDefault().ServiceType
+                        }).ToList()
                     }).ToList();
 
-                if(grpInvoices.Count() > 0)
+
+                if (grpInvoices.Count() > 0)
                 {
                     foreach (var item in grpInvoices)
                     {
                         AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
                         && x.Office == item.Office
                         && x.Service == item.Service);
-                        if(ar != null)
+                        if (ar != null)
                         {
-                            var totalUnpaidAmountVnd = item.Invoices.Sum(x => x.UnpaidAmountVnd);
-                            var totalUnpaidAmountUsd = item.Invoices.Sum(x => x.UnpaidAmountUsd);
-                            if(ar.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                            switch (type)
                             {
-                                ar.Over1To15Day = totalUnpaidAmountVnd;
-                            } else
-                            {
-                                ar.Over1To15Day = totalUnpaidAmountUsd;
+                                case 1: // 1 - 15
+                                    ar.Over1To15Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                case 2: // 15 - 30
+                                    ar.Over16To30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                case 3: // 30
+                                    ar.Over30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    break;
+                                default:
+                                    break;
                             }
-
                             DataContext.Update(ar, x => x.Id == ar.Id, false);
                         }
                     }
@@ -2695,25 +2746,80 @@ namespace eFMS.API.Accounting.DL.Services
                     arDatas = DataContext.Get(x => partnerIds.Contains(x.PartnerId));
                     if (arDatas.Count() > 0)
                     {
-                        foreach (var item in arDatas)
+                        switch (type)
                         {
-                            item.Over1To15Day = 0;
+                            case 1: // 1 - 15
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over1To15Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            case 2: // 15 - 30
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over16To30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            case 3: // 30
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            default:
+                                break;
                         }
+
+                        hs = DataContext.SubmitChanges();
                     }
-                } else
+                }
+                else
                 {
-                    arDatas = DataContext.Get(x => x.Over1To15Day != 0 && x.Over1To15Day != null);
-                    if (arDatas.Count() > 0)
+                    switch (type)
                     {
-                        foreach (var item in arDatas)
-                        {
-                            item.Over1To15Day = 0;
-                        }
+                        case 1: // 1 - 15
+                            arDatas = DataContext.Get(x => x.Over1To15Day != 0 && x.Over1To15Day != null);
+                            if (arDatas.Count() > 0)
+                            {
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over1To15Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                            }
+                            break;
+                        case 2: // 15 - 30
+                            arDatas = DataContext.Get(x => x.Over16To30Day != 0 && x.Over16To30Day != null);
+                            if (arDatas.Count() > 0)
+                            {
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over16To30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                            }
+                            break;
+                        case 3: // 30
+                            arDatas = DataContext.Get(x => x.Over30Day != 0 && x.Over30Day != null);
+                            if (arDatas.Count() > 0)
+                            {
+                                foreach (var item in arDatas)
+                                {
+                                    item.Over30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
+                    hs = DataContext.SubmitChanges();
                 }
             }
             return hs;
         }
-        #endregion
     }
 }
