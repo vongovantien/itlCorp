@@ -818,12 +818,13 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL) 
+                        var currencyCompare = surcharge.KickBack == true ? cdNote.CurrencyId : surcharge.CurrencyId;
+                        if (currencyCompare == AccountingConstants.CURRENCY_LOCAL) 
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                        else if (currencyCompare == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
@@ -1137,12 +1138,13 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                        var currencyCompare = surcharge.KickBack == true ? soa.Currency : surcharge.CurrencyId;
+                        if (currencyCompare == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                        else if (currencyCompare == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
