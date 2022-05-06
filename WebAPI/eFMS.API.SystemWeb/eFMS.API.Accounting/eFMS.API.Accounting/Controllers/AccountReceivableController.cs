@@ -217,5 +217,19 @@ namespace eFMS.API.Accounting.Controllers
             }
             return BadRequest(message);
         }
+
+        [HttpPut("CalculateDebitAmount")]
+        public IActionResult CalculateDebitAmount([FromBody] List<string> partnerIds)
+        {
+            var hs = accountReceivableService.CalculatorReceivableDebitAmount(partnerIds);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
     }
 }

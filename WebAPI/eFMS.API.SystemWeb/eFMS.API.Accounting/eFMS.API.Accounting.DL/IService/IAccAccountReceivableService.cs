@@ -29,6 +29,8 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds);
         HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds);
         HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds);
+        HandleState CalculatorReceivableDebitAmount(List<string> partnerIds);
+
 
     }
 }

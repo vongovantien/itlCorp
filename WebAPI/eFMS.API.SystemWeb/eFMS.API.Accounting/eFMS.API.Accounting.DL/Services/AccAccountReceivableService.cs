@@ -2628,8 +2628,11 @@ namespace eFMS.API.Accounting.DL.Services
             var invoiceOverDue = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
             Expression<Func<AccAccountingManagement, bool>> query = x => (x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
                                                       && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
-                                                      && x.PaymentDueDate != null
-                                                      && partnerIds.Count() > 0 ? partnerIds.Contains(x.PartnerId) : false);
+                                                      && x.PaymentDueDate != null);
+            if(partnerIds.Count() > 0)
+            {
+                query = query.And(x => partnerIds.Contains(x.PartnerId));
+            }
             switch (type)
             {
                 case 1: // 1 - 15
