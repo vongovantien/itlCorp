@@ -179,12 +179,17 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CalculateOverDue1To15")]
         public IActionResult CalculateOverDue1To15([FromBody] List<string> partnerIds)
         {
-            var hs = accountReceivableService.CalculatorReceivableOverDue1To15Day(partnerIds);
+            var hs = accountReceivableService.CalculatorReceivableOverDue1To15Day(partnerIds, out List<Guid?> contractIdstoUpdate);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)
             {
                 ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                Response.OnCompleted(async () =>
+                {
+                    await accountReceivableService.CalculateAgreementFlag(contractIdstoUpdate, "overdue");
+                });
+
                 return Ok(result);
             }
             return BadRequest(message);
@@ -193,12 +198,16 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CalculateOverDue15To30")]
         public IActionResult CalculateOverDue15To30([FromBody] List<string> partnerIds)
         {
-            var hs = accountReceivableService.CalculatorReceivableOverDue15To30Day(partnerIds);
+            var hs = accountReceivableService.CalculatorReceivableOverDue15To30Day(partnerIds, out List<Guid?> contractIdstoUpdate);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)
             {
                 ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                Response.OnCompleted(async () =>
+                {
+                    await accountReceivableService.CalculateAgreementFlag(contractIdstoUpdate, "overdue");
+                });
                 return Ok(result);
             }
             return BadRequest(message);
@@ -207,14 +216,20 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CalculateOverDue30")]
         public IActionResult CalculateOverDue30([FromBody] List<string> partnerIds)
         {
-            var hs = accountReceivableService.CalculatorReceivableOverDue30Day(partnerIds);
+            var hs = accountReceivableService.CalculatorReceivableOverDue30Day(partnerIds, out List<Guid?> contractIdstoUpdate);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)
             {
                 ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                Response.OnCompleted(async () =>
+                {
+                    await accountReceivableService.CalculateAgreementFlag(contractIdstoUpdate, "overdue");
+                });
                 return Ok(result);
             }
+
+         
             return BadRequest(message);
         }
 

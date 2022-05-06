@@ -26,10 +26,11 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
         Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
         Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
-        HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds);
-        HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds);
-        HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds);
+        HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
+        HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
+        HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableDebitAmount(List<string> partnerIds);
+        Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
 
 
     }

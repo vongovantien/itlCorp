@@ -2605,21 +2605,24 @@ namespace eFMS.API.Accounting.DL.Services
             return models;
         }
 
-        public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds)
+        public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
-            HandleState hs = CalculatorReceivableOverDue(partnerIds, 1);
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 1, out List<Guid?> contractIdsNeedUpdate);
+            contractIds = contractIdsNeedUpdate;
             return hs;
         }
         #endregion
 
-        public HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds)
+        public HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
-            HandleState hs = CalculatorReceivableOverDue(partnerIds, 2);
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 2, out List<Guid?> contractIdsNeedUpdate);
+            contractIds = contractIdsNeedUpdate;
             return hs;
         }
-        public HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds)
+        public HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
-            HandleState hs = CalculatorReceivableOverDue(partnerIds, 3);
+            HandleState hs = CalculatorReceivableOverDue(partnerIds, 3, out List<Guid?> contractIdsNeedUpdate);
+            contractIds = contractIdsNeedUpdate;
             return hs;
         }
 
@@ -2652,9 +2655,11 @@ namespace eFMS.API.Accounting.DL.Services
             return invoiceOverDue;
         }
 
-        private HandleState CalculatorReceivableOverDue(List<string> partnerIds, int type)
+        private HandleState CalculatorReceivableOverDue(List<string> partnerIds, int type, out List<Guid?> contractIds)
         {
             HandleState hs = new HandleState();
+            contractIds = new List<Guid?>();
+
             // Get công nợ quá hạn từ 1->15 ngày của ds đối tượng xác định hoặc lấy hết
             var invoiceOverDue = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
@@ -2676,6 +2681,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over1To15Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                                 break;
                             case 2: // 15 - 30
@@ -2683,6 +2692,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over16To30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                                 break;
                             case 3: // 30
@@ -2690,6 +2703,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                                 break;
                             default:
@@ -2711,6 +2728,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over1To15Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                             }
                             break;
@@ -2722,6 +2743,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over16To30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                             }
                             break;
@@ -2733,6 +2758,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
+                                    if (item.ContractId != null)
+                                    {
+                                        contractIds.Add(item.ContractId);
+                                    }
                                 }
                             }
                             break;
@@ -2792,7 +2821,6 @@ namespace eFMS.API.Accounting.DL.Services
                         }).ToList()
                     }).ToList();
 
-
                 if (grpInvoices.Count() > 0)
                 {
                     foreach (var item in grpInvoices)
@@ -2817,11 +2845,50 @@ namespace eFMS.API.Accounting.DL.Services
                                     break;
                             }
                             DataContext.Update(ar, x => x.Id == ar.Id, false);
+                            if(ar.ContractId != null)
+                            {
+                                contractIds.Add(ar.ContractId);
+                            }
                         }
                     }
                     hs = DataContext.SubmitChanges();
                 }
             }
+            return hs;
+        }
+
+        public HandleState CalculatorReceivableDebitAmount(List<string> partnerIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag)
+        {
+            HandleState hs = new HandleState();
+            if(contractIds.Count > 0)
+            {
+                foreach (var Id in contractIds)
+                {
+                    var contract = contractPartnerRepo.Get(x => x.Id == Id)?.FirstOrDefault();
+                    if(contract != null)
+                    {
+                        var receivables = DataContext.Get(x => x.ContractId == Id);
+
+                        if(flag == "overdue")
+                        {
+                            contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                              || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                              || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
+                              );
+                        }
+
+                       hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == Id, false);
+                    }
+                }
+
+                hs = contractPartnerRepo.SubmitChanges();
+            }
+
             return hs;
         }
     }
