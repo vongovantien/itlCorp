@@ -2202,11 +2202,16 @@ namespace eFMS.API.Documentation.DL.Services
 
                             if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                             {
+                                //var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                //if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
+                                if (charge.CreditCharge == null) {
+                                    continue;
+                                }
                                 charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                                var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
-                                if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
+                                charge.ChargeId = charge.CreditCharge ?? Guid.Empty;
+
                                 if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
-                                    charge.PaymentObjectId = charge.PartnerInternal_Id;
+                                charge.PaymentObjectId = charge.PartnerInternal_Id;
                             }
                             else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                             {
