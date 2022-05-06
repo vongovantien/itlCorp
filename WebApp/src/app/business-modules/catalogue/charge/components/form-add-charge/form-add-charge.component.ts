@@ -133,7 +133,8 @@ export class FormAddChargeComponent extends AppForm {
                         } else {
                             this.isShowMappingSelling = false;
                         }
-                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
+                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()
+                            || value.toLowerCase() === CommonEnum.CHARGE_TYPE.DEBIT.toLowerCase()) {
                             this.isShowMappingBuying = true;
                         } else {
                             this.isShowMappingBuying = false;
