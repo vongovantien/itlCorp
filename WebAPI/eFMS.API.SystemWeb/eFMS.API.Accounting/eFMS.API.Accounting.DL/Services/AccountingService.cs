@@ -801,14 +801,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        if (surcharge.KickBack == true)
-                        {
-                            charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId); // get ExchangeRate theo currency credit
-                        }
-                        else
-                        {
-                            charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
-                        }
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -1128,14 +1121,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        if (surcharge.KickBack == true)
-                        {
-                            charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency); // get ExchangeRate theo currency credit
-                        }
-                        else
-                        {
-                            charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
-                        }
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
