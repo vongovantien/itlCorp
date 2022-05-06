@@ -269,10 +269,11 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
-            if(HblId == Guid.Empty)
+            if (HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(partnerId);
-            } else
+            }
+            else
             {
                 if (transactionType == "CL")
                 {
@@ -284,8 +285,14 @@ namespace eFMS.API.Documentation.DL.Services
                     currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
                     contract = GetContractByPartnerId(partnerId, currentSaleman);
                 }
+
+                if (currentSaleman == salemanBOD)
+                {
+                    isValid = true;
+                    return result;
+                }
             }
-           
+
             if (contract == null)
             {
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
@@ -294,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-                    if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE || checkPointType == CHECK_POINT_TYPE.HBL)
+                    if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE || checkPointType == CHECK_POINT_TYPE.HBL)
                     {
                         isValid = true;
                         break;
@@ -309,23 +316,66 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case "Trial":
                 case "Official":
-                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdue"))
                     {
-                        if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
                         {
-                            if (contract.IsOverDue == true || contract.IsExpired == true)
+                            if(contract.IsOverDue == true)
                             {
                                 isValid = false;
-                            } else isValid = true;
-                        }
-                        else if (contract.IsOverDue == true || contract.IsExpired == true || contract.IsOverLimit == true)
+                            }
+                            else isValid = true;
+                        } else if(contract.IsOverDue == true)
                         {
                             isValid = false;
-                        } 
+                        }
                         else isValid = true;
+                        if (!isValid)
+                        {
+                            errorCode = 2;
+                            break;
+                        }
                     }
+                    if(IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "expired"))
+                    {
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        {
+                            if (contract.IsExpired == true)
+                            {
+                                isValid = false;
+                            }
+                            else isValid = true;
+                        }
+                        else if (contract.IsExpired == true)
+                        {
+                            isValid = false;
+                        }
+                        else isValid = true;
+                        if (!isValid)
+                        {
+                            errorCode = 3;
+                            break;
+                        }
+                    }
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "credit"))
+                    {
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) //vẫn cho issue debit nếu vượt hạn mức
+                        {
+                            isValid = true;
+                        }
+                        else if(contract.IsOverLimit == true)
+                        {
+                            isValid = false;
+                        }
+                        else isValid = true;
+                        if (!isValid)
+                        {
+                            errorCode = 4;
+                            break;  
+                        }
+                    }
+                   
                     else isValid = true;
-                    if (!isValid) errorCode = 2;
                     break;
                 default:
                     isValid = true;
@@ -335,15 +385,26 @@ namespace eFMS.API.Documentation.DL.Services
             if (isValid == false)
             {
                 SysUser saleman = sysUserRepository.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
-                if (errorCode == 1)
+                switch (errorCode)
                 {
-                    messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please you check it again!",
-                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
-                }
-                else if (errorCode == 2)
-                {
-                    messError = string.Format(@"{0} - {1} {2} agreement of {3} have over due or over credit limit, please you check it again!",
+                    case 1:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please you check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                        break;
+                    case 2:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due, please you check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                        break;
+                    case 3:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Expired, please you check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                        break;
+                    case 4:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please you check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
+                        break;
+                    default:
+                        break;
                 }
                 return new HandleState((object)messError);
             }
@@ -392,7 +453,7 @@ namespace eFMS.API.Documentation.DL.Services
             return contract;
         }
 
-        private bool IsSettingFlowApplyContract(string ContractType, Guid officeId, string partnerType)
+        private bool IsSettingFlowApplyContract(string ContractType, Guid officeId, string partnerType, string typeCheckPoint = null)
         {
             bool IsApplySetting = false;
             var settingFlow = sysSettingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable"
@@ -405,10 +466,10 @@ namespace eFMS.API.Documentation.DL.Services
                     IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
                     break;
                 case "Trial":
-                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow.ApplyType, settingFlow.ApplyPartner, partnerType);
+                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
                     break;
                 case "Official":
-                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow.ApplyType, settingFlow.ApplyPartner, partnerType);
+                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
                     break;
                 default:
                     break;
@@ -427,13 +488,24 @@ namespace eFMS.API.Documentation.DL.Services
             return isApply;
         }
 
-        private bool IsApplySettingFlowContractTrialOfficial(string applyType, string applyPartnerType, string partnerType)
+        private bool IsApplySettingFlowContractTrialOfficial(SysSettingFlow setting, string partnerType, string typeCheckPoint)
         {
             bool isApply = false;
-            isApply = applyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
-                && applyType != DocumentConstants.SETTING_FLOW_APPLY_TYPE_NONE
-                && (applyPartnerType == partnerType || applyPartnerType == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
-
+            isApply = setting.ApplyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
+                && setting.ApplyType != DocumentConstants.SETTING_FLOW_APPLY_TYPE_NONE
+                && (setting.ApplyPartner == partnerType || setting.ApplyPartner == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+            if (typeCheckPoint == "credit")
+            {
+                isApply = isApply && setting.CreditLimit == true;
+            }
+            if (typeCheckPoint == "overdue")
+            {
+                isApply = isApply && setting.OverPaymentTerm == true;
+            }
+            if (typeCheckPoint == "expired")
+            {
+                isApply = isApply && setting.ExpiredAgreement == true;
+            }
             return isApply;
         }
     }
