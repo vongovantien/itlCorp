@@ -472,7 +472,7 @@ namespace eFMS.API.ForPartner.DL.Service
             else
             {
                 //Nếu Partner không có contract thì lấy Invoice Date của Invoice
-                dueDate = invoiceDate;
+                dueDate = invoiceDate.Value.AddDays((double)(paymentTerm ?? 0));
             }
             return dueDate;
         }
