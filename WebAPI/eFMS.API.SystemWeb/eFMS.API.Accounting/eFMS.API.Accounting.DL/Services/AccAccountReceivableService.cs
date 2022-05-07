@@ -2681,10 +2681,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over1To15Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
                                 break;
                             case 2: // 15 - 30
@@ -2692,10 +2688,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over16To30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
                                 break;
                             case 3: // 30
@@ -2703,10 +2695,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
                                 break;
                             default:
@@ -2714,6 +2702,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         hs = DataContext.SubmitChanges();
+                        contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
                     }
                 }
                 else
@@ -2728,11 +2717,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over1To15Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
+                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
                             }
                             break;
                         case 2: // 15 - 30
@@ -2743,11 +2729,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over16To30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
+                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
                             }
                             break;
                         case 3: // 30
@@ -2758,11 +2741,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.Over30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
-                                    if (item.ContractId != null)
-                                    {
-                                        contractIds.Add(item.ContractId);
-                                    }
                                 }
+                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
                             }
                             break;
                         default:
@@ -2852,6 +2832,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     hs = DataContext.SubmitChanges();
+                    contractIds = contractIds.Distinct().ToList();
                 }
             }
             return hs;
