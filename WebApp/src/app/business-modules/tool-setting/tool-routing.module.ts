@@ -4,6 +4,7 @@ import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
+import { LinkFeeComponent } from './link-fee/link-fee.component';
 
 const routes: Routes = [
     {
@@ -63,6 +64,13 @@ const routes: Routes = [
         data: {
             name: "Supplier",
             level: 2
+        }
+    },
+    {
+        path: 'link-fee', loadChildren: () => import('./link-fee/link-fee.module').then(m => m.LinkFeeModule),
+        data: {
+            name: "Link Fee",
+            title:"eFMS Link Fee"
         }
     },
 ];

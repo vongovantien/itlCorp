@@ -86,14 +86,6 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.authorizationNote = this.formAuthorization.controls['authorizationNote'];
         this.authorizationActive = this.formAuthorization.controls['authorizationActive'];
 
-        this.formAuthorization.get("effectiveDate").valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
-            });
     }
 
     saveAuthorization() {

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SettingRepo {
@@ -144,6 +145,56 @@ export class SettingRepo {
     generatePaymentId(paymentNo: string, type: number){
         return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`,{paymentNo:paymentNo,type:type})
         .pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getRule(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteRule(ruleId: string) {
+        return this._api.delete(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Delete`, { id: ruleId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addRule(body: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailRule(ruleId: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/getRuleByID`, { id: ruleId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateRule(body: any) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    upLoadRuleLinkFeeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/UploadFile`, files, "uploadedFile");
+    }
+
+    importRuleLinkFee(body: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downloadRuleLinkFeeExcel() {
+        return this._api.downloadfile(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/RuleLinkFee/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

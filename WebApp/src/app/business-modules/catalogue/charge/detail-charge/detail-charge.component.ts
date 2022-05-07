@@ -67,7 +67,8 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.Charge = res;
                 this.formAddCharge.activeServices = this.formAddCharge.getCurrentActiveService(this.Charge.charge.serviceTypeId);
                 this.formAddCharge.updateDataToForm(this.Charge);
-
+                console.log(this.formAddCharge.activeServices);
+                
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
                 this.Charge.charge.userCreated = res.charge.userCreated;
