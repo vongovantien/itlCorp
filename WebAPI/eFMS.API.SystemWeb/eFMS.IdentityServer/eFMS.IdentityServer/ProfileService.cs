@@ -71,6 +71,8 @@ namespace eFMS.IdentityServer
                     new Claim("bankCode", employee.BankCode?? ""),
                     new Claim("kbExchangeRate", company.KbExchangeRate != null ? company.KbExchangeRate.ToString() : "0"),
                     new Claim("internalCode", !string.IsNullOrEmpty(office.InternalCode) ? office.InternalCode: ""),
+                    new Claim("CompanyCode", company.Code),
+                    new Claim("OfficeCode", office.Code),
                     companyClaim,
                     officeClaim,
                     departmentclaim,
