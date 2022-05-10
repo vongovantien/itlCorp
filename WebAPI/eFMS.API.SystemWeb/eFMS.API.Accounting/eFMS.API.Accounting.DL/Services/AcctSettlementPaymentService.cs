@@ -542,7 +542,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- LIST & PAGING SETTLEMENT PAYMENT ---
 
-        public async Task<HandleState> DeleteSettlementPayment(string settlementNo)
+        public HandleState DeleteSettlementPayment(string settlementNo)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
@@ -1869,7 +1869,7 @@ namespace eFMS.API.Accounting.DL.Services
             return new ResultHandle() { Status = true};
         }
 
-        public async Task<HandleState> AddSettlementPayment(CreateUpdateSettlementModel model)
+        public HandleState AddSettlementPayment(CreateUpdateSettlementModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -2092,7 +2092,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public async Task<HandleState> UpdateSettlementPayment(CreateUpdateSettlementModel model)
+        public HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
