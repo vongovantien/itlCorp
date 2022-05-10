@@ -215,7 +215,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     preview(reportType: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -246,7 +246,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -300,7 +300,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewAuthorizeLetter2(withSign: boolean) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -324,7 +324,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
     previewAuthorizeLetter1(withSign: boolean) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -348,7 +348,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewProofOfDelivery() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -372,7 +372,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewAirDocumentRelease() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {

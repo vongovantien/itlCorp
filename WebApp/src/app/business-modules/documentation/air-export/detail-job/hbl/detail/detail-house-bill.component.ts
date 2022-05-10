@@ -204,7 +204,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     preview(reportType: string, separateId?: string) {
         const id = !separateId ? this.hblId : separateId;
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -229,7 +229,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     previewAttachList() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -254,7 +254,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     exportNeutralHawb() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {

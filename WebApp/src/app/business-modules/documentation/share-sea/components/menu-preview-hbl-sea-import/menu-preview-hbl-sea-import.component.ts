@@ -55,7 +55,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
 
     onPreview(type: string) {
         this.isClickSubMenu = false;
-
+        this._toastService.clear();
         // Preview Delivery Order
         if (type === 'DELIVERY_ORDER') {
             this.previewDeliveryOrder();
@@ -81,8 +81,9 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             this.exportDangerousGoods();
         }
     }
+
     previewProofOfDelivery() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -93,13 +94,15 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.renderAndShowReport();
+                    if (!!res) {
+                        this.dataReport = res;
+                        this.renderAndShowReport();
+                    }
                 },
             );
     }
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -110,18 +113,20 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data charge to display preview');
+                    if (!!res) {
+                        this.dataReport = res;
+                        if (this.dataReport.dataSource?.length > 0) {
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
                     }
                 },
             );
     }
 
     previewDeliveryOrder() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -132,18 +137,20 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no container data to display preview');
+                    if (!!res) {
+                        this.dataReport = res;
+                        if (this.dataReport.dataSource?.length > 0) {
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no container data to display preview');
+                        }
                     }
                 },
             );
     }
 
     exportDangerousGoods() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -154,13 +161,15 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    if (!!res) {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    }
                 },
             );
     }
 
     exportGoodsDeclare() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -171,13 +180,15 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    if (!!res) {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    }
                 },
             );
     }
 
     exportEManifest() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -188,7 +199,9 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 })
             ).subscribe(
                 (res: any) => {
-                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    if (!!res) {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    }
                 },
             );
     }
