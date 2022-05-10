@@ -23,7 +23,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 
-        HandleState DeleteSettlementPayment(string settlementNo);
+        Task<HandleState> DeleteSettlementPayment(string settlementNo);
 
         AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement);
 
@@ -40,9 +40,9 @@ namespace eFMS.API.Accounting.DL.IService
         ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
         ResultHandle CheckDuplicateListShipmentsSettlement(List<CheckDuplicateShipmentSettlementCriteria> data);
 
-        HandleState AddSettlementPayment(CreateUpdateSettlementModel model);
+        Task<HandleState> AddSettlementPayment(CreateUpdateSettlementModel model);
 
-        HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model);
+        Task<HandleState> UpdateSettlementPayment(CreateUpdateSettlementModel model);
 
         HandleState CheckExistsInfoManagerOfRequester(AcctApproveSettlementModel settlement);
 

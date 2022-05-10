@@ -173,7 +173,7 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE,settlementNo].Value });
             }
 
-            HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);
+            HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo).Result;
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -416,7 +416,7 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            var hs = acctSettlementPaymentService.AddSettlementPayment(model);
+            var hs = acctSettlementPaymentService.AddSettlementPayment(model).Result;
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -475,8 +475,7 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
-
-            var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
+            var hs = acctSettlementPaymentService.UpdateSettlementPayment(model).Result;
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -655,7 +654,7 @@ namespace eFMS.API.Accounting.Controllers
             {
 
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
-                hs = acctSettlementPaymentService.AddSettlementPayment(model);
+                hs = acctSettlementPaymentService.AddSettlementPayment(model).Result;
                 message = HandleError.GetMessage(hs, Crud.Insert);
                 if (hs.Code == 403)
                 {
@@ -665,7 +664,7 @@ namespace eFMS.API.Accounting.Controllers
             else //Update Settlement Payment
             {
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
-                hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
+                hs = acctSettlementPaymentService.UpdateSettlementPayment(model).Result;
                 message = HandleError.GetMessage(hs, Crud.Update);
                 if (hs.Code == 403)
                 {
