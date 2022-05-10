@@ -57,6 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IContextBase<SysGroup> sysGroupRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -87,7 +88,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<CatDepartment> catDepartRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
-            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
+            IContextBase<SysGroup> sysGroupRepo,
+        IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -117,6 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            sysGroupRepository = sysGroupRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -988,7 +991,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var houseBillData = query.Select(s => s.detail).GroupBy(g => g.Id).Select(s => s.FirstOrDefault());
             var res = from detail in houseBillData//DataContext.Get()
-                                                  //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                      //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -1001,6 +1004,10 @@ namespace eFMS.API.Documentation.DL.Services
                       from notify in notifys.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
                       from pod in portDetail.DefaultIfEmpty()
+                      join dept in catDepartmentRepository.Get() on detail.DepartmentId equals dept.Id into deptDetail
+                      from dept in deptDetail.DefaultIfEmpty()
+                      join gr in sysGroupRepository.Get() on detail.GroupId equals gr.Id into sysGroupDetails
+                      from gr in sysGroupDetails.DefaultIfEmpty()
                           //where detail.JobId == criteria.JobId
                       select new CsTransactionDetailModel
                       {
@@ -1063,6 +1070,8 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
+                          Department=dept.DeptNameAbbr,
+                          Group=gr.ShortName
                       };
             //Order tăng dần theo số House
             var results = res.ToArray().OrderBy(o => o.Hwbno).ToList();
