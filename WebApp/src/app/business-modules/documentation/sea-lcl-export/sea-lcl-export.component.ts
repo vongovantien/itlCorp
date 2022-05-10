@@ -81,6 +81,9 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'Packages', field: 'packages', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Department', field: 'department', sortable: true },
+
         ];
 
         this.getShipments();
