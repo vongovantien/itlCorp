@@ -2323,6 +2323,36 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- DETAIL ---
 
+        public DebitAmountDetail GetDebitAmountDetailByContract(Guid argeementId)
+        {
+            DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
+            var contract = contractPartnerRepo.Get(x => x.Id == argeementId).FirstOrDefault();
+            var partner = partnerRepo.Get(x => x.Id == contract.PartnerId).FirstOrDefault();
+            debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+            {
+                ContractNo = contract.ContractNo,
+                EffectiveDate = contract.EffectiveDate,
+                ContracType = contract.ContractType,
+                ExpiredDate = contract.ExpiredDate,
+                PartnerCode = partner.TaxCode,
+                PartnerName = partner.ShortName,
+                Currency = contract.CurrencyId
+            };
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(contract.PartnerId);
+
+            return debitAmountDetail;
+        }
+
+        public List<sp_GetDebitAmountDetailbyPartnerId> GetDebitAmountDetailbyPartnerId(string partnerId)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("partnerID", partnerId)
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailbyPartnerId>(parameters);
+            return data;
+        }
+
         #region -- Update AcctManagement and overdays AccountReceivable after change payment term contract
         /// <summary>
         /// UpdateDueDateAndOverDays

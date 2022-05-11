@@ -160,6 +160,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDebitAmountDetailByContract(System.Guid)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="agreementId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -582,6 +589,13 @@
             <param name="acctPayables"></param>
             <param name="criteria"></param>
             <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportDebitAmountDetail(eFMS.API.ReportData.Models.DebitAmountDetail,System.Guid)">
+            <summary>
+            Generate Export Generate Export Debit Amount Detail Report
+            </summary>
+            <param name="agreementId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateMAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">

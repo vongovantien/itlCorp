@@ -323,6 +323,13 @@
             <param name="models"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDebitAmountDetailByContract(System.Guid)">
+            <summary>
+            Get AR detail has argeement by argeement id
+            </summary>
+            <param name="argeementId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">
             <summary>
             Get AR detail has argeement by argeement id

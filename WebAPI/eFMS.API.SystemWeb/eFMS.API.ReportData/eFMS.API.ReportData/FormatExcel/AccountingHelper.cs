@@ -6149,6 +6149,107 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        /// <summary>
+        /// Generate Export Generate Export Debit Amount Detail Report
+        /// </summary>
+        /// <param name="agreementId"></param>
+        /// <returns></returns>
+        public Stream GenerateExportDebitAmountDetail(DebitAmountDetail debitAmountDetail,Guid agreementId)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.DebitAmountDetailByContract));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 3;
+                var listKeyData = new Dictionary<string, object>();
+                Double SumTotalVND = 0, SumTotalUSD = 0, PaidAmountVND = 0, PaidAmountUSD = 0, DebitAmountVND = 0, DebitAmountUSD = 0;
+                //listKeyData.Add("PartnerCode", string.Format("From date: {0} To date: {0}", DateTime.Parse(criteria.FromPaymentDate).ToString("dd/MM/yyyy"), DateTime.Parse(criteria.ToPaymentDate).ToString("dd/MM/yyyy")));
+                listKeyData.Add("PartnerCode", debitAmountDetail.DebitAmountGeneralInfo.PartnerCode);
+                listKeyData.Add("ContractNo", debitAmountDetail.DebitAmountGeneralInfo.ContractNo);
+                startRow++;
+                listKeyData.Add("PartnerName", debitAmountDetail.DebitAmountGeneralInfo.PartnerName);
+                listKeyData.Add("EffectiveDate", debitAmountDetail.DebitAmountGeneralInfo.EffectiveDate);
+                startRow++;
+                listKeyData.Add("ContractType", debitAmountDetail.DebitAmountGeneralInfo.ContracType);
+                listKeyData.Add("ExpiredDate", debitAmountDetail.DebitAmountGeneralInfo.ExpiredDate);
+                excel.SetData(listKeyData);
+
+                startRow = 8;
+                excel.StartDetailTable = startRow;
+                
+                for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
+                {
+                    var item = debitAmountDetail.DebitAmountDetails[i];
+                    listKeyData = new Dictionary<string, object>();
+
+                    excel.SetGroupsTable();
+                    listKeyData.Add("No", i);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("HblNo", item.HBLNo);
+                    listKeyData.Add("MblNo", item.MBLNo);
+                    listKeyData.Add("BillingNo", item.DebitNo);
+                    listKeyData.Add("Type", item.Type=="SELL"?"DEBIT":"OBH");
+                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                    listKeyData.Add("TotalVND", item.TotalVND);
+                    listKeyData.Add("TotalUSD", item.TotalUSD);
+                    listKeyData.Add("Office", item.OfficeName);
+                    listKeyData.Add("SalesMan", item.UserName);
+                    listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("Service", item.TransactionType);
+                    listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
+                    SumTotalUSD += item.TotalUSD;
+                    SumTotalVND += item.TotalVND;
+                    PaidAmountUSD += item.PaidAmountUSD;
+                    PaidAmountVND += item.PaidAmountVND;
+                    excel.SetData(listKeyData);
+                    startRow++;
+                }
+
+                DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
+                DebitAmountVND = SumTotalVND - PaidAmountVND;
+                startRow++;
+                listKeyData.Add("SumTotalVND", SumTotalVND);
+                listKeyData.Add("SumTotalUSD", SumTotalUSD);
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("PaidAmountVND", PaidAmountVND);
+                    listKeyData.Add("PaidAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("PaidAmountVND", null);
+                    listKeyData.Add("PaidAmountUSD", PaidAmountUSD);
+                }
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("DebitAmountVND", DebitAmountVND);
+                    listKeyData.Add("DebitAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("DebitAmountVND", null);
+                    listKeyData.Add("DebitAmountUSD", DebitAmountUSD);
+                }
+                excel.SetData(listKeyData);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
         public Stream GenerateExportAccountingTemplateReport(List<AccountingTemplateExport> acctPayables, AccountPayableCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AP");

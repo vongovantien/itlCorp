@@ -118,7 +118,9 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
-                                            <td class="text-right"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
+                                            <td class="text-right" id="debitAmountStyle"                                                             
+                                            [contextMenu]="trialContextMenu"
+                                            (onTouch)="onSelectTrial(item)"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
                                             <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}
                                             </td>
                                             <td class="text-right">{{ (item.debitAmount-item.creditLimited) |
@@ -171,5 +173,9 @@
 
     </div>
 </div>
-
+<app-context-menu #trialContextMenu (clickOutside)="this.selectedTrialOfficial = null">
+    <div class="menu-context__item" (click)="exportDebitAmount()">
+        <span><i class="la la-download"></i><span> Export Debit Amount Detail </span></span>
+    </div>
+</app-context-menu>
 <account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>

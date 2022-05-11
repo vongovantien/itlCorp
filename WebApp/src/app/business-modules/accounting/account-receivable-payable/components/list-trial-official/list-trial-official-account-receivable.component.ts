@@ -25,6 +25,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
 
     trialOfficialList: TrialOfficialOtherModel[] = [];
+    selectedTrialOfficial: TrialOfficialOtherModel;
 
     constructor(
         private _sortService: SortService,
@@ -150,6 +151,22 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                     }
                 },
             );
+    }
+
+    exportDebitAmount() {
+        this._exportRepo.exportDebitAmountDetailByContract(this.selectedTrialOfficial.agreementId)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                }
+            );
+    }
+
+    onSelectTrial(item: TrialOfficialOtherModel) {
+        //this.exportDebitAmount(item.partnerId)
+        console.log(item);
+        
+        this.selectedTrialOfficial=item
     }
 }
 
