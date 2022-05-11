@@ -140,14 +140,6 @@
     </div>
 </div>
 
-<confirm-popup [labelConfirm]="'Ok'" [labelCancel]="'No'" [title]="'Warning'"
-    [body]="'Do you want to convert selected Clearance No to shipment ?'" #confirmConvertPopup
-    (onSubmit)="onComfirmConvertToJobs()"></confirm-popup>
-
-<confirm-popup [labelConfirm]="'Ok'" [labelCancel]="'No'" [title]="'Warning'"
-    [body]="'Do you want to delete Clearance No selected ?'" #confirmDeletePopup (onSubmit)="onConfirmDelete()">
-</confirm-popup>
-
 <permission-403-popup></permission-403-popup>
 
 <app-dropdown #dropdownMenuClearance>
@@ -166,3 +158,5 @@
     <a class="dropdown-item pointer" (click)="getDataFromEcus()"> Get From Ecus</a>
     <a class="dropdown-item pointer" (click)="getDataOlaFromEcus()"> Get Ola From Ecus</a>
 </app-dropdown>
+
+<ng-template inject></ng-template>

@@ -269,9 +269,11 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
+
             if (HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(partnerId);
+                currentSaleman = contract?.SaleManId;
             }
             else
             {
@@ -285,18 +287,19 @@ namespace eFMS.API.Documentation.DL.Services
                     currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
                     contract = GetContractByPartnerId(partnerId, currentSaleman);
                 }
-
-                if (currentSaleman == salemanBOD)
-                {
-                    isValid = true;
-                    return result;
-                }
             }
 
             if (contract == null)
             {
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
+
+            if (currentSaleman == salemanBOD)
+            {
+                isValid = true;
+                return result;
+            }
+
             int errorCode = -1;
             switch (contract.ContractType)
             {
@@ -323,13 +326,9 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdue"))
                     {
-                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) // hđ quá hạn vẫn cho issue DEBIT.
                         {
-                            if(contract.IsOverDue == true)
-                            {
-                                isValid = false;
-                            }
-                            else isValid = true;
+                            isValid = true;
                         } else if(contract.IsOverDue == true)
                         {
                             isValid = false;
@@ -341,7 +340,24 @@ namespace eFMS.API.Documentation.DL.Services
                             break;
                         }
                     }
-                    if(IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "expired"))
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "credit"))
+                    {
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) //vẫn cho issue debit nếu vượt hạn mức
+                        {
+                            isValid = true;
+                        }
+                        else if (contract.IsOverLimit == true)
+                        {
+                            isValid = false;
+                        }
+                        else isValid = true;
+                        if (!isValid)
+                        {
+                            errorCode = 4;
+                            break;
+                        }
+                    }
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "expired"))
                     {
                         if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
                         {
@@ -362,24 +378,6 @@ namespace eFMS.API.Documentation.DL.Services
                             break;
                         }
                     }
-                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "credit"))
-                    {
-                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) //vẫn cho issue debit nếu vượt hạn mức
-                        {
-                            isValid = true;
-                        }
-                        else if(contract.IsOverLimit == true)
-                        {
-                            isValid = false;
-                        }
-                        else isValid = true;
-                        if (!isValid)
-                        {
-                            errorCode = 4;
-                            break;  
-                        }
-                    }
-                   
                     else isValid = true;
                     break;
                 default:

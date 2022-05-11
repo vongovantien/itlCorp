@@ -16,6 +16,7 @@ namespace eFMS.API.Operation.DL.Models
         public bool? isDelete { get; set; }
         public Guid? jobId { get; set; }
         public Guid? hbl { get; set; }
+        public string CustomerId { get; set; }
     }
 
 }

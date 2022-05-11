@@ -76,7 +76,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                 [CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER],
                                 true,
                                 this.serviceTypeId,
-                                data?.officeId
+                                data?.officeId,
+                                this.hbl.saleManId
                             ).pipe(
                                 finalize(() => {
                                     this._spinner.hide(this.spinnerpartner);

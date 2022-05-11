@@ -2253,14 +2253,20 @@ namespace eFMS.API.Catalogue.DL.Services
 
 
                 data = DataContext.Get(query);
-                if(!string.IsNullOrEmpty(criteria.Service) && !string.IsNullOrEmpty(criteria.Office))
+                Expression<Func<CatContract, bool>> queryContract = x => x.Active == true
+                                                                && (x.IsExpired == null || x.IsExpired == false)
+                                                                && IsMatchService(x.SaleService, criteria.Service)
+                                                                && IsMatchOffice(x.OfficeId, criteria.Office);
+                if(criteria.SalemanId != null)
                 {
-                    var contract = contractRepository.Get(x => x.Active == true && IsMatchService(x.SaleService, criteria.Service) && IsMatchOffice(x.OfficeId, criteria.Office));
-                    data = from p in data
-                                    join c in contract on p.Id equals c.PartnerId
-                                    select p;
+                    queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
                 }
-               
+
+                IQueryable<CatContract> contracts = contractRepository.Get(queryContract);
+                data = from p in data
+                       join c in contracts on p.Id equals c.PartnerId
+                       select p;
+
             }
             else
             {

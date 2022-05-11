@@ -163,12 +163,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getUnits();
         this.getCurrency();
+        this.getDetailHBL();
         this.getPartner();
         this.getCharge();
         this.getShipmentContainer();
         this.getHBLContainer();
         this.getShipmentDetail();
-        this.getDetailHBL();
         this.getChargeGroup();
 
     }
@@ -277,6 +277,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
+                    console.log(this.hbl);
                 }
             );
     }

@@ -220,10 +220,20 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            // list.ForEach(fe => {
-            // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
-            // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
-            //});
+            // validate checkpoint
+            var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE)).ToList();
+            if(partnersNeedValidate.Count() > 0)
+            {
+                for (int i = 0; i < partnersNeedValidate.Count; i++)
+                {
+                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[i].PaymentObjectId, 
+                        partnersNeedValidate[i].Hblid, "DOC", CHECK_POINT_TYPE.SURCHARGE, null);
+                    if (!hsCheckpoint.Success)
+                    {
+                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
+                    }
+                }
+            }
             currentUser.Action = "AddAndUpdate";
 
             var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
