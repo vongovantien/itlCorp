@@ -2508,7 +2508,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return salemans;
         }
 
-        public IQueryable<CatPartnerViewModel> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria)
+        public IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria)
         {
             
             IQueryable<CatPartner> dataAgents = Enumerable.Empty<CatPartner>().AsQueryable();
@@ -2525,12 +2525,11 @@ namespace eFMS.API.Catalogue.DL.Services
                                                             && IsMatchService(x.SaleService, criteria.Service)
                                                             && IsMatchOffice(x.OfficeId, criteria.Office);
            
-
             IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
 
             var d = from p in dataAgents
                     join c in contractAgents on p.Id equals c.PartnerId
-                    select new CatPartnerViewModel
+                    select new CatPartnerForKeyinCharge
                     {
                         Id = p.Id,
                         PartnerGroup = p.PartnerGroup,
@@ -2550,7 +2549,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var d2 = from p in dataCustomers
                     join c in contractCustomers on p.Id equals c.PartnerId
-                    select new CatPartnerViewModel
+                    select new CatPartnerForKeyinCharge
                     {
                         Id = p.Id,
                         PartnerGroup = p.PartnerGroup,

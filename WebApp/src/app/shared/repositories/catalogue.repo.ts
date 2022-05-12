@@ -172,6 +172,16 @@ export class CatalogueRepo {
             }, null, { "hideSpinner": "true" });
     }
 
+    getPartnerForKeyingCharge(active: boolean = true, service: string = null, office: string = null, salemanId: string = null) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetPartnerForKeyingCharge`,
+            {
+                active: active,
+                service: service,
+                office: office,
+                salemanId: salemanId
+            }, null, { "hideSpinner": "true" });
+    }
+
     getSalemanIdByPartnerId(partnerId: string, jobId: string = null) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetSalemanIdByPartnerId/${partnerId}/${jobId}`).pipe(
             map((res: any) => {

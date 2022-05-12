@@ -69,11 +69,11 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 switchMap(
                     (data) => {
                         if (!!data?.officeId) {
-                            return this._catalogueRepo.getPartnerByGroups(
-                                [CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER],
+                            return this._catalogueRepo.getPartnerForKeyingCharge(
                                 true,
                                 this.serviceTypeId,
-                                data?.officeId
+                                data?.officeId,
+                                this.hbl.saleManId
                             ).pipe(
                                 finalize(() => {
                                     this._spinner.hide(this.spinnerpartner);
