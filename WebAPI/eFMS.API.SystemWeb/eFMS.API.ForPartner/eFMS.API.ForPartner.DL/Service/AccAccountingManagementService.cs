@@ -1472,7 +1472,7 @@ namespace eFMS.API.ForPartner.DL.Service
             settlement.ReasonReject = reason;
 
             var surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).ToList();
-
+            UpdateSurchargeDataToDB(surcharges, settlement.SettlementNo, "Reject");
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -1514,7 +1514,6 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserModified = currentUser.UserID,
                             };
                             sysUserNotificationRepository.AddAsync(sysUserNotify);
-                            UpdateSurchargeDataToDB(surcharges, settlement.SettlementNo, "Reject");
                             #region Change to store
                             //if (surcharges != null && surcharges.Count() > 0)
                             //{
@@ -2831,7 +2830,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     Direction = ParameterDirection.Input,
                     ParameterName = "@surcharges",
-                    Value = DataHelper.ToDataTable(new List<CsShipmentSurcharge>()),
+                    Value = DataHelper.ToDataTable(surcharges),
                     SqlDbType = SqlDbType.Structured,
                     TypeName = "[dbo].[CsShipmentSurchargeTable]"
                 },

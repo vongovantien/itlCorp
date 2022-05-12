@@ -579,7 +579,7 @@ namespace eFMS.API.Accounting.DL.Services
                             #endregion -- Cập nhật Status Payment = 'NotSettled' của Advance Request cho các phí của Settlement (nếu có) -- [15/01/2021]
                         }
                         // Update/Delete surcharge of settlement
-                        UpdateSurchargeSettle(new List<CsShipmentSurcharge>(), settlement.SettlementNo, "Delete");
+                        UpdateSurchargeSettle(surchargeShipment, settlement.SettlementNo, "Delete");
 
                         var hs = DataContext.Delete(x => x.Id == settlement.Id);
                         if (hs.Success)

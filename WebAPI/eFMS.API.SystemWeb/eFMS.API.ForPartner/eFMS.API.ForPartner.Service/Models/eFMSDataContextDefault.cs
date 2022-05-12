@@ -88,7 +88,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
 
-                entity.Property(e => e.InvoiceNo).HasMaxLength(10);
+                entity.Property(e => e.InvoiceNo).HasMaxLength(50);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -328,6 +328,9 @@ namespace eFMS.API.ForPartner.Service.Models
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
                 entity.ToTable("accAccountingManagement");
+
+                entity.HasIndex(e => e.PartnerId)
+                    .HasName("Index_AccMngt");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -582,6 +585,10 @@ namespace eFMS.API.ForPartner.Service.Models
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
                 entity.ToTable("acctAdvancePayment");
+
+                entity.HasIndex(e => e.AdvanceNo)
+                    .HasName("Index_AccAdv")
+                    .IsUnique();
 
                 entity.HasIndex(e => e.DatetimeCreated)
                     .HasName("Idx_DatetimeCreated_acctAdvancePayment");
@@ -1101,6 +1108,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.HasIndex(e => e.DatetimeCreated)
                     .HasName("Idx_DatetimeCreated_acctSettlementPayment");
 
+                entity.HasIndex(e => e.SettlementNo)
+                    .HasName("Index_Settle")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -1185,6 +1196,10 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.HasIndex(e => e.DatetimeCreated)
                     .HasName("Idx_DatetimeCreated_acctSOA");
+
+                entity.HasIndex(e => e.Soano)
+                    .HasName("AcctSOA")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -1287,6 +1302,10 @@ namespace eFMS.API.ForPartner.Service.Models
             modelBuilder.Entity<CatCharge>(entity =>
             {
                 entity.ToTable("catCharge");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("Index_CatCharge")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -1812,10 +1831,14 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("KB")
                     .HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.LinkChargeId).HasMaxLength(250);
+
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDateLinkFee).HasColumnType("datetime");
 
                 entity.Property(e => e.NetAmount).HasColumnType("decimal(18, 4)");
 
@@ -1914,6 +1937,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserNameLinkFee)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2233,6 +2260,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerMapping)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShortName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2292,6 +2323,10 @@ namespace eFMS.API.ForPartner.Service.Models
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("sysUser");
+
+                entity.HasIndex(e => e.Username)
+                    .HasName("Index_SysUser_ID")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
