@@ -2188,7 +2188,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID));
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
                 {
