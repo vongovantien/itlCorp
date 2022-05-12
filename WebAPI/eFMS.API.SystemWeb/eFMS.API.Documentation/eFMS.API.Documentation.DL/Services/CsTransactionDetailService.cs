@@ -530,6 +530,9 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
+                    detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;
+                    detail.Group = sysGroupRepository.Get(x => x.Id == detail.GroupId)?.FirstOrDefault()?.ShortName;
+
                     return detail;
                 }
             }
@@ -778,6 +781,10 @@ namespace eFMS.API.Documentation.DL.Services
                       from pod in portPODDetail.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pol equals port.Id into portPOLDetail
                       from pol in portPOLDetail.DefaultIfEmpty()
+                      join gr in sysGroupRepository.Get() on detail.GroupId equals gr.Id into sysGroupDetails
+                      from gr in sysGroupDetails.DefaultIfEmpty()
+                      join dept in catDepartmentRepository.Get() on detail.DepartmentId equals dept.Id into sysDepartmentDetails
+                      from dept in sysDepartmentDetails.DefaultIfEmpty()
                       select new CsTransactionDetailModel
                       {
                           Id = detail.Id,
@@ -853,7 +860,9 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceBy2 = detail.TransitPlaceBy2,
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
                           Total = detail.Total, 
-                          Notify = detail.Notify
+                          Notify = detail.Notify,
+                          Group=gr.ShortName,
+                          Department=dept.DeptNameAbbr
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
