@@ -51,7 +51,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICacheServiceBase<CatPartner> cache;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
-
+        string salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
             IMapper mapper,
@@ -108,6 +108,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsManifest>("Id", "Supplier");
             SetChildren<CsShipmentSurcharge>("Id", "PayerID");
             SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
+
+            salemanBOD = sysUserRepository.First(x => x.Username == "ITL.BOD").Id;
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -2504,6 +2506,64 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             return salemans;
+        }
+
+        public IQueryable<CatPartnerViewModel> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria)
+        {
+            
+            IQueryable<CatPartner> dataAgents = Enumerable.Empty<CatPartner>().AsQueryable();
+            IQueryable<CatPartner> dataCustomers = Enumerable.Empty<CatPartner>().AsQueryable();
+
+            Expression<Func<CatPartner, bool>> queryAgent = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_AGENT;
+            Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER;
+
+
+            dataAgents = DataContext.Get(queryAgent);
+            dataCustomers = DataContext.Get(queryCustomer);
+            Expression<Func<CatContract, bool>> queryContract = x => x.Active == true
+                                                            && (x.IsExpired == null || x.IsExpired == false)
+                                                            && IsMatchService(x.SaleService, criteria.Service)
+                                                            && IsMatchOffice(x.OfficeId, criteria.Office);
+           
+
+            IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
+
+            var d = from p in dataAgents
+                    join c in contractAgents on p.Id equals c.PartnerId
+                    select new CatPartnerViewModel
+                    {
+                        Id = p.Id,
+                        PartnerGroup = p.PartnerGroup,
+                        PartnerNameVn = p.PartnerNameVn,
+                        PartnerNameEn = p.PartnerNameEn,
+                        ShortName = p.ShortName,
+                        TaxCode = p.TaxCode,
+                        AccountNo = p.AccountNo,
+                        PartnerType = p.PartnerType,
+                    };
+
+            if (criteria.SalemanId != null && criteria.SalemanId != salemanBOD)
+            {
+                queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
+            }
+            IQueryable<CatContract> contractCustomers = contractRepository.Get(queryContract);
+
+            var d2 = from p in dataCustomers
+                    join c in contractCustomers on p.Id equals c.PartnerId
+                    select new CatPartnerViewModel
+                    {
+                        Id = p.Id,
+                        PartnerGroup = p.PartnerGroup,
+                        PartnerNameVn = p.PartnerNameVn,
+                        PartnerNameEn = p.PartnerNameEn,
+                        ShortName = p.ShortName,
+                        TaxCode = p.TaxCode,
+                        AccountNo = p.AccountNo,
+                        PartnerType = p.PartnerType,
+                    };
+
+            var results = d.Union(d2);
+            return results;
         }
     }
 }

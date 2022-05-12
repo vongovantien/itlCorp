@@ -35,6 +35,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState UpdatePartnerData(CatPartnerModel model);
         IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria);
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType);
+        IQueryable<CatPartnerViewModel> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
 
     }
 }
