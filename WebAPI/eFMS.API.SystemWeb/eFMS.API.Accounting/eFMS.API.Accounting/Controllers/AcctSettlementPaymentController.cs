@@ -194,8 +194,10 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
                 Response.OnCompleted(async () =>
                 {
+                    
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
 
@@ -430,6 +432,8 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                // Add Surcharge settle
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, "Add");
                 // Tính công nợ sau khi insert Settlement
                 Response.OnCompleted(async () =>
                 {
@@ -489,6 +493,7 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, "Update");
                 // Tính công nợ sau khi update Settlement
                 Response.OnCompleted(async () =>
                 {
@@ -650,6 +655,7 @@ namespace eFMS.API.Accounting.Controllers
 
             HandleState hs;
             var message = string.Empty;
+            var action = string.IsNullOrEmpty(model.Settlement.SettlementNo) ? "Add" : "Update";
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
 
@@ -671,10 +677,11 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
             }
-            
+
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (hs.Success)
             {
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, action);
                 return Ok(result);
             }
             else
