@@ -17,6 +17,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ContextMenuDirective } from '@directives';
 
 
 @Component({
@@ -38,6 +40,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+    messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 
     messageCreditRate: string = '';
 

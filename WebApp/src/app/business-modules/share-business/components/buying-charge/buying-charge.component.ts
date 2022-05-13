@@ -9,7 +9,7 @@ import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTran
 import { AppList } from 'src/app/app.list';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from '@enums';
 
@@ -44,6 +44,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild('detailLinkFeePopup') detailLinkFeePopup: InfoPopupComponent;
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -83,6 +84,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isSelectedPartnerDynamicCombogrid: boolean = false;
     userLogged: any;
     selectedCs: CsShipmentSurcharge;
+    messageConfirmRevertLinkFee: string = "Do you want to Revert Fee these Jobs ?";
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,

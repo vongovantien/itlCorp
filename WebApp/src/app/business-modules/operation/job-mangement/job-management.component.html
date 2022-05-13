@@ -29,8 +29,7 @@
     <div class="row">
         <div class="col-xl-12">
             <job-management-form-search (onSearch)="onSearchShipment($event)" (onReset)="onResetSearchShipment($event)"
-            [isSearchLinkFee] = "isSearchLinkFeea"
-            >
+                [isSearchLinkFee]="isSearchLinkFeea">
             </job-management-form-search>
             <!-- <div class="m-portlet">
                 <div class="alert-block alert-block-red">
@@ -61,7 +60,6 @@
         <div class="col-12">
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
-
                     <tab heading="List Job" (selectTab)="onSelectTab('JOB')">
                         <div class="bg-white p-4">
                             <div class="table-wrapper table-scrollable" id="ops-job-list-table">
@@ -209,33 +207,16 @@
                                 (onChange)="updatePagingData($event)"></app-pagination>
                         </div>
                     </tab>
+                    <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
+                            <app-job-mangement-link-fee></app-job-mangement-link-fee>
+                    </tab>
                 </tabset>
             </div>
         </div>
     </div>
 </div>
 
-                    <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
-                        <app-job-mangement-link-fee></app-job-mangement-link-fee>
-                        <!-- <div class="bg-white p-4">
-                            <div class="table-wrapper table-scrollable" id="ops-job-list-table">
-                                <table class="table table-hover table-brand dataTable">
-                                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
-                                        <th class="table-actions-col no-sorting first"></th>
-                                    </thead>
-                                    <tbody class="tbody-group">
-                                        <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
-                                            <tr class="collapse-toggle-row">
-                                                <td class="table-actions-col">
-                                                    <div class="table-actions" style="width: 100px">
-                                                        <button type="button"
-                                                            class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
-                                                            data-toggle="collapse"
-                                                            [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                                            title="Collapse"
-                                                            (click)="showCustomClearance(item.jobNo, i)">
-                                                            <i class="la la-angle-up"></i>
-                                                        </button>
+<confirm-popup (onSubmit)="onDeleteShipment()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>
 

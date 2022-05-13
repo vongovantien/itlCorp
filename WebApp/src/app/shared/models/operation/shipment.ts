@@ -51,10 +51,14 @@ export class Shipment {
     userCreatedName: string = null;
     userCreatedLinkJob: string = null;
 
-    replicatedId: string = null;
-    userCreatedName: string = null;
+    isSelected: boolean = false;
+    isLinkJob: boolean = false;
+    isLinkFee: boolean = false;
+
     linkSource: string = null;
     replicateJobNo: string = null;
+    serviceNo: string = '';
+    userCreatedNameLinkJob: string = null;
 
     constructor(object?: any) {
         const self = this;

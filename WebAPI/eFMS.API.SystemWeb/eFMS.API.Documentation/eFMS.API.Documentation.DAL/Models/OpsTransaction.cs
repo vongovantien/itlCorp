@@ -68,6 +68,5 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? IsLinkJob { get; set; }
         public string UserCreatedLinkJob { get; set; }
         public DateTime? DateCreatedLinkJob { get; set; }
-        public bool? IsReplicate { get; set; }
     }
 }

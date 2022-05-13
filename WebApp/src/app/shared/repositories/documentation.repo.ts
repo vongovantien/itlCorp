@@ -1187,4 +1187,18 @@ export class DocumentationRepo {
     getAllShipment(jobNo: string){
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo:jobNo });
     }
+
+    revertShipmentSurchargesLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/RevertChargeLinkFee`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    detailLinkFee(id: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/DetailByChargeOrgId?id=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
