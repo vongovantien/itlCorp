@@ -29,7 +29,6 @@ using System.Linq.Expressions;
 using Newtonsoft.Json;
 using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
-using System.Threading;
 
 namespace eFMS.API.Documentation.DL.Services
 {
