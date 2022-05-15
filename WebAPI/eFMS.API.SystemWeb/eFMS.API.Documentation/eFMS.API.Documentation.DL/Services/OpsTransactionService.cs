@@ -201,19 +201,17 @@ namespace eFMS.API.Documentation.DL.Services
                                     );
                             };
                             // Add new ops
+                            OpsTransaction entityReplicate = MappingReplicateJob(opsInsert, dataUserLevel);
+                            opsInsert.ReplicatedId = entityReplicate.Id;
                             var addResult = databaseUpdateService.InsertDataToDB(opsInsert);
                             if (!addResult.Status)
                             {
                                 return new HandleState((object)"Fail to create ops job. Please try again.");
                             }
                             var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                            OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                             // Insert Replicate Data
-                            OpsTransaction entityReplicate = MappingReplicateJob(entity, dataUserLevel);
+                            entityReplicate.JobNo += opsInfo.JobNo;
                             databaseUpdateService.InsertDataToDB(entityReplicate);
-
-                            entity.ReplicatedId = entityReplicate.Id;
-                            DataContext.Update(entity, x => x.Id == entity.Id);
                             result = new HandleState(addResult.Status, addResult.Message);
                         }
                     }

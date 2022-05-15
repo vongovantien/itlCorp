@@ -1881,7 +1881,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.Settlement.SettlementNo = settlement.SettlementNo;
                 model.Settlement.Requester = settlement.Requester;
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
+                HandleState hs = new HandleState();
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1899,22 +1899,21 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
-
+                        hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
-                        return hs;
                     }
                     catch (Exception ex)
                     {
                         trans.Rollback();
                         new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
-                        return new HandleState(ex.Message);
+                        hs = new HandleState(ex.Message);
                     }
                     finally
                     {
                         trans.Dispose();
                     }
                 }
+                return hs;
             }
             catch (Exception ex)
             {
@@ -2030,7 +2029,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
                 }
-
+                HandleState hs = new HandleState();
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -2048,22 +2047,21 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
-
+                        hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
-                        return hs;
                     }
                     catch (Exception ex)
                     {
                         trans.Rollback();
                         new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
-                        return new HandleState(ex.Message);
+                        hs = new HandleState(ex.Message);
                     }
                     finally
                     {
                         trans.Dispose();
                     }
                 }
+                return hs;
             }
             catch (Exception ex)
             {
