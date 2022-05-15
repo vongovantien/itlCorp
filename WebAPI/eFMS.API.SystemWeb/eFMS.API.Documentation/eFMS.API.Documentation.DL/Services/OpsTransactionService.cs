@@ -27,11 +27,6 @@ using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
-using System.Xml.Serialization;
-using System.IO;
-using System.Reflection;
-using System.Data.SqlClient;
 
 namespace eFMS.API.Documentation.DL.Services
 {
