@@ -105,7 +105,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
-            IContextBase<SysGroup> groupRepo
+            IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService
             ) : base(repository, mapper)
         {
