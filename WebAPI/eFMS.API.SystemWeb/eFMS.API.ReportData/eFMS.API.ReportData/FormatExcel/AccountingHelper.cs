@@ -6182,35 +6182,59 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 startRow = 8;
                 excel.StartDetailTable = startRow;
-                
-                for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
+                if (debitAmountDetail.DebitAmountDetails.Count == 0)
                 {
-                    var item = debitAmountDetail.DebitAmountDetails[i];
                     listKeyData = new Dictionary<string, object>();
 
                     excel.SetGroupsTable();
-                    listKeyData.Add("No", i);
-                    listKeyData.Add("JobNo", item.JobNo);
-                    listKeyData.Add("HblNo", item.HBLNo);
-                    listKeyData.Add("MblNo", item.MBLNo);
-                    listKeyData.Add("BillingNo", item.DebitNo);
-                    listKeyData.Add("Type", item.Type=="SELL"?"DEBIT":"OBH");
-                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("TotalVND", item.TotalVND);
-                    listKeyData.Add("TotalUSD", item.TotalUSD);
-                    listKeyData.Add("Office", item.OfficeName);
-                    listKeyData.Add("SalesMan", item.UserName);
-                    listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
-                    listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
-                    listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
-                    listKeyData.Add("Service", item.TransactionType);
-                    listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
-                    SumTotalUSD += item.TotalUSD;
-                    SumTotalVND += item.TotalVND;
-                    PaidAmountUSD += item.PaidAmountUSD;
-                    PaidAmountVND += item.PaidAmountVND;
-                    excel.SetData(listKeyData);
-                    startRow++;
+                    listKeyData.Add("No", 0);
+                    listKeyData.Add("JobNo", "");
+                    listKeyData.Add("HblNo", "");
+                    listKeyData.Add("MblNo", "");
+                    listKeyData.Add("BillingNo", "");
+                    listKeyData.Add("Type", "");
+                    listKeyData.Add("InvoiceNo", "");
+                    listKeyData.Add("TotalVND", 0);
+                    listKeyData.Add("TotalUSD", 0);
+                    listKeyData.Add("Office", "");
+                    listKeyData.Add("SalesMan", "");
+                    listKeyData.Add("ServiceDate", "");
+                    listKeyData.Add("ETD", "");
+                    listKeyData.Add("ETA", "");
+                    listKeyData.Add("Service","");
+                    listKeyData.Add("InvoicePaymentStatus", "");
+                }
+                else
+                {
+                    for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
+                    {
+                        var item = debitAmountDetail.DebitAmountDetails[i];
+                        listKeyData = new Dictionary<string, object>();
+
+                        excel.SetGroupsTable();
+                        listKeyData.Add("No", i);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("HblNo", item.HBLNo);
+                        listKeyData.Add("MblNo", item.MBLNo);
+                        listKeyData.Add("BillingNo", item.DebitNo);
+                        listKeyData.Add("Type", item.Type == "SELL" ? "DEBIT" : "OBH");
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                        listKeyData.Add("TotalVND", item.TotalVND);
+                        listKeyData.Add("TotalUSD", item.TotalUSD);
+                        listKeyData.Add("Office", item.OfficeName);
+                        listKeyData.Add("SalesMan", item.UserName);
+                        listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("Service", item.TransactionType);
+                        listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
+                        SumTotalUSD += item.TotalUSD;
+                        SumTotalVND += item.TotalVND;
+                        PaidAmountUSD += item.PaidAmountUSD;
+                        PaidAmountVND += item.PaidAmountVND;
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
                 }
 
                 DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
