@@ -71,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysGroup> groupRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
+        private IDatabaseUpdateService databaseUpdateService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -105,6 +106,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
             IContextBase<SysGroup> groupRepo
+            IDatabaseUpdateService _databaseUpdateService
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -142,6 +144,7 @@ namespace eFMS.API.Documentation.DL.Services
             csLinkChargeRepository = csLinkChargeRepo;
             departmentRepository = departmentRepo;
             groupRepository = groupRepo;
+            databaseUpdateService = _databaseUpdateService;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -179,15 +182,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
-
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            model.JobNo = string.Empty;
+            //using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    model.JobNo = CreateJobNoOps();
-                    OpsTransaction entity = mapper.Map<OpsTransaction>(model);
-
-
+                    var opsInsert = mapper.Map<OpsTransaction>(model);
                     if (model.IsReplicate == true)
                     {
                         SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
@@ -203,31 +203,38 @@ namespace eFMS.API.Documentation.DL.Services
                                     string.Format("You don't have permission at {0}, Please you check with system admin!", officeReplicate.ShortName)
                                     );
                             };
-                            OpsTransaction entityReplicate = MappingReplicateJob(entity, dataUserLevel);
-
-                            DataContext.Add(entityReplicate, false);
-
-                            entity.ReplicatedId = entityReplicate.Id;
+                            // Add new ops
+                            OpsTransaction entityReplicate = MappingReplicateJob(opsInsert, dataUserLevel);
+                            opsInsert.ReplicatedId = entityReplicate.Id;
+                            var addResult = databaseUpdateService.InsertDataToDB(opsInsert);
+                            if (!addResult.Status)
+                            {
+                                return new HandleState((object)"Fail to create ops job. Please try again.");
+                            }
+                            var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                            // Insert Replicate Data
+                            entityReplicate.JobNo += opsInfo.JobNo;
+                            databaseUpdateService.InsertDataToDB(entityReplicate);
+                            result = new HandleState(addResult.Status, addResult.Message);
                         }
-
-                    };
-
-                    DataContext.Add(entity, false);
-                    result = DataContext.SubmitChanges();
-                    if (result.Success)
-                    {
-                        trans.Commit();
                     }
+                    else
+                    {
+                        // Add new ops
+                        var addResult = databaseUpdateService.InsertDataToDB(opsInsert);
+                        if (!addResult.Status)
+                        {
+                            return new HandleState((object)"Fail to create ops job. Please try again.");
+                        }
+                        var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                        OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
+                        result = new HandleState(addResult.Status, addResult.Message);
+                    }                   
                 }
                 catch (Exception ex)
                 {
                     new LogHelper("eFMS_Add_OpsTransaction_Log", ex.ToString());
-                    trans.Rollback();
                     result = new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
                 }
             }
             if (model.CsMawbcontainers?.Count > 0 && result.Success)
