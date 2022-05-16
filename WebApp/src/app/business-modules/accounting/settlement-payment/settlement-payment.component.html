@@ -289,7 +289,7 @@
     </div>
     <ng-container title="Deny" *ngIf="menuSpecialPermission | async | specialPermission:'DenySettlement'">
         <ng-container
-            *ngIf="selectedSettlement?.statusApproval === 'Done' && selectedSettlement?.syncStatus !== 'Synced' ">
+            *ngIf="!selectedSettlement?.voucherNo && selectedSettlement?.statusApproval === 'Done' && selectedSettlement?.syncStatus !== 'Synced' ">
             <hr />
             <div class="menu-context__item text-danger" (click)="denySettleItem()">
                 <span><i class="la la-times "></i><span> Deny</span></span>
