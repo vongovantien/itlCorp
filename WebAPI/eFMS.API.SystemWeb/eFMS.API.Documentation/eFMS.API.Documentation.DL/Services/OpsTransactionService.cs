@@ -67,6 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
+        private readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly IContextBase<SysGroup> groupRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -100,7 +102,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
             IContextBase<CatCharge> catChargeRepo,
-            IContextBase<CsLinkCharge> csLinkChargeRepo
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
+            IContextBase<CatDepartment> departmentRepo,
+            IContextBase<SysGroup> groupRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -136,6 +140,8 @@ namespace eFMS.API.Documentation.DL.Services
             settingFlowRepository = settingFlowRepo;
             catChargeRepository = catChargeRepo;
             csLinkChargeRepository = csLinkChargeRepo;
+            departmentRepository = departmentRepo;
+            groupRepository = groupRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -533,7 +539,8 @@ namespace eFMS.API.Documentation.DL.Services
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
-
+                    x.GroupName = groupRepository.Get(y => y.Id == x.GroupId)?.FirstOrDefault().ShortName;
+                    x.DepartmentName = departmentRepository.Get(z => z.Id == x.DepartmentId)?.FirstOrDefault().DeptNameAbbr;
                     IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
 
                     x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
