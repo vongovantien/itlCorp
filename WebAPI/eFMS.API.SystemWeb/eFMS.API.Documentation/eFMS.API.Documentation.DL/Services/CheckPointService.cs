@@ -439,19 +439,29 @@ namespace eFMS.API.Documentation.DL.Services
             CatContract contract = null;
             if (string.IsNullOrEmpty(saleman))
             {
-                contract = contractRepository.Get(x => x.PartnerId == partnerId
-                                       && x.Active == true)
-                .OrderBy(x => x.ContractType)
-                .FirstOrDefault();
+                var contracts = contractRepository.Get(x => x.PartnerId == partnerId
+                                       && x.Active == true).OrderBy(x => x.ContractType);
+                 if (contracts.Count() > 1)
+                {
+                    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
+                }
+                else
+                {
+                    contract = contracts.FirstOrDefault();
+                }
             }
             else
             {
-                contract = contractRepository.Get(x => x.PartnerId == partnerId
+                var contracts = contractRepository.Get(x => x.PartnerId == partnerId
                                        && x.Active == true
-                                       //&& x.SaleManId == saleman
-                                       )
-                .OrderBy(x => x.ContractType)
-                .FirstOrDefault();
+                                       ).OrderBy(x => x.ContractType);
+                if (contracts.Count() > 1)
+                {
+                    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
+                } else
+                {
+                    contract = contracts.FirstOrDefault();
+                }
             }
             return contract;
         }
