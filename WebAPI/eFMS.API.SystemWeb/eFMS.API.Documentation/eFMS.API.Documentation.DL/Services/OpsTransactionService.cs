@@ -2195,14 +2195,12 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID));
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
                 {
                     if (charges != null && charges.Count() > 0)
                     {
-                        logMessage = string.Format(" *  \n [CHARGES]: {0} * ", JsonConvert.SerializeObject(charges));
-                        new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                         foreach (var charge in charges)
                         {
                             CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
@@ -2289,7 +2287,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (surchargeAdds.Count > 0)
                     {
-                        logMessage = string.Format(" *  \n [SURCHARGE_ADD]: {0} * ", JsonConvert.SerializeObject(surchargeAdds));
+                        logMessage = string.Format(" *  \n [TIME]:{0}[SURCHARGE_ADD]: {1} * ",DateTime.Now.ToString("DD/MM/YYYY hh:mm:ss"), JsonConvert.SerializeObject(surchargeAdds));
                         new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                         surchargeRepository.Add(surchargeAdds, false);
                         var result = surchargeRepository.SubmitChanges();
