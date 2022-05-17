@@ -1375,65 +1375,55 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState("Danh sách settlement không hợp lệ");
                 }
 
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                try
                 {
-                    try
+                    foreach (Guid id in ids)
                     {
-                        foreach (Guid id in ids)
+                        AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                        if (settle != null)
                         {
-                            AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
-                            if (settle != null)
-                            {
-                                settle.UserModified = currentUser.UserID;
-                                settle.DatetimeModified = DateTime.Now;
-                                settle.LastSyncDate = DateTime.Now;
-                                settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                            settle.UserModified = currentUser.UserID;
+                            settle.DatetimeModified = DateTime.Now;
+                            settle.LastSyncDate = DateTime.Now;
+                            settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
-                                SettlementRepository.Update(settle, x => x.Id == id, false);
+                            SettlementRepository.Update(settle, x => x.Id == id, false);
 
-                                databaseUpdateService.UpdateSurchargeAfterSynced("SETTLEMENT", settle.SettlementNo);
-                                #region Change to store
-                                //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
-                                //if (surcharges != null && surcharges.Count() > 0)
-                                //{
-                                //    foreach (var surcharge in surcharges)
-                                //    {
-                                //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                //        {
-                                //            //Charge OBH sẽ lưu vào PaySyncedFrom
-                                //            surcharge.PaySyncedFrom = "SETTLEMENT";
-                                //        }
-                                //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                                //        {
-                                //            //Charge BUY sẽ lưu vào SyncedFrom
-                                //            surcharge.SyncedFrom = "SETTLEMENT";
-                                //        }
-                                //        surcharge.UserModified = currentUser.UserID;
-                                //        surcharge.DatetimeModified = DateTime.Now;
+                            databaseUpdateService.UpdateSurchargeAfterSynced("SETTLEMENT", settle.SettlementNo);
+                            #region Change to store
+                            //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
+                            //if (surcharges != null && surcharges.Count() > 0)
+                            //{
+                            //    foreach (var surcharge in surcharges)
+                            //    {
+                            //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            //        {
+                            //            //Charge OBH sẽ lưu vào PaySyncedFrom
+                            //            surcharge.PaySyncedFrom = "SETTLEMENT";
+                            //        }
+                            //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                            //        {
+                            //            //Charge BUY sẽ lưu vào SyncedFrom
+                            //            surcharge.SyncedFrom = "SETTLEMENT";
+                            //        }
+                            //        surcharge.UserModified = currentUser.UserID;
+                            //        surcharge.DatetimeModified = DateTime.Now;
 
-                                //        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
-                                //    }
-                                //}
-                                #endregion
-                            }
+                            //        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            //    }
+                            //}
+                            #endregion
                         }
-                        HandleState hsCharge = SurchargeRepository.SubmitChanges();
-                        result = SettlementRepository.SubmitChanges();
+                    }
+                    result = SettlementRepository.SubmitChanges();
 
-                        trans.Commit();
-                        data = new List<Guid>();
-                        return result;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        data = new List<Guid>();
-                        return new HandleState((object)ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
-                    }
+                    data = new List<Guid>();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    data = new List<Guid>();
+                    return new HandleState((object)ex.Message);
                 }
 
             }
@@ -1457,7 +1447,7 @@ namespace eFMS.API.Accounting.DL.Services
                     data = invalidSVouchers;
                     return new HandleState("Danh sách voucher không hợp lệ");
                 }
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                
                 {
                     try
                     {
@@ -1496,23 +1486,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 #endregion
                             }
                         }
-                        var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
-
-                        trans.Commit();
-
                         data = new List<Guid>();
                         return result;
                     }
                     catch (Exception ex)
                     {
-                        trans.Rollback();
                         data = new List<Guid>();
                         return new HandleState((object)ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
                     }
                 }
 
@@ -1526,7 +1507,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
             if (cdNotes == null) return new HandleState((object)"Không tìm thấy cd note");
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -1570,19 +1550,12 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
                     }
 
-                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
-                    trans.Commit();
                     return sm;
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     return new HandleState((object)ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
                 }
             }
         }
@@ -1591,7 +1564,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var soas = soaRepository.Get(x => ids.Contains(x.Id));
             if (soas == null) return new HandleState((object)"Không tìm thấy soa");
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -1612,7 +1584,7 @@ namespace eFMS.API.Accounting.DL.Services
                         //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
-                            databaseUpdateService.UpdateSurchargeAfterSynced("CDNOTE", soa.Soano);
+                            databaseUpdateService.UpdateSurchargeAfterSynced("SOA", soa.Soano);
                             #region Change to store
                             //foreach (var surcharge in surcharges)
                             //{
@@ -1634,19 +1606,15 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
-                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
-                    trans.Commit();
                     return sm;
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     return new HandleState((object)ex.Message);
                 }
                 finally
                 {
-                    trans.Dispose();
                 }
             }
         }

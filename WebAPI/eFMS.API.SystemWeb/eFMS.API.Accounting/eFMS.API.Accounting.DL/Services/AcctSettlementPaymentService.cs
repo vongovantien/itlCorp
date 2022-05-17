@@ -1812,10 +1812,10 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = catChargeRepo.Get();
             foreach (var criteria in charges)
             {
-                if (criteria.TypeService != "OPS" || (criteria.TypeService == "OPS" && (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))))
+                if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
-                                (criteria.SurchargeID == Guid.Empty ? true : x.Id != criteria.SurchargeID)
+                                (criteria.SurchargeID == Guid.Empty ? true : (x.Id != criteria.SurchargeID))
                                 && x.SettlementCode != criteria.SettlementNo
                                 && x.ChargeId == criteria.ChargeID
                                 && x.Hblid == criteria.HBLID
@@ -5946,6 +5946,18 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
                     var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(newSurcharges);
+                    foreach (var itemScene in newSurcharges)
+                    {
+                        foreach (var itemSceneAdd in listChargeSceneUpdate)
+                        {
+                            if (itemSceneAdd.Id == itemScene.Id && itemSceneAdd.Hblid == itemScene.Hblid)
+                            {
+                                itemSceneAdd.JobNo = itemScene.JobId;
+                                itemSceneAdd.Mblno = itemScene.MBL;
+                                itemSceneAdd.Hblno = itemScene.HBL;
+                            }
+                        }
+                    }
                     databaseUpdateService.UpdateSurchargeSettleDataToDB(listChargeSceneUpdate, settlement.SettlementNo, kickBackExcRate, action);
 
                     var idsChargeScene = chargeScene.Select(x => x.Id);

@@ -207,7 +207,7 @@ namespace eFMS.API.Documentation.DL.Services
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
                             databaseUpdateService.InsertDataToDB(entityReplicate);
-                            result = new HandleState(addResult.Status, addResult.Message);
+                            result = new HandleState(addResult.Status, (object)addResult.Message);
                         }
                     }
                     else
@@ -220,7 +220,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
-                        result = new HandleState(addResult.Status, addResult.Message);
+                        result = new HandleState(addResult.Status, (object)addResult.Message);
                     }                   
                 }
                 catch (Exception ex)
