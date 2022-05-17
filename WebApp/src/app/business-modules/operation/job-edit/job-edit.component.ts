@@ -56,6 +56,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     selectedTabSurcharge: string = 'BUY';
+    allowLinkFeeSell: boolean = true;
     isReplicate: boolean = false;
 
     constructor(
@@ -82,9 +83,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     subscriptionParamURLChange() {
         this.subscription = combineLatest([
             this.route.params,
-            this.route.queryParams
+            this.route.queryParams,
+            this.route.data
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams })),
+            map(([params, qParams, dataParm]) => ({ ...params, ...qParams, ...dataParm })),
             tap((param) => {
                 this.jobId = param.id;
                 this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit' : param.tab) : 'job-edit';
@@ -94,6 +96,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 } else {
                     this.isDuplicate = false;
                 }
+                this.selectedTabSurcharge = param.tabSurcharge ?? 'BUY';
+                this.allowLinkFeeSell = param.allowLinkFee ?? true;
             }),
             switchMap(() => of(this.jobId)),
             takeUntil(this.ngUnsubscribe)
@@ -321,6 +325,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     concatMap((res: ILinkAirSeaInfoModel) => {
                         this.opsTransaction.serviceNo = res.jobNo;
                         this.opsTransaction.serviceHblId = res.hblId;
+                        this.opsTransaction.isLinkJob = true;
 
                         return this._documentRepo.updateShipment(this.opsTransaction);
                     })
@@ -427,14 +432,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
 
+                        if (this.opsTransaction.linkSource == "Replicate") {
+                            this.allowLinkFeeSell = false;
+                        }
+
                         this.hblid = this.opsTransaction.hblid;
 
                         this.getListContainersOfJob();
-                        this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+                        if (this.selectedTabSurcharge == CommonEnum.SurchargeTypeEnum.SELLING_RATE)
+                            this.getSurCharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                        else if (this.selectedTabSurcharge == CommonEnum.SurchargeTypeEnum.BUYING_RATE)
+                            this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
 
                         this.editForm.opsTransaction = this.opsTransaction;
                         const hbl = new CsTransactionDetail(this.opsTransaction);
                         hbl.id = this.opsTransaction.hblid;
+                        hbl.saleManId = this.opsTransaction.salemanId;
+
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
 
                         const csTransation: CsTransaction = new CsTransaction(Object.assign({}, response, {
@@ -476,13 +490,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         this.selectedTabSurcharge = type;
-        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.opsTransaction != null) {
             this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.opsTransaction.hblid }));
         }
-        if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+        if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE && this.opsTransaction != null) {
             this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.opsTransaction.hblid }));
         }
-        if (type === CommonEnum.SurchargeTypeEnum.OBH) {
+        if (type === CommonEnum.SurchargeTypeEnum.OBH && this.opsTransaction != null) {
             this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.opsTransaction.hblid }));
         }
     }

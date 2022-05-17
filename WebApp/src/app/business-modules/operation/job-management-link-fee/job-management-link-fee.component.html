@@ -59,8 +59,8 @@
                             <span>{{ item.customerName }}</span>
                         </td>
                         <td>
-                            <ng-container *ngIf="!!item.isLinkJob;else noLink">
-                                <span class="text-info">Link</span>
+                            <ng-container *ngIf="!!item.serviceNo;else noLink">
+                                <span class="text-info">Linked</span>
                             </ng-container>
                             <ng-template #noLink>
                                 <span class="text-danger text-center"> - </span>
@@ -68,7 +68,7 @@
                         </td>
                         <td>
                             <ng-container *ngIf="!!item.isLinkFee;else noLinkFee">
-                                <span class="text-info">Link</span>
+                                <span class="text-info">Linked</span>
                             </ng-container>
                             <ng-template #noLinkFee>
                                 <span class="text-danger text-center"> - </span>

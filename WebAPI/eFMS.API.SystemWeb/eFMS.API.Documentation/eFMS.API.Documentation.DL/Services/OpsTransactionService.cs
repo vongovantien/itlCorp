@@ -673,6 +673,7 @@ namespace eFMS.API.Documentation.DL.Services
             var queryDefault = ExpressionQueryDefault(criteria);
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
+            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
             data = data.Where(queryPermission);
 
             if (data == null) return null;
@@ -759,9 +760,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Not Link")
                 query = query.And(x => x.IsLinkFee == null || x.IsLinkFee == false);
             if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Have Linked")
-                query = query.And(x => String.IsNullOrEmpty(x.ServiceNo) == false);
+                query = query.And(x => !string.IsNullOrEmpty(x.ServiceNo));
             if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Not Link")
-                query = query.And(x => String.IsNullOrEmpty(x.ServiceNo) == true);
+                query = query.And(x => string.IsNullOrEmpty(x.ServiceNo));
             return query;
         }
 
@@ -2232,14 +2233,15 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 //var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
                                 //if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
-                                if (charge.CreditCharge == null) {
+                                if (charge.CreditCharge == null)
+                                {
                                     continue;
                                 }
                                 charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
                                 charge.ChargeId = charge.CreditCharge ?? Guid.Empty;
 
                                 if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
-                                charge.PaymentObjectId = charge.PartnerInternal_Id;
+                                    charge.PaymentObjectId = charge.PartnerInternal_Id;
                             }
                             else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                             {
@@ -2348,6 +2350,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         private SysOffice GetInfoOfficeOfUser(Guid? officeId)
         {
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();

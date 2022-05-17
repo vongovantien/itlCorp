@@ -365,7 +365,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.hblno = this.hbl.hwbno || null;
         newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
         newSurCharge.jobNo = this.shipment.jobNo || null;
-
+        newSurCharge.linkFee = false;
+        newSurCharge.linkChargeId = null;
+        newSurCharge.type = type;
 
         this.addSurcharges(type, newSurCharge);
     }

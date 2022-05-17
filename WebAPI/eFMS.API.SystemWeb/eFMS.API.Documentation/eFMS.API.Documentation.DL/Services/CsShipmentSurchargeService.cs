@@ -69,9 +69,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo,
             IContextBase<CatCurrency> currencyRepo,
-            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
             IContextBase<CatChargeGroup> catChargeGroupRepo,
             IContextBase<CsRuleLinkFee> csRuleLinkFeeRepo
             ) : base(repository, mapper)

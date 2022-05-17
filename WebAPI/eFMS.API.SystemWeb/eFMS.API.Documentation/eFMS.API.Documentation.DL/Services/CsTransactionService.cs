@@ -61,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IOptions<ApiUrl> apiUrl;
         private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -99,6 +100,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo,
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
@@ -137,6 +139,7 @@ namespace eFMS.API.Documentation.DL.Services
             apiUrl = url;
             sysImageService = imageService;
             opsTransactionRepository = opsTransactionRepo;
+            csLinkChargeRepository = csLinkChargeRepo;
         }
 
         #region -- INSERT & UPDATE --

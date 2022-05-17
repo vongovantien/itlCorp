@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -16,10 +16,10 @@ import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
-import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
+import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { ContextMenuDirective } from '@directives';
-
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'selling-charge',
@@ -30,6 +30,10 @@ import { ContextMenuDirective } from '@directives';
 })
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+    @ViewChild(ConfirmPopupComponent) confirmLinkFeePopup: InfoPopupComponent;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild('detailLinkFeePopup') detailLinkFeePopup: InfoPopupComponent;
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
@@ -43,6 +47,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 
     messageCreditRate: string = '';
+    selectedCs: CsShipmentSurcharge;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,

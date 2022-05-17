@@ -96,7 +96,8 @@
                                             </buying-charge>
                                         </ng-container>
                                     </tab>
-                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
+                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')"
+                                        [active]="selectedTabSurcharge === 'SELL'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
