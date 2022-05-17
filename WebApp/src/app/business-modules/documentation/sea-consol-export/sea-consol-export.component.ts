@@ -87,6 +87,9 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
             { title: 'Containers', field: 'containers', sortable: true },
             { title: 'Packages', field: 'packages', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Department', field: 'department', sortable: true },
+
         ];
 
         this.getShipments();
