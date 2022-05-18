@@ -2541,7 +2541,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         PartnerType = p.PartnerType,
                     };
 
-            if (criteria.SalemanId != null && criteria.SalemanId != salemanBOD)
+            if (criteria.SalemanId != null)
             {
                 queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
             }
