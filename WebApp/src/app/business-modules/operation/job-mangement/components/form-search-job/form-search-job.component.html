@@ -9,7 +9,8 @@
                                 Search text
                             </label>
                             <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                placeholder="Search text" formControlName="searchText">
+                                placeholder="Search text" formControlName="searchText"
+                                (blur)="onBlurSearchText($event)">
                         </div>
                     </div>
                     <div class="col-lg-4">

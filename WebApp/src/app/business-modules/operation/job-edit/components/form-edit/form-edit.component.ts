@@ -9,11 +9,11 @@ import { Store } from '@ngrx/store';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
-import { JobConstants, SystemConstants } from '@constants';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
@@ -72,7 +72,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     warehouses: Observable<Warehouse[]>;
-    salesmans: Observable<User[]>;
+    salesmans: User[];
+    users: Observable<User[]>;
     commodityGroups: Observable<CommodityGroup[]>;
     packageTypes: Observable<Unit[]>;
 
@@ -96,6 +97,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     userLogged: any;
 
     containers: Observable<any>;
+    salesmanName: string = null;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -114,7 +116,22 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.salesmans = this._systemRepo.getSystemUsers();
+        // this.customers = this._store.select(getCurrentUserState)
+        //     .pipe(
+        //         filter(c => !!c.userName),
+        //         switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+        //             if (!!currentUser.userName) {
+        //                 return this._catalogueRepo.getPartnerByGroups(
+        //                     [CommonEnum.PartnerGroupEnum.CUSTOMER],
+        //                     true,
+        //                     'CL',
+        //                     currentUser?.officeId
+        //                 ).pipe(startWith([]))
+        //             }
+        //         }),
+        //         takeUntil(this.ngUnsubscribe),
+        //     ) as any;
+        this.users = this._systemRepo.getSystemUsers();
         this.ports = this._store.select(getCataloguePortState);
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
@@ -167,6 +184,14 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
+        this.salesmanName = this.opsTransaction.salesmanName;
+
+        if (this.opsTransaction.isAllowChangeSaleman) {
+            this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+                .subscribe((salesmans: any) => {
+                    this.salesmans = salesmans;
+                })
+        }
 
     }
 
@@ -265,22 +290,41 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
-                this.customerName = data.shortName;
+                this._toaster.clear();
                 this.customerId.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.salemansId.setValue(res.salemanId);
-                        } else {
-                            this.salemansId.setValue(null);
+                this.customerName = data.shortName;
+                const comboGridSalesman = this.comboGrids.find(x => x.name === 'salemansId');
+
+                if (!this.opsTransaction.isAllowChangeSaleman) {
+                    this.salesmanName = SystemConstants.ITL_BOD;
+
+                    return;
+                }
+
+                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
+                    .subscribe(
+                        (res: any) => {
+                            if (!!res) {
+                                this.salesmans = res || [];
+                                if (!!this.salesmans.length) {
+                                    this.salemansId.setValue(res[0].id);
+                                    this.salesmanName = res[0].username;
+                                } else {
+                                    this.salemansId.setValue(null);
+                                    this.salesmanName = null;
+                                    this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                        body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                    })
+
+                                }
+                            } else {
+                                this.salesmans = [];
+                                this.customerName = this.salesmanName = null;
+                                comboGridSalesman.displayStringValue = null;
+                                this.salemansId.setValue(null);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                                body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
-                            })
-                        }
-                    }
-                });
+                    )
                 break;
             case 'warehouse':
                 this.warehouseId.setValue(data.id);

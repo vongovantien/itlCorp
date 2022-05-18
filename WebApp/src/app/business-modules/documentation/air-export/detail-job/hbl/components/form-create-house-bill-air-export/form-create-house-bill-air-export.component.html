@@ -6,15 +6,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
                                 <label required>HAWB No</label>
                                 <input type="text" class="form-control" formControlName="hwbno"
                                     placeholder="House airway bill">
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
-                            <div class="form-group" 
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                                 <label required>MAWB No</label>
                                 <input type="text" class="form-control" formControlName="mawb"
                                     placeholder="Master airway bill">
@@ -38,7 +38,7 @@
                         <label required>Salesman In Charge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
-                            [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
+                            [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" [disabled]="!customerId.value"
                             (remove)="resetFormControl(saleManId)" placeholder="Please select salesman" size="15">
                         </app-combo-grid-virtual-scroll>
@@ -553,21 +553,21 @@
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="length" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2>
+                                                            autoFormatCurrency [digits]=2 placeholder="Length">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="width" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2>
+                                                            autoFormatCurrency [digits]=2 placeholder="Width">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="height" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2>
+                                                            autoFormatCurrency [digits]=2 placeholder="Height">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="package" integer>
+                                                            formControlName="package" integer placeholder="PCS">
                                                     </td>
                                                     <td>
                                                         <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
@@ -737,5 +737,4 @@
 
 <air-export-other-charge-popup (onUpdate)="updateOtherCharge($event)"></air-export-other-charge-popup>
 
-<info-popup [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
+<ng-container inject></ng-container>

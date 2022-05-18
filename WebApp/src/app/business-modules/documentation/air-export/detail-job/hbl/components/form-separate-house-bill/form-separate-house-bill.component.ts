@@ -11,6 +11,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
 import { catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
+import { InfoPopupComponent } from '@common';
 
 
 @Component({
@@ -66,7 +67,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             .subscribe((res: any) => {
                 if (!!res && !!res.id && res.id !== SystemConstants.EMPTY_GUID) {
                     this.hblSeparateId = res.id;
-                    this.hblSeprateDetail = res;
+
                     this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(res.id));
                     this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(res.id));
                     this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(res.id));
@@ -89,7 +90,10 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     saveHBLSeparate() {
         this.formCreateHBLComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update HBL Separate',
+                body: this.invalidFormText
+            });
             return;
         }
         const houseBill: HouseBill = this.getDataForm();
