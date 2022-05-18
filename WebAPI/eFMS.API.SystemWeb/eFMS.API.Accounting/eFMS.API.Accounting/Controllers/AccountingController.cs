@@ -87,6 +87,23 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetListSoaCreditToSync")]
+        public IActionResult GetListSoaCreditToSync(List<RequestStringTypeListModel> requests)
+        {
+            var models = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+            List<SyncCreditModel> list = (models.Count > 0) ? accountingService.GetListSoaCreditToSync(models) : new List<SyncCreditModel>();
+            return Ok(list);
+        }
+
+        [HttpPost("GetListCdNoteCredit")]
+        public IActionResult GetListCdNoteCredit(List<RequestGuidTypeListModel> requests)
+        {
+            List<RequestGuidTypeListModel> models = requests.Where(x => x.Action == ACTION.ADD && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+            List<SyncCreditModel> list = (models.Count > 0) ? accountingService.GetListCdNoteCreditToSync(models) : new List<SyncCreditModel>();
+            return Ok(list);
+        }
+
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)

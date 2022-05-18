@@ -113,6 +113,17 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     }
 
     configHBL() {
+        // this.headers = [
+        //     { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+        //     { title: 'Customer', field: 'customerName', sortable: true },
+        //     { title: 'Salesman', field: 'saleManName', sortable: true },
+        //     { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
+        //     { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
+        //     { title: 'Package', field: 'packages', sortable: true },
+        //     { title: 'C.W', field: 'cw', sortable: true },
+        //     { title: 'G.W', field: 'gw', sortable: true },
+        //     { title: 'CBM', field: 'cbm', sortable: true }
+        // ];
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
@@ -122,10 +133,12 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             { title: 'Package', field: 'packages', sortable: true },
             { title: 'C.W', field: 'cw', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
-            { title: 'CBM', field: 'cbm', sortable: true }
+            { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Department', field: 'department', sortable: true }
         ];
     }
-
+    
     sortLocal(sort: string): void {
         this.houseBills = this._sortService.sort(this.houseBills, sort, this.order);
     }

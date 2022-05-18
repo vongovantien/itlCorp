@@ -1091,10 +1091,7 @@ namespace eFMS.API.Accounting.DL.Services
                     agreement.IsOverLimit = false;
                 }
 
-                agreement.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
-                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
-                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
-                );
+                agreement.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0)); // CR 17536
             }
             return agreement;
         }

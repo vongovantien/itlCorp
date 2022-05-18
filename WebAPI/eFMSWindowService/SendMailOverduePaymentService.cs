@@ -86,8 +86,8 @@ namespace eFMSWindowService
                         foreach (var overduePayment in item)
                         {
                             content.Append(@"<tr>");
-                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: center'>;" + overduePayment.TaxCode + "</td>");
-                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: center'>;" + overduePayment.PartnerName_EN + "</td>");
+                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: left';>" + overduePayment.TaxCode + "</td>");
+                            content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: left';>" + overduePayment.PartnerName_EN + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + (overduePayment.NonOverdue > 0 ? string.Format("{0:#,##0.00}", overduePayment.NonOverdue) : string.Empty) + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", overduePayment.Over1To15Day) + "</td>");
                             content.Append(@"<td style='width: 15%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", overduePayment.Over16To30Day) + "</td>");

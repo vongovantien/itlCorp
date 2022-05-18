@@ -6,8 +6,7 @@ import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { SharedModule } from '../../shared/shared.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { LogViewerComponent } from './log-viewer/log-viewer.component';
-@NgModule({
+import { LogViewerComponent } from './log-viewer/log-viewer.component';@NgModule({
   imports: [
     ToolRoutingModule,
     SharedModule,

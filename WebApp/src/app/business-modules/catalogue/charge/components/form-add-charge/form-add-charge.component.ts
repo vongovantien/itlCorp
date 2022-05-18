@@ -133,7 +133,8 @@ export class FormAddChargeComponent extends AppForm {
                         } else {
                             this.isShowMappingSelling = false;
                         }
-                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
+                        if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()
+                            || value.toLowerCase() === CommonEnum.CHARGE_TYPE.DEBIT.toLowerCase()) {
                             this.isShowMappingBuying = true;
                         } else {
                             this.isShowMappingBuying = false;
@@ -199,6 +200,8 @@ export class FormAddChargeComponent extends AppForm {
                 activeServiceList.push(activeService);
             }
         });
+        console.log(activeServiceList);
+        
         return activeServiceList;
     }
 
@@ -227,5 +230,6 @@ export class FormAddChargeComponent extends AppForm {
             mode: res.charge.mode,
             creditCharge: res.charge.creditCharge,
         });
+        console.log(this.service);
     }
 }

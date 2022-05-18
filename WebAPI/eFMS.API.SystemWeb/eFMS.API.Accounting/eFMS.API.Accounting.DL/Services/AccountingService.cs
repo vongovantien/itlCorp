@@ -800,7 +800,8 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        charge.CurrencyCode = surcharge.CurrencyId;
+                        var currencyId = surcharge.KickBack == true ? cdNote.CurrencyId : surcharge.CurrencyId;
+                        charge.CurrencyCode = currencyId;
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
@@ -818,12 +819,12 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL) 
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL) 
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                        else if (currencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
@@ -1119,7 +1120,8 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        charge.CurrencyCode = surcharge.CurrencyId;
+                        var currencyId = surcharge.KickBack == true ? soa.Currency : surcharge.CurrencyId;
+                        charge.CurrencyCode = currencyId;
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
@@ -1137,12 +1139,13 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                        
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
+                        else if (currencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;

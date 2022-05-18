@@ -67,6 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
+        private readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly IContextBase<SysGroup> groupRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -100,7 +102,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
             IContextBase<CatCharge> catChargeRepo,
-            IContextBase<CsLinkCharge> csLinkChargeRepo
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
+            IContextBase<CatDepartment> departmentRepo,
+            IContextBase<SysGroup> groupRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -136,6 +140,8 @@ namespace eFMS.API.Documentation.DL.Services
             settingFlowRepository = settingFlowRepo;
             catChargeRepository = catChargeRepo;
             csLinkChargeRepository = csLinkChargeRepo;
+            departmentRepository = departmentRepo;
+            groupRepository = groupRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -533,7 +539,8 @@ namespace eFMS.API.Documentation.DL.Services
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
-
+                    x.GroupName = groupRepository.Get(y => y.Id == x.GroupId)?.FirstOrDefault().ShortName;
+                    x.DepartmentName = departmentRepository.Get(z => z.Id == x.DepartmentId)?.FirstOrDefault().DeptNameAbbr;
                     IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
 
                     x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
@@ -2188,25 +2195,28 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID));
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
                 {
                     if (charges != null && charges.Count() > 0)
                     {
-                        logMessage = string.Format(" *  \n [CHARGES]: {0} * ", JsonConvert.SerializeObject(charges));
-                        new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                         foreach (var charge in charges)
                         {
                             CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
 
                             if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                             {
+                                //var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                //if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
+                                if (charge.CreditCharge == null) {
+                                    continue;
+                                }
                                 charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                                var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
-                                if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
+                                charge.ChargeId = charge.CreditCharge ?? Guid.Empty;
+
                                 if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
-                                    charge.PaymentObjectId = charge.PartnerInternal_Id;
+                                charge.PaymentObjectId = charge.PartnerInternal_Id;
                             }
                             else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                             {
@@ -2277,7 +2287,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (surchargeAdds.Count > 0)
                     {
-                        logMessage = string.Format(" *  \n [SURCHARGE_ADD]: {0} * ", JsonConvert.SerializeObject(surchargeAdds));
+                        logMessage = string.Format(" *  \n [TIME]:{0}[SURCHARGE_ADD]: {1} * ",DateTime.Now.ToString("DD/MM/YYYY hh:mm:ss"), JsonConvert.SerializeObject(surchargeAdds));
                         new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                         surchargeRepository.Add(surchargeAdds, false);
                         var result = surchargeRepository.SubmitChanges();

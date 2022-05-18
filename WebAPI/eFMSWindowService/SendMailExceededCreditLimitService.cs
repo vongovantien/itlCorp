@@ -183,8 +183,8 @@ namespace eFMSWindowService
                 foreach (var item in exceededCreditLimits)
                 {
                     content.Append(@"<tr>");
-                    content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + no + "</td>");
-                    content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: center;'>" + item.TaxCode + "</td>");
+                    content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: left;'>" + no + "</td>");
+                    content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: left;'>" + item.TaxCode + "</td>");
                     content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + item.Customer + "</td>");
                     content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", item.CreditLimit) + "</td>");
                     content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + string.Format("{0:#,##0.00}", item.CurrentCredit) + " %</td>");

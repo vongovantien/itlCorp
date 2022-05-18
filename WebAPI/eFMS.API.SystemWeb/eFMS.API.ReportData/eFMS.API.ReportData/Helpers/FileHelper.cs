@@ -14,6 +14,10 @@ namespace eFMS.API.ReportData.Helpers
     {
         private string preUpper(string fileName)
         {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return "";
+            }
             var nameSplit=fileName.Split(' ');
             string nameResult1="";
             string nameResult = "";

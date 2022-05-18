@@ -51,6 +51,9 @@ export class Shipment {
     linkSource: string = null;
     replicateJobNo: string = null;
 
+    groupName: string = null;
+    departmentName: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
