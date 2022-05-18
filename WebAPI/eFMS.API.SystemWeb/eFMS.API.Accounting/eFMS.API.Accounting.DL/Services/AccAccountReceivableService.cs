@@ -1244,18 +1244,27 @@ namespace eFMS.API.Accounting.DL.Services
                     receivable.Office = model.Office;
                     receivable.Service = model.Service;
                     receivable.AcRef = partner.ParentId ?? partner.Id;
-                    var contractPartner = contractPartnerRepo.Get(x => x.Active == true
+                    receivable.SaleMan = model.SalesmanId; // CR 17531
+                    CatContract contractPartner = null;
+                    var contracts = contractPartnerRepo.Get(x => x.Active == true
                                                                     && x.PartnerId == model.PartnerId
                                                                     && x.OfficeId.Contains(model.Office.ToString())
-                                                                    && x.SaleService.Contains(model.Service)).OrderBy(x => x.ContractType)
-                                                                    .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
-                                                                    .FirstOrDefault();
+                                                                    && x.SaleService.Contains(model.Service));
+                    if(!string.IsNullOrEmpty(model.SalesmanId))
+                    {
+                        contractPartner = contracts.FirstOrDefault(x => x.SaleManId == model.SalesmanId);
+                    } else
+                    {
+                        contractPartner = contracts.OrderBy(x => x.ContractType)
+                            .ThenBy(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+                            .FirstOrDefault();
+                    }
                     if (contractPartner == null)
                     {
                         // Lấy currency local và use created of partner gán cho Receivable
                         receivable.ContractId = null;
                         receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
-                        receivable.SaleMan = null;
+                        // receivable.SaleMan = null; 
                         receivable.UserCreated = partner.UserCreated;
                         receivable.UserModified = partner.UserCreated;
                         receivable.GroupId = partner.GroupId;
@@ -1268,7 +1277,7 @@ namespace eFMS.API.Accounting.DL.Services
                         // Lấy currency của contract & user created of contract gán cho Receivable
                         receivable.ContractId = contractPartner.Id;
                         receivable.ContractCurrency = contractPartner.CreditCurrency;
-                        receivable.SaleMan = contractPartner.SaleManId;
+                        // receivable.SaleMan = contractPartner.SaleManId;
                         receivable.UserCreated = contractPartner.UserCreated;
                         receivable.UserModified = contractPartner.UserCreated;
                         receivable.GroupId = null;
@@ -1353,8 +1362,8 @@ namespace eFMS.API.Accounting.DL.Services
                 var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)
                                                                   && (x.Office != null && x.Office != Guid.Empty)
                                                                   && !string.IsNullOrEmpty(x.Service))
-                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service })
-                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service }).ToList();
+                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service, g.SalesmanId })
+                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service, SalesmanId = s.Key.SalesmanId }).ToList();
                 if (objReceivalble.Count > 0)
                 {
                     hs = InsertOrUpdateReceivable(objReceivalble);

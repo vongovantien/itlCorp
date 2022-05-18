@@ -10,6 +10,7 @@ namespace eFMS.API.ForPartner.DL.Models.Receivable
         public string PartnerId { get; set; }
         public Guid? Office { get; set; }
         public string Service { get; set; }
+        public string SalesmanId { get; set; }
     }
 
     public class CalculatorReceivableNotAuthorizeModel
