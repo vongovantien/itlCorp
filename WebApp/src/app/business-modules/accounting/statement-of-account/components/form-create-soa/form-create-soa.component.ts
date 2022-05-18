@@ -477,8 +477,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 customNo: this.mapShipment("CustomNo"),
                 airlineCode: this.airlineCode,
                 staffType: this.selectedStaffType.value,
-                customerShipmentId: this.selectedCustomerShipment.value,
-                salemanId: this.selectedSaleman.id
+                customerShipmentId: !!this.selectedCustomerShipment.length ? this.selectedCustomerShipment.value : null,
+                salemanId: !!this.selectedSaleman.length ? this.selectedSaleman.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
@@ -584,6 +584,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         }
                     }
                 );
+            }
+            else{
+                this.onSelectDataFormInfo(null, 'saleman');
             }
     }
 }

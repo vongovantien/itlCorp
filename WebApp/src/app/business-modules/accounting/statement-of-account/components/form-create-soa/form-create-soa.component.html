@@ -187,12 +187,11 @@
                         <div class="col-lg-12">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isApplied && (selectedType.value === this.types[0].value) && !salemanDisplay}">
-                                {{!salemanDisplay}}
                                 <label class="form-control-label">Saleman</label>
                                 <label required *ngIf="selectedType.value === this.types[0].value"></label>
                                 <ng-select class="custom" [(ngModel)]="salemanDisplay" [items]="saleMans" bindLabel="value" bindValue="value"
                                 [clearable]="false" (change)="onSelectDataFormInfo($event, 'saleman')" 
-                                [disabled]="selectedType.value !== this.types[0].value" placeholder="Select saleman">
+                                [disabled]="selectedType.value !== this.types[0].value" placeholder="">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isApplied && (selectedType.value === this.types[0].value) && !salemanDisplay">
                                     Saleman is required!

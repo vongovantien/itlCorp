@@ -1340,6 +1340,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
             #endregion -- Search by MBL --
 
+            // CR #17433 Không lấy phí 0 đồng
+            surchargesQuery = surchargesQuery.And(x => x.Total > 0);
+            obhSurchargesQuery = obhSurchargesQuery.And(x => x.Total > 0);
+
             surcharges = csShipmentSurchargeRepo.Get(surchargesQuery);
             obhSurcharges = csShipmentSurchargeRepo.Get(obhSurchargesQuery);
 
@@ -1362,12 +1366,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (obhSurchargesApply != null && obhSurchargesApply.Count() > 0)
                     {
-                        surcharges = surcharges.Union(obhSurchargesApply);
+                        if (surcharges.Count() > 0)
+                        {
+                            surcharges = surcharges.Union(obhSurchargesApply);
+                        }
+                        else
+                        {
+                            surcharges = obhSurchargesApply;
+                        }
                     }
                 }
             }
-            // CR #17433 Không lấy phí 0 đồng
-            surcharges = surcharges.Where(x => x.Total > 0);
             #endregion -- Get more OBH charge --
 
             var data = new List<ChargeShipmentModel>();
@@ -1699,21 +1708,30 @@ namespace eFMS.API.Accounting.DL.Services
             }
             #endregion -- In SOA --
 
+            // CR #17433 Không lấy phí 0 đồng
+            surchargesQuery = surchargesQuery.And(x => x.Total > 0);
+
             surcharges = csShipmentSurchargeRepo.Get(surchargesQuery);
             #region -- Get more OBH charge --
             //Lấy thêm phí OBH
             if (criteria.IsOBH)
             {
+                // CR #17433 Không lấy phí 0 đồng
+                obhSurchargesQuery = obhSurchargesQuery.And(x => x.Total > 0);
                 obhSurcharges = csShipmentSurchargeRepo.Get(obhSurchargesQuery);
                 if (obhSurcharges != null && obhSurcharges.Count() > 0)
                 {
-                    surcharges = surcharges.Union(obhSurcharges);
+                    if (surcharges.Count() > 0)
+                    {
+                        surcharges = surcharges.Union(obhSurcharges);
+                    }
+                    else
+                    {
+                        surcharges = obhSurcharges;
+                    }
                 }
             }
             #endregion -- Get more OBH charge --
-
-            // CR #17433 Không lấy phí 0 đồng
-            surcharges = surcharges.Where(x => x.Total > 0);
 
             var data = new List<ChargeShipmentModel>();
             if (surcharges == null || surcharges.Count() == 0) return data.AsQueryable();
