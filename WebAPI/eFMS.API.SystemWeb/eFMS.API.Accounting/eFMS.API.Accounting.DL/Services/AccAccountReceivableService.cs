@@ -2633,22 +2633,23 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => partnerIds.Contains(x.PartnerId));
             }
+            invoiceOverDue = accountingManagementRepo.Get(query);
+
             switch (type)
             {
                 case 1: // 1 - 15
-                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
+                    invoiceOverDue = invoiceOverDue.Where(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
                     break;
                 case 2: // 15 - 30
-                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days <= 30 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15);
+                    invoiceOverDue = invoiceOverDue.Where(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days <= 30 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15);
                     break;
                 case 3: // 30
-                    query = query.And(x => x.PaymentDueDate != null && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 30);
+                    invoiceOverDue = invoiceOverDue.Where(x => (DateTime.Now.Date - x.PaymentDueDate.Value.Date).TotalDays > 30);
                     break;
                 default:
                     break;
             }
 
-            invoiceOverDue = accountingManagementRepo.Get(query);
             return invoiceOverDue;
         }
 
@@ -2854,10 +2855,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if(flag == "overdue")
                         {
-                            contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
-                              || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
-                              || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
-                              );
+                            contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
                         }
 
                        hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == Id, false);
