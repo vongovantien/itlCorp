@@ -919,7 +919,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var code in cdNoList)
                 {
                     var surcharge = surchargeRepository.Get(x => x.CreditNo == code || x.DebitNo == code);
-                    if(surcharge != null)
+                    if (surcharge != null)
                     {
                         charges.AddRange(surcharge);
                     }
@@ -1149,6 +1149,13 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             cdNoteDetails.DatetimeCreated = cdNote.DatetimeCreated;
             cdNoteDetails.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
+            // Get saleman name
+            var saleman = sysUserRepo.Get(x => x.Id == cdNote.SalemanId).FirstOrDefault();
+            if (saleman != null)
+            {
+                cdNoteDetails.SalemanName = sysEmployeeRepo.Get(x => x.Id == saleman.EmployeeId).FirstOrDefault().EmployeeNameEn;
+            }
+
             return cdNoteDetails;
         }
 
@@ -3779,5 +3786,10 @@ namespace eFMS.API.Documentation.DL.Services
                 acctCombineBillingRepository.SubmitChanges();
             }
         }
+
+        //public HandleState CheckMultiSalemanInDebitInvCDNote(AcctCdnoteModel model)
+        //{
+
+        //}
     }
 }

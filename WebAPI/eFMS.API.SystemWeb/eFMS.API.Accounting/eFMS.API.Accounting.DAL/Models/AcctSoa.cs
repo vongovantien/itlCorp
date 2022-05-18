@@ -43,5 +43,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? ExcRateUsdToLocal { get; set; }
         public bool? NetOff { get; set; }
         public string CombineBillingNo { get; set; }
+        public string SalemanId { get; set; }
     }
 }

@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Chỉ lấy những charge chưa sync
                     var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL=houseBill.ReferenceNo };
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, SalemanId = houseBill.SaleManId, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL=houseBill.ReferenceNo };
                     returnList.Add(returnObj);
                 }
             }

@@ -90,7 +90,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             lastSync: 'Last Sync',
             currency: 'Currency',
             exchangeRate: 'Exc Rate',
-            reasonReject: 'Reason Reject'
+            reasonReject: 'Reason Reject',
+            saleman: 'Salesman'
         };
 
         this.headers = [

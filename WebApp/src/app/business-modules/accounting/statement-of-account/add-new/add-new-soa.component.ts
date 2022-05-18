@@ -122,7 +122,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 obh: this.dataSearch.isOBH,
                 creatorShipment: this.dataSearch.strCreators,
                 commodityGroupId: this.dataSearch.commodityGroupId,
-                staffType: this.dataSearch.staffType
+                staffType: this.dataSearch.staffType,
+                salemanId: this.dataSearch.salemanId
             };
             this._progressRef.start();
             this._accountRepo.createSOA(body)

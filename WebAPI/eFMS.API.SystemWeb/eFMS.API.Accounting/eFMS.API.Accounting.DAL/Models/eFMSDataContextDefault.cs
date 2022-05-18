@@ -356,6 +356,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("accAccountingManagement");
 
+                entity.HasIndex(e => e.PartnerId)
+                    .HasName("Index_AccMngt");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -609,6 +612,10 @@ namespace eFMS.API.Accounting.Service.Models
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
                 entity.ToTable("acctAdvancePayment");
+
+                entity.HasIndex(e => e.AdvanceNo)
+                    .HasName("Index_AccAdv")
+                    .IsUnique();
 
                 entity.HasIndex(e => e.DatetimeCreated)
                     .HasName("Idx_DatetimeCreated_acctAdvancePayment");
@@ -994,6 +1001,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
+
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SentByUser)
                     .HasMaxLength(50)
@@ -1416,6 +1427,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.HasIndex(e => e.DatetimeCreated)
                     .HasName("Idx_DatetimeCreated_acctSettlementPayment");
 
+                entity.HasIndex(e => e.SettlementNo)
+                    .HasName("Index_Settle")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -1498,8 +1513,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("acctSOA");
 
-                entity.HasIndex(e => e.DatetimeCreated)
-                    .HasName("Idx_DatetimeCreated_acctSOA");
+                entity.HasIndex(e => e.Soano)
+                    .HasName("AcctSOA")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -1561,6 +1577,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PaymentStatus).HasMaxLength(50);
 
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServiceTypeId)
                     .HasMaxLength(250)
                     .IsUnicode(false);
@@ -1602,6 +1622,10 @@ namespace eFMS.API.Accounting.Service.Models
             modelBuilder.Entity<CatCharge>(entity =>
             {
                 entity.ToTable("catCharge");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("Index_CatCharge")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -2404,7 +2428,7 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.ToTable("catUnit");
 
                 entity.HasIndex(e => e.Code)
-                    .HasName("U_Unit")
+                    .HasName("Index_CatUnit")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("ID");
@@ -2756,6 +2780,9 @@ namespace eFMS.API.Accounting.Service.Models
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csTransaction");
+
+                entity.HasIndex(e => e.JobNo)
+                    .HasName("Index_CSTransaction");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -3511,6 +3538,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("opsTransaction");
 
+                entity.HasIndex(e => e.JobNo)
+                    .HasName("Index_OpsTransaction");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -4244,6 +4274,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerMapping)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShortName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -4369,6 +4403,10 @@ namespace eFMS.API.Accounting.Service.Models
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("sysUser");
+
+                entity.HasIndex(e => e.Username)
+                    .HasName("Index_SysUser_ID")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")

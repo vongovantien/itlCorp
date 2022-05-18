@@ -1717,7 +1717,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 CatPartner partnerAcRef = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
                 if (partnerAcRef != null)
                 {
-                    IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerAcRef.ParentId && x.Active == (criteria.Status ?? true));
+                    var partnerId = criteria.IsGetChild == true ? partnerAcRef.Id : partnerAcRef.ParentId;
+                    IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
 
                     var queryContracts = from contract in catContracts
                                          join users in sysUser on contract.SaleManId equals users.Id
@@ -1730,6 +1731,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         results = queryContracts.Select(x => new CatAgreementModel
                         {
                             ID = x.contract.Id,
+                            SaleManId = x.contract.SaleManId,
                             SaleManName = x.employee.EmployeeNameEn,
                             ContractNo = x.contract.ContractNo,
                             ExpiredDate = x.contract.ExpiredDate,

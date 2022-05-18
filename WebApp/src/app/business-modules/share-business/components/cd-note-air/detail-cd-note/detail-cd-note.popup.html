@@ -189,6 +189,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="m--margin-bottom-10" *ngIf="CdNoteDetail.cdNote.type !== 'CREDIT'">
+                                            <span class="m--font-bolder">
+                                                {{labelDetail.saleman}}:
+                                            </span>
+                                            <span>{{CdNoteDetail.salemanName}}</span>
+                                        </div>
                                     </div>
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
