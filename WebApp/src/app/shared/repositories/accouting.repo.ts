@@ -587,8 +587,8 @@ export class AccountingRepo {
         );
     }
 
-    getInvoiceExtendedDate(refNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refNo }).pipe(
+    getInvoiceExtendedDate(refNo: string, type: string, invoiceNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { refNo: refNo, type: type, invoiceNo: invoiceNo }).pipe(
             map((data: any) => data)
         );
     }

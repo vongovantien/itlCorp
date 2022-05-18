@@ -446,9 +446,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="refNo">billing no</param>
         /// <returns></returns>
         [HttpGet("GetInvoiceExtendedDate")]
-        public IActionResult GetInvoiceExtendedDate(string refNo)
+        public IActionResult GetInvoiceExtendedDate(string refNo, string type, string invoiceNo)
         {
-            var result = accountingPaymentService.GetInvoiceExtendedDate(refNo);
+            var result = accountingPaymentService.GetInvoiceExtendedDate(refNo, type, invoiceNo);
             return Ok(result);
         }
 

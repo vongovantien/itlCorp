@@ -1231,18 +1231,17 @@ namespace eFMS.API.Accounting.DL.Services
         {
 
             HandleState hs = new HandleState();
-            var refIdLst = DataContext.Get(x => x.BillingRefNo == model.RefId).Select(x => x.RefId).ToList();
-            foreach (var refId in refIdLst)
+            var refIdLst = surchargeRepository.Get(x => (x.DebitNo == model.RefId || x.Soano == model.RefId) && (model.Type != "OBH" ? true : x.Type.ToUpper() == model.Type.ToUpper())).Select(x => x.AcctManagementId).ToList();
+            var vatInvoices = accountingManaRepository.Get(x => refIdLst.Any(t => t == x.Id) && (string.IsNullOrEmpty(model.InvoiceNo) || x.InvoiceNoReal == model.InvoiceNo));
+            foreach (var vatInvoice in vatInvoices)
             {
-                Guid id = new Guid(refId);
-                var vatInvoice = accountingManaRepository.Get(x => x.Id == id).FirstOrDefault();
                 vatInvoice.PaymentExtendDays = model.NumberDaysExtend;
                 vatInvoice.PaymentNote = model.Note;
                 vatInvoice.PaymentDueDate = vatInvoice.PaymentDueDate.Value.AddDays(model.NumberDaysExtend);
                 vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
                 vatInvoice.UserModified = currentUser.UserID;
                 vatInvoice.DatetimeModified = DateTime.Now;
-                accountingManaRepository.Update(vatInvoice, x => x.Id == id, false);
+                accountingManaRepository.Update(vatInvoice, x => x.Id == vatInvoice.Id, false);
             }
             hs = accountingManaRepository.SubmitChanges();
             return hs;
@@ -1473,14 +1472,16 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public ExtendDateUpdatedModel GetInvoiceExtendedDate(string refNo)
+        public ExtendDateUpdatedModel GetInvoiceExtendedDate(string refNo, string type, string invoiceNo)
         {
-            var billingNoList = DataContext.Get(x => x.BillingRefNo == refNo).Select(x => x.RefId).ToList();
-            var invoice = accountingManaRepository.Get(x => billingNoList.Any(b => b.ToUpper() == x.Id.ToString())).FirstOrDefault();
+            var billingNoList = surchargeRepository.Get(x => (x.DebitNo == refNo || x.Soano == refNo) && (type != "OBH" ? true : x.Type.ToUpper() == type.ToUpper())).Select(x => x.AcctManagementId).ToList();
+            var invoice = accountingManaRepository.Get(x => billingNoList.Any(b => b == x.Id) && (string.IsNullOrEmpty(invoiceNo) || x.InvoiceNoReal == invoiceNo)).FirstOrDefault();
             if (invoice == null) return null;
             return new ExtendDateUpdatedModel
             {
                 RefId = refNo,
+                Type = type,
+                InvoiceNo = invoiceNo,
                 Note = invoice.PaymentNote,
                 NumberDaysExtend = invoice.PaymentExtendDays == null ? 0 : (int)invoice.PaymentExtendDays,
                 PaymentType = PaymentType.Invoice
