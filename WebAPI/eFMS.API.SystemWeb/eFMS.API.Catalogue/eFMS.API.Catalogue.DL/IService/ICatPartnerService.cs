@@ -25,7 +25,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Delete(string id);
         HandleState Update(CatPartnerModel model);
         object Add(CatPartnerModel model);
-        IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
+        IQueryable<CatPartnerViewModel2> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
         HandleState CheckDetailPermission(string id);
         CatPartnerModel GetDetail(string id);
         HandleState CheckDeletePermission(string id);
@@ -35,7 +35,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState UpdatePartnerData(CatPartnerModel model);
         IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria);
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType);
-        IQueryable<CatPartnerViewModel> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
+        IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
 
     }
 }

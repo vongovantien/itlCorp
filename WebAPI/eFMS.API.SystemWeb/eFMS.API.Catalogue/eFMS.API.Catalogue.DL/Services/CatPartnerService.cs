@@ -2228,7 +2228,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        public IQueryable<CatPartnerViewModel2> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
         {
             IQueryable<CatPartner> data;
             List<string> grpCodes = new List<string>();
@@ -2255,10 +2255,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
 
                 data = DataContext.Get(query);
-                Expression<Func<CatContract, bool>> queryContract = x => x.Active == true
-                                                                && (x.IsExpired == null || x.IsExpired == false)
-                                                                && IsMatchService(x.SaleService, criteria.Service)
-                                                                && IsMatchOffice(x.OfficeId, criteria.Office);
+                Expression<Func<CatContract, bool>> queryContract = x => x.Active == true && (x.IsExpired == null || x.IsExpired == false);
+                if(!string.IsNullOrEmpty(criteria.Service))
+                {
+                    queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
+                }
+
+                if (!string.IsNullOrEmpty(criteria.Office))
+                {
+                    queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office));
+                }
+
                 if(criteria.SalemanId != null)
                 {
                     queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
@@ -2266,7 +2273,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 IQueryable<CatContract> contracts = contractRepository.Get(queryContract);
                 data = from p in data
-                       join c in contracts on p.Id equals c.PartnerId
+                       join c in contracts on p.Id equals c.PartnerId into pGrps
+                       from pgrp in pGrps.DefaultIfEmpty()
                        select p;
 
             }
@@ -2275,7 +2283,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 data = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
             }
             if (data == null) return null;
-            var results = data.Select(x => new CatPartnerViewModel
+            var results = data.Select(x => new CatPartnerViewModel2
             {
                 Id = x.Id,
                 PartnerGroup = x.PartnerGroup,

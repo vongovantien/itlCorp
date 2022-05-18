@@ -56,18 +56,26 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Hblno { get; set; }
         public Guid? AcctManagementId { get; set; }
         public Guid? PayerAcctManagementId { get; set; }
-        public Guid? ChargeGroup { get; set; }
-        public string TransactionType { get; set; }
-        public Guid? OfficeId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public decimal? AmountUsd { get; set; }
         public decimal? VatAmountUsd { get; set; }
+        public Guid? ChargeGroup { get; set; }
+        public string TransactionType { get; set; }
+        public Guid? OfficeId { get; set; }
         public string ReferenceNo { get; set; }
         public Guid? CompanyId { get; set; }
         public string SyncedFrom { get; set; }
         public string PaySyncedFrom { get; set; }
         public decimal? NetAmount { get; set; }
         public string VatPartnerId { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
+        public string AdvanceNoFor { get; set; }
+        public bool? LinkFee { get; set; }
+        public DateTime? ModifiedDateLinkFee { get; set; }
+        public Guid? UserIdLinkFee { get; set; }
+        public string UserNameLinkFee { get; set; }
+        public string LinkChargeId { get; set; }
     }
 }
