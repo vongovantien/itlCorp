@@ -269,7 +269,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this.getListContract(this.partnerId);
         } else {
             const checkUpdate = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && data.contractType === x.contractType && x.index !== data.index);
-            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? data.contractType === "Official" && this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
+            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? data.contractType === "Official" && this.contracts.some(x => x.contractNo === this.selectedContract.contractNo  && x.active) : null;
             if (this.indexlstContract !== null) {
                 if (!checkUpdate) {
                     this.contracts[this.indexlstContract] = this.selectedContract;
