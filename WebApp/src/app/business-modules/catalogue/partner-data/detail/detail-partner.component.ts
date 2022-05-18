@@ -613,7 +613,7 @@ export class PartnerDetailComponent extends AppList {
             this.getListContract(this.partner.id);
         } else {
             console.log(this.selectedContract);
-            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.active) : null;
+            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 this.contracts[this.indexlstContract] = this.selectedContract;
                 this.formContractPopup.hide();

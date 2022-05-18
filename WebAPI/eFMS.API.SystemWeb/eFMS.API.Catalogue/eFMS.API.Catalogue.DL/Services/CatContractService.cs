@@ -275,7 +275,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (!string.IsNullOrEmpty(model.ContractNo))
                 {
-                    if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && (model.Id == Guid.Empty || (x.Id != model.Id && model.Active == true))))
+                    if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && (model.Id == Guid.Empty || x.Id != model.Id)))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         return messageDuplicate;
