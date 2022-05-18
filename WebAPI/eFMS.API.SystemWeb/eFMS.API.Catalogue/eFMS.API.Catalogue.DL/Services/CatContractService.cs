@@ -271,65 +271,85 @@ namespace eFMS.API.Catalogue.DL.Services
             int LengthService = model.SaleService.Split(";").ToArray().Length;
             int LengthOffice = model.OfficeId.Split(";").ToArray().Length;
             var contractPartner = DataContext.Get(x => x.PartnerId == model.PartnerId && x.Active == true);
-            if (model.Id == Guid.Empty)
+            if (model.ContractType == "Official") // [CR:17/05/22] Chỉ check trùng contract no type official khi add/update
             {
                 if (!string.IsNullOrEmpty(model.ContractNo))
                 {
-                    if (model.ContractType == "Official")
+                    if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && (model.Id == Guid.Empty || x.Id != model.Id)))
                     {
-                        if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim()))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                            return messageDuplicate;
-                        }
-                    }
-                }
-                //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
-                if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
-                {
-                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-                else
-                {
-                    //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
-                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        return messageDuplicate;
                     }
                 }
             }
-            else
-            {
-                if (!string.IsNullOrEmpty(model.ContractNo))
-                {
-                    if (model.ContractType == "Official")
-                    {
-                        if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.Id != model.Id && model.Active == true))
-                        {
-                            return messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-                }
-                //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
-                if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
-                {
-                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-                else
-                {
-                    //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
-                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
-                    {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
-                    }
-                }
-            }
+            #region delete theo CR 17/05/22
+            //if (model.Id == Guid.Empty)
+            //{
+            //    if (model.ContractType == "Official") // [CR:17/05/22] Chỉ check trùng contract no type official khi add/update
+            //    {
+            //        if (!string.IsNullOrEmpty(model.ContractNo))
+            //        {
+            //            if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim()))
+            //            {
+            //                messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+            //                return messageDuplicate;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+            //        if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
+            //        {
+            //            if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+            //            {
+            //                messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
+            //            if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+            //            {
+            //                messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+            //            }
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    if (model.ContractType == "Official") // [CR:17/05/22] Chỉ check trùng contract no type official khi add/update
+            //    {
+            //        if (!string.IsNullOrEmpty(model.ContractNo))
+            //        {
+
+            //            if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.Id != model.Id && model.Active == true))
+            //            {
+            //                return messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+            //        if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
+            //        {
+            //            if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
+            //            {
+            //                messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
+            //            if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
+            //            {
+            //                messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion
             return messageDuplicate;
         }
 
