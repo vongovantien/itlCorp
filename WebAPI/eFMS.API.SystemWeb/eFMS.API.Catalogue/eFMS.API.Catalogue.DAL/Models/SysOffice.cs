@@ -38,5 +38,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public string OfficeType { get; set; }
+        public string InternalCode { get; set; }
+        public string PartnerMapping { get; set; }
     }
 }

@@ -2,13 +2,13 @@ import { PopupBase } from "src/app/popup.base";
 import { Component, ViewChild, ElementRef } from "@angular/core";
 import { FormGroup, AbstractControl, FormBuilder } from "@angular/forms";
 import { DocumentationRepo } from "@repositories";
-import { catchError, finalize } from "rxjs/operators";
-import { Crystal, CsTransactionDetail } from "@models";
+import { catchError, finalize, switchMap, concatMap } from "rxjs/operators";
+import { CsTransactionDetail } from "@models";
 import { ToastrService } from "ngx-toastr";
-import { NgProgress } from "@ngx-progressbar/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { environment } from "src/environments/environment";
+import { of } from "rxjs";
 
 @Component({
     selector: 'input-booking-note-popup',
@@ -26,8 +26,6 @@ export class InputBookingNotePopupComponent extends PopupBase {
     contactPerson: AbstractControl;
     closingTime: AbstractControl;
 
-    dataReport: any = null;
-
     reportType: string = '';
     hblId: string = '';
     hblDetail: CsTransactionDetail;
@@ -36,10 +34,8 @@ export class InputBookingNotePopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _fb: FormBuilder,
-        private _progressService: NgProgress,
-        private sanitizer: DomSanitizer,) {
+        private sanitizer: DomSanitizer, ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -69,28 +65,46 @@ export class InputBookingNotePopupComponent extends PopupBase {
             contactPerson: this.contactPerson.value,
             closingTime: this.closingTime.value
         };
-        this._progressRef.start();
-        this._documentationRepo.previewBookingNote(body)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
             .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewBookingNote(body);
+                    } else {
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    }
+                }),
+                concatMap((data: any) => {
+                    if (!!data) {
+                        if (data !== null && data.dataSource.length > 0) {
+                            this.dataReport = JSON.stringify(data);
+                            setTimeout(() => {
+                                if (!this.popupReport.isShown) {
+                                    this.popupReport.config = this.options;
+                                    this.popupReport.show();
+                                }
+                                this.submitFormPreview();
+                            }, 1000);
+
+                            return this._documentationRepo.updateInputBookingNoteAirExport(body);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                })
             )
             .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        this.updateInputBookingNote(body);
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.hblDetail.flexId = body.flexId;
+                        this.hblDetail.flightNoRowTwo = body.flightNo2;
+                        this.hblDetail.contactPerson = body.contactPerson;
+                        this.hblDetail.closingTime = body.closingTime;
                     } else {
-                        this._toastService.warning('There is no data to display preview');
+                        this._toastService.error(res.message);
                     }
-                },
+                }
             );
     }
 

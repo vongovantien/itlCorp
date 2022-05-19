@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         private IMapper mapper;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
-
+        private readonly ICheckPointService checkPointService;
 
         /// <summary>
         /// constructor
@@ -62,6 +62,7 @@ namespace eFMS.API.Documentation.Controllers
             ICurrencyExchangeService currencyExchange,
             IMapper _mapper,
             IAccAccountReceivableService accAccountReceivable,
+            ICheckPointService checkPoint,
             IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
@@ -72,6 +73,7 @@ namespace eFMS.API.Documentation.Controllers
             mapper = _mapper;
             accAccountReceivableService = accAccountReceivable;
             apiServiceUrl = serviceUrl;
+            checkPointService = checkPoint;
 
         }
 
@@ -218,10 +220,20 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            // list.ForEach(fe => {
-            // fe.Total = CalculateTotal(fe.UnitPrice, fe.Quantity, fe.Vatrate, fe.CurrencyId);
-            // fe.Total = NumberHelper.RoundNumber(fe.Total, fe.CurrencyId != DocumentConstants.CURRENCY_LOCAL ? 2 : 0); //Làm tròn charge VND
-            //});
+            // validate checkpoint
+            var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE)).ToList();
+            if(partnersNeedValidate.Count() > 0)
+            {
+                for (int i = 0; i < partnersNeedValidate.Count; i++)
+                {
+                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[i].PaymentObjectId, 
+                        partnersNeedValidate[i].Hblid, "DOC", CHECK_POINT_TYPE.SURCHARGE, null);
+                    if (!hsCheckpoint.Success)
+                    {
+                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
+                    }
+                }
+            }
             currentUser.Action = "AddAndUpdate";
 
             var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
@@ -682,6 +694,22 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpGet("ValidateCheckPointPartner")]
+        [Authorize]
+        public IActionResult ValidateCheckPointPartner(string partnerId, string Hblid, string transactionType, CHECK_POINT_TYPE type, string settlementCode)
+        {
+            Guid _hblId = Guid.Empty;
+            if(!string.IsNullOrEmpty(Hblid))
+            {
+                _hblId = Guid.Parse(Hblid);
+            }
+
+            HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, type, settlementCode);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+
             return Ok(result);
         }
     }

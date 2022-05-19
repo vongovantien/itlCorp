@@ -126,7 +126,8 @@
 					<div class="form-control-feedback" *ngIf="(isSubmitted || hwbno.dirty) && !hwbno.valid">
 						HBL No must be not have special character!
 					</div>
-					<div class="form-control-feedback" *ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('hwbno').value.length==0">
+					<div class="form-control-feedback"
+						*ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('hwbno').value.length==0">
 						HBL No is required!
 					</div>
 				</div>
@@ -141,7 +142,8 @@
 					<div class="form-control-feedback" *ngIf="(isSubmitted || mblno.dirty) && !mblno.valid">
 						MBL No must be not have special charater!
 					</div>
-					<div class="form-control-feedback" *ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('mblno').value.length==0">
+					<div class="form-control-feedback"
+						*ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('mblno').value.length==0">
 						HBL No is required!
 					</div>
 				</div>
@@ -154,8 +156,8 @@
 					<app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
 						[currentActiveItemId]="{ field: 'id', value: customerId.value, hardValue: customerName}"
 						[selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-						[displayFields]="displayFieldsCustomer" placeholder="Please select"
-						(remove)="resetFormControl(customerId)">
+						[displayFields]="displayFieldsCustomer" placeholder="Please select" name="customerId"
+						[clearable]="false">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !customerId.value">
 						Customer is required!
@@ -276,10 +278,12 @@
 					<label class="form-control-label" for="" required>
 						Salesman
 					</label>
-					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value: salemansId.value}"
+					<app-combo-grid-virtual-scroll
+						[currentActiveItemId]="{field:'id',value: salemansId.value, hardValue: salesmanName}"
 						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
-						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async" size="15"
-						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(salemansId)">
+						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
+						[displayFields]="displayFieldSalesman" placeholder="Select salesman" [clearable]="false"
+						[disabled]="!opsTransaction?.isAllowChangeSaleman" name="salemansId">
 					</app-combo-grid-virtual-scroll>
 					<div class="form-control-feedback" *ngIf="isSubmitted && !salemansId.value">
 						Salesman is required!
@@ -295,8 +299,9 @@
 					</label>
 					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id', value: fieldOpsId.value}"
 						(itemSelected)="onSelectDataFormInfo($event, 'fieldOps')"
-						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async"
-						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(fieldOpsId)">
+						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="users | async"
+						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(fieldOpsId)"
+						placeholder="Select username">
 					</app-combo-grid-virtual-scroll>
 				</div>
 			</div>
@@ -307,9 +312,8 @@
 					</label>
 					<app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'billingOps')"
 						[currentActiveItemId]="{ field: 'id', value: billingOpsId.value}"
-						[selectedDisplayFields]="['username']" [dataSources]="salesmans | async"
-						[displayFields]="displayFieldSalesman" placeholder="Please select"
-						(remove)="resetFormControl(billingOpsId)">
+						[selectedDisplayFields]="['username']" [dataSources]="users | async"
+						[displayFields]="displayFieldSalesman" placeholder="Please select" [clearable]="false">
 					</app-combo-grid-virtual-scroll>
 				</div>
 			</div>
@@ -320,7 +324,7 @@
 					</label>
 					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id', value: clearanceLocation.value}"
 						(itemSelected)="onSelectDataFormInfo($event, 'clearance')" [selectedDisplayFields]="['nameEn']"
-						[dataSources]="ports | async" [displayFields]="displayFieldPort">
+						[dataSources]="ports | async" [displayFields]="displayFieldPort" placeholder="Select location">
 					</app-combo-grid-virtual-scroll>
 				</div>
 			</div>

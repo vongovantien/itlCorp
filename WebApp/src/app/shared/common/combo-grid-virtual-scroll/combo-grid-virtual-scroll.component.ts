@@ -34,6 +34,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
     @Input() placeholder: string = '';
     @Input() size: number = 25;
     @Input() clearable: boolean = true;
+    @Input() name: string = null;
     @Input() set allowFreeText(val: any) {
         this._allowEditing = coerceBooleanProperty(val);
     }
@@ -290,6 +291,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
             this.displaySelectedStr = val;
             this.onChange(val);
             this.onTouch(val);
+            this.cdf.markForCheck();
+
         }
     }
 

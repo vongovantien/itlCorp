@@ -12,6 +12,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
 using System.Collections.Generic;
+using ITL.NetCore.Common;
 using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
@@ -56,6 +57,12 @@ namespace eFMS.API.Accounting.Controllers
         {
             currentUser.Action = "AddAcctSoaPayment";
             if (!ModelState.IsValid) return BadRequest();
+            HandleState hsCheckPoint = acctSOAService.ValidateCheckPointPartnerSOA(model);
+            if(!hsCheckPoint.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hsCheckPoint.Message.ToString() });
+
+            }
             var hs = acctSOAService.AddSOA(model);
 
             ResultHandle result = new ResultHandle();

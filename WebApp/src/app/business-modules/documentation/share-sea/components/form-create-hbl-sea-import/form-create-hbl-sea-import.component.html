@@ -8,7 +8,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mtBill.dirty) && !mtBill.valid }">
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || mtBill.dirty) && !mtBill.valid }">
                                 <label class="form-control-label" for="">
                                     MBL No <span class="m--font-danger">(*)</span>
                                 </label>
@@ -44,7 +44,7 @@
                                 <label class="form-control-label" required>Salesman In Charge</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
+                                    [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                                     [displayFields]="[{field: 'username', label: 'User Name'}]"
                                     [disabled]="!customer.value" (remove)="resetFormControl(saleMan)" size="15"
                                     placeholder="Select Salemans">
@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
                                 <label class="form-control-label" for="">
                                     HBL No. <span class="m--font-danger">(*)</span>
                                 </label>
@@ -473,7 +473,7 @@
                                 </div>
                             </div>
                         </div>
-        
+
                     </div>
                 </div>
             </div>
@@ -481,5 +481,4 @@
     </form>
 </div>
 
-<info-popup [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
+<ng-container inject></ng-container>

@@ -73,6 +73,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     isDisableCargo: boolean = false;
     taxCode: string = '';
     customerName: string = '';
+    customerId: string;
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareBussinessState>,
@@ -186,6 +187,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             }
         }
         this.customerName = this.customDeclaration.customerName;
+        this.customerId = this.customDeclaration.customerId;
 
     }
 
@@ -195,6 +197,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 this.customerName = data.shortName;
                 this.partnerTaxCode.setValue(data.accountNo);
                 this.taxCode = data.taxCode;
+                this.customerId = data.id;
                 break;
             case 'gateway':
                 this.gateway.setValue(data.code);
@@ -264,5 +267,6 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.serviceType = form.serviceType;
         this.customDeclaration.type = form.type;
         this.customDeclaration.accountNo = !!form.partnerTaxCode ? form.partnerTaxCode.trim() : null;
+        this.customDeclaration.customerId = this.customerId;
     }
 }

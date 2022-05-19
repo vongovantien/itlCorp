@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -28,14 +28,10 @@ import { SystemConstants } from '@constants';
 })
 export class OpsCDNoteComponent extends AppList {
     @Input() currentJob: OpsTransaction;
-    @ViewChild(ConfirmPopupComponent) confirmDeleteCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(OpsCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
-    @ViewChild('popupDataCombine') reportPrePopup: ReportPreviewComponent;
-    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    
+    @ViewChild(InjectViewContainerRefDirective) public viewContainerRef: InjectViewContainerRefDirective;
+
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -53,11 +49,9 @@ export class OpsCDNoteComponent extends AppList {
         private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
-        private _progressService: NgProgress,
         private _toastService: ToastrService,
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -115,7 +109,7 @@ export class OpsCDNoteComponent extends AppList {
             );
     }
 
-    getListCdNoteWithPreview(id: string, cdNo: string, currency: string){
+    getListCdNoteWithPreview(id: string, cdNo: string, currency: string) {
         this.isLoading = true;
         const isShipmentOperation = true;
         this._documentRepo.getListCDNote(id, isShipmentOperation)
@@ -169,33 +163,32 @@ export class OpsCDNoteComponent extends AppList {
     }
 
     checkDeleteCdNote(id: string) {
-        this._progressRef.start();
         this._documentRepo.checkCdNoteAllowToDelete(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             ).subscribe(
                 (res: any) => {
                     if (res) {
                         this.selectedCdNoteId = id;
-                        this.deleteMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
-                        this.confirmDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'All related information will be lost? Are you sure you want to delete this Credit/Debit Note?',
+                            labelConfirm: 'Ok',
+                        }, () => {
+                            this.onDeleteCdNote();
+                        });
                     } else {
-                        this.canNotDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'You can not delete this C/D Note, because it was issued SOA/Voucher/VAT Invoice. Please recheck!'
+                        });
                     }
                 },
             );
     }
 
     onDeleteCdNote() {
-        this._progressRef.start();
         this._documentRepo.deleteCdNote(this.selectedCdNoteId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.confirmDeleteCdNotePopup.hide();
-                })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -275,7 +268,7 @@ export class OpsCDNoteComponent extends AppList {
         }
         return true;
     }
-    
+
     @delayTime(1000)
     showReport(): void {
         this.componentRef.instance.frm.nativeElement.submit();
@@ -284,7 +277,7 @@ export class OpsCDNoteComponent extends AppList {
 
     renderAndShowReport() {
         // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
 
         this.showReport();
@@ -292,7 +285,7 @@ export class OpsCDNoteComponent extends AppList {
         this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
             (v: any) => {
                 this.subscription.unsubscribe();
-                this.reportContainerRef.viewContainerRef.clear();
+                this.viewContainerRef.viewContainerRef.clear();
             });
     }
 
@@ -310,7 +303,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -325,7 +318,6 @@ export class OpsCDNoteComponent extends AppList {
         this._exportRepo.exportCDNoteCombine(this.cdNotePrint)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {

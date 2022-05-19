@@ -30,10 +30,10 @@
             </div>
 
             <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
-                (onClick)="confirmSave.show()">
+                (onClick)="confirmSaveHBL()">
             </app-default-button>
 
-            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancelPopup.show()">
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
             </app-default-button>
         </div>
     </app-sub-header>
@@ -55,22 +55,7 @@
     </div>
 </div>
 
-<confirm-popup #confirmSave body="You are about to update HBL.
-Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Update HBL"></confirm-popup>
-
-
-<info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update HB'"></info-popup>
-<info-popup #infoPopupHbl [title]="'HAWB No Existed'"></info-popup>
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
-
-<confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
-    (onSubmit)="confirmCancelPopup.hide();gotoList()"></confirm-popup>
-<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
-    (onSubmit)="confirmUpdateData()" title="HAWB Existed"></confirm-popup>
-
+<ng-template inject></ng-template>
 
 <input-booking-note-popup></input-booking-note-popup>
 

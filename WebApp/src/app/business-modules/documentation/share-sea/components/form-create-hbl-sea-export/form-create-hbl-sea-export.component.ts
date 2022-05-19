@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote, Incoterm } from '@models';
 import { JobConstants, ChargeConstants, SystemConstants } from '@constants';
@@ -21,6 +21,7 @@ import { DataService } from '@services';
 
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-form-create-hbl-sea-export',
@@ -28,7 +29,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 })
 export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     @Input() isUpdate: boolean = false;
@@ -72,7 +73,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     issueHblplace: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: Observable<User[]>;
+    saleMans: User[];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -105,20 +106,21 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     userCreated: string;
     userModified: string;
 
+    hblId: string = '';
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _dataService: DataService,
+        private _toast: ToastrService
     ) {
         super();
     }
 
     ngOnInit() {
         this.initForm();
-        this.getSaleMans();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
         if (this.type === ChargeConstants.SLE_CODE) {
             this.getCSBookingNotes();
@@ -159,10 +161,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     (res: CsTransactionDetail) => {
                         if (!!res) {
                             this.shipmmentDetail.id = res.jobId;
-                            this.dateTimeCreated=res.datetimeCreated;
-                            this.dateTimeModified=res.datetimeModified;
-                            this.userCreated=res.userNameCreated;
-                            this.userModified=res.userNameModified;
+                            this.dateTimeCreated = res.datetimeCreated;
+                            this.dateTimeModified = res.datetimeModified;
+                            this.userCreated = res.userNameCreated;
+                            this.userModified = res.userNameModified;
+                            this.hblId = res.id;
                             this.updateFormValue(res);
                         }
                     }
@@ -170,7 +173,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         } else {
             this.getShipmentDetailAndUpdateDefault();
         }
-        
+
     }
 
     getShipmentDetailAndUpdateDefault() {
@@ -301,10 +304,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             issueHbldate: [],
 
             // * Input
-            mawb: [null,Validators.compose([
+            mawb: [null, Validators.compose([
                 FormValidators.validateSpecialChar
             ])],
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -365,7 +368,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.podDescription = this.formCreate.controls["podDescription"];
 
         this.hwbno.valueChanges
-            .pipe(startWith(this.hwbno.value))
+            .pipe(startWith(this.hwbno.value), takeUntil(this.ngUnsubscribe))
             .subscribe((hwbno: string) => {
                 this._dataService.setData('formHBLData', { hblNo: hwbno, etd: '', eta: '' });
             });
@@ -396,10 +399,11 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
-    }
 
-    getSaleMans() {
-        this.saleMans = this._systemRepo.getListSystemUser();
+        this._catalogueRepo.getListSalemanByPartner(data.customerId, this.type)
+            .subscribe((salesmans: any) => {
+                this.saleMans = salesmans;
+            });
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
@@ -453,12 +457,12 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             polDescription: data.polDescription,
             podDescription: data.podDescription,
         });
-        
-        this.ports.pipe().subscribe(
-            (ports: PortIndex[])=> {
-                let portIndex = ports.filter((x: PortIndex)=> x.id === data.pol)[0];
+
+        this.ports.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+            (ports: PortIndex[]) => {
+                let portIndex = ports.filter((x: PortIndex) => x.id === data.pol)[0];
                 this.onSelectDataFormInfo(portIndex, 'pol');
-                portIndex = ports.filter((x: PortIndex)=> x.id === data.pod)[0];
+                portIndex = ports.filter((x: PortIndex) => x.id === data.pod)[0];
                 this.onSelectDataFormInfo(portIndex, 'pod');
             }
         )
@@ -467,27 +471,32 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                this.customerName = data.shortName;
+                this._toast.clear();
+
                 this.customer.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.shipmmentDetail.id).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.saleMan.setValue(res.salemanId);
-                        } else {
-                            this.saleMan.setValue(null);
-                        }
-                        if (!!res.officeNameAbbr) {
-                            console.log(res.officeNameAbbr);
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
+                this.customerName = data.shortName;
 
                 if (!this.shipper.value) {
                     this.shipper.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
+                this._catalogueRepo.getListSalemanByPartner(data.id, this.type)
+                    .subscribe((res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleMan.setValue(res[0].id);
+                            } else {
+                                this.saleMan.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
+                            }
+                        } else {
+                            this.saleMans = [];
+                            this.saleMan.setValue(null);
+                        }
+                    });
                 break;
             case 'shipper':
                 this.shipperName = data.shortName;
@@ -559,7 +568,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     }
 
     showBookingNote() {
-        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.bookingNoteContainerRef.viewContainerRef);
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.viewContainerRef.viewContainerRef);
 
 
         if (!!this.componentRef) {
@@ -572,14 +581,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 (bookingNote: csBookingNote) => {
                     this.updateDataFromBookingNo(bookingNote);
                     this.subscription.unsubscribe();
-                    this.bookingNoteContainerRef.viewContainerRef.clear();
+                    this.viewContainerRef.viewContainerRef.clear();
                 });
 
             ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).clickOutSide
                 .pipe(skip(1))
                 .subscribe(
                     () => {
-                        this.bookingNoteContainerRef.viewContainerRef.clear();
+                        this.viewContainerRef.viewContainerRef.clear();
                     }
                 );
         }
