@@ -58,6 +58,7 @@ namespace eFMS.API.Accounting.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
+        private readonly IContextBase<SysSettingFlow> settingFlowRepository;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -86,6 +87,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
             IContextBase<CatContract> contractRepo,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
+            IContextBase<SysSettingFlow> settingFlowRepo,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
@@ -114,6 +116,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctCombineBillingRepository = acctCombineBillingRepo;
             contractRepository = contractRepo;
             acctApproveSettlementRepository = acctApproveSettlementRepo;
+            settingFlowRepository = settingFlowRepo;
         }
 
         #region -- Insert & Update SOA
@@ -3666,7 +3669,10 @@ namespace eFMS.API.Accounting.DL.Services
                 switch (contract.ContractType)
                 {
                     case "Cash":
-                        isValid = false;
+                        if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                        {
+                            isValid = false;
+                        }
                         break;
                     //case "Official":
                     //case "Trial":
@@ -3690,6 +3696,42 @@ namespace eFMS.API.Accounting.DL.Services
 
             return result;
         }
+
+        private bool IsSettingFlowApplyContract(string ContractType, Guid officeId, string partnerType, string typeCheckPoint = null)
+        {
+            bool IsApplySetting = false;
+            var settingFlow = settingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable"
+            && x.ApplyType != "None"
+            && x.ApplyPartner != "None");
+            if (settingFlow == null) return IsApplySetting;
+            switch (ContractType)
+            {
+                case "Cash":
+                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
+                    break;
+                case "Trial":
+                    //IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
+                    break;
+                case "Official":
+                    //IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
+                    break;
+                default:
+                    break;
+            }
+
+            return IsApplySetting;
+        }
+
+        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, bool? isApplyContract, string partnerType)
+        {
+            bool isApply = false;
+            isApply = applyType == "Check Point"
+                && isApplyContract == true
+                && (applyPartnerType == partnerType || applyPartnerType == "Both");
+
+            return isApply;
+        }
+
 
         public AdjustModel GetAdjustDebitValue(AdjustModel model)
         {
