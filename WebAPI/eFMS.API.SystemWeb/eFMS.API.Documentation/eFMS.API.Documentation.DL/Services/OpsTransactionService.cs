@@ -2760,7 +2760,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@userId", Value = userId},
-                new SqlParameter(){ ParameterName = "@jobRepNo", Value = arrJob},
+                new SqlParameter(){ ParameterName = "@jobRepNo", Value = string.IsNullOrEmpty(arrJob)?null:arrJob},
             };
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeReplicateToLinkCharge>(parameters);
             return listSurcharges;

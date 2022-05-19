@@ -378,12 +378,12 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpGet("ChargeFromReplicate")]
+        [HttpPost("ChargeFromReplicate")]
         [Authorize]
-        public IActionResult ChargeFromReplicate(string arrJobRep)
+        public IActionResult ChargeFromReplicate([FromBody] ChargeFromReplicateCriteria model)
         {
             currentUser.Action = "ChargeFromReplicate";
-            ResultHandle hs = transactionService.ChargeFromReplicate(arrJobRep);
+            ResultHandle hs = transactionService.ChargeFromReplicate(model.ArrJobRep);
             if (!hs.Status)
                 return BadRequest(hs);
             return Ok(hs);

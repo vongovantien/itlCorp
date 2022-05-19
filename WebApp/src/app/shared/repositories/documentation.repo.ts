@@ -1174,7 +1174,7 @@ export class DocumentationRepo {
     }
 
     chargeFromReplicate(arrJobRep) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate?arrJobRep=${arrJobRep}`).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`,{arrJobRep:arrJobRep}).pipe(
             map((data: any) => data)
         );
     }
