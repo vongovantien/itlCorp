@@ -380,10 +380,10 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet("ChargeFromReplicate")]
         [Authorize]
-        public IActionResult ChargeFromReplicate()
+        public IActionResult ChargeFromReplicate(string arrJobRep)
         {
             currentUser.Action = "ChargeFromReplicate";
-            ResultHandle hs = transactionService.ChargeFromReplicate();
+            ResultHandle hs = transactionService.ChargeFromReplicate(arrJobRep);
             if (!hs.Status)
                 return BadRequest(hs);
             return Ok(hs);

@@ -231,7 +231,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                         result = new HandleState(addResult.Status, (object)addResult.Message);
-                    }                   
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -557,8 +557,10 @@ namespace eFMS.API.Documentation.DL.Services
                     IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
 
                     x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
+                    x.UserCreatedNameLinkJob = string.IsNullOrEmpty(x.UserCreatedLinkJob) ? "" : userRepository.Get(u => u.Id == x.UserCreatedLinkJob)?.FirstOrDefault()?.Username;
 
-                    if(x.ReplicatedId != null) {
+                    if (x.ReplicatedId != null)
+                    {
                         var replicateJob = DataContext.Get(d => d.Id == x.ReplicatedId)?.FirstOrDefault();
                         x.ReplicateJobNo = replicateJob?.JobNo;
                     }
@@ -588,7 +590,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDeleteJobUsed(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
-            if(detail.ReplicatedId != null || detail.IsLocked == true)
+            if (detail.ReplicatedId != null || detail.IsLocked == true)
             {
                 return false;
             }
@@ -1113,7 +1115,9 @@ namespace eFMS.API.Documentation.DL.Services
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                     && x.SaleService.Contains("CL")
                     && x.Active == true
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                    && (x.IsExpired == null || x.IsExpired == false)
+                    )?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
@@ -1384,10 +1388,10 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 // Xóa job rep thì xóa liên kết với job origin.
-                if(job.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE)
+                if (job.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE)
                 {
                     var jobOrigin = DataContext.First(x => x.ReplicatedId == job.Id);
-                    if(jobOrigin != null)
+                    if (jobOrigin != null)
                     {
                         jobOrigin.ReplicatedId = null;
                         DataContext.Update(jobOrigin, x => x.Id == jobOrigin.Id, false);
@@ -1395,7 +1399,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             result = DataContext.SubmitChanges();
-            if(result.Success)
+            if (result.Success)
             {
                 surchargeRepository.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
@@ -1993,7 +1997,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (dataUserLevel != null)
                             {
                                 OpsTransaction replicateJob = DataContext.Get(x => x.Id == _replicateId)?.FirstOrDefault();
-                                if(replicateJob != null)
+                                if (replicateJob != null)
                                 {
                                     OpsTransaction entityReplicate = MappingReplicateJob(entity, dataUserLevel);
                                     DataContext.Add(entityReplicate, false);
@@ -2056,9 +2060,9 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsShipmentSurcharge> CopySurChargeToNewJob(Guid _oldHblId, OpsTransaction shipment, bool isOrigin = true)
         {
             List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
-            IQueryable<CsShipmentSurcharge> charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true &&  string.IsNullOrEmpty(x.LinkChargeId));
+            IQueryable<CsShipmentSurcharge> charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true && string.IsNullOrEmpty(x.LinkChargeId));
 
-            if(isOrigin == false)
+            if (isOrigin == false)
             {
                 // Không lấy phí đã AutoRate | LINK_FEE ( phí link từ Buy(ChargeOrg) làm thanh toán qua sell (ChargeLinkId)
                 OpsTransaction JobRepOld = DataContext.Get(x => x.Hblid == _oldHblId)?.FirstOrDefault();
@@ -2220,7 +2224,7 @@ namespace eFMS.API.Documentation.DL.Services
             return preFix;
         }
 
-        public ResultHandle ChargeFromReplicate()
+        public ResultHandle ChargeFromReplicate(string arrJob)
         {
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
             string logMessage = string.Format(" *  \n [START][USER]: {0}{1} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"), currentUser.UserName);
@@ -2229,7 +2233,8 @@ namespace eFMS.API.Documentation.DL.Services
             ResultHandle hs = new ResultHandle();
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
             CatPartner partnerInternal = new CatPartner();
-            var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID));
+            var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID), arrJob);
+           
 
             using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
@@ -2324,7 +2329,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (surchargeAdds.Count > 0)
                     {
-                        logMessage = string.Format(" *  \n [TIME]:{0}[SURCHARGE_ADD]: {1} * ",DateTime.Now.ToString("DD/MM/YYYY hh:mm:ss"), JsonConvert.SerializeObject(surchargeAdds));
+                        logMessage = string.Format(" *  \n [TIME]:{0}[SURCHARGE_ADD]: {1} * ", DateTime.Now.ToString("DD/MM/YYYY hh:mm:ss"), JsonConvert.SerializeObject(surchargeAdds));
                         new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
                         surchargeRepository.Add(surchargeAdds, false);
                         var result = surchargeRepository.SubmitChanges();
@@ -2345,9 +2350,10 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         trans.Rollback();
-                        return new ResultHandle { Status = true, Message = "Empty ChargeFromReplicate", Data = null };
+                        return new ResultHandle { Status = true, Message = "Empty Charge From Replicate", Data = null };
                     }
-                    return new ResultHandle { Status = true, Message = "ChargeFromReplicate sccuess", Data = null };
+                    var jobNos = surchargeAdds.GroupBy(item => item.JobNo).Select(group => new { JobNo = group.Key, Charges = group.ToList() }).ToList();
+                    return new ResultHandle { Status = true, Message = "The " + jobNos.Count() + " job is linked Charge successfully", Data = null };
                 }
                 catch (Exception ex)
                 {
@@ -2448,14 +2454,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                         var customD = customDeclarationRepository.First(x => x.JobNo == job.JobNo);
                         // Add tk ảo.
-                        if(customD != null)
+                        if (customD != null)
                         {
                             var cdInfo = customD.GetType().GetProperties();
                             CustomsDeclaration cdReplicate = new CustomsDeclaration();
 
                             foreach (var item in cdInfo)
                             {
-                                if(item.Name != "Id")
+                                if (item.Name != "Id")
                                 {
                                     cdReplicate.GetType().GetProperty(item.Name).SetValue(cdReplicate, item.GetValue(customD, null), null);
                                 }
@@ -2478,7 +2484,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         // copy assignment
                         var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id)?.FirstOrDefault();
-                        if(assign != null)
+                        if (assign != null)
                         {
                             var opsAssignProp = assign.GetType().GetProperties();
                             OpsStageAssigned newOpsAssigned = new OpsStageAssigned();
@@ -2510,7 +2516,7 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             CatPartner partnerInternal = new CatPartner();
             var date = new DateTime(2022, 01, 31);
-            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date );
+            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
             List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
             var hs = new ResultHandle();
             var surchargesAddHis = new List<CsLinkCharge>();
@@ -2700,7 +2706,7 @@ namespace eFMS.API.Documentation.DL.Services
                 surcharge.Quantity = chargeBuy.Quantity;
             }
 
-            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge,0);
+            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, 0);
             surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
             surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
             surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -2717,10 +2723,44 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.DatetimeCreated = DateTime.Now;
             return surcharge;
         }
-        private List<sp_GetChargeReplicateToLinkCharge> GetChargesToLinkCharge(Guid userId)
+
+        public async Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list)
+        {
+            var result = new HandleState();
+            var lstCharge = new List<CsShipmentSurchargeModel>();
+
+            foreach (var ops in list)
+            {
+                var lstChargeSell = surchargeRepository.Get(x => x.Hblid == ops.Hblid && x.Type == "SELL");
+                if (lstChargeSell != null)
+                {
+                    foreach (var i in lstChargeSell)
+                    {
+                        if (i.LinkFee == null || i.LinkFee == false)
+                        {
+                            var propInfo = i.GetType().GetProperties();
+                            CsShipmentSurchargeModel chargeModel = new CsShipmentSurchargeModel();
+                            foreach (var item in propInfo)
+                            {
+                                chargeModel.GetType().GetProperty(item.Name).SetValue(chargeModel, item.GetValue(i, null), null);
+                            }
+
+                            lstCharge.Add(chargeModel);
+                        }
+                    }
+                }
+            }
+
+            if (lstCharge.Count > 0)
+                result = csShipmentSurchargeServe.UpdateChargeLinkFee(lstCharge);
+            return result;
+        }
+
+        private List<sp_GetChargeReplicateToLinkCharge> GetChargesToLinkCharge(Guid userId, string arrJob)
         {
             var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@userId", Value = userId },
+                new SqlParameter(){ ParameterName = "@userId", Value = userId},
+                new SqlParameter(){ ParameterName = "@jobRepNo", Value = arrJob},
             };
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeReplicateToLinkCharge>(parameters);
             return listSurcharges;

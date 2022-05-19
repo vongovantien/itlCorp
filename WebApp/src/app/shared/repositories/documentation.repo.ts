@@ -1173,17 +1173,8 @@ export class DocumentationRepo {
         );
     }
 
-    revertShipmentSurchargesLinkFee(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/RevertChargeLinkFee`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
-    }
-
-    chargeFromReplicate() {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`).pipe(
+    chargeFromReplicate(arrJobRep) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate?arrJobRep=${arrJobRep}`).pipe(
             map((data: any) => data)
         );
     }
@@ -1198,7 +1189,7 @@ export class DocumentationRepo {
     }
 
     validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5) {
-        /* 
+        /*
             1 - SHIPMENT
             2 - SOA
             3 - DEBIT
