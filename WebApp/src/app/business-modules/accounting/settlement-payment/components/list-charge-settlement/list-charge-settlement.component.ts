@@ -312,7 +312,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
             for (const groupShipment of this.groupShipments) {
-                const chargeIssue = groupShipment.chargeSettlements.filter((chg: Surcharge) => chg.isSelected && chg.hadIssued);
+                const chargeIssue = groupShipment.chargeSettlements.filter((chg: Surcharge) => chg.isSelected && chg.hadIssued && !chg.isFromShipment);
                 if(!!chargeIssue.length){
                     this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
                     return;
@@ -335,7 +335,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments = this.groupShipments.filter((groupItem: any) => groupItem.chargeSettlements.length);
         } else {
             const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
-            const chargeIssue = surchargeSelected.filter((chg: Surcharge) => chg.hadIssued);
+            const chargeIssue = surchargeSelected.filter((chg: Surcharge) => chg.hadIssued && !chg.isFromShipment);
             if(!!chargeIssue.length){
                 this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
                 return;

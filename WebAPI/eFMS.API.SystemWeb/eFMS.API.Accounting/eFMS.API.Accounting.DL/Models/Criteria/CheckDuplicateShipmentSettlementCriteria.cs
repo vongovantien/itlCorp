@@ -19,6 +19,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string MBLNo { get; set; }
         public string Notes { get; set; }
         public string SettlementNo { get; set; }
+        public string TypeService { get; set; }
     }
 
     public class DuplicateShipmentSettlementResultModel
