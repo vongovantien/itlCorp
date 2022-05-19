@@ -61,5 +61,12 @@ namespace eFMS.API.Accounting.Service.Models
         public string ServiceNo { get; set; }
         public Guid? ServiceHblId { get; set; }
         public string Note { get; set; }
+        public bool? IsLinkFee { get; set; }
+        public string LinkSource { get; set; }
+        public Guid? ReplicatedId { get; set; }
+        public bool? IsLinkJob { get; set; }
+        public string UserCreatedLinkJob { get; set; }
+        public DateTime? DateCreatedLinkJob { get; set; }
+        public bool? IsReplicate { get; set; }
     }
 }

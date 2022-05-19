@@ -93,6 +93,28 @@
 
         public static readonly string LINK_CHARGE_TYPE_AUTO_RATE = "AUTO_RATE";
         public static readonly string LINK_CHARGE_TYPE_LINK_FEE = "LINK_FEE";
+
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
+
+        public static readonly string CDNOTE_TYPE_DEBIT = "DEBIT";
+        public static readonly string CDNOTE_TYPE_CREDIT = "CREDIT";
+        public static readonly string CDNOTE_TYPE_INVOICE = "INVOICE";
+        public static readonly string SOA_TYPE_DEBIT = "DEBIT";
+        public static readonly string SOA_TYPE_CREDIT = "CREDIT";
+
         public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_CHECK_POINT = "Check Point";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_NONE = "None";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_ALERT= "Alert";
+
+        public static readonly string SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH = "Both";
+        public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_CASH = "Cash";
+        public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_OFFICIAL = "Official";
+        public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_TRIAL = "Trial";
+
+        public static readonly string PARTNER_TYPE_CUSTOMER = "Customer";
+        public static readonly string PARTNER_TYPE_AGENT = "Agent";
     }
 }

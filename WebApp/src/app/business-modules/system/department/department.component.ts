@@ -8,7 +8,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-department',
@@ -116,8 +117,8 @@ export class DepartmentComponent extends AppList {
     export() {
         this._exportRepo.exportDepartment(this.dataSearch)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Department.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                     console.log(errors);

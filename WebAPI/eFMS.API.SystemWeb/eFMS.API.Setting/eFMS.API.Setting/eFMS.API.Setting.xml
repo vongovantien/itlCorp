@@ -4,6 +4,61 @@
         <name>eFMS.API.Setting</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Setting.Controllers.RuleLinkFeeController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Setting.DL.IService.IRuleLinkFeeService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            
+            </summary>
+            <param name="localizer"></param>
+            <param name="curUser"></param>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.AddNewRule(eFMS.API.Setting.DL.Models.RuleLinkFeeModel)">
+            <summary>
+            Add New Rule Link Fee
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.Paging(eFMS.API.Setting.DL.Models.Criteria.RuleLinkFeeCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Rule Link Fee by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.UpdateRuleLinkFee(eFMS.API.Setting.DL.Models.RuleLinkFeeModel)">
+            <summary>
+            Update Settlement Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.DownloadExcel">
+            <summary>
+            download an excel file from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.UpLoadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read data from excel file
+            </summary>
+            <param name="uploadedFile">file upload</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.Import(System.Collections.Generic.List{eFMS.API.Setting.DL.Models.RuleLinkFeeImportModel})">
+            <summary>
+            import partner data
+            </summary>
+            <param name="data">data to import</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Setting.Controllers.TariffController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.ITariffService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor

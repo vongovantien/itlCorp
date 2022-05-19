@@ -21,6 +21,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string DataType { get; set; }
         public string LocalBranchCode { get; set; }
         public List<PaymentDetailModel> Details { get; set; }
+        public List<BravoAttachDoc> AtchDocInfo { get; set; }
+
     }
 
     public class PaymentDetailModel

@@ -389,6 +389,18 @@ export class AccountingRepo {
         );
     }
 
+    checkAllowUpdateDirectCharges(shipmentCharges: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowUpdateDirectCharges`, shipmentCharges).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDenySettlement(ids: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckAllowDenySettle`, ids).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkAllowDeleteSOA(soaId: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDelete/${soaId}`).pipe(
             map((data: any) => data)
@@ -1018,6 +1030,24 @@ export class AccountingRepo {
         );
     }
 
+ 
+
+    payablePaging(page: number, size: number, body: any) {
+        console.log('payablePaging', body)
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getPayablePaymentByRefNo(data: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctPayable/GetBy`, data).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListSurchargeDetailSettlement(settleNo: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
     }
@@ -1025,7 +1055,16 @@ export class AccountingRepo {
     getListJobGroupSurchargeDetailSettlement(settleNo: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
     }
-
+    getAdjustDebitValue(model: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetAdjustDebitValue`, model).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateAdjustDebitValue(data: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateAdjustDebitValue`, data).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

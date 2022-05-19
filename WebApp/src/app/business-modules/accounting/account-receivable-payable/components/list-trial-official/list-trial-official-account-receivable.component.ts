@@ -14,6 +14,7 @@ import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 import { ToastrService } from 'ngx-toastr';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
@@ -122,19 +123,20 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         } else {
             this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
                 .subscribe(
-                    (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Ar-Summary.xlsx');
+                    (res: HttpResponse<any>) => {
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
                 );
         }
     }
 
     showDebitDetail(agreementId, option) {
-        let offi = "";
+        let officeId = "";
         let overDueDay = 0;
-        if(this.dataSearch && this.dataSearch.officeIds){offi = this.dataSearch.officeIds.join("|");}
+        let agreeStr=''+agreementId;
+        if(this.dataSearch && this.dataSearch.officeIds){officeId = this.dataSearch.officeIds.join("|");}
         if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
-        this._accountingRepo.getDataDebitDetailList(agreementId, option,offi,'',overDueDay)
+        this._accountingRepo.getDataDebitDetailList(agreementId, option,officeId,'',overDueDay)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -142,6 +144,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
+                        this.debitDetailPopupComponent.dataSearch= {argeementId:agreeStr, option,officeId,serviceCode:'',overDueDay};
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }

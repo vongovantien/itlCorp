@@ -1,53 +1,48 @@
-import { Component, ViewChild, Output, EventEmitter, ElementRef } from "@angular/core";
+import { Component, ViewChild, Output, EventEmitter } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, switchMap } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { DomSanitizer } from "@angular/platform-browser";
-import { ModalDirective } from "ngx-bootstrap/modal";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
-import { environment } from 'src/environments/environment';
-import { NgxSpinnerService } from "ngx-spinner";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
+import { of } from "rxjs";
+import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
+import { InjectViewContainerRefDirective } from "@directives";
+import { ICrystalReport } from "@interfaces";
+import { delayTime } from "@decorators";
+import { ReportPreviewComponent } from "@common";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
-export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
-    @ViewChild(ConfirmPopupComponent) confirmCdNotePopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteCdNotePopup: InfoPopupComponent;
+export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase implements ICrystalReport {
     @ViewChild(ShareBussinessCdNoteAddAirPopupComponent) cdNoteEditPopupComponent: ShareBussinessCdNoteAddAirPopupComponent;
-    @ViewChild('formPreviewCdNote') formPreviewCdNote: ElementRef;
-    @ViewChild("popupReport") popupReport: ModalDirective;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
-    @ViewChild('validateSyncedCDNotePopup') validateSyncedPopup: InfoPopupComponent;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = null;
     cdNote: string = null;
-    confirmMessage: string = '';
     typeConfirm: string = '';
     isHouseBillID: boolean = false;
     transactionType: TransactionTypeEnum = 0;
-
-    headers: CommonInterface.IHeaderTable[];
 
     CdNoteDetail: any = null;
     totalCredit: string = '';
     totalDebit: string = '';
     balanceAmount: string = '';
-
-    dataReport: any = null;
+    totalAdjustVND: string = '';
 
     labelDetail: any = {};
     paymentMethodSelected: string = '';
-    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -55,10 +50,15 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
         private _accountantRepo: AccountingRepo,
-        private _spinner: NgxSpinnerService,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     ngOnInit() {
@@ -115,8 +115,28 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
                     dataCdNote.listSurcharges.forEach(element => {
                         element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total : null;
                         element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total : null;
+                        element.adjustVND = element.amountVnd + element.vatAmountVnd;
                     });
                     this.CdNoteDetail = dataCdNote;
+                    if (this.CdNoteDetail.cdNote.type == "DEBIT") {
+                        this.headers = [
+                            { title: 'HAWB No', field: 'hwbno', sortable: true },
+                            { title: 'Code', field: 'chargeCode', sortable: true },
+                            { title: 'Charge Name', field: 'nameEn', sortable: true },
+                            { title: 'Quantity', field: 'quantity', sortable: true },
+                            { title: 'Unit', field: 'unit', sortable: true },
+                            { title: 'Unit Price', field: 'unitPrice', sortable: true },
+                            { title: 'Currency', field: 'currency', sortable: true },
+                            { title: 'VAT', field: 'vatrate', sortable: true },
+                            { title: "Credit Value", field: 'credit', sortable: true },
+                            { title: "Debit Value", field: 'debit', sortable: true },
+                            { title: 'Total VND', field: 'totalVND', sortable: true },
+                            { title: 'Total USD', field: 'totalUSD', sortable: true },
+                            { title: 'Note', field: 'notes', sortable: true },
+                            { title: 'Exc Rate', field: 'exchangeRate', sortable: true },
+                            { title: 'Synced From', field: 'syncedFromBy', sortable: true }
+                        ];
+                    }
                     // Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -138,6 +158,9 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
+        this.totalAdjustVND = '';
+        const adjustVND = listCharge.reduce((adjustVND, charge) => adjustVND + charge.adjustVND, 0);
+        this.totalAdjustVND += this.formatNumberCurrency(adjustVND) + ' ' + 'VND';
         for (const currency of uniqueCurrency) {
             const _credit = listCharge.filter(f => f.currencyId === currency).reduce((credit, charge) => credit + charge.credit, 0);
             const _debit = listCharge.filter(f => f.currencyId === currency).reduce((debit, charge) => debit + charge.debit, 0);
@@ -172,11 +195,15 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmMessage = `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`;
                         this.typeConfirm = "DELETE";
-                        this.confirmCdNotePopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `All related information will be lost? Are you sure you want to delete this Credit/Debit Note?`,
+                            labelConfirm: 'Ok'
+                        }, () => { this.onConfirmCdNote(); });
                     } else {
-                        this.canNotDeleteCdNotePopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: `You can not delete this Credit/Debit Note. Please recheck!`
+                        });
                     }
                 },
             );
@@ -184,12 +211,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
 
     deleteCdNote() {
         this._documentationRepo.deleteCdNote(this.CdNoteDetail.cdNote.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmCdNotePopup.hide();
-                })
-            ).subscribe(
+            .subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
@@ -229,79 +251,67 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     previewCdNote(data: string) {
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this.previewAirCdNote(data);
-        } else {
-            this.previewSeaCdNote(data);
         }
     }
 
-    previewSeaCdNote(data: string) {
-        this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
+    // previewSeaCdNote(data: string) {
+    //     this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
+    //         .subscribe(
+    //             (res: Crystal | any) => {
+    //                 if (res !== false) {
+    //                     if (res != null && res.dataSource.length > 0) {
+    //                         this.dataReport = res;
+    //                         this.renderAndShowReport();
+    //                     } else {
+    //                         this._toastService.warning('There is no data to display preview');
+    //                     }
+    //                 }
+    //             },
+    //         );
+    // }
 
     previewAirCdNote(data: string) {
-        this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data })
-            .pipe(catchError(this.catchError))
+        let sourcePreview$;
+        if (this.CdNoteDetail.cdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId,
+                this.CdNoteDetail.listSurcharges[0].hblid,
+                'DOC',
+                null,
+                3).pipe(
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            return this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                        }
+                        this._toastService.warning(res.message);
+                        return of(false);
+                    })
+
+                )
+        } else {
+            sourcePreview$ = this._documentationRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+        }
+        sourcePreview$
             .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = JSON.stringify(res);
-                    if (res != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            if (!this.popupReport.isShown) {
-                                this.popupReport.config = this.options;
-                                this.popupReport.show();
-                            }
-                            this.submitFormPreview();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                (res: Crystal | any) => {
+                    if (res !== false) {
+                        if (res != null && res.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
     }
 
-    get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
-    }
-
-    ngAfterViewInit() {
-        if (!!this.dataReport) {
-            this.formPreviewCdNote.nativeElement.submit();
-        }
-    }
-
-    submitFormPreview() {
-        this.formPreviewCdNote.nativeElement.submit();
-    }
-
-    onSubmitForm(event) {
-        return true;
-    }
-
-    hidePreview() {
-        this.popupReport.hide();
-    }
 
     confirmSendToAcc() {
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
         this.typeConfirm = "CONFIRMED";
-        this.confirmCdNotePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure you want to send data to accountant system?`,
+            labelConfirm: 'Ok'
+        }, () => { this.onConfirmCdNote(); });
     }
 
     showConfirmed() {
@@ -311,12 +321,16 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
+                        let messageValidate: string;
                         if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
-                        this.validateSyncedPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Alert',
+                            body: messageValidate
+                        });
                     } else {
                         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {
                             this.paymentMethodPopupComponent.show();
@@ -343,7 +357,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     syncCdNote() {
-        this.confirmCdNotePopup.hide();
         const cdNoteIds: AccountingInterface.IRequestGuidType[] = [];
         const cdNoteId: AccountingInterface.IRequestGuidType = {
             Id: this.CdNoteDetail.cdNote.id,
@@ -352,12 +365,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
             paymentMethod: this.paymentMethodSelected
         };
         cdNoteIds.push(cdNoteId);
-        this._spinner.show();
         this._accountantRepo.syncCdNoteToAccountant(cdNoteIds)
-            .pipe(
-                finalize(() => this._spinner.hide()),
-                catchError(this.catchError),
-            ).subscribe(
+            .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");
@@ -372,5 +381,29 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
                     console.log(error);
                 }
             );
+    }
+    adjustDebitValue() {
+        this.adjustDebitValuePopup.action = 'CDNOTE';
+        this.adjustDebitValuePopup.jodId = this.jobId;
+        this.adjustDebitValuePopup.cdNote = this.cdNote;
+        this.adjustDebitValuePopup.active();
+    }
+
+    onSaveAdjustDebit() {
+        this.getDetailCdNote(this.jobId, this.cdNote)
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            })
     }
 }

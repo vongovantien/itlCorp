@@ -1,8 +1,8 @@
 import { LoadListSettlePayment } from './components/store/actions/settlement-payment.action';
-import { takeUntil, withLatestFrom } from 'rxjs/operators';
+import { takeUntil, withLatestFrom, concatMap, switchAll } from 'rxjs/operators';
 import { getSettlementPaymentListState, getSettlementPaymentSearchParamsState, getSettlementPaymentListPagingState, getSettlementPaymentListLoadingState } from './components/store/reducers/index';
 import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
@@ -29,6 +29,10 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from '../compo
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
 import { catchError, finalize, map, } from 'rxjs/operators';
+import { ContextMenuDirective } from '@directives';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
+import { of, forkJoin } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -42,7 +46,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     @ViewChild(SettlementPaymentsPopupComponent) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
 
     @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
-
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild(AccountingSelectAttachFilePopupComponent) selectAttachPopup: AccountingSelectAttachFilePopupComponent;
 
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
@@ -188,8 +193,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     prepareDeleteSettle(settlement: SettlementPayment) {
         this._accoutingRepo.checkAllowDeleteSettlement(settlement.id)
-            .subscribe((value: boolean) => {
-                if (value) {
+            .subscribe((value: any) => {
+                if (value === 0) {
                     this.selectedSettlement = settlement;
 
                     this.showPopupDynamicRender<ConfirmPopupComponent>(
@@ -202,7 +207,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         this.deleteSettlement(this.selectedSettlement.settlementNo);
                     })
                 } else {
-                    this.permissionPopup.show();
+                    if (value === 403) {
+                        this.permissionPopup.show();
+                    } else {
+                        this._toastService.error("Settlement have synced charges. Please re-check.");
+                    }
                 }
             });
     }
@@ -259,7 +268,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                 this.confirmPopupContainerRef.viewContainerRef.clear();
             });
     }
-    
+
     printSettlement(settlementNo: string) {
         this._accoutingRepo.previewSettlementPayment(settlementNo)
             .pipe(
@@ -270,7 +279,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                 (res: any) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -281,8 +290,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     export() {
         this._exportRepo.exportSettlementPaymentShipment(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'settlement-payment.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }
@@ -290,8 +299,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     accountingeExport() {
         this._exportRepo.exportSettlementPaymentShipmentDetail(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Settlement-Detail Template.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }
@@ -408,63 +417,140 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
             {
-                body: 'Are you sure you want to sync data to accountant system ?',   // ? Config confirm popup
+                body: `Are you sure you want to sync <span class="font-weight-bold">${settlementSyncList.map(x => x.settlementNo).join()}</span> to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
-                labelConfirm: 'Yes'
+                labelConfirm: 'Yes',
+                center: true
             },
             (v: boolean) => {                                   // ? Hàm Callback khi sumit
-                this.onSyncBravo(this.settleSyncIds);
+                this.selectAttachPopup.show();
             });
 
-    }
 
-    onSyncBravo(Ids: AccountingInterface.IRequestGuid[]) {
-        this._accoutingRepo.syncSettleToAccountant(Ids)
+        let sub = this.selectAttachPopup.onSelect
             .pipe(
+                takeUntil(this.ngUnsubscribe),
+                concatMap((value: any) => {
+                    if (!!value) {
+                        const smSyncIds: string[] = settlementSyncList.map(x => x.id);
+                        const mapV: { key: any, id: string }[] = Array(settlementSyncList.length).fill(value).map((value, i) => {
+                            return { key: value, id: smSyncIds[i] }
+                        })
+                        const source = mapV.map(x => this.getPreviewSource(x.id, x.key))
+                        return forkJoin(source);
+                    }
+                    return of(false);
+                }),
+                concatMap((data: CommonInterface.IResult[]) => {
+                    if (!!data.length) {
+                        const advSyncModel = settlementSyncList.map((x: SettlementPayment) => {
+                            return <AccountingInterface.IRequestFileType>{
+                                Id: x.id,
+                                action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+                                fileName: this.getFileName(data, x.id)
+                            };
+                        });
+                        return this._accoutingRepo.syncSettleToAccountant(advSyncModel);
+                    }
+                }),
                 catchError(this.catchError)
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (((res as CommonInterface.IResult).status)) {
+                (res) => {
+                    if (((res as CommonInterface.IResult)?.status)) {
                         this._toastService.success("Sync Data to Accountant System Successful");
 
                         this.requestSettlePaymentList();
                     } else {
                         this._toastService.error("Sync Data Fail");
                     }
+                    sub.unsubscribe();
+
                 },
                 (error) => {
                     console.log(error);
+                },
+                () => {
+                    sub.unsubscribe();
                 }
-            );
+            )
+
+    }
+
+    getFileName(data: CommonInterface.IResult[], id: string) {
+        let url: string = '';
+        data.forEach(x => {
+            const smId: string[] = x.data.match(SystemConstants.CPATTERN.GUID)
+            if (smId[0] === id) {
+                url = x.data;
+            }
+        })
+
+        return url;
     }
 
     denySettle() {
-        const settlesDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
+        const settleDenyList = this.settlements.filter(x => x.isSelected && x.statusApproval !== AccountingConstants.STATUS_APPROVAL.NEW
             && x.syncStatus !== AccountingConstants.SYNC_STATUS.SYNCED);
-        if (!settlesDenyList.length) {
-            this._toastService.warning("Please select settle payment was rejected to deny");
+        if (!settleDenyList.length) {
+            this._toastService.warning("Please select correct settle payment to deny");
             return;
         }
 
-        const hasDenied: boolean = settlesDenyList.some(x => x.statusApproval === 'Denied');
+        const hasDenied: boolean = settleDenyList.some(x => x.statusApproval === 'Denied');
         if (hasDenied) {
-            const advanceHasDenied: string = settlesDenyList.filter(x => x.statusApproval === 'Denied').map(a => a.settlementNo).toString();
+            const advanceHasDenied: string = settleDenyList.filter(x => x.statusApproval === 'Denied').map(a => a.settlementNo).toString();
             this._toastService.warning(`${advanceHasDenied} had denied, Please recheck!`);
             return;
         }
 
-        const settleIds: string[] = settlesDenyList.map((x: SettlementPayment) => x.id);
-        if (!settleIds.length) {
+        let smIds: string[] = settleDenyList.map((x: SettlementPayment) => x.id);
+        if (!smIds.length) {
             return;
         }
 
+        this._accoutingRepo.checkAllowDenySettlement(smIds)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.error(`Settlement was delete, Please re-load page.`);
+                        return;
+                    }
+                    else {
+                        if (!!res.data) {
+                            this._toastService.warning(res.message);
+                            smIds = smIds.filter(x => res.data.indexOf(x) === -1).map(x => x);
+                        }
+                        if (smIds.length > 0) {
+                            this.showPopupDynamicRender<ConfirmPopupComponent>(
+                                ConfirmPopupComponent,
+                                this.confirmPopupContainerRef.viewContainerRef,
+                                { body: `Are you sure you want to deny settlement <span class="font-weight-bold">${settleDenyList.map(x => x.settlementNo).join()}</span> payments ?` },
+                                (v: boolean) => {
+                                    this.onDenySettlePayments(smIds);
+                                });
+                        }
+                    }
+                },
+            )
+    }
+
+    denySettleItem() {
+        if (!this.selectedSettlement) {
+            return;
+        }
+
+        const currentSm: SettlementPayment = Object.assign({}, this.selectedSettlement);
+        if (currentSm.statusApproval === 'Denied') {
+            this._toastService.warning(`${currentSm.settlementNo} had denied, Please recheck!`);
+            return;
+        }
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,
-            { body: 'Are you sure you want to deny settle payments ?' },
+            { body: `Are you sure you want to deny settle <span class="font-weight-bold">${currentSm.settlementNo}</span> payments ?`, center: true },
             (v: boolean) => {
-                this.onDenySettlePayments(settleIds);
+                this.onDenySettlePayments([currentSm.id]);
             });
     }
 
@@ -473,6 +559,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this._toastService.success("Deny Successful");
                         this.requestSettlePaymentList();
                     }
                 },
@@ -480,5 +567,134 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                     console.log(error);
                 }
             )
+    }
+
+    onSelectSM(sm: SettlementPayment) {
+        this.selectedSettlement = sm;
+
+        this.clearMenuContext(this.queryListMenuContext);
+    }
+
+    syncSM() {
+        if (!this.selectedSettlement) {
+            return;
+        }
+        const currentSM: SettlementPayment = Object.assign({}, this.selectedSettlement);
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef,
+            {
+                body: `Are you sure you want to sync <span class="font-weight-bold">${currentSM.settlementNo}</span> to accountant system ?`,
+                iconConfirm: 'la la-cloud-upload',
+                labelConfirm: 'Yes',
+                center: true
+            },
+            (v: boolean) => {
+                this.selectAttachPopup.show();
+            });
+
+        // * listen event select file.
+        this.listenSelectFileAttachAndSyncSM(currentSM);
+    }
+
+    listenSelectFileAttachAndSyncSM(settle: SettlementPayment) {
+        let sub = this.selectAttachPopup.onSelect
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                concatMap((value: any) => {
+                    if (!!value) {
+                        const previewSource = this.getPreviewSource(settle.id, value);
+                        return previewSource;
+                    }
+                    return of(false);
+                }),
+                map((exportData: any) => {
+                    if (!exportData) throw new Error("error: ");
+                    return exportData?.data // url preview
+                }),
+                concatMap((url: any) => {
+                    const syncModel = [settle].map((x: SettlementPayment) => {
+                        return <AccountingInterface.IRequestFileType>{
+                            Id: x.id,
+                            action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+                            fileName: url
+                        };
+                    });
+                    return this._accoutingRepo.syncSettleToAccountant(syncModel)
+                }),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res) => {
+                    if (((res as CommonInterface.IResult)?.status)) {
+                        this._toastService.success("Sync Data to Accountant System Successful");
+
+                        this.requestSettlePaymentList();
+                    } else {
+                        this._toastService.error("Sync Data Fail");
+                    }
+                    sub.unsubscribe();
+
+                },
+                (error) => {
+                    console.log(error);
+                    sub.unsubscribe();
+
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            )
+    }
+
+    previewSM(settle: SettlementPayment, language: string, key: string) {
+        let previewSoure$ = null;
+        switch (key) {
+            case 'multiple':
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settle.id, language)
+                break;
+            case 'general':
+                previewSoure$ = this._exportRepo.exportGeneralSettlementPayment(settle.id);
+                break;
+            case 'payment':
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetailTemplate(settle.id, language);
+                break;
+            default:
+                break;
+        }
+
+        previewSoure$
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe((response: any) => {
+                console.log(response);
+                if (response?.data) {
+                    this._exportRepo.previewExport(response.data);
+                }
+            });
+    }
+
+    getPreviewSource(settleId: string, key: number) {
+        let previewSoure$ = null;
+        switch (key) {
+            case 3:
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'VN')
+                break;
+            case 4:
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'EN')
+                break;
+            case 5:
+                previewSoure$ = this._exportRepo.exportGeneralSettlementPayment(settleId)
+                break;
+            case 6:
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetailTemplate(settleId, 'VN')
+                break;
+            default:
+                break;
+        }
+
+        return previewSoure$;
     }
 }

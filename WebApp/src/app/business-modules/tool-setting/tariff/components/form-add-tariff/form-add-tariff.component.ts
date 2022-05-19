@@ -49,7 +49,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     ngOnInit() {
         this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'PartnerID' },
+                { field: 'taxCode', label: 'Partner Code' },
                 { field: 'shortName', label: 'Abbr Name' },
                 { field: 'partnerNameEn', label: 'Name EN' },
             ]

@@ -87,6 +87,23 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetListSoaCreditToSync")]
+        public IActionResult GetListSoaCreditToSync(List<RequestStringTypeListModel> requests)
+        {
+            var models = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+            List<SyncCreditModel> list = (models.Count > 0) ? accountingService.GetListSoaCreditToSync(models) : new List<SyncCreditModel>();
+            return Ok(list);
+        }
+
+        [HttpPost("GetListCdNoteCredit")]
+        public IActionResult GetListCdNoteCredit(List<RequestGuidTypeListModel> requests)
+        {
+            List<RequestGuidTypeListModel> models = requests.Where(x => x.Action == ACTION.ADD && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+            List<SyncCreditModel> list = (models.Count > 0) ? accountingService.GetListCdNoteCreditToSync(models) : new List<SyncCreditModel>();
+            return Ok(list);
+        }
+
+
         [HttpPost("GetListInvoicePaymentToSync")]
         [Authorize]
         public async Task<IActionResult> GetListInvoicePaymentToSync(List<RequestGuidListModel> request)
@@ -271,7 +288,7 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("SyncAdvanceToAccountantSystem")]
         [Authorize]
-        public async Task<IActionResult> SyncAdvanceToAccountantSystem(List<RequestGuidListModel> request)
+        public async Task<IActionResult> SyncAdvanceToAccountantSystem(List<RequestGuidAndFileListModel> request)
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
@@ -294,6 +311,8 @@ namespace eFMS.API.Accounting.Controllers
                     List<BravoAdvanceModel> listAdd = (IdsAdd.Count > 0) ? accountingService.GetListAdvanceToSyncBravo(IdsAdd) : new List<BravoAdvanceModel>();
                     List<BravoAdvanceModel> listUpdate = (IdsUpdate.Count > 0) ? accountingService.GetListAdvanceToSyncBravo(IdsUpdate) : new List<BravoAdvanceModel>();
 
+                   
+                    
                     HttpResponseMessage resAdd = new HttpResponseMessage();
                     HttpResponseMessage resUpdate = new HttpResponseMessage();
                     BravoResponseModel responseAddModel = new BravoResponseModel();
@@ -301,6 +320,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listAdd.Count > 0)
                     {
+                        foreach (var item in listAdd)
+                        {
+                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                            if(!string.IsNullOrEmpty(fileNameAttached))
+                            {
+                                item.AtchDocInfo.Add(new BravoAttachDoc
+                                {
+                                    AttachDocRowId = Guid.NewGuid().ToString(),
+                                    AttachDocName = item.ReferenceNo,
+                                    AttachDocPath = fileNameAttached,
+                                    AttachDocDate = DateTime.Now
+                                });
+                            }
+                        }
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -321,6 +354,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
+                        foreach (var item in listUpdate)
+                        {
+                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                            if (!string.IsNullOrEmpty(fileNameAttached))
+                            {
+                                item.AtchDocInfo.Add(new BravoAttachDoc
+                                {
+                                    AttachDocRowId = Guid.NewGuid().ToString(),
+                                    AttachDocName = "Advance Preview Template",
+                                    AttachDocPath = fileNameAttached,
+                                    AttachDocDate = DateTime.Now
+                                });
+                            }
+                        }
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -367,7 +414,7 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("SyncSettlementToAccountantSystem")]
         [Authorize]
-        public async Task<IActionResult> SyncSettlementToAccountantSystem(List<RequestGuidListModel> request)
+        public async Task<IActionResult> SyncSettlementToAccountantSystem(List<RequestGuidAndFileListModel> request)
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
@@ -398,6 +445,20 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
+                        foreach (var item in listAdd)
+                        {
+                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                            if (!string.IsNullOrEmpty(fileNameAttached))
+                            {
+                                item.AtchDocInfo.Add(new BravoAttachDoc
+                                {
+                                    AttachDocRowId = Guid.NewGuid().ToString(),
+                                    AttachDocName = "SM Preview Template",
+                                    AttachDocPath = fileNameAttached,
+                                    AttachDocDate = DateTime.Now
+                                });
+                            }
+                        }
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -418,6 +479,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
+                        foreach (var item in listUpdate)
+                        {
+                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                            if (!string.IsNullOrEmpty(fileNameAttached))
+                            {
+                                item.AtchDocInfo.Add(new BravoAttachDoc
+                                {
+                                    AttachDocRowId = Guid.NewGuid().ToString(),
+                                    AttachDocName = "SM Preview Template",
+                                    AttachDocPath = fileNameAttached,
+                                    AttachDocDate = DateTime.Now
+                                });
+                            }
+                        }
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -649,10 +724,20 @@ namespace eFMS.API.Accounting.Controllers
                         #endregion
                     }
 
-                    // ADD Voucher: Chỉ send qua Bravo những Credit Note có currency là VND và currency của từng phí của Credit Note đó là VND
-                    if (listAdd_NVCP_SameCurrLocal.Count > 0)
+                    // [CR: #16976] => Send qua Bravo những Credit Note có [currency là VND và currency của từng phí của Credit Note đó là VND] hoặc [Currency là USD hoặc tồn tại phí currency USD]
+                    // bỏ => [ADD Voucher: Chỉ send qua Bravo những Credit Note có currency là VND và currency của từng phí của Credit Note đó là VND]
+                    if (listAdd_NVCP_SameCurrLocal.Count > 0 || listAdd_NVCP_DiffCurrLocal.Count > 0)
                     {
-                        resAdd_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd_NVCP_SameCurrLocal, loginResponse.TokenKey);
+                        var listAddToSynceBravo = new List<SyncCreditModel>();
+                        if(listAdd_NVCP_SameCurrLocal.Count > 0)
+                        {
+                            listAddToSynceBravo = listAdd_NVCP_SameCurrLocal;
+                        }
+                        else
+                        {
+                            listAddToSynceBravo = listAdd_NVCP_DiffCurrLocal;
+                        }
+                        resAdd_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAddToSynceBravo, loginResponse.TokenKey);
                         responseAddModel_NVCP = await resAdd_NVCP.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
@@ -660,7 +745,7 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             FuncLocal = "SyncListCdNoteToAccountant",
                             FuncPartner = "EFMSVoucherDataSyncAdd",
-                            ObjectRequest = JsonConvert.SerializeObject(listAdd_NVCP_SameCurrLocal),
+                            ObjectRequest = JsonConvert.SerializeObject(listAddToSynceBravo),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVCP),
                             Major = "Nghiệp Vụ Chi Phí",
                             StartDateProgress = _startDateProgress,
@@ -670,10 +755,20 @@ namespace eFMS.API.Accounting.Controllers
                         #endregion
                     }
 
-                    // ADD Voucher: Chỉ send qua Bravo những Credit Note có currency là VND và currency của từng phí của Credit Note đó là VND
-                    if (listUpdate_NVCP_SameCurrLocal.Count > 0)
+                    // [CR: #16976] => Send qua Bravo những Credit Note có [currency là VND và currency của từng phí của Credit Note đó là VND] hoặc [Currency là USD hoặc tồn tại phí currency USD]
+                    // bỏ => [ADD Voucher: Chỉ send qua Bravo những Credit Note có currency là VND và currency của từng phí của Credit Note đó là VND]
+                    if (listUpdate_NVCP_SameCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
                     {
-                        resUpdate_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate_NVCP_SameCurrLocal, loginResponse.TokenKey);
+                        var listUpdateToSynceBravo = new List<SyncCreditModel>();
+                        if (listUpdate_NVCP_SameCurrLocal.Count > 0)
+                        {
+                            listUpdateToSynceBravo = listUpdate_NVCP_SameCurrLocal;
+                        }
+                        else
+                        {
+                            listUpdateToSynceBravo = listUpdate_NVCP_DiffCurrLocal;
+                        }
+                        resUpdate_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdateToSynceBravo, loginResponse.TokenKey);
                         responseUpdateModel_NVCP = await resUpdate_NVCP.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
@@ -681,7 +776,7 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             FuncLocal = "SyncListCdNoteToAccountant",
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
-                            ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVCP_SameCurrLocal),
+                            ObjectRequest = JsonConvert.SerializeObject(listUpdateToSynceBravo),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVCP),
                             Major = "Nghiệp Vụ Chi Phí",
                             StartDateProgress = _startDateProgress,
@@ -695,9 +790,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (responseAddModel_NVHD.Success == "1"
                         || responseUpdateModel_NVHD.Success == "1"
                         || responseAddModel_NVCP.Success == "1"
-                        || responseUpdateModel_NVCP.Success == "1" 
-                        || listAdd_NVCP_DiffCurrLocal.Count > 0 
-                        || listUpdate_NVCP_DiffCurrLocal.Count > 0)
+                        || responseUpdateModel_NVCP.Success == "1")
                     {
                         HandleState hs = accountingService.SyncListCdNoteToAccountant(ids);
                         string message = HandleError.GetMessage(hs, Crud.Update);
@@ -831,10 +924,20 @@ namespace eFMS.API.Accounting.Controllers
                         #endregion
                     }
 
-                    // ADD Voucher: Chỉ send qua Bravo những SOA(credit) có currency là VND và currency của từng phí của SOA đó là VND
-                    if (listAdd_NVCP_SameCurrLocal.Count > 0)
+                    // [CR: #16976] => ADD Voucher:Send qua Bravo những SOA(credit) có [currency là VND và currency của từng phí của SOA đó là VND] hoặc [Currency là USD hoặc tồn tại phí currency USD]
+                    // bỏ => ADD Voucher: Chỉ send qua Bravo những SOA(credit) có currency là VND và currency của từng phí của SOA đó là VND
+                    if (listAdd_NVCP_SameCurrLocal.Count > 0 || listAdd_NVCP_DiffCurrLocal.Count > 0)
                     {
-                        resAdd_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd_NVCP_SameCurrLocal, loginResponse.TokenKey);
+                        var listAddToSynceBravo = new List<SyncCreditModel>();
+                        if (listAdd_NVCP_SameCurrLocal.Count > 0)
+                        {
+                            listAddToSynceBravo = listAdd_NVCP_SameCurrLocal;
+                        }
+                        else
+                        {
+                            listAddToSynceBravo = listAdd_NVCP_DiffCurrLocal;
+                        }
+                        resAdd_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAddToSynceBravo, loginResponse.TokenKey);
                         responseAddModel_NVCP = await resAdd_NVCP.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
@@ -842,7 +945,7 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             FuncLocal = "SyncListSoaToAccountant",
                             FuncPartner = "EFMSVoucherDataSyncAdd",
-                            ObjectRequest = JsonConvert.SerializeObject(listAdd_NVCP_SameCurrLocal),
+                            ObjectRequest = JsonConvert.SerializeObject(listAddToSynceBravo),
                             ObjectResponse = JsonConvert.SerializeObject(responseAddModel_NVCP),
                             Major = "Nghiệp Vụ Chi Phí",
                             StartDateProgress = _startDateProgress,
@@ -852,10 +955,20 @@ namespace eFMS.API.Accounting.Controllers
                         #endregion
                     }
 
-                    // UDPATE Voucher: Chỉ send qua Bravo những SOA(credit) có currency là VND và currency của từng phí của SOA đó là VND
-                    if (listUpdate_NVCP_SameCurrLocal.Count > 0)
+                    // [CR: #16976] => UDPATE Voucher: Send qua Bravo những SOA(credit) có [currency là VND và currency của từng phí của SOA đó là VND] hoặc [Currency là USD hoặc tồn tại phí currency USD]
+                    // bỏ => UDPATE Voucher: Chỉ send qua Bravo những SOA(credit) có currency là VND và currency của từng phí của SOA đó là VND
+                    if (listUpdate_NVCP_SameCurrLocal.Count > 0 || listUpdate_NVCP_DiffCurrLocal.Count > 0)
                     {
-                        resUpdate_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate_NVCP_SameCurrLocal, loginResponse.TokenKey);
+                        var listUpdateToSynceBravo = new List<SyncCreditModel>();
+                        if (listUpdate_NVCP_SameCurrLocal.Count > 0)
+                        {
+                            listUpdateToSynceBravo = listUpdate_NVCP_SameCurrLocal;
+                        }
+                        else
+                        {
+                            listUpdateToSynceBravo = listUpdate_NVCP_DiffCurrLocal;
+                        }
+                        resUpdate_NVCP = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdateToSynceBravo, loginResponse.TokenKey);
                         responseUpdateModel_NVCP = await resUpdate_NVCP.Content.ReadAsAsync<BravoResponseModel>();
 
                         #region -- Ghi Log --
@@ -863,7 +976,7 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             FuncLocal = "SyncListSoaToAccountant",
                             FuncPartner = "EFMSVoucherDataSyncUpdate",
-                            ObjectRequest = JsonConvert.SerializeObject(listUpdate_NVCP_SameCurrLocal),
+                            ObjectRequest = JsonConvert.SerializeObject(listUpdateToSynceBravo),
                             ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel_NVCP),
                             Major = "Nghiệp Vụ Chi Phí",
                             StartDateProgress = _startDateProgress,
@@ -877,9 +990,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (responseAddModel_NVHD.Success == "1"
                         || responseUpdateModel_NVHD.Success == "1"
                         || responseAddModel_NVCP.Success == "1"
-                        || responseUpdateModel_NVCP.Success == "1"
-                        || listAdd_NVCP_DiffCurrLocal.Count > 0
-                        || listUpdate_NVCP_DiffCurrLocal.Count > 0)
+                        || responseUpdateModel_NVCP.Success == "1")
                     {
                         HandleState hs = accountingService.SyncListSoaToAccountant(ids);
                         string message = HandleError.GetMessage(hs, Crud.Update);
@@ -1370,6 +1481,14 @@ namespace eFMS.API.Accounting.Controllers
             if (res.Success)
                 return File((MemoryStream)res.Message, "application/zip", m.FileName);
             return BadRequest(res);
+        }
+
+        [HttpPost("TestSendMail")]
+        public ActionResult TestSendMail(string subject, string body, [FromBody] List<string> emails)
+        {
+            var listcc = new List<string> {"lynne.loc@itlvn.com","alex.phuong@itlvn.com", "paulchen.bao@itlvn.com" };
+            var sendSuccess = SendMail.Send(subject, body, emails, null, listcc, null);
+            return Ok( new { sendSuccess } );
         }
     }
 }

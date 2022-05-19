@@ -17,5 +17,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? IsTemp { get; set; }
+        public string KeyS3 { get; set; }
     }
 }

@@ -1,4 +1,3 @@
-import { getCurrentUserState } from './../../../../store/reducers/index';
 import { takeUntil } from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,42 +8,41 @@ import { SOA, SysImage } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { AccountingConstants } from '@constants';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 import { Store } from '@ngrx/store';
-import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { getMenuUserSpecialPermissionState, IAppState, getCurrentUserState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { HttpResponse } from '@angular/common/http';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
+
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
 })
-export class StatementOfAccountDetailComponent extends AppList {
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild(ConfirmPopupComponent) confirmSoaPopup: ConfirmPopupComponent;
+export class StatementOfAccountDetailComponent extends AppList implements ICrystalReport {
     @ViewChild(StatementOfAccountPaymentMethodComponent) paymentMethodPopupComponent: StatementOfAccountPaymentMethodComponent;
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
-    @ViewChild('validateSyncedSOAPopup') validateSyncedPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+
     soaNO: string = '';
-    currencyLocal: string = 'VND';
-    folderModuleName: string = 'SOA';
 
     soa: SOA = new SOA();
-    headers: CommonInterface.IHeaderTable[] = [];
 
     isClickSubMenu: boolean = false;
 
     dataExportSOA: ISOAExport;
-    dataReport: any = null;
     initGroup: any[] = [];
     TYPE: string = 'LIST';
-    confirmMessage: string = '';
     paymentMethodSelected: string = '';
     confirmType: string = 'SYNC';
     reasonReject: string = '';
-    messageValidate: string = '';
     attachFiles: SysImage[] = [];
     backToInv: boolean = false;
 
@@ -58,13 +56,17 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _router: Router,
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
-        private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>
     ) {
         super();
         this.requestSort = this.sortChargeList;
         this._progressRef = this._progressService.ref();
+    }
 
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     ngOnInit() {
@@ -72,7 +74,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.headers = [
             { title: 'No.', field: 'i', sortable: false },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
-            { title: 'Charge Name', field: 'chargeName', sortable: true },
+            { title: 'Charge Name', field: 'chargeName', width: 400, sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'MBL', field: 'mbl', sortable: true },
@@ -80,7 +82,12 @@ export class StatementOfAccountDetailComponent extends AppList {
             { title: 'Debit', field: 'debit', sortable: true },
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Total VND', field: 'totalVND', sortable: true },
+            { title: 'Total USD', field: 'totalUSD', sortable: true },
             { title: 'C/D Note', field: 'cdNote', sortable: true },
+            { title: 'Unit Price', field: 'unitPrice', sortable: true },
+            { title: 'Quantity', field: 'quantity', sortable: true },
+            { title: 'VAT', field: 'vatRate', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
@@ -90,10 +97,10 @@ export class StatementOfAccountDetailComponent extends AppList {
         this._activedRoute.queryParams.subscribe((params: any) => {
             if (!!params.no && params.currency) {
                 this.soaNO = params.no;
-                this.currencyLocal = params.currency;
-                this.getDetailSOA(this.soaNO, this.currencyLocal)
+                const currencyLocal = params.currency || 'VND';
+                this.getDetailSOA(this.soaNO, currencyLocal)
             }
-            if(!!params.action && params.action === 'inv'){
+            if (!!params.action && params.action === 'inv') {
                 this.backToInv = true;
             }
         });
@@ -142,26 +149,28 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    const fileName = "Export SOA " + this.soaNO + ".xlsx";
-                    this.downLoadFile(response, "application/ms-excel", fileName);
+                (response: HttpResponse<any>) => {
+                    if (response != null && response.headers.get(SystemConstants.EFMS_FILE_NAME) != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
                 },
             );
 
     }
 
     exportSOAAF() {
-        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this._progressRef.start();
-        this._exportRepo.exportSOAAirFreight(this.soaNO, userLogged.officeId)
+        this._exportRepo.exportSOAAirFreight(this.soaNO, this.userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response != null && response.headers.get(SystemConstants.EFMS_FILE_NAME) != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -177,9 +186,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight With HBL.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response != null && response.headers.get(SystemConstants.EFMS_FILE_NAME) != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -188,17 +197,16 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     exportSOASupplierAF() {
-        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this._progressRef.start();
-        this._exportRepo.exportSOASupplierAirFreight(this.soaNO, userLogged.officeId)
+        this._exportRepo.exportSOASupplierAirFreight(this.soaNO, this.userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'AIR -SOA COST.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response != null && response.headers.get(SystemConstants.EFMS_FILE_NAME) != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -239,8 +247,8 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Bravo SOA.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }
@@ -253,9 +261,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+                (response: HttpResponse<any>) => {
+                    if (response != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');
                     }
@@ -264,20 +272,12 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     previewAccountStatementFull(soaNo: string) {
-        this._progressRef.start();
         this._accoutingRepo.previewAccountStatementFull(soaNo)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-            )
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -329,23 +329,27 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     confirmSendToAcc() {
-        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
-        this.confirmSoaPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure you want to send <strong>${this.soa.soano}</strong> to accountant system?`,
+            labelConfirm: 'Ok'
+        }, () => { this.onConfirmSoa(); });
     }
 
     showConfirmed() {
         this._accoutingRepo.checkSoaSynced(this.soa.id)
-            .pipe(
-                catchError(this.catchError),
-            ).subscribe(
+            .subscribe(
                 (res: any) => {
                     if (res) {
+                        let messageValidate;
                         if (this.soa.type !== 'Credit') {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
                         } else {
-                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
                         }
-                        this.validateSyncedPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Alert',
+                            body: messageValidate
+                        });
                     } else {
                         this.confirmType = "SYNC";
                         if (this.soa.type === "All") {
@@ -377,14 +381,10 @@ export class StatementOfAccountDetailComponent extends AppList {
             paymentMethod: this.paymentMethodSelected
         };
         soaSyncIds.push(soaId);
-        this._spinner.show();
+
         this._accoutingRepo.syncSoaToAccountant(soaSyncIds)
-            .pipe(
-                finalize(() => this._spinner.hide()),
-                catchError(this.catchError),
-            ).subscribe(
+            .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
@@ -399,7 +399,6 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     onConfirmSoa() {
-        this.confirmSoaPopup.hide();
         if (this.confirmType === "SYNC") {
             this.sendSoaToAccountant();
         }
@@ -413,25 +412,19 @@ export class StatementOfAccountDetailComponent extends AppList {
         this.reasonRejectPopupComponent.show();
     }
 
-    confirmReject() {
-        this.confirmMessage = `Are you sure you want to reject soa?`;
-        this.confirmSoaPopup.show();
-    }
 
     onApplyReasonReject($event) {
         this.reasonReject = $event;
-        this.confirmReject();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure you want to reject soa <strong>${this.soa.soano}</strong>?`,
+            labelConfirm: 'Ok'
+        }, () => { this.onConfirmSoa(); });
     }
 
     rejectSoa() {
-        this._spinner.show();
         this._accoutingRepo.rejectSoaCredit({ id: this.soa.id, reason: this.reasonReject })
-            .pipe(
-                finalize(() => this._spinner.hide()),
-                catchError(this.catchError),
-            ).subscribe(
+            .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success(res.message);
                         this.getDetailSOA(this.soa.soano, this.soa.currency);
@@ -445,6 +438,28 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+    adjustDebitValue() {
+        this.adjustDebitValuePopup.soano = this.soaNO;
+        this.adjustDebitValuePopup.action = "SOA";
+        this.adjustDebitValuePopup.active();
+    }
+    onSaveAdjustDebit() {
+        this.getDetailSOA(this.soaNO, 'VND');
+    }
 }
 
 interface ISOAExport {
@@ -458,3 +473,5 @@ interface ISOAExport {
     customerName: string;
     listCharges: any[];
 }
+
+

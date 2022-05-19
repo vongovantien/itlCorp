@@ -85,7 +85,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "WarehouseImportTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "WarehouseImportTemplate.xlsx");
                 },
             );
     }

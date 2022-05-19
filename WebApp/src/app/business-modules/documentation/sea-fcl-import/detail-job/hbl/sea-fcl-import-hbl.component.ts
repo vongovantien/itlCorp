@@ -58,7 +58,9 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
             { title: 'Container', 'field': 'containers', sortable: true },
             { title: 'Package', field: 'packages', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
-            { title: 'CBM', field: 'cbm', sortable: true }
+            { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Department', field: 'department', sortable: true }
         ];
     }
 

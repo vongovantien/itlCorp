@@ -1,40 +1,42 @@
 import { Component, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, map, finalize, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, takeUntil, withLatestFrom, every } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
-import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
-import { IAppState, getMenuUserPermissionState } from '@store';
+import { IAppState, getMenuUserPermissionState, getCurrentUserState } from '@store';
 import { Store } from '@ngrx/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { formatDate } from '@angular/common';
 import { RoutingConstants } from '@constants';
 import { getOperationClearanceDataSearch, getOperationClearanceList, getOperationClearanceLoadingState, getOperationClearancePagingState } from '../store';
 import { CustomsDeclarationLoadListAction } from '../store/actions/custom-clearance.action';
+import { HttpResponse } from '@angular/common/http';
+import { InjectViewContainerRefDirective } from '@directives';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-custom-clearance',
     templateUrl: './custom-clearance.component.html',
 })
 export class CustomClearanceComponent extends AppList {
-    @ViewChild('confirmConvertPopup') confirmConvertPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDeletePopup') confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     listCustomDeclaration: CustomDeclaration[] = [];
     menuPermission: SystemInterface.IUserPermission;
     messageConvertError: string = '';
     clearancesToConvert: CustomDeclaration[] = [];
-    headers: CommonInterface.IHeaderTable[];
+
     defaultDataSearch = {
         fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
         toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         imPorted: null,
-        personHandle: JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id
+        personHandle: null
     };
 
     constructor(
@@ -42,18 +44,24 @@ export class CustomClearanceComponent extends AppList {
         private _sortService: SortService,
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
-        private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _exportRepo: ExportRepo,
         private _router: Router,
     ) {
         super();
         this.requestSort = this.sortCD;
-        this._progressRef = this._ngProgressService.ref();
         this.requestList = this.requestCustomDeclarationList;
     }
 
     ngOnInit() {
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: SystemInterface.IClaimUser) => {
+                if (!!res.userName) {
+                    this.defaultDataSearch.personHandle = res.id
+                }
+            });
+
         this._store.select(getMenuUserPermissionState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -139,12 +147,10 @@ export class CustomClearanceComponent extends AppList {
             }
         }
     }
+
     showDetail(id) {
         this._operationRepo.checkViewDetailPermission(id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
+            .subscribe(
                 (res: any) => {
                     if (res) {
                         this._router.navigate([`${RoutingConstants.LOGISTICS.CUSTOM_CLEARANCE}/detail`, id]);
@@ -154,11 +160,9 @@ export class CustomClearanceComponent extends AppList {
                 },
             );
     }
+
     getDataFromEcus() {
-        this._progressRef.start();
         this._operationRepo.importCustomClearanceFromEcus()
-            .pipe(catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!!res.message) {
@@ -168,11 +172,9 @@ export class CustomClearanceComponent extends AppList {
                 },
             );
     }
+
     getDataOlaFromEcus() {
-        this._progressRef.start();
         this._operationRepo.importCustomClearanceOlaFromEcus()
-            .pipe(catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!!res.message) {
@@ -194,26 +196,54 @@ export class CustomClearanceComponent extends AppList {
                 this.messageConvertError = '';
                 return;
             } else {
+                let partnerIdsToCheckPoint: string[] = [];
+
                 this.clearancesToConvert.forEach(c => {
                     c.isReplicate = isReplicate;
+                    partnerIdsToCheckPoint.push(c.customerId);
                 });
-                this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
-                    .pipe(
-                        catchError(this.catchError),
-                        finalize(() => this._progressRef.complete())
-                    ).subscribe(
-                        (res: any) => {
-                            if (res.status) {
-                                this.confirmConvertPopup.show();
+
+                partnerIdsToCheckPoint = [...new Set(partnerIdsToCheckPoint)];
+                const sourceCheckPoint: any = [];
+                for (let i = 0; i < partnerIdsToCheckPoint.length; i++) {
+                    sourceCheckPoint.push(this._documentRepo.validateCheckPointContractPartner(partnerIdsToCheckPoint[i], '', 'CL', null, 1));
+                }
+
+                forkJoin([...sourceCheckPoint])
+                    .pipe()
+                    .subscribe((res: CommonInterface.IResult[]) => {
+                        if (!!res.length) {
+                            const isValid = res.some(x => x.status == false);
+                            if (isValid) {
+                                const messages = res.filter((i) => i.status === false).map(x => x.message);
+                                console.log(messages);
+                                messages.forEach(message => {
+                                    this._toastrService.warning(message);
+                                });
                             } else {
-                                if (res.data === 403) {
-                                    this._toastrService.error(res.message, '', { enableHtml: true });
-                                } else {
-                                    this.canNotAllowActionPopup.show();
-                                }
+                                this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
+                                    .subscribe(
+                                        (res: any) => {
+                                            if (res.status) {
+                                                this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                                    title: 'Warning',
+                                                    body: 'Do you want to convert selected Clearance No to shipment',
+                                                    labelConfirm: 'Ok',
+                                                    labelCancel: 'No'
+                                                }, () => { this.onComfirmConvertToJobs(); });
+                                            } else {
+                                                if (res.data === 403) {
+                                                    this._toastrService.error(res.message, '', { enableHtml: true });
+                                                } else {
+                                                    this.canNotAllowActionPopup.show();
+                                                }
+                                            }
+                                        },
+                                    );
                             }
-                        },
-                    );
+                        }
+                    });
+
             }
         } else {
             this._toastrService.warning("Chưa chọn clearance để Convert", '', { enableHtml: true });
@@ -224,37 +254,30 @@ export class CustomClearanceComponent extends AppList {
         const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
             this._operationRepo.checkDeletePermission(customCheckedArray)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
-                ).subscribe(
+                .subscribe(
                     (res: any) => {
                         if (res.success) {
-                            this.confirmDeletePopup.show();
+                            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'Warning',
+                                body: 'Do you want to delete Clearance No selected',
+                                labelCancel: 'No',
+                                labelConfirm: 'Ok',
+                            }, () => { this.onConfirmDelete(); });
                         } else {
-                            // this._toastrService.error(res.message);
                             this.canNotAllowActionPopup.show();
                         }
                     },
                 );
-            // this.confirmDeletePopup.show();
         } else {
             this._toastrService.warning("Chưa chọn clearance để Delete", '', { enableHtml: true });
         }
     }
 
     onConfirmDelete() {
-        this._progressRef.start();
-        this.confirmDeletePopup.hide();
         const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
         this._operationRepo.deleteMultipleClearance(customCheckedArray || [])
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    // this._toastrService.success(res.message, '');
                     if (res.status) {
                         this.getListCustomsDeclaration();
                     } else {
@@ -265,11 +288,7 @@ export class CustomClearanceComponent extends AppList {
     }
 
     onComfirmConvertToJobs() {
-        this.confirmConvertPopup.hide();
         this._documentRepo.convertExistedClearanceToJob(this.clearancesToConvert)
-            .pipe(
-                catchError(this.catchError),
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -289,6 +308,7 @@ export class CustomClearanceComponent extends AppList {
     onChangeAction() {
         this.isCheckAll = this.listCustomDeclaration.every((item: CustomDeclaration) => item.isSelected);
     }
+
     checkValidClearancesToJobs() {
         const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter((item: CustomDeclaration) => item.isSelected && !item.jobNo);
         if (customCheckedArray === null) {
@@ -336,8 +356,8 @@ export class CustomClearanceComponent extends AppList {
         const body = this.dataSearch || {};
         this._exportRepo.exportCustomClearance(body)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'CustomClearance.xlsx');
+                (response: HttpResponse<Blob>) => {
+                    this.downLoadFile(response, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                 },

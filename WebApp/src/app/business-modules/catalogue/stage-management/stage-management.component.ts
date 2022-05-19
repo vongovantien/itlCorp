@@ -11,6 +11,8 @@ import { AppList } from 'src/app/app.list';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
+import { HttpResponse } from '@angular/common/http';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-stage-management',
@@ -156,8 +158,8 @@ export class StageManagementComponent extends AppList {
         this._exportRepo.exportStage(this.dataSearch)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "StageManagement.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

@@ -144,7 +144,7 @@ export class PartnerDataImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "PartnerImportTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "PartnerImportTemplate.xlsx");
                 },
             );
     }

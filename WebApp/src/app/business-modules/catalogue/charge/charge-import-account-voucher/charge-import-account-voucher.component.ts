@@ -123,7 +123,7 @@ export class ChargeImportAccountVoucherComponent extends AppPage implements OnIn
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "VoucherTypeAccountTemplate.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "VoucherTypeAccountTemplate.xlsx");
                 },
             );
     }

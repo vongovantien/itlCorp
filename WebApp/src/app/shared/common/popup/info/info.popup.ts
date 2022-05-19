@@ -1,5 +1,6 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { eFMSPopup } from '../popup';
+import { InfoPopupConfig } from '@app';
 
 @Component({
     selector: 'info-popup',
@@ -7,7 +8,7 @@ import { eFMSPopup } from '../popup';
     styleUrls: ['./info.popup.scss'],
 })
 
-export class InfoPopupComponent extends eFMSPopup {
+export class InfoPopupComponent extends eFMSPopup implements InfoPopupConfig {
 
     @Input() title: string = 'Notification';
     @Input() body: string = 'Default Info Popup';

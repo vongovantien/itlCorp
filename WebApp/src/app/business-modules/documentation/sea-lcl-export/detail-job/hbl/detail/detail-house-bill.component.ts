@@ -1,13 +1,11 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { CsTransactionDetail } from '@models';
-import { ReportPreviewComponent } from '@common';
 import { ChargeConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
 
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
@@ -16,17 +14,16 @@ import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
 import { formatDate } from '@angular/common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
     templateUrl: './detail-house-bill.component.html'
 })
 
-export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLComponent implements OnInit, AfterViewInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLComponent implements OnInit, AfterViewInit {
 
     hblId: string;
-
     hblDetail: CsTransactionDetail;
 
     constructor(
@@ -107,12 +104,13 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     }
 
     onSaveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         this.goodSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -123,6 +121,15 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
         this.updateHbl(modelUpdate);
 
+    }
+
+    showCreatepoup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmUpdateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
     updateHbl(body: any) {
@@ -154,43 +161,43 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             );
     }
 
-    preview(reportType: string) {
-        this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
+    // preview(reportType: string) {
+    //     this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.dataReport = res;
+    //                 if (this.dataReport.dataSource.length > 0) {
+    //                     this.showReport();
+    //                 } else {
+    //                     this._toastService.warning('There is no data to display preview');
+    //                 }
+    //             },
+    //         );
+    // }
 
-    previewAttachList() {
-        this._documentationRepo.previewAirAttachList(this.hblId)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
+    // previewAttachList() {
+    //     this._documentationRepo.previewAirAttachList(this.hblId)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.dataReport = res;
+    //                 if (this.dataReport.dataSource.length > 0) {
+    //                     this.showReport();
+    //                 } else {
+    //                     this._toastService.warning('There is no data to display preview');
+    //                 }
+    //             },
+    //         );
+    // }
 
-    @delayTime(1000)
-    showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
-    }
+    // @delayTime(1000)
+    // showReport(): void {
+    //     this.reportPopup.frm.nativeElement.submit();
+    //     this.reportPopup.show();
+    // }
 }

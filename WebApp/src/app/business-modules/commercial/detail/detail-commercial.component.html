@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <hr />
-                <form-create-commercial [isUpdate]="true" (partnerLocationString)="onChangePartnerLocation($event)">
+                <form-create-commercial [isUpdate]="true" (partnerLocationString)="onChangePartnerLocation($event)" [isActive]="partner?.active">
                 </form-create-commercial>
                 <div class="row" *ngIf="!!partner && !isAddSubPartner">
                     <div class="col-6">

@@ -104,7 +104,7 @@ export class UserManagementImportComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "User-Import.xlsx");
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, "User-Import.xlsx");
                 },
             );
     }

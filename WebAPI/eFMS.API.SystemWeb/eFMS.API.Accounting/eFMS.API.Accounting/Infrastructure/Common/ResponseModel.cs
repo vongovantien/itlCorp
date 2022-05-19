@@ -13,6 +13,8 @@ namespace eFMS.API.Accounting.Infrastructure.Common
         public string Exception { get; set; }
         public bool Success { get; set; }
 
+        public string Path { get; set; }
+
         // other fields
 
         public override string ToString()

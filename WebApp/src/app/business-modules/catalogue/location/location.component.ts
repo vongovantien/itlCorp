@@ -8,6 +8,7 @@ import { SystemConstants } from "src/constants/system.const";
 
 import { catchError, finalize } from "rxjs/operators";
 import { RoutingConstants } from "@constants";
+import { HttpResponse } from "@angular/common/http";
 
 
 type LOCATION_TAB = 'country' | 'city' | 'district' | 'town';
@@ -59,8 +60,8 @@ export class LocationComponent extends AppList implements OnInit, AfterViewInit 
                 this._exportRepo.exportCountry()
                     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                     .subscribe(
-                        (res: any) => {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_country.xlsx');
+                        (res: HttpResponse<any>) => {
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         }
                     );
                 break;
@@ -68,8 +69,8 @@ export class LocationComponent extends AppList implements OnInit, AfterViewInit 
                 this._exportRepo.exportProvince()
                     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                     .subscribe(
-                        (res: any) => {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_provinces.xlsx');
+                        (res: HttpResponse<any>) => {
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         }
                     );
                 break;
@@ -77,8 +78,8 @@ export class LocationComponent extends AppList implements OnInit, AfterViewInit 
                 this._exportRepo.exportDistrict()
                     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                     .subscribe(
-                        (res: any) => {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_districts.xlsx');
+                        (res: HttpResponse<any>) => {
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         }
                     );
                 break;
@@ -86,8 +87,8 @@ export class LocationComponent extends AppList implements OnInit, AfterViewInit 
                 this._exportRepo.exportTownWard()
                     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                     .subscribe(
-                        (res: any) => {
-                            this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_towns_wards.xlsx');
+                        (res: HttpResponse<any>) => {
+                            this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                         }
                     );
                 break;

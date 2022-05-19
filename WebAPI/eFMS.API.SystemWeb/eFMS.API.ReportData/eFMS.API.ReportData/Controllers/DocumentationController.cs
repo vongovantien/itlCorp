@@ -63,8 +63,8 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "E-Manifest.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "E-Manifest");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -90,8 +90,8 @@ namespace eFMS.API.ReportData.Controllers
                 {
                     return null;
                 }
-                FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Import Goods Declare.xlsx");
-
+                FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Import Goods Declare");
+                HeaderResponse(fileContent.FileDownloadName);
                 return fileContent;
             }
             catch (Exception)
@@ -121,8 +121,8 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Dangerous Goods.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Dangerous Goods");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -140,16 +140,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateMAWBAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - MAWB.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - MAWB");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -168,16 +168,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateHAWBAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - NEUTRAL HAWB.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - NEUTRAL HAWB");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -195,16 +195,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateSCSCAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân SCSC.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - SCSC");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -222,16 +222,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateTCSAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân TCS.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - TCS");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -249,16 +249,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateACSAirExportExcel(dataObject.Result, "PHIEU-CAN-ACS-Template.xlsx");
+            var stream = new DocumentationHelper().GenerateACSAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân ACS.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - ACS");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -276,16 +276,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObject = responseFromApi.Content.ReadAsAsync<AirwayBillExportResult>();
             if (dataObject.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateNCTSALSAirExportExcel(dataObject.Result, "PHIEU-CAN-NCTS-ALS-Template.xlsx");
+            var stream = new DocumentationHelper().GenerateNCTSALSAirExportExcel(dataObject.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân NCTS & ALS.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - Phiếu Cân NCTS & ALS");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -315,16 +315,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportShipmentOverview>>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateShipmentOverviewExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Shipment Overview");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -357,27 +357,27 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportShipmentOverviewFCL>>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             Stream stream;
             if (reportType == "FCL")
             {
-               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment-Overview-FCL.xlsx");
+               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria);
             }
             else
             {
-                stream = new DocumentationHelper().BidingGeneralLCLExport(dataObjects.Result, criteria, "ShipmentOverviewLCL.xlsx");
+                stream = new DocumentationHelper().BidingGeneralLCLExport(dataObjects.Result, criteria, "ShipmentOverviewLCL");
             }
 
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
-            var downloadName = reportType == "FCL" ? "Shipment Overview FCL.xlsx" : "Shipment Overview-LCL.xlsx";
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, downloadName);
-
+            var downloadName = reportType == "FCL" ? "Shipment Overview FCL" : "Shipment Overview-LCL";
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, downloadName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -407,16 +407,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<GeneralReportResult>>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateStandardGeneralReportExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Standard Report.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Standard Report"+criteria.Currency);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -446,16 +446,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingPlSheetExport>>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateAccountingPLSheetExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Accounting PL Sheet.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Accounting PL Sheet"+criteria.Currency);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -485,15 +485,15 @@ namespace eFMS.API.ReportData.Controllers
 
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
             var stream = new DocumentationHelper().GenerateJobProfitAnalysisExportExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Job Profit Analysis.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Job Profit Analysis");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -521,16 +521,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SummaryOfCostsIncurredModel>>();
             if (dataObjects.Result == null || !dataObjects.Result.Any())
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateSummaryOfCostsIncurredExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Cossts incurred.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Summary of Cossts incurred");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -559,15 +559,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
             if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result,criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Revenue incurred.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Summary of Revenue incurred");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -596,15 +597,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
             if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Costs By Partner.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Costs By Partner");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -614,23 +616,23 @@ namespace eFMS.API.ReportData.Controllers
         {
             if (issuedDate == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.GetDataHousebillDailyExportUrl + issuedDate.Value.ToString("yyyy-MM-dd"));
 
             var dataObject = responseFromApi.Content.ReadAsAsync<List<HousebillDailyExportResult>>();
             if (dataObject.Result == null || dataObject.Result.Count == 0)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
 
             var stream = new DocumentationHelper().GenerateHousebillDailyExportExcel(dataObject.Result, issuedDate);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DAILY LIST "+ issuedDate.Value.ToString("dd MMM yyyy").ToUpper() + ".xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "DAILY LIST "+ issuedDate.Value.ToString("dd MMM yyyy").ToUpper() + "");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -654,8 +656,9 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            string fileName = "Export OPS CD Note.xlsx";
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            string fileName = "OPS - DEBIT NOTE";
+            FileContentResult fileContent = new FileHelper().ExportExcel(cdNo,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -675,31 +678,32 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<CommissionExportResult>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
             Stream stream;
             if (rptType == "OPS")
             {
-                stream = new DocumentationHelper().BindingDataCommissionPROpsReport(dataObjects.Result, "Commission-OPS-VND.xlsx");
+                stream = new DocumentationHelper().BindingDataCommissionPROpsReport(dataObjects.Result);
             }
             else
             {
-                stream = new DocumentationHelper().BindingDataCommissionPRReport(dataObjects.Result, "Commission-PR.xlsx"); // truyền data và tên file
+                stream = new DocumentationHelper().BindingDataCommissionPRReport(dataObjects.Result); // truyền data và tên file
             }
 
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
             FileContentResult fileContent;
             if(rptType == "OPS")
             {
-                fileContent = new FileHelper().ExportExcel(stream, "Commission OPS VND.xlsx");
+                fileContent = new FileHelper().ExportExcel(null,stream, "Commission OPS VND");
             }
             else
             {
-                fileContent = new FileHelper().ExportExcel(stream, "Commission PR.xlsx");
+                fileContent = new FileHelper().ExportExcel(null,stream, "Commission PR");
             }
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -716,15 +720,16 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<CommissionExportResult>();
             if (dataObjects.Result == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            var stream = new DocumentationHelper().BindingDataIncentiveReport(dataObjects.Result, "Incentive.xlsx");
+            var stream = new DocumentationHelper().BindingDataIncentiveReport(dataObjects.Result);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(new MemoryStream(), "");
+                return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            string fileName = "Incentive.xlsx";
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            string fileName = "Incentive";
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -748,8 +753,9 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            string fileName = "Export OPS CD Note.xlsx";
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            string fileName = "OPS - DEBIT NOTE";
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, fileName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -770,9 +776,10 @@ namespace eFMS.API.ReportData.Controllers
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             var stream = new AccountingHelper().GenerateAccountingManagementDebCreInvExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
-            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null,new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "INVOICE LIST") + " - eFMS");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
 
@@ -797,6 +804,12 @@ namespace eFMS.API.ReportData.Controllers
             var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + salemanId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             return Ok(result);
+        }
+        
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
         }
     }
 }

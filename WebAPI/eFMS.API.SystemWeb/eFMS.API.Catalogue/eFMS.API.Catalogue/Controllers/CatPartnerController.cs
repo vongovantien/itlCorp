@@ -592,6 +592,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetPartnerForKeyingCharge")]
+        public IActionResult GetPartnerForKeyingCharge(PartnerMultiCriteria criteria)
+        {
+            var data = catPartnerService.GetPartnerForKeyinCharge(criteria);
+            return Ok(data);
+        }
+
         /// <summary>
         /// get the list of partners
         /// </summary>
@@ -623,6 +630,15 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetListSaleman")]
+        [Authorize]
+        public IActionResult GetListSaleman(string partnerId, string transactionType)
+        {
+            var data = catPartnerService.GetListSaleman(partnerId, transactionType);
+            return Ok(data);
         }
     }
 }

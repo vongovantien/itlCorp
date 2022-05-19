@@ -154,10 +154,26 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     showDenyPopup() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.containerRef.viewContainerRef, {
-            body: 'Do you want to deny this settlement payment ?',
-            labelConfirm: 'Yes',
-        }, () => this.openModalDeny(this.templateModalDeny))
+        this._accoutingRepo.checkAllowDenySettlement([this.settlementPayment.settlement.id])
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.error(`Settlement was delete, Please re-load page.`);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
+                        return;
+                    }
+                    else {
+                        if (!!res.data) {
+                            this._toastService.warning(res.message);
+                        } else {
+                            this.showPopupDynamicRender(ConfirmPopupComponent, this.containerRef.viewContainerRef, {
+                                body: 'Do you want to deny this settlement payment ?',
+                                labelConfirm: 'Yes',
+                            }, () => this.openModalDeny(this.templateModalDeny))
+                        }
+                    }
+                },
+            );
     }
 
     openModalDeny(template: TemplateRef<any>) {

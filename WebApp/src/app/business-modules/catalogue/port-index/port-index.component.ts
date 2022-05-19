@@ -15,6 +15,7 @@ import { CommonEnum } from '@enums';
 
 import { of } from 'rxjs';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-port-index',
@@ -261,8 +262,8 @@ export class PortIndexComponent extends AppList implements OnInit {
         this.exportRepository.exportPortIndex(this.criteria)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "PortIndex.xlsx");
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

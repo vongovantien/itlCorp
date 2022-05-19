@@ -11,7 +11,8 @@ import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
 import { ExportRepo } from 'src/app/shared/repositories';
 import { User } from 'src/app/shared/models';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-user-management',
@@ -189,8 +190,8 @@ export class UserManagementComponent extends AppList {
     export() {
         this._exportRepo.exportUser(this.criteria)
             .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'User.xlsx');
+                (response: HttpResponse<any>) => {
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
                 (errors: any) => {
                 },

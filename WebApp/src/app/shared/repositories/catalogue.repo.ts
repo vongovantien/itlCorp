@@ -161,18 +161,25 @@ export class CatalogueRepo {
         );
     }
 
-    getPartnerByGroups(groups: number[], active: boolean = true, service: string = null, office: string = null): any {
-        if (!!service && !!office) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`,
-                {
-                    partnerGroups: groups,
-                    active: active,
-                    service: service,
-                    office: office
-                }, null, { "hideSpinner": "true" });
-        } else {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }, null, { "hideSpinner": "true" })
-        }
+    getPartnerByGroups(groups: number[], active: boolean = true, service: string = null, office: string = null, salemanId: string = null): any {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`,
+            {
+                partnerGroups: groups,
+                active: active,
+                service: service,
+                office: office,
+                salemanId: salemanId
+            }, null, { "hideSpinner": "true" });
+    }
+
+    getPartnerForKeyingCharge(active: boolean = true, service: string = null, office: string = null, salemanId: string = null) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetPartnerForKeyingCharge`,
+            {
+                active: active,
+                service: service,
+                office: office,
+                salemanId: salemanId
+            }, null, { "hideSpinner": "true" });
     }
 
     getSalemanIdByPartnerId(partnerId: string, jobId: string = null) {
@@ -461,7 +468,7 @@ export class CatalogueRepo {
 
     getListPort(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body, null, { "hideSpinner": "true" }).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -537,7 +544,7 @@ export class CatalogueRepo {
 
     getPlace(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body, null, { "hideSpinner": "true" }).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -1234,7 +1241,7 @@ export class CatalogueRepo {
     }
     //
     downloadIncotermListExcel(body: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1299,7 +1306,7 @@ export class CatalogueRepo {
     }
     //
     downloadPotentialCustomerListExcel(body: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPotentialCustomerList`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPotentialCustomerList`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1369,13 +1376,20 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
     upLoadBankFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/UploadFile`, files, "uploadedFile");
     }
+
     importBank(body: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/import`, body).pipe(
             map((data: any) => data)
         );
+    }
+
+    getListSalemanByPartner(partnerId: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType });
+
     }
 
 }

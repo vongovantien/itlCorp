@@ -55,8 +55,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctReceiptSync> receiptSyncReposotory;
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
-
+        private readonly IContextBase<SysImage> sysFileRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
+   
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -67,7 +68,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IQueryable<CatCharge> charges;
         readonly IQueryable<CatChargeDefaultAccount> chargesDefault;
         readonly IQueryable<CatUnit> catUnits;
-
+        readonly IQueryable<SysImage> sysFiles;
 
         public AccountingService(
             ICurrencyExchangeService exchangeService,
@@ -105,6 +106,7 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
+            IContextBase<SysImage> sysFileRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -141,6 +143,7 @@ namespace eFMS.API.Accounting.DL.Services
             receiptSyncReposotory = receiptSyncRepo;
             emailSettingRepository = emailSettingRepo;
 
+            sysFileRepository = sysFileRepo;
             settlementPaymentService = settlementService;
             // ---
 
@@ -179,7 +182,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                              DocDate = ad.RequestDate.HasValue ? ad.RequestDate.Value.Date : ad.RequestDate, //Chỉ lấy Date (không lấy Time)
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
-                                                             PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod
+                                                             PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod,
+                                                             
                                                          };
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
@@ -206,6 +210,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (advRGrps.Count > 0)
                     {
                         item.Details = advRGrps;
+                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString());
                     }
                 }
                 result = data;
@@ -337,7 +342,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode, //[06/01/2021]
                                                                        PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
-                                                                       LocalBranchCode = partner != null ? partner.InternalCode : null,
+                                                                       LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null, //Parnter mode là internal => Internal Code
                                                                        Payee = settle.Payee,
                                                                        CurrencyCode = settle.SettlementCurrency,
                                                                        SettleAmount = settle.Amount,
@@ -413,6 +418,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
+                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString());
 
                                 // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
                                 bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
@@ -573,7 +579,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                 sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
                 sync.CustomerMode = cdNotePartner?.PartnerMode;
-                sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
+                sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
                 sync.Description0 = cdNote.Note;
@@ -592,6 +598,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
                 var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
 
+                var hblId = string.Empty;
                 foreach (var surcharge in surcharges)
                 {
                     var charge = new ChargeSyncModel();
@@ -711,8 +718,27 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.DueDate = _dueDate;
 
                     charges.Add(charge);
+
+                    if(string.IsNullOrEmpty(hblId))
+                    {
+                        hblId = surcharge.Hblid.ToString();
+                    }
+
                 }
+
                 sync.Details = charges;
+
+                CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
+                if (hbl != null)
+                {
+                    string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
+                    sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
+                        AttachDocDate = DateTime.Now,
+                        AttachDocName = cdNote.Code,
+                        AttachDocPath = webUrl.Value.Url.ToString() + "/en/#/" + urlPreviewCd,
+                        AttachDocRowId = cdNote.Id.ToString()
+                    }};
+                }
 
                 data.Add(sync);
             }
@@ -747,12 +773,12 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                     sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
                     sync.CustomerMode = cdNotePartner?.PartnerMode;
-                    sync.LocalBranchCode = cdNotePartner?.InternalCode; //Parnter Internal Code
+                    sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = cdNote.CurrencyId;
                     sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
                     sync.Description0 = cdNote.Note;
-                    sync.DataType = "CDNOTE";
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
+                    sync.DataType = "CDNOTE";
 
                     int decimalRound = 0;
                     if (sync.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)
@@ -762,6 +788,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    string hblId = string.Empty;
+
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -772,8 +800,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                        var currencyId = surcharge.KickBack == true ? cdNote.CurrencyId : surcharge.CurrencyId;
+                        charge.CurrencyCode = currencyId;
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -789,21 +818,22 @@ namespace eFMS.API.Accounting.DL.Services
                         //CR: 15500
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
-                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        // tính net amount và vat amount theo phí
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL) 
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        else if (currencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
                         }
-                        else if (sync.CurrencyCode == surcharge.CurrencyId)
-                        {
-                            _netAmount = surcharge.NetAmount ?? 0;
-                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
-                        }
+                        //else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        //{
+                        //    _netAmount = surcharge.NetAmount ?? 0;
+                        //    _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        //}
                         else
                         {
                             _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
@@ -844,8 +874,24 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.IsRefund = 0;
 
                         charges.Add(charge);
+                        if(string.IsNullOrEmpty(hblId))
+                        {
+                            hblId = surcharge.Hblid.ToString();
+                        }
                     }
                     sync.Details = charges;
+
+                    CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
+                    if (hbl != null)
+                    {
+                        string urlPreviewCd = GetLinkCdNote(cdNote.Code, hbl.JobId, cdNote.CurrencyId);
+                        sync.AtchDocInfo = new List<BravoAttachDoc> { new BravoAttachDoc{
+                        AttachDocDate = DateTime.Now,
+                        AttachDocName = cdNote.Code,
+                        AttachDocPath = webUrl.Value.Url.ToString() + "/en/#/" + urlPreviewCd,
+                        AttachDocRowId = cdNote.Id.ToString()
+                    }};
+                    }
 
                     data.Add(sync);
                 }
@@ -878,7 +924,7 @@ namespace eFMS.API.Accounting.DL.Services
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                 sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
                 sync.CustomerMode = soaPartner?.PartnerMode;
-                sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
+                sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                 sync.Description0 = soa.Note;
@@ -1015,7 +1061,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charges.Add(charge);
                 }
                 sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
-
+                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
                 data.Add(sync);
             }
             return data;
@@ -1048,12 +1094,12 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                     sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
                     sync.CustomerMode = soaPartner?.PartnerMode;
-                    sync.LocalBranchCode = soaPartner?.InternalCode; //Parnter Internal Code
+                    sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = soa.Currency;
                     sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                     sync.Description0 = soa.Note;
-                    sync.DataType = "SOA";
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
+                    sync.DataType = "SOA";
 
                     int decimalRound = 0;
                     if (sync.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)
@@ -1063,6 +1109,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -1073,8 +1120,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
+                        var currencyId = surcharge.KickBack == true ? soa.Currency : surcharge.CurrencyId;
+                        charge.CurrencyCode = currencyId;
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL); // get ExchangeRate theo phí
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -1090,21 +1138,23 @@ namespace eFMS.API.Accounting.DL.Services
                         //CR:15500
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
-                        if (sync.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
+                        // tính net amount và vat amount theo phí
+                        
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
                         }
-                        else if (sync.CurrencyCode == AccountingConstants.CURRENCY_USD)
+                        else if (currencyId == AccountingConstants.CURRENCY_USD)
                         {
                             _netAmount = surcharge.AmountUsd ?? 0;
                             _taxMoney = surcharge.VatAmountUsd ?? 0;
                         }
-                        else if (sync.CurrencyCode == surcharge.CurrencyId)
-                        {
-                            _netAmount = surcharge.NetAmount ?? 0;
-                            _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
-                        }
+                        //else if (sync.CurrencyCode == surcharge.CurrencyId)
+                        //{
+                        //    _netAmount = surcharge.NetAmount ?? 0;
+                        //    _taxMoney = (surcharge.Total - surcharge.NetAmount) ?? 0;
+                        //}
                         else
                         {
                             _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
@@ -1147,7 +1197,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charges.Add(charge);
                     }
                     sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
-
+                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
                     data.Add(sync);
                 }
             }
@@ -1487,12 +1537,13 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.LastSyncDate = DateTime.Now;
 
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
+                        // [CR: #16976] => Update charge cho phí USD giống với phí VND
                         //Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
                         if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
                             cdNote.Note += " Request Voucher";
                         }
-                        else
+                        //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
                             foreach (var surcharge in surcharges)
@@ -1548,12 +1599,13 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.LastSyncDate = DateTime.Now;
 
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                        //Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        // [CR: #16976] => Update charge cho phí USD giống với phí VND
+                        ////Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
                         if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
                         {
                             soa.Note += " Request Voucher";
                         }
-                        else
+                        //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
                             foreach (var surcharge in surcharges)
@@ -1668,7 +1720,7 @@ namespace eFMS.API.Accounting.DL.Services
             return customerName;
         }
 
-        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
+        private string  GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
@@ -2285,7 +2337,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var syncCreditModel in syncCreditModels)
                 {
-                    string type = syncCreditModel.DataType;
                     string creatorEnName = string.Empty;
                     string refNo = string.Empty;
                     string partnerEn = string.Empty;
@@ -2304,10 +2355,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         decRound = 2;
                     }
-
+                    var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
+                    var creditNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncCreditModel.Stt)).FirstOrDefault();
+                    string type = soa == null ? "CDNOTE" : "SOA";
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
+                        //var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -2331,7 +2384,6 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (type == "CDNOTE")
                     {
-                        var creditNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncCreditModel.Stt)).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == creditNote.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = creditNote.Code;
@@ -2366,7 +2418,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var syncModel in syncModels)
                 {
-                    string type = syncModel.DataType;
                     string creatorEnName = string.Empty;
                     string refNo = string.Empty;
                     string partnerEn = string.Empty;
@@ -2386,9 +2437,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decRound = 2;
                     }
 
+                    var soa = soaRepository.Get(x => x.Id == syncModel.Stt).FirstOrDefault();
+                    var debitNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncModel.Stt)).FirstOrDefault();
+                    string type = soa == null ? "CDNOTE" : "SOA";
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == syncModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -2411,7 +2464,6 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (type == "CDNOTE")
                     {
-                        var debitNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncModel.Stt)).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == debitNote.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = debitNote.Code;
@@ -3367,6 +3419,27 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return false;
+        }
+
+        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId)
+        {
+            List<BravoAttachDoc> results = new List<BravoAttachDoc>();
+
+            var files = sysFileRepository.Get(x => x.Folder == "Accounting/" + folder && x.ObjectId == objectId).ToList();
+            if(files.Count > 0)
+            {
+                files.ForEach(c =>
+                {
+                    results.Add(new BravoAttachDoc {
+                        AttachDocRowId = c.Id.ToString(),
+                        AttachDocName = c.Name,
+                        AttachDocPath = c.Url,
+                        AttachDocDate = c.DateTimeCreated
+                    });
+                });
+            }
+
+            return results;
         }
     }
 }

@@ -13,10 +13,10 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
-        public const string _emailFrom = "info.fms@itlvn.com"; //"noreply-efms@itlvn.com";
-        private const string _smtpHost = "webmail.itlvn.com"; //"email-smtp.ap-southeast-2.amazonaws.com";
-        private const string _smptUser = "info.fms"; //"AKIA2AI6JMUOVFIQJQXN";
-        private const string _smtpPassword = "ITPr0No1!"; //"BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP";
+        public const string _emailFrom = "noreply-efms@itlvn.com"; //"info.fms@itlvn.com";
+        private const string _smtpHost = "email-smtp.ap-southeast-2.amazonaws.com"; //"webmail.itlvn.com";
+        private const string _smptUser = "AKIA2AI6JMUOVFIQJQXN"; //"info.fms";
+        private const string _smtpPassword = "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP"; //"ITPr0No1!";
 
         public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments, List<string> emailCCs, List<string> emailBCC = null)
         {

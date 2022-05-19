@@ -101,7 +101,7 @@
                                     <label class="form-control-label" required>
                                         Customer
                                     </label>
-                                    <app-combo-grid-virtual-scroll
+                                    <app-combo-grid-virtual-scroll #comboGridCustomerCpn
                                         (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                                         [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
@@ -227,8 +227,8 @@
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value: salemansId.value}"
                                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
-                                        [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async"
-                                        size="15" [displayFields]="displayFieldSalesman" placeholder="Please select"
+                                        [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
+                                        [displayFields]="displayFieldSalesman" placeholder="Please select"
                                         (remove)="resetFormControl(salemansId)">
                                     </app-combo-grid-virtual-scroll>
                                 </div>

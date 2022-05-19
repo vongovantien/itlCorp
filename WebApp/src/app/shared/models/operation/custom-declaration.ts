@@ -49,6 +49,7 @@ export class CustomDeclaration {
 
     // custom
     isReplicate: boolean = false;
+    customerId: string = null;
 
     constructor(object?: any) {
         const self = this;

@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, AbstractControl } from "@angular/forms";
 import { formatDate } from "@angular/common";
 import { catchError, finalize } from "rxjs/operators";
 import { NgProgress } from "@ngx-progressbar/core";
+import { SystemConstants } from "@constants";
 
 @Component({
     selector: 'input-daily-export-popup',
@@ -55,7 +56,7 @@ export class ShareBussinessInputDailyExportPopupComponent extends PopupBase {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         const fileName = "DAILY LIST " + formatDate(this.issuedDate.value.startDate, 'dd MMM yyyy', 'en').toUpperCase() + ".xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
+                        this.downLoadFile(response, SystemConstants.FILE_EXCEL, fileName);
                     } else {
                         this._toastService.warning('Not found data to print', '');
                     }

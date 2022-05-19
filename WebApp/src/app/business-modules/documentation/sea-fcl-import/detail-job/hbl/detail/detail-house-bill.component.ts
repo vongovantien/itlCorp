@@ -3,11 +3,9 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
+import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
-import { ReportPreviewComponent } from '@common';
-import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
+import { InfoPopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
 import { DataService } from '@services';
 
@@ -16,7 +14,8 @@ import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import isUUID from 'validator/lib/isUUID';
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { InjectViewContainerRefDirective } from '@directives';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -29,10 +28,10 @@ enum HBL_TAB {
     selector: 'app-detail-house-bill',
     templateUrl: './detail-house-bill.component.html',
 })
-export class DetailHouseBillComponent extends CreateHouseBillComponent implements ICrystalReport {
+export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     hblId: string;
     containers: Container[] = [];
@@ -49,18 +48,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _store: Store<fromShareBussiness.ITransactionState>,
-        private _exportRepository: ExportRepo,
         protected _cd: ChangeDetectorRef,
         protected _dataService: DataService
 
     ) {
         super(_documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
-    }
-
-    @delayTime(1000)
-    showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
     }
 
     ngOnInit() {
@@ -139,7 +131,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     onUpdateHblDetail() {
         this.formHouseBill.isSubmited = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
+                title: 'Cannot create HBL'
+            });
             return;
         }
         const modelUpdate: any = this.onsubmitData();
@@ -199,6 +194,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
                     if (!!res) {
                         this.hblDetail = res;
 
+                        this.formHouseBill.hblId = this.hblDetail.id;
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
@@ -217,114 +213,114 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         this.selectedTab = tabName;
     }
 
-    onPreview(type: string) {
-        this.isClickSubMenu = false;
+    // onPreview(type: string) {
+    //     this.isClickSubMenu = false;
 
-        // Preview Delivery Order
-        if (type === 'DELIVERY_ORDER') {
-            this.previewDeliveryOrder();
-        }
+    //     // Preview Delivery Order
+    //     if (type === 'DELIVERY_ORDER') {
+    //         this.previewDeliveryOrder();
+    //     }
 
-        // Preview Arrival Notice
-        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
-            const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-            this.previewArrivalNotice(_currency);
-        }
+    //     // Preview Arrival Notice
+    //     if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
+    //         const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
+    //         this.previewArrivalNotice(_currency);
+    //     }
 
-        // PREVIEW PROOF OF DELIVERY
-        if (type === 'PROOF_OF_DELIVERY') {
-            this.previewProofOfDelivery();
-        }
-        if (type === 'E_MANIFEST') {
-            this.exportEManifest();
-        }
-        if (type === 'GOODS_DECLARE') {
-            this.exportGoodsDeclare();
-        }
-        if (type === 'DANGEROUS_GOODS') {
-            this.exportDangerousGoods();
-        }
-    }
-    previewProofOfDelivery() {
-        this._documentationRepo.previewProofofDelivery(this.hblId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    }
-                },
-            );
-    }
-    previewArrivalNotice(_currency: string) {
-        this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data charge to display preview');
-                    }
-                },
-            );
-    }
-    previewDeliveryOrder() {
-        if (this.hblDetail.deliveryOrderNo === null) {
-            this._toastService.warning('There is no delivery order information. You must save delivery order information');
-            return;
-        }
-        this._documentationRepo.previewDeliveryOrder(this.hblId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no container data to display preview');
-                    }
-                },
-            );
-    }
-    exportDangerousGoods() {
-        this._exportRepository.exportDangerousGoods(this.hblId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
-                },
-            );
-    }
+    //     // PREVIEW PROOF OF DELIVERY
+    //     if (type === 'PROOF_OF_DELIVERY') {
+    //         this.previewProofOfDelivery();
+    //     }
+    //     if (type === 'E_MANIFEST') {
+    //         this.exportEManifest();
+    //     }
+    //     if (type === 'GOODS_DECLARE') {
+    //         this.exportGoodsDeclare();
+    //     }
+    //     if (type === 'DANGEROUS_GOODS') {
+    //         this.exportDangerousGoods();
+    //     }
+    // }
+    // previewProofOfDelivery() {
+    //     this._documentationRepo.previewProofofDelivery(this.hblId)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => { })
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.dataReport = res;
+    //                 if (this.dataReport.dataSource.length > 0) {
+    //                     this.showReport();
+    //                 }
+    //             },
+    //         );
+    // }
+    // previewArrivalNotice(_currency: string) {
+    //     this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => { })
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.dataReport = res;
+    //                 if (this.dataReport.dataSource.length > 0) {
+    //                     this.showReport();
+    //                 } else {
+    //                     this._toastService.warning('There is no data charge to display preview');
+    //                 }
+    //             },
+    //         );
+    // }
+    // previewDeliveryOrder() {
+    //     if (this.hblDetail.deliveryOrderNo === null) {
+    //         this._toastService.warning('There is no delivery order information. You must save delivery order information');
+    //         return;
+    //     }
+    //     this._documentationRepo.previewDeliveryOrder(this.hblId)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => { })
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.dataReport = res;
+    //                 if (this.dataReport.dataSource.length > 0) {
+    //                     this.showReport();
+    //                 } else {
+    //                     this._toastService.warning('There is no container data to display preview');
+    //                 }
+    //             },
+    //         );
+    // }
+    // exportDangerousGoods() {
+    //     this._exportRepository.exportDangerousGoods(this.hblId)
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
+    //             },
+    //         );
+    // }
 
-    exportGoodsDeclare() {
-        this._exportRepository.exportGoodDeclare(this.hblId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
-                },
-            );
-    }
+    // exportGoodsDeclare() {
+    //     this._exportRepository.exportGoodDeclare(this.hblId)
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
+    //             },
+    //         );
+    // }
 
-    exportEManifest() {
-        this._exportRepository.exportEManifest(this.hblId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
-                },
-            );
-    }
+    // exportEManifest() {
+    //     this._exportRepository.exportEManifest(this.hblId)
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
+    //             },
+    //         );
+    // }
 }

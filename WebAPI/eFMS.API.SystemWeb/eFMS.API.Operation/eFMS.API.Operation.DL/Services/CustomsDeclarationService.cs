@@ -410,7 +410,7 @@ namespace eFMS.API.Operation.DL.Services
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
             var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
             // var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
-            var customers = customerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
+            // var customers = customerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
             foreach (CustomsDeclaration item in list)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);
@@ -420,11 +420,16 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
                 if (item.AccountNo == null)
                 {
-                    clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
+                    var customer = customerRepository.First(x => x.TaxCode == item.PartnerTaxCode);
+                    clearance.CustomerName = customer?.ShortName;
+                    clearance.CustomerId = customer.Id;
                 }
                 else
                 {
-                    clearance.CustomerName = customers.FirstOrDefault(x => x.AccountNo == item.AccountNo)?.ShortName;
+                    var customer = customerRepository.First(x => x.AccountNo == item.AccountNo);
+                    clearance.CustomerName = customer.ShortName;
+                    clearance.CustomerId = customer.Id;
+
                 }
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
@@ -1287,7 +1292,11 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.AccountNo = clearance.PartnerTaxCode;
             }
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
-            result.CustomerName = customerRepository.Get(x => x.AccountNo == result.AccountNo).FirstOrDefault()?.ShortName;
+            var customer = customerRepository.Get(x => x.AccountNo == result.AccountNo).FirstOrDefault();
+
+            result.CustomerName = customer.ShortName;
+            result.CustomerId = customer.Id;
+
             result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);

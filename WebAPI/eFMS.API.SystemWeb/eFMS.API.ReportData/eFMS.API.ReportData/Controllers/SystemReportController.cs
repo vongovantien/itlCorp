@@ -42,8 +42,8 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Company List.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Company List");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
 
         }
@@ -67,8 +67,8 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Company List.xlsx");
-
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Company List");
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
 
         }
@@ -86,7 +86,9 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catDepartmentCriteria, aPis.HostStaging + Urls.System.DepartmentUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDepartmentModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateDepartmentExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.DepartmentName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -102,7 +104,9 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.GroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysGroupModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateGroupExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
+            var result = new FileHelper().ExportExcel(null,stream, FilesNames.GroupName);
+            HeaderResponse(result.FileDownloadName);
+            return result;
         }
 
         /// <summary>
@@ -122,9 +126,16 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream,FilesNames.UserName);
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream,FilesNames.UserName);
+            HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
 
+        }
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
         }
     }
 }

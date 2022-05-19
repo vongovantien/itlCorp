@@ -76,7 +76,7 @@ namespace eFMSWindowService
                         string tableBody = @"<table style='width: 100%; border: 1px solid #dddddd; border-collapse: collapse;'>"
                                          + @"<tr>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>STT <br/> <i style='font-weight: normal'>No.</i></th>"
-                                         + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Chi nhánh <br/> <i style='font-weight: normal'>Branch</i></th>"
+                                         + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Mã số thuế <br/> <i style='font-weight: normal'>Tax code</i></th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Khách hàng <br/> <i style='font-weight: normal'>Customer</i></th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Hạn mức được cấp <br/> <i style='font-weight: normal'>Credit Limit</i></th>"
                                          + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>% Hạn mức công nợ hiện tại <br/> <i style='font-weight: normal'>% Current Credit</i></th>"
@@ -90,6 +90,7 @@ namespace eFMSWindowService
                         {
                             var o = new ExceededCreditLimit()
                             {
+                                TaxCode = it.TaxCode,
                                 Office = it.BranchName_EN,
                                 Customer = it.PartnerName_EN,
                                 CreditLimit = it.CreditLimit != null?it.CreditLimit:0,
@@ -182,8 +183,8 @@ namespace eFMSWindowService
                 foreach (var item in exceededCreditLimits)
                 {
                     content.Append(@"<tr>");
-                    content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + no + "</td>");
-                    content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + item.Office + "</td>");
+                    content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: left;'>" + no + "</td>");
+                    content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;text-align: left;'>" + item.TaxCode + "</td>");
                     content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + item.Customer + "</td>");
                     content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", item.CreditLimit) + "</td>");
                     content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + string.Format("{0:#,##0.00}", item.CurrentCredit) + " %</td>");
@@ -211,6 +212,7 @@ namespace eFMSWindowService
 
     class ExceededCreditLimit
     {
+        public string TaxCode { get; set; }
         public string Office { get; set; }
         public string Customer { get; set; }
         public decimal? CreditLimit { get; set; }

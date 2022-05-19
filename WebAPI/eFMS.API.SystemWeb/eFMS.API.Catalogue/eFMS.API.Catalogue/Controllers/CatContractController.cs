@@ -325,6 +325,7 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         [HttpGet("GetById")]
+        [Authorize]
         public IActionResult GetById(Guid Id)
         {
             var results = catContractService.GetById(Id);

@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppList } from '@app';
-import {  RoutingConstants } from '@constants';
+import {  RoutingConstants, SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -17,6 +17,7 @@ import {
   ConfirmPopupComponent, Permission403PopupComponent
 } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
+import { HttpResponse } from '@angular/common/http';
 @Component({
   selector: 'combine-billing',
   templateUrl: './combine-billing.component.html',
@@ -193,9 +194,9 @@ deleteCombineBilling(id: string) {
             finalize(() => this._progressRef.complete())
           )
           .subscribe(
-            (response: ArrayBuffer) => {
-              if (response.byteLength > 0) {
-                this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+            (response: HttpResponse<any>) => {
+              if (response!=null) {
+                this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
               } else {
                 this._toastService.warning('No data found');
               }

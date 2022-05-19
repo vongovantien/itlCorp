@@ -14,6 +14,7 @@ import { CommercialPotentialCustomerPopupComponent } from './components/popup/po
 
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Component({
@@ -176,8 +177,8 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     exportExcel() {
         this._catalogueRepo.downloadPotentialCustomerListExcel(this.dataSearch)
             .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'potential-customer-list.xlsx');
+                (res: HttpResponse<any>) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 }
             );
     }

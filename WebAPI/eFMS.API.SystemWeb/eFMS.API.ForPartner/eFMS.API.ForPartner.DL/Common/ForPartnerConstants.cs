@@ -56,8 +56,10 @@
 
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
-        public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_BANK = "Bank Transfer";
         public static readonly string PAYMENT_METHOD_BANK_OR_CASH = "Bank Transfer / Cash";
+        public static readonly string PAYMENT_METHOD_OTHER = "Other";
+        public static readonly string PAYMENT_METHOD_NETOFF = "Net Off Shipment";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -80,6 +82,8 @@
         public static readonly string CHARGE_AWB_FEE = "Air Waybill fee";
 
         public static readonly string CHARGE_HANDLING_FEE = "Handling fee";
+
+        public static readonly string CHARGE_MODE_NINV = "N.INV";
         #region -- TYPE SOA--
         public static readonly string TYPE_SOA_CREDIT = "Credit";
         public static readonly string TYPE_SOA_DEBIT = "Debit";
@@ -150,6 +154,25 @@
 
         public static readonly string SYNCED_FROM_CDNOTE = "CDNOTE";
         public static readonly string SYNCED_FROM_SOA = "SOA";
+        public static readonly string SYNCED_FROM_SETTLEMENT = "SETTLEMENT";
+        public static readonly string SYNCED_FROM_VOUCHER = "VOUCHER";
+
+        public static readonly int KB_EXCHANGE_RATE = 20000;
+
+        #region PAYABLE
+        public static readonly string PAYABLE_TRANSACTION_TYPE_CREDIT = "CREDIT";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_OBH = "OBH";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_ADV = "ADV";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_COMBINE = "COMBINE";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_CR_COMBINE = "CRCOMBINE";
+
+        public static readonly string PAYABLE_PAYMENT_TYPE_CREDIT = "CREDIT";
+        public static readonly string PAYABLE_PAYMENT_TYPE_OBH = "OBH";
+        public static readonly string PAYABLE_PAYMENT_TYPE_NETOFF = "NETOFF";
+        public static readonly string PAYABLE_PAYMENT_TYPE_ADV = "ADV";
+        public static readonly string PAYABLE_PAYMENT_TYPE_CLEAR_ADV = "CLEAR_ADVANCE";
+        public static readonly string TRANSACTION_TYPE_BALANCE = "BALANCE";
+        #endregion
 
         public static readonly string STATUS_CANCEL_RECEIPT = "Cancel";
         public static readonly string STATUS_DONE_RECEIPT = "Done";

@@ -71,7 +71,7 @@
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSOA(System.String,System.String)" -->
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
             <summary>
-            Export Bravo SOA
+            Export Bravo SOAExportSettlementPaymentDetailSurCharges
             </summary>
             <param name="soaNo"></param>
             <returns></returns>
@@ -130,6 +130,13 @@
             <param name="criteria">AccountReceivableCriteria</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDebitDetail(eFMS.API.ReportData.Models.Criteria.DebitDetailCriteria)">
+            <summary>
+            Export debit detail
+            </summary>
+            <param name="criteria">AccountReceivableCriteria</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPreview(System.Guid,System.String,System.String)">
             <summary>
             Export detail settlement payment
@@ -137,6 +144,20 @@
             <param name="settlementId">Id of settlement payment</param>
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <param name="key">String random</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableStandartReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableAcctTemplateReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
@@ -485,6 +506,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetFolderInTemplateExport(System.String)">
+            <summary>
+            Get folder contain template excel
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
             <summary>
             Generate advance payment excel
@@ -501,7 +528,7 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.ExportSettlementPaymentDetailSurCharges(System.Collections.Generic.List{eFMS.API.ReportData.Models.Accounting.AccountingSettlementExportGroup},System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.ExportSettlementPaymentDetailSurCharges(System.Collections.Generic.List{eFMS.API.ReportData.Models.Accounting.AccountingSettlementExportGroup})">
             <summary>
             Set settlement detail data to excel
             </summary>
@@ -509,7 +536,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria)">
             <summary>
             GenerateExportCutomerHistoryPayment
             </summary>
@@ -546,11 +573,20 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportGeneralSettlementPayment(eFMS.API.ReportData.Models.Accounting.InfoSettlementExport,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportGeneralSettlementPayment(eFMS.API.ReportData.Models.Accounting.InfoSettlementExport)">
             <summary>
             Generate data to Export General Preview in Settlement detail
             </summary>
             <param name="settlementExport"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportAccountingPayableStandart(System.Collections.Generic.List{eFMS.API.ReportData.Models.Accounting.AcctPayablePaymentExport},eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
+            <summary>
+            Generate Export Accounting Payable Standart Report
+            </summary>
+            <param name="acctPayables"></param>
+            <param name="criteria"></param>
             <param name="fileName"></param>
             <returns></returns>
         </member>
@@ -586,7 +622,7 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateACSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateACSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult)">
             <summary>
             Get Data Export ACS Excel For MAWB
             </summary>
@@ -594,7 +630,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateNCTSALSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateNCTSALSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult)">
             <summary>
             Get Data Export NCTS-ALS Excel For MAWB
             </summary>
@@ -641,14 +677,14 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult)">
             <summary>
             Bind Commission Ops Report Excel
             </summary>
             <param name="resultData"></param>
             <param name="fileName"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult)">
             <summary>
             Bind Commission Services Report Excel
             </summary>
@@ -656,7 +692,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataIncentiveReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataIncentiveReport(eFMS.API.ReportData.Models.CommissionExportResult)">
             <summary>
             Bind data to Incentive Report
             </summary>
@@ -721,7 +757,7 @@
             <param name="nameList"></param>
             <param name="numberFormat"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String},System.Nullable{System.Int32})">
             <summary>
             Set formula for one cell
             </summary>

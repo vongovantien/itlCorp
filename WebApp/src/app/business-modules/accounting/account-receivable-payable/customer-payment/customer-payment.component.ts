@@ -325,7 +325,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .subscribe(
                 (res: HttpResponse<any>) => {
                     if (res.body) {
-                        const fileName = res.headers.get('efms-file-name');
+                        const fileName = res.headers.get(SystemConstants.EFMS_FILE_NAME);
                         console.log(fileName);
                         this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, fileName);
                         return;

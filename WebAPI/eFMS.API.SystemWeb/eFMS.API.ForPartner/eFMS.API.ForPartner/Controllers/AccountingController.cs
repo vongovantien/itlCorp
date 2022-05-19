@@ -19,6 +19,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using eFMS.API.ForPartner.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Payable;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -35,6 +38,7 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IAccountingManagementService accountingManagementService;
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly IOptions<ApiUrl> apiUrl;
+        private readonly IAccountPayableService accPayableService;
 
         /// <summary>
         /// Accounting Contructor
@@ -42,12 +46,14 @@ namespace eFMS.API.ForPartner.Controllers
         public AccountingController(IAccountingManagementService service,
             IStringLocalizer<LanguageSub> localizer,
             IActionFuncLogService actionFuncLog,
+            IAccountPayableService payableService,
             IOptions<ApiUrl> aUrl)
         {
             accountingManagementService = service;
             stringLocalizer = localizer;
             actionFuncLogService = actionFuncLog;
             apiUrl = aUrl;
+            accPayableService = payableService;
         }
 
         /// <summary>
@@ -668,6 +674,90 @@ namespace eFMS.API.ForPartner.Controllers
         }
 
         /// <summary>
+        /// Ghi nhận công nợ phải trả
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey">API Key</param>
+        /// <param name="hash">Hash Value</param>s
+        /// <returns></returns>
+        [HttpPost("InsertPayablePayment")]
+        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
+        {
+            var _startDateProgress = DateTime.Now;
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+            var checkPayableData = accPayableService.CheckIsValidPayable(model);
+            if (!string.IsNullOrEmpty(checkPayableData))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = checkPayableData, Data = model };
+                return Ok(_result);
+            }
+
+            var hs = accPayableService.InsertAccountPayablePayment(model, apiKey);
+
+            string _message = hs.Success ? "Ghi nhận giảm trừ công nợ thành công" : string.Format("{0}. Ghi nhận giảm trừ công nợ thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+            #region -- Ghi Log --
+            string _funcLocal = "InsertPayablePayment";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = string.Format("Ghi nhận giảm trừ công nợ");
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion -- Ghi Log --
+
+            if (!hs.Success)
+                return Ok(result);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Hủy thanh toán giảm trừ công nợ phải trả
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpPut("CancelPayablePayment")]
+        public IActionResult CancelPayablePayment(List<CancelPayablePayment> model, [Required] string apiKey, [Required] string hash)
+        {
+            var _startDateProgress = DateTime.Now;
+
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = accPayableService.CancelAccountPayablePayment(model, apiKey);
+            string _message = hs.Success ? "Hủy giao dịch giảm trừ thành công" : string.Format("{0}.Hủy giao dịch giảm trừ", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+            #region -- Ghi Log --
+            string _funcLocal = "CancelPayablePayment";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Hủy giao dịch giảm trừ";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion -- Ghi Log --
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Cập nhật thông tin phiếu chi và số HT
         /// </summary>
         /// <param name="model"></param>
@@ -703,6 +793,104 @@ namespace eFMS.API.ForPartner.Controllers
 
             if (!hs.Success)
                 return Ok(result);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin tạo voucher
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpPost("CreateVoucher")]
+        public async Task<IActionResult> CreateVoucher(VoucherSyncCreateModel model, [Required] string apiKey, [Required] string hash)
+        {
+            var _startDateProgress = DateTime.Now;
+            string _objectRequest = JsonConvert.SerializeObject(model);
+
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
+
+            HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+            #region -- Ghi Log --
+            string _funcLocal = "CreateVoucher";
+            string _major = "Tạo voucher";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion
+
+
+            if (hs.Success)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    HandleState payableHandle = await accPayableService.InsertAccPayable(model);
+                });
+            }
+           
+            return Ok(result);
+          
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin  voucher cho voucher dc sync từ efms
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateVoucher")]
+        public async Task<IActionResult> UpdateVoucher(VoucherSyncUpdateModel model,[Required] string apiKey, [Required] string hash)
+        {
+
+            HandleState hs = await accountingManagementService.UpdateVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Cập nhật voucher thành công" : string.Format("{0} Cập nhật voucher thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// Hóa voucher đc tạo từ bravo trước đó
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteVoucher")]
+        public async Task<IActionResult> DeleteVoucher(VoucherSyncDeleteModel model, [Required] string apiKey, [Required] string hash)
+        {
+            bool IsHasPayment = accPayableService.IsPayableHasPayment(model);
+            if(IsHasPayment == true)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = string.Format("{0} Phiếu Hoạch toán đã có thanh toán, vui lòng hủy thanh toán toán trước khi hủy voucher", model.VoucherNo) });
+            }
+            HandleState hs = await accountingManagementService.DeleteVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Xóa voucher thành công" : string.Format("{0} Xóa voucher thất bại", hs.Exception?.Message);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            if (hs.Success)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    HandleState payableDelHandle = await accPayableService.DeleteAccountPayable(model, apiKey);
+                });
+            }
             return Ok(result);
         }
     }

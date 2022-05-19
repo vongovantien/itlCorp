@@ -9,9 +9,7 @@
             </app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
-
     </app-sub-header>
-
 </div>
 
 <div class="m-content">
@@ -19,6 +17,7 @@
         <tabset class="custom-class-tab">
             <tab heading="HBL Detail">
                 <app-form-create-hbl-sea-import [type]="'SLI'"></app-form-create-hbl-sea-import>
+
                 <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
                 </hbl-goods-summary-lcl>
             </tab>
@@ -38,9 +37,4 @@
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="9">
 </import-house-bill-detail>
 
-<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create HBL'"></info-popup>
-
-<confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct?'"
-    [labelCancel]="'No'" (onSubmit)="oncreate()" title="Save HBL">
-</confirm-popup>
+<ng-template inject></ng-template>
