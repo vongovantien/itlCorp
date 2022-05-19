@@ -1279,7 +1279,7 @@ namespace eFMS.API.Accounting.DL.Services
             var cstranDetail = from trs in transactions
                                join trsDtl in csTransactionDetailRepo.Get(transDetailQuery) on trs.Id equals trsDtl.JobId
                                select trsDtl;
-            
+
             #endregion
 
             #region -- Get surcharge with filter jobno--
@@ -1346,7 +1346,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             surcharges = csShipmentSurchargeRepo.Get(surchargesQuery);
             obhSurcharges = csShipmentSurchargeRepo.Get(obhSurchargesQuery);
-
+            var data = new List<ChargeShipmentModel>();
+            if (surcharges.Count() > 0)
+            {
+                data.AddRange(GetListChargeSoa(surcharges, operations, transactions, criteria.CustomerID, criteria.Type));
+            }
             #region -- Get more OBH charge --
             //Lấy thêm phí OBH
             if (criteria.IsOBH)
@@ -1364,24 +1368,116 @@ namespace eFMS.API.Accounting.DL.Services
                         obhSurchargesApply = obhSurchargesApply.Union(chargesSoaDebitSettle.Where(x => validSettleDebit.Any(z => z == x.SettlementCode)));
                     }
 
-                    if (obhSurchargesApply != null && obhSurchargesApply.Count() > 0)
+                    if (obhSurchargesApply.Count() > 0)
                     {
-                        if (surcharges.Count() > 0)
-                        {
-                            surcharges = surcharges.Union(obhSurchargesApply);
-                        }
-                        else
-                        {
-                            surcharges = obhSurchargesApply;
-                        }
+                        data.AddRange(GetListChargeSoa(obhSurchargesApply, operations, transactions, criteria.CustomerID, criteria.Type));
                     }
                 }
             }
             #endregion -- Get more OBH charge --
 
-            var data = new List<ChargeShipmentModel>();
-            if (surcharges == null || surcharges.Count() == 0) return data.AsQueryable();
+            #region delete Old use GetListChargeSoa(...)
+            //foreach (var surcharge in surcharges)
+            //{
+            //    var chg = new ChargeShipmentModel();
+            //    chg.ID = surcharge.Id;
+            //    var charge = chargeLookup[surcharge.ChargeId].FirstOrDefault();
+            //    chg.ChargeCode = charge?.Code;
+            //    chg.ChargeName = charge?.ChargeNameEn;
+            //    chg.JobId = surcharge.JobNo;
+            //    chg.HBL = surcharge.Hblno;
+            //    chg.MBL = surcharge.Mblno;
+            //    chg.Type = surcharge.Type;
+            //    chg.Currency = surcharge.CurrencyId;
+            //    chg.InvoiceNo = surcharge.InvoiceNo;
+            //    chg.Note = surcharge.Notes;
+            //    chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
+            //    chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
 
+            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+            //    {
+            //        chg.Debit = surcharge.Total;
+            //        chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+            //        chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+            //    }
+            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+            //    {
+            //        chg.Credit = surcharge.Total;
+            //        chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+            //        chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+            //    }
+
+            //    chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
+
+            //    string _pic = string.Empty;
+            //    DateTime? _serviceDate = null;
+            //    string _customNo = string.Empty;
+            //    if (surcharge.TransactionType == "CL")
+            //    {
+            //        var ops = operations.Where(x => x.JobNo == surcharge.JobNo).FirstOrDefault();
+            //        if (ops != null)
+            //        {
+            //            _serviceDate = ops.ServiceDate;
+            //            var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
+            //            _pic = user?.Username;
+            //            _customNo = surcharge.ClearanceNo;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var tran = transactions.Where(x => x.JobNo == surcharge.JobNo).FirstOrDefault();
+            //        if (tran != null)
+            //        {
+            //            //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+            //            _serviceDate = tran.ServiceDate;
+            //            var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
+            //            _pic = user?.Username;
+            //        }
+            //    }
+            //    chg.CustomNo = _customNo;
+            //    chg.ServiceDate = _serviceDate;
+            //    chg.PIC = _pic;
+
+            //    string _cdNote = string.Empty;
+            //    if (criteria.CustomerID != null)
+            //    {
+            //        if (criteria.CustomerID == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //        {
+            //            _cdNote = surcharge.CreditNo;
+            //        }
+            //        else
+            //        {
+            //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+            //            {
+            //                _cdNote = surcharge.CreditNo;
+            //            }
+            //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //            {
+            //                _cdNote = surcharge.DebitNo;
+            //            }
+            //        }
+            //    }
+            //    chg.CDNote = _cdNote;
+            //    data.Add(chg);
+            //}
+            #endregion
+            //Sort Array sẽ nhanh hơn
+            charges = data.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
+            return charges;
+        }
+
+        /// <summary>
+        /// Get surcharge data when get charges soa
+        /// </summary>
+        /// <param name="surcharges"></param>
+        /// <param name="operations"></param>
+        /// <param name="transactions"></param>
+        /// <param name="customerId"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private List<ChargeShipmentModel> GetListChargeSoa(IQueryable<CsShipmentSurcharge> surcharges, IQueryable<OpsTransaction> operations, IQueryable<CsTransaction> transactions, string customerId, string type)
+        {
+            var data = new List<ChargeShipmentModel>();
             var chargeLookup = catChargeRepo.Get().ToLookup(x => x.Id);
             foreach (var surcharge in surcharges)
             {
@@ -1400,13 +1496,13 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
 
-                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == customerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
                 {
                     chg.Debit = surcharge.Total;
                     chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
                     chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
                 }
-                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == customerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
                 {
                     chg.Credit = surcharge.Total;
                     chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
@@ -1414,6 +1510,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
+                chg.SOANo = (type == "Debit" ? surcharge.Soano : surcharge.PaySoano);
 
                 string _pic = string.Empty;
                 DateTime? _serviceDate = null;
@@ -1445,9 +1542,9 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.PIC = _pic;
 
                 string _cdNote = string.Empty;
-                if (criteria.CustomerID != null)
+                if (!string.IsNullOrEmpty(customerId))
                 {
-                    if (criteria.CustomerID == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    if (customerId == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
                     {
                         _cdNote = surcharge.CreditNo;
                     }
@@ -1466,9 +1563,7 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.CDNote = _cdNote;
                 data.Add(chg);
             }
-            //Sort Array sẽ nhanh hơn
-            charges = data.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
-            return charges;
+            return data;
         }
 
         public ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria)
@@ -1712,6 +1807,12 @@ namespace eFMS.API.Accounting.DL.Services
             surchargesQuery = surchargesQuery.And(x => x.Total > 0);
 
             surcharges = csShipmentSurchargeRepo.Get(surchargesQuery);
+            var data = new List<ChargeShipmentModel>();
+            if (surcharges.Count() > 0)
+            {
+                data.AddRange(GetListChargeSoa(surcharges, operations, transactions, criteria.CustomerID, criteria.Type));
+            }
+            
             #region -- Get more OBH charge --
             //Lấy thêm phí OBH
             if (criteria.IsOBH)
@@ -1719,106 +1820,101 @@ namespace eFMS.API.Accounting.DL.Services
                 // CR #17433 Không lấy phí 0 đồng
                 obhSurchargesQuery = obhSurchargesQuery.And(x => x.Total > 0);
                 obhSurcharges = csShipmentSurchargeRepo.Get(obhSurchargesQuery);
-                if (obhSurcharges != null && obhSurcharges.Count() > 0)
+                if (obhSurcharges.Count() > 0)
                 {
-                    if (surcharges.Count() > 0)
-                    {
-                        surcharges = surcharges.Union(obhSurcharges);
-                    }
-                    else
-                    {
-                        surcharges = obhSurcharges;
-                    }
+                    data.AddRange(GetListChargeSoa(obhSurcharges, operations, transactions, criteria.CustomerID, criteria.Type));
                 }
             }
             #endregion -- Get more OBH charge --
 
-            var data = new List<ChargeShipmentModel>();
-            if (surcharges == null || surcharges.Count() == 0) return data.AsQueryable();
-            foreach (var surcharge in surcharges)
-            {
-                var chg = new ChargeShipmentModel();
-                chg.ID = surcharge.Id;
-                var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
-                chg.ChargeCode = charge?.Code;
-                chg.ChargeName = charge?.ChargeNameEn;
-                chg.JobId = surcharge.JobNo;
-                chg.HBL = surcharge.Hblno;
-                chg.MBL = surcharge.Mblno;
-                chg.Type = surcharge.Type;
-                chg.Currency = surcharge.CurrencyId;
-                chg.InvoiceNo = surcharge.InvoiceNo;
-                chg.Note = surcharge.Notes;
-                chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
-                chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
+            #region Delete Old to use GetListChargeSoa(...)
+            //var data = new List<ChargeShipmentModel>();
+            //if (surcharges == null || surcharges.Count() == 0) return data.AsQueryable();
+            //foreach (var surcharge in surcharges)
+            //{
+            //    var chg = new ChargeShipmentModel();
+            //    chg.ID = surcharge.Id;
+            //    var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
+            //    chg.ChargeCode = charge?.Code;
+            //    chg.ChargeName = charge?.ChargeNameEn;
+            //    chg.JobId = surcharge.JobNo;
+            //    chg.HBL = surcharge.Hblno;
+            //    chg.MBL = surcharge.Mblno;
+            //    chg.Type = surcharge.Type;
+            //    chg.Currency = surcharge.CurrencyId;
+            //    chg.InvoiceNo = surcharge.InvoiceNo;
+            //    chg.Note = surcharge.Notes;
+            //    chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
+            //    chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
 
-                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                {
-                    chg.Debit = surcharge.Total;
-                    chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
-                    chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
-                }
-                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                {
-                    chg.Credit = surcharge.Total;
-                    chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
-                    chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
-                }
+            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+            //    {
+            //        chg.Debit = surcharge.Total;
+            //        chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+            //        chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+            //    }
+            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == criteria.CustomerID && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
+            //    {
+            //        chg.Credit = surcharge.Total;
+            //        chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
+            //        chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
+            //    }
 
-                chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
-                chg.SOANo = criteria.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
+            //    chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
+            //    chg.SOANo = criteria.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
 
-                string _pic = string.Empty;
-                DateTime? _serviceDate = null;
-                string _customNo = string.Empty;
-                if (surcharge.TransactionType == "CL")
-                {
-                    var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
-                    if (ops != null)
-                    {
-                        _serviceDate = ops.ServiceDate;
-                        var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
-                        _pic = user?.Username;
-                        _customNo = surcharge.ClearanceNo;
-                    }
-                }
-                else
-                {
-                    var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
-                    if (tran != null)
-                    {
-                        //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
-                        _serviceDate = tran.ServiceDate;
-                        var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
-                        _pic = user?.Username;
-                    }
-                }
-                chg.CustomNo = _customNo;
-                chg.ServiceDate = _serviceDate;
-                chg.PIC = _pic;
+            //    string _pic = string.Empty;
+            //    DateTime? _serviceDate = null;
+            //    string _customNo = string.Empty;
+            //    if (surcharge.TransactionType == "CL")
+            //    {
+            //        var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+            //        if (ops != null)
+            //        {
+            //            _serviceDate = ops.ServiceDate;
+            //            var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
+            //            _pic = user?.Username;
+            //            _customNo = surcharge.ClearanceNo;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
+            //        if (tran != null)
+            //        {
+            //            //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+            //            _serviceDate = tran.ServiceDate;
+            //            var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
+            //            _pic = user?.Username;
+            //        }
+            //    }
+            //    chg.CustomNo = _customNo;
+            //    chg.ServiceDate = _serviceDate;
+            //    chg.PIC = _pic;
 
-                string _cdNote = string.Empty;
-                if (criteria.CustomerID != null)
-                {
-                    if (criteria.CustomerID == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                    {
-                        _cdNote = surcharge.CreditNo;
-                    }
-                    else
-                    {
-                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                        {
-                            _cdNote = surcharge.CreditNo;
-                        }
-                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                        {
-                            _cdNote = surcharge.DebitNo;
-                        }
-                    }
-                }
-                chg.CDNote = _cdNote;
-                data.Add(chg);
-            }
+            //    string _cdNote = string.Empty;
+            //    if (criteria.CustomerID != null)
+            //    {
+            //        if (criteria.CustomerID == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //        {
+            //            _cdNote = surcharge.CreditNo;
+            //        }
+            //        else
+            //        {
+            //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+            //            {
+            //                _cdNote = surcharge.CreditNo;
+            //            }
+            //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //            {
+            //                _cdNote = surcharge.DebitNo;
+            //            }
+            //        }
+            //    }
+            //    chg.CDNote = _cdNote;
+            //    data.Add(chg);
+            //}
+            #endregion
             //Sort Array sẽ nhanh hơn
             charges = data.ToArray().OrderByDescending(x => x.DatetimeModifiedSurcharge).AsQueryable();
             return charges;

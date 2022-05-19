@@ -478,7 +478,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 airlineCode: this.airlineCode,
                 staffType: this.selectedStaffType.value,
                 customerShipmentId: !!this.selectedCustomerShipment.length ? this.selectedCustomerShipment.value : null,
-                salemanId: !!this.selectedSaleman.length ? this.selectedSaleman.id : null
+                salemanId: !!this.salemanDisplay ? this.selectedSaleman.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
