@@ -15,5 +15,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public int NumberDaysExtend { get; set; }
         public string Note { get; set; }
         public PaymentType PaymentType { get; set; }
+        public string PartnerId { get; set; }
     }
 }

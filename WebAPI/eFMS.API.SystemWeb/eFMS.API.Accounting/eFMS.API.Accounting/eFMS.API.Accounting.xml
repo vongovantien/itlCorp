@@ -173,7 +173,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IAcctSOAService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Common.ApiUrl},eFMS.API.Accounting.DL.IService.IAcctSOAService)">
             <summary>
             constructor
             </summary>

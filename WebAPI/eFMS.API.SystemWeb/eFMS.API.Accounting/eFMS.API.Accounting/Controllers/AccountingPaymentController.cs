@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.Common;
@@ -15,11 +16,13 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using ExcelDataReader;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -41,7 +44,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAccountingManagementService accountingManagementService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IAcctSOAService acctSOAService;
-
+        private readonly IOptions<ApiUrl> apiServiceUrl;
 
         /// <summary>
         /// constructor
@@ -57,6 +60,7 @@ namespace eFMS.API.Accounting.Controllers
             IHostingEnvironment hostingEnvironment,
             IAccountingManagementService acctManagementService,
             IAccAccountReceivableService accountReceivableService,
+            IOptions<ApiUrl> _apiServiceUrl,
             IAcctSOAService soaServiceService)
         {
             stringLocalizer = localizer;
@@ -65,6 +69,7 @@ namespace eFMS.API.Accounting.Controllers
             accountingManagementService = acctManagementService;
             accAccountReceivableService = accountReceivableService;
             acctSOAService = soaServiceService;
+            apiServiceUrl = _apiServiceUrl;
         }
         
         /// <summary>
@@ -390,7 +395,41 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
+            else
+            {
+                if (!string.IsNullOrEmpty(model.PartnerId))
+                {
+                    Response.OnCompleted(async () =>
+                    {
+                        await CalculateOverDueAsync(new List<string>() { model.PartnerId });
+                    });
+                }
+            }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// CalculateOverDueAsync
+        /// </summary>
+        /// <param name="partnerIds"></param>
+        /// <returns></returns>
+        private async Task<IActionResult> CalculateOverDueAsync(List<string> partnerIds)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.Url);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquestOverDue1To15 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue1To15", partnerIds, accessToken);
+            HttpResponseMessage resquestOverDue15To30 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue15To30", partnerIds, accessToken);
+            HttpResponseMessage resquestOverDueover30 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue30", partnerIds, accessToken);
+            var responseOverDue1To15 = await resquestOverDue1To15.Content.ReadAsAsync<ResultHandle>();
+            var responseOverDue15To30 = await resquestOverDue15To30.Content.ReadAsAsync<ResultHandle>();
+            var responseOverDueOver30 = await resquestOverDueover30.Content.ReadAsAsync<ResultHandle>();
+
+            string log = "Partner: " + partnerIds.FirstOrDefault() + "\n Over due 1-15 Status: " + responseOverDue1To15.Status.ToString() + " \nMessage : " + responseOverDue1To15.Message?.ToString();
+            log += "\n Over due 15-30 Status: " + responseOverDue15To30.Status.ToString() + " \nMessage : " + responseOverDue15To30.Message?.ToString();
+            log += "\n Over due over 30 Status: " + responseOverDueOver30.Status.ToString() + " \nMessage : " + responseOverDueOver30.Message?.ToString();
+            new LogHelper("eFMS_UpdateExtendDate_CalculateOverDue", log);
+            return Ok();
         }
 
         /// <summary>

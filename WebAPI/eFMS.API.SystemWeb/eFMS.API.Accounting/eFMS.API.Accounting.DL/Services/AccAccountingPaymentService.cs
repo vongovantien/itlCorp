@@ -1233,6 +1233,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hs = new HandleState();
             var refIdLst = surchargeRepository.Get(x => (x.DebitNo == model.RefId || x.Soano == model.RefId) && (model.Type != "OBH" ? true : x.Type.ToUpper() == model.Type.ToUpper())).Select(x => x.AcctManagementId).ToList();
             var vatInvoices = accountingManaRepository.Get(x => refIdLst.Any(t => t == x.Id) && (string.IsNullOrEmpty(model.InvoiceNo) || x.InvoiceNoReal == model.InvoiceNo));
+            model.PartnerId = vatInvoices.Where(x => !string.IsNullOrEmpty(x.PartnerId)).FirstOrDefault()?.PartnerId;
             foreach (var vatInvoice in vatInvoices)
             {
                 vatInvoice.PaymentExtendDays = model.NumberDaysExtend;
