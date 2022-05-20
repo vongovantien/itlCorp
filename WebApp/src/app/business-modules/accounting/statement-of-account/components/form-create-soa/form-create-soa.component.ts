@@ -439,11 +439,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return false;
         }
-        if(this.selectedStaffType.value === this.staffTypes[1].value && this.selectedType.value === this.types[0].value){
+        if(this.selectedType.value === this.types[0].value){
             if(!this.salemanDisplay){
                 return false;
             }
-            if((this.selectedUser.map((item: any) => item.id).length > 1) || (this.selectedSaleman.id !== this.selectedUser.map((item: any) => item.id)[0])){
+            if(this.selectedStaffType.value === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
                 this._toastService.warning("Selection Staff Saleman and Saleman must be the same.")
                 return false;
             }
