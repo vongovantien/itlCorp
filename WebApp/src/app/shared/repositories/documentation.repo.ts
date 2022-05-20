@@ -1184,7 +1184,22 @@ export class DocumentationRepo {
 
     }
 
-    getAllShipment(jobNo: string){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo:jobNo });
+    getAllShipment(jobNo: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo: jobNo });
     }
+
+    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5) {
+        /* 
+            1 - SHIPMENT
+            2 - SOA
+            3 - DEBIT
+            4 - CREDIT
+            5 - SURCHARGE
+            6 - HBL
+            7 - Preview HBL
+        */
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
+            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type });
+    }
+
 }

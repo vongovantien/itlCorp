@@ -419,6 +419,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.editForm.opsTransaction = this.opsTransaction;
                         const hbl = new CsTransactionDetail(this.opsTransaction);
                         hbl.id = this.opsTransaction.hblid;
+                        hbl.saleManId = this.opsTransaction.salemanId;
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
 
                         const csTransation: CsTransaction = new CsTransaction(Object.assign({}, response, {

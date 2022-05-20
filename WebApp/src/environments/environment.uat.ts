@@ -10,6 +10,7 @@ export const environment = {
         // ACCOUNTING: "localhost:44300",
 
         DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
+        // DOCUMENTATION: "localhost:44324/",
         CATALOGUE: "uat-api-efms.itlvn.com/Catalogue",
         OPERATION: "uat-api-efms.itlvn.com/Operation",
         SYSTEM: "uat-api-efms.itlvn.com/System",

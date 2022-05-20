@@ -21,13 +21,14 @@ import {
 
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 
-import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { catchError, takeUntil, mergeMap, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -43,13 +44,12 @@ enum HBL_TAB {
 export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = '';
     shipmentDetail: CsTransaction;
@@ -155,20 +155,20 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         return valid;
     }
 
-    oncreate() {
-        this.confirmCreatePopup.hide();
+    onSaveHBL() {
         this.formHouseBill.isSubmited = true;
         this.hblGoodsSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.arrivalNoteComponent.isSubmitted = true;
             this.deliveryComponent.isSubmitted = true;
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot create HBL',
+                body: this.invalidFormText
+            });
         } else {
             const body = this.onsubmitData();
-
             this.createHbl(body);
-
         }
     }
 
@@ -180,7 +180,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     showCreatePpoup() {
-        this.confirmCreatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
     combackToHBLList() {
@@ -190,37 +194,50 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
 
-            this._documentationRepo.createHousebill(body)
+            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
                 .pipe(
-                    mergeMap((res: CommonInterface.IResult) => {
-                        const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
-                        const printedDate = {
-                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.deliveryComponent.deliveryOrder.hblid = res.data;
-                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
 
-                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        const deliveryDate = {
-                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
-                        return forkJoin([arrival, delivery, proof]);
-                    }),
-                    catchError(this.catchError),
-                ).subscribe(result => {
-                    this._toastService.success(result[0].message, '');
-                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                        return this._documentationRepo.createHousebill(body)
+                            .pipe(
+                                mergeMap((res: CommonInterface.IResult) => {
+                                    const dateNotice = {
+                                        arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+                                        arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                                    const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                                    const printedDate = {
+                                        deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.deliveryComponent.deliveryOrder.hblid = res.data;
+                                    const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                                    this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                                    const deliveryDate = {
+                                        deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+                                    return forkJoin([arrival, delivery, proof]);
+                                }),
+                                catchError(this.catchError),
+                            )
+                    })
+                )
+                .subscribe(result => {
+                    if (!!result) {
+                        this._toastService.success(result[0].message, '');
+                        if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                            this.proofOfDeliveryComponent.uploadFilePOD();
+                        }
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
-                }
-                );
+
+                });
         }
     }
 
@@ -278,7 +295,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
             etd: !!this.formHouseBill.etd.value && this.formHouseBill.etd.value.startDate != null ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
-            eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
+            eta: !!this.formHouseBill.eta.value?.startDate ? formatDate(this.formHouseBill.eta.value.startDate, 'yyyy-MM-dd', 'en') : null,
             etawarehouse: !!this.formHouseBill.etawarehouse.value && this.formHouseBill.etawarehouse.value.startDate != null ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!this.formHouseBill.issueHBLDate.value && this.formHouseBill.issueHBLDate.value.startDate != null ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
             documentDate: !!this.formHouseBill.documentDate.value && this.formHouseBill.documentDate.value.startDate != null ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,

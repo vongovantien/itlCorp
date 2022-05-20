@@ -9,17 +9,18 @@ import { AppForm } from '@app';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { HouseBill } from '@models';
 import { DataService } from '@services';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
 import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction } from '@share-bussiness';
 
-import { forkJoin, merge } from 'rxjs';
+import { forkJoin, merge, of } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 
-import { catchError, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, mergeMap, takeUntil, switchMap } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Component({
@@ -28,13 +29,11 @@ import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/
 })
 export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(AirImportHBLFormCreateComponent) formCreateHBLComponent: AirImportHBLFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-    @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string;
     selectedHbl: any = {};
@@ -84,7 +83,9 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     confirmSaveHBL() {
-        this.confirmPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'You are about to create a new HAWB. Are you sure all entered details are correct?',
+        }, () => { this.saveHBL() });
     }
 
     onImport(selectedData: any) {
@@ -127,20 +128,24 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     saveHBL() {
-        this.confirmPopup.hide();
-
         this.formCreateHBLComponent.isSubmitted = true;
         this.arrivalNoteComponent.isSubmitted = true;
         this.deliveryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
             this.activeTab = 'hawb';
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot create HBL',
+                body: this.invalidFormText
+            });
             return;
         }
         if (!this.arrivalNoteComponent.checkValidate() || !this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
             this.activeTab = 'arrival';
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot create HBL',
+                body: this.invalidFormText
+            });
 
             return;
         }
@@ -148,7 +153,10 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
         if (!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.activeTab = 'authorize';
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot create HBL',
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -169,7 +177,10 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmExistedHbl.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'HAWB No has existed, do you want to continue saving?',
+                            title: 'HAWB Existed'
+                        }, () => { this.confirmSaveData() });
                     } else {
                         const houseBill: HouseBill = this.getDataForm();
                         houseBill.jobId = this.jobId;
@@ -182,8 +193,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     confirmSaveData() {
-        this.confirmExistedHbl.hide();
-
         const houseBill: HouseBill = this.getDataForm();
         houseBill.jobId = this.jobId;
 
@@ -200,33 +209,43 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     createHbl(houseBill: HouseBill) {
         if (this.formCreateHBLComponent.formCreate.valid) {
-            this._documentationRepo.createHousebill(houseBill)
+            this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
                 .pipe(
-                    mergeMap((res: any) => {
-                        const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
-                        const printedDate = {
-                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.deliveryComponent.deliveryOrder.hblid = res.data;
-                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(houseBill)
+                            .pipe(
+                                mergeMap((res: any) => {
+                                    const dateNotice = {
+                                        arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+                                        arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                                    const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                                    const printedDate = {
+                                        deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.deliveryComponent.deliveryOrder.hblid = res.data;
+                                    const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
 
-                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        const deliveryDate = {
-                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+                                    this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                                    const deliveryDate = {
+                                        deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
 
-                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
-                        return forkJoin([arrival, delivery, proof]);
-                    }),
-                    catchError(this.catchError),
-                ).subscribe((res: CommonInterface.IResult) => {
+                                    //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                                    return forkJoin([arrival, delivery, proof]);
+                                }),
+                                catchError(this.catchError),
+                            )
+                    })
+                )
+                .subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');
                         if (res[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
@@ -240,5 +259,14 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     gotoList() {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
+    }
+
+    showCreatepoup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.saveHBL() });
     }
 }

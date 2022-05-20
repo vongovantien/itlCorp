@@ -7,6 +7,7 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -28,12 +29,14 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctCDNoteServices cdNoteServices;
         private readonly ICurrentUser currentUser;
+        private readonly ICheckPointService checkPointService;
 
-        public AcctCDNoteController(IStringLocalizer<LanguageSub> localizer, IAcctCDNoteServices service, ICurrentUser user)
+        public AcctCDNoteController(IStringLocalizer<LanguageSub> localizer, IAcctCDNoteServices service, ICurrentUser user, ICheckPointService checkPoint)
         {
             stringLocalizer = localizer;
             cdNoteServices = service;
             currentUser = user;
+            checkPointService = checkPoint;
         }
 
         /// <summary>
@@ -48,7 +51,21 @@ namespace eFMS.API.Documentation.Controllers
         {
             currentUser.Action = "AddNewCDNote";
             if (!ModelState.IsValid) return BadRequest();
-            var hs = cdNoteServices.AddNewCDNote(model);
+
+            //if(model.Type != DocumentConstants.CDNOTE_TYPE_CREDIT)
+            //{
+            //    string transctionType = model.TransactionTypeEnum == TransactionTypeEnum.CustomLogistic ? "CL" : "DOC";
+            //    Guid _hblId = model.listShipmentSurcharge.First()?.Hblid ?? Guid.Empty;
+
+            //    HandleState validatePartnerCheckpoint = checkPointService.ValidateCheckPointPartnerDebitNote(model.PartnerId, _hblId, transctionType);
+
+            //    if(validatePartnerCheckpoint.Success == false)
+            //    {
+            //        return Ok(new ResultHandle { Status = validatePartnerCheckpoint.Success, Message = validatePartnerCheckpoint.Message?.ToString() });
+            //    }
+            //}
+          
+            HandleState hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)

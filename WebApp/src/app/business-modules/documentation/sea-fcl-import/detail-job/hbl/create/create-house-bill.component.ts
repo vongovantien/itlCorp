@@ -23,11 +23,12 @@ import { DataService } from '@services';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
-import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, skip, switchMap } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -42,13 +43,12 @@ enum HBL_TAB {
 })
 export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaImportComponent) formHouseBill: ShareSeaServiceFormCreateHouseBillSeaImportComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) hblGoodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string = '';
     selectedHbl: any = {}; // TODO model.
@@ -144,12 +144,14 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     oncreate() {
-        this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
             this.arrivalNoteComponent.isSubmitted = true;
             this.deliveryComponent.isSubmitted = true;
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create HBL',
+                body: this.invalidFormText
+            });
         } else {
             const body = this.onsubmitData();
             this.createHbl(body);
@@ -164,7 +166,13 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     showCreatePpoup() {
-        this.confirmCreatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+
+        }, () => { this.oncreate() });
     }
 
     showImportPopup() {
@@ -180,46 +188,54 @@ export class CreateHouseBillComponent extends AppForm {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl`]);
     }
 
-
-
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            this._documentationRepo.createHousebill(body)
+            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
                 .pipe(
-                    mergeMap((res: any) => {
-                        const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-                            arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
-                        const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
-                        const printedDate = {
-                            deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        this.deliveryComponent.deliveryOrder.hblid = res.data;
-                        const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(body)
+                            .pipe(
+                                mergeMap((res: any) => {
+                                    const dateNotice = {
+                                        arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+                                        arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
+                                    const arrival = this._documentationRepo.updateArrivalInfo(Object.assign({}, this.arrivalNoteComponent.hblArrivalNote, dateNotice));
+                                    const printedDate = {
+                                        deliveryOrderPrintedDate: !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate && !!this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(this.deliveryComponent.deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    this.deliveryComponent.deliveryOrder.hblid = res.data;
+                                    const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
+                                    this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                                    const deliveryDate = {
+                                        deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                                    };
+                                    const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
 
-                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        const deliveryDate = {
-                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        };
-                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
-
-                        return forkJoin([arrival, delivery, proof]);
-                    }),
-
-                    catchError(this.catchError),
-                ).subscribe((result) => {
-                    this._toastService.success(result[0].message, '');
-                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    return forkJoin([arrival, delivery, proof]);
+                                }),
+                                catchError(this.catchError),
+                            )
+                    })
+                )
+                .subscribe((result) => {
+                    if (!!result) {
+                        this._toastService.success(result[0].message, '');
+                        if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                            this.proofOfDeliveryComponent.uploadFilePOD();
+                        }
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
-                }
-                );
+                });
         }
     }
+
     onsubmitData() {
         const body = {
             id: SystemConstants.EMPTY_GUID,

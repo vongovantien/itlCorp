@@ -4,7 +4,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
-import { ReportPreviewComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
 import { CsTransactionDetail, HouseBill } from '@models';
 import { ChargeConstants } from '@constants';
 import { DataService } from '@services';
@@ -14,8 +14,9 @@ import { delayTime } from '@decorators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { skip, catchError, takeUntil } from 'rxjs/operators';
+import { skip, catchError, takeUntil, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { of } from 'rxjs';
 
 
 enum HBL_TAB {
@@ -30,7 +31,6 @@ enum HBL_TAB {
     templateUrl: './detail-house-bill.component.html',
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit, ICrystalReport {
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
 
     hblId: string;
     hblDetail: any;
@@ -88,8 +88,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     @delayTime(1000)
     showReport(): void {
-        this.reportPopup.frm.nativeElement.submit();
-        this.reportPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     getDetailHbl() {
@@ -116,7 +116,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
             // * Update Arrival Note.    
             case HBL_TAB.ARRIVAL: {
-                this.confirmPopup.hide();
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {
                     return;
@@ -127,7 +126,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             }
             // * Update Delivery Order.
             case HBL_TAB.AUTHORIZE: {
-                this.confirmPopup.hide();
                 this.deliveryComponent.isSubmitted = true;
                 if (!!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
                     this.deliveryComponent.saveDeliveryOrder();
@@ -138,7 +136,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             }
             // * Update Proof Of Delivery.
             case HBL_TAB.PROOF: {
-                this.confirmPopup.hide();
                 this.proofOfDeliveryComponent.saveProofOfDelivery();
                 break;
             }
@@ -148,21 +145,22 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     saveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
+                title: 'Cannot update HBL'
+            });
             return;
         } else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
-                .pipe(
-                    catchError(this.catchError),
-                )
                 .subscribe(
                     (res: any) => {
                         if (res) {
-                            this.confirmExistedHbl.show();
+                            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: 'HAWB No has existed, do you want to continue saving?',
+                                title: 'HAWB Existed'
+                            }, () => { this.confirmUpdateData() });
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
@@ -175,7 +173,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     confirmUpdateData() {
-        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
         this.setDataToUpdate(modelUpdate);
         this.updateHbl(modelUpdate);
@@ -218,18 +215,26 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     preview(reportType: string) {
-        this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
                     }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+
                 },
             );
     }
@@ -241,22 +246,30 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency })
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport.dataSource.length > 0) {
-                        this.showReport();
-                    } else {
-                        this._toastService.warning('There is no data charge to display preview');
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency });
                     }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data charge to display preview');
+                        }
+                    }
+
                 },
             );
     }
-    showPreviewSignature(type: string, withSign: boolean){
+    showPreviewSignature(type: string, withSign: boolean) {
         this.isClickSubMenu = false;
         if (type === 'AUTHORIZE_LETTER1') {
             this.previewAuthorizeLetter1(withSign);
@@ -285,55 +298,123 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         //     this.previewAuthorizeLetter2();
         // }
     }
-    
+
     previewAuthorizeLetter2(withSign: boolean) {
-        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId, withSign)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId, withSign);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
             )
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
                 },
             );
     }
     previewAuthorizeLetter1(withSign: boolean) {
-        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
                 },
             );
     }
 
     previewProofOfDelivery() {
-        this._documentationRepo.previewAirProofofDelivery(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirProofofDelivery(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
                 },
             );
     }
 
     previewAirDocumentRelease() {
-        this._documentationRepo.previewAirDocumentRelease(this.hblId)
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirDocumentRelease(this.hblId);
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false)
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    this.showReport();
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
                 },
             );
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+    showCreatepoup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Save HBL',
+            body: this.confirmUpdateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.saveHBL() });
     }
 }
