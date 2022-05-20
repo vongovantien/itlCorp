@@ -435,7 +435,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             if (this.selectedIndexCharge > -1) {
 
                                 // TODO Tính công nợ BE
-                                this.calculatorReceivable([this.selectedSurcharge]);
+                                //this.calculatorReceivable([this.selectedSurcharge]);
 
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
 
@@ -456,6 +456,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteSellingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.OBH:
@@ -1439,12 +1440,19 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     calculatorReceivable(charges: CsShipmentSurcharge[]) {
-        const objReceivable = charges.map((item: any) => ({ surchargeId: item.id, partnerId: item.paymentObjectId, office: (!!item.officeId ? item.officeId : this.userLogged.officeId), service: (!!item.transactionType ? item.transactionType : this.serviceTypeId) }));
-        charges.forEach((element: any) => {
-            if (element.type === 'OBH') {
-                objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
-            }
-        });
+        const objReceivable = charges.map((item: any) => ({
+            surchargeId: item.id,
+            partnerId: item.paymentObjectId,
+            office: (!!item.officeId ? item.officeId : this.userLogged.officeId),
+            service: (!!item.transactionType ? item.transactionType : this.serviceTypeId),
+            salesmanId: this.hbl.saleManId
+        }));
+
+        // charges.forEach((element: any) => {
+        //     if (element.type === 'OBH') {
+        //         objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
+        //     }
+        // });
 
         this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }

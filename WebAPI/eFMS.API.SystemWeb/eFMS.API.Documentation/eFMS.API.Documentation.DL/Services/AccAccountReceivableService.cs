@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -36,6 +37,16 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var surcharges = csShipmentSurchargeService.Get(x => Ids.Any(a => a == x.Id));
 
+            return GetListObjectReceivable(surcharges);
+        }
+
+        public List<ObjectReceivableModel> GetListObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges)
+        {
+            return GetListObjectReceivable(surcharges);
+        }
+
+        private List<ObjectReceivableModel> GetListObjectReceivable(IQueryable<CsShipmentSurcharge> surcharges)
+        {
             if (surcharges.Count() == 0)
             {
                 return new List<ObjectReceivableModel>();
@@ -48,18 +59,18 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var hblids = surchargeOps.Select(x => x.Hblid).ToList();
                 var houseBills = opsTranRepository.Get(x => hblids.Contains(x.Hblid));
-                objPO  = from surcharge in surchargeOps
-                         join csd in houseBills on surcharge.Hblid equals csd.Hblid
-                         where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                         select new ObjectReceivableModel
-                         {
-                             PartnerId = surcharge.PaymentObjectId,
-                             Office = surcharge.OfficeId,
-                             Service = surcharge.TransactionType,
-                             SalesmanId = csd.SalemanId
-                         };
+                objPO = from surcharge in surchargeOps
+                        join csd in houseBills on surcharge.Hblid equals csd.Hblid
+                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+                        select new ObjectReceivableModel
+                        {
+                            PartnerId = surcharge.PaymentObjectId,
+                            Office = surcharge.OfficeId,
+                            Service = surcharge.TransactionType,
+                            SalesmanId = csd.SalemanId
+                        };
             }
-            if(surchargeCs.Count() > 0)
+            if (surchargeCs.Count() > 0)
             {
                 var hblids = surchargeCs.Select(x => x.Hblid).ToList();
                 var houseBills = csTranDetailRepository.Get(x => hblids.Contains(x.Id));
@@ -67,17 +78,16 @@ namespace eFMS.API.Documentation.DL.Services
                 objPR = from surcharge in surchargeCs
                         join csd in houseBills on surcharge.Hblid equals csd.Id
                         where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId,
+                        select new ObjectReceivableModel
+                        {
+                            PartnerId = surcharge.PaymentObjectId,
                             Office = surcharge.OfficeId,
                             Service = surcharge.TransactionType,
-                            SalesmanId = csd.SaleManId };
+                            SalesmanId = csd.SaleManId
+                        };
             }
-          
-            //var objPR = from surcharge in surcharges
-            //            where !string.IsNullOrEmpty(surcharge.PayerId)
-            //            select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-
             var objMerge = objPO.Union(objPR).ToList();
+
             var objectReceivables = objMerge.GroupBy(g => new { g.Service, g.PartnerId, g.Office, g.SalesmanId })
                 .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office, SalesmanId = s.Key.SalesmanId });
             return objectReceivables.ToList();

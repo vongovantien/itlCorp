@@ -426,7 +426,10 @@ namespace eFMS.API.Accounting.DL.Services
                     _charges = from ops in opsJob
                                join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
                                from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               where surGrp.OfficeId == fe.Office 
+                               && surGrp.PaymentObjectId == fe.PartnerId 
+                               && surGrp.TransactionType == fe.Service
+                               && ops.SalemanId == fe.SaleMan
                                select surGrp;
                 }
                 else
@@ -435,7 +438,10 @@ namespace eFMS.API.Accounting.DL.Services
                                join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
                                join sur in surcharges on csd.Id equals sur.Hblid into grpOps
                                from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               where surGrp.OfficeId == fe.Office 
+                               && surGrp.PaymentObjectId == fe.PartnerId 
+                               && surGrp.TransactionType == fe.Service
+                               && csd.SaleManId == fe.SaleMan
                                select surGrp;
                 }
                 decimal? obhAmount = 0;
@@ -790,7 +796,10 @@ namespace eFMS.API.Accounting.DL.Services
                     _charges = from ops in opsJob
                                join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
                                from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               where surGrp.OfficeId == fe.Office 
+                               && surGrp.PaymentObjectId == fe.PartnerId 
+                               && surGrp.TransactionType == fe.Service
+                               && ops.SalemanId == fe.SaleMan
                                select surGrp;
                 }
                 else
@@ -799,7 +808,10 @@ namespace eFMS.API.Accounting.DL.Services
                                join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
                                join sur in surcharges on csd.Id equals sur.Hblid into grpOps
                                from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
+                               where surGrp.OfficeId == fe.Office 
+                               && surGrp.PaymentObjectId == fe.PartnerId 
+                               && surGrp.TransactionType == fe.Service
+                               && csd.SaleManId == fe.SaleMan
                                select surGrp;
                 }
                 if (_charges.Count() > 0)
@@ -1245,7 +1257,6 @@ namespace eFMS.API.Accounting.DL.Services
                     receivable.Office = model.Office;
                     receivable.Service = model.Service;
                     receivable.AcRef = partner.ParentId ?? partner.Id;
-                    receivable.SaleMan = model.SalesmanId; // CR 17531
                     CatContract contractPartner = null;
                     var contracts = contractPartnerRepo.Get(x => x.Active == true
                                                                     && x.PartnerId == model.PartnerId
@@ -1266,6 +1277,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receivable.ContractId = null;
                         receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
                         // receivable.SaleMan = null; 
+                        receivable.SaleMan = model.SalesmanId; // CR 17531
                         receivable.UserCreated = partner.UserCreated;
                         receivable.UserModified = partner.UserCreated;
                         receivable.GroupId = partner.GroupId;
@@ -1278,7 +1290,7 @@ namespace eFMS.API.Accounting.DL.Services
                         // Lấy currency của contract & user created of contract gán cho Receivable
                         receivable.ContractId = contractPartner.Id;
                         receivable.ContractCurrency = contractPartner.CreditCurrency;
-                        // receivable.SaleMan = contractPartner.SaleManId;
+                        receivable.SaleMan = contractPartner.SaleManId;
                         receivable.UserCreated = contractPartner.UserCreated;
                         receivable.UserModified = contractPartner.UserCreated;
                         receivable.GroupId = null;
@@ -1305,7 +1317,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
                 // receivables = CalculatorAdvanceAmount(receivables); //Advance Amount CR: 16851
-                receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
+                // receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
                 receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
                 receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
                 receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
@@ -1448,15 +1460,45 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges)
         {
-            var objPO = from surcharge in surcharges
+            var objPO = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
+            var objPR = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
+            var surchargeOps = surcharges.Where(x => x.TransactionType == "CL");
+            var surchargeCs = surcharges.Where(x => x.TransactionType != "CL");
+            if (surchargeOps.Count() > 0)
+            {
+                var hblids = surchargeOps.Select(x => x.Hblid).ToList();
+                var houseBills = opsRepo.Get(x => hblids.Contains(x.Hblid));
+                objPO = from surcharge in surchargeOps
+                        join csd in houseBills on surcharge.Hblid equals csd.Hblid
                         where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objPR = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PayerId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
+                        select new ObjectReceivableModel
+                        {
+                            PartnerId = surcharge.PaymentObjectId,
+                            Office = surcharge.OfficeId,
+                            Service = surcharge.TransactionType,
+                            SalesmanId = csd.SalemanId
+                        };
+            }
+            if (surchargeCs.Count() > 0)
+            {
+                var hblids = surchargeCs.Select(x => x.Hblid).ToList();
+                var houseBills = transactionDetailRepo.Get(x => hblids.Contains(x.Id));
+
+                objPR = from surcharge in surchargeCs
+                        join csd in houseBills on surcharge.Hblid equals csd.Id
+                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+                        select new ObjectReceivableModel
+                        {
+                            PartnerId = surcharge.PaymentObjectId,
+                            Office = surcharge.OfficeId,
+                            Service = surcharge.TransactionType,
+                            SalesmanId = csd.SaleManId
+                        };
+            }
             var objMerge = objPO.Union(objPR).ToList();
-            var objectReceivables = objMerge.GroupBy(g => new { Service = g.Service, PartnerId = g.PartnerId, Office = g.Office })
-                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
+
+            var objectReceivables = objMerge.GroupBy(g => new { g.Service, g.PartnerId, g.Office, g.SalesmanId })
+                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office, SalesmanId = s.Key.SalesmanId });
             return objectReceivables.ToList();
         }
 
