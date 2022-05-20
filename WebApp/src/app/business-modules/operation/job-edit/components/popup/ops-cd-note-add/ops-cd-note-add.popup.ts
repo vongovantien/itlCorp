@@ -232,9 +232,9 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             for (const charges of listCharge) {
                 chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);
                 if (chargesNotDeleted.length > 0) {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: chargesNotDeleted });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, salemanId: charges.salemanId, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: chargesNotDeleted });
                 } else {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: [] });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, salemanId: charges.salemanId, isSelected: charges.isSelected, isDeleted: charges.isDeleted, listCharges: [] });
                 }
             }
         }
@@ -288,6 +288,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
+            this.CDNote.salemanId = this.listChargePartner.filter((x: ChargeCdNote) => x.listCharges.length > 0).map(x=>x.salemanId)[0];
             // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
             this.CDNote.note = this.note.value;
