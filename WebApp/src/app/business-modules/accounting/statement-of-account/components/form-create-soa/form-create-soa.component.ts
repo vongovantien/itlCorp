@@ -322,7 +322,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('customerID', this.selectedPartner.value);
                 this.getInfoAgreement();
                 break;
-            case 'customerShipment':
+            case 'customershipment':
                 this.selectedCustomerShipment = { field: data.partnerNameEn, value: data.id };
                 this.updateDataSearch('customerShipmentId', this.selectedCustomerShipment.value);
                 break;
@@ -477,7 +477,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 customNo: this.mapShipment("CustomNo"),
                 airlineCode: this.airlineCode,
                 staffType: this.selectedStaffType.value,
-                customerShipmentId: !!this.selectedCustomerShipment.length ? this.selectedCustomerShipment.value : null,
+                customerShipmentId: !!this.selectedCustomerShipment ? this.selectedCustomerShipment.value : null,
                 salemanId: !!this.salemanDisplay ? this.selectedSaleman.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
