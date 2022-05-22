@@ -4139,8 +4139,26 @@ namespace eFMS.API.Accounting.DL.Services
                 advRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
                 advRequest.DatetimeModified = DateTime.Now;
                 advRequest.UserModified = currentUser.UserID;
-                var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(advRequest, x => x.Id == advRequest.Id);
+                var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(advRequest, x => x.Id == advRequest.Id, false);
             }
+            acctAdvanceRequestRepo.SubmitChanges();
+        }
+
+        /// <summary>
+        /// Update đồng loạt theo list AcctAdvanceRequest
+        /// </summary>
+        /// <param name="advRequestList"></param>
+        public void UpdateStatusPaymentNotSettledOfAdvanceRequest(IQueryable<AcctAdvanceRequest> advRequestList)
+        {
+            //List Advance Request có Status Payment là Settled 
+            foreach (var advRequest in advRequestList)
+            {
+                advRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                advRequest.DatetimeModified = DateTime.Now;
+                advRequest.UserModified = currentUser.UserID;
+                var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(advRequest, x => x.Id == advRequest.Id, false);
+            }
+            acctAdvanceRequestRepo.SubmitChanges();
         }
 
         public HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model)

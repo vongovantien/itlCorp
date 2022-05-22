@@ -194,8 +194,10 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
                 Response.OnCompleted(async () =>
                 {
+                    
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
 
@@ -404,40 +406,10 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
+                var _result = CheckDuplicateChargesShipmentInSettle(model);
+                if (!_result.Status)
                 {
-                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
-                    if (isDuplicateCharge)
-                    {
-                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                        return BadRequest(_result);
-                    }
-                }
-
-                foreach (var item in model.ShipmentCharge)
-                {
-                    var shipment = new CheckDuplicateShipmentSettlementCriteria
-                    {
-                        SurchargeID = item.Id,
-                        ChargeID = item.ChargeId,
-                        TypeCharge = item.Type,
-                        HBLID = item.Hblid,
-                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
-                        CustomNo = item.ClearanceNo,
-                        InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo,
-                        MBLNo = item.MBL,
-                        HBLNo = item.HBL,
-                        JobNo = item.JobId,
-                        Notes = item.Notes
-                    };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
-                    if (_checkDuplicate.Status)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message, Data = listDup };
-                        return BadRequest(_result);
-                    }
+                    return BadRequest(_result);
                 }
             }
             else
@@ -452,12 +424,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            //if (hs.Success)
-            //{
-            //    // Tính công nợ sau khi insert Settlement
-            //    acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-            //}
-
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -466,6 +432,9 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                // Add Surcharge settle
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, "Add");
+                // Tính công nợ sau khi insert Settlement
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
@@ -499,42 +468,10 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
+                var _result = CheckDuplicateChargesShipmentInSettle(model);
+                if (!_result.Status)
                 {
-                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
-                    if (isDuplicateCharge)
-                    {
-                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                        return BadRequest(_result);
-                    }
-                }
-
-                foreach (var item in model.ShipmentCharge)
-                {
-                    var shipment = new CheckDuplicateShipmentSettlementCriteria
-                    {
-                        SurchargeID = item.Id,
-                        ChargeID = item.ChargeId,
-                        TypeCharge = item.Type,
-                        HBLID = item.Hblid,
-                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
-                        CustomNo = item.ClearanceNo,
-                        InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo,
-                        MBLNo = item.MBL,
-                        HBLNo = item.HBL,
-                        JobNo = item.JobId,
-                        Notes = item.Notes,
-                        SettlementNo = model.Settlement.SettlementNo
-                    };
-                    
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
-                    if (_checkDuplicate.Status)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
-                        return BadRequest(_result);
-                    }
+                    return BadRequest(_result);
                 }
             }
             else
@@ -542,18 +479,11 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
-
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
-            //if (hs.Success)
-            //{
-            //    // Tính công nợ sau khi update Settlement
-            //    acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -563,6 +493,8 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, "Update");
+                // Tính công nợ sau khi update Settlement
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
@@ -573,72 +505,57 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Save and Send Request
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
         [HttpPost]
-        [Route("SaveAndSendRequest")]
-        [Authorize]
-        public IActionResult SaveAndSendRequest(CreateUpdateSettlementModel model)
+        [Route("CheckDuplicateChargesShipmentInSettle")]
+        public ResultHandle CheckDuplicateChargesShipmentInSettle(CreateUpdateSettlementModel model)
         {
-            currentUser.Action = "SaveAndSendRequestAcctSettlementPayment";
+            //Check Duplicate phí
+            if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
+            {
+                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
+                if (isDuplicateCharge)
+                {
+                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                    return new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
+                }
+                var shipments = model.ShipmentCharge.Select(item => new CheckDuplicateShipmentSettlementCriteria
+                {
+                    SurchargeID = item.Id,
+                    ChargeID = item.ChargeId,
+                    TypeCharge = item.Type,
+                    HBLID = item.Hblid,
+                    Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
+                    CustomNo = item.ClearanceNo,
+                    InvoiceNo = item.InvoiceNo,
+                    ContNo = item.ContNo,
+                    MBLNo = item.MBL,
+                    HBLNo = item.HBL,
+                    JobNo = item.JobId,
+                    Notes = item.Notes,
+                    SettlementNo = model.Settlement.SettlementNo,
+                    TypeService = item.TypeService
+                }).ToList();
+                var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateListShipmentsSettlement(shipments);
+                if (!_checkDuplicate.Status)
+                {
+                    return new ResultHandle { Status = false, Message = _checkDuplicate.Message, Data = _checkDuplicate.Data };
+                }
+            }
+            return new ResultHandle() { Status = true };
+        }
 
-            if (!ModelState.IsValid) return BadRequest();
-
+        [HttpPost]
+        [Route("CheckValidToSendRequestSettle")]
+        [Authorize]
+        public IActionResult CheckValidToSendRequestSettle(CreateUpdateSettlementModel model)
+        {
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
+                var _result = CheckDuplicateChargesShipmentInSettle(model);
+                if (!_result.Status)
                 {
-                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
-                    if (isDuplicateCharge)
-                    {
-                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                        return BadRequest(_result);
-                    }
-                }
-
-                foreach (var item in model.ShipmentCharge)
-                {
-                    // Check lô hàng khóa chỉ lô của hiện trường
-                    //bool isLockedJob = false;
-                    //if (item.IsFromShipment == false) // Check lô hàng khóa chỉ lô của hiện trường
-                    //{
-                    //    isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
-                    //}
-                    //if (isLockedJob)
-                    //{
-                    //    ResultHandle _result = new ResultHandle { Status = false, Message = item.JobId + " have been locked. You not allow save and send request." };
-                    //    return BadRequest(_result);
-                    //}
-
-                    // TODO: ĐÃ RÀNG CHỈNH SỬA TRÊN CLIENT CHECK THAY ĐỔI GIÁ, TOTAL AMOUNT => CẦN VERIFY DƯỚI BE
-
-                    var shipment = new CheckDuplicateShipmentSettlementCriteria
-                    {
-                        SurchargeID = item.Id,
-                        ChargeID = item.ChargeId,
-                        TypeCharge = item.Type,
-                        HBLID = item.Hblid,
-                        Partner = item.Type.Equals(AccountingConstants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
-                        CustomNo = item.ClearanceNo,
-                        InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo,
-                        MBLNo = item.MBL,
-                        HBLNo = item.HBL,
-                        JobNo = item.JobId,
-                        Notes = item.Notes,
-                        SettlementNo = model.Settlement.SettlementNo
-                    };
-                    var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
-                    if (_checkDuplicate.Status)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = _checkDuplicate.Message,Data = listDup };
-                        return BadRequest(_result);
-                    }
+                    return BadRequest(_result);
                 }
             }
             else
@@ -656,8 +573,6 @@ namespace eFMS.API.Accounting.Controllers
             }
             #endregion -- Check Validate Email Requester --
 
-            HandleState hs;
-            var message = string.Empty;
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
                 #region -- Check Exist Setting Flow --
@@ -677,16 +592,8 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(_result);
                 }
                 #endregion -- Check Exist User Approval --
-
-                model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
-                hs = acctSettlementPaymentService.AddSettlementPayment(model);
-                message = HandleError.GetMessage(hs, Crud.Insert);
-                if (hs.Code == 403)
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-                }
             }
-            else //Update Settlement Payment
+            else
             {
                 var isAllowUpdate = acctSettlementPaymentService.CheckUpdatePermissionBySettlementId(model.Settlement.Id);
                 if (isAllowUpdate == false)
@@ -728,7 +635,40 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(_result);
                 }
                 #endregion -- Check Settlement Payment Approving --
+            }
+            return Ok(new ResultHandle());
+        }
 
+        /// <summary>
+        /// Save and Send Request
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SaveAndSendRequest")]
+        [Authorize]
+        public IActionResult SaveAndSendRequest(CreateUpdateSettlementModel model)
+        {
+            currentUser.Action = "SaveAndSendRequestAcctSettlementPayment";
+
+            if (!ModelState.IsValid) return BadRequest();
+
+            HandleState hs;
+            var message = string.Empty;
+            var action = string.IsNullOrEmpty(model.Settlement.SettlementNo) ? "Add" : "Update";
+            if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
+            {
+
+                model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                hs = acctSettlementPaymentService.AddSettlementPayment(model);
+                message = HandleError.GetMessage(hs, Crud.Insert);
+                if (hs.Code == 403)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                }
+            }
+            else //Update Settlement Payment
+            {
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
                 message = HandleError.GetMessage(hs, Crud.Update);
@@ -737,37 +677,40 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
             }
-            
+
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (hs.Success)
             {
-                AcctApproveSettlementModel approve = new AcctApproveSettlementModel
-                {
-                    SettlementNo = model.Settlement.SettlementNo,
-                    Requester = model.Settlement.Requester,
-                    RequesterAprDate = DateTime.Now
-                };
-                var resultInsertUpdateApprove = acctSettlementPaymentService.InsertOrUpdateApprovalSettlement(approve);
-                if (!resultInsertUpdateApprove.Success)
-                {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
-                    return BadRequest(_result);
-                }
-
-                // Tính công nợ sau khi Save And Send Request
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
-
+                acctSettlementPaymentService.UpdateSurchargeSettle(model.ShipmentCharge, model.Settlement.SettlementNo, action);
                 return Ok(result);
             }
             else
             {
                 return BadRequest(result);
             }
+        }
+
+        [HttpPost]
+        [Route("UpdateAndSendMailApprovalSettlement")]
+        [Authorize]
+        public IActionResult UpdateAndSendMailApprovalSettlement(AcctApproveSettlementModel approve)
+        {
+            var resultInsertUpdateApprove = acctSettlementPaymentService.InsertOrUpdateApprovalSettlement(approve);
+            ResultHandle _result = new ResultHandle { Status = resultInsertUpdateApprove.Success };
+            if (!resultInsertUpdateApprove.Success)
+            {
+                _result = new ResultHandle { Status = resultInsertUpdateApprove.Success, Message = resultInsertUpdateApprove.Exception.Message };
+                return BadRequest(_result);
+            }
+
+            // Tính công nợ sau khi Save And Send Request
+            Response.OnCompleted(async () =>
+            {
+                List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(approve.SettlementNo);
+                await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+            });
+            return Ok(_result);
         }
 
         /// <summary>

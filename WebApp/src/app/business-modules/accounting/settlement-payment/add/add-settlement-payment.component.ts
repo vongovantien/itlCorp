@@ -13,7 +13,7 @@ import { DataService } from '@services';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 
-import { catchError } from 'rxjs/operators';
+import { catchError, concatMap, finalize } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -125,19 +125,45 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
-        this._accountingRepo.saveAndSendRequestSettlemntPayment(body)
-            .pipe(catchError(this.catchError))
+        let settlementResult: any = {};
+        this._accountingRepo.checkValidToSendRequestSettle(body)
+            .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status && !!res.message) {
+                        this._toastService.warning(res.message, '', { enableHtml: true });
+                        return;
+                    }
+                    else {
+                        return this._accountingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
+                            catchError(this.catchError),
+                            concatMap((res: CommonInterface.IResult) => {
+                                if (!res.status) {
+                                    this._toastService.warning(res.message, '', { enableHtml: true });
+                                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                                } else {
+                                    settlementResult = res.data.settlement;
+                                    let approve: any = {
+                                        settlementNo: settlementResult.settlementNo,
+                                        requester: settlementResult.requester,
+                                        requesterAprDate: new Date()
+                                    }
+                                    return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
+                                }
+                            })
+                        );
+                    }
+                }
+                ))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
-
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${res.data.settlement.id}/approve`]);
-                    } else {
+                    if (!res.status) {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
+                    else {
+                        this._toastService.success(`${settlementResult.settlementNo}`, ' Send request successfully');
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlementResult.id}/approve`]);
+                    }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-
                 },
                 (error) => {
                     if (error instanceof HttpErrorResponse) {
