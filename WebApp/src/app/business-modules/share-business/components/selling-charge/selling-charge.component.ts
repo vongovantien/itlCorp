@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -16,8 +16,10 @@ import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
-import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
-
+import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'selling-charge',
@@ -28,16 +30,24 @@ import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 })
 
 export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingChargeComponent {
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+    @ViewChild(ConfirmPopupComponent) confirmLinkFeePopup: InfoPopupComponent;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild('detailLinkFeePopup') detailLinkFeePopup: InfoPopupComponent;
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
     @Input() showSyncStandard: boolean = true;
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
+    @Input() allowLinkFee: boolean = false;
+    @Input() isDuplicateJob: boolean = false;
 
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+    messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 
     messageCreditRate: string = '';
+    selectedCs: CsShipmentSurcharge;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -113,6 +123,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
+                    if (this.isDuplicateJob) {
+                        buyings.forEach(s=>s.linkFee = null);
+                    }
                     this.charges = buyings;
                     this._cd.markForCheck();
 
@@ -159,7 +172,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             this._toastService.warning("Please add charge");
             return;
         }
-        // * Update data 
+
+
+        // * Update data
         this.isSubmitted = true;
         if (!this.checkValidate()) {
             return;
@@ -264,6 +279,130 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     });
 
                     // this.charges = [...this.charges, ...buyingCharges];
+                }
+            );
+    }
+
+    getSaveLinkFee() {
+        let isSubmitted = this.charges.filter(x => x.id == "00000000-0000-0000-0000-000000000000");
+        if (isSubmitted.length) {
+            this._toastService.warning("Please save charge");
+            return;
+        }
+        let links = this.charges.filter(x => x.isSelected);
+        if (!links.length) {
+            this._toastService.warning("Please select charge");
+            return;
+        }
+        links.forEach((e) => {
+            if (e.linkFee) {
+                this._toastService.warning("Select charge have linked");
+                return;
+            }
+        })
+        if (!this.charges.length) {
+            this._toastService.warning("Please add charge");
+            return;
+        }
+
+        if (!this.checkValidate()) {
+            return;
+        }
+
+        if (!this.checkDuplicate()) {
+            return;
+        }
+        if (!this.shipment.serviceNo) {
+            this._toastService.warning("Please linked job");
+            return;
+        }
+
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmLinkFee())
+    }
+
+    onConfirmLinkFee() {
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        let links = this.charges.filter(x => x.isSelected);
+        this._documentRepo.updateShipmentSurchargesLinkFee(links)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                    } else {
+                        links.forEach(e => e.linkFee = false);
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+    onConfirmRevertLinkFee (selectedCs:CsShipmentSurcharge){
+        let charges = [];
+        selectedCs.linkFee = false;
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._documentRepo.updateShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+    onSelectSurcharge(cs: CsShipmentSurcharge) {
+        this.selectedCs = cs;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    revertFeeSell(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs.linkFee) {
+            this._toastService.warning("Charge without fee");
+            return;
+        }
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmRevertLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmRevertLinkFeeSell(selectedCs))
+    }
+
+    onConfirmRevertLinkFeeSell(selectedCs: CsShipmentSurcharge) {
+        let charges = [];
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+        this._documentRepo.revertShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                    this.getProfit();
+                    this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
                 }
             );
     }

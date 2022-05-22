@@ -19,11 +19,13 @@ namespace eFMS.API.Documentation.DL.Models
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
         public string ProductService { get; set; }
+        public bool IsLinkJob { get; set; }
         public bool IsReplicate { get; set; }
         public string ReplicateJobNo { get; set; }
-        public string DepartmentName { get; set; }
-        public string GroupName { get; set; }
+        public string UserCreatedNameLinkJob { get; set; }
         public bool IsAllowChangeSaleman { get; set; }
         public string SalesmanName { get; set; }
+        public string DepartmentName { get; set; }
+        public string GroupName { get; set; }
     }
 }

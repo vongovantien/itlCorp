@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string RoundUpMethod { get; set; }
         public string ApplyDim { get; set; }
         public string MawbShipper { get; set; }
+        public bool IsLinkFee { get; set; }
     }
 
     public class AgentData

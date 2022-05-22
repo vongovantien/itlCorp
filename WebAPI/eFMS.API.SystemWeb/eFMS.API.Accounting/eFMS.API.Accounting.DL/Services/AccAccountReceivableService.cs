@@ -2775,6 +2775,38 @@ namespace eFMS.API.Accounting.DL.Services
 
                 if (grpInvoices.Count() > 0)
                 {
+                    // reset các over due của partner
+                    var partnerArIds = grpInvoices.Select(x => x.PartnerId).Distinct();
+                    foreach (var partnerId in partnerArIds)
+                    {
+                        List<AccAccountReceivable> arOverDueToRest = DataContext.Get(x => x.PartnerId == partnerId).ToList();
+                        switch (type)
+                        {
+                            case 1: // 1 - 15
+                                foreach (var item in arOverDueToRest)
+                                {
+                                    item.Over1To15Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            case 2: // 15 - 30
+                                foreach (var item in arOverDueToRest)
+                                {
+                                    item.Over16To30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            case 3: // 30
+                                foreach (var item in arOverDueToRest)
+                                {
+                                    item.Over30Day = 0;
+                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }    
                     foreach (var item in grpInvoices)
                     {
                         AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId

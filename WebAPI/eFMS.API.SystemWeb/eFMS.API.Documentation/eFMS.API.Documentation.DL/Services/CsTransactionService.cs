@@ -61,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IOptions<ApiUrl> apiUrl;
         private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -99,6 +100,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo,
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
@@ -137,6 +139,7 @@ namespace eFMS.API.Documentation.DL.Services
             apiUrl = url;
             sysImageService = imageService;
             opsTransactionRepository = opsTransactionRepo;
+            csLinkChargeRepository = csLinkChargeRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -816,6 +819,12 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
+            if (detail.Permission.AllowDelete)
+            {
+                //[01/03/2022][Có tồn tại linkfee không cho xóa]
+                var check = csLinkChargeRepository.Get(x => x.JobNoLink == detail.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).FirstOrDefault();
+                detail.Permission.AllowDelete = check != null ? false : true;
+            }
             return detail;
         }
 
@@ -1267,6 +1276,7 @@ namespace eFMS.API.Documentation.DL.Services
             var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var creators = sysUserRepo.Get();
+            var csLinkCharges = csLinkChargeRepository.Get();
 
             masterBills.ToList().ForEach(fe => {
                 fe.SupplierName = coloaders.FirstOrDefault(x => x.Id == fe.ColoaderId)?.ShortName;
@@ -1274,6 +1284,7 @@ namespace eFMS.API.Documentation.DL.Services
                 fe.PODName = pods.FirstOrDefault(x => x.Id == fe.Pod)?.NameEn;
                 fe.POLName = pols.FirstOrDefault(x => x.Id == fe.Pol)?.NameEn;
                 fe.CreatorName = creators.FirstOrDefault(x => x.Id == fe.UserCreated)?.Username;
+                fe.IsLinkFee = csLinkCharges.Any(x => x.JobNoLink == fe.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
             });
             
             return masterBills;
@@ -2483,6 +2494,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
+        private IQueryable<CsShipmentSurcharge> CheckChargesLinkFee(IQueryable<CsShipmentSurcharge> houseSurcharges, Guid oldHouseId)
+        {
+            //[01/03/2022] Không lấy những phí đã linkFee
+            var charges = houseSurcharges;
+            List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.HbllinkId == oldHouseId.ToString() && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
+            if (csLinkFee.Count > 0)
+            {
+                List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+            }
+            return charges;
+        }
+
         private string SetDefaultOnboard(string polName, string country,DateTime? etd)
         {
             string value = string.Empty;
@@ -2649,6 +2673,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             IQueryable<CsShipmentSurcharge> charges = csShipmentSurchargeRepo.Get(x => x.Hblid == oldHouseId && x.IsFromShipment == true); // Không lấy phí hiện trường
+
+            charges = CheckChargesLinkFee(charges, oldHouseId);
+
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {

@@ -69,6 +69,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly IContextBase<SysGroup> groupRepository;
+        private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
+        private readonly ICsTransactionService csTransactionServe;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -215,7 +217,7 @@ namespace eFMS.API.Documentation.DL.Services
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
                             databaseUpdateService.InsertDataToDB(entityReplicate);
-                            result = new HandleState(addResult.Status, addResult.Message);
+                            result = new HandleState(addResult.Status, (object)addResult.Message);
                         }
                     }
                     else
@@ -228,7 +230,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
-                        result = new HandleState(addResult.Status, addResult.Message);
+                        result = new HandleState(addResult.Status, (object)addResult.Message);
                     }                   
                 }
                 catch (Exception ex)
@@ -617,9 +619,9 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.Owner:
                     query = query.And(x => ((x.BillingOpsId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
                                                     || x.SalemanId == currentUser.UserID
-                                                    || authorizeUserIds.Contains(x.BillingOpsId) 
+                                                    || authorizeUserIds.Contains(x.BillingOpsId)
                                                     || authorizeUserIds.Contains(x.SalemanId)
-                                                    || (x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID) 
+                                                    || (x.UserCreated == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
                                             ));
                     break;
                 case PermissionRange.Group:
@@ -672,6 +674,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
+
             return query;
         }
 
@@ -684,6 +687,7 @@ namespace eFMS.API.Documentation.DL.Services
             var queryDefault = ExpressionQueryDefault(criteria);
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
+            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
             data = data.Where(queryPermission);
 
             if (data == null) return null;
@@ -761,6 +765,19 @@ namespace eFMS.API.Documentation.DL.Services
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
+        }
+
+        private Expression<Func<OpsTransaction, bool>> QuerySearchLinkJob(Expression<Func<OpsTransaction, bool>> query, OpsTransactionCriteria criteria)
+        {
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Have Linked")
+                query = query.And(x => x.IsLinkFee == true);
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Not Link")
+                query = query.And(x => x.IsLinkFee == null || x.IsLinkFee == false);
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Have Linked")
+                query = query.And(x => !string.IsNullOrEmpty(x.ServiceNo));
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Not Link")
+                query = query.And(x => string.IsNullOrEmpty(x.ServiceNo));
+            return query;
         }
 
         private string SetProductServiceShipment(CustomsDeclarationModel model)
@@ -1382,7 +1399,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 surchargeRepository.SubmitChanges();
                 customDeclarationRepository.SubmitChanges();
-            } 
+            }
             return result;
         }
 
@@ -1432,7 +1449,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //var existedMblHblData = DataContext.Get(x => x.Id != model.Id
                 //&& x.CurrentStatus != TermData.Canceled
-                //&& x.Hwbno == model.Hwbno 
+                //&& x.Hwbno == model.Hwbno
                 //&& x.Mblno == model.Mblno
                 //&& (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
                 //).ToList();
@@ -1578,7 +1595,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
 
-            return result;
+            return result; 
         }
         public HandleState Update(OpsTransactionModel model)
         {
@@ -1619,8 +1636,13 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                model.Hwbno = model.Hwbno?.Trim();
-                model.Mblno = model.Mblno?.Trim();
+
+                if (model.IsLinkJob && string.IsNullOrEmpty(model.UserCreatedLinkJob))
+                {
+                    model.UserCreatedLinkJob = currentUser.UserName;
+                    model.DateCreatedLinkJob = DateTime.Now;
+                }
+
                 OpsTransaction entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)
@@ -1946,12 +1968,16 @@ namespace eFMS.API.Documentation.DL.Services
                         List<CsMawbcontainer> masterContainers = GetNewMasterBillContainer(model.Id, model.Hblid, listContainerOld);
                         newContainers.AddRange(masterContainers);
                     }
-                    
+
                     List<CsShipmentSurcharge> listSurCharge = CopySurChargeToNewJob(_hblId, model);
                     if (listSurCharge?.Count() > 0)
                     {
                         newSurcharges.AddRange(listSurCharge);
                     }
+
+                    model.IsLinkFee = null;
+                    model.DateCreatedLinkJob = null;
+                    model.UserCreatedLinkJob = null;
 
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
@@ -1981,7 +2007,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         newSurcharges.AddRange(listSurChargeReplicate);
                                     }
                                 }
-                                
+
                             };
                         }
                     };
@@ -2042,7 +2068,6 @@ namespace eFMS.API.Documentation.DL.Services
                     List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
                     charges = charges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
                 }
-
             }
 
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
@@ -2220,14 +2245,15 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 //var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
                                 //if (catCharge != null) { surcharge.ChargeId = catCharge.Id; } else continue;
-                                if (charge.CreditCharge == null) {
+                                if (charge.CreditCharge == null)
+                                {
                                     continue;
                                 }
                                 charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
                                 charge.ChargeId = charge.CreditCharge ?? Guid.Empty;
 
                                 if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
-                                charge.PaymentObjectId = charge.PartnerInternal_Id;
+                                    charge.PaymentObjectId = charge.PartnerInternal_Id;
                             }
                             else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                             {
@@ -2336,6 +2362,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         private SysOffice GetInfoOfficeOfUser(Guid? officeId)
         {
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
@@ -2410,6 +2437,7 @@ namespace eFMS.API.Documentation.DL.Services
                     entityReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
                     entityReplicate.SalemanId = salemanDefault.Id;
                     entityReplicate.IsLocked = false;
+                    entityReplicate.IsLinkFee = false;
                     entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
 
                     hs = DataContext.Add(entityReplicate);

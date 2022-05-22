@@ -2,7 +2,7 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{state === 'create' ? 'Add New Charge' : 'Update Charge'}}</h5>
+                <h5 class="modal-title">{{state === 'create' ? 'Add New Charge' : 'Duplicate Charge'}}</h5>
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -279,7 +279,7 @@
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        {{state === 'update' ? 'Update' : 'Add'}}
+                                        {{state === 'update' ? 'Save' : 'Add'}}
                                     </span>
                                 </span>
                             </button>

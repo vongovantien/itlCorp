@@ -66,6 +66,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[] = [];
 
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
@@ -480,6 +481,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     // * Auto set cstomer for OBH Partner
                     this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
                 }
+
                 break;
             case 'payer':
                 chargeItem.payer = data.shortName;
@@ -650,17 +652,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     saveChargeList() {
         this.isSubmitted = true;
@@ -680,6 +682,22 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         //         return;
         //     }
         // }
+        //}
+        if(this.selectedShipment.service==='CL'){
+            for (const charge of this.charges) {
+                if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+                    if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Series No Must be fill in");
+                        return;
+                    }
+                    if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Invoice No Must be fill in");
+                        return;
+                    }
+                }
+            }
+        }
+
 
         const error = this.checkValidate();
         if (error < 0) {
