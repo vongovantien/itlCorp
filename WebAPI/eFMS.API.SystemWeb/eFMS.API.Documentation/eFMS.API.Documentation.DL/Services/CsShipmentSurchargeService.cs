@@ -1528,7 +1528,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
-                } else
+                }
+                else
                 {
                     if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
                     {
@@ -1562,13 +1563,23 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
                 }
-                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                //if (!string.IsNullOrEmpty(item.InvoiceNo))
+                //{
+                //    if (string.IsNullOrEmpty(item.SeriesNo))
+                //    {
+                //        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                //        item.IsValid = false;
+                //    }
+                //}
+                if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
                 {
-                    if (string.IsNullOrEmpty(item.SeriesNo))
-                    {
-                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
-                        item.IsValid = false;
-                    }
+                    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
+                {
+                    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
+                    item.IsValid = false;
                 }
                 else
                 {
@@ -1686,15 +1697,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
-                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
-                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
+
                     }
                 }
             });
