@@ -79,5 +79,31 @@ namespace eFMS.API.Common.Helpers
             }
             return null;
         }
+
+        public async static Task<HttpResponseMessage> PutAPI(string url, object obj, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                StringContent content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split()[1]; // remove bearer
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                HttpResponseMessage response = await client.PutAsync(url, content);
+                return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
     }
 }

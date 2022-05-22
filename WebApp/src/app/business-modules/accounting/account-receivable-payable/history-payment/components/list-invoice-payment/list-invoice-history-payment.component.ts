@@ -245,13 +245,15 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         }
     }
 
-    showExtendDateModel(refNo: string) {
-        this._accountingRepo.getInvoiceExtendedDate(refNo)
+    showExtendDateModel(refNo: string, type: string, invoiceNo: string) {
+        this._accountingRepo.getInvoiceExtendedDate(refNo, type, invoiceNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe((res: any) => {
 
                 this.updateExtendDayPopup.refId = res.refId;
+                this.updateExtendDayPopup.type = res.type;
+                this.updateExtendDayPopup.invoiceNo = res.invoiceNo;
                 this.updateExtendDayPopup.numberDaysExtend.setValue(res.numberDaysExtend);
                 this.updateExtendDayPopup.note.setValue(res.note);
                 this.updateExtendDayPopup.paymentType = res.paymentType;
@@ -265,6 +267,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._progressRef.start();
         const body: any = {
             refId: $event.refId,
+            type: $event.type,
+            invoiceNo: $event.invoiceNo,
             numberDaysExtend: $event.numberDaysExtend,
             note: $event.note,
             paymentType: $event.paymentType,
