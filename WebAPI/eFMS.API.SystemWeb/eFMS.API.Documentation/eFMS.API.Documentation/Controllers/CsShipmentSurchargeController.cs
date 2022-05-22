@@ -709,6 +709,12 @@ namespace eFMS.API.Documentation.Controllers
 
             HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, type, settlementCode);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
        
         [HttpPost("RevertChargeLinkFee")]
