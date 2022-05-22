@@ -34,7 +34,7 @@
                                                     class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
                                                     <i class="fa fa-lock"></i>
                                                 </button>
-                                                <ng-container *ngIf="!item.isLocked">
+                                                <ng-container *ngIf="!item.isLocked && !item.isLinkFee">
                                                     <app-permission-button (onClick)="prepareDeleteShipment(item)"
                                                         type="delete" [user]="item.userCreated">
                                                     </app-permission-button>

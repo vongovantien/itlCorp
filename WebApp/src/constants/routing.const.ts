@@ -22,6 +22,7 @@ export class RoutingConstants {
     public static readonly LOGISTICS = {
         JOB_MANAGEMENT: `${RoutingConstants.ROOT_LOGISTICS}/job-management`,
         JOB_DETAIL: `${RoutingConstants.ROOT_LOGISTICS}/job-management/job-edit`,
+        JOB_DETAIL_LINK_FEE: `${RoutingConstants.ROOT_LOGISTICS}/job-management/job-edit-link-fee`,
         ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/assigment`,
         TRUCKING_ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/trucking-assigment`,
         CUSTOM_CLEARANCE: `${RoutingConstants.ROOT_LOGISTICS}/custom-clearance`,

@@ -9,7 +9,7 @@ import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTran
 import { AppList } from 'src/app/app.list';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from '@enums';
 
@@ -44,6 +44,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild('detailLinkFeePopup') detailLinkFeePopup: InfoPopupComponent;
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -83,6 +84,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isSelectedPartnerDynamicCombogrid: boolean = false;
     userLogged: any;
     selectedCs: CsShipmentSurcharge;
+    messageConfirmRevertLinkFee: string = "Do you want to Revert Fee these Jobs ?";
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -364,6 +366,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.hblno = this.hbl.hwbno || null;
         newSurCharge.mblno = this.getMblNo(this.shipment, this.hbl);
         newSurCharge.jobNo = this.shipment.jobNo || null;
+        newSurCharge.linkFee = false;
+        newSurCharge.linkChargeId = null;
         newSurCharge.type = type;
 
         this.addSurcharges(type, newSurCharge);
@@ -398,6 +402,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
 
         newSurCharge.linkChargeId = null;
+        newSurCharge.linkFee = null;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -735,7 +740,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge, ) {
+    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge,) {
         chargeItem.partnerShortName = partnerData.shortName;
         chargeItem.partnerName = partnerData.partnerNameEn;
         chargeItem.paymentObjectId = partnerData.id;
@@ -1487,6 +1492,65 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     }
                 );
         }
+    }
+
+    revertFeeBuy(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs.linkFee) {
+            this._toastService.warning("Charge without fee");
+            return;
+        }
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmRevertLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmRevertLinkFeeBuy(selectedCs))
+    }
+    onConfirmRevertLinkFeeBuy(selectedCs: CsShipmentSurcharge) {
+        let charges = [];
+        charges.push(selectedCs);
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+        this._documentRepo.revertShipmentSurchargesLinkFee(charges)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Revert Linked Success");
+                        this.getProfit();
+                        this.getSurcharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+    detailLinkFee(selectedCs: CsShipmentSurcharge) {
+        if (!selectedCs)
+            this._toastService.error("Please Select Charge");
+        this._spinner.show(this.spinnerpartner);
+        this._documentRepo.detailLinkFee(selectedCs.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: any) => {
+                    if (result) {
+                        this._spinner.hide(this.spinnerpartner);
+                        let strBody = "<div class=detail-linkfee > <b>Link from Job Ops:</b><a> " + result.jobNoOrg + "</a>"
+                            + "</br><b>Link to Job Service:</b><a> " + result.jobNoLink + "</a>"
+                            + "</br><b>Partner Name Selling :</b><a> " + result.partnerNameOrg + "</a>"
+                            + "</br><b>Partner Name Buying :</b><a> " + result.partnerNameLink + "</a>"
+                            + "</br><b>Linked At:</b><a> " + formatDate(new Date(result.datetimeCreated), 'dd/MM/yyyy hh:mm:ss', 'en') + "</a>"
+                            + "</br><b>Create By:</b><a> " + result.userCreatedName + "</a>"
+                            + "<div>"
+                        this.detailLinkFeePopup.title = "Information";
+                        this.detailLinkFeePopup.body = strBody;
+                        this.detailLinkFeePopup.show();
+                    } else {
+                        this._toastService.error("No Charge Link Fee");
+                    }
+                }
+            );
     }
 }
 

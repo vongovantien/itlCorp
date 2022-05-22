@@ -402,6 +402,16 @@ a {
                     background: rgb(255, 242, 204) !important;
                 }
             }
+            &.bg-green {
+                background: #8af1b6 !important;
+                .fixed-side {
+                    background: #8af1b6 !important;
+                }
+                .e--combogrid_icon,
+                .e--combogrid_icon__clear {
+                    background: #8af1b6 !important;
+                }
+            }
         }
         & + tbody {
             border-top: 0;

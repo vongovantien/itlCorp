@@ -38,6 +38,8 @@ export class JobConstants {
 
         ROUTES: <string[]>['Red', 'Green', 'Yellow'],
 
+        LINKFEESEARCHS: <string[]>['All','Have Linked', 'Not Link'],
+
         AIRLIGHTCODEMAPPING: <CommonInterface.INg2Select[]>[
             { id: '235', text: 'TURKISH CARGO' },
             { id: '180', text: 'KOREAN AIR' },

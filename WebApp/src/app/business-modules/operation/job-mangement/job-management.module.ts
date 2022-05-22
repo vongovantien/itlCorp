@@ -14,6 +14,7 @@ import { JobManagementFormSearchComponent } from './components/form-search-job/f
 import { JobManagementFormCreateComponent } from './components/form-create/form-create-job.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { JobManagementChargeImportComponent } from './job-management-import/job-charge-import.component';
+import { JobManagementLinkFeeComponent } from '../job-management-link-fee/job-management-link-fee.component';
 
 
 const routing: Routes = [
@@ -34,7 +35,12 @@ const routing: Routes = [
             {
                 path: "job-edit",
                 loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
-                data: { name: 'Detail Job' }
+                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true }
+            },
+            {
+                path: "job-edit-link-fee",
+                loadChildren: () => import('../job-edit/job-edit.module').then(m => m.JobEditModule),
+                data: { name: 'Detail Job', tabSurcharge: 'SELL', allowLinkFee: true }
             },
 
         ]
@@ -64,7 +70,8 @@ const LIB = [
         JobManagementComponent,
         JobManagementCreateJobComponent,
         JobManagementFormSearchComponent,
-        JobManagementFormCreateComponent
+        JobManagementFormCreateComponent,
+        JobManagementLinkFeeComponent
     ],
     providers: [
     ],

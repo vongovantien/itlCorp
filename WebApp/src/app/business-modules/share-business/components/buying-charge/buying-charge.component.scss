@@ -96,6 +96,18 @@
                         background: rgb(255,242,204) !important;
                     }
                 }
+                .bg-green{
+                    .form-control {
+                        background: inherit;
+                    }
+                    .fixed-side {
+                        background: #8af1b6 !important;
+                    }
+                    .e--combogrid_icon,
+                    .e--combogrid_icon__clear {
+                        background: #8af1b6 !important;
+                    }
+                }
             }
 
             .quantity-hint {
@@ -135,5 +147,8 @@
         .e--combogrid-content {
             min-width: 520px;
         }
+    }
+    .detail-linkfee{
+        text-align: left;
     }
 }

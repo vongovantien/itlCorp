@@ -58,6 +58,8 @@ export class OpsTransaction extends BaseModel {
     replicatedId: string = null;
 
     note: string = '';
+    isLinkFee: boolean = false;
+    isLinkJob: boolean = false;
 
     permission: PermissionShipment = new PermissionShipment();
 

@@ -1261,7 +1261,8 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(item.CreditNo)
                             || !string.IsNullOrEmpty(item.DebitNo)
                             || !string.IsNullOrEmpty(item.SettlementCode)
-                            || !string.IsNullOrEmpty(item.VoucherId))
+                            || !string.IsNullOrEmpty(item.VoucherId)
+                            || item.LinkFee == true)
                         {
                             isSpecialCase = true;
                             break;

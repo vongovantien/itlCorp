@@ -21,5 +21,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public PermissionRange RangeSearch { get; set; }
         public DateTime? CreatedDateFrom { get; set; }
         public DateTime? CreatedDateTo { get; set; }
+        public string LinkJobSearch { get; set; }
+        public string LinkFeeSearch { get; set; }
     }
 }
