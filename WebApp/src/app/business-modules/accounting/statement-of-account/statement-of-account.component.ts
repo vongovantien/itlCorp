@@ -110,7 +110,7 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     getSOAs() {
-        this.pageSize=30;
+        //this.pageSize=30;
         this.isLoading = true;
         this._progressRef.start();
         this._accoutingRepo
