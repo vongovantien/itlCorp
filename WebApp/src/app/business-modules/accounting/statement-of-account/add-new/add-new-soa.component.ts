@@ -12,6 +12,7 @@ import _uniq from 'lodash/uniq';
 import { StatementOfAccountFormCreateComponent } from '../components/form-create-soa/form-create-soa.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
+import { cloneDeep } from 'lodash';
 
 @Component({
     selector: 'app-statement-of-account-new',
@@ -25,6 +26,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
 
     dataSearch: SOASearchCharge = new SOASearchCharge();
+    dataSearchOld: any = null;
 
     listCharges: any[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -35,7 +37,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     isCollapsed: boolean = true;
     isCheckAllCharge: boolean = false;
 
-    dataCharge: any = null;
+    dataCharge: any = null;  
 
     constructor(
         private _sortService: SortService,
@@ -101,9 +103,23 @@ export class StatementOfAccountAddnewComponent extends AppList {
         }
     }
 
-    onCreateSOA() {
+    isValidSOA(){
         if (!this.listCharges.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            return false;
+        }
+
+        if(this.dataSearch.type.toLowerCase() === 'debit' && !!this.dataSearchOld){
+            if(this.dataSearch.salemanId !== this.dataSearchOld.salemanId){
+                this._toastService.warning(`The selected Saleman is different from shipment, Please recheck the Saleman! `, '', { positionClass: 'toast-bottom-right' });
+                return false;
+            }
+        }
+        return true;
+    }
+
+    onCreateSOA() {
+        if (!this.isValidSOA()) {
             return;
         } else {
             const body = {
@@ -154,6 +170,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     searchChargeWithDataSearch(dataSearch: SOASearchCharge) {
         this.isLoading = true;
         this.dataSearch = dataSearch;
+        this.dataSearchOld = cloneDeep(dataSearch);
         this._accountRepo.getListChargeShipment(dataSearch)
             .pipe(
                 catchError(this.catchError),
