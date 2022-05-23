@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SortService } from '@services';
-import { Partner, Company } from '@models';
+import { Partner, Company, Office } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { IPartnerDataState, getPartnerDataSearchParamsState } from '../../store';
 import { Store } from '@ngrx/store';
@@ -83,6 +83,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Fax', field: 'fax', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'Office', field: 'office', sortable: true },
         ];
         localStorage.removeItem('success_add_sub');
         this.dataSearch = this.criteria;
@@ -131,6 +132,8 @@ export class PartnerListComponent extends AppList implements OnInit {
                     }
                 },
             );
+
+        console.log(this.offices);
     }
 
     getCompany() {
@@ -190,6 +193,9 @@ export class PartnerListComponent extends AppList implements OnInit {
             })).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.partners = res.data || [];
+                    this.partners.forEach(x=>{
+                        x.officeName=this.offices.find(z=>z.id===x.officeId).shortName;
+                    })
                     console.log(this.partners);
                     this.totalItems = res.totalItems;
                 }
