@@ -566,7 +566,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             this.saleMans = [];
             this._catalogueRepo.getAgreement(
                 {
-                    partnerId: this.selectedPartner.value, status: true
+                    partnerId: this.selectedPartner.value, status: true, isGetChild: true
                 }).subscribe(
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
