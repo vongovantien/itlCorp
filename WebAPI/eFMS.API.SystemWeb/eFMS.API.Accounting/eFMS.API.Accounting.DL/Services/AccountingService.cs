@@ -396,7 +396,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              CustomerCodeTransfer = _customerCodeTransfer,
 
                                                                                              // 15709
-                                                                                             AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo, item.Payee),
+                                                                                             AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo, string.Empty),
                                                                                              RefundAmount = null, // Logic bên dưới
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
                                                                                              IsRefund = 0,
