@@ -11,7 +11,7 @@ export interface IAgentState {
 export const commercialState = createFeatureSelector<IAgentState>('agent');
 export const getAgentSearchParamsState = createSelector(commercialState, (state: IAgentState) => state && state.com && state.com.dataSearch);
 export const getAgentDataListState = createSelector(commercialState, (state: IAgentState) => state.com?.agents);
-
+export const getAgentPagingState = createSelector(commercialState, (state: IAgentState) => state?.com?.pagingData);
 
 export const reducers: ActionReducerMap<IAgentState> = {
     com: reducer

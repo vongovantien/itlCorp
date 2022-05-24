@@ -2,11 +2,11 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SortService } from '@services';
 import { Partner, Company } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner } from '../../store';
+import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState } from '../../store';
 import { Store } from '@ngrx/store';
 
 
@@ -49,17 +49,21 @@ export class PartnerListComponent extends AppList implements OnInit {
         this.getCompany();
         this._store.select(getPartnerDataSearchParamsState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(getPartnerDataListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData])=>({page:pagingData.page,pageSize:pagingData.pageSize,dataSearch:dataSearch}))
             )
             .subscribe(
                 (data: any) => {
-                    if (!!data && !!data.keyword) {
-                        this.dataSearchs = data;
+                    if (!!data.dataSearch) {
+                        this.dataSearchs = data.dataSearch;
                         console.log(this.dataSearchs);
                         if (Object.keys(this.dataSearchs).length > 0) {
                             this.dataSearchs.type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
                             this.criteria[this.dataSearchs.type] = this.dataSearchs.keyword;
                         }
+                        this.page=data.page;
+                        this.pageSize=data.pageSize;
                     }
 
                 }

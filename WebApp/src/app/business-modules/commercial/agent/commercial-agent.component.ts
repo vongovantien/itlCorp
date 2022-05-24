@@ -12,9 +12,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchList, getAgentDataListState, LoadListAgent } from './store';
+import { IAgentState, getAgentSearchParamsState, SearchList, getAgentDataListState, LoadListAgent, getAgentPagingState } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
@@ -67,15 +67,17 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getAgentSearchParamsState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(getAgentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData])=>({page:pagingData.page,pageSize:pagingData.pageSize,dataSearch:dataSearch}))
             )
             .subscribe(
                 (data: any) => {
-                    if (!!data && !!data.keyword) {
-                        this.dataSearchs = data;
-                        console.log(this.dataSearchs);
+                    if (!!data.dataSearch) {
+                        this.dataSearchs = data.dataSearch;
                     }
-
+                    this.page=data.page;
+                    this.pageSize=data.pageSize;
                 }
             );
         this._store.select(getAgentDataListState)
@@ -93,6 +95,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                     this.totalItems = res.totalItems || 0;
                 },
             );
+
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Salesman', field: 'username', sortable: true },
@@ -238,7 +241,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
+            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type)?.title;
         }
         this._cd.detectChanges();
     }
