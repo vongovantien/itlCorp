@@ -5,7 +5,7 @@ import {
     Permission403PopupComponent
 } from "src/app/shared/common/popup";
 import { AccountingRepo } from "src/app/shared/repositories";
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { SOA } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
@@ -15,6 +15,8 @@ import { Router } from "@angular/router";
 import { RoutingConstants } from "@constants";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserSpecialPermissionState } from "@store";
+import { getDataSearchSOAState, getSOAListState, getSOAPagingState } from "./store/reducers";
+import { LoadListSOA } from "./store/actions";
 
 @Component({
     selector: "app-statement-of-account",
@@ -42,7 +44,7 @@ export class StatementOfAccountComponent extends AppList {
         super();
 
         this.requestSort = this.sortLocal;
-        this.requestList = this.getSOAs;
+        this.requestList = this.requestSearchSOA;
         this._progressRef = this._progressService.ref();
     }
 
@@ -65,6 +67,25 @@ export class StatementOfAccountComponent extends AppList {
         this.dataSearch = {
             CurrencyLocal: "VND"
         };
+        this._store.select(getDataSearchSOAState)
+          .pipe(
+            withLatestFrom(this._store.select(getSOAPagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+          )
+          .subscribe(
+            (data: any) => {
+              if (!!data.dataSearch) {
+                this.dataSearch = data.dataSearch;
+              }
+              if (!!data.dataSearch.dataSearch) {
+                this.dataSearch = data.dataSearch.dataSearch;
+              }
+              this.page = data.page;
+              this.pageSize = data.pageSize;
+              this.requestSearchSOA();
+            }
+          );
         this.getSOAs();
     }
 
@@ -106,6 +127,7 @@ export class StatementOfAccountComponent extends AppList {
     onSearchSoa(data: any) {
         this.page = 1;
         this.dataSearch = data;
+        this.requestSearchSOA();
         this.getSOAs();
     }
 
@@ -113,23 +135,46 @@ export class StatementOfAccountComponent extends AppList {
         //this.pageSize=30;
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo
-            .getListSOA(
-                this.page,
-                this.pageSize,
-                Object.assign({}, this.dataSearch)
-            )
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                    this._progressRef.complete();
-                })
-            )
-            .subscribe((res: any) => {
-                this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
+        // this._accoutingRepo
+        //     .getListSOA(
+        //         this.page,
+        //         this.pageSize,
+        //         Object.assign({}, this.dataSearch)
+        //     )
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => {
+        //             this.isLoading = false;
+        //             this._progressRef.complete();
+        //         })
+        //     )
+        //     .subscribe((res: any) => {
+        //         this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
+        //         this.totalItems = res.totalItems || 0;
+        //     });
+        this._store.select(getSOAListState)
+        .pipe(
+            catchError(this.catchError),
+            map((data: any) => {
+                return {
+                    data: !!data ? data.data : [],
+                    totalItems: data.totalItems,
+                };
+            }),
+            takeUntil(this.ngUnsubscribe),
+        )
+        .subscribe(
+            (res: any) => {
+                this.SOAs = res.data || [];
                 this.totalItems = res.totalItems || 0;
-            });
+                this.isLoading = false;
+                this._progressRef.complete();
+            },
+        );
+    }
+
+    requestSearchSOA(){
+        this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     sortLocal(sort: string): void {

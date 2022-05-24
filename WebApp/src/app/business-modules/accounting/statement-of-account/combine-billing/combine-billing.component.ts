@@ -65,6 +65,7 @@ export class CombineBillingComponent extends AppList implements OnInit {
     this.isLoading = this._store.select(getCombineBillingLoadingListState);
 
     this.getListCombineBilling();
+    
     this._store.select(getDataSearchCombineBillingState)
       .pipe(
         withLatestFrom(this._store.select(getCombineBillingPagingState)),

@@ -8,6 +8,10 @@ import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppForm } from '@app';
+import { Store } from '@ngrx/store';
+import { IAppState } from '@store';
+import { SearchListSOA } from '../../store/actions';
+import { getDataSearchSOAState, getSOAPagingState } from '../../store/reducers';
 
 @Component({
     selector: 'soa-search-box',
@@ -44,7 +48,8 @@ export class StatementOfAccountSearchComponent extends AppForm {
         private _sysRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _store: Store<IAppState>,
     ) {
         super();
         this.requestReset = this.reset;
@@ -54,10 +59,25 @@ export class StatementOfAccountSearchComponent extends AppForm {
         this.getBasicData();
         this.getStatus();
         this.getUserLogged();
+        this.subscriptionSearchParamState();
     }
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+    }
+
+    subscriptionSearchParamState() {
+        this._store.select(getDataSearchSOAState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data) {
+                        this.reference=data.dataSearch.strCodes;
+                    }
+                }
+            );
     }
 
     getBasicData() {
@@ -145,6 +165,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
             soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
             CurrencyLocal: "VND"
         };
+        this._store.dispatch(SearchListSOA({ dataSearch: body }));
         this.onSearch.emit(body);
     }
 
