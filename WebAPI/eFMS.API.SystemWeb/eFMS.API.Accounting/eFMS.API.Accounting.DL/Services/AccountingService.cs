@@ -511,7 +511,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
 
-                                        string _requesterAdvanceCode = reqItem.AdvanceCustomerCode;//GetAdvanceReqterCode(reqItem.AdvanceNo);
+                                        string _requesterAdvanceCode = GetAdvanceCustomerCode(reqItem.AdvanceNo, string.Empty);
 
                                         if (!string.IsNullOrEmpty(reqItem.AdvanceNo))
                                         {
