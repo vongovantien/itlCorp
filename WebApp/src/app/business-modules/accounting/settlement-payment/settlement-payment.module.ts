@@ -41,6 +41,7 @@ import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 import { SettlementShipmentAttachFilePopupComponent } from './components/popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 import { SettlementDetailChargesPaymentComponent } from './components/popup/payment-management/detail-charges-payment/detail-charges-payment.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 const routing: Routes = [
     {
@@ -120,7 +121,9 @@ const maskConfig: Partial<IConfig> = {
         EffectsModule.forFeature([SettlePaymentEffect]),
         ShareModulesModule,
         NgxMaskModule.forRoot(maskConfig),
-        TabsModule
+        TabsModule,
+        ScrollingModule
+
     ],
     exports: [],
     declarations: [

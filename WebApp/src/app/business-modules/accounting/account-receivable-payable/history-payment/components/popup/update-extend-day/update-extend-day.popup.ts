@@ -11,6 +11,8 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
     formUpdateExtenDate: FormGroup;
 
     refId: string;
+    type: string;
+    invoiceNo: string;
     numberDaysExtend: AbstractControl;
     note: AbstractControl;
     paymentType: number;
@@ -44,6 +46,8 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
         }
         const body: IExtendDateUpdated = {
             refId: this.refId,
+            type: this.type,
+            invoiceNo: this.invoiceNo,
             numberDaysExtend: this.numberDaysExtend.value,
             note: this.note.value,
             paymentType: this.paymentType,
@@ -63,6 +67,8 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
 }
 export interface IExtendDateUpdated {
     refId: string;
+    type: string;
+    invoiceNo: string;
     numberDaysExtend: number;
     note: string;
     paymentType: number;

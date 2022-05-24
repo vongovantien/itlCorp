@@ -9,7 +9,9 @@ namespace eFMS.IdentityServer.DL.UserManager
         string UserID { get; set; }
         string UserName { get; set; }
         Guid CompanyID { get; set; }
+        string CompanyCode { get; set; }
         Guid OfficeID { get; set; }
+        string OfficeCode { get; set; }
         int? DepartmentId { get; set; }
         short? GroupId { get; set; }
         decimal? KbExchangeRate { get; set; }

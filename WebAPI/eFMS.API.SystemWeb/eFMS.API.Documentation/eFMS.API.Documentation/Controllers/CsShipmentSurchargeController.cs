@@ -710,6 +710,25 @@ namespace eFMS.API.Documentation.Controllers
             HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, type, settlementCode);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
 
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+       
+        [HttpPost("RevertChargeLinkFee")]
+        [Authorize]
+        public IActionResult  RevertChargeLinkFee([FromBody] List<CsShipmentSurchargeModel> list)
+        {
+            currentUser.Action = "RevertChargeLinkFee";
+            var hs = csShipmentSurchargeService.RevertChargeLinkFee(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }

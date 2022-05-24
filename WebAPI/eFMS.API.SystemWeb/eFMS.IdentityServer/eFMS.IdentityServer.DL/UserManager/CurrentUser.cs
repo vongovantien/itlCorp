@@ -147,16 +147,33 @@ namespace eFMS.IdentityServer.DL.UserManager
                 kbExc = value;
             }
         }
-        private string _action;
-        public string Action
+        public string Action { get; set; }
+
+        private string _cCode;
+        public string CompanyCode
         {
             get
             {
-                return _action;
+                _cCode = currentUser.FirstOrDefault(x => x.Type == "CompanyCode").Value;
+                return _cCode;
             }
             set
             {
-                _action = value;
+                _cCode = value;
+            }
+        }
+
+        private string _oCode;
+        public string OfficeCode
+        {
+            get
+            {
+                _oCode = currentUser.FirstOrDefault(x => x.Type == "OfficeCode").Value;
+                return _oCode;
+            }
+            set
+            {
+                _oCode = value;
             }
         }
     }

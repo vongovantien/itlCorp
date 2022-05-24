@@ -10,8 +10,11 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
     {
         public string RefId { get; set; }
         [Required]
+        public string Type { get; set; }
+        public string InvoiceNo { get; set; }
         public int NumberDaysExtend { get; set; }
         public string Note { get; set; }
         public PaymentType PaymentType { get; set; }
+        public string PartnerId { get; set; }
     }
 }

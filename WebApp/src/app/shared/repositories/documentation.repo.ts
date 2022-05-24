@@ -1165,7 +1165,16 @@ export class DocumentationRepo {
     }
 
     updateShipmentSurchargesLinkFee(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UpdateChargeLinkFee`, data).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/UpdateChargeLinkFee`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    revertShipmentSurchargesLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/RevertChargeLinkFee`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1202,4 +1211,9 @@ export class DocumentationRepo {
             { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type });
     }
 
+    detailLinkFee(id: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/DetailByChargeOrgId?id=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }

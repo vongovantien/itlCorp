@@ -3,7 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { CatalogueRepo, AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { takeUntil, distinctUntilChanged, catchError, map, debounceTime } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
-import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
+import { CsShipmentSurcharge, CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
@@ -22,6 +22,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     @Input() state: string = 'create';
 
     isShow: boolean = false;
+    isOPS: boolean = false;
 
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
@@ -461,6 +462,17 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             };
             Object.assign(body, dataChargeOBH);
         }
+        if(this.selectedCharge.type==='OBH' && body.jobId.includes('LOG')){
+            if(!this.utility.isWhiteSpace(body.invoiceNo )&& this.utility.isWhiteSpace(body.seriesNo)){
+                this._toastService.warning("Series No Must be fill in");
+                return;
+            }
+            if(this.utility.isWhiteSpace(body.invoiceNo) && !this.utility.isWhiteSpace(body.seriesNo)){
+                this._toastService.warning("Invoice No Must be fill in");
+                return;
+            }
+
+        }
 
         // TODO EMIT (UPDATE, COPY, CREATE) TO LIST SURCHARGE.
 
@@ -601,7 +613,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                             this.onUpdateChange.emit(body);
                         } else {
                             body.id = SystemConstants.EMPTY_GUID; // * Update ID
-                            this.onRequest.emit(body);
+                            let surcharges:CsShipmentSurcharge[]=[];
+                            surcharges.push(body)
+                            this.onRequest.emit(surcharges);
+                            console.log(surcharges);
+                            
                         }
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
