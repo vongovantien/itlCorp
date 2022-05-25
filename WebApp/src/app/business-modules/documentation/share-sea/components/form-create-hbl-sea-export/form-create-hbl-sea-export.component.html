@@ -306,7 +306,7 @@
                                     [items]="serviceTypes"></ng-select>
                             </div>
                             <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (incotermId.dirty && !incotermId.valid) || (isSubmited && !incotermId.valid)}">
+                                    [ngClass]="{'m-form__group has-danger': (incotermId.dirty && !incotermId.valid) || (isSubmitted && !incotermId.valid)}">
                                     <label class="form-control-label" for="">
                                         Incoterm. <span class="m--font-danger">(*)</span>
                                     </label>
@@ -314,7 +314,7 @@
                                     [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
                                     <div class="form-control-feedback"
-                                        *ngIf="isSubmited && (incotermId.errors | equalError: 'required') || (incotermId.errors | equalError: 'required') && incotermId.dirty">
+                                        *ngIf="isSubmitted && (incotermId.errors | equalError: 'required') || (incotermId.errors | equalError: 'required') && incotermId.dirty">
                                         Incoterm is required!
                                     </div>
                             </div>
