@@ -71,6 +71,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     moveType: AbstractControl;
     issueHbldate: AbstractControl;
     issueHblplace: AbstractControl;
+    incotermId:AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -366,7 +367,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
-
+        this.incotermId = this.formCreate.controls["incotermId"];
         this.hwbno.valueChanges
             .pipe(startWith(this.hwbno.value), takeUntil(this.ngUnsubscribe))
             .subscribe((hwbno: string) => {
