@@ -48,6 +48,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     selectedCustomerShipment: any = {};
     selectedSaleman: any = null;
     saleMans: any[] = [];
+    itlBOD: any = [];
     salemanDisplay: string = '';
     
     dateModes: any[] = [];
@@ -170,6 +171,13 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 );
 
         }
+
+        this._sysRepo.getEmployeeByUserId('ad78fc30-5316-46e5-bc9d-7e207efafbec').pipe()
+            .subscribe((data: any) => {
+                if(data){
+                    this.itlBOD = [{ id: 'ad78fc30-5316-46e5-bc9d-7e207efafbec', value: data.employeeNameEn }];
+                }
+            })
     }
 
     getPartnerData(data: any) {
@@ -571,8 +579,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].creditCurrency)[0];
-                            this.saleMans = agreements.map(x => ({id: x.saleManId, value: x.saleManName}));
+                            this.saleMans = [...agreements.map(x => ({id: x.saleManId, value: x.saleManName})), ...this.itlBOD];
                         }else{
+                            this.saleMans = this.itlBOD;
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
                         }
                         this.updateDataSearch('currency', this.selectedCurrency.id);
