@@ -418,38 +418,58 @@ namespace eFMS.API.Accounting.DL.Services
 
             models.ForEach(fe =>
             {
-                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
-                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
-
+                IQueryable<SalesmanSurcharge> _chargeWithSaleman = Enumerable.Empty<SalesmanSurcharge>().AsQueryable();
                 if (fe.Service == "CL")
                 {
-                    _charges = from ops in opsJob
-                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
-                               from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office 
-                               && surGrp.PaymentObjectId == fe.PartnerId 
-                               && surGrp.TransactionType == fe.Service
-                               && ops.SalemanId == fe.SaleMan
-                               select surGrp;
+                    _chargeWithSaleman = from ops in opsJob
+                                         join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                                         from surGrp in grpOps.DefaultIfEmpty()
+                                         where surGrp.OfficeId == fe.Office
+                                         && surGrp.PaymentObjectId == fe.PartnerId
+                                         && surGrp.TransactionType == fe.Service
+                                         && ops.SalemanId == fe.SaleMan
+                                         // group surGrp by new { surGrp.PaymentObjectId, surGrp.OfficeId, surGrp.TransactionType, ops.SalemanId } into gS
+                                         select new SalesmanSurcharge
+                                         {
+                                             Surcharge = surGrp,
+                                             Salesman = ops.SalemanId,
+                                             Office = surGrp.OfficeId,
+                                             PartnerId = surGrp.PaymentObjectId,
+                                             TransactionType = surGrp.TransactionType
+                                         };
                 }
                 else
                 {
-                    _charges = from cs in csJob
-                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
-                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
-                               from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office 
-                               && surGrp.PaymentObjectId == fe.PartnerId 
-                               && surGrp.TransactionType == fe.Service
-                               && csd.SaleManId == fe.SaleMan
-                               select surGrp;
+                    _chargeWithSaleman = from cs in csJob
+                                         join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                                         join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                                         from surGrp in grpOps.DefaultIfEmpty()
+                                         where surGrp.OfficeId == fe.Office
+                                         && surGrp.PaymentObjectId == fe.PartnerId
+                                         && surGrp.TransactionType == fe.Service
+                                         && csd.SaleManId == fe.SaleMan
+                                         // group surGrp by new { surGrp.PaymentObjectId, surGrp.OfficeId, surGrp.TransactionType, csd.SaleManId } into gS
+                                         select new SalesmanSurcharge
+                                         {
+                                             Surcharge = surGrp,
+                                             Salesman = csd.SaleManId,
+                                             Office = surGrp.OfficeId,
+                                             PartnerId = surGrp.PaymentObjectId,
+                                             TransactionType = surGrp.TransactionType
+                                         };
                 }
-                decimal? obhAmount = 0;
-                foreach (var charge in _charges)
+                if (_chargeWithSaleman.Count() > 0)
                 {
-                    obhAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    var _chargeGrp = _chargeWithSaleman
+                   .GroupBy(x => new { x.PartnerId, x.Office, x.TransactionType, x.Salesman })
+                   .SelectMany(x => x.Select(i => i.Surcharge));
+                    decimal? obhAmount = 0;
+                    foreach (var charge in _chargeGrp)
+                    {
+                        obhAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
+                    }
+                    fe.ObhAmount = obhAmount + fe.ObhUnpaid; //Cộng thêm OBH Unpaid thuộc Receivable (ObhUnpaid cần phải được tính toán trước)
                 }
-                fe.ObhAmount = obhAmount + fe.ObhUnpaid; //Cộng thêm OBH Unpaid thuộc Receivable (ObhUnpaid cần phải được tính toán trước)
             });
 
             return models;
@@ -777,7 +797,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<AccAccountReceivableModel> CalculatorSellingNoVat(List<AccAccountReceivableModel> models, IQueryable<CsShipmentSurcharge> charges)
         {
             //Lấy ra các phí thu (SELLING) chưa có Invoice
-            var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL
+            var surcharges = charges.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL)
                                              && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId == null);
 
@@ -788,36 +808,54 @@ namespace eFMS.API.Accounting.DL.Services
                                            && x.ServiceDate.Value.Date <= DateTime.Now.Date);
             models.ForEach(fe =>
             {
+                IQueryable<SalesmanSurcharge> _chargeWithSaleman = Enumerable.Empty<SalesmanSurcharge>().AsQueryable();
 
-                // var _charges = surcharges.Where(x => x.OfficeId == fe.Office && x.PaymentObjectId == fe.PartnerId && x.TransactionType == fe.Service);
-                var _charges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
                 if (fe.Service == "CL")
                 {
-                    _charges = from ops in opsJob
-                               join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
-                               from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office 
-                               && surGrp.PaymentObjectId == fe.PartnerId 
-                               && surGrp.TransactionType == fe.Service
-                               && ops.SalemanId == fe.SaleMan
-                               select surGrp;
+                    _chargeWithSaleman = from ops in opsJob
+                                         join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
+                                         from surGrp in grpOps.DefaultIfEmpty()
+                                         where surGrp.OfficeId == fe.Office
+                                         && surGrp.PaymentObjectId == fe.PartnerId
+                                         && surGrp.TransactionType == fe.Service
+                                         && ops.SalemanId == fe.SaleMan
+                                         // group surGrp by new { surGrp.PaymentObjectId, surGrp.OfficeId, surGrp.TransactionType, ops.SalemanId } into gS
+                                         select new SalesmanSurcharge
+                                         {
+                                             Surcharge = surGrp,
+                                             Salesman = ops.SalemanId,
+                                             Office = surGrp.OfficeId,
+                                             PartnerId = surGrp.PaymentObjectId,
+                                             TransactionType = surGrp.TransactionType
+                                         };
                 }
                 else
                 {
-                    _charges = from cs in csJob
-                               join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
-                               join sur in surcharges on csd.Id equals sur.Hblid into grpOps
-                               from surGrp in grpOps.DefaultIfEmpty()
-                               where surGrp.OfficeId == fe.Office 
-                               && surGrp.PaymentObjectId == fe.PartnerId 
-                               && surGrp.TransactionType == fe.Service
-                               && csd.SaleManId == fe.SaleMan
-                               select surGrp;
+                    _chargeWithSaleman = from cs in csJob
+                                         join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
+                                         join sur in surcharges on csd.Id equals sur.Hblid into grpOps
+                                         from surGrp in grpOps.DefaultIfEmpty()
+                                         where surGrp.OfficeId == fe.Office
+                                         && surGrp.PaymentObjectId == fe.PartnerId
+                                         && surGrp.TransactionType == fe.Service
+                                         && csd.SaleManId == fe.SaleMan
+                                         //group surGrp by new { surGrp.PaymentObjectId, surGrp.OfficeId, surGrp.TransactionType, csd.SaleManId } into gS
+                                         select new SalesmanSurcharge
+                                         {
+                                             Surcharge = surGrp,
+                                             Salesman = csd.SaleManId,
+                                             Office = surGrp.OfficeId,
+                                             PartnerId = surGrp.PaymentObjectId,
+                                             TransactionType = surGrp.TransactionType
+                                         };
                 }
-                if (_charges.Count() > 0)
+                if (_chargeWithSaleman.Count() > 0)
                 {
+                    var _chargeGrp = _chargeWithSaleman
+                    .GroupBy(x => new { x.PartnerId, x.Office, x.TransactionType, x.Salesman })
+                    .SelectMany(x => x.Select(i => i.Surcharge));
                     decimal? sellingNoVat = 0;
-                    foreach (var charge in _charges)
+                    foreach (var charge in _chargeGrp)
                     {
                         sellingNoVat += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, fe.ContractCurrency);
                     }
@@ -1240,66 +1278,61 @@ namespace eFMS.API.Accounting.DL.Services
             var receivables = new List<AccAccountReceivableModel>();
             foreach (var model in models)
             {
-                var receivable = new AccAccountReceivableModel();
-                receivable.Over30Day = 0;
-                receivable.Over1To15Day = 0;
-                receivable.Over16To30Day = 0;
-                receivable.ObhAmount = 0;
-                receivable.ObhBilling = 0;
-                receivable.ObhPaid = 0;
-                receivable.ObhUnpaid = 0;
-                receivable.DebitAmount = 0;
                 var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
                 //Không tính công nợ cho đối tượng Internal
                 if (partner != null && partner.PartnerMode != "Internal")
                 {
-                    receivable.PartnerId = model.PartnerId;
-                    receivable.Office = model.Office;
-                    receivable.Service = model.Service;
-                    receivable.AcRef = partner.ParentId ?? partner.Id;
-                    CatContract contractPartner = null;
-                    var contracts = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == model.PartnerId
-                                                                    && x.OfficeId.Contains(model.Office.ToString())
-                                                                    && x.SaleService.Contains(model.Service));
-                    if(!string.IsNullOrEmpty(model.SalesmanId))
+                    var contracts = contractPartnerRepo.Get(x => x.PartnerId == model.PartnerId);
+                    if (contracts.Count() > 0)
                     {
-                        contractPartner = contracts.FirstOrDefault(x => x.SaleManId == model.SalesmanId);
-                    } else
-                    {
-                        contractPartner = contracts.OrderBy(x => x.ContractType)
-                            .ThenBy(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
-                            .FirstOrDefault();
-                    }
-                    if (contractPartner == null)
-                    {
-                        // Lấy currency local và use created of partner gán cho Receivable
-                        receivable.ContractId = null;
-                        receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
-                        // receivable.SaleMan = null; 
-                        receivable.SaleMan = model.SalesmanId; // CR 17531
-                        receivable.UserCreated = partner.UserCreated;
-                        receivable.UserModified = partner.UserCreated;
-                        receivable.GroupId = partner.GroupId;
-                        receivable.DepartmentId = partner.DepartmentId;
-                        receivable.OfficeId = partner.OfficeId;
-                        receivable.CompanyId = partner.CompanyId;
-                    }
-                    else
-                    {
-                        // Lấy currency của contract & user created of contract gán cho Receivable
-                        receivable.ContractId = contractPartner.Id;
-                        receivable.ContractCurrency = contractPartner.CreditCurrency;
-                        receivable.SaleMan = contractPartner.SaleManId;
-                        receivable.UserCreated = contractPartner.UserCreated;
-                        receivable.UserModified = contractPartner.UserCreated;
-                        receivable.GroupId = null;
-                        receivable.DepartmentId = null;
-                        receivable.OfficeId = model.Office;
-                        receivable.CompanyId = contractPartner.CompanyId;
+                        foreach (var contract in contracts)
+                        {
+                            AccAccountReceivableModel receivable = new AccAccountReceivableModel();
+                            receivable.Over30Day = 0;
+                            receivable.Over1To15Day = 0;
+                            receivable.Over16To30Day = 0;
+                            receivable.ObhAmount = 0;
+                            receivable.ObhBilling = 0;
+                            receivable.ObhPaid = 0;
+                            receivable.ObhUnpaid = 0;
+                            receivable.DebitAmount = 0;
+                            receivable.PartnerId = model.PartnerId;
+                            receivable.Office = model.Office;
+                            receivable.Service = model.Service;
+                            receivable.AcRef = partner.ParentId ?? partner.Id;
+
+                            if (contract.Active == true && contract.OfficeId.Contains(model.Office.ToString()) == true
+                                && contract.SaleService.Contains(model.Service) == true)
+                            {
+
+                                // Lấy currency của contract & user created of contract gán cho Receivable
+                                receivable.ContractId = contract.Id;
+                                receivable.ContractCurrency = contract.CreditCurrency;
+                                receivable.SaleMan = contract.SaleManId;
+                                receivable.UserCreated = contract.UserCreated;
+                                receivable.UserModified = contract.UserCreated;
+                                receivable.GroupId = null;
+                                receivable.DepartmentId = null;
+                                receivable.OfficeId = model.Office;
+                                receivable.CompanyId = contract.CompanyId;
+                            }
+                            else
+                            {
+                                // Lấy currency local và use created of partner gán cho Receivable
+                                receivable.ContractId = null;
+                                receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
+                                receivable.SaleMan = contract.SaleManId;
+                                receivable.UserCreated = partner.UserCreated;
+                                receivable.UserModified = partner.UserCreated;
+                                receivable.GroupId = partner.GroupId;
+                                receivable.DepartmentId = partner.DepartmentId;
+                                receivable.OfficeId = partner.OfficeId;
+                                receivable.CompanyId = partner.CompanyId;
+                            }
+                            receivables.Add(receivable);
+                        }
                     }
                 }
-                receivables.Add(receivable);
             }
 
             if (receivables.Count > 0)
@@ -1310,14 +1343,12 @@ namespace eFMS.API.Accounting.DL.Services
                 var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
 
                 receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
-                //receivables = CalculatorBillingUnpaid(receivables, surcharges, invoices); //Billing Unpaid
                 receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
                 receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
                 receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
-                // receivables = CalculatorAdvanceAmount(receivables); //Advance Amount CR: 16851
-                // receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
+
                 receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
                 receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
                 receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
@@ -2654,7 +2685,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountingManagement, bool>> query = x => (x.Type != AccountingConstants.ACCOUNTING_VOUCHER_TYPE
                                                       && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
                                                       && x.PaymentDueDate != null);
-            if(partnerIds.Count() > 0)
+            if (partnerIds.Count() > 0)
             {
                 query = query.And(x => partnerIds.Contains(x.PartnerId));
             }
@@ -2688,7 +2719,7 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
 
             invoiceOverDue = GetOverDuePartnerWithType(partnerIds, type);
-            if(invoiceOverDue.Count() == 0)
+            if (invoiceOverDue.Count() == 0)
             {
                 var arDatas = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
                 // Nếu không có phát sinh hóa đơn nào đang nợ theo ds đối tượng hoặc toán hệ thống k còn ai nợ
@@ -2857,7 +2888,7 @@ namespace eFMS.API.Accounting.DL.Services
                             default:
                                 break;
                         }
-                    }    
+                    }
                     foreach (var item in grpInvoices)
                     {
                         AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
@@ -2880,7 +2911,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     break;
                             }
                             DataContext.Update(ar, x => x.Id == ar.Id, false);
-                            if(ar.ContractId != null)
+                            if (ar.ContractId != null)
                             {
                                 contractIds.Add(ar.ContractId);
                             }
@@ -2901,21 +2932,21 @@ namespace eFMS.API.Accounting.DL.Services
         public async Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag)
         {
             HandleState hs = new HandleState();
-            if(contractIds.Count > 0)
+            if (contractIds.Count > 0)
             {
                 foreach (var Id in contractIds)
                 {
                     var contract = contractPartnerRepo.Get(x => x.Id == Id)?.FirstOrDefault();
-                    if(contract != null)
+                    if (contract != null)
                     {
                         var receivables = DataContext.Get(x => x.ContractId == Id);
 
-                        if(flag == "overdue")
+                        if (flag == "overdue")
                         {
                             contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
                         }
 
-                       hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == Id, false);
+                        hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == Id, false);
                     }
                 }
 
