@@ -14,6 +14,7 @@ import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-module
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserPermissionState } from '@store';
 import { cloneDeep } from 'lodash';
+import _uniqBy from 'lodash/uniqBy';
 
 @Component({
     selector: 'soa-form-create',
@@ -580,6 +581,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         if (!!agreements && !!agreements.length) {
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].creditCurrency)[0];
                             this.saleMans = [...agreements.map(x => ({id: x.saleManId, value: x.saleManName})), ...this.itlBOD];
+                            this.saleMans = _uniqBy(this.saleMans, 'id');
                         }else{
                             this.saleMans = this.itlBOD;
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
