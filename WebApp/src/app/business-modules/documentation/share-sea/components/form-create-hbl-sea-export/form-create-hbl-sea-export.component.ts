@@ -331,7 +331,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             shippingMark: [],
             inWord: [],
             onBoardStatus: [],
-            incotermId: []
+            incotermId: [null, Validators.required]
 
         },
             { validator: FormValidators.comparePort }

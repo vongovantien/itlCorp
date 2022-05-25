@@ -399,7 +399,7 @@
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-2">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     Date of Issued
@@ -419,6 +419,23 @@
                         <div class="col-lg-2">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
+                                    Received Bill Time
+                                </label>
+                                <div class="m-input-icon">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" formControlName="receivedBillTime" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
                                     Reference No
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
@@ -426,12 +443,19 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Incoterm</label>
-                                <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (incotermId.dirty && !incotermId.valid) || (isSubmited && !incotermId.valid)}">
+                                    <label class="form-control-label" for="">
+                                        Incoterm. <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
                                     [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
-                            </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmited && (incotermId.errors | equalError: 'required') || (incotermId.errors | equalError: 'required') && incotermId.dirty">
+                                        Incoterm is required!
+                                    </div>
+                                </div>
                         </div>
                     </div>
                     <div class="row">

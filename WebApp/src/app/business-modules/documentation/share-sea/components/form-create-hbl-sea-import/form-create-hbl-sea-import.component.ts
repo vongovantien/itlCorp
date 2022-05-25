@@ -66,6 +66,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     notifyPartyDescription: AbstractControl;
     alsonotifyPartyDescription: AbstractControl;
     incotermId: AbstractControl;
+    receivedBillTime: AbstractControl;
+
 
     oceanVoyNo: AbstractControl;
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
@@ -241,7 +243,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             ],
             arrivalVoyage: [
             ],
-
+            receivedBillTime:[],
             documentNo: [],
             referenceNo: [],
             inWord: [],
@@ -259,7 +261,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             consigneeDescription: [],
             notifyPartyDescription: [],
             alsonotifyPartyDescription: [],
-            incotermId: [null],
+            incotermId: [null,Validators.required],
             serviceType: [null,
                 Validators.required]
         }, { validator: [FormValidators.comparePort] });
@@ -300,6 +302,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
         this.incotermId = this.formGroup.controls['incotermId'];
+        this.receivedBillTime = this.formGroup.controls['receivedBillTime'];
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {
@@ -330,6 +333,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             remark: data.remark,
             inWord: data.inWord,
             serviceType: data.serviceType,
+            receivedBillTime:data.receivedBillTime
         });
     }
 
@@ -340,6 +344,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             etawarehouse: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
             dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
             documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
+            receivedBillTime: !!res.receivedBillTime ? { startDate: new Date(res.receivedBillTime), endDate: new Date(res.receivedBillTime) } : null,
+
+            re: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
 
             masterBill: res.mawb,
             shipperDescription: res.shipperDescription,
