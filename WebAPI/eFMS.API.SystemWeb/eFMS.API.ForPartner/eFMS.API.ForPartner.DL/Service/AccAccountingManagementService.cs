@@ -196,7 +196,8 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
                 var obhCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
-                var surchargesLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
+                var idsInCharges = model.Charges.Select(x => x.ChargeId).ToList();
+                var surchargesLookupId = surchargeRepo.Get(x => idsInCharges.Any(z => z == x.Id)).ToLookup(x => x.Id);
 
                 /*var chargeNotExistsInSurcharge = GetChargeNotExistsInSurcharge(model.Charges, surchargesLookupId);
                 if (!string.IsNullOrEmpty(chargeNotExistsInSurcharge))
@@ -563,6 +564,19 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.Description = model.Description;
             invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
 
+            // Get saleman nếu có chứng từ
+            if (firstCharge != null && partner != null)
+            {
+                if (!string.IsNullOrEmpty(firstCharge.Soano))
+                {
+                    invoice.SalesmanId = acctSOARepository.Get(x => x.Soano == firstCharge.Soano && x.Customer == partner.Id).FirstOrDefault()?.SalemanId;
+                }
+                if(string.IsNullOrEmpty(invoice.SalesmanId))
+                {
+                    invoice.SalesmanId = acctCdNoteRepo.Get(x => x.Code == firstCharge.DebitNo && x.PartnerId == partner.Id).FirstOrDefault()?.SalemanId;
+                }
+            }
+
             return invoice;
         }
 
@@ -610,6 +624,19 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.AccountNo = obhChargeFirst.AccountNo;
                 invoice.Description = model.Description;
                 invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
+
+                // Get saleman nếu có chứng từ
+                if (firstCharge != null && partner != null)
+                {
+                    if (!string.IsNullOrEmpty(firstCharge.Soano))
+                    {
+                        invoice.SalesmanId = acctSOARepository.Get(x => x.Soano == firstCharge.Soano && x.Customer == partner.Id).FirstOrDefault()?.SalemanId;
+                    }
+                    if (string.IsNullOrEmpty(invoice.SalesmanId))
+                    {
+                        invoice.SalesmanId = acctCdNoteRepo.Get(x => x.Code == firstCharge.DebitNo && x.PartnerId == partner.Id).FirstOrDefault()?.SalemanId;
+                    }
+                }
 
                 invoices.Add(invoice);
             }
@@ -2354,6 +2381,22 @@ namespace eFMS.API.ForPartner.DL.Service
                         _totalAmountUsd = item.surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd);
                     }
 
+                    // Get saleman nếu có chứng từ
+                    var soaNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.Soano)).Select(x=>x.Soano).Distinct().ToList();
+                    var salesManId = string.Empty;
+                    if (soaNoList.Count > 0)
+                    {
+                        salesManId = acctSOARepository.Get(x => soaNoList.Any(z => z == x.Soano) && x.Customer == customer.Id).FirstOrDefault()?.SalemanId;
+                    }
+                    if(string.IsNullOrEmpty(salesManId))
+                    {
+                        var debitNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).Distinct().ToList();
+                        if(debitNoList.Count > 0)
+                        {
+                            salesManId = acctCdNoteRepo.Get(x => debitNoList.Any(z=>z== x.Code) && x.PartnerId == customer.Id).FirstOrDefault()?.SalemanId;
+                        }                        
+                    }
+
                     AccAccountingManagement voucher = new AccAccountingManagement
                     {
                         Id = Guid.NewGuid(),
@@ -2396,6 +2439,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         LastSyncDate = DateTime.Now,
                         ServiceType = null, // Invoice mới cần Service type
                         SourceCreated = "Bravo",
+                        SalesmanId = salesManId
                     };
 
                     vouchers.Add(voucher);
