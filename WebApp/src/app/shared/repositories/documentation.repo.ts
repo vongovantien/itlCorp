@@ -1173,6 +1173,15 @@ export class DocumentationRepo {
         );
     }
 
+    revertShipmentSurchargesLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/RevertChargeLinkFee`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     chargeFromReplicate(arrJobRep) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`,{arrJobRep:arrJobRep}).pipe(
             map((data: any) => data)

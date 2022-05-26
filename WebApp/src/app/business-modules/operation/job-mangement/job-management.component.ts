@@ -313,7 +313,10 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.loadingPopupComponent.show();
         this._documentRepo.chargeFromReplicate('')
             .pipe(
-                catchError(this.catchError),
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                )),
                 finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
