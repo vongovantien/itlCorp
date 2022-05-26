@@ -6149,13 +6149,61 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        private string convertServiceType(string serviceCode)
+        {
+            switch (serviceCode)
+            {
+                case "AE":
+                    return "Air Export";
+                case "AI":
+                    return "Air Import";
+                case "CL":
+                    return "Custom Logistic";
+                case "SCE":
+                    return "Sea Consol Export";
+                case "SCI":
+                    return "Sea Consol Import";
+                case "SFE":
+                    return "Sea FCL Export";
+                case "SFI":
+                    return "Sea FCL Import";
+                case "SLE":
+                    return "Sea LCL Export";
+                case "SLI":
+                    return "Sea LCL Import";
+                default: return null;
+            }
+
+        }
+
+        private bool compareDebitAmountDetailByContract(DebitAmountDetailByContractModel obj1, DebitAmountDetailByContractModel obj2)
+        {
+            return obj1.JobNo == obj2.JobNo && obj1.HBLNo == obj2.HBLNo && obj2.MBLNo == obj1.MBLNo && obj1.DebitNo == obj2.DebitNo && obj1.OfficeName == obj2.OfficeName && obj1.TransactionType == obj2.TransactionType
+                && obj1.PaymentStatus == obj2.PaymentStatus && obj1.Type == obj2.Type;
+        }
+
+        private List<DebitAmountDetailByContractModel> groupDebitAmountDetails(List<DebitAmountDetailByContractModel> debitAmountDetailByContractModels)
+        {
+            for(int i=0;i< debitAmountDetailByContractModels.Count-1; i++)
+            {
+                if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[i + 1]))
+                {
+                    debitAmountDetailByContractModels[i].TotalUSD *= 2;
+                    debitAmountDetailByContractModels[i].TotalVND *= 2;
+                    debitAmountDetailByContractModels.RemoveAt(i+1);
+                }
+            }
+            return debitAmountDetailByContractModels;
+        }
+
         /// <summary>
         /// Generate Export Generate Export Debit Amount Detail Report
         /// </summary>
         /// <param name="agreementId"></param>
         /// <returns></returns>
-        public Stream GenerateExportDebitAmountDetail(DebitAmountDetail debitAmountDetail,Guid agreementId)
+        public Stream GenerateExportDebitAmountDetail(DebitAmountDetail debitAmountDetail)
         {
+
             var folderOfFile = GetFolderInTemplateExport("AR");
             FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.DebitAmountDetailByContract));
             var path = f.FullName;
@@ -6182,6 +6230,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 startRow = 8;
                 excel.StartDetailTable = startRow;
+
                 if (debitAmountDetail.DebitAmountDetails.Count == 0)
                 {
                     listKeyData = new Dictionary<string, object>();
@@ -6208,11 +6257,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
                     {
+                        debitAmountDetail.DebitAmountDetails = groupDebitAmountDetails(debitAmountDetail.DebitAmountDetails);
                         var item = debitAmountDetail.DebitAmountDetails[i];
                         listKeyData = new Dictionary<string, object>();
-
                         excel.SetGroupsTable();
-                        listKeyData.Add("No", i);
+                        listKeyData.Add("No", i + 1);
                         listKeyData.Add("JobNo", item.JobNo);
                         listKeyData.Add("HblNo", item.HBLNo);
                         listKeyData.Add("MblNo", item.MBLNo);
@@ -6226,7 +6275,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
                         listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
                         listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
-                        listKeyData.Add("Service", item.TransactionType);
+                        listKeyData.Add("Service", convertServiceType(item.TransactionType));
                         listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
                         SumTotalUSD += item.TotalUSD;
                         SumTotalVND += item.TotalVND;

@@ -6,6 +6,6 @@ namespace eFMS.API.ReportData.Models
     public class DebitAmountDetail
     {
         public DebitAmountGeneralInfo DebitAmountGeneralInfo { get; set; }
-        public List<DebitAmountDetailbyPartnerIdModel> DebitAmountDetails { get; set; }
+        public List<DebitAmountDetailByContractModel> DebitAmountDetails { get; set; }
     }
 }

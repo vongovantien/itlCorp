@@ -8,6 +8,6 @@ namespace eFMS.API.Accounting.Service.Models
     public class DebitAmountDetail
     {
         public DebitAmountGeneralInfo DebitAmountGeneralInfo { get; set; }
-        public List<sp_GetDebitAmountDetailbyPartnerId> DebitAmountDetails { get; set; }
+        public List<sp_GetDebitAmountDetailByContract> DebitAmountDetails { get; set; }
     }
 }

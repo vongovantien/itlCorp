@@ -730,7 +730,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<DebitAmountDetail>();
 
-            var stream = new AccountingHelper().GenerateExportDebitAmountDetail(dataObjects.Result, agreementId);
+            var stream = new AccountingHelper().GenerateExportDebitAmountDetail(dataObjects.Result);
             if (stream == null) return null;
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "DebitAmountDetail");

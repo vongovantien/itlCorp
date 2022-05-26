@@ -591,7 +591,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportDebitAmountDetail(eFMS.API.ReportData.Models.DebitAmountDetail,System.Guid)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportDebitAmountDetail(eFMS.API.ReportData.Models.DebitAmountDetail)">
             <summary>
             Generate Export Generate Export Debit Amount Detail Report
             </summary>

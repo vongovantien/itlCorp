@@ -2343,13 +2343,13 @@ namespace eFMS.API.Accounting.DL.Services
             return debitAmountDetail;
         }
 
-        public List<sp_GetDebitAmountDetailbyPartnerId> GetDebitAmountDetailbyPartnerId(string partnerId)
+        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(string partnerId)
         {
             DbParameter[] parameters =
             {
                 SqlParam.GetParameter("partnerID", partnerId)
             };
-            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailbyPartnerId>(parameters);
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailByContract>(parameters);
             return data;
         }
 

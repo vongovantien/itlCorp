@@ -2,7 +2,7 @@
 
 namespace eFMS.API.ReportData.Models.Accounting
 {
-    public class DebitAmountDetailbyPartnerIdModel
+    public class DebitAmountDetailByContractModel
     {
         public string JobNo { get; set; }
         public string HBLNo { get; set; }
