@@ -29,5 +29,6 @@ namespace eFMSWindowService.Models
         public Nullable<System.DateTime> DatetimeModified { get; set; }
         public Nullable<bool> Active { get; set; }
         public Nullable<System.DateTime> InactiveOn { get; set; }
+        public string SignPath { get; set; }
     }
 }

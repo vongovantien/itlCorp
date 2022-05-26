@@ -120,7 +120,12 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult SendMailContractCashWithOutstandingDebit()
         {
             var hs = sendMailService.SendMailContractCashWithOutstandingDebit();
-            return Ok(hs);
+            if (hs)
+            {
+                ResultHandle result = new ResultHandle { Status = hs, Message = "Send Successful!" };
+                return Ok(result);
+            }
+            return BadRequest("Send Fail!");
         }
 
         /// <summary>

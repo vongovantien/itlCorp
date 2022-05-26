@@ -13,6 +13,7 @@ using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -35,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> unitRepository;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
@@ -49,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysEmailTemplate> sysEmailTemplate,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -62,6 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
             csMawbcontainerRepo = csMawbcontainer;
             sentEmailHistoryRepo = sentEmailHistory;
             apiServiceUrl = serviceUrl;
+            sysEmailTemplateRepo = sysEmailTemplate;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -395,21 +399,13 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
                 var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
-                
+                new LogHelper("SendMailContractCashWithOutstandingDebit", "Data : " + JsonConvert.SerializeObject(dtData, Formatting.Indented));
                 var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
                 {
                     x.SaleManId
                 });
-                string subject = "AR Alert - Customers With Agreement Cash Have Outstanding Debit ";
-                string footerBody = " </br></br>Anh/chị vui lòng liên hệ Khách hàng đề nghị thanh toán ngay để tránh ảnh hưởng đến việc nhận hàng theo quy định Công ty.</br>"
-                                 + "Please you contact the Customer to request immediate payment to avoid affecting the receipt of cargo according to the Company's regulations.</br></br>"
-                                 + "Many thanks and Best Regards,</br>"
-                                 + "<b> eFMS System, </b>"
-                                 + "</br>"
-                                 + "<p><img src = 'https://api-efms.itlvn.com/ReportPreview/Images/logo-eFMS.png' /></p> " + " </div>";
-                var detailLink = "</br><p>" + "<div><i>You can click file below to view detail.</i></div>"
-                                        + "<div><i>Click vào file trên để xem chi tiết.</i></div>"
-                                        + "</p>";
+                var emailTemplate = sysEmailTemplateRepo.Get(x => x.Code == "CASH-WITH-OUTSTANDING-DEBIT").FirstOrDefault();
+                string subject = emailTemplate.Subject;
                 List<string> emailBCCs = new List<string>();
                 if (emailBcc != null)
                 {
@@ -418,48 +414,40 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var saleman in dtGrp)
                 {
                     var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
-                    string tableBody = @"<table style='width: 100%; border: 1px solid #dddddd; border-collapse: collapse;'>"
-                                 + @"<tr>"
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>STT </th>"
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Khách Hàng </th>"
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>C.Nhánh </th>"                                 
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Số Tiền Cần Thanh Toán </th>"
-                                 + @"<th style='border: 1px solid #dddddd; border-collapse: collapse;'>Tiền Tệ </th>"
-                                 + @"</tr>"
-                                 + @"[content]"
-                                 + @"</table>";
-                    string headerBody = string.Format(@"<strong>Dear {0},</strong></br></br>"
-                                     + "<p>Dưới đây là danh sách Khách hàng có Agreement Cash có dư nợ chưa thanh toán</br>"
-                                     + "<i>There are  Customers with Agreement Cash that have outstanding Debit</i></p>", saleman.FirstOrDefault().SalemanName);
+                    string body = emailTemplate.Body;
+                    body = body.Replace("{{SalemanName}}", saleman.FirstOrDefault().SalemanName);
+
                     int number = 0;
-                    
-                    StringBuilder content = new StringBuilder();
+
+                    string content = string.Empty;
                     var contractGrp = saleman.GroupBy(x => new { x.AccountNo, x.ContractId });
                     foreach (var item in contractGrp)
                     {
                         string formatCurrency = item.FirstOrDefault().CreditCurrency == "VND" ? "N0" : "N02";
                         var office = string.Join(";", item.GroupBy(x => x.OfficeName).Select(x => x.Key));
-                        content.Append(@"<tr>");
-                        content.Append(@"<td style='width: 5%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center; vertical-align: top;'>" + (number + 1) + "</td>");
-                        content.Append(@"<td style='width: 33%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName + "</td>");
-                        content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + office + "</td>");
-                        content.Append(@"<td style='width: 12%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right; vertical-align: top;'>" + item.FirstOrDefault().DebitAmount?.ToString(formatCurrency) + "</td>");
-                        content.Append(@"<td style='width: 10%; border: 1px solid #dddddd; border-collapse: collapse; vertical-align: top;'>&nbsp;&nbsp;" + item.FirstOrDefault().CreditCurrency + "</td>");
-                        content.Append(@"</tr>");
+                        string row = emailTemplate.Content;
+                        row = row.Replace("{{STT}}", (number + 1).ToString());
+                        row = row.Replace("{{Customer}}", item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName);
+                        row = row.Replace("{{Branch}}", office);
+                        row = row.Replace("{{Amount}}", item.FirstOrDefault().DebitAmount?.ToString(formatCurrency));
+                        row = row.Replace("{{Currency}}", item.FirstOrDefault().CreditCurrency);
+                        content += row;
                         number++;
                     }
+
+                    body = body.Replace("{{Content}}", content);
+
+                    string footer = emailTemplate.Footer;
                     // Mail to
                     var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
                     var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
                     // Bcc
                     if (saleman.Count() > 0 && attachFile.Status)
                     {
-                        tableBody = tableBody.Replace("[content]", content.ToString());
-                        string body = headerBody + tableBody + detailLink + footerBody;
-                        body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
+                        string email = body + footer;
 
                         List<string> pathFile = new List<string>() { attachFile.Data.ToString() };
-                        var s = SendMail.Send(subject, body, mailTo, pathFile, mailCC, emailBCCs);
+                        var s = SendMail.Send(subject, email, mailTo, pathFile, mailCC, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
                         var logSendMail = new SysSentEmailHistory
