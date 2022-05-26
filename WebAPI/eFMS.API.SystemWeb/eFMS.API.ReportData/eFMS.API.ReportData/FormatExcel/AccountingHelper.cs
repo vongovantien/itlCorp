@@ -6188,8 +6188,8 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[i + 1]))
                 {
-                    debitAmountDetailByContractModels[i].TotalUSD *= 2;
-                    debitAmountDetailByContractModels[i].TotalVND *= 2;
+                    debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[i + 1].TotalUSD;
+                    debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[i + 1].TotalVND;
                     debitAmountDetailByContractModels.RemoveAt(i+1);
                 }
             }
@@ -6222,10 +6222,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("ContractNo", debitAmountDetail.DebitAmountGeneralInfo.ContractNo);
                 startRow++;
                 listKeyData.Add("PartnerName", debitAmountDetail.DebitAmountGeneralInfo.PartnerName);
-                listKeyData.Add("EffectiveDate", debitAmountDetail.DebitAmountGeneralInfo.EffectiveDate);
+                listKeyData.Add("EffectiveDate", debitAmountDetail.DebitAmountGeneralInfo.EffectiveDate?.ToString("dd/MM/yyyy"));
                 startRow++;
                 listKeyData.Add("ContractType", debitAmountDetail.DebitAmountGeneralInfo.ContracType);
-                listKeyData.Add("ExpiredDate", debitAmountDetail.DebitAmountGeneralInfo.ExpiredDate);
+                listKeyData.Add("ExpiredDate", debitAmountDetail.DebitAmountGeneralInfo.ExpiredDate?.ToString("dd/MM/yyyy"));
                 excel.SetData(listKeyData);
 
                 startRow = 8;
