@@ -2338,16 +2338,17 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerName = partner.ShortName,
                 Currency = contract.CurrencyId
             };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(contract.PartnerId);
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(argeementId,partner.ParentId);
 
             return debitAmountDetail;
         }
 
-        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(string partnerId)
+        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(Guid argeementId, string partnerID)
         {
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("partnerID", partnerId)
+                SqlParam.GetParameter("partnerID", partnerID),
+                SqlParam.GetParameter("argeementId", argeementId)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailByContract>(parameters);
             return data;

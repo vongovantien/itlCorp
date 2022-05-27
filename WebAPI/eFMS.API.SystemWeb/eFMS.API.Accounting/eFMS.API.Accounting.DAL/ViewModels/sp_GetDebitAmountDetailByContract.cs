@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Accounting.Service.ViewModels
 {
-    public class sp_GetDebitAmountDetailbyPartnerId
+    public class sp_GetDebitAmountDetailByContract
     {
         public string JobNo { get; set; }
         public string HBLNo { get; set; }
