@@ -29,7 +29,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
-        HandleState CalculatorReceivableDebitAmount(List<string> partnerIds);
+        Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models);
         Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
 
 

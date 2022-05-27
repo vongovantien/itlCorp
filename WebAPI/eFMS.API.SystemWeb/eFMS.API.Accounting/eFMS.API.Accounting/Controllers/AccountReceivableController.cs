@@ -234,9 +234,9 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPut("CalculateDebitAmount")]
-        public IActionResult CalculateDebitAmount([FromBody] List<string> partnerIds)
+        public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
-            var hs = accountReceivableService.CalculatorReceivableDebitAmount(partnerIds);
+            var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)

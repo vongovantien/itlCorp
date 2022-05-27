@@ -248,20 +248,19 @@ namespace eFMS.API.Documentation.Controllers
                 //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
                 Response.OnCompleted(async () =>
                 {
-                    //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                    await CalculatorReceivable(modelReceivableList);
                 });
             }
             return Ok(result);
         }
 
-        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
             Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
