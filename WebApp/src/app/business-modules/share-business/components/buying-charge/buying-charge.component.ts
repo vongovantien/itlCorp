@@ -741,7 +741,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge,) {
+    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge, ) {
         chargeItem.partnerShortName = partnerData.shortName;
         chargeItem.partnerName = partnerData.partnerNameEn;
         chargeItem.paymentObjectId = partnerData.id;
@@ -1450,7 +1450,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             partnerId: item.paymentObjectId,
             office: (!!item.officeId ? item.officeId : this.userLogged.officeId),
             service: (!!item.transactionType ? item.transactionType : this.serviceTypeId),
-            salesmanId: this.hbl.saleManId
         }));
 
         // charges.forEach((element: any) => {

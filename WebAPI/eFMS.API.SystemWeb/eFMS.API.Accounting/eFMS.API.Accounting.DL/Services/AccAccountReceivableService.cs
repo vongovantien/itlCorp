@@ -1434,16 +1434,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                 receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
                 receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
+                receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
                 receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
                 receivables = CalculatorObhAmount(receivables, surcharges, out List<AccAccountReceivableModel> newRecordForOBHs); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
-                receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
                 newReceivableRecord.AddRange(newRecordForOBHs);
                 receivables = CalculatorSellingNoVat(receivables, surcharges, out List < AccAccountReceivableModel > newRecordForSellings); //Selling No Vat
                 newReceivableRecord.AddRange(newRecordForSellings);
-                receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
-                receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
-                receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
+
+                // receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
+                // receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
+                // receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
             }
             receivables.AddRange(newReceivableRecord); // add thêm những dòng công nợ Nocontract để ghi nhận cho sales.
             receivables.ForEach(fe =>
@@ -1582,45 +1583,49 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges)
         {
-            var objPO = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
-            var objPR = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
-            var surchargeOps = surcharges.Where(x => x.TransactionType == "CL");
-            var surchargeCs = surcharges.Where(x => x.TransactionType != "CL");
-            if (surchargeOps.Count() > 0)
+            if (surcharges.Count() == 0)
             {
-                var hblids = surchargeOps.Select(x => x.Hblid).ToList();
-                var houseBills = opsRepo.Get(x => hblids.Contains(x.Hblid));
-                objPO = from surcharge in surchargeOps
-                        join csd in houseBills on surcharge.Hblid equals csd.Hblid
-                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel
-                        {
-                            PartnerId = surcharge.PaymentObjectId,
-                            Office = surcharge.OfficeId,
-                            Service = surcharge.TransactionType,
-                            SalesmanId = csd.SalemanId
-                        };
+                return new List<ObjectReceivableModel>();
             }
-            if (surchargeCs.Count() > 0)
-            {
-                var hblids = surchargeCs.Select(x => x.Hblid).ToList();
-                var houseBills = transactionDetailRepo.Get(x => hblids.Contains(x.Id));
+            //var objPO = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
+            //var objPR = Enumerable.Empty<ObjectReceivableModel>().AsQueryable();
+            //var surchargeOps = surcharges.Where(x => x.TransactionType == "CL");
+            //var surchargeCs = surcharges.Where(x => x.TransactionType != "CL");
+            //if (surchargeOps.Count() > 0)
+            //{
+            //    var hblids = surchargeOps.Select(x => x.Hblid).ToList();
+            //    var houseBills = opsRepo.Get(x => hblids.Contains(x.Hblid));
+            //    objPO = from surcharge in surchargeOps
+            //            join csd in houseBills on surcharge.Hblid equals csd.Hblid
+            //            where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+            //            select new ObjectReceivableModel
+            //            {
+            //                PartnerId = surcharge.PaymentObjectId,
+            //                Office = surcharge.OfficeId,
+            //                Service = surcharge.TransactionType,
+            //                SalesmanId = csd.SalemanId
+            //            };
+            //}
+            //if (surchargeCs.Count() > 0)
+            //{
+            //    var hblids = surchargeCs.Select(x => x.Hblid).ToList();
+            //    var houseBills = transactionDetailRepo.Get(x => hblids.Contains(x.Id));
 
-                objPR = from surcharge in surchargeCs
-                        join csd in houseBills on surcharge.Hblid equals csd.Id
-                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel
-                        {
-                            PartnerId = surcharge.PaymentObjectId,
-                            Office = surcharge.OfficeId,
-                            Service = surcharge.TransactionType,
-                            SalesmanId = csd.SaleManId
-                        };
-            }
-            var objMerge = objPO.Union(objPR).ToList();
+            //    objPR = from surcharge in surchargeCs
+            //            join csd in houseBills on surcharge.Hblid equals csd.Id
+            //            where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+            //            select new ObjectReceivableModel
+            //            {
+            //                PartnerId = surcharge.PaymentObjectId,
+            //                Office = surcharge.OfficeId,
+            //                Service = surcharge.TransactionType,
+            //                SalesmanId = csd.SaleManId
+            //            };
+            //}
+            //var objMerge = objPO.Union(objPR).ToList();
 
-            var objectReceivables = objMerge.GroupBy(g => new { g.Service, g.PartnerId, g.Office, g.SalesmanId })
-                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office, SalesmanId = s.Key.SalesmanId });
+            var objectReceivables = surcharges.GroupBy(g => new { Service = g.TransactionType, PartnerId = g.PaymentObjectId, Office = g.OfficeId })
+                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
             return objectReceivables.ToList();
         }
 
