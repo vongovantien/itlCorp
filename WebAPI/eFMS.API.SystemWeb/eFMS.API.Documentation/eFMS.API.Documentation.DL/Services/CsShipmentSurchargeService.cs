@@ -483,8 +483,9 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = hblid,
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
-            List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
-            if (!surcharges.Any()) return result;
+            //List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
+            var surcharges = DataContext.Get(x => x.Hblid == hblid).Select(x => new { x.Type, x.AmountVnd, x.AmountUsd });
+            if (surcharges.Count() == 0) return result;
             foreach (var item in surcharges)
             {
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
