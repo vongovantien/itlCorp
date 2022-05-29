@@ -19,11 +19,12 @@ install_dependency:
     - npm install
     - npm install -g @angular/cli
   only:
-    - dev
+    - prod/test-cicd-prod
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - WebApp/node_modules
+      - WebApp/package-lock.json
 build_uat:
   stage: build
   script:
