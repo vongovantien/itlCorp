@@ -6,28 +6,38 @@ variables:
 
 image: node:12
 
-cache:
-  paths:
-    - ./WebApp/node_modules
-    - ./WebApp/package-lock.json
 stages:
+  - install
   - build
-  # - deploy
-build_uat:
-  stage: build
+
+install_dependency:
+  stage: install
   script:
     - node --version
     - echo "start job_build"
     - cd WebApp
     - npm install
     - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
+  only:
+    - dev
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+build_uat:
+  stage: build
+  script:
+    - cd WebApp
     - npm run build:uat:en
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - dev
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build"
     paths:
@@ -55,6 +65,7 @@ build_test:
 
 build_prod_en:
   stage: build
+  when: manual
   script:
     - node --version
     - echo "start job_build"
@@ -67,7 +78,7 @@ build_prod_en:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - production
+    - prod/test-cicd-prod
   artifacts:
     name: "angular_build_prod_en"
     paths:
@@ -75,6 +86,7 @@ build_prod_en:
 
 build_prod_vi:
   stage: build
+  when: manual
   script:
     - node --version
     - echo "start job_build"
@@ -87,7 +99,7 @@ build_prod_vi:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - production
+    - prod/test-cicd-prod
   artifacts:
     name: "angular_build_prod_vi"
     paths:
