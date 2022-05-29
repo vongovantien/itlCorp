@@ -79,6 +79,11 @@ build_prod_en:
     - echo "end job_build"
   only:
     - prod/test-cicd-prod
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build_prod_en"
     paths:
@@ -91,15 +96,20 @@ build_prod_vi:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-    - ng version
+    # - npm install
+    # - npm install -g @angular/cli
+    # - ng version
     #- node_modules/.bin/ng build --c=uat-en
     - npm run build:prod:vi
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - prod/test-cicd-prod
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build_prod_vi"
     paths:
