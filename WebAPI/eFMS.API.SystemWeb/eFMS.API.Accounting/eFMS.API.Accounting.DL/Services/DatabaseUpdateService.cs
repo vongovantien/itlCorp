@@ -55,7 +55,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        values.Add("\'" + propertyInfo.GetValue(obj) + "\'");
+                        values.Add("N'" + propertyInfo.GetValue(obj) + "\'");
                     }
                 }
                 else

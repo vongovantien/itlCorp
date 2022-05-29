@@ -136,6 +136,8 @@ export class StatementOfAccountEditComponent extends AppList {
                         hbls: [],
                         mbls: [],
                         staffType: this.soa.staffType,
+                        customerShipmentId: '',
+                        salemanId: ''
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },
@@ -297,7 +299,8 @@ export class StatementOfAccountEditComponent extends AppList {
             isOBH: this.soa.obh,
             strServices: this.soa.serviceTypeId.replace(';', ','),
             strCreators: this.soa.creatorShipment.replace(';', ','),
-            staffType: this.soa.staffType
+            staffType: this.soa.staffType,
+            salemanId: this.soa.salemanId
         };
         this.dataSearch = new SOASearchCharge(body);
         this.addChargePopup.searchInfo = this.dataSearch;

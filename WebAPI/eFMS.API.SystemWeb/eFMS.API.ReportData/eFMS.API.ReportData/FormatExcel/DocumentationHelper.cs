@@ -4177,5 +4177,71 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
         #endregion
+
+        public Stream GenerateExportShipmentOutstandingDebit(List<ShipmentOustandingDebitModel> result, string fileName, out string salemanName)
+        {
+            salemanName = string.Empty;
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                int startRow = 4;
+                excel.StartDetailTable = startRow;
+                
+                var contractGrp = result.GroupBy(x => new { x.SaleManId, x.SalemanName, x.SalemanEmail, x.AccountNo, x.CustomerName, x.ContractId, x.DebitAmount, x.CreditCurrency });
+                int? stt = 1;
+                salemanName = result.FirstOrDefault().SalemanName;
+                var isExistDetail = false;
+                foreach (var contract in contractGrp)
+                {
+                    var groupIndex = stt;
+                    string formatCurrency = contract.Key.CreditCurrency == "VND" ? numberFormats : numberFormat;
+                    var branchGrp = contract.GroupBy(x => new { x.OfficeName });
+                    foreach (var item in branchGrp)
+                    {
+                        var listKeyData = new Dictionary<string, object>();
+                        excel.SetGroupsTable();
+                        listKeyData.Add("Stt", groupIndex == stt ? stt : null);
+                        listKeyData.Add("Customer", groupIndex == stt ? (contract.Key.AccountNo + "-" + contract.Key.CustomerName) : null);
+                        listKeyData.Add("Currency", groupIndex == stt ? contract.Key.CreditCurrency : null);
+                        listKeyData.Add("DebitAmount", groupIndex == stt ? contract.Key.DebitAmount?.ToString(formatCurrency) : null);
+                        listKeyData.Add("Office", item.Key.OfficeName);
+                        var shipmentInfo = item.GroupBy(x => new { x.JobNo, x.HblNo });
+                        var firstShipment = shipmentInfo.FirstOrDefault();
+                        listKeyData.Add("JobNo", firstShipment.Key.JobNo);
+                        listKeyData.Add("HblNo", firstShipment.Key.HblNo);
+                        excel.SetData(listKeyData);
+                        shipmentInfo = shipmentInfo.Skip(1);
+                        foreach (var shipment in shipmentInfo)
+                        {
+                            isExistDetail = true;
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("JobNoDt", shipment.Key.JobNo);
+                            listKeyData.Add("HblNoDt", shipment.Key.HblNo);
+                            excel.SetData(listKeyData);
+                        }
+                        groupIndex++;
+                    }
+                    stt++;
+                }
+                if (!isExistDetail)
+                {
+                    var cell = excel.AddressOfKey("JobNoDt");
+                    excel.DeleteRow(cell.Row);
+                }
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Hwbno { get; set; }
         public string Hbltype { get; set; }
         public Guid Id { get; set; }
+        public string SalemanId { get; set; }
         public List<CsShipmentSurchargeDetailsModel> listCharges { get; set; }
         public string FlexId { get; set; }
         public string ReferenceNoHBL { get; set; }

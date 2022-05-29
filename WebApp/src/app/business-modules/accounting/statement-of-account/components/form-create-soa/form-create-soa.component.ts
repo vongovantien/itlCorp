@@ -13,6 +13,8 @@ import { ToastrService } from 'ngx-toastr';
 import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserPermissionState } from '@store';
+import { cloneDeep } from 'lodash';
+import _uniqBy from 'lodash/uniqBy';
 
 @Component({
     selector: 'soa-form-create',
@@ -44,7 +46,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     selectedPartner: any = {};
     selectedCharge: any = {};
     selectedCharges: any[] = []; // for multiple select
-
+    selectedCustomerShipment: any = {};
+    selectedSaleman: any = null;
+    saleMans: any[] = [];
+    itlBOD: any = [];
+    salemanDisplay: string = '';
+    
     dateModes: any[] = [];
     selectedDateMode: any = null;
 
@@ -165,6 +172,13 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 );
 
         }
+
+        this._sysRepo.getEmployeeByUserId('ad78fc30-5316-46e5-bc9d-7e207efafbec').pipe()
+            .subscribe((data: any) => {
+                if(data){
+                    this.itlBOD = [{ id: 'ad78fc30-5316-46e5-bc9d-7e207efafbec', value: data.employeeNameEn }];
+                }
+            })
     }
 
     getPartnerData(data: any) {
@@ -315,7 +329,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             case 'partner':
                 this.selectedPartner = { field: data.partnerNameEn, value: data.id };
                 this.updateDataSearch('customerID', this.selectedPartner.value);
-                this.getCurrencyAgreement();
+                this.getInfoAgreement();
+                break;
+            case 'customershipment':
+                this.selectedCustomerShipment = { field: data.partnerNameEn, value: data.id };
+                this.updateDataSearch('customerShipmentId', this.selectedCustomerShipment.value);
                 break;
             case 'date-mode':
                 this.selectedDateMode = data;
@@ -324,7 +342,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             case 'type':
                 this.selectedType = data;
                 this.updateDataSearch('type', this.selectedType.value);
-                this.getCurrencyAgreement();
+                this.getInfoAgreement();
                 break;
             case 'obh':
                 this.selectedObh = data;
@@ -378,6 +396,17 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.detectChargeWithAllOption(data);
                 }
                 break;
+            case 'saleman':
+                this.selectedSaleman = {};
+                if(!!data){
+                    this.selectedSaleman = cloneDeep({ id: data.id, value: data.value });
+                    this.salemanDisplay = this.selectedSaleman.value;
+                    this.updateDataSearch('salemanId', this.selectedSaleman.id);
+                } else{
+                    this.salemanDisplay = null;
+                    this.updateDataSearch('salemanId', null);
+                }
+                break;
             default:
                 break;
         }
@@ -415,9 +444,25 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
     }
 
+    isValidSearch(){
+        if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
+            return false;
+        }
+        if(this.selectedType.value === this.types[0].value){
+            if(!this.salemanDisplay){
+                return false;
+            }
+            if(this.selectedStaffType.value === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
+                this._toastService.warning("Selection Staff Saleman and Saleman must be the same.")
+                return false;
+            }
+        }
+        return true;
+    }
+
     onApplySearchCharge() {
         this.isApplied = true;
-        if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
+        if (!this.isValidSearch()) {
             return;
         } else {
             const body = {
@@ -440,7 +485,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 mbls: this.mapShipment("MBL"),
                 customNo: this.mapShipment("CustomNo"),
                 airlineCode: this.airlineCode,
-                staffType: this.selectedStaffType.value
+                staffType: this.selectedStaffType.value,
+                customerShipmentId: !!this.selectedCustomerShipment ? this.selectedCustomerShipment.value : null,
+                salemanId: !!this.salemanDisplay ? this.selectedSaleman.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
@@ -523,21 +570,34 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         return _shipment;
     }
 
-    getCurrencyAgreement(){
+    getInfoAgreement(){
         if(this.selectedType.value === this.types[0].value && !!this.selectedPartner.value){
+            this.saleMans = [];
             this._catalogueRepo.getAgreement(
                 {
-                    partnerId: this.selectedPartner.value, status: true
+                    partnerId: this.selectedPartner.value, status: true, isGetChild: true
                 }).subscribe(
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].creditCurrency)[0];
+                            this.saleMans = [...agreements.map(x => ({id: x.saleManId, value: x.saleManName})), ...this.itlBOD];
+                            this.saleMans = _uniqBy(this.saleMans, 'id');
                         }else{
+                            this.saleMans = this.itlBOD;
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
                         }
                         this.updateDataSearch('currency', this.selectedCurrency.id);
+                        if(this.saleMans.length > 0){
+                            this.onSelectDataFormInfo(this.saleMans[0], 'saleman');
+                        }
+                        else{
+                            this.onSelectDataFormInfo(null, 'saleman');
+                        }
                     }
                 );
+            }
+            else{
+                this.onSelectDataFormInfo(null, 'saleman');
             }
     }
 }

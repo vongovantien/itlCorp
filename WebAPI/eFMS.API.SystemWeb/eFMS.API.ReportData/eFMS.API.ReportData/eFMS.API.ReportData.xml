@@ -430,6 +430,12 @@
             <param name="criteria">List Voucher or Invoices</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOutstandingDebit(System.String)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.SettingReportController">
             <summary>
             Setting Report Controller
