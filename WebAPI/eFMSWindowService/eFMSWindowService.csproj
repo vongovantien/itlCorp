@@ -89,6 +89,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlertCustomerContractCashWithOutstandingDebit.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AlertCustomerContractCashWithOutstandingDebit.Designer.cs">
+      <DependentUpon>AlertCustomerContractCashWithOutstandingDebit.cs</DependentUpon>
+    </Compile>
     <Compile Include="AutoLockShipmentService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,6 +102,8 @@
       <DependentUpon>AutoLockShipmentService.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CommonData.cs" />
+    <Compile Include="Helpers\ScheduleSetting.cs" />
+    <Compile Include="Helpers\URLSetting.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\SendMailHelper.cs" />
     <Compile Include="Models\catDepartment.cs">
@@ -116,6 +124,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>eFMSModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\ScheduleTime.cs" />
     <Compile Include="Models\sp_GetShipmentInThreeDayToSendARDept_Result.cs">
       <DependentUpon>eFMSModel.tt</DependentUpon>
     </Compile>
@@ -197,6 +206,7 @@
     <None Include="eFMSWindowService_TemporaryKey.pfx" />
     <None Include="Models\eFMSModel.edmx.diagram">
       <DependentUpon>eFMSModel.edmx</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>

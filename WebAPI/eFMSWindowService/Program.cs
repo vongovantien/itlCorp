@@ -42,7 +42,8 @@ namespace eFMSWindowService
                             new SendMailExceededCreditLimitService(),
                             new SendMailExpiredAgreementService(),
                             new UpdateOverDuePaymentService(),
-                            new UpAutoRateService()
+                            new UpAutoRateService(),
+                            new AlertCustomerContractCashWithOutstandingDebit()
             };
             ServiceBase.Run(ServicesToRun);
             //#endif

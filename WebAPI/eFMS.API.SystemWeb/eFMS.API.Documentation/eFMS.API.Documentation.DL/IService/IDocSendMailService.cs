@@ -1,7 +1,11 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -13,5 +17,7 @@ namespace eFMS.API.Documentation.DL.IService
         EmailContentModel GetInfoMailSISeaExport(Guid jobId);
         EmailContentModel GetInfoMailHBLSeaImport(Guid jobId, string serviceId);
         EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid hblId, string serviceId);
+        bool SendMailContractCashWithOutstandingDebit();
+        List<sp_GetShipmentDataWithOutstandingDebit> GetDataOustandingDebit(string salemanId);
     }
 }
