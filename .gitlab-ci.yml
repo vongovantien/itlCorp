@@ -19,7 +19,7 @@ install_dependency:
     - npm install
     - npm install -g @angular/cli
   only:
-    - prod/test-cicd-prod
+    - production
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
@@ -27,10 +27,10 @@ install_dependency:
       - WebApp/package-lock.json
 build_uat:
   stage: build
+  when: manual
   script:
     - cd WebApp
     - npm run build:uat:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - dev
@@ -46,19 +46,19 @@ build_uat:
 
 build_test:
   stage: build
+  when: manual
   script:
-    - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:test:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - feature/dev
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build"
     paths:
@@ -71,14 +71,10 @@ build_prod_en:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    # - npm install
-    # - npm install -g @angular/cli
-    # - ng version
     - npm run build:prod:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/test-cicd-prod
+    - production
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
@@ -96,15 +92,10 @@ build_prod_vi:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    # - npm install
-    # - npm install -g @angular/cli
-    # - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:prod:vi
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/test-cicd-prod
+    - production
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
