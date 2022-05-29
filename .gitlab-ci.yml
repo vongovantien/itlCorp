@@ -71,10 +71,9 @@ build_prod_en:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
+    # - npm install
+    # - npm install -g @angular/cli
     - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:prod:en
     - echo "job_build doing something..."
     - echo "end job_build"
