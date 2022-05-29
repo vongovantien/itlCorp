@@ -248,4 +248,7 @@
 
 <app-dropdown #dropdownMenuLinkOps>
     <a class="dropdown-item pointer" (click)="chargeFromRep()">Charge From Replicate</a>
+    <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'" (click)="chargeFromJobRep()">Option Link Charge From Job List</a>
 </app-dropdown>
+
+<link-charge-from-job-rep></link-charge-from-job-rep>
