@@ -73,7 +73,7 @@ build_prod_en:
     - cd WebApp
     # - npm install
     # - npm install -g @angular/cli
-    - ng version
+    # - ng version
     - npm run build:prod:en
     - echo "job_build doing something..."
     - echo "end job_build"
