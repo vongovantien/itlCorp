@@ -57,6 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
+        private readonly IContextBase<AcctCdnote> acctCdnoteRepository;
         private readonly IContextBase<SysGroup> sysGroupRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -88,8 +89,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<CatDepartment> catDepartRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<AcctCdnote> acctCdnoteRepo,
             IContextBase<SysGroup> sysGroupRepo,
-        IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -119,6 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
+            acctCdnoteRepository = acctCdnoteRepo;
             sysGroupRepository = sysGroupRepo;
         }
 
@@ -349,6 +352,19 @@ namespace eFMS.API.Documentation.DL.Services
 
                         // Cập nhật MBL, HBL cho các phiếu tạm ứng
                         HandleState hsAdvanceRq = UpdateHblAdvanceRequest(model);
+
+                        // update saleman cdnote type debit/invoice
+                        var cdNoteList = surchareRepository.Get(x => x.Hblid == model.Id).Select(x => x.DebitNo).Distinct().ToList();
+                        foreach (var item in cdNoteList)
+                        {
+                            var cdnote = acctCdnoteRepository.Get(x => x.JobId == model.JobId && x.Code == item).FirstOrDefault();
+                            if (cdnote != null && cdnote.SalemanId != model.SaleManId)
+                            {
+                                cdnote.SalemanId = model.SaleManId;
+                                acctCdnoteRepository.Update(cdnote, x => x.Id == cdnote.Id, false);
+                            }
+                        }
+                        acctCdnoteRepository.SubmitChanges();
                     }
                     trans.Commit();
                     //Send email to salesman

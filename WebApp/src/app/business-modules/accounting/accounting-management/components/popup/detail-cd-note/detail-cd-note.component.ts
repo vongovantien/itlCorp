@@ -47,7 +47,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         lastSync: 'Last Sync',
         currency: 'Currency',
         exchangeRate: 'Exc Rate',
-        reasonReject: 'Reason Reject'
+        reasonReject: 'Reason Reject',
+        saleman: 'Salesman'
     };
     airLabelDetail: any = {
         hbl: 'HAWB/ HBL',

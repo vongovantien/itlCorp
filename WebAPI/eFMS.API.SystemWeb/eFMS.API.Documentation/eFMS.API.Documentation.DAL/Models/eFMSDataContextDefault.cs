@@ -673,6 +673,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
 
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.SentByUser)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1017,6 +1021,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.PaymentNote).HasMaxLength(500);
 
                 entity.Property(e => e.PaymentStatus).HasMaxLength(50);
+
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasMaxLength(250)
@@ -2478,6 +2486,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PartnerLinkId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerNameLink)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

@@ -87,7 +87,8 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
             lastSync: 'Last Sync',
             currency: 'Currency',
             exchangeRate: 'Exc Rate',
-            reasonReject: 'Reason Reject'
+            reasonReject: 'Reason Reject',
+            saleman: 'Salesman'
         };
 
         this.headers = [

@@ -1660,6 +1660,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                     // Cập nhật MBL, HBL cho các phiếu tạm ứng
                     HandleState hsAdvanceRq = UpdateMblHblAdvanceRequest(model);
+
+                    // update saleman cdnote type debit/invoice
+                    var cdnote = acctCdNoteRepository.Get(x => x.JobId == model.Id && x.Type != "CREDIT").FirstOrDefault();
+                    if(cdnote != null && cdnote?.SalemanId != model.SalemanId)
+                    {
+                        cdnote.SalemanId = model.SalemanId;
+                        acctCdNoteRepository.Update(cdnote, x => x.Id == cdnote.Id);
+                    }
                 }
                 return hs;
             }
