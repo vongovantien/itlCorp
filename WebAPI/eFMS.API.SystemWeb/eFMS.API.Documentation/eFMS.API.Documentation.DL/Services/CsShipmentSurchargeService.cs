@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
         private readonly IContextBase<CatCurrency> currencyRepository;
+        private readonly IContextBase<CsRuleLinkFee> csRuleLinkFeeRepository;
 
         private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
 
@@ -68,9 +69,10 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo,
             IContextBase<CatCurrency> currencyRepo,
-            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo
+            IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
+            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            IContextBase<CsRuleLinkFee> csRuleLinkFeeRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -95,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             catChargeGroupRepository = catChargeGroupRepo;
             currencyRepository = currencyRepo;
             acctApproveSettlementRepository = acctApproveSettlementRepo;
+            csRuleLinkFeeRepository = csRuleLinkFeeRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -1528,7 +1531,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CURRENCY_EMPTY]);
                     item.IsValid = false;
-                } else
+                }
+                else
                 {
                     if (!currencyRepository.Any(x => x.Id == item.CurrencyId.Trim()))
                     {
@@ -1562,13 +1566,23 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_EMPTY]);
                     item.IsValid = false;
                 }
-                if (!string.IsNullOrEmpty(item.InvoiceNo))
+                //if (!string.IsNullOrEmpty(item.InvoiceNo))
+                //{
+                //    if (string.IsNullOrEmpty(item.SeriesNo))
+                //    {
+                //        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
+                //        item.IsValid = false;
+                //    }
+                //}
+                if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
                 {
-                    if (string.IsNullOrEmpty(item.SeriesNo))
-                    {
-                        item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIENO_EMPTY]);
-                        item.IsValid = false;
-                    }
+                    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
+                {
+                    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
+                    item.IsValid = false;
                 }
                 else
                 {
@@ -1686,15 +1700,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IsValid = false;
                             }
                         }
-                        if ((!string.IsNullOrEmpty(item.InvoiceNo)&&string.IsNullOrEmpty(item.SeriesNo))){
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
-                        if((!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo)))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode, jobNo);
-                            item.IsValid = false;
-                        }
+
                     }
                 }
             });
@@ -1845,6 +1851,149 @@ namespace eFMS.API.Documentation.DL.Services
             var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
             var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
             return customNos;
+        }
+
+        public HandleState UpdateChargeLinkFee(List<CsShipmentSurchargeModel> list)
+        {
+            var result = new HandleState();
+            var surChargeUp = new CsShipmentSurcharge();
+            var surchargesUpdate = new List<CsShipmentSurcharge>();
+            var surchargesAddBuy = new List<CsShipmentSurcharge>();
+
+            var shipment = opsTransRepository.Get(x => x.JobNo == list[0].JobNo).FirstOrDefault();
+            if (shipment != null)
+                shipment.IsLinkFee = list.Where(x => x.LinkFee == true).FirstOrDefault() != null ? true : false;
+
+            foreach (var item in list)
+            {
+                var rules = csRuleLinkFeeRepository.Get().ToList();
+                var rule = rules.Where(x => x.Status == true
+                && x.ServiceSelling == item.TransactionType
+                && x.ChargeSelling.ToLower() == item.ChargeId.ToString().ToLower()
+                && x.PartnerSelling.ToLower() == item.PaymentObjectId.ToLower()).FirstOrDefault();
+
+                if (rule == null)
+                    return new HandleState(false, "There is no link fee rule ");
+
+                var charge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
+                CsShipmentSurcharge chargeBuy = mapper.Map<CsShipmentSurcharge>(charge);
+                CsShipmentSurcharge chargeUpdate = mapper.Map<CsShipmentSurcharge>(item);
+
+                //Update charge selling 
+                chargeUpdate.LinkFee = item.LinkFee;
+                chargeUpdate.ModifiedDateLinkFee = DateTime.Now;
+                chargeUpdate.UserIdLinkFee = new Guid(currentUser.UserID);
+                chargeUpdate.UserNameLinkFee = currentUser.UserName;
+
+                surchargesUpdate.Add(chargeUpdate);
+
+                //Add charge type buy
+                chargeBuy.Id = Guid.NewGuid();
+                chargeBuy.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                chargeBuy.TransactionType = rule.ServiceBuying;
+                chargeBuy.ChargeId = Guid.Parse(rule.ChargeBuying);
+                chargeBuy.JobNo = shipment.ServiceNo;
+                chargeBuy.LinkFee = true;
+
+                //Nếu HBL từ link nội bộ null
+                if (shipment.ServiceHblId == null)
+                {
+                    var jobTrans = csTransactionRepository.Get(x => x.JobNo == shipment.ServiceNo).FirstOrDefault();
+                    if (jobTrans != null)
+                    {
+                        var hbl = tranDetailRepository.Get(x => x.JobId == jobTrans.Id).FirstOrDefault();
+                        chargeBuy.Hblid = hbl != null ? hbl.Id : new Guid();
+                        chargeBuy.Hblno = hbl != null ? hbl.Hwbno : null;
+                    }
+                }
+                else
+                    chargeBuy.Hblid = shipment.ServiceHblId??new Guid();
+
+                surchargesAddBuy.Add(chargeBuy);
+            }
+
+            if (!result.Success)
+                return result;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (surchargesUpdate.Count() > 0)
+                    {
+                        foreach (var surchargeUpdate in surchargesUpdate)
+                        {
+                            var hsUpdate = DataContext.Update(surchargeUpdate, x => x.Id == surchargeUpdate.Id, false);
+                        }
+                    }
+
+                    if (surchargesAddBuy.Count() > 0)
+                        DataContext.Add(surchargesAddBuy);
+
+                    opsTransRepository.Update(shipment, x => x.Id == shipment.Id, false);
+                    opsTransRepository.SubmitChanges();
+                    result = DataContext.SubmitChanges();
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("CsShipmentSurChargeLog", ex.ToString());
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+                return result;
+            }
+        }
+
+        public HandleState RevertChargeLinkFee(List<CsShipmentSurchargeModel> list)
+        {
+            var result = new HandleState();
+
+            var surchargesUpdate = new List<CsShipmentSurcharge>();
+
+            var shipment = opsTransRepository.Get(x => x.JobNo == list[0].JobNo).FirstOrDefault();
+            if (shipment != null)
+                shipment.IsLinkFee = list.Where(x => x.LinkFee == true).FirstOrDefault() != null ? true : false;
+
+            foreach (var i in list)
+            {
+                i.ModifiedDateLinkFee = DateTime.Now;
+                surchargesUpdate.Add(i);
+            }
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (surchargesUpdate.Count() > 0)
+                    {
+                        foreach (var surchargeUpdate in surchargesUpdate)
+                        {
+                            var hsUpdate = DataContext.Update(surchargeUpdate, x => x.Id == surchargeUpdate.Id, false);
+                        }
+                    }
+
+                    opsTransRepository.Update(shipment, x => x.Id == shipment.Id, false);
+                    opsTransRepository.SubmitChanges();
+                    result = DataContext.SubmitChanges();
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("RevertChargeLinkFeeLog", ex.ToString());
+                    result = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+                return result;
+            }
         }
     }
 }

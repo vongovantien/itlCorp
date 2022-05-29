@@ -270,6 +270,18 @@ export class AccountingRepo {
         );
     }
 
+    checkValidToSendRequestSettle(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckValidToSendRequestSettle`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateAndSendMailApprovalSettlement(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/UpdateAndSendMailApprovalSettlement`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteSettlement(settlementNo: string) {
         return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/delete`, { settlementNo: settlementNo })
             .pipe(
@@ -587,8 +599,8 @@ export class AccountingRepo {
         );
     }
 
-    getInvoiceExtendedDate(refNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refNo }).pipe(
+    getInvoiceExtendedDate(refNo: string, type: string, invoiceNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { refNo: refNo, type: type, invoiceNo: invoiceNo }).pipe(
             map((data: any) => data)
         );
     }

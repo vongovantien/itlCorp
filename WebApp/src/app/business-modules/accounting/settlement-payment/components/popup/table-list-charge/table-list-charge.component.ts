@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, QueryList, ViewChildren, ViewChild, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
@@ -65,6 +65,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[] = [];
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -479,9 +480,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
                     // * Auto set cstomer for OBH Partner
                     this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
-
-
                 }
+
                 break;
             case 'payer':
                 chargeItem.payer = data.shortName;
@@ -491,10 +491,22 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 // chargeItem.obhPartnerName = '';
                 break;
             case 'obh':
-                chargeItem.obhPartnerName = data.shortName;
-                chargeItem.obhId = data.id;
-                chargeItem.objectBePaid = null;
-                chargeItem.payerId = chargeItem.paymentObjectId;
+                const transactionType: string = this.utility.getServiceType(chargeItem.jobId) === 'CL' ? 'CL' : 'DOC';
+                this._documentRepo.validateCheckPointContractPartner(data.id, chargeItem.hblid, transactionType, this.settlementCode)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem.obhPartnerName = data.shortName;
+                                chargeItem.obhId = data.id;
+                                chargeItem.objectBePaid = null;
+                                chargeItem.payerId = chargeItem.paymentObjectId;
+
+                            } else {
+                                this._toastService.warning(res.message);
+                                chargeItem.obhPartnerName = chargeItem.obhId = chargeItem.objectBePaid = chargeItem.payerId = null;
+                            }
+                        }
+                    )
                 break;
             default:
                 break;
@@ -503,7 +515,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':
@@ -530,20 +542,41 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         partner = this.getPartnerById(this.selectedShipment.customerId);
+
+                        const transactionType: string = this.utility.getServiceType(this.selectedShipment.jobId) === 'CL' ? 'CL' : 'DOC';
+                        this._documentRepo.validateCheckPointContractPartner(partner.id, this.selectedShipment.hblid, transactionType, this.settlementCode)
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        if (!!partner) {
+                                            chargeItem.obhId = partner.id;
+                                            chargeItem.obhPartnerName = partner.shortName;
+                                        }
+                                    } else {
+                                        this._toastService.warning(res.message);
+                                        chargeItem.obhId = chargeItem.obhPartnerName = null;
+                                    }
+                                }
+                            )
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
                         partner = this.getPartnerById(this.selectedShipment.carrierId);
+                        if (!!partner) {
+                            chargeItem.obhId = partner.id;
+                            chargeItem.obhPartnerName = partner.shortName;
+                        }
                         break;
                     case CommonEnum.PartnerGroupEnum.AGENT:
                         partner = this.getPartnerById(this.selectedShipment.agentId);
+                        if (!!partner) {
+                            chargeItem.obhId = partner.id;
+                            chargeItem.obhPartnerName = partner.shortName;
+                        }
                         break;
                     default:
                         break;
                 }
-                if (!!partner) {
-                    chargeItem.obhId = partner.id;
-                    chargeItem.obhPartnerName = partner.shortName;
-                }
+
                 break;
         }
 
@@ -619,17 +652,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     saveChargeList() {
         this.isSubmitted = true;
@@ -649,6 +682,22 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         //         return;
         //     }
         // }
+        //}
+        if(this.selectedShipment.service==='CL'){
+            for (const charge of this.charges) {
+                if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+                    if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Series No Must be fill in");
+                        return;
+                    }
+                    if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+                        this._toastService.warning("Invoice No Must be fill in");
+                        return;
+                    }
+                }
+            }
+        }
+
 
         const error = this.checkValidate();
         if (error < 0) {

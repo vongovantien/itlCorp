@@ -69,6 +69,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IQueryable<CatChargeDefaultAccount> chargesDefault;
         readonly IQueryable<CatUnit> catUnits;
         readonly IQueryable<SysImage> sysFiles;
+        private IDatabaseUpdateService databaseUpdateService;
 
         public AccountingService(
             ICurrencyExchangeService exchangeService,
@@ -107,6 +108,7 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
             IContextBase<SysImage> sysFileRepo,
+            IDatabaseUpdateService _databaseUpdateService,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -145,6 +147,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             sysFileRepository = sysFileRepo;
             settlementPaymentService = settlementService;
+            databaseUpdateService = _databaseUpdateService;
             // ---
 
             users = UserRepository.Get();
@@ -300,7 +303,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                       CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo,
                                                                                       DueDate = item.PaymentTerm ?? 0,
-                                                                                      CustomerCodeVAT = GetCustomerCodeVAT(surcharge),
+                                                                                      CustomerCodeVAT = GetCustomerCodeVAT(surcharge.VatPartnerId),
                                                                                       CustomerCodeTransfer = item.PaymentMethod == "Bank Transfer" ? item.CustomerCode : null
                                                                                   };
                         if (queryChargesVoucher.Count() > 0)
@@ -323,46 +326,40 @@ namespace eFMS.API.Accounting.DL.Services
                 // IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id));
                 IQueryable<AcctSettlementPayment> settlements = SettlementRepository.Get(x => Ids.Contains(x.Id) && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
-                IQueryable<BravoSettlementModel> querySettlement = from settle in settlements
-                                                                   join user in users on settle.Requester equals user.Id
-                                                                   join employee in employees on user.EmployeeId equals employee.Id
-                                                                   join office in offices on settle.OfficeId equals office.Id
-                                                                   join partner in partners on settle.Payee equals partner.Id into payeeGrps
-                                                                   from partner in payeeGrps.DefaultIfEmpty()
-                                                                   select new BravoSettlementModel
-                                                                   {
-                                                                       Stt = settle.Id,
-                                                                       OfficeCode = office.Code,
-                                                                       DocDate = settle.RequestDate,
-                                                                       ReferenceNo = settle.SettlementNo,
-                                                                       ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency),
-                                                                       Description0 = settle.Note,
-                                                                       CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn,
-                                                                       // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
-                                                                       CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode, //[06/01/2021]
-                                                                       PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod,
-                                                                       CustomerMode = partner != null ? partner.PartnerMode : "External",
-                                                                       LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null, //Parnter mode là internal => Internal Code
-                                                                       Payee = settle.Payee,
-                                                                       CurrencyCode = settle.SettlementCurrency,
-                                                                       SettleAmount = settle.Amount,
-                                                                   };
-                if (querySettlement != null && querySettlement.Count() > 0)
+                if (settlements != null && settlements.Count() > 0)
                 {
-                    List<BravoSettlementModel> data = querySettlement.ToList();
-                    if (data.Count() > 0)
                     {
-                        foreach (BravoSettlementModel item in data)
+                        List<BravoSettlementModel> data = new List<BravoSettlementModel>();
+                        foreach (var settle in settlements)
                         {
+                            var item = new BravoSettlementModel();
+                            item.Stt = settle.Id;
+                            item.OfficeCode = offices.Where(x => x.Id == settle.OfficeId).FirstOrDefault()?.Code;
+                            item.DocDate = settle.RequestDate;
+                            item.ReferenceNo = settle.SettlementNo;
+                            item.ExchangeRate = GetExchangeRate(settle.RequestDate, settle.SettlementCurrency);
+                            item.Description0 = settle.Note;
+                            var user = users.Where(x => x.Id == settle.Requester).FirstOrDefault();
+                            var employee = user == null ? null : employees.Where(x => x.Id == user.EmployeeId).FirstOrDefault();
+                            var partner = partners.Where(x => x.Id == settle.Payee).FirstOrDefault();
+                            item.CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn;
+                            // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
+                            item.CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode; //[06/01/2021]
+                            item.PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod;
+                            item.CustomerMode = partner != null ? partner.PartnerMode : "External";
+                            item.LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null; //Parnter mode là internal => Internal Code
+                            item.Payee = settle.Payee;
+                            item.CurrencyCode = settle.SettlementCurrency;
+                            item.SettleAmount = settle.Amount;
+
                             // Ds Surcharge của settlement.
                             IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
-
                             //*Note: Nếu charge là OBH thì OriginalAmount = Thành tiền trước thuế + Tiền thuế; OriginalAmount3 = 0; 
                             //Ngược lại OriginalAmount = Thành tiền trước thuế, OriginalAmount3 = Tiền thuế
 
-                            string _staffCodeRequester = GetSettleStaffCode(item.Stt);
+                            string _staffCodeRequester = employee.StaffCode;//GetSettleStaffCode(settle.Requester);
                             string _customerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null);
-                            AcctSettlementPayment currentSettle = settlements.First(x => x.Id == item.Stt);
+                            //AcctSettlementPayment currentSettle = settlements.First(x => x.Id == item.Stt);
 
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
@@ -395,7 +392,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                              // CustomerCodeBook = obhP.AccountNo
                                                                                              CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId), //CR: 15500
-                                                                                             CustomerCodeVAT = GetCustomerCodeVAT(surcharge), // 15709: Sẽ bằng Partner Code của VAT Partner
+                                                                                             CustomerCodeVAT = GetCustomerCodeVAT(surcharge.VatPartnerId), // 15709: Sẽ bằng Partner Code của VAT Partner
                                                                                              CustomerCodeTransfer = _customerCodeTransfer,
 
                                                                                              // 15709
@@ -444,7 +441,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
-                                    if (currentSettle.SettlementCurrency == "VND")
+                                    if (settle.SettlementCurrency == "VND")
                                     {
                                         x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 0);
                                         x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountVND), 0);
@@ -455,7 +452,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             x.ExchangeRate = 1;
                                         }
                                     }
-                                    else if (currentSettle.SettlementCurrency == "USD")
+                                    else if (settle.SettlementCurrency == "USD")
                                     {
                                         x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 2);
                                         x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountUSD), 2);
@@ -467,23 +464,23 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                 });
 
-                                if (hasAdvancePayment == true && currentSettle.BalanceAmount != 0)
+                                if (hasAdvancePayment == true && settle.BalanceAmount != 0)
                                 {
                                     item.Details.Add(new BravoSettlementRequestModel
                                     {
                                         RowId = item.Stt.ToString(),
                                         Ma_SpHt = "BALANCE",
                                         ItemCode = "BALANCE",
-                                        Description = GenerateDescriptionSettleItemWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
+                                        Description = GenerateDescriptionSettleItemWithBalanceAdvance(settle.BalanceAmount ?? 0, item.PaymentMethod),
                                         Unit = "Lô",
                                         CurrencyCode = item.CurrencyCode,
                                         ExchangeRate = 1,
                                         // DeptCode = reqItem.DeptCode,
                                         Quantity9 = 0,
                                         OriginalUnitPrice = 0,
-                                        OriginalAmount = currentSettle.BalanceAmount == null ? currentSettle.BalanceAmount : NumberHelper.RoundNumber((decimal)currentSettle.BalanceAmount, item.CurrencyCode == "VND" ? 0 : 2),
+                                        OriginalAmount = settle.BalanceAmount == null ? settle.BalanceAmount : NumberHelper.RoundNumber((decimal)settle.BalanceAmount, item.CurrencyCode == "VND" ? 0 : 2),
                                         OriginalAmount3 = 0,
-                                        ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
+                                        ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(settle.BalanceAmount ?? 0, item.PaymentMethod),
                                         CustomerCodeBook = _staffCodeRequester,
                                         CustomerCodeTransfer = _customerCodeTransfer,
                                         RefundAmount = 0,
@@ -514,7 +511,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
 
-                                        string _requesterAdvanceCode = GetAdvanceReqterCode(reqItem.AdvanceNo);
+                                        string _requesterAdvanceCode = GetAdvanceCustomerCode(reqItem.AdvanceNo, string.Empty);
 
                                         if (!string.IsNullOrEmpty(reqItem.AdvanceNo))
                                         {
@@ -546,6 +543,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                 }
                             }
+                            data.Add(item);
                         }
                         result = data;
                     }
@@ -1380,62 +1378,55 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState("Danh sách settlement không hợp lệ");
                 }
 
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                try
                 {
-                    try
+                    foreach (Guid id in ids)
                     {
-                        foreach (Guid id in ids)
+                        AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
+                        if (settle != null)
                         {
-                            AcctSettlementPayment settle = SettlementRepository.Get(x => x.Id == id)?.FirstOrDefault();
-                            if (settle != null)
-                            {
-                                settle.UserModified = currentUser.UserID;
-                                settle.DatetimeModified = DateTime.Now;
-                                settle.LastSyncDate = DateTime.Now;
-                                settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                            settle.UserModified = currentUser.UserID;
+                            settle.DatetimeModified = DateTime.Now;
+                            settle.LastSyncDate = DateTime.Now;
+                            settle.SyncStatus = AccountingConstants.STATUS_SYNCED;
 
-                                SettlementRepository.Update(settle, x => x.Id == id, false);
+                            SettlementRepository.Update(settle, x => x.Id == id, false);
 
-                                IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
-                                if (surcharges != null && surcharges.Count() > 0)
-                                {
-                                    foreach (var surcharge in surcharges)
-                                    {
-                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                        {
-                                            //Charge OBH sẽ lưu vào PaySyncedFrom
-                                            surcharge.PaySyncedFrom = "SETTLEMENT";
-                                        }
-                                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                                        {
-                                            //Charge BUY sẽ lưu vào SyncedFrom
-                                            surcharge.SyncedFrom = "SETTLEMENT";
-                                        }
-                                        surcharge.UserModified = currentUser.UserID;
-                                        surcharge.DatetimeModified = DateTime.Now;
+                            databaseUpdateService.UpdateSurchargeAfterSynced("SETTLEMENT", settle.SettlementNo);
+                            #region Change to store
+                            //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == settle.SettlementNo);
+                            //if (surcharges != null && surcharges.Count() > 0)
+                            //{
+                            //    foreach (var surcharge in surcharges)
+                            //    {
+                            //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            //        {
+                            //            //Charge OBH sẽ lưu vào PaySyncedFrom
+                            //            surcharge.PaySyncedFrom = "SETTLEMENT";
+                            //        }
+                            //        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                            //        {
+                            //            //Charge BUY sẽ lưu vào SyncedFrom
+                            //            surcharge.SyncedFrom = "SETTLEMENT";
+                            //        }
+                            //        surcharge.UserModified = currentUser.UserID;
+                            //        surcharge.DatetimeModified = DateTime.Now;
 
-                                        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
-                                    }
-                                }
-                            }
+                            //        SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            //    }
+                            //}
+                            #endregion
                         }
-                        HandleState hsCharge = SurchargeRepository.SubmitChanges();
-                        result = SettlementRepository.SubmitChanges();
+                    }
+                    result = SettlementRepository.SubmitChanges();
 
-                        trans.Commit();
-                        data = new List<Guid>();
-                        return result;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        data = new List<Guid>();
-                        return new HandleState((object)ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
-                    }
+                    data = new List<Guid>();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    data = new List<Guid>();
+                    return new HandleState((object)ex.Message);
                 }
 
             }
@@ -1459,7 +1450,7 @@ namespace eFMS.API.Accounting.DL.Services
                     data = invalidSVouchers;
                     return new HandleState("Danh sách voucher không hợp lệ");
                 }
-                using (var trans = DataContext.DC.Database.BeginTransaction())
+                
                 {
                     try
                     {
@@ -1476,42 +1467,36 @@ namespace eFMS.API.Accounting.DL.Services
                                 DataContext.Update(voucher, x => x.Id == id, false);
 
                                 //Update SyncedFrom or PaySyncedFrom equal VOUCHER by Id of Voucher
-                                var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id || x.PayerAcctManagementId == voucher.Id);
-                                foreach (var surcharge in surcharges)
-                                {
-                                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                    {
-                                        //Charge OBH sẽ lưu vào PaySyncedFrom
-                                        surcharge.PaySyncedFrom = "VOUCHER";
-                                    }
-                                    else
-                                    {
-                                        //Charge BUY/SELL sẽ lưu vào PaySyncedFrom
-                                        surcharge.SyncedFrom = "VOUCHER";
-                                    }
-                                    surcharge.UserModified = currentUser.UserID;
-                                    surcharge.DatetimeModified = DateTime.Now;
-                                    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
-                                }
+                                databaseUpdateService.UpdateSurchargeAfterSynced("VOUCHER", voucher.Id.ToString());
+                                #region Chage to store
+                                //var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id || x.PayerAcctManagementId == voucher.Id);
+                                //foreach (var surcharge in surcharges)
+                                //{
+                                //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                //    {
+                                //        //Charge OBH sẽ lưu vào PaySyncedFrom
+                                //        surcharge.PaySyncedFrom = "VOUCHER";
+                                //    }
+                                //    else
+                                //    {
+                                //        //Charge BUY/SELL sẽ lưu vào PaySyncedFrom
+                                //        surcharge.SyncedFrom = "VOUCHER";
+                                //    }
+                                //    surcharge.UserModified = currentUser.UserID;
+                                //    surcharge.DatetimeModified = DateTime.Now;
+                                //    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                //}
+                                #endregion
                             }
                         }
-                        var smSurcharge = SurchargeRepository.SubmitChanges();
                         result = DataContext.SubmitChanges();
-
-                        trans.Commit();
-
                         data = new List<Guid>();
                         return result;
                     }
                     catch (Exception ex)
                     {
-                        trans.Rollback();
                         data = new List<Guid>();
                         return new HandleState((object)ex.Message);
-                    }
-                    finally
-                    {
-                        trans.Dispose();
                     }
                 }
 
@@ -1525,7 +1510,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var cdNotes = cdNoteRepository.Get(x => ids.Contains(x.Id));
             if (cdNotes == null) return new HandleState((object)"Không tìm thấy cd note");
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -1546,39 +1530,35 @@ namespace eFMS.API.Accounting.DL.Services
                         //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
-                            foreach (var surcharge in surcharges)
-                            {
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                {
-                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : surcharge.PaySyncedFrom;
-                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : surcharge.SyncedFrom;
-                                }
-                                else
-                                {
-                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                    surcharge.SyncedFrom = "CDNOTE";
-                                }
-                                surcharge.UserModified = currentUser.UserID;
-                                surcharge.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
-                            }
+                            databaseUpdateService.UpdateSurchargeAfterSynced("CDNOTE", cdNote.Code);
+                            #region Change to store
+                            //foreach (var surcharge in surcharges)
+                            //{
+                            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            //    {
+                            //        surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : surcharge.PaySyncedFrom;
+                            //        surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : surcharge.SyncedFrom;
+                            //    }
+                            //    else
+                            //    {
+                            //        //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                            //        surcharge.SyncedFrom = "CDNOTE";
+                            //    }
+                            //    surcharge.UserModified = currentUser.UserID;
+                            //    surcharge.DatetimeModified = DateTime.Now;
+                            //    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            //}
+                            #endregion
                         }
                         var hsUpdateCdNote = cdNoteRepository.Update(cdNote, x => x.Id == cdNote.Id, false);
                     }
 
-                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = cdNoteRepository.SubmitChanges();
-                    trans.Commit();
                     return sm;
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     return new HandleState((object)ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
                 }
             }
         }
@@ -1587,7 +1567,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var soas = soaRepository.Get(x => ids.Contains(x.Id));
             if (soas == null) return new HandleState((object)"Không tìm thấy soa");
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -1608,38 +1587,37 @@ namespace eFMS.API.Accounting.DL.Services
                         //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
-                            foreach (var surcharge in surcharges)
-                            {
-                                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                {
-                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : surcharge.PaySyncedFrom;
-                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : surcharge.SyncedFrom;
-                                }
-                                else
-                                {
-                                    //Charge BUY or SELL sẽ lưu vào SyncedFrom
-                                    surcharge.SyncedFrom = "SOA";
-                                }
-                                surcharge.UserModified = currentUser.UserID;
-                                surcharge.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
-                            }
+                            databaseUpdateService.UpdateSurchargeAfterSynced("SOA", soa.Soano);
+                            #region Change to store
+                            //foreach (var surcharge in surcharges)
+                            //{
+                            //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            //    {
+                            //        surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : surcharge.PaySyncedFrom;
+                            //        surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : surcharge.SyncedFrom;
+                            //    }
+                            //    else
+                            //    {
+                            //        //Charge BUY or SELL sẽ lưu vào SyncedFrom
+                            //        surcharge.SyncedFrom = "SOA";
+                            //    }
+                            //    surcharge.UserModified = currentUser.UserID;
+                            //    surcharge.DatetimeModified = DateTime.Now;
+                            //    var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            //}
+                            #endregion
                         }
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
-                    var smSurcharge = SurchargeRepository.SubmitChanges();
                     var sm = soaRepository.SubmitChanges();
-                    trans.Commit();
                     return sm;
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     return new HandleState((object)ex.Message);
                 }
                 finally
                 {
-                    trans.Dispose();
                 }
             }
         }
@@ -1940,12 +1918,11 @@ namespace eFMS.API.Accounting.DL.Services
             return employeeCode;
         }
 
-        private string GetSettleStaffCode(Guid Id)
+        private string GetSettleStaffCode(string requester)
         {
             string settleRequesterCode = string.Empty;
 
-            var querySettle = from ad in SettlementRepository.Get(x => x.Id == Id)
-                              join u in users on ad.Requester equals u.Id
+            var querySettle = from u in users.Where(x => x.Id == requester)
                               join employee in employees on u.EmployeeId equals employee.Id
                               select new { employee.StaffCode };
 
@@ -2106,9 +2083,8 @@ namespace eFMS.API.Accounting.DL.Services
             return PayeeCode;
         }
 
-        private string GetCustomerCodeVAT(CsShipmentSurcharge surcharge)
+        private string GetCustomerCodeVAT(string vatPartnerId)
         {
-            string codeVat = string.Empty;
             //if (!string.IsNullOrEmpty(surcharge.InvoiceNo))
             //{
             //    if (surcharge.Type == "BUY")
@@ -2122,12 +2098,7 @@ namespace eFMS.API.Accounting.DL.Services
             //        codeVat = partner?.AccountNo;
             //    }
             //}
-            if (!string.IsNullOrEmpty(surcharge.VatPartnerId))
-            {
-                CatPartner partner = PartnerRepository.Get(x => x.Id == surcharge.VatPartnerId)?.FirstOrDefault();
-                codeVat = partner?.AccountNo;
-            }
-            return codeVat;
+            return !string.IsNullOrEmpty(vatPartnerId) ? PartnerRepository.Get(x => x.Id == vatPartnerId)?.FirstOrDefault()?.AccountNo : string.Empty;
         }
 
         private string GetCustomerCodeTransfer(string paymentMethod, string realPartnerTransfer, string payee)

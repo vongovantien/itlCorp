@@ -105,7 +105,7 @@
                                                     <tr (click)="selectHBL(house, $event)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
-                                                        *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
+                                                        *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm','group','department']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
                                                                 <app-permission-button type="detail"
@@ -132,6 +132,8 @@
                                                         <td>{{house.packages}}</td>
                                                         <td>{{house.gw}}</td>
                                                         <td>{{house.cbm}}</td>
+                                                        <td>{{house.group}}</td>
+                                                        <td>{{house.department}}</td>
                                                     </tr>
                                                     <tr class="font-weight-bold">
                                                         <td></td>

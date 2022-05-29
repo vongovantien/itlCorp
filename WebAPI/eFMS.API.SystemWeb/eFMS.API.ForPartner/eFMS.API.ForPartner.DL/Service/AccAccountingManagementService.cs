@@ -1471,8 +1471,8 @@ namespace eFMS.API.ForPartner.DL.Service
             settlement.DatetimeModified = DateTime.Now;
             settlement.ReasonReject = reason;
 
-            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
-
+            var surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).ToList();
+            UpdateSurchargeDataToDB(surcharges, settlement.SettlementNo, "Reject");
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -1514,28 +1514,29 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserModified = currentUser.UserID,
                             };
                             sysUserNotificationRepository.AddAsync(sysUserNotify);
+                            #region Change to store
+                            //if (surcharges != null && surcharges.Count() > 0)
+                            //{
+                            //    foreach (var item in surcharges)
+                            //    {
+                            //        if (item.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                            //        {
+                            //            item.PaySyncedFrom = null;
+                            //        }
+                            //        if (item.Type == ForPartnerConstants.TYPE_CHARGE_BUY)
+                            //        {
+                            //            item.SyncedFrom = null;
 
-                            if (surcharges != null && surcharges.Count() > 0)
-                            {
-                                foreach (var item in surcharges)
-                                {
-                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
-                                    {
-                                        item.PaySyncedFrom = null;
-                                    }
-                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_BUY)
-                                    {
-                                        item.SyncedFrom = null;
+                            //            // Reset nếu kt đã update UpdateVoucherExpense
+                            //            item.VoucherId = null;
+                            //            item.VoucherIddate = null;
+                            //        }
 
-                                        // Reset nếu kt đã update UpdateVoucherExpense
-                                        item.VoucherId = null;
-                                        item.VoucherIddate = null;
-                                    }
-
-                                    var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
-                                }
-                                surchargeRepo.SubmitChanges();
-                            }
+                            //        var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
+                            //    }
+                            //    surchargeRepo.SubmitChanges();
+                            //}
+                            #endregion
                         }
                         trans.Commit();
                     }
@@ -2577,7 +2578,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             else if (_type == ForPartnerConstants.SYNCED_FROM_SOA)
             {
-                AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == Id.ToString()).FirstOrDefault();
+                AcctSoa soa = acctSOARepository.Get(x => x.Id == Id.ToString()).FirstOrDefault();
 
                 soa.Status = _status;
                 soa.UserModified = currentUser.UserID;
@@ -2610,7 +2611,7 @@ namespace eFMS.API.ForPartner.DL.Service
             switch (docType)
             {
                 case "SOA":
-                    AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == docID.ToString())?.FirstOrDefault();
+                    AcctSoa soa = acctSOARepository.Get(x => x.Id == docID.ToString())?.FirstOrDefault();
                     if (soa == null)
                     {
                         _messageInvalidDoc = string.Format("Số chứng từ SOA {0} không tồn tại", docCode);
@@ -2816,6 +2817,40 @@ namespace eFMS.API.ForPartner.DL.Service
             return hsDeletVoucher;
         }
 
+        /// <summary>
+        /// Update Surcharge Data To Settlement
+        /// </summary>
+        /// <param name="surcharges"></param>
+        /// <param name="settleCode"></param>
+        /// <param name="action"></param>
+        private void UpdateSurchargeDataToDB(List<CsShipmentSurcharge> surcharges, string settleCode, string action)
+        {
+            try
+            {
+                var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@surcharges",
+                    Value = DataHelper.ToDataTable(surcharges),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[CsShipmentSurchargeTable]"
+                },
+                new SqlParameter(){ ParameterName = "@settleCode", Value = settleCode},
+                new SqlParameter(){ ParameterName = "@kickBackExcRate", Value = 0},
+                new SqlParameter(){ ParameterName = "@userCurrent", Value = currentUser.UserID},
+                new SqlParameter(){ ParameterName = "@curOfficeID", Value = currentUser.OfficeID},
+                new SqlParameter(){ ParameterName = "@curCompanyID", Value = currentUser.CompanyID},
+                new SqlParameter(){ ParameterName = "@action", Value = action}
+            };
+                var hs = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateSurchargeSettlement>(parameters);
+                new LogHelper("eFMS_Log_UpdateSurchargeSettle-" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_Log_UpdateSurchargeSettle-" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\nError " + ex.ToString() + "\n Settle: " + settleCode + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
+            }
+        }
     }
 }
 

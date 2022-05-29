@@ -274,7 +274,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         };
     }
 
-    showPopupDynamicRender<T = any>(component: T | ConfirmPopupComponent | InfoPopupComponent | any, containerRef: ViewContainerRef, config?: ConfirmPopupConfig, callBack?: Function) {
+    showPopupDynamicRender<T = any>(component: T | ConfirmPopupComponent | InfoPopupComponent | any, containerRef: ViewContainerRef, config?: ConfirmPopupConfig | InfoPopupConfig, callBack?: Function) {
         this.componentRef = this.renderDynamicComponent(component, containerRef);
 
         const configKeys = config && Object.keys(config) || [];
@@ -324,4 +324,13 @@ export interface ConfirmPopupConfig {
     classCancelButton?: string;
     center?: boolean;
     [key: string]: any;
+}
+
+export interface InfoPopupConfig {
+    title?: string;
+    body?: string;
+    label?: string;
+    align?: string;
+    isShowButton?: boolean;
+    class?: string;
 }

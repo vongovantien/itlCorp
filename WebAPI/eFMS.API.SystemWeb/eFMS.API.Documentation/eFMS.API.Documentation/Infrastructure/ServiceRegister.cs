@@ -50,6 +50,9 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IDocSendMailService, DocSendMailService>();
             services.AddTransient<IReportLogService, ReportLogService>();
             services.AddTransient<IAccAccountReceivableService, AccAccountReceivableService>();
+            services.AddTransient<ICheckPointService, CheckPointService>();
+            services.AddTransient<IDatabaseUpdateService, DatabaseUpdateService>();
+            services.AddTransient<ICsLinkChargeService, CsLinkChargeService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

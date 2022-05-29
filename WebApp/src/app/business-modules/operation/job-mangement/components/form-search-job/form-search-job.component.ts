@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -22,12 +22,14 @@ import { Observable } from 'rxjs';
 export class JobManagementFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Output() onReset: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
+    @Input() isSearchLinkFee: boolean = false;
 
     filterTypes: CommonInterface.ICommonTitleValue[];
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
     shipmentModes: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    linkFeeSearchs: string[] = JobConstants.COMMON_DATA.LINKFEESEARCHS;
 
     formSearch: FormGroup;
     searchText: AbstractControl;
@@ -39,6 +41,9 @@ export class JobManagementFormSearchComponent extends AppForm {
     customerId: AbstractControl;
     fieldOps: AbstractControl;
     createdDate: AbstractControl;
+    linkFeeSearch: AbstractControl;
+    linkJobSearch: AbstractControl;
+
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -103,7 +108,9 @@ export class JobManagementFormSearchComponent extends AppForm {
             'serviceDate': [],
             'customerId': [],
             'fieldOps': [],
-            'createdDate': []
+            'createdDate': [],
+            'linkJobSearch':[],
+            'linkFeeSearch':[]
         });
 
         this.searchText = this.formSearch.controls['searchText'];
@@ -115,6 +122,9 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.customerId = this.formSearch.controls['customerId'];
         this.fieldOps = this.formSearch.controls['fieldOps'];
         this.createdDate = this.formSearch.controls['createdDate'];
+        this.linkJobSearch = this.formSearch.controls['linkJobSearch'];
+        this.linkFeeSearch = this.formSearch.controls['linkFeeSearch'];
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -146,7 +156,9 @@ export class JobManagementFormSearchComponent extends AppForm {
             customerId: this.customerId.value,
             fieldOps: this.fieldOps.value,
             createdDateFrom: (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            createdDateTo: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null
+            createdDateTo: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            linkJobSearch: !!this.linkJobSearch.value ? this.linkJobSearch.value : null,
+            linkFeeSearch: !!this.linkFeeSearch.value ? this.linkFeeSearch.value : null
         };
         this.onSearch.emit(body);
 
@@ -171,6 +183,8 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.resetFormControl(this.customerId);
         this.resetFormControl(this.fieldOps);
         this.resetFormControl(this.createdDate);
+        this.resetFormControl(this.linkFeeSearch);
+        this.resetFormControl(this.linkJobSearch);
     }
 
     expanded() {
@@ -189,9 +203,20 @@ export class JobManagementFormSearchComponent extends AppForm {
                     startDate: new Date(this.dataSearch.createdDateFrom),
                     endDate: new Date(this.dataSearch.createdDateTo)
                 } : null,
+                linkFeeSearch: this.linkFeeSearchs.find(s => s === this.dataSearch.linkFeeSearch) || null,
+                linkJobSearch: this.linkFeeSearchs.find(s => s === this.dataSearch.linkJobSearch) || null
             };
 
             this.formSearch.patchValue(advanceSearchForm);
+        }
+    }
+
+    onBlurSearchText(data) {
+        this.searchText.setValue((this.searchText.value || '').trim());
+        if (this.searchText.dirty) {
+            if (!!data.target.value?.includes('LOG')) {
+                this.filterType.setValue(this.filterTypes[1]);
+            }
         }
     }
 }
@@ -214,5 +239,7 @@ interface ISearchDataShipment {
     creditDebitInvoice: string;
     createdDateFrom: string;
     createdDateTo: string;
+    linkJobSearch: string;
+    linkFeeSearch: string;
 }
 

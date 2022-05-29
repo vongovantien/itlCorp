@@ -5,9 +5,10 @@
                 <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Create Credit/Debit Note</h5>
                 <ng-template #updateTitle class="modal-title">
                     <h5 class="modal-title">Edit
-                        <b><span
-                                class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
-                        No: <b class="text-warning">{{CDNote.code}}</b></h5>
+                        <b><span class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type ===
+                                'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                        No: <b class="text-warning">{{CDNote.code}}</b>
+                    </h5>
                 </ng-template>
 
                 <button type="button" (click)="closePopup()" class="close">
@@ -69,7 +70,7 @@
                                         Exc USD
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        formControlName="excRateUsdToLocal" formatDecimalFormControl format=".0-3" >
+                                        formControlName="excRateUsdToLocal" formatDecimalFormControl format=".0-3">
                                 </div>
                             </div>
                             <div class="col-lg-8">
@@ -231,21 +232,6 @@
     </div>
 </div>
 
-<confirm-popup #changePartnerPopup (onSubmit)="onSubmitChangePartnerPopup()" [title]="'Alert'"
-    (onCancel)="onCancelChangePartnerPopup()"
-    [body]="'If you change partner, all Selected Charges will be lost. Are you sure about this?'" [labelCancel]="'No'">
-</confirm-popup>
-
-<info-popup #notExistsChargePopup (onSubmit)="onSubmitNotExistsChargePopup()"
-    [body]="'Look like you have not selected any charges for the C/D Note. Please recheck and try again!'"
-    [title]="'Alert'">
-</info-popup>
-
 <ops-cd-note-add-remaining-charge (onAddCharge)="onAddMoreCharge($event)"></ops-cd-note-add-remaining-charge>
 
-<confirm-popup #confirmCloseAddPopup (onSubmit)="onSubmitConfirmCloseAdd()" [title]="'Alert'"
-    (onCancel)="onCancelConfirmCloseAdd()" [body]="'Do you want to exit without saving?'" [labelCancel]="'No'">
-</confirm-popup>
-
-<info-popup #validateCDNotePopup [body]="messageValidate" [title]="'Alert'">
-</info-popup>
+<ng-template inject></ng-template>

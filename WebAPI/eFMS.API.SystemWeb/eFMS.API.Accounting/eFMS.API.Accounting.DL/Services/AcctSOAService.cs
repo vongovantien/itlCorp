@@ -53,11 +53,13 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
+        private readonly IContextBase<CatContract> contractRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+        private readonly IContextBase<SysSettingFlow> settingFlowRepository;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -84,8 +86,10 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<CatContract> contractRepo,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysSettingFlow> settingFlowRepo,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
@@ -112,8 +116,10 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctCombineBillingRepository = acctCombineBillingRepo;
+            contractRepository = contractRepo;
             acctApproveSettlementRepository = acctApproveSettlementRepo;
             sysEmployeeRepository = sysEmployeeRepo;
+            settingFlowRepository = settingFlowRepo;
         }
 
         #region -- Insert & Update SOA
@@ -3632,6 +3638,92 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        public HandleState ValidateCheckPointPartnerSOA(AcctSoa soa)
+        {
+            HandleState result = new HandleState();
+            bool isValid = true;
+
+            if (soa.Type == AccountingConstants.TYPE_SOA_DEBIT)
+            {
+                CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer && x.Active == true && (x.IsExpired == false || x.IsExpired == null))
+                   .OrderBy(x => x.ContractType)
+                   .FirstOrDefault();
+                CatPartner partner = catPartnerRepo.Get(x => x.Id == soa.Customer)?.FirstOrDefault();
+
+                if (contract == null)
+                {
+                    return new HandleState((object)string.Format(@"SOA debit - {0} doesn't have any agreement please you check again", partner.ShortName));
+                }
+                string salemanBOD = sysUserRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+
+                if (contract.SaleManId == salemanBOD) return result;
+                switch (contract.ContractType)
+                {
+                    case "Cash":
+                        if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
+                        {
+                            isValid = false;
+                        }
+                        break;
+                    //case "Official":
+                    //case "Trial":
+                    // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
+                    // break;
+                    default:
+                        isValid = true;
+                        break;
+                }
+
+                if (isValid == false)
+                {
+                    SysUser saleman = sysUserRepo.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
+
+                    string messError = string.Format(@"{0} - {1} - {2} has an invalid contract, You cannot issued soa debit with Cash contract",
+                        partner?.TaxCode, partner?.ShortName, saleman.Username);
+
+                    return new HandleState((object)messError);
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsSettingFlowApplyContract(string ContractType, Guid officeId, string partnerType, string typeCheckPoint = null)
+        {
+            bool IsApplySetting = false;
+            var settingFlow = settingFlowRepository.First(x => x.OfficeId == officeId && x.Type == "AccountReceivable"
+            && x.ApplyType != "None"
+            && x.ApplyPartner != "None");
+            if (settingFlow == null) return IsApplySetting;
+            switch (ContractType)
+            {
+                case "Cash":
+                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
+                    break;
+                case "Trial":
+                    //IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
+                    break;
+                case "Official":
+                    //IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
+                    break;
+                default:
+                    break;
+            }
+
+            return IsApplySetting;
+        }
+
+        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, bool? isApplyContract, string partnerType)
+        {
+            bool isApply = false;
+            isApply = applyType == "Check Point"
+                && isApplyContract == true
+                && (applyPartnerType == partnerType || applyPartnerType == "Both");
+
+            return isApply;
+        }
+
+
         public AdjustModel GetAdjustDebitValue(AdjustModel model)
         {
             var res = new AdjustModel();
@@ -3710,6 +3802,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return res;
         }
+
         private List<CsShipmentSurchargeModel> GetChargeByCdNote(Guid jobId, string cdNoteNo)
         {
             var lstCharge = new List<CsShipmentSurchargeModel>();
@@ -3754,6 +3847,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return lstCharge;
         }
+
         public AdjustModel GetAdjustDebitValueSOA(string soaNo)
         {
             var lst = new List<AdjustListChargeGrpModel>();
@@ -3826,6 +3920,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return res;
         }
+        
         public HandleState UpdateAdjustDebitValue(AdjustModel model)
         {
             var listChargeUpdate = new List<CsShipmentSurcharge>();

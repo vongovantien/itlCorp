@@ -40,7 +40,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string DeptSign { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
-
+        public string Group { get; set; }
+        public string Department { get; set; }
         public PermissionAllowBase Permission { get; set; }
     }
 }

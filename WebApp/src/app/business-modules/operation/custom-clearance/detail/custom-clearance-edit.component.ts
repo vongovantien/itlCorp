@@ -6,6 +6,8 @@ import { AppPage } from 'src/app/app.base';
 
 import { CustomClearanceFormDetailComponent } from '../components/form-detail-clearance/form-detail-clearance.component';
 import { ToastrService } from 'ngx-toastr';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 
 @Component({
@@ -36,7 +38,6 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
 
     getCustomCleanranceById(id: number) {
         this._operationRepo.getDetailCustomsDeclaration(id)
-            .pipe()
             .subscribe(
                 (res: CustomClearance) => {
                     if (!!res) {
@@ -92,9 +93,18 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     }
 
     updateAndConvertClearance(body: CustomClearance) {
-        this._documentation.convertExistedClearanceToJob([body])
+        this._documentation.validateCheckPointContractPartner(body.customerId, '', 'CL', null, 1)
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this._toart.warning(res.message);
+                        return of(false);
+                    }
+                    return this._documentation.convertExistedClearanceToJob([body]);
+                })
+            )
             .subscribe((response) => {
-                if (response.status) {
+                if (!!response && response.status) {
                     this._toart.success(`Convert ${body.clearanceNo} Successfull`);
                     this.getCustomCleanranceById(body.id);
                 }

@@ -28,7 +28,8 @@
 <div class="m-content">
     <div class="row">
         <div class="col-xl-12">
-            <job-management-form-search (onSearch)="onSearchShipment($event)" (onReset)="onResetSearchShipment($event)">
+            <job-management-form-search (onSearch)="onSearchShipment($event)" (onReset)="onResetSearchShipment($event)"
+                [isSearchLinkFee]="isSearchLinkFeea">
             </job-management-form-search>
             <!-- <div class="m-portlet">
                 <div class="alert-block alert-block-red">
@@ -59,7 +60,7 @@
         <div class="col-12">
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
-                    <tab heading="Table View">
+                    <tab heading="List Job" (selectTab)="onSelectTab('JOB')">
                         <div class="bg-white p-4">
                             <div class="table-wrapper table-scrollable" id="ops-job-list-table">
                                 <table class="table table-hover table-brand dataTable">
@@ -126,6 +127,12 @@
                                                 <td>
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.departmentName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.groupName }}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.sumContainers }}</span>
@@ -205,6 +212,9 @@
                             <app-pagination [itemPerPage]="pageSize" [pageNum]="page" [total]="totalItems"
                                 (onChange)="updatePagingData($event)"></app-pagination>
                         </div>
+                    </tab>
+                    <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
+                            <app-job-mangement-link-fee></app-job-mangement-link-fee>
                     </tab>
                 </tabset>
             </div>

@@ -5,15 +5,15 @@ import { CommodityGroup, Customer, PortIndex, User, LinkAirSeaModel } from '@mod
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
-import { InfoPopupComponent } from '@common';
-import { JobConstants, SystemConstants } from '@constants';
+import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { FormValidators } from '@validators';
 import { AppForm } from '@app';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -22,6 +22,8 @@ import { catchError } from 'rxjs/operators';
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
     @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
+    @ViewChild('comboGridCustomerCpn') comboGridCustomerCpn: ComboGridVirtualScrollComponent;
+
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -53,7 +55,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
-    salesmans: Observable<User[]>;
+    salesmans: User[]; // * Load động theo Partner được chọn.
 
     jobLinkAirSeaNo: string = '';
     jobLinkAirSeaInfo: LinkAirSeaModel;
@@ -83,7 +85,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _fb: FormBuilder,
-        private _toaster: ToastrService
+        private _toaster: ToastrService,
     ) {
         super();
     }
@@ -102,7 +104,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.agents = this._store.select(getCatalogueAgentState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        this.salesmans = this._systemRepo.getSystemUsers({ active: true });
+        // this.salesmans = this._systemRepo.getSystemUsers({ active: true });
         this.users = this._systemRepo.getListSystemUser();
 
         this.initForm();
@@ -122,20 +124,38 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 this.agentId.setValue(data.id);
                 break;
             case 'customer':
-                this.customerId.setValue(data.id);
-                this._catalogueRepo.getSalemanIdByPartnerId(data.id, null).subscribe((res: any) => {
-                    if (!!res) {
-                        if (!!res.salemanId) {
-                            this.salemansId.setValue(res.salemanId);
-                        } else {
-                            this.salemansId.setValue(null);
+                this._toaster.clear();
+                this._documentRepo.validateCheckPointContractPartner(data.id, '', 'CL', null, 1)
+                    .pipe(
+                        switchMap(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this.customerId.setValue(data.id);
+                                    return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
+                                }
+                                this.customerId.setValue(null);
+                                this._toaster.warning(res.message);
+                                return of(false);
+                            }
+                        )
+                    )
+                    .subscribe(
+                        (res: any) => {
+                            if (!!res) {
+                                this.salesmans = res || [];
+                                if (!!this.salesmans.length) {
+                                    this.salemansId.setValue(res[0].id);
+                                } else {
+                                    this.infoPopup.body = `${data.shortName} not have any agreement for service in this office <br/> please check again!`;
+                                    this.infoPopup.show();
+                                    this.salemansId.setValue(null);
+                                }
+                            } else {
+                                this.salesmans = [];
+                                this.salemansId.setValue(null);
+                            }
                         }
-                        if (!!res.officeNameAbbr) {
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
-                        }
-                    }
-                });
+                    )
                 break;
             case 'salesman':
                 this.salemansId.setValue(data.id);

@@ -47,6 +47,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     };
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
+    isSearchLinkFeea:boolean = false;
 
     constructor(
         private sortService: SortService,
@@ -76,6 +77,8 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Product Service', field: 'productService', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
+            { title: 'Department', field: 'departmentName', sortable: true },
+            { title: 'Group', field: 'groupName', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
@@ -258,16 +261,56 @@ export class JobManagementComponent extends AppList implements OnInit {
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
     }
 
+    printPLSheet(currency: string) {
+        const currentJob = Object.assign({}, this.selectedShipment);
+        this._documentRepo.previewPL(this.selectedShipment?.id, currency)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+    }
+
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+    onSelectTab(tabName:any){
+        this.isSearchLinkFeea = !this.isSearchLinkFeea;
+    }
+
     chargeFromRep() {
         this._spinner.hide();
         this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
         this.loadingPopupComponent.show();
         this._documentRepo.chargeFromReplicate()
             .pipe(
-                catchError(() => of(
-                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
-                    this.loadingPopupComponent.proccessFail()
-                )),
+                catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -313,45 +356,5 @@ export class JobManagementComponent extends AppList implements OnInit {
                     )
             }
         });
-    }
-
-    printPLSheet(currency: string) {
-        const currentJob = Object.assign({}, this.selectedShipment);
-        this._documentRepo.previewPL(this.selectedShipment?.id, currency)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
-    }
-
-
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
     }
 }

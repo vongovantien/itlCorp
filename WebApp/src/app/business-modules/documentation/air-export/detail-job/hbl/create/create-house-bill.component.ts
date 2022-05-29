@@ -23,10 +23,11 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 
 import _merge from 'lodash/merge';
-import { catchError, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
+import { catchError, takeUntil, map, tap, mergeMap, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { forkJoin, merge } from 'rxjs';
+import { merge, of } from 'rxjs';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -35,13 +36,11 @@ import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/
 export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     @ViewChild(AirExportHBLFormCreateComponent, { static: true }) formCreateHBLComponent: AirExportHBLFormCreateComponent;
-    @ViewChild('confirmSave') confirmPopup: ConfirmPopupComponent;
-    @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild('infoPopupHbl') infoPopupHbl: InfoPopupComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     jobId: string;
     selectedHbl: CsTransactionDetail;
     isImport: boolean = false;
@@ -114,7 +113,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     saveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         if (this.isImport) {
             this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
@@ -124,21 +122,25 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
                         }
                         if (!this.checkValidateForm()) {
-                            this.infoPopup.show();
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: this.invalidFormText
+                            });
                             return null;
                         }
                         return this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null);
                     }
                     )).subscribe(result => {
                         if (!!result && result.length > 0) {
-                            this.infoPopupHbl.class = 'bg-danger';
                             let jobNo = '';
                             result.forEach(element => {
                                 jobNo += element + '<br>';
                             });
-                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
-                            this.infoPopupHbl.show();
-                            //this.confirmExistedHbl.show();
+
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'HAWB No Existed',
+                                body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                                class: 'bg-danger'
+                            });
                         } else {
                             const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);
@@ -148,7 +150,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     );
         } else {
             if (!this.checkValidateForm()) {
-                this.infoPopup.show();
+                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                    body: this.invalidFormText
+                });
                 return;
             }
             this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
@@ -156,14 +160,14 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 .subscribe(
                     (res: any) => {
                         if (!!res && res.length > 0) {
-                            this.infoPopupHbl.class = 'bg-danger';
                             let jobNo = '';
                             res.forEach(element => {
                                 jobNo += element + '<br>';
                             });
-                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
-                            this.infoPopupHbl.show();
-                            //this.confirmExistedHbl.show();
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                                class: 'bg-danger'
+                            });
                         } else {
                             const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);
@@ -185,11 +189,13 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     confirmSaveHBL() {
-        this.confirmPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Create HBL',
+            body: 'You are about to create a new HAWB. Are you sure all entered details are correct?'
+        }, () => { this.saveHBL() });
     }
 
     confirmSaveData() {
-        this.confirmExistedHbl.hide();
         const houseBill: HouseBill = this.getDataForm();
         this.setData(houseBill);
         this.createHbl(houseBill);
@@ -220,16 +226,31 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
         house.deliveryDate = deliveryDate;
-        this._documentationRepo.createHousebill(Object.assign({}, house, deliveryDate))
+
+        this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
             .pipe(
-                tap((result: any) => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.hblid = result.data;
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(Object.assign({}, house, deliveryDate))
+                            .pipe(
+                                tap((result: any) => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                                        this.proofOfDeliveryComponent.hblid = result.data;
+                                        if (this.proofOfDeliveryComponent.fileList.length > 0) {
+                                            this.proofOfDeliveryComponent.uploadFilePOD();
+                                        }
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            ).subscribe(
+                )
+            )
+            .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
@@ -287,6 +308,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 );
         }
+    }
+
+    confirmCancel() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: this.confirmCancelFormText,
+        }, () => { this.gotoList() });
     }
 
     gotoList() {

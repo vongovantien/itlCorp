@@ -1,23 +1,7 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <div class="dropdown m-dropdown m-dropdown--inline">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                    <i class="la la-print"></i>Preview<span class="caret"></span>
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME')">ITL (Frame) H-B/L Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL')">ITL H-B/L Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('FBL_FRAME')">VLA (Frame) H-B/L Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_SEKO')">ITL H-B/L SEKO Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_KESCO')">ITL (Frame) H-B/L KESCO
-                        Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>
-                    <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_SAMKIP')">ITL (Frame) H-B/L SAMKIP
-                        Preview</a>
-                    <a class="dropdown-item pointer" (click)="previewAttachList()">Attach List Preview</a>
-                </div>
-            </div>
+            <app-menu-preview-hbl-sea-export [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-export>
 
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
                 *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
@@ -43,13 +27,4 @@
     </div>
 </div>
 
-<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Create HBL'"></info-popup>
-
-<confirm-popup [body]="'You are about to update HBL, are you sure all entered details are correct ?'"
-    [labelCancel]="'No'" (onSubmit)="onSaveHBL()" [labelConfirm]="'Yes'" title="Update HBL">
-</confirm-popup>
-
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>

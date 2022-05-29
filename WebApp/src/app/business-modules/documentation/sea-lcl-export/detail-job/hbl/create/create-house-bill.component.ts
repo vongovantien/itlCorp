@@ -19,10 +19,12 @@ import {
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
-import { catchError, takeUntil, tap } from 'rxjs/operators';
+import { catchError, takeUntil, tap, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { InjectViewContainerRefDirective } from '@directives';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -31,13 +33,12 @@ import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/
 
 export class SeaLCLExportCreateHBLComponent extends AppForm {
 
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(ShareSeaServiceFormCreateHouseBillSeaExportComponent) formCreateHBLComponent: ShareSeaServiceFormCreateHouseBillSeaExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     jobId: string;
 
@@ -120,16 +121,21 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     showCreatepoup() {
-        this.confirmPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: this.confirmCreateHblText,
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => { this.onSaveHBL() });
     }
 
     onSaveHBL() {
-        this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         this.goodSummaryComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -253,15 +259,27 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-        this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
+
+        this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
             .pipe(
-                tap((result: any) => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
-                        this.proofOfDeliveryComponent.hblid = result.data;
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
+                            .pipe(
+                                tap((result: any) => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                                        this.proofOfDeliveryComponent.hblid = result.data;
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
+                )
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

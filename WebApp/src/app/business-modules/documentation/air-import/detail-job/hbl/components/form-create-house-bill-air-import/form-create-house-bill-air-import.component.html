@@ -3,8 +3,8 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group" 
-                    [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                         <label required>MAWB No</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
@@ -26,7 +26,7 @@
                         <label required>Salesman In Charge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
-                            [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
+                            [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" placeholder="Select Salesman"
                             [height]="200" [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)"
                             size="15">
@@ -78,7 +78,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && !hwbno.valid }">
                                 <label required>HAWB</label>
                                 <input type="text" class="form-control" formControlName="hwbno">
                             </div>
@@ -338,5 +338,4 @@
     </div>
 </div>
 
-<info-popup [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
+<ng-container inject></ng-container>

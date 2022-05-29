@@ -63,7 +63,7 @@
 
   "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: {0}!",
   "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
-  "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Không thể xóa vì house bill này đã được lên SOA hoặc CD Note!",
+  "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Không thể xóa vì house bill này đã được lên SOA hoặc CD Note! hoặc Link Fee",
   "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
   "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} không tìm thấy, vui lòng kiểm tra lại!",
 
@@ -72,5 +72,8 @@
   "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH": "Ngày Service Không được đổi sang tháng khác",
 
   "MSG_CURRENCY_EMPTY": "Currency không được để trống!",
-  "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!"
+  "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!",
+
+  "MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
+  "MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!"
 }

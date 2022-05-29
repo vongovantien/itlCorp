@@ -38,6 +38,7 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool getCopyCharge = false);
 
         ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
+        ResultHandle CheckDuplicateListShipmentsSettlement(List<CheckDuplicateShipmentSettlementCriteria> data);
 
         HandleState AddSettlementPayment(CreateUpdateSettlementModel model);
 
@@ -107,5 +108,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
         ResultHandle CheckAllowDenySettle(List<Guid> ids);
+        void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action);
     }
 }

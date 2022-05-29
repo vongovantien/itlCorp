@@ -5,7 +5,7 @@
                 (click)="showImportPopup()">
             </app-default-button>
             <app-default-button *ngIf="(permissionShipments | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
-                (onClick)="confirmSave.show()">
+                (onClick)="showCreatepoup()">
             </app-default-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
@@ -34,11 +34,4 @@
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="3">
 </import-house-bill-detail>
 
-<confirm-popup #confirmSave body="You are about to create a new HAWB. Are you sure all entered details are correct?"
-    (onSubmit)="saveHBL()"></confirm-popup>
-
-<info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update HB'"></info-popup>
-
-<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
-    (onSubmit)="confirmSaveData()" title="HAWB Existed"></confirm-popup>
+<ng-template inject></ng-template>

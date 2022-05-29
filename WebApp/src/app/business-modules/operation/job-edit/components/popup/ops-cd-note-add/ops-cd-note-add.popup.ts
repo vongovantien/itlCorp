@@ -10,6 +10,7 @@ import { AcctCDNote } from "src/app/shared/models/document/acctCDNote.model";
 import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum";
 import { OpsCdNoteAddRemainingChargePopupComponent } from "../ops-cd-note-add-remaining-charge/ops-cd-note-add-remaining-charge.popup";
 import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
+import { InjectViewContainerRefDirective } from "@directives";
 @Component({
     selector: 'ops-cd-note-add-popup',
     templateUrl: './ops-cd-note-add.popup.html'
@@ -17,11 +18,10 @@ import { AbstractControl, FormGroup, FormBuilder } from "@angular/forms";
 export class OpsCdNoteAddPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild('changePartnerPopup') changePartnerPopup: ConfirmPopupComponent;
-    @ViewChild('notExistsChargePopup') notExistsChargePopup: InfoPopupComponent;
     @ViewChild(OpsCdNoteAddRemainingChargePopupComponent) addRemainChargePopup: OpsCdNoteAddRemainingChargePopupComponent;
-    @ViewChild('confirmCloseAddPopup') confirmCloseAddPopup: ConfirmPopupComponent;
-    @ViewChild('validateCDNotePopup') validateCDNotePopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
+
     formCreate: FormGroup;
     headers: CommonInterface.IHeaderTable[];
 
@@ -62,7 +62,6 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     balanceAmount: string = '';
 
     isChangeCharge: boolean = false;
-    messageValidate: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -91,7 +90,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         ];
         this.formCreate = this._fb.group({
             note: [],
-            excRateUsdToLocal:0,
+            excRateUsdToLocal: 0,
         });
         this.note = this.formCreate.controls["note"];
         this.excRateUsdToLocal = this.formCreate.controls["excRateUsdToLocal"];
@@ -176,16 +175,11 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         // Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
-        this.changePartnerPopup.hide();
     }
 
     onCancelChangePartnerPopup() {
         // Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
-    }
-
-    onSubmitNotExistsChargePopup() {
-        this.notExistsChargePopup.hide();
     }
 
     checkUncheckAllCharge() {
@@ -242,18 +236,23 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     }
 
     validateChargeOfCdNote(listChargePartner: ChargeCdNote[]) {
-        this.messageValidate = this.selectedNoteType + " Note existed Charge not match type, Please check again!";
         for (const charges of listChargePartner) {
             if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE") {
                 const existsCredit = charges.listCharges.filter(group => group.credit !== null);
                 if (existsCredit.length > 0) {
-                    this.validateCDNotePopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: `${this.selectedNoteType} Note existed Charge not match type, Please check again!`,
+                        title: 'Alert'
+                    });
                     return true;
                 }
             } else {
                 const existsDebit = charges.listCharges.filter(group => group.debit !== null);
                 if (existsDebit.length > 0) {
-                    this.validateCDNotePopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: `${this.selectedNoteType} Note existed Charge not match type, Please check again!`,
+                        title: 'Alert'
+                    });
                     return true;
                 }
             }
@@ -265,13 +264,13 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
 
-        if (this.action !== "create"){
+        if (this.action !== "create") {
             if (this.excRateUsdToLocal.value) {
-                if (Number(this.excRateUsdToLocal.value) <=0) {
+                if (Number(this.excRateUsdToLocal.value) <= 0) {
                     this._toastService.warning(`Required to enter Excel USD greater than 0`);
                     return;
                 }
-            }else {
+            } else {
                 this._toastService.warning(`Required to enter Excel USD`);
                 return;
             }
@@ -283,7 +282,10 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
 
         // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
-            this.notExistsChargePopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Look like you have not selected any charges for the C/ D Note.Please recheck and try again!',
+                title: 'Alert'
+            });
         } else {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
@@ -300,7 +302,10 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                 }
             }
             if (arrayCharges.length === 0) {
-                this.notExistsChargePopup.show();
+                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                    body: 'Look like you have not selected any charges for the C/ D Note.Please recheck and try again!',
+                    title: 'Alert'
+                });
                 return;
             }
             this.CDNote.listShipmentSurcharge = arrayCharges;
@@ -332,9 +337,9 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
-                                    let checkSoa = this.listCharges.find(x=>x.soano !== "" && x.soano !== null);
-                                    if(!checkSoa){checkSoa = this.listCharges.find(x=>x.paySoano !== "" && x.paySoano !== null);}
-                                    if(checkSoa){
+                                    let checkSoa = this.listCharges.find(x => x.soano !== "" && x.soano !== null);
+                                    if (!checkSoa) { checkSoa = this.listCharges.find(x => x.paySoano !== "" && x.paySoano !== null); }
+                                    if (checkSoa) {
                                         this._toastService.warning("Vui lòng cập nhật SOA");
                                     }
                                     this.onUpdate.emit();
@@ -461,16 +466,14 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         if (this.isChangeCharge === false) {
             this.closePopup();
         } else {
-            this.confirmCloseAddPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Do you want to exit without saving?',
+                title: 'Alert',
+                labelCancel: 'No'
+
+            }, () => {
+                this.closePopup();
+            });
         }
-    }
-
-    onSubmitConfirmCloseAdd() {
-        this.confirmCloseAddPopup.hide();
-        this.closePopup();
-    }
-
-    onCancelConfirmCloseAdd() {
-        this.confirmCloseAddPopup.hide();
     }
 }

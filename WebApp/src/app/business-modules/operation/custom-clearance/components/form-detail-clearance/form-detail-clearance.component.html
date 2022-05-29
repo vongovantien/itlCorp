@@ -27,7 +27,7 @@
                                 [currentActiveItemId]="{ field: 'accountNo', value: partnerTaxCode.value, hardValue: customerName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                                 [displayFields]="displayFieldsCustomer" placeholder="Please select"
-                                (remove)="resetFormControl(partnerTaxCode)">
+                                (remove)="resetFormControl(partnerTaxCode)" [clearable]="false">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted && !partnerTaxCode.value">
                                 Customer is required!
@@ -115,7 +115,7 @@
                                 [currentActiveItemId]="{ field: 'code', value: gateway.value}"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Clearance Location"
-                                (remove)="resetFormControl(gateway)">
+                                (remove)="resetFormControl(gateway)" [clearable]="false">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted && !gateway.value">
                                 Clearance location is required

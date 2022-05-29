@@ -51,7 +51,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICacheServiceBase<CatPartner> cache;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
-
+        string salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
             IMapper mapper,
@@ -108,6 +108,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsManifest>("Id", "Supplier");
             SetChildren<CsShipmentSurcharge>("Id", "PayerID");
             SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
+
+            salemanBOD = sysUserRepository.First(x => x.Username == "ITL.BOD").Id;
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -2226,7 +2228,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        public IQueryable<CatPartnerViewModel2> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
         {
             IQueryable<CatPartner> data;
             List<string> grpCodes = new List<string>();
@@ -2253,21 +2255,35 @@ namespace eFMS.API.Catalogue.DL.Services
 
 
                 data = DataContext.Get(query);
-                if(!string.IsNullOrEmpty(criteria.Service) && !string.IsNullOrEmpty(criteria.Office))
+                Expression<Func<CatContract, bool>> queryContract = x => x.Active == true && (x.IsExpired == null || x.IsExpired == false);
+                if(!string.IsNullOrEmpty(criteria.Service))
                 {
-                    var contract = contractRepository.Get(x => x.Active == true && IsMatchService(x.SaleService, criteria.Service) && IsMatchOffice(x.OfficeId, criteria.Office));
-                    data = from p in data
-                                    join c in contract on p.Id equals c.PartnerId
-                                    select p;
+                    queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
                 }
-               
+
+                if (!string.IsNullOrEmpty(criteria.Office))
+                {
+                    queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office));
+                }
+
+                if(criteria.SalemanId != null)
+                {
+                    queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
+                }
+
+                IQueryable<CatContract> contracts = contractRepository.Get(queryContract);
+                data = from p in data
+                       join c in contracts on p.Id equals c.PartnerId into pGrps
+                       from pgrp in pGrps.DefaultIfEmpty()
+                       select p;
+
             }
             else
             {
                 data = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
             }
             if (data == null) return null;
-            var results = data.Select(x => new CatPartnerViewModel
+            var results = data.Select(x => new CatPartnerViewModel2
             {
                 Id = x.Id,
                 PartnerGroup = x.PartnerGroup,
@@ -2462,5 +2478,99 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType)
+        {
+            List<SysUserViewModel> salemans = new List<SysUserViewModel>();
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+            && x.SaleService.Contains(transactionType) 
+            && x.Active == true);
+            if(contracts.Count() > 0)
+            {
+                var salemansIds = contracts.Select(x => x.SaleManId).ToList();
+                var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
+                var employees = sysEmployeeRepository.Get();
+
+
+                var userQ = from u in users
+                            join em in employees on u.EmployeeId equals em.Id into emGrps
+                            from emGrp in emGrps.DefaultIfEmpty()
+                            select new SysUserViewModel
+                            {
+                                Id = u.Id,
+                                Active = u.Active,
+                                EmployeeNameEn = emGrp.EmployeeNameEn,
+                                EmployeeNameVn = emGrp.EmployeeNameVn,
+                                StaffCode = emGrp.StaffCode,
+                                Status = u.WorkingStatus,
+                                Title = emGrp.Title,
+                                Username = u.Username,
+                                UserType = u.UserType
+                            };
+                if(userQ.Count() > 0)
+                {
+                    salemans = userQ.ToList();
+                }
+            }
+
+            return salemans;
+        }
+
+        public IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria)
+        {
+            
+            IQueryable<CatPartner> dataAgents = Enumerable.Empty<CatPartner>().AsQueryable();
+            IQueryable<CatPartner> dataCustomers = Enumerable.Empty<CatPartner>().AsQueryable();
+
+            Expression<Func<CatPartner, bool>> queryAgent = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_AGENT;
+            Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER;
+
+
+            dataAgents = DataContext.Get(queryAgent);
+            dataCustomers = DataContext.Get(queryCustomer);
+            Expression<Func<CatContract, bool>> queryContract = x => x.Active == true
+                                                            && (x.IsExpired == null || x.IsExpired == false)
+                                                            && IsMatchService(x.SaleService, criteria.Service)
+                                                            && IsMatchOffice(x.OfficeId, criteria.Office);
+           
+            IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
+
+            var d = from p in dataAgents
+                    join c in contractAgents on p.Id equals c.PartnerId
+                    select new CatPartnerForKeyinCharge
+                    {
+                        Id = p.Id,
+                        PartnerGroup = p.PartnerGroup,
+                        PartnerNameVn = p.PartnerNameVn,
+                        PartnerNameEn = p.PartnerNameEn,
+                        ShortName = p.ShortName,
+                        TaxCode = p.TaxCode,
+                        AccountNo = p.AccountNo,
+                        PartnerType = p.PartnerType,
+                    };
+
+            if (criteria.SalemanId != null)
+            {
+                queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
+            }
+            IQueryable<CatContract> contractCustomers = contractRepository.Get(queryContract);
+
+            var d2 = from p in dataCustomers
+                    join c in contractCustomers on p.Id equals c.PartnerId
+                    select new CatPartnerForKeyinCharge
+                    {
+                        Id = p.Id,
+                        PartnerGroup = p.PartnerGroup,
+                        PartnerNameVn = p.PartnerNameVn,
+                        PartnerNameEn = p.PartnerNameEn,
+                        ShortName = p.ShortName,
+                        TaxCode = p.TaxCode,
+                        AccountNo = p.AccountNo,
+                        PartnerType = p.PartnerType,
+                    };
+
+            var results = d.Union(d2);
+            return results;
+        }
     }
 }

@@ -1165,7 +1165,16 @@ export class DocumentationRepo {
     }
 
     updateShipmentSurchargesLinkFee(data: any[]) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UpdateChargeLinkFee`, data).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/UpdateChargeLinkFee`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    revertShipmentSurchargesLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/RevertChargeLinkFee`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1184,7 +1193,27 @@ export class DocumentationRepo {
 
     }
 
-    getAllShipment(jobNo: string){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo:jobNo });
+    getAllShipment(jobNo: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo: jobNo });
+    }
+
+    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5) {
+        /* 
+            1 - SHIPMENT
+            2 - SOA
+            3 - DEBIT
+            4 - CREDIT
+            5 - SURCHARGE
+            6 - HBL
+            7 - Preview HBL
+        */
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
+            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type });
+    }
+
+    detailLinkFee(id: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/DetailByChargeOrgId?id=${id}`).pipe(
+            map((data: any) => data)
+        );
     }
 }

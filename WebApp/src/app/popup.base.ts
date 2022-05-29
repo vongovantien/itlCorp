@@ -1,7 +1,8 @@
 import { ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { AppPage } from "src/app/app.base";
-import { ViewChild, QueryList, ViewChildren, Directive } from "@angular/core";
+import { ViewChild, Directive } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
+import { delayTime } from "@decorators";
 
 @Directive()
 export abstract class PopupBase extends AppPage {
@@ -57,6 +58,11 @@ export abstract class PopupBase extends AppPage {
             this.popup.config = this.options;
             this.popup.show();
         }
+    }
+
+    @delayTime(100)
+    ShowWithDelay() {
+        this.show();
     }
 
     hide() {

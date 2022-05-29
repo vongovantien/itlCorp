@@ -30,7 +30,7 @@
     <ng-container *ngIf="(opsTransaction?.isLocked === false) || isDuplicate">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()"
-            *ngIf="opsTransaction.permission.allowDelete && !isDuplicate && !opsTransaction.replicatedId"
+            *ngIf="opsTransaction.permission.allowDelete && !isDuplicate && !opsTransaction.replicatedId  && !opsTransaction.isLinkFee"
             title="Shipment was deleted">
             <span>
                 <i class="la la-trash"></i>
@@ -96,11 +96,14 @@
                                             </buying-charge>
                                         </ng-container>
                                     </tab>
-                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')">
+                                    <tab heading="Selling" (selectTab)="getSurCharges('SELL')"
+                                        [active]="selectedTabSurcharge === 'SELL'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
                                                 [showGetCharge]="true" [showSyncStandard]="false"
+                                                [allowLinkFee]="allowLinkFeeSell"
+                                                [isDuplicateJob]="isDuplicate"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>

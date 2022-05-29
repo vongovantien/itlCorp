@@ -7,7 +7,8 @@ import { DocumentationRepo, OperationRepo } from '@repositories';
 
 import { CustomClearanceFormDetailComponent } from '../components/form-detail-clearance/form-detail-clearance.component';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import { CustomDeclaration } from '@models';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -54,7 +55,6 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     convertClearance(isReplicate: boolean) {
-        console.log(isReplicate);
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
 
@@ -74,10 +74,19 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     saveAndConvertClearance(body: CustomClearance) {
-        this._documentation.convertClearanceToJob(body)
+        this._documentation.validateCheckPointContractPartner(body.customerId, '', 'CL', null, 1)
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this._toastr.warning(res.message);
+                        return of(false);
+                    }
+                    return this._documentation.convertClearanceToJob(body);
+                })
+            )
             .subscribe(
                 (response: any) => {
-                    if (response.status) {
+                    if (!!response && response.status) {
                         this._toastr.success(`Convert ${body.clearanceNo} Successfull`);
                         this._location.back();
                     }

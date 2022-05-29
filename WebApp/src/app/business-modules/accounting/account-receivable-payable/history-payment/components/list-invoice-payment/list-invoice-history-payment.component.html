@@ -103,7 +103,7 @@
                                                 </ng-container>
                                             </td>
                                             <td><a href="javascript:void(0)"
-                                                    (click)="showExtendDateModel(item.refNo)">{{ item.dueDate | date:
+                                                    (click)="showExtendDateModel(item.refNo, item.type, item.invoiceNoReal)">{{ item.dueDate | date:
                                                     'dd/MM/yyyy'}}</a>
                                             </td>
                                             <td class="text-right">{{ item.overdueDays }}</td>

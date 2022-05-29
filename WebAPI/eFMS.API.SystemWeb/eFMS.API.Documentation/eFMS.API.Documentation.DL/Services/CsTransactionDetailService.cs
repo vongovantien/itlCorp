@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
         private readonly IContextBase<AcctCdnote> acctCdnoteRepository;
+        private readonly IContextBase<SysGroup> sysGroupRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -89,6 +90,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatDepartment> catDepartRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<AcctCdnote> acctCdnoteRepo,
+            IContextBase<SysGroup> sysGroupRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             webUrl = wUrl;
@@ -120,6 +122,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
             acctCdnoteRepository = acctCdnoteRepo;
+            sysGroupRepository = sysGroupRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -543,6 +546,9 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
+                    detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;
+                    detail.Group = sysGroupRepository.Get(x => x.Id == detail.GroupId)?.FirstOrDefault()?.ShortName;
+
                     return detail;
                 }
             }
@@ -791,6 +797,10 @@ namespace eFMS.API.Documentation.DL.Services
                       from pod in portPODDetail.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pol equals port.Id into portPOLDetail
                       from pol in portPOLDetail.DefaultIfEmpty()
+                      join gr in sysGroupRepository.Get() on detail.GroupId equals gr.Id into sysGroupDetails
+                      from gr in sysGroupDetails.DefaultIfEmpty()
+                      join dept in catDepartmentRepository.Get() on detail.DepartmentId equals dept.Id into sysDepartmentDetails
+                      from dept in sysDepartmentDetails.DefaultIfEmpty()
                       select new CsTransactionDetailModel
                       {
                           Id = detail.Id,
@@ -866,7 +876,9 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceBy2 = detail.TransitPlaceBy2,
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
                           Total = detail.Total, 
-                          Notify = detail.Notify
+                          Notify = detail.Notify,
+                          Group=gr.ShortName,
+                          Department=dept.DeptNameAbbr
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
@@ -1004,7 +1016,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var houseBillData = query.Select(s => s.detail).GroupBy(g => g.Id).Select(s => s.FirstOrDefault());
             var res = from detail in houseBillData//DataContext.Get()
-                                                  //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                      //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -1017,6 +1029,10 @@ namespace eFMS.API.Documentation.DL.Services
                       from notify in notifys.DefaultIfEmpty()
                       join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
                       from pod in portDetail.DefaultIfEmpty()
+                      join dept in catDepartmentRepository.Get() on detail.DepartmentId equals dept.Id into deptDetail
+                      from dept in deptDetail.DefaultIfEmpty()
+                      join gr in sysGroupRepository.Get() on detail.GroupId equals gr.Id into sysGroupDetails
+                      from gr in sysGroupDetails.DefaultIfEmpty()
                           //where detail.JobId == criteria.JobId
                       select new CsTransactionDetailModel
                       {
@@ -1079,6 +1095,8 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
+                          Department=dept.DeptNameAbbr,
+                          Group=gr.ShortName
                       };
             //Order tăng dần theo số House
             var results = res.ToArray().OrderBy(o => o.Hwbno).ToList();
@@ -1259,7 +1277,8 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(item.CreditNo)
                             || !string.IsNullOrEmpty(item.DebitNo)
                             || !string.IsNullOrEmpty(item.SettlementCode)
-                            || !string.IsNullOrEmpty(item.VoucherId))
+                            || !string.IsNullOrEmpty(item.VoucherId)
+                            || item.LinkFee == true)
                         {
                             isSpecialCase = true;
                             break;
