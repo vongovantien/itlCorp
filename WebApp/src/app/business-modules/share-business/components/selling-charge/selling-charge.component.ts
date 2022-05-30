@@ -155,6 +155,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
             { title: 'Net Amount', field: 'netAmount', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+            { title: 'Paid Date', field: 'paidDate', sortable: true },
         ];
     }
 

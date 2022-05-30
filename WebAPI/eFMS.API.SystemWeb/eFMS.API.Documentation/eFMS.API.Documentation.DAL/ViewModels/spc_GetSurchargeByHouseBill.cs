@@ -84,5 +84,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string VatPartnerShortName { get; set; }
         public bool? LinkFee { get; set; }
         public string LinkChargeId { get; set; }
+        public string PaymentStatus { get; set; }
+        public DateTime? PaidDate { get; set; }
     }
 }
