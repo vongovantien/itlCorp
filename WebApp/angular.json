@@ -256,6 +256,18 @@
               "serviceWorker": true,
               "ngswConfigPath": "ngsw-config.json"
             },
+            "uat-stl-debug": {
+              "sourceMap": true,
+              "extractCss": true,
+              "namedChunks": true,
+              "outputHashing": "none",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stl-uat.ts"
+                }
+              ]
+            },
             "uat-en-stl": {
               "optimization": true,
               "outputHashing": "all",
@@ -499,6 +511,9 @@
             },
             "uat": {
               "browserTarget": "eFMS-Web:build:uat-debug"
+            },
+            "uat-stl": {
+              "browserTarget": "eFMS-Web:build:uat-stl-debug"
             },
             "prod": {
               "browserTarget": "eFMS-Web:build:prod-debug"
