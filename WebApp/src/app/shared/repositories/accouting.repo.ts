@@ -638,7 +638,7 @@ export class AccountingRepo {
 
     // Tính công nợ theo {surchargeId, partnerId, office, service}
     calculatorReceivable(body: any) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body, null, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -1042,7 +1042,7 @@ export class AccountingRepo {
         );
     }
 
- 
+
 
     payablePaging(page: number, size: number, body: any) {
         console.log('payablePaging', body)

@@ -465,6 +465,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._store.dispatch(new fromStore.DeleteSellingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.OBH:
+                this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteOBHSurchargeAction(index));
                 break;
             default:
@@ -741,7 +742,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge, ) {
+    mapValueWhenSelectPartnerSuccess(partnerData: Partner, chargeItem: CsShipmentSurcharge,) {
         chargeItem.partnerShortName = partnerData.shortName;
         chargeItem.partnerName = partnerData.partnerNameEn;
         chargeItem.paymentObjectId = partnerData.id;
