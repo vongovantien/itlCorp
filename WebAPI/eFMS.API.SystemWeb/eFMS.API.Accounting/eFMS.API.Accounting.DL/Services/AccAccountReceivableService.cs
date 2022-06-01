@@ -2976,8 +2976,53 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 receivables = CalculatorReceivableDataDebitAmount(models);
-                var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
 
+                var partnerGrpsAr = receivables.GroupBy(x => new { x.PartnerId }).Select(x => new { x.Key.PartnerId, receivables = x }).ToList();
+                var receivableDrafts = new List<AccAccountReceivable>();
+                foreach (var arGrp in partnerGrpsAr)
+                {
+                    foreach (var ar in arGrp.receivables)
+                    {
+                        var currentArData = DataContext.Get(x => x.PartnerId == ar.PartnerId
+                        && ar.Service == x.Service
+                        && ar.Office == x.Office
+                        ).ToList();
+
+                        if(currentArData.Count > 0)
+                        {
+                            var currentDataExisted = currentArData.FirstOrDefault(x => x.SaleMan == ar.SaleMan && x.ContractId == ar.ContractId);
+                            if(currentDataExisted != null)
+                            {
+                                ar.BillingAmount = currentDataExisted.BillingAmount;
+                                ar.BillingUnpaid = currentDataExisted.BillingUnpaid;
+                                ar.PaidAmount = currentDataExisted.PaidAmount;
+                                ar.ObhBilling = currentDataExisted.ObhBilling;
+                                ar.Over1To15Day = currentDataExisted.Over1To15Day;
+                                ar.Over16To30Day = currentDataExisted.Over16To30Day;
+                                ar.Over30Day = currentDataExisted.Over30Day;
+                            }
+
+                            var currentDataNotExisted = currentArData.FirstOrDefault(x => x.SaleMan != ar.SaleMan && x.ContractId != ar.ContractId);
+                            if(currentDataNotExisted != null) receivableDrafts.Add(currentDataNotExisted);
+                        }
+                    }
+                }
+
+                if(receivableDrafts.Count > 0)
+                {
+                    var d = mapper.Map<List<AccAccountReceivableModel>>(receivableDrafts);
+                    foreach (var fe in d)
+                    {
+                        fe.SellingNoVat = 0;
+                        fe.ObhAmount = fe.ObhUnpaid ?? 0;
+                        fe.DebitAmount = fe.SellingNoVat + (fe.BillingUnpaid ?? 0) + fe.ObhAmount;
+                        fe.DatetimeCreated = DateTime.Now;
+                        fe.DatetimeModified = DateTime.Now;
+                    }
+                    receivables.AddRange(d);
+                }
+
+                var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
                 var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
                 if (!hsInsertOrUpdate.Status)
                 {
@@ -3102,7 +3147,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
 
                 // receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
-                // receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
+                receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
 
                 receivables = CalculatorObhAmount(receivables, surcharges, out List<AccAccountReceivableModel> newRecordForOBHs); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 newReceivableRecord.AddRange(newRecordForOBHs);
