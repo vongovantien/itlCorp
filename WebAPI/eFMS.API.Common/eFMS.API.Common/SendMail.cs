@@ -13,7 +13,7 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
-        public const string _emailFrom = "noreply-efms@itlvn.com"; //"info.fms@itlvn.com";
+        public static string _emailFrom = "noreply-efms@itlvn.com"; //"info.fms@itlvn.com";
         private const string _smtpHost = "email-smtp.ap-southeast-2.amazonaws.com"; //"webmail.itlvn.com";
         private const string _smptUser = "AKIA2AI6JMUOVFIQJQXN"; //"info.fms";
         private const string _smtpPassword = "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP"; //"ITPr0No1!";
