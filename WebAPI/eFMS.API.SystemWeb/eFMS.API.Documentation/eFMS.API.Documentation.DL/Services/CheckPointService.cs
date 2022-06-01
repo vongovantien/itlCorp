@@ -68,16 +68,16 @@ namespace eFMS.API.Documentation.DL.Services
             string salemanCurrent = null;
             if (transactionType == "CL")
             {
-                salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+                if (hbl?.SalemanId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
                 }
             }
             else
             {
-                salemanCurrent = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault();
+                if (hbl?.SaleManId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
                 }
