@@ -69,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (transactionType == "CL")
             {
                 var hbl = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SalemanId;
                 if (hbl?.SalemanId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
@@ -77,6 +78,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var hbl = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SaleManId;
+
                 if (hbl?.SaleManId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
