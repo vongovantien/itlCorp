@@ -1446,8 +1446,8 @@ namespace eFMS.API.Accounting.DL.Services
                 var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)
                                                                   && (x.Office != null && x.Office != Guid.Empty)
                                                                   && !string.IsNullOrEmpty(x.Service))
-                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service, g.SalesmanId })
-                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service, SalesmanId = s.Key.SalesmanId }).ToList();
+                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service })
+                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service, }).ToList();
                 if (objReceivalble.Count > 0)
                 {
                     hs = InsertOrUpdateReceivable(objReceivalble);
@@ -2968,8 +2968,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         public async Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models)
-        {
-            //Insert Or Update Receivable Multiple
+        {            
             var receivables = new List<AccAccountReceivableModel>();
             HandleState hs = new HandleState();
 
@@ -3146,7 +3145,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var surcharges = surchargeRepo.Get(x => models.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
                 var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
 
-                // receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
                 receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
 
                 receivables = CalculatorObhAmount(receivables, surcharges, out List<AccAccountReceivableModel> newRecordForOBHs); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
@@ -3164,6 +3162,88 @@ namespace eFMS.API.Accounting.DL.Services
             });
 
             return receivables;
+        }
+
+        private List<AccAccountReceivableModel> CalculatorReceivableBillingData(List<ObjectReceivableModel> models)
+        {
+            var receivables = GenerateListReceivableModelFromContract(models);
+
+            List<AccAccountReceivableModel> newReceivableRecord = new List<AccAccountReceivableModel>();
+            if (receivables.Count > 0)
+            {
+                var surcharges = surchargeRepo.Get(x => models.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
+                var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+
+                receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmount
+                receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
+                receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
+                receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
+                receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
+
+
+            }
+
+            return receivables;
+        }
+
+        public async Task<HandleState> CalculatorReceivableBillingAsync(List<ObjectReceivableModel> models)
+        {
+            //Insert Or Update Receivable Multiple
+            var receivables = new List<AccAccountReceivableModel>();
+            HandleState hs = new HandleState();
+
+            try
+            {
+                receivables = CalculatorReceivableBillingData(models);
+                var partnerGrpsAr = receivables.GroupBy(x => new { x.PartnerId }).Select(x => new { x.Key.PartnerId, receivables = x }).ToList();
+
+                foreach (var arGrp in partnerGrpsAr)
+                {
+                    foreach (var ar in arGrp.receivables)
+                    {
+                        var currentArData = DataContext.Get(x => x.PartnerId == ar.PartnerId
+                        && ar.Service == x.Service
+                        && ar.Office == x.Office
+                        ).ToList();
+
+                        if (currentArData.Count > 0)
+                        {
+                            var currentDataExisted = currentArData.FirstOrDefault(x => x.SaleMan == ar.SaleMan && x.ContractId == ar.ContractId);
+                            if (currentDataExisted != null)
+                            {
+                                ar.SellingNoVat = currentDataExisted.SellingNoVat;
+                                ar.ObhAmount = currentDataExisted.ObhUnpaid + ar.ObhUnpaid;
+                                ar.Over1To15Day = currentDataExisted.Over1To15Day;
+                                ar.Over16To30Day = currentDataExisted.Over16To30Day;
+                                ar.Over30Day = currentDataExisted.Over30Day;
+
+                                ar.DebitAmount = (currentDataExisted.SellingNoVat ?? 0) + (ar.BillingUnpaid ?? 0) + (ar.ObhAmount ?? 0);
+                            }
+                        }
+                    }
+                }
+
+
+                var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
+                var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
+                if (!hsInsertOrUpdate.Status)
+                {
+                    hs = new HandleState((object)hsInsertOrUpdate.Message);
+                }
+                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+
+                var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+
+                await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
+
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables);
+                return new HandleState((object)ex.Message);
+            }
         }
     }
 }

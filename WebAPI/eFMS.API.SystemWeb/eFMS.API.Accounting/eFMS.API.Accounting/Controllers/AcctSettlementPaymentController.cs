@@ -199,8 +199,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -438,8 +440,10 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -498,8 +502,10 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -707,7 +713,10 @@ namespace eFMS.API.Accounting.Controllers
             Response.OnCompleted(async () =>
             {
                 List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(approve.SettlementNo);
-                await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                if (modelReceivableList.Count > 0)
+                {
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                }
 
             });
             return Ok(_result);

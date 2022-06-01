@@ -5424,6 +5424,10 @@ namespace eFMS.API.Accounting.DL.Services
         public List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode)
         {
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Where(x => x.Type != AccountingConstants.TYPE_CHARGE_BUY);
+            if(surcharges.Count() > 0)
+            {
+                return new List<ObjectReceivableModel>();
+            }
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             return objectReceivablesModel;
         }

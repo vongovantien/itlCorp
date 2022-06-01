@@ -246,5 +246,19 @@ namespace eFMS.API.Accounting.Controllers
             }
             return BadRequest(message);
         }
+
+        [HttpPut("CalculateBilling")]
+        public async Task<IActionResult> CalculateBilling(List<ObjectReceivableModel> models)
+        {
+            var hs = await accountReceivableService.CalculatorReceivableBillingAsync(models);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
     }
 }
