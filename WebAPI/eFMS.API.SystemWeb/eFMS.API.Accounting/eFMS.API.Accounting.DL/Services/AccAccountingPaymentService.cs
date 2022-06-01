@@ -1956,7 +1956,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
                                 salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
 
-                                salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
+                                salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId && x.Active == true
                                                                                            && x.OfficeId.Contains(invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                             }
                             if (!string.IsNullOrEmpty(salemanId))
@@ -2287,7 +2287,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
                             salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
 
-                            salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
+                            salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
                                                                                          && x.OfficeId.Contains(item.invoice.Where(z => z.OfficeId != null).FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                         }
                         if (!string.IsNullOrEmpty(salemanId))
