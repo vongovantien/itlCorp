@@ -143,7 +143,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     Validators.pattern(SystemConstants.CPATTERN.EMAIL_MULTIPLE)
                 ])
             ],
-            cc: ['',
+            cc: this.serviceId.indexOf('I') !== -1 ? null : ['',
                 Validators.compose([
                     Validators.required
                 ])
