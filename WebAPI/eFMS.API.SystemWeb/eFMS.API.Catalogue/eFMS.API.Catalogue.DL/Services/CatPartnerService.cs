@@ -1281,7 +1281,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          from agreement in agreements.DefaultIfEmpty()
                          join office in offices on partner.OfficeId equals office.Id into officeGr
                          from office in officeGr.DefaultIfEmpty()
-                         select new { user, partner, x, agreement, office }
+                         select new { user, partner, x, agreement, office.ShortName }
                         );
             // Allow search partner when don't have contract
             //if (!string.IsNullOrEmpty(criteria.PartnerType))
@@ -1385,7 +1385,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 BankAccountName = x.partner.BankAccountName,
                 BankName = x.partner.BankName,
                 Note = x.partner.Note,
-                OfficeName=x.office.ShortName
+                OfficeName=x.ShortName
             });
             return results;
         }
