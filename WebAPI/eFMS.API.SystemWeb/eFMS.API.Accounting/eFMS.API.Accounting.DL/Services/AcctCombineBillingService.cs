@@ -479,11 +479,14 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctCombineBillingResult> GetData(AcctCombineBillingCriteria criteria)
         {
             var query = ExpressionQuery(criteria);
-            var partners = partnerRepo.Get();
-            var users = userRepo.Get();
-            var employee = employeeRepo.Get();
             var dataCombineBilling = GetCombinePermission().Where(query);
-            var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+            var userId = dataCombineBilling.Select(x => x.UserCreated);
+            var users = userRepo.Get(x => userId.Any(z => z == x.Id));
+            var partnerId= dataCombineBilling.Select(x => x.PartnerId);
+            var partners = partnerRepo.Get(x => partnerId.Any(z => z == x.Id));
+            var combineNos = dataCombineBilling.Select(x => x.CombineBillingNo);
+            var surcharges = surchargeRepo.Get(x => combineNos.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
+
             var result = from data in dataCombineBilling
                          join part in partners on data.PartnerId equals part.Id
                          join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
@@ -491,7 +494,7 @@ namespace eFMS.API.Accounting.DL.Services
                          join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.CombineBillingNo into grpCombineObh
                          from surcharge2 in grpCombineObh.DefaultIfEmpty()
                          join us in users on data.UserCreated equals us.Id
-                         join emp in employee on us.EmployeeId equals emp.Id
+                         join emp in employeeRepo.Get() on us.EmployeeId equals emp.Id
                          select new AcctCombineBillingResult
                          {
                              Id = data.Id,
@@ -515,26 +518,22 @@ namespace eFMS.API.Accounting.DL.Services
                                                             criteria.ReferenceNo.Any(z => z.Trim() == x.Soano) || criteria.ReferenceNo.Any(z => z.Trim() == x.PaySoano) ||
                                                             criteria.ReferenceNo.Any(z => z.Trim() == x.CreditNo) || criteria.ReferenceNo.Any(z => z.Trim() == x.DebitNo));
             }
-            var dataResult = new List<AcctCombineBillingResult>();
+            IQueryable<AcctCombineBillingResult> dataResult = null;
             if (result != null && result.Count() > 0)
             {
-                var dataGrp = result.Where(x => x.Id != null).GroupBy(x => new { x.Id, x.CombineBillingNo });
-                foreach (var item in dataGrp)
+                dataResult = result.Where(x => x.Id != null).GroupBy(x => new { x.Id, x.CombineBillingNo }).Select(x => new AcctCombineBillingResult
                 {
-                    var billing = new AcctCombineBillingResult();
-                    var firstData = item.FirstOrDefault();
-                    billing.Id = item.Key.Id;
-                    billing.CombineBillingNo = item.Key.CombineBillingNo;
-                    billing.TotalAmountVnd = firstData?.TotalAmountVnd ?? 0;
-                    billing.TotalAmountUsd = firstData?.TotalAmountUsd ?? 0;
-                    billing.PartnerName = firstData?.PartnerName;
-                    billing.UserCreatedName = firstData?.UserCreatedName;
-                    billing.DatetimeCreated = firstData?.DatetimeCreated;
-                    billing.UserCreated = firstData?.UserCreated;
-                    dataResult.Add(billing);
-                }
+                    Id = x.Key.Id,
+                    CombineBillingNo = x.Key.CombineBillingNo,
+                    TotalAmountVnd = x.FirstOrDefault() == null ? 0 : (x.FirstOrDefault().TotalAmountVnd ?? 0),
+                    TotalAmountUsd = x.FirstOrDefault() == null ? 0 : (x.FirstOrDefault().TotalAmountUsd ?? 0),
+                    PartnerName = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().PartnerName,
+                    UserCreatedName = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().UserCreatedName,
+                    DatetimeCreated = x.FirstOrDefault() == null ? null : x.FirstOrDefault().DatetimeCreated,
+                    UserCreated = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().UserCreated
+                });
             }
-            return dataResult?.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
+            return dataResult.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
         }
 
         /// <summary>
@@ -583,19 +582,26 @@ namespace eFMS.API.Accounting.DL.Services
                         var existCDNotes = cdNoteRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Code) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Code).ToList();
                         foreach (var item in existCDNotes)
                         {
-                            var credit = surchargeRepo.Get(x => item.Trim() == x.CreditNo).Select(x => x.Hblid);
-                            var existingCredit = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
-                            if (credit.Count() == existingCredit.Count() && existingCredit.Count() > 0)
+                            var existingCredit = surchargeRepo.Get(x => (string.IsNullOrEmpty(x.CombineBillingNo) && string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
+                            if (existingCredit?.Count() > 0 && existingCredit.Count() > 0)
                             {
-                                existCombineNo = item + " has been existed in CB: " + (existingCredit.FirstOrDefault().Type != "OBH" ? existingCredit.FirstOrDefault().CombineBillingNo : existingCredit.FirstOrDefault().ObhcombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo).FirstOrDefault().CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo).FirstOrDefault().ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo) && combineNo != criteria.CombineNo)
+                                {
+                                    existCombineNo = item + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
-                            var debit = surchargeRepo.Get(x => item.Trim() == x.DebitNo).Select(x => x.Hblid).ToList();
-                            var existingDebit = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).ToList();
-                            if (debit.Count == existingDebit.Count && existingDebit.Count > 0)
+                            var existingDebit = surchargeRepo.Get(x => string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo);
+                            if (existingDebit?.Count() > 0)
                             {
-                                existCombineNo = item + " has been existed in CB: " + existingDebit[0].CombineBillingNo;
-                                return existCombineNo;
+                                var combineNo = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).FirstOrDefault()?.CombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo) && combineNo != criteria.CombineNo)
+                                {
+                                    existCombineNo = item + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
@@ -603,64 +609,110 @@ namespace eFMS.API.Accounting.DL.Services
                         var existSoa = soaRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Soano) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Soano).ToList();
                         foreach (var item in existSoa)
                         {
-                            var soa = surchargeRepo.Get(x => item.Trim() == x.Soano);
-                            var existingSoa = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
-                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
+                            var existingSoa = surchargeRepo.Get(x => string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
+                            if (existingSoa.Count() > 0 && existingSoa.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + existingSoa.FirstOrDefault().CombineBillingNo;
-                                return existCombineNo;
+                                var combineNo = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano).FirstOrDefault()?.CombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo) && combineNo != criteria.CombineNo)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
-                            soa = surchargeRepo.Get(x => item.Trim() == x.PaySoano);
-                            existingSoa = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
-                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
+                            existingSoa = surchargeRepo.Get(x => (string.IsNullOrEmpty(x.CombineBillingNo) && string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
+                            if (existingSoa.Count() > 0 && existingSoa.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingSoa.FirstOrDefault().Type != "OBH" ? existingSoa.FirstOrDefault().CombineBillingNo : existingSoa.FirstOrDefault().ObhcombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano).FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano).FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo) && combineNo != criteria.CombineNo)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
                     case "Job No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var jobNoInfo = surchargeInfo.Where(x => item.Trim() == x.JobNo);
-                            var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo);
-
-                            var existingJobNo = jobNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingJobNoObh = jobNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (jobNoInfo.Count() == existingJobNo.Count() && jobNoObhInfo.Count() == existingJobNoObh.Count() && (existingJobNo.Count() > 0 || existingJobNoObh.Count() > 0))
+                            var jobNoInfo = surchargeInfo.Where(x => item.Trim() == x.JobNo && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            if (jobNoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingJobNo.Count() > 0 ? existingJobNo.FirstOrDefault().CombineBillingNo : existingJobNoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = jobNoInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
+                            }
+                            if (jobNoObhInfo.Count() > 0)
+                            {
+                                var combineNo = jobNoObhInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
                     case "HBL No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var hblnoInfo = surchargeInfo.Where(x => item.Trim() == x.Hblno);
-                            var hblnoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.Hblno);
+                            var hblnoInfo = surchargeInfo.Where(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (criteria.Services.Count == 0 || criteria.Services.Any(z => z == x.TransactionType)));
+                            var hblnoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (criteria.Services.Count == 0 || criteria.Services.Any(z => z == x.TransactionType)));
 
-                            var existingHblno = hblnoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingHblnoObh = hblnoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (hblnoInfo.Count() == existingHblno.Count() && hblnoObhInfo.Count() == existingHblnoObh.Count() && (existingHblno.Count() > 0 || existingHblnoObh.Count() > 0))
+                            if (hblnoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingHblno.Count() > 0 ? existingHblno.FirstOrDefault().CombineBillingNo : existingHblnoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = hblnoInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : hblnoInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
+                            }
+
+                            if (hblnoObhInfo.Count() > 0)
+                            {
+                                var combineNo = hblnoObhInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : hblnoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
                     case "Custom No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var cusNoInfo = surchargeInfo.Where(x => item.Trim() == x.ClearanceNo);
-                            var cusNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.ClearanceNo);
-
-                            var existingCusNo = cusNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingCusNoObh = cusNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (cusNoInfo.Count() == existingCusNo.Count() && cusNoObhInfo.Count() == existingCusNoObh.Count() && (existingCusNo.Count() > 0 || existingCusNoObh.Count() > 0))
+                            var jobNo = customsDeclarationRepo.Get(x => x.ClearanceNo == item.Trim() && !string.IsNullOrEmpty(x.JobNo)).Select(x => x.JobNo);
+                            var jobNoInfo = surchargeInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            var jobNoObhInfo = surchargeOBHInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            if (jobNoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingCusNo.Count() > 0 ? existingCusNo.FirstOrDefault().CombineBillingNo : existingCusNoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = jobNoInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
+                            }
+                            if (jobNoObhInfo.Count() > 0)
+                            {
+                                var combineNo = jobNoObhInfo.FirstOrDefault()?.CombineBillingNo;
+                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
+                                if (!string.IsNullOrEmpty(combineNo))
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;

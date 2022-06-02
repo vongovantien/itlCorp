@@ -59,7 +59,7 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
     this.formSearch = this._fb.group({
       'referenceNo': [],
       'partnerId': [],
-      'createDate': [{ startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()),
+      'createDate': [{ startDate: new Date(new Date().getFullYear(), new Date().getMonth() - 3, new Date().getDate()),
         endDate: new Date()}],
       'creator': []
     });
@@ -172,7 +172,7 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
     this.referenceNo.setValue(null);
     this.partnerId.setValue(null);
 
-    this._store.dispatch(SearchListCombineBilling({createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    this._store.dispatch(SearchListCombineBilling({createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 3, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')}));
   }
 }
