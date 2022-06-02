@@ -6,28 +6,39 @@ variables:
 
 image: node:12
 
-cache:
-  paths:
-    - ./WebApp/node_modules
-    - ./WebApp/package-lock.json
 stages:
+  - install
   - build
-  # - deploy
-build_uat:
-  stage: build
+
+install_dependency:
+  stage: install
   script:
     - node --version
     - echo "start job_build"
     - cd WebApp
     - npm install
     - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
+  only:
+    - production
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+      - WebApp/package-lock.json
+build_uat:
+  stage: build
+  when: manual
+  script:
+    - cd WebApp
     - npm run build:uat:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - dev
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build"
     paths:
@@ -35,19 +46,19 @@ build_uat:
 
 build_test:
   stage: build
+  when: manual
   script:
-    - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:test:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - feature/dev
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build"
     paths:
@@ -55,19 +66,20 @@ build_test:
 
 build_prod_en:
   stage: build
+  when: manual
   script:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:prod:en
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - production
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build_prod_en"
     paths:
@@ -75,19 +87,20 @@ build_prod_en:
 
 build_prod_vi:
   stage: build
+  when: manual
   script:
     - node --version
     - echo "start job_build"
     - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-    - ng version
-    #- node_modules/.bin/ng build --c=uat-en
     - npm run build:prod:vi
-    - echo "job_build doing something..."
     - echo "end job_build"
   only:
     - production
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - WebApp/node_modules
+    policy: pull
   artifacts:
     name: "angular_build_prod_vi"
     paths:

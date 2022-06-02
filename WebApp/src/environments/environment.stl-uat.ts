@@ -1,26 +1,25 @@
 
 
 export const environment = {
+    eFMSVersion: require('../../package.json').version,
     production: false,
     uat: true,
     local: false,
     HOST: {
-        WEB_URL: "uat-api-efms.itlvn.com",
-        ACCOUNTING: "uat-api-efms.itlvn.com/Accounting",
-        // ACCOUNTING: "localhost:44300",
-
-        DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
-        CATALOGUE: "uat-api-efms.itlvn.com/Catalogue",
-        OPERATION: "uat-api-efms.itlvn.com/Operation",
-        SYSTEM: "uat-api-efms.itlvn.com/System",
-        REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",
-        EXPORT: "uat-api-efms.itlvn.com/Export",
-        SETTING: "uat-api-efms.itlvn.com/Setting",
-        INDENTITY_SERVER_URL: "https://uat-api-efms.itlvn.com/identityserver",
-        EXPORT_CRYSTAL: "https://uat-api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
-        PARTNER_API: "uat-api-efms.itlvn.com/partner",
-        FILE_SYSTEM: "uat-api-efms.itlvn.com/File",
-        REPORT_MANAGEMENT: "uat-api-efms.itlvn.com/Report"
+        WEB_URL: "efms-uat.sotrans.com.vn ",
+        ACCOUNTING: "efms-uat-api.sotrans.com.vn/Accounting",
+        DOCUMENTATION: "efms-uat-api.sotrans.com.vn/Documentation",
+        CATALOGUE: "efms-uat-api.sotrans.com.vn/Catalogue",
+        OPERATION: "efms-uat-api.sotrans.com.vn/Operation",
+        SYSTEM: "efms-uat-api.sotrans.com.vn/System",
+        REPORT: "https://efms-uat-api.sotrans.com.vn/ReportPreview/Default.aspx",
+        EXPORT: "efms-uat-api.sotrans.com.vn/Export",
+        SETTING: "efms-uat-api.sotrans.com.vn/Setting",
+        INDENTITY_SERVER_URL: "https://efms-uat-api.sotrans.com.vn/identityserver",
+        EXPORT_CRYSTAL: "https://efms-uat-api.sotrans.com.vn/ReportPreview/ExportCrystal.aspx",
+        PARTNER_API: "efms-uat-api.sotrans.com.vn/partner",
+        FILE_SYSTEM: "efms-uat-api.sotrans.com.vn/File",
+        REPORT_MANAGEMENT: "efms-uat-api.sotrans.com.vn/Report"
     },
     AUTHORIZATION:
     {

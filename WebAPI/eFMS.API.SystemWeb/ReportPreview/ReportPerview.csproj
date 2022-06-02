@@ -275,7 +275,6 @@
     <Content Include="Reports\rptManifest.rpt" />
     <Content Include="Reports\ManifestHouseBillDetail.ttx" />
     <None Include="packages.config" />
-    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Reports\OCL.ttx" />
     <Content Include="Reports\OCLContainer.ttx" />
     <Content Include="Reports\rptOnBoardContainerList.rpt" />
@@ -374,6 +373,11 @@
     <Content Include="Reports\AirwayBillL.ttx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\Pre-Prod-STL.pubxml" />
+    <None Include="Properties\PublishProfiles\Pre-Prod.pubxml" />
+    <None Include="Properties\PublishProfiles\Prod.pubxml" />
+    <None Include="Properties\PublishProfiles\StagingProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\TestProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

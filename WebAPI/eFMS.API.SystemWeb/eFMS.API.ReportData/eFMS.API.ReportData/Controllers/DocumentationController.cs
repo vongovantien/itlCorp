@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using eFMS.API.Common;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.FormatExcel;
@@ -178,7 +180,7 @@ namespace eFMS.API.ReportData.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
-        
+
         /// <summary>
         /// Export SCSC of MAWB Air Export
         /// </summary>
@@ -494,7 +496,7 @@ namespace eFMS.API.ReportData.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
-        
+
         /// Export Shipment Overview
         /// </summary>
         /// <param name="criteria">Id of shipment</param>
@@ -730,7 +732,7 @@ namespace eFMS.API.ReportData.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
-        
+
         /// <summary>
         /// Export Combine Ops Debit Note
         /// </summary>
@@ -781,6 +783,29 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportShipmentOutstandingDebit")]
+        [HttpGet]
+        public async Task<IActionResult> ExportShipmentOutstandingDebit(string salemanId)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.GetDataOustandingDebitUrl + salemanId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<ShipmentOustandingDebitModel>>();
+
+            var salemanName = string.Empty;
+            var stream = new DocumentationHelper().GenerateExportShipmentOutstandingDebit(dataObjects.Result, "Shipment-Oustanding-Debit-Template.xlsx", out salemanName);
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+
+            var file = new FileHelper().ReturnFormFile("eFMS", stream, salemanName + "-OustandingDebit");
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + salemanId, accessToken);
+            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            return Ok(result);
+        }
+        
         private void HeaderResponse(string fileName)
         {
             Response.Headers.Add("efms-file-name", fileName);

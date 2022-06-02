@@ -15,9 +15,10 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 import { JobConstants, RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
-import { GetCurrenctUser, getCurrentUserState } from '@store';
+import { GetCurrenctUser, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import { Observable, of } from 'rxjs';
 import { delayTime } from '@decorators';
+import { LinkChargeJobRepPopupComponent } from './components/popup/link-charge-from-jobRep-popup/link-charge-from-job-rep.popup';
 
 
 
@@ -27,6 +28,7 @@ import { delayTime } from '@decorators';
 })
 export class JobManagementComponent extends AppList implements OnInit {
 
+    @ViewChild(LinkChargeJobRepPopupComponent) linkChargeFromRep: LinkChargeJobRepPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
     @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
@@ -120,6 +122,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 }
             );
 
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
@@ -308,9 +311,12 @@ export class JobManagementComponent extends AppList implements OnInit {
         this._spinner.hide();
         this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
         this.loadingPopupComponent.show();
-        this._documentRepo.chargeFromReplicate()
+        this._documentRepo.chargeFromReplicate('')
             .pipe(
-                catchError(this.catchError),
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                )),
                 finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -320,6 +326,10 @@ export class JobManagementComponent extends AppList implements OnInit {
                     }
                 },
             );
+    }
+
+    chargeFromJobRep(){
+        this.linkChargeFromRep.show();
     }
 
     onSelectOps(shipment) {

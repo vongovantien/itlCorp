@@ -50,6 +50,7 @@ namespace eFMS.API.Shipment
 
             services.Configure<ApiServiceUrl>(option => {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
+                option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
             });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
