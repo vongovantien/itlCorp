@@ -46,6 +46,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string ContactPerson { get; set; }
         public string Note { get; set; }
         public string InternalCode { get; set; }
+        public string OfficeName { get; set; }
     }
 
     public class CatPartnerViewModel2

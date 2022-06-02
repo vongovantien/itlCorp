@@ -1163,7 +1163,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
+            IQueryable<CatPartnerViewModel> datas = null;
             IQueryable<CatPartnerViewModel> results = null;
+            List<CatPartnerViewModel> partners = new List<CatPartnerViewModel>();
             if (size > 1)
             {
                 if (page < 1)
@@ -1264,6 +1266,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var agreementData = contractRepository.Get();
             string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
             var SalemanId = sysUsers.Where(x => salemans.Contains(x.Username)).Select(t => t.Id).ToList();
+            var offices = officeRepository.Get();
 
             string ContractType = string.IsNullOrEmpty(criteria.ContractType) ? criteria.All : criteria.ContractType.Trim();
             ClearCache();
@@ -1276,7 +1279,9 @@ namespace eFMS.API.Catalogue.DL.Services
                          from x in prods.DefaultIfEmpty()
                          join agreement in agreementData on partner.Id equals agreement.PartnerId into agreements
                          from agreement in agreements.DefaultIfEmpty()
-                         select new { user, partner, x, agreement }
+                         join office in offices on partner.OfficeId equals office.Id into officeGr
+                         from office in officeGr.DefaultIfEmpty()
+                         select new { user, partner, x, agreement, office }
                         );
             // Allow search partner when don't have contract
             //if (!string.IsNullOrEmpty(criteria.PartnerType))
@@ -1379,7 +1384,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 BankAccountNo = x.partner.BankAccountNo,
                 BankAccountName = x.partner.BankAccountName,
                 BankName = x.partner.BankName,
-                Note = x.partner.Note
+                Note = x.partner.Note,
+                OfficeName=x.office.ShortName
             });
             return results;
         }

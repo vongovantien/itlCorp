@@ -11,7 +11,7 @@ export const environment = {
 
         DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
         // DOCUMENTATION: "localhost:44324/",
-        CATALOGUE: "uat-api-efms.itlvn.com/Catalogue",
+        CATALOGUE: "localhost:44341",
         OPERATION: "uat-api-efms.itlvn.com/Operation",
         SYSTEM: "uat-api-efms.itlvn.com/System",
         REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",

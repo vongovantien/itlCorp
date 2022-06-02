@@ -44,9 +44,9 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        this.getService();
-        this.getOffice();
-        this.getCompany();
+        //this.getService();
+        //this.getOffice();
+        //this.getCompany();
         this._store.select(getPartnerDataSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -83,7 +83,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Fax', field: 'fax', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
-            { title: 'Office', field: 'office', sortable: true },
+            { title: 'Office', field: 'officeName', sortable: true },
         ];
         localStorage.removeItem('success_add_sub');
         this.dataSearch = this.criteria;
@@ -132,8 +132,6 @@ export class PartnerListComponent extends AppList implements OnInit {
                     }
                 },
             );
-
-        console.log(this.offices);
     }
 
     getCompany() {
@@ -193,9 +191,6 @@ export class PartnerListComponent extends AppList implements OnInit {
             })).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.partners = res.data || [];
-                    this.partners.forEach(x=>{
-                        x.officeName=this.offices.find(z=>z.id===x.officeId).shortName;
-                    })
                     console.log(this.partners);
                     this.totalItems = res.totalItems;
                 }
