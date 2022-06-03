@@ -87,8 +87,10 @@ namespace eFMS.API.Accounting.Controllers
                     }
 
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -136,7 +138,10 @@ namespace eFMS.API.Accounting.Controllers
                         await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
                     }
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
 
                 });
             }
@@ -206,8 +211,10 @@ namespace eFMS.API.Accounting.Controllers
                         await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
                     }
                     List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(soaNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);

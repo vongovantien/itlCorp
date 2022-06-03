@@ -61,7 +61,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 }),
             ).subscribe(
                 (data: any) => {
-                    if(data.accountReceivable ===null){
+                    if (data.accountReceivable === null) {
                         this._toastService.info("Chưa có data công nợ");
                     }
                     this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
@@ -128,7 +128,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             };
 
             console.log({ body });
-            this._accoutingRepo.insertOrUpdateReceivable([body])
+            this._accoutingRepo.calculatorDebitAmount([body], false)
                 .pipe(
                     switchMap((res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -148,9 +148,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         })
     }
 
-    showDebitDetail(option,officeId,serviceCode) {
+    showDebitDetail(option, officeId, serviceCode) {
         var argeementId = this.accReceivableDetail.agreementId;
-        this._accoutingRepo.getDataDebitDetail(argeementId, option,officeId,serviceCode)
+        this._accoutingRepo.getDataDebitDetail(argeementId, option, officeId, serviceCode)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -158,7 +158,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        this.debitDetailPopupComponent.dataSearch= {argeementId, option,officeId,serviceCode};
+                        this.debitDetailPopupComponent.dataSearch = { argeementId, option, officeId, serviceCode };
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }

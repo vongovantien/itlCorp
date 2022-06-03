@@ -201,7 +201,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
                     if(modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     }
                 });
             }
@@ -442,7 +442,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     }
                 });
             }
@@ -504,7 +504,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     }
                 });
             }
@@ -715,7 +715,7 @@ namespace eFMS.API.Accounting.Controllers
                 List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(approve.SettlementNo);
                 if (modelReceivableList.Count > 0)
                 {
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                 }
 
             });

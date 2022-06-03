@@ -440,8 +440,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             if (this.selectedIndexCharge > -1) {
 
                                 // TODO Tính công nợ BE
-                                //this.calculatorReceivable([this.selectedSurcharge]);
-
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
 
                             }
@@ -549,9 +547,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
-                        // Tính công nợ
-                        // this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(type);
@@ -1459,7 +1454,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         //     }
         // });
 
-        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+        this._accountingRepo.calculatorDebitAmount({ objectReceivable: objReceivable }).subscribe();
     }
 
     onSelectSurcharge(index, cs: CsShipmentSurcharge) {

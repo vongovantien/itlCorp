@@ -3738,7 +3738,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong Receipt
-            hs = await accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
+            hs = await accAccountReceivableService.CalculatorReceivableDebitAmountAsync(objectReceivablesModel);
             return hs;
         }
 
