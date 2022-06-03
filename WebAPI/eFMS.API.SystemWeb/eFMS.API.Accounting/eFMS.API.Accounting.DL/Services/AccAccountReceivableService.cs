@@ -3507,7 +3507,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var dataInvoicesWithSalesmanInvoicePaidApart = GetDataBillingSalesman(fe.PartnerId, fe.Office, fe.Service, AccountingConstants.ACCOUNTANT_TYPE_INVOICE, AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
                 var dataGrpSalesmanInvoicePaidApart = dataInvoicesWithSalesmanInvoicePaidApart.GroupBy(x => new { x.SalesmanId, x.PartnerId, x.OfficeId, x.Service })
                   .Select(x => new { x.Key.SalesmanId, x.Key.PartnerId, x.Key.OfficeId, x.Key.Service, invoices = x });
-                if (dataGrpSalesmanInvoiceTempPaidApart.Count() > 0)
+                if (dataGrpSalesmanInvoicePaidApart.Count() > 0)
                 {
                     foreach (var item in dataGrpSalesmanInvoicePaidApart)
                     {
@@ -3615,24 +3615,26 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 #endregion
-
-                receivableIdModified = receivableIdModified.Distinct().ToList();
-                var draft = receivables.Where(x => x.PartnerId == fe.PartnerId 
-                && x.Service == fe.Service 
-                && x.Office == fe.Office 
-                && !receivableIdModified.Contains(x.Id));
-                if(draft.Count() > 0)
+                if(receivableIdModified.Count > 0)
                 {
-                    foreach (var item in draft)
+                    receivableIdModified = receivableIdModified.Distinct().ToList();
+                    var draft = receivables.Where(x => x.PartnerId == fe.PartnerId
+                    && x.Service == fe.Service
+                    && x.Office == fe.Office
+                    && !receivableIdModified.Contains(x.Id));
+                    if (draft.Count() > 0)
                     {
-                        item.SellingNoVat = 0;
-                        item.ObhAmount = 0;
-                        item.BillingUnpaid = 0;
-                        item.ObhUnpaid = 0;
-                        item.BillingAmount = 0;
-                        item.ObhBilling = 0;
-                        item.PaidAmount = 0;
-                        item.ObhPaid = 0;
+                        foreach (var item in draft)
+                        {
+                            item.SellingNoVat = 0;
+                            item.ObhAmount = 0;
+                            item.BillingUnpaid = 0;
+                            item.ObhUnpaid = 0;
+                            item.BillingAmount = 0;
+                            item.ObhBilling = 0;
+                            item.PaidAmount = 0;
+                            item.ObhPaid = 0;
+                        }
                     }
                 }
             }

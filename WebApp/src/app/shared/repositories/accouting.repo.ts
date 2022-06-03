@@ -644,7 +644,7 @@ export class AccountingRepo {
     }
 
     calculatorDebitAmount(body: any, isHideSpinner: boolean = true) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body, null, { "hideSpinner": isHideSpinner.toString() }).pipe(
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body, null, { "hideSpinner": isHideSpinner.toString() }).pipe(
             map((data: any) => data)
         );
 
