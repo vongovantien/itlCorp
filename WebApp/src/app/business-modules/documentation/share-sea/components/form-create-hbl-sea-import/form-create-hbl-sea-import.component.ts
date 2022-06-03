@@ -346,8 +346,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
             receivedBillTime: !!res.receivedBillTime ? { startDate: new Date(res.receivedBillTime), endDate: new Date(res.receivedBillTime) } : null,
 
-            re: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
-
             masterBill: res.mawb,
             shipperDescription: res.shipperDescription,
             consigneeDescription: res.consigneeDescription,
