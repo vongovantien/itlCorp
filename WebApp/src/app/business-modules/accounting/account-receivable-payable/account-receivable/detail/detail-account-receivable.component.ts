@@ -10,7 +10,7 @@ import { RoutingConstants } from '@constants';
 import { takeUntil, switchMap, switchMapTo, tap, catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
@@ -116,7 +116,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     onClickCalculateService(serviceData: AccReceivableServicesDetailModel, officeData: AccReceivableOfficesDetailModel) {
-        console.log({ serviceData, officeData });
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Calculate Accounts Receivable Payable',
             body: 'Are you sure to recalculate data',
@@ -127,8 +126,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 service: this.utility.mappingServiceType(serviceData.serviceName),
             };
 
-            console.log({ body });
-            this._accoutingRepo.calculatorDebitAmount([body], false)
+            this._accoutingRepo.calculatorDebitAmount([body], null)
                 .pipe(
                     switchMap((res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -164,5 +162,46 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     }
                 },
             );
+    }
+
+    calculateOverDue(type: number) {
+        if (!this.accReceivableDetail?.partnerId) {
+            return;
+        }
+        const partnerIds: string[] = [this.accReceivableDetail.partnerId];
+
+        let overDueAPI: Observable<any> = null;
+
+        switch (type) {
+            case 1:
+                overDueAPI = this._accoutingRepo.calculateOverDue1To15(partnerIds);
+                break;
+            case 2:
+                overDueAPI = this._accoutingRepo.calculateOverDue15To30(partnerIds);
+                break;
+            case 3:
+                overDueAPI = this._accoutingRepo.calculateOverDue30(partnerIds);
+                break;
+            default:
+                break;
+        }
+
+        if (!!overDueAPI) {
+            overDueAPI.pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                    }
+                    return of(false);
+                })
+            ).subscribe((data: any) => {
+                if (!!data) {
+                    this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
+                    this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
+                        .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
+                }
+            });
+        }
     }
 }

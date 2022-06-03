@@ -41,41 +41,59 @@
                                             <td class="text-right">{{ item.officeNameAbbr}}</td>
                                             <td class="text-right">{{ item.totalDebitAmount | number: '.0-3'}}</td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail('Unpaid',item.officeId,'')">
-                                                    {{ (item.totalBillingAmount + item.totalObhBillingAmount) | number:'.0-3'}}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail('Unpaid',item.officeId,'')">
+                                                    {{ (item.totalBillingAmount + item.totalObhBillingAmount) |
+                                                    number:'.0-3'}}
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail('Paid',item.officeId,'')">
-                                                {{ (item.totalPaidAmount + item.totalObhPaidAmount) | number:'.0-3'}}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail('Paid',item.officeId,'')">
+                                                    {{ (item.totalPaidAmount + item.totalObhPaidAmount) |
+                                                    number:'.0-3'}}
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail('OutStanding',item.officeId,'')">
-                                                    {{ (item.totalBillingUnpaid + item.totalObhUnPaidAmount) | number:'.0-3'}}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail('OutStanding',item.officeId,'')">
+                                                    {{ (item.totalBillingUnpaid + item.totalObhUnPaidAmount) |
+                                                    number:'.0-3'}}
                                                 </a>
                                             </td>
 
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over1To15Day',item.officeId,'')">
-                                                    {{ item.totalOver1To15Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail('Over1To15Day',item.officeId,'')">
+                                                        {{ item.totalOver1To15Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
+                                                <a (click)="calculateOverDue(1)">
+                                                    <i class="la la-calculator"></i>
+                                                </a>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over16To30Day',item.officeId,'')">
-                                                    {{ item.totalOver15To30Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail('Over16To30Day',item.officeId,'')">
+                                                        {{ item.totalOver15To30Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
+                                                <a (click)="calculateOverDue(2)">
+                                                    <i class="la la-calculator"></i>
+                                                </a>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over30Day',item.officeId,'')">
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail('Over30Day',item.officeId,'')">
                                                         {{ item.totalOver30Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
+                                                <a (click)="calculateOverDue(3)">
+                                                    <i class="la la-calculator"></i>
+                                                </a>
                                             </td>
                                             <td class="text-right">{{ item.currency}}</td>
                                         </tr>
@@ -105,37 +123,46 @@
                                                         </td>
 
                                                         <td class="text-right">
-                                                            <a href="javascript:void(0)" (click)="showDebitDetail('Unpaid',element.officeId,element.serviceCode)">
-                                                            {{ (element.billingAmount+ element.obhBillingAmount)| number: '.0-3'}}
+                                                            <a href="javascript:void(0)"
+                                                                (click)="showDebitDetail('Unpaid',element.officeId,element.serviceCode)">
+                                                                {{ (element.billingAmount+ element.obhBillingAmount)|
+                                                                number: '.0-3'}}
                                                             </a>
                                                         </td>
                                                         <td class="text-right">
-                                                            <a href="javascript:void(0)" (click)="showDebitDetail('Paid A Part',element.officeId,element.serviceCode)">
-                                                            {{ (element.paidAmount + element.obhPaidAmount) | number: '.0-3' }}
+                                                            <a href="javascript:void(0)"
+                                                                (click)="showDebitDetail('Paid A Part',element.officeId,element.serviceCode)">
+                                                                {{ (element.paidAmount + element.obhPaidAmount) |
+                                                                number: '.0-3' }}
                                                             </a>
                                                         </td>
                                                         <td class="text-right">
-                                                            <a href="javascript:void(0)" (click)="showDebitDetail('OutStanding',element.officeId,element.serviceCode)">
-                                                            {{ (element.billingUnpaid + element.obhUnPaidAmount) | number: '.0-3'}}
+                                                            <a href="javascript:void(0)"
+                                                                (click)="showDebitDetail('OutStanding',element.officeId,element.serviceCode)">
+                                                                {{ (element.billingUnpaid + element.obhUnPaidAmount) |
+                                                                number: '.0-3'}}
                                                             </a>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over1To15Day',element.officeId,element.serviceCode)">
-                                                                {{ element.over1To15Day | number: '.0-3'}}
+                                                                <a href="javascript:void(0)"
+                                                                    (click)="showDebitDetail('Over1To15Day',element.officeId,element.serviceCode)">
+                                                                    {{ element.over1To15Day | number: '.0-3'}}
                                                                 </a>
                                                             </span>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over16To30Day',element.officeId,element.serviceCode)">
-                                                                {{ element.over16To30Day | number:'.0-3' }}
+                                                                <a href="javascript:void(0)"
+                                                                    (click)="showDebitDetail('Over16To30Day',element.officeId,element.serviceCode)">
+                                                                    {{ element.over16To30Day | number:'.0-3' }}
                                                                 </a>
                                                             </span>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over30Day',element.officeId,element.serviceCode)">
+                                                                <a href="javascript:void(0)"
+                                                                    (click)="showDebitDetail('Over30Day',element.officeId,element.serviceCode)">
                                                                     {{ element.over30Day | number: '.0-3' }}
                                                                 </a>
                                                             </span>

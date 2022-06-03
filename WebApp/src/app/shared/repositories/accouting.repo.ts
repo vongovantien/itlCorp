@@ -644,10 +644,10 @@ export class AccountingRepo {
     }
 
     calculatorDebitAmount(body: any, isHideSpinner: boolean = true) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body, null, { "hideSpinner": isHideSpinner.toString() }).pipe(
-            map((data: any) => data)
-        );
-
+        if (!!isHideSpinner) {
+            return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body, null, { "hideSpinner": "true" });
+        }
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body);
     }
 
     // Tính công nợ theo {partnerId, office, service}
@@ -1074,15 +1074,29 @@ export class AccountingRepo {
     getListJobGroupSurchargeDetailSettlement(settleNo: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
     }
+
     getAdjustDebitValue(model: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetAdjustDebitValue`, model).pipe(
             map((data: any) => data)
         );
     }
+
     updateAdjustDebitValue(data: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateAdjustDebitValue`, data).pipe(
             map((data: any) => data)
         );
+    }
+
+    calculateOverDue1To15(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue1To15`, partnerIds);
+    }
+
+    calculateOverDue15To30(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue15To30`, partnerIds);
+    }
+
+    calculateOverDue30(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue30`, partnerIds);
     }
 }
 
