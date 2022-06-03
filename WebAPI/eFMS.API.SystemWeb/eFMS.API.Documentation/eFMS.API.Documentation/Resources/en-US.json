@@ -99,5 +99,6 @@
   "MSG_PARTNER_CODE_DUPLICATE": "Partner Code and OBH Partner can't duplicate",
   "MSG_CHARGE_CODE_WRONG_SERVICE": "Charge Code '{0}' invalid in service",
   "MSG_SERIES_NO_REQUIRED": "SeriesNo is required!",
-  "MSG_INVOICE_NO_REQUIRED": "InvoiceNo is required!"
+  "MSG_INVOICE_NO_REQUIRED": "InvoiceNo is required!",
+  "MSG_CDNOTE_ISSUED_COMBINE": "CD Note have issued combine billing {0}. Please remove CD Note from combine billing before update CD Note."
 }

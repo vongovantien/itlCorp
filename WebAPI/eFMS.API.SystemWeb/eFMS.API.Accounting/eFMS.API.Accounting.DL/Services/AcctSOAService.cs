@@ -253,6 +253,19 @@ namespace eFMS.API.Accounting.DL.Services
             var result = new ResultHandle();
             try
             {
+                var soa = mapper.Map<AcctSoa>(model);
+                var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
+
+                // If soa have issued combine billing => fail update
+                var combineNoSoa = !string.IsNullOrEmpty(soaCurrent.CombineBillingNo) ? soaCurrent.CombineBillingNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
+                var hasCombineValue = combineNoSoa != null && combineNoSoa.Count() > 0;
+                var currentCharges = model.Surcharges.Select(x => x.surchargeId);
+                var oldCharges = csShipmentSurchargeRepo.Get(x => x.Soano == soaCurrent.Soano || x.PaySoano == soaCurrent.Soano).Select(x => x.Id);
+                if (hasCombineValue && (currentCharges.Except(oldCharges).Count() > 0 || oldCharges.Except(currentCharges).Count() > 0))
+                {
+                    return new ResultHandle() { Status = false, Message = "Soa have issued combine billing: " + soaCurrent.CombineBillingNo + ". Please remove Soa from combine billing before update Soa." };
+                }
+
                 var userCurrent = currentUser.UserID;
                 // Get orgin list surcharge in soa with credit type
                 var surchargesUpdateSoa = new List<CsShipmentSurcharge>();
@@ -260,8 +273,6 @@ namespace eFMS.API.Accounting.DL.Services
                 //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
                 var clearChargeOld = ClearSoaCharge(model.Soano, model.Type, "ClearChargeOldUpdateSOA", out surchargesUpdateSoa);
 
-                var soa = mapper.Map<AcctSoa>(model);
-                var soaCurrent = DataContext.Get(x => x.Id == soa.Id).FirstOrDefault();
                 soa.DatetimeModified = DateTime.Now;
                 soa.UserModified = userCurrent;
                 soa.Currency = model.Currency.Trim();
@@ -380,12 +391,12 @@ namespace eFMS.API.Accounting.DL.Services
                     if (hsCharges.Success)
                     {
                         // update data combine billing
-                        {
-                            if (!string.IsNullOrEmpty(soa.CombineBillingNo))
-                            {
-                                UpdateCombineBilling(soa.CombineBillingNo);
-                            }
-                        }
+                        //{
+                        //    if (!string.IsNullOrEmpty(soa.CombineBillingNo))
+                        //    {
+                        //        UpdateCombineBilling(soa.CombineBillingNo);
+                        //    }
+                        //}
                         // Update Credit AR
                         if (soa.Type == "Credit" && hsCharges.Success)
                         {
@@ -482,6 +493,14 @@ namespace eFMS.API.Accounting.DL.Services
                 return new ResultHandle() { Status = false, Message = message };
             }
 
+            // If soa have issued combine billing => fail update
+            var combineNoSoa = !string.IsNullOrEmpty(soa.CombineBillingNo) ? soa.CombineBillingNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
+            var hasCombineValue = combineNoSoa != null && combineNoSoa.Count() > 0;
+            if (hasCombineValue)
+            {
+                return new ResultHandle() { Status = false, Message = "Soa have issued combine billing: " + soa.CombineBillingNo + ". Please remove Soa from combine billing before delete Soa." };
+            }
+
             var surcharges = new List<CsShipmentSurcharge>();
 
             //Clear Charge of SOA
@@ -489,10 +508,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             var hs = DataContext.Delete(x => x.Id == soaId);
             // Update data combine billing
-            if (!string.IsNullOrEmpty(soa.CombineBillingNo))
-            {
-                UpdateCombineBilling(soa.CombineBillingNo);
-            }
+            //if (!string.IsNullOrEmpty(soa.CombineBillingNo))
+            //{
+            //    UpdateCombineBilling(soa.CombineBillingNo);
+            //}
             // Delete Credit AR
             if (soa.Type == "Credit" && hs.Success)
             {
@@ -585,16 +604,16 @@ namespace eFMS.API.Accounting.DL.Services
                         _creditAmount += _amount;
                     }
 
-                    if (action != "Add")
-                    {
-                        // Update combine no for old charges
-                        var oldCharge = surchargesUpdateSoa.Where(x => x.Hblid == surcharge.Hblid && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo))).FirstOrDefault();
-                        if (oldCharge != null)
-                        {
-                            surcharge.CombineBillingNo = oldCharge.CombineBillingNo;
-                            surcharge.ObhcombineBillingNo = oldCharge.ObhcombineBillingNo;
-                        }
-                    }
+                    //if (action != "Add")
+                    //{
+                    //    // Update combine no for old charges
+                    //    var oldCharge = surchargesUpdateSoa.Where(x => x.Hblid == surcharge.Hblid && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo))).FirstOrDefault();
+                    //    if (oldCharge != null)
+                    //    {
+                    //        surcharge.CombineBillingNo = oldCharge.CombineBillingNo;
+                    //        surcharge.ObhcombineBillingNo = oldCharge.ObhcombineBillingNo;
+                    //    }
+                    //}
                     var surchargeCopy = mapper.Map<CsShipmentSurcharge>(surcharge);
                     //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
                     if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH && surcharge.PayerId == model.Customer))
@@ -602,14 +621,14 @@ namespace eFMS.API.Accounting.DL.Services
                         surcharge.PaySoano = model.Soano;
                         surcharge.Soano = surcharge.Soano;
                         surchargeCopy.PaySoano = model.Soano;
-                        if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                        {
-                            surcharge.CombineBillingNo = surcharge.CombineBillingNo;
-                        }
-                        else
-                        {
-                            surcharge.ObhcombineBillingNo = surcharge.ObhcombineBillingNo;
-                        }
+                        //if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                        //{
+                        //    surcharge.CombineBillingNo = surcharge.CombineBillingNo;
+                        //}
+                        //else
+                        //{
+                        //    surcharge.ObhcombineBillingNo = surcharge.ObhcombineBillingNo;
+                        //}
 
                     }
                     //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
@@ -618,7 +637,7 @@ namespace eFMS.API.Accounting.DL.Services
                         surcharge.Soano = model.Soano;
                         surcharge.PaySoano = surcharge.PaySoano;
                         surchargeCopy.Soano = model.Soano;
-                        surcharge.CombineBillingNo = surcharge.CombineBillingNo;
+                        //surcharge.CombineBillingNo = surcharge.CombineBillingNo;
                     }
                     surchargesSoa.Add(surcharge);
                     surchargeSoaUpdMng.Add(surchargeCopy);
@@ -634,13 +653,13 @@ namespace eFMS.API.Accounting.DL.Services
                 updateChargeSoa = UpdateSoaCharge(soa.Soano, surchargesSoa, action);
                 if (action != "Add")
                 {
-                    if (updateChargeSoa.Success) // update data combine billing
-                    {
-                        if (!string.IsNullOrEmpty(soa.CombineBillingNo))
-                        {
-                            UpdateCombineBilling(soa.CombineBillingNo);
-                        }
-                    }
+                    //if (updateChargeSoa.Success) // update data combine billing
+                    //{
+                    //    if (!string.IsNullOrEmpty(soa.CombineBillingNo))
+                    //    {
+                    //        UpdateCombineBilling(soa.CombineBillingNo);
+                    //    }
+                    //}
                     // Update Credit AR
                     if (soa.Type == "Credit" && updateChargeSoa.Success)
                     {
@@ -740,8 +759,8 @@ namespace eFMS.API.Accounting.DL.Services
             var hs = new HandleState();
             surchargeUpdate = new List<CsShipmentSurcharge>();
             var surcharges = csShipmentSurchargeRepo.Get(x => (soaType == "Debit" ? x.Soano : x.PaySoano) == soaNo);
-            var combineNo = DataContext.Get(x => x.Soano == soaNo).Select(x => x.CombineBillingNo).FirstOrDefault();
-            var listCombineNo = !string.IsNullOrEmpty(combineNo) ? combineNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
+            //var combineNo = DataContext.Get(x => x.Soano == soaNo).Select(x => x.CombineBillingNo).FirstOrDefault();
+            //var listCombineNo = !string.IsNullOrEmpty(combineNo) ? combineNo.Split(";").Where(x => !string.IsNullOrEmpty(x)).Select(x => x.Trim()) : null;
             if (surcharges != null)
             {
                 var soaCharges = new List<ClearChargeSoaTable>();
@@ -752,16 +771,16 @@ namespace eFMS.API.Accounting.DL.Services
                     soaCharge.Id = surcharge.Id;
                     soaCharge.PaySoano = charge.PaySoano = (soaType == "Credit") ? null : surcharge.PaySoano;
                     soaCharge.Soano = charge.Soano = (soaType == "Debit") ? null : surcharge.Soano;
-                    if (listCombineNo != null && listCombineNo.Count() > 0)
-                    {
-                        soaCharge.CombineBillingNo = listCombineNo.Any(x => x == charge.CombineBillingNo) ? null : charge.CombineBillingNo;
-                        soaCharge.ObhcombineBillingNo = listCombineNo.Any(x => x == charge.ObhcombineBillingNo) ? null : charge.ObhcombineBillingNo;
-                    }
-                    else
-                    {
-                        soaCharge.CombineBillingNo = charge.CombineBillingNo;
-                        soaCharge.ObhcombineBillingNo = charge.ObhcombineBillingNo;
-                    }
+                    //if (listCombineNo != null && listCombineNo.Count() > 0)
+                    //{
+                    //    soaCharge.CombineBillingNo = listCombineNo.Any(x => x == charge.CombineBillingNo) ? null : charge.CombineBillingNo;
+                    //    soaCharge.ObhcombineBillingNo = listCombineNo.Any(x => x == charge.ObhcombineBillingNo) ? null : charge.ObhcombineBillingNo;
+                    //}
+                    //else
+                    //{
+                    //    soaCharge.CombineBillingNo = charge.CombineBillingNo;
+                    //    soaCharge.ObhcombineBillingNo = charge.ObhcombineBillingNo;
+                    //}
                     soaCharge.UserModified = currentUser.UserID;
                     soaCharge.DatetimeModified = DateTime.Now;
                     soaCharges.Add(soaCharge);
