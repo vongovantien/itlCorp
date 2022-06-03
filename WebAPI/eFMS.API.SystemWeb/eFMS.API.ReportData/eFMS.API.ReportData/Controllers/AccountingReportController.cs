@@ -641,6 +641,7 @@ namespace eFMS.API.ReportData.Controllers
 
         /// <summary>
         /// Export Accounting Payable Standart Report
+        /// Export Accounting Payable Standart Report
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -711,18 +712,18 @@ namespace eFMS.API.ReportData.Controllers
         /// <param name="agreementId"></param>
         /// <returns></returns>
         [Route("ExportDebitAmountDetailByContract")]
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ExportDebitAmountDetailByContract(Guid agreementId)
+        public async Task<IActionResult> ExportDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             //var responseFromApi = await HttpServiceExtension.PostAPI(agreementId, aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl + agreementId);
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria,aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
             {
                 ReportName = "AR Debit Amount Report",
-                ObjectParameter = JsonConvert.SerializeObject(agreementId),
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
                 Type = ResourceConsts.Export_Excel
             };
             var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);

@@ -9,6 +9,7 @@ export class TrialOfficialOtherModel {
     agreementNo: string = null;
     agreementType: string = null;
     agreementStatus: string = null;
+    agreementSalesmanId: string = null;
 
     expriedDate: Date = null;
     expriedDay: number = null;

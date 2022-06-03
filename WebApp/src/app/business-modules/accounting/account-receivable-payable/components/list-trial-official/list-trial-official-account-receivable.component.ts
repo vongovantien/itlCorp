@@ -154,7 +154,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     exportDebitAmount() {
-        this._exportRepo.exportDebitAmountDetailByContract(this.selectedTrialOfficial.agreementId)
+        this._exportRepo.exportDebitAmountDetailByContract(this.selectedTrialOfficial)
             .subscribe(
                 (res: any) => {
                     this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));

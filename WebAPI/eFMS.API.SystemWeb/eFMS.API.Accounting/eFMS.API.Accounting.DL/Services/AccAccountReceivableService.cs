@@ -2323,11 +2323,11 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- DETAIL ---
 
-        public DebitAmountDetail GetDebitAmountDetailByContract(Guid argeementId)
+        public DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
         {
             DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
-            var contract = contractPartnerRepo.Get(x => x.Id == argeementId).FirstOrDefault();
-            var partner = partnerRepo.Get(x => x.Id == contract.PartnerId).FirstOrDefault();
+            var contract = contractPartnerRepo.Get(x => x.Id == criteria.AgreementId).FirstOrDefault();
+            var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId.ToString()).FirstOrDefault();
             debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
             {
                 ContractNo = contract.ContractNo,
@@ -2338,17 +2338,18 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerName = partner.ShortName,
                 Currency = contract.CurrencyId
             };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(argeementId,partner.ParentId);
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId,criteria.PartnerId,criteria.AgreementSalesmanId);
 
             return debitAmountDetail;
         }
 
-        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(Guid argeementId, string partnerID)
+        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(Guid argeementId, Guid partnerID, Guid salemanID)
         {
             DbParameter[] parameters =
             {
                 SqlParam.GetParameter("partnerID", partnerID),
-                SqlParam.GetParameter("argeementId", argeementId)
+                SqlParam.GetParameter("argeementId", argeementId),
+                SqlParam.GetParameter("salemanId", salemanID)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailByContract>(parameters);
             return data;

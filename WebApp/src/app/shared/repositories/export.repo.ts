@@ -497,8 +497,8 @@ export class ExportRepo {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
     }
 
-    exportDebitAmountDetailByContract(agreementId: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitAmountDetailByContract?agreementId=${agreementId}`, null, null, null, 'response');
+    exportDebitAmountDetailByContract(selectedTrialOfficial: any={}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitAmountDetailByContract`, selectedTrialOfficial, null, null, 'response');
     }
 }
 
