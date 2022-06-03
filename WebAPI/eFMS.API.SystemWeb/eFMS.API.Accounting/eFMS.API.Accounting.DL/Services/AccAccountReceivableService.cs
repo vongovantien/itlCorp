@@ -3383,6 +3383,13 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
+                else
+                {
+                    foreach (var item in receivables)
+                    {
+                        item.ObhBilling = item.ObhUnpaid = 0;
+                    }
+                }
                 #endregion
 
                 #region OBH Paid
@@ -3485,6 +3492,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 receivables.Add(arRow);
                             }
                         }
+                    }
+                }
+                else
+                {
+                    foreach (var item in receivables)
+                    {
+                        item.ObhPaid = 0;
                     }
                 }
                 #endregion
@@ -3591,6 +3605,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 receivables.Add(arRow);
                             }
                         }
+                    }
+                }
+                else
+                {
+                    foreach (var item in receivables)
+                    {
+                        item.PaidAmount = 0;
                     }
                 }
                 #endregion
