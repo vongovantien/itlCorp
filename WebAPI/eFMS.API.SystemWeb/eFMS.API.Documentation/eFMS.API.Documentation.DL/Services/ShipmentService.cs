@@ -3457,6 +3457,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.VatPartnerName = detailLookupPartner[charge.VatPartnerID].FirstOrDefault()?.ShortName;
                 //data.BillNoSynced = getBillNoSynced(charge);
                 data.BillNoSynced = charge.BillNoSynced;
+                data.PaySyncedFrom = charge.PaySyncedFrom;
+                data.PayBillNoSynced = charge.PayBillNoSynced;
                 dataList.Add(data);
             }
             return dataList.AsQueryable();

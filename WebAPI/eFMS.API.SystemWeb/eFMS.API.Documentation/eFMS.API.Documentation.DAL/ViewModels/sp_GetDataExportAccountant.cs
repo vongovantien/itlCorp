@@ -34,5 +34,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string SyncedFrom { get; set; }
         public string VatPartnerID { get; set; }
         public string BillNoSynced { get; set; }
+        public string PayBillNoSynced { get; set; }
+        public string PaySyncedFrom { get; set; }
     }
 }

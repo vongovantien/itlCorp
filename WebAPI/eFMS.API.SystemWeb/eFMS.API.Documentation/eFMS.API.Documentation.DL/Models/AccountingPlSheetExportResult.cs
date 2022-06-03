@@ -52,5 +52,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string VatPartnerName { get; set; }
         public decimal? OBHNetAmount { get; set; }
         public string BillNoSynced { get; set; }
+        public string PaySyncedFrom { get; set; }
+        public string PayBillNoSynced { get; set; }
     }
 }

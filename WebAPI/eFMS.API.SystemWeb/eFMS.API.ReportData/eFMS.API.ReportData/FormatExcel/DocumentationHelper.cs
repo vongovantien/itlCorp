@@ -1910,6 +1910,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(36).Width = 24; //Cột AJ
             workSheet.Column(37).Width = 24; //Cột AK
             workSheet.Column(38).Width = 24; //Cột AL
+            workSheet.Column(39).Width = 24; //Cột AM
+            workSheet.Column(40).Width = 24; //Cột AN
         }
         /// <summary>
         /// 
@@ -2131,7 +2133,9 @@ namespace eFMS.API.ReportData.FormatExcel
                "Creator", //35,
                "Synced", //36,
                "Billing No", //37
-               "Vat Partner" //38
+               "Pay Synced", //38,
+               "Pay Billing No", //39
+               "Vat Partner" //40
 
             };
 
@@ -2168,9 +2172,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AL8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AL8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AL8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AN8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AN8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AN8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2263,7 +2267,13 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AK7"].Value = headers[37]; //Billing No
 
             workSheet.Cells["AL7:AL8"].Merge = true;
-            workSheet.Cells["AL7"].Value = headers[38]; //Vat Parter
+            workSheet.Cells["AL7"].Value = headers[38]; //Pay Synced
+
+            workSheet.Cells["AM7:AM8"].Merge = true;
+            workSheet.Cells["AM7"].Value = headers[39]; //Pay Billing No
+
+            workSheet.Cells["AN7:AN8"].Merge = true;
+            workSheet.Cells["AN7"].Value = headers[40]; //Vat Parter
             //Header table
 
             //Cố định dòng thứ 8 (Freeze Row 8 and no column)
@@ -2377,7 +2387,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 35].Value = listData[i].Creator;
                 workSheet.Cells[rowStart, 36].Value = listData[i].SyncedFrom;
                 workSheet.Cells[rowStart, 37].Value = listData[i].BillNoSynced;
-                workSheet.Cells[rowStart, 38].Value = listData[i].VatPartnerName;
+                workSheet.Cells[rowStart, 38].Value = listData[i].PaySyncedFrom;
+                workSheet.Cells[rowStart, 39].Value = listData[i].PayBillNoSynced;
+                workSheet.Cells[rowStart, 40].Value = listData[i].VatPartnerName;
                 rowStart += 1;
 
             }
@@ -2410,9 +2422,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 38].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 38].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 38].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 40].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 40].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 40].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
