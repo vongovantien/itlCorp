@@ -3648,5 +3648,28 @@ namespace eFMS.API.Accounting.DL.Services
 
             return receivables;
         }
+
+        public List<ObjectReceivableModel> CalculatorReceivableByBillingCode(string code, string billingType)
+        {
+            if(string.IsNullOrEmpty(code) || string.IsNullOrEmpty(billingType))
+            {
+                return new List<ObjectReceivableModel>();
+            }
+            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true;
+            switch (billingType)
+            {
+                case "SOA":
+                    surchargesQuery = surchargesQuery.And(XmlReadMode => XmlReadMode.Soano == code);
+                    break;
+                case "DEBIT":
+                    surchargesQuery = surchargesQuery.And(XmlReadMode => XmlReadMode.DebitNo == code);
+                    break;
+                default:
+                    break;
+            }
+            var surcharges = surchargeRepo.Get(surchargesQuery);
+            var objectReceivablesModel = GetObjectReceivableBySurcharges(surcharges);
+            return objectReceivablesModel;
+        }
     }
 }

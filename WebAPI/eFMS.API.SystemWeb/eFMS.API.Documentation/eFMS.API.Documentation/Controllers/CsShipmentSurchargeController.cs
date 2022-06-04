@@ -403,18 +403,28 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="chargId"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPut]
         [Route("Delete")]
         [Authorize]
-        public IActionResult Delete(Guid chargId)
+        public IActionResult Delete(DeleteSurchargeDeleteModel model)
         {
             currentUser.Action = "DeleteCsShipmentSurcharge";
-            var hs = csShipmentSurchargeService.DeleteCharge(chargId);
+            var hs = csShipmentSurchargeService.DeleteCharge(model.Id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = new List<ObjectReceivableModel>() {
+                        new ObjectReceivableModel { Office = model.Office, PartnerId = model.PartnerId, Service = model.Service }
+                    };
+                    await CalculatorReceivable(modelReceivableList);
+                });
             }
             return Ok(result);
         }

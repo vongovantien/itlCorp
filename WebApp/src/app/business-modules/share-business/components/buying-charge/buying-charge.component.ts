@@ -431,7 +431,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
             this._progressRef.start();
-            this._documentRepo.deleteShipmentSurcharge(this.selectedSurcharge.id)
+            const body = {
+                Id: this.selectedSurcharge.id,
+                partnerId: this.selectedSurcharge.paymentObjectId,
+                office: (!!this.selectedSurcharge ? this.selectedSurcharge.officeId : this.userLogged.officeId),
+                service: (!!this.selectedSurcharge.transactionType ? this.selectedSurcharge.transactionType : this.serviceTypeId),
+            }
+            this._documentRepo.deleteShipmentSurcharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -459,11 +465,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
-                this.calculatorReceivable([this.selectedSurcharge])
+                // this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteSellingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.OBH:
-                this.calculatorReceivable([this.selectedSurcharge])
+                // this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteOBHSurchargeAction(index));
                 break;
             default:

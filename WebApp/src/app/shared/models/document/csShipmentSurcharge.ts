@@ -90,13 +90,15 @@ export class CsShipmentSurcharge {
     chargeGroup: string = null;
     vatPartnerId: string = null;
     vatPartnerShortName: string = null;
+    officeId: string = null;
+    transactionType: string = null;
 
     // * Custom
     duplicateCharge: boolean = false;
     duplicateInvoice: boolean = false;
     isShowPartnerHeader: boolean = false;
     linkFee: boolean = null;
-    linkChargeId:string = null;
+    linkChargeId: string = null;
 
     constructor(object?: any) {
         const self = this;

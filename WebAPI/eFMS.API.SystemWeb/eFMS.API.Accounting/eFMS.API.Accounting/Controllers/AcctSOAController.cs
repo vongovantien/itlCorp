@@ -86,7 +86,7 @@ namespace eFMS.API.Accounting.Controllers
                         await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
                     }
 
-                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if(modelReceivableList.Count > 0)
                     {
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
@@ -137,7 +137,7 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
                     }
-                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
@@ -210,7 +210,7 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
                     }
-                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(soaNo);
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
@@ -500,6 +500,7 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(new ResultHandle { Status = reject.Success, Message = "Reject SOA successful.", Data = model });
         }
+
         [HttpPost]
         [Route("GetAdjustDebitValue")]
         [Authorize]
@@ -515,6 +516,18 @@ namespace eFMS.API.Accounting.Controllers
         {
             currentUser.Action = "UpdateAdjustDebitValue";
             var dt = acctSOAService.UpdateAdjustDebitValue(model);
+            if(dt.Success)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = new List<ObjectReceivableModel>();
+                    modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.CODE, model.Action);
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
+                });
+            }
             return Ok(dt);
         }
     }

@@ -428,8 +428,8 @@ export class DocumentationRepo {
         return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadGoodsFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
     }
 
-    deleteShipmentSurcharge(chargId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Delete`, { chargId: chargId }).pipe(
+    deleteShipmentSurcharge(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Delete`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

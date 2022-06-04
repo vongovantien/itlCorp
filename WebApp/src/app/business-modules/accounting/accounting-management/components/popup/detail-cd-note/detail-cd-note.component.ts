@@ -96,7 +96,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService, ) {
+        private _spinner: NgxSpinnerService,) {
         super();
         this.requestSort = this.sortChargeCdNote;
     }
@@ -140,7 +140,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
 
                     });
                     this.cdnoteDetail = dataCdNote;
-                    if(this.cdnoteDetail.cdNote.type =="DEBIT") {
+                    if (this.cdnoteDetail.cdNote.type == "DEBIT") {
                         this.headers = [
                             { title: 'HAWB No', field: 'hwbno', sortable: true },
                             { title: 'Code', field: 'chargeCode', sortable: true },
@@ -181,7 +181,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         this.balanceAmount = '';
         this.totalAdjustVND = '';
         const adjustVND = listCharge.reduce((adjustVND, charge) => adjustVND + charge.adjustVND, 0);
-        this.totalAdjustVND += this.formatNumberCurrency(adjustVND) + ' ' + 'VND' ;
+        this.totalAdjustVND += this.formatNumberCurrency(adjustVND) + ' ' + 'VND';
         for (const currency of uniqueCurrency) {
             const _credit = listCharge.filter(f => f.currencyId === currency).reduce((credit, charge) => credit + charge.credit, 0);
             const _debit = listCharge.filter(f => f.currencyId === currency).reduce((debit, charge) => debit + charge.debit, 0);
@@ -302,13 +302,13 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
             );
     }
 
-    adjustDebitValue(){
-        this.adjustDebitValuePopup.action='CDNOTE';
-        this.adjustDebitValuePopup.jodId=this.jobId;
-        this.adjustDebitValuePopup.cdNote=this.cdNote;
+    adjustDebitValue() {
+        this.adjustDebitValuePopup.action = 'DEBIT';
+        this.adjustDebitValuePopup.jodId = this.jobId;
+        this.adjustDebitValuePopup.cdNote = this.cdNote;
         this.adjustDebitValuePopup.active();
     }
-    onSaveAdjustDebit(){
-        this.getDetailCdNote(this.jobId,this.cdNote);
+    onSaveAdjustDebit() {
+        this.getDetailCdNote(this.jobId, this.cdNote);
     }
 }
