@@ -861,8 +861,12 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
                           Total = detail.Total, 
                           Notify = detail.Notify,
-                          Group=gr.ShortName,
-                          Department=dept.DeptNameAbbr
+                          Group = gr.ShortName,
+                          Department = dept.DeptNameAbbr,
+                          WareHouseAnDate = detail.WareHouseAnDate,
+                          OfficeId = detail.OfficeId,
+                          CompanyId = detail.CompanyId,
+                          TransactionType = tran.TransactionType
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();

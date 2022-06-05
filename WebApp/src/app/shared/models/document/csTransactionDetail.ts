@@ -113,6 +113,10 @@ export class CsTransactionDetail {
   contactPerson: string = '';
   closingTime: string = '';
   incotermId: string = null;
+  receivedBillTime: any = null;
+  officeId: string = null;
+  companyId: string = null;
+
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

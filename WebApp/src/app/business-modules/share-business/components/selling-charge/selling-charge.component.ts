@@ -10,7 +10,7 @@ import { CsShipmentSurcharge, Charge, Unit } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { takeUntil, catchError, finalize, switchMap } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
@@ -19,7 +19,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { formatDate } from '@angular/common';
+import { getPartnerForKeyingChargeState, LoadListPartnerForKeyInSurcharge } from './../../store';
 
 @Component({
     selector: 'selling-charge',
@@ -76,32 +76,14 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getPartner() {
-        this._spinner.show(this.spinnerpartner);
-        this._store.select(fromStore.getTransactionDetailCsTransactionState)
-            .pipe(
-                switchMap(
-                    (data) => {
-                        if (!!data?.officeId) {
-                            return this._catalogueRepo.getPartnerForKeyingCharge(
-                                true,
-                                this.serviceTypeId,
-                                data?.officeId,
-                                this.hbl.saleManId
-                            ).pipe(
-                                finalize(() => {
-                                    this._spinner.hide(this.spinnerpartner);
-                                    this.isShowLoadingPartner = false;
-                                }),
-                            );;
-                        }
-                    }
-                ),
-                takeUntil(this.ngUnsubscribe),
-            ).subscribe(
-                (partners: any[]) => {
-                    this.listPartner = partners;
-                }
-            );
+        this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+            { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId })
+        );
+        this._store.select(getPartnerForKeyingChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((partners: any[]) => {
+                this.listPartner = partners;
+            });
     }
 
     getCurrency() {
@@ -124,7 +106,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     if (this.isDuplicateJob) {
-                        buyings.forEach(s=>s.linkFee = null);
+                        buyings.forEach(s => s.linkFee = null);
                     }
                     this.charges = buyings;
                     this._cd.markForCheck();
@@ -342,7 +324,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 }
             );
     }
-    onConfirmRevertLinkFee (selectedCs:CsShipmentSurcharge){
+    onConfirmRevertLinkFee(selectedCs: CsShipmentSurcharge) {
         let charges = [];
         selectedCs.linkFee = false;
         charges.push(selectedCs);

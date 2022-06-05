@@ -1075,13 +1075,15 @@ namespace eFMS.API.Accounting.DL.Services
                 if (partner != null)
                 {
                     //Agreement của partner
-                    var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId
-                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
-                    if (contractPartner != null)
+                    var contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId
+                                                                    && agreementIds.Contains(x.Id));
+                    if (contractPartner.Count() > 0)
                     {
-                        var agreementPartner = CalculatorAgreement(contractPartner);
-                        hs = await contractPartnerRepo.UpdateAsync(agreementPartner, x => x.Id == agreementPartner.Id);
+                        foreach (var item in contractPartner)
+                        {
+                            var agreementPartner = CalculatorAgreement(item);
+                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id);
+                        }
                     }
                     else
                     {
@@ -1089,11 +1091,10 @@ namespace eFMS.API.Accounting.DL.Services
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
                                                                        && x.PartnerId == partner.ParentId
                                                                        && agreementIds.Contains(x.Id)).FirstOrDefault();
-                        if (contractParent != null)
+                        foreach (var item in contractPartner)
                         {
-                            var agreementParent = CalculatorAgreement(contractParent);
-
-                            hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
+                            var agreementPartner = CalculatorAgreement(item);
+                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id);
                         }
                     }
                 }
@@ -2729,7 +2730,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
 
-                var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+                var partnerIds = receivables.Select(s => s.PartnerId).Distinct().ToList();
                 var agreementIds = receivables.Select(s => s.ContractId).ToList();
 
                 await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
@@ -3621,7 +3622,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var draft = receivables.Where(x => x.PartnerId == fe.PartnerId
                     && x.Service == fe.Service
                     && x.Office == fe.Office
-                    && !receivableIdModified.Contains(x.Id));
+                    && !receivableIdModified.Contains(x.Id)
+                    && x.Id != Guid.Empty);
                     if (draft.Count() > 0)
                     {
                         foreach (var item in draft)
