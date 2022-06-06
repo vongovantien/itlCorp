@@ -2860,6 +2860,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var currentReceivables = DataContext.Get(x => x.PartnerId == fe.PartnerId && x.Office == fe.Office && x.Service == fe.Service).ToList();
                 receivables = mapper.Map<List<AccAccountReceivableModel>>(currentReceivables);
+                foreach (var item in receivables)
+                {
+                    item.SellingNoVat = 0;
+                    item.ObhAmount = 0;
+                    item.BillingUnpaid = 0;
+                    item.ObhUnpaid = 0;
+                    item.BillingAmount = 0;
+                    item.ObhBilling = 0;
+                    item.PaidAmount = 0;
+                    item.ObhPaid = 0;
+                }
                 var receivableIdModified = new List<Guid>();
 
                 #region SellingNoVat
@@ -2972,13 +2983,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
                     }
-                } else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.SellingNoVat = 0;
-                    }
-                }
+                } 
                 #endregion SellingNoVat
 
                 #region OBH Amount
@@ -3237,13 +3242,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
                     }
-                } else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.BillingAmount = item.BillingUnpaid = 0;
-                    }
                 }
+               
                 #endregion
 
                 #region OBH Billing - OBH Unpaid
@@ -3384,13 +3384,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.ObhBilling = item.ObhUnpaid = 0;
-                    }
-                }
+                
                 #endregion
 
                 #region OBH Paid
@@ -3495,13 +3489,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.ObhPaid = 0;
-                    }
-                }
+               
                 #endregion
 
                 #region  Paid Amount
@@ -3608,13 +3596,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.PaidAmount = 0;
-                    }
-                }
+               
                 #endregion
                 if(receivableIdModified.Count > 0)
                 {
