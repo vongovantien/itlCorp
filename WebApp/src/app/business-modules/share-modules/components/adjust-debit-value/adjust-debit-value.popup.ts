@@ -134,16 +134,16 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
             let el = this.data.listChargeGrp[i];
             for (let j = 0; j < this.data.listChargeGrp[i].listCharges.length; j++) {
                 let el2 = this.data.listChargeGrp[i].listCharges[j];
-                if (!el2.amountVND&&el2.amountVND!=0) {
+                if (!el2.amountVND && el2.amountVND != 0) {
                     this._toastService.warning(`${el2.chargeCode} cannot empty NetDebit`);
                     return false;
                 }
-                if (!el2.vatAmountVND && el2.vatAmountVND!=0) {
+                if (!el2.vatAmountVND && el2.vatAmountVND != 0) {
                     this._toastService.warning(`${el2.chargeCode} cannot empty Vat`);
                     return false;
                 }
                 let total = el2.orgAmountVND - (el2.amountVND + el2.vatAmountVND);
-                if (total >= 10000 || total <=-10000) {
+                if (total >= 10000 || total <= -10000) {
                     this._toastService.warning(`${el2.chargeCode} cannot enter too 10.000`);
                     return false;
                 }
@@ -160,7 +160,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
         var modelSearch = new AdjustModel();
         if (this.action == "SOA") {
             modelSearch.code = this.soano;
-        } else if (this.action == "CDNOTE") {
+        } else if (this.action == "DEBIT") {
             modelSearch.jodId = this.jodId;
             modelSearch.code = this.cdNote ?? "";
         }
