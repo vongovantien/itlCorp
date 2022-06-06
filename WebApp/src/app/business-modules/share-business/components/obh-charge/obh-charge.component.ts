@@ -134,11 +134,12 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH }).subscribe(
-            (charges: Charge[]) => {
-                this.listCharges = charges;
-            }
-        );
+        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH })
+        // .subscribe(
+        //     (charges: Charge[]) => {
+        //         this.listCharges = charges;
+        //     }
+        // );
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {
@@ -291,11 +292,11 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         //     }
         // }
         for (const charge of this.charges) {
-            if(!this.utility.isWhiteSpace(charge.invoiceNo) &&this.utility.isWhiteSpace(charge.seriesNo)){
+            if (!this.utility.isWhiteSpace(charge.invoiceNo) && this.utility.isWhiteSpace(charge.seriesNo)) {
                 this._toastService.warning("Series No Must be fill in");
                 return;
             }
-            if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+            if (this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)) {
                 this._toastService.warning("Invoice No Must be fill in");
                 return;
             }

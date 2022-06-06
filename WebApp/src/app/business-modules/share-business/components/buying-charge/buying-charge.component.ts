@@ -58,6 +58,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
     listCharges: Charge[];
+    listCharges$: Observable<Charge[]>;
     listUnits: Unit[] = [];
     listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
@@ -285,12 +286,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
-            .subscribe(
-                (charges: Charge[]) => {
-                    this.listCharges = charges;
-                }
-            );
+        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
+        // .subscribe(
+        //     (charges: Charge[]) => {
+        //         this.listCharges = charges;
+        //     }
+        // );
     }
 
     sortSurcharge() {

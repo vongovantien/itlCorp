@@ -141,12 +141,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT })
-            .subscribe(
-                (charges: Charge[]) => {
-                    this.listCharges = charges;
-                }
-            );
+        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT })
+        // .subscribe(
+        //     (charges: Charge[]) => {
+        //         this.listCharges = charges;
+        //     }
+        // );
     }
 
     saveSellingSurCharge() {
