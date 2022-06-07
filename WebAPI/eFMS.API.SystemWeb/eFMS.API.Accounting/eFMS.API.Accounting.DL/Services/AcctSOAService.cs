@@ -2617,32 +2617,34 @@ namespace eFMS.API.Accounting.DL.Services
                         air.DAN = NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitUSD).Sum(), 2);
                         air.TotalAmount += NumberHelper.RoundNumber((decimal)lstDANFee.Select(t => t.DebitLocal).Sum());
                     }
-                    // Other fee
-                    var lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE);
-                    if (lstOTHFee.Count() == 0)
-                    {
-                        lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower());
-                    }
-                    if (lstOTHFee.Count() == 0)
-                    {
-                        lstOTHFee = charge.Where(x => x.HBLID == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SCREENING_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SCREENING_FEE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_AWB_FEE_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AWB_FEE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_AMS_FEE_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AMS_FEE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
-                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
-                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
-                        ));
-                    }
+                    // Other fee => Update 07/07/2022: get all remain fees
+                    //var lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE);
+                    //if (lstOTHFee.Count() == 0)
+                    //{
+                    //    lstOTHFee = charge.Where(x => x.HBLID == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower());
+                    //}
+                    //if (lstOTHFee.Count() == 0)
+                    //{
+                    var lstOTHFee = charge.Where(x => x.HBLID == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_SCREENING_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SCREENING_FEE.ToLower()
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_X_RAY.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_AWB_FEE_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AWB_FEE.ToLower()
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AWB.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_AMS_FEE_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AMS_FEE.ToLower()
+                                                                && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
+                                                                //&& x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
+                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
+                    ));
+                    //}
                     if (lstOTHFee.Count() > 0)
                     {
                         air.OTH = NumberHelper.RoundNumber((decimal)lstOTHFee.Select(t => t.DebitUSD).Sum(), 2);
