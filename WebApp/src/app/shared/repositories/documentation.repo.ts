@@ -1164,6 +1164,16 @@ export class DocumentationRepo {
         );
     }
 
+    updateShipmentLinkFee(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/LinkFeeJob`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+
     updateShipmentSurchargesLinkFee(data: any[]) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/UpdateChargeLinkFee`, data).pipe(
             catchError((error) => throwError(error)),
@@ -1183,7 +1193,7 @@ export class DocumentationRepo {
     }
 
     chargeFromReplicate(arrJobRep) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`,{arrJobRep:arrJobRep}).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`, { arrJobRep: arrJobRep }).pipe(
             map((data: any) => data)
         );
     }
