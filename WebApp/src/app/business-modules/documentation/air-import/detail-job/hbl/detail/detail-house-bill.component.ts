@@ -17,6 +17,7 @@ import { AirImportCreateHBLComponent } from '../create/create-house-bill.compone
 import { skip, catchError, takeUntil, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { of } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 
 enum HBL_TAB {
@@ -200,20 +201,20 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         let proofOfDelievey = this.proofOfDeliveryComponent.proofOfDelievey;
 
         modelUpdate.arrivalNo = arrivalNote.arrivalNo;
-        modelUpdate.arrivalFirstNotice = arrivalNote.arrivalFirstNotice.startDate?formatDate(arrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en'):null;
-        modelUpdate.arrivalSecondNotice = arrivalNote.arrivalSecondNotice.startDate?formatDate(arrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en'):null;
+        modelUpdate.arrivalFirstNotice = arrivalNote.arrivalFirstNotice.startDate ? formatDate(arrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null;
+        modelUpdate.arrivalSecondNotice = arrivalNote.arrivalSecondNotice.startDate ? formatDate(arrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null;
         modelUpdate.arrivalFooter = arrivalNote.arrivalFooter;
         modelUpdate.arrivalHeader = arrivalNote.arrivalHeader;
         modelUpdate.dofooter = deliveryOrder.dofooter;
         modelUpdate.dosentTo1 = deliveryOrder.doheader1;
         modelUpdate.dosentTo2 = deliveryOrder.doheader2;
-        modelUpdate.subAbbr =  deliveryOrder.subAbbr;
+        modelUpdate.subAbbr = deliveryOrder.subAbbr;
         modelUpdate.deliveryOrderNo = deliveryOrder.deliveryOrderNo;
-        modelUpdate.deliveryOrderPrintedDate = deliveryOrder.deliveryOrderPrintedDate.startDate?formatDate(deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en'):null;
-        modelUpdate.deliveryDate =   proofOfDelievey.deliveryDate.startDate?formatDate(proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en'):null;
-        modelUpdate.referenceNoProof =  proofOfDelievey.referenceNo;
-        modelUpdate.note =  proofOfDelievey.note;
-        modelUpdate.deliveryPerson =  proofOfDelievey.deliveryPerson;
+        modelUpdate.deliveryOrderPrintedDate = deliveryOrder.deliveryOrderPrintedDate.startDate ? formatDate(deliveryOrder.deliveryOrderPrintedDate.startDate, 'yyyy-MM-dd', 'en') : null;
+        modelUpdate.deliveryDate = proofOfDelievey.deliveryDate.startDate ? formatDate(proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null;
+        modelUpdate.referenceNoProof = proofOfDelievey.referenceNo;
+        modelUpdate.note = proofOfDelievey.note;
+        modelUpdate.deliveryPerson = proofOfDelievey.deliveryPerson;
     }
 
     updateHbl(body: any) {
