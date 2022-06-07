@@ -280,13 +280,12 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Incoterm</label>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
+                                <label required>Incoterm</label>
                                 <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
-                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                           [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -298,7 +297,20 @@
                                 <input type="text" class="form-control" formControlName="poinvoiceNo">
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Warehouse A.N</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" readonly
+                                        formControlName="wareHouseAnDate" (remove)="resetFormControl(wareHouseAnDate)"
+                                        calendar
+                                        [allowRemove]="!!wareHouseAnDate.value && !!wareHouseAnDate.value.startDate" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Issued Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">

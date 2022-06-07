@@ -259,11 +259,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         [this.editForm.commodityGroupId,
         this.editForm.packageTypeId,
         ].forEach((control: AbstractControl) => this.setError(control));
-
+        console.log(this.editForm);
         let valid: boolean = true;
         if (!this.editForm.formEdit.valid
             || (!!this.editForm.serviceDate.value && !this.editForm.serviceDate.value.startDate)
             || (!!this.editForm.finishDate.value.startDate && this.editForm.serviceDate.value.startDate > this.editForm.finishDate.value.startDate)
+            || (this.editForm.hwbno.value===null || this.editForm.hwbno.value?.length===0)
+            || (this.editForm.mblno.value===null || this.editForm.mblno.value?.length===0)
         ) {
             valid = false;
         }

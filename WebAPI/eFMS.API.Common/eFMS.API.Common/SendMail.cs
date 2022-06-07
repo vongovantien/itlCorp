@@ -13,7 +13,8 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
-        public const string _emailFrom = "noreply-efms@itlvn.com"; //"info.fms@itlvn.com";
+        public const string _FromMailString = "noreply-efms@itlvn.com"; //"info.fms@itlvn.com";
+        public static string _emailFrom = _FromMailString;
         private const string _smtpHost = "email-smtp.ap-southeast-2.amazonaws.com"; //"webmail.itlvn.com";
         private const string _smptUser = "AKIA2AI6JMUOVFIQJQXN"; //"info.fms";
         private const string _smtpPassword = "BPHb4U8b6yCmJ7W4QB095djPHL75tQUfcXLOCGL99WKP"; //"ITPr0No1!";
@@ -31,6 +32,7 @@ namespace eFMS.API.Common
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
+            ResetMailFrom(); // reset from email
             try
             {
                 if (toEmails != null && toEmails.Count() > 0)
@@ -124,6 +126,15 @@ namespace eFMS.API.Common
             }
             return result;
         }
+
+        /// <summary>
+        /// Reset lại mail From để tránh lấy lại mail From được gán trước đó
+        /// </summary>
+        private static void ResetMailFrom()
+        {
+            _emailFrom = _FromMailString;
+        }
+
         public static bool Send(string Subject, string Body, string ToEmail, List<string> Attachments, List<string> EmailCCs, List<string> emailBCC = null)
         {
             List<string> ToEmails = new List<string>() { ToEmail };

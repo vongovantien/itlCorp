@@ -249,6 +249,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             documentDate: !!this.formHouseBill.documentDate.value && this.formHouseBill.documentDate.value.startDate != null ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,
             etawarehouse: !!this.formHouseBill.etawarehouse.value && this.formHouseBill.etawarehouse.value.startDate != null ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!this.formHouseBill.issueHBLDate.value && this.formHouseBill.issueHBLDate.value.startDate != null ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
+            receivedBillTime: !!this.formHouseBill.receivedBillTime.value && this.formHouseBill.receivedBillTime.value.startDate != null ? formatDate(this.formHouseBill.receivedBillTime.value.startDate !== undefined ? this.formHouseBill.receivedBillTime.value.startDate : this.formHouseBill.receivedBillTime.value, 'yyyy-MM-dd', 'en') : null,
 
             hbltype: this.formHouseBill.hbltype.value,
             servicetype: this.formHouseBill.servicetype.value,

@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
 {
     public class sp_GetDataExportAccountant
     {
+        public Guid SurChargeId { get; set; }
         public string JobNo { get; set; }
         public string HWBNo { get; set; }
         public string Service { get; set; }
@@ -32,6 +33,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string UserCreated { get; set; }
         public string SyncedFrom { get; set; }
         public string VatPartnerID { get; set; }
-
+        public string BillNoSynced { get; set; }
+        public string PayBillNoSynced { get; set; }
+        public string PaySyncedFrom { get; set; }
     }
 }
