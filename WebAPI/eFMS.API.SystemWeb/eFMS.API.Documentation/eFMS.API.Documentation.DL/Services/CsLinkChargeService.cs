@@ -80,6 +80,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = _opsTransRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
                 if (shipment != null)
                     shipment.IsLinkFee = true;
+                if (shipment.ShipmentMode == "External")
+                    return new HandleState("There job shipment mode External");
 
                 //Map transtype
                 var proSerVe = myDict[shipment.ProductService + " " + shipment.ServiceMode];
