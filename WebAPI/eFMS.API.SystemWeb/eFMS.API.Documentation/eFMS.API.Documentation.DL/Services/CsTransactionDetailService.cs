@@ -878,7 +878,8 @@ namespace eFMS.API.Documentation.DL.Services
                           Total = detail.Total, 
                           Notify = detail.Notify,
                           Group=gr.ShortName,
-                          Department=dept.DeptNameAbbr
+                          Department=dept.DeptNameAbbr,
+                          WareHouseAnDate= detail.WareHouseAnDate
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
