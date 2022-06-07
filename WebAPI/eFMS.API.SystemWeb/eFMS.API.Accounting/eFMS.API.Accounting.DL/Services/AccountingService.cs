@@ -56,6 +56,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysFileRepository;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
    
         #endregion --Dependencies--
@@ -109,6 +110,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAcctSettlementPaymentService settlementService,
             IContextBase<SysImage> sysFileRepo,
             IDatabaseUpdateService _databaseUpdateService,
+            IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -148,6 +150,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysFileRepository = sysFileRepo;
             settlementPaymentService = settlementService;
             databaseUpdateService = _databaseUpdateService;
+            sysEmailTemplateRepository = sysEmailTemplateRepo;
             // ---
 
             users = UserRepository.Get();
@@ -2495,39 +2498,92 @@ namespace eFMS.API.Accounting.DL.Services
                 _type2 = "Invoice";
             }
 
-            string subject = string.Format(@"eFMS - {0} Request - {1} {2}", _type1, _type2, refNo);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
-                                            "<p><i>Dear Accountant Team,</i></p>" +
-                                            "<p>" +
-                                                "<div>You received a <b>[SOA_CDNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
-                                                "<div><i>Bạn có nhận một đề nghị thanh toán bằng <b>[SOA_CDNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
-                                            "</p>" +
-                                            "<ul>" +
-                                                "<li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li>" +
-                                                "<li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li>" +
-                                                "<li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li>" +
-                                                "<li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li>" +
-                                                "<li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li>" +
-                                                "<li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li>" +
-                                            "</ul>" +
-                                            "<p>" +
-                                                "<div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div>" +
-                                                "<div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div>" +
-                                            "</p>" +
-                                            "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
-                                         "</div>");
-            body = body.Replace("[SOA_CDNote]", _type2);
-            body = body.Replace("[CreatorEnName]", creatorEnName);
-            body = body.Replace("[RefNo]", refNo);
-            body = body.Replace("[PartnerEn]", partnerEn);
-            body = body.Replace("[Taxcode]", taxCode);
-            body = body.Replace("[ServiceName]", serviceName);
-            body = body.Replace("[AmountCurr]", amountCurr);
-            body = body.Replace("[PaymentMethod]", !string.IsNullOrEmpty(paymentMethod) ? paymentMethod : "Credit");
-            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
-            body = body.Replace("[lang]", "en");
-            body = body.Replace("[UrlFunc]", urlFunc);
-            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #region Delete Old
+            //string subject = string.Format(@"eFMS - {0} Request - {1} {2}", _type1, _type2, refNo);
+            //string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+            //                                "<p><i>Dear Accountant Team,</i></p>" +
+            //                                "<p>" +
+            //                                    "<div>You received a <b>[SOA_CDNote]</b> from <b>[CreatorEnName]</b> as info bellow:</div>" +
+            //                                    "<div><i>Bạn có nhận một đề nghị thanh toán bằng <b>[SOA_CDNote]</b> từ <b>[CreatorEnName]</b> với thông tin như sau: </i></div>" +
+            //                                "</p>" +
+            //                                "<ul>" +
+            //                                    "<li>Ref No/ <i>Số tham chiếu</i>: <b><i>[RefNo]</i></b></li>" +
+            //                                    "<li>Partner Name/ <i>Tên đối tượng</i>: <b><i>[PartnerEn]</i></b></li>" +
+            //                                    "<li>Tax Code/ <i>Mã số thuế</i>: <b><i>[Taxcode]</i></b></li>" +
+            //                                    "<li>Service/ <i>Dịch vụ</i>: <b><i>[ServiceName]</i></b></li>" +
+            //                                    "<li>Amount/ <i>Số tiền</i>: <b><i>[AmountCurr]</i></b></li>" +
+            //                                    "<li>Payment Method/ <i>Phương Thức thanh toán</i>: <b><i>[PaymentMethod]</i></b></li>" +
+            //                                "</ul>" +
+            //                                "<p>" +
+            //                                    "<div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div>" +
+            //                                    "<div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div>" +
+            //                                "</p>" +
+            //                                "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
+            //                             "</div>");
+            //body = body.Replace("[SOA_CDNote]", _type2);
+            //body = body.Replace("[CreatorEnName]", creatorEnName);
+            //body = body.Replace("[RefNo]", refNo);
+            //body = body.Replace("[PartnerEn]", partnerEn);
+            //body = body.Replace("[Taxcode]", taxCode);
+            //body = body.Replace("[ServiceName]", serviceName);
+            //body = body.Replace("[AmountCurr]", amountCurr);
+            //body = body.Replace("[PaymentMethod]", !string.IsNullOrEmpty(paymentMethod) ? paymentMethod : "Credit");
+            //body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            //body = body.Replace("[lang]", "en");
+            //body = body.Replace("[UrlFunc]", urlFunc);
+            //body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #endregion
+
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT") ? "INV-VOUCHER-REQUEST-DEBIT" : "INV-VOUCHER-REQUEST")).FirstOrDefault();
+            string subject = emailTemplate.Subject.Replace("{{Type}}", _type1);
+            subject = subject.Replace("{{Billing}}", _type2 + " " + refNo);
+
+            decimal? exchangeRateIssue = 1;
+            decimal? finalExchangeRate = 1;
+            if (catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT")
+            {
+                if (catagory == "SOA_DEBIT")
+                {
+                    var soa = soaRepository.Get(x => x.Soano == refNo).FirstOrDefault();
+                    if (soa.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                        finalExchangeRate = soa.ExcRateUsdToLocal;
+                    }
+                    else
+                    {
+                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_LOCAL);
+                        finalExchangeRate = exchangeRateIssue ?? 1;
+                    }
+                }
+                else
+                {
+                    var debit = cdNoteRepository.Get(x => x.Code == refNo).FirstOrDefault();
+                    if (debit.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, debit.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                        finalExchangeRate = debit.ExcRateUsdToLocal;
+                    }
+                    else
+                    {
+                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, debit.DatetimeCreated, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_LOCAL);
+                        finalExchangeRate = debit.ExchangeRate ?? 1;
+                    }
+                }
+            }
+            string body = emailTemplate.Body;
+            body = body.Replace("{{SOA_CDNote}}", _type2);
+            body = body.Replace("{{CreatorEnName}}", creatorEnName);
+            body = body.Replace("{{RefNo}}", refNo);
+            body = body.Replace("{{PartnerEn}}", partnerEn);
+            body = body.Replace("{{Taxcode}}", taxCode);
+            body = body.Replace("{{ServiceName}}", serviceName);
+            body = body.Replace("{{AmountCurr}}", amountCurr);
+            body = body.Replace("{{PaymentMethod}}", !string.IsNullOrEmpty(paymentMethod) ? paymentMethod : "Credit");
+            body = body.Replace("{{ExchangeRateIssue}}", string.Format("{0:n0}", exchangeRateIssue));
+            body = body.Replace("{{FinalExchangeRate}}", string.Format("{0:n0}", finalExchangeRate));
+            body = body.Replace("{{Url}}", string.Format("{0}/{1}/#/{2}", webUrl.Value.Url.ToString(), "en", urlFunc));
+            body = body.Replace("{{Logo}}", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID)?.FirstOrDefault();
 

@@ -143,8 +143,8 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
                     return false;
                 }
                 let total = el2.orgAmountVND - (el2.amountVND + el2.vatAmountVND);
-                if (total >= 10000 || total <=-10000) {
-                    this._toastService.warning(`${el2.chargeCode} cannot enter too 10.000`);
+                if (total > 100 || total < -100) {
+                    this._toastService.warning(`${el2.chargeCode} cannot update more than 100`);
                     return false;
                 }
             }
