@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepo;
+        private readonly IContextBase<CatDepartment> catDepartmentRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
@@ -52,6 +53,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<SysSentEmailHistory> sentEmailHistory,
             IContextBase<SysEmailTemplate> sysEmailTemplate,
+            IContextBase<CatDepartment> catDepartment,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -66,6 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
             sentEmailHistoryRepo = sentEmailHistory;
             apiServiceUrl = serviceUrl;
             sysEmailTemplateRepo = sysEmailTemplate;
+            catDepartmentRepo = catDepartment;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -81,6 +84,11 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(emailContent.Cc))
                 {
                     ccEmails = emailContent.Cc.Split(';').Where(x => x.Trim().ToString() != string.Empty).ToList();
+                }
+
+                if (SendMail.IsValidEmail(emailContent.From))
+                {
+                    SendMail._emailFrom = emailContent.From;
                 }
                 var sendMailResult = SendMail.Send(emailContent.Subject, emailContent.Body, toEmails, emailContent.AttachFiles, ccEmails);
                 
@@ -148,7 +156,17 @@ namespace eFMS.API.Documentation.DL.Services
                 _empCurrentUser?.Email);
 
             var emailContent = new EmailContentModel();
-            emailContent.From = "Info FMS";
+            var department = catDepartmentRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (department != null)
+            {
+                mailFrom = department.Email;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom;
             emailContent.To = _airlineMail; //Email của Airlines
             emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
             emailContent.Subject = _subject;
