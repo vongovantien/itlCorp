@@ -113,8 +113,6 @@ namespace eFMS.API.Documentation.DL.Services
                             return new HandleState("There is no hbl job service");
                         if (jobTrans.TransactionType != rule.ServiceBuying)
                             return new HandleState("There is no service type");
-                        if (jobTrans.ShipmentType != rule.ServiceBuying)
-                            return new HandleState("There is no service type");
 
                         chargeBuy.Hblid = hbl != null ? hbl.Id : new Guid();
                         chargeBuy.Hblno = hbl != null ? hbl.Hwbno : null;
