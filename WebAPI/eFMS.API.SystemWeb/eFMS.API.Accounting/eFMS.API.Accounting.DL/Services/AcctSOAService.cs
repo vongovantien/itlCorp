@@ -2642,7 +2642,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                 && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
                                                                 && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
                                                                 //&& x.ChargeCode != AccountingConstants.CHARGE_SA_HDL_AIR_CODE
-                                                                && x.ChargeName.ToLower() != AccountingConstants.CHARGE_HANDLING_FEE.ToLower()
+                                                                && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_HANDLING_FEE)
                     ));
                     //}
                     if (lstOTHFee.Count() > 0)
