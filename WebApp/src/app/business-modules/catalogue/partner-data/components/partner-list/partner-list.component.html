@@ -35,6 +35,7 @@
                         <td>{{partner.datetimeModified | date:'dd/MM/yyyy' }}</td>
                         <td [ngClass]="partner.active ? 'text-success' : 'text-danger'">
                             {{partner.active ? 'Active' : 'Inactive'}}</td>
+                        <td>{{partner.officeName}}</td>
                     </tr>
                     <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
                         [id]="'ops-customer-00' + partner.id | removeTrim " [parentId]="'#ops-customer-list-table'">
