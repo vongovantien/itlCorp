@@ -1,8 +1,11 @@
 ﻿using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -12,6 +15,8 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CheckPointService : ICheckPointService
     {
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)csSurchargeRepository.DC;
+
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<AccAccountingManagement> accAccountMngtRepository;
@@ -80,9 +85,23 @@ namespace eFMS.API.Documentation.DL.Services
                 var hbl = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault();
                 salemanCurrent = hbl?.SaleManId;
 
-                if (hbl?.SaleManId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
+                if (hbl?.SaleManId == salemanBOD)
                 {
                     return valid;
+                }
+
+                if(!string.IsNullOrEmpty(hbl?.ShipmentType) )
+                {
+                    if (hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED) {
+                        return valid;
+                    } 
+                }else
+                {
+                    var jobcs = DC.CsTransaction.FirstOrDefault(x => x.Id == hbl.JobId);
+                    if(jobcs?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
+                    {
+                        return valid;
+                    }
                 }
             }
 
