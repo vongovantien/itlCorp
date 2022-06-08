@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{action === 'SOA'?'Adjusted Soa'
-                    :action === 'CDNOTE'?'Adjusted CD Note':''}} </h5>
+                    :action === 'DEBIT'?'Adjusted CD Note':''}} </h5>
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -13,50 +13,57 @@
                     <div class="m-portlet__body modal-list">
                         <div class="div-inside bg-jagged-ice">
                             <div class="row">
-                                <ng-container *ngIf="action === 'SOA'" >
+                                <ng-container *ngIf="action === 'SOA'">
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">SOA No:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.code}}</span>
-                                        <br/>
+                                        <br />
                                         <span class="m--font-bolder">Total USD:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.totalUSD | number: '.0-3'}}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{data.totalUSD | number:
+                                            '.0-3'}}</span>
                                     </div>
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">Partner Name:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.partnerName}}</span>
-                                        <br/>
+                                        <br />
                                         <span class="m--font-bolder">Total Shipment/Charge:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.totalShipment}}/{{data.totalCharge}}</span>
+                                        <span
+                                            class="m--font-brand m--margin-left-5">{{data.totalShipment}}/{{data.totalCharge}}</span>
                                     </div>
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">Exchange Rate:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.exchangeRate| number: '.0-3'}}</span>
-                                        <br/>
+                                        <span class="m--font-brand m--margin-left-5">{{data.exchangeRate| number:
+                                            '.0-3'}}</span>
+                                        <br />
                                         <span class="m--font-bolder">Total VND:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.totalVND | number: '.0-3'}}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{data.totalVND | number:
+                                            '.0-3'}}</span>
                                     </div>
                                 </ng-container>
-                                <ng-container *ngIf="action === 'CDNOTE'" >
+                                <ng-container *ngIf="action === 'DEBIT'">
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">CODE:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.code}}</span>
-                                        <br/>
+                                        <br />
                                         <span class="m--font-bolder">Exchange Rate:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.exchangeRate| number: '.0-3'}}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{data.exchangeRate| number:
+                                            '.0-3'}}</span>
                                     </div>
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">Partner Name:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.partnerName}}</span>
-                                        <br/>
+                                        <br />
                                         <span class="m--font-bolder">Total VND:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.totalVND | number: '.0-3'}}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{data.totalVND | number:
+                                            '.0-3'}}</span>
                                     </div>
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">Job Id:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.jobNo}}</span>
-                                        <br/>
+                                        <br />
                                         <span class="m--font-bolder">Total USD:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{data.totalUSD | number: '.0-3'}}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{data.totalUSD | number:
+                                            '.0-3'}}</span>
                                     </div>
                                 </ng-container>
                             </div>
@@ -86,53 +93,59 @@
                                     </div>
                                 </div>
                             </div>
-                            <table class="table table-wrapper table-scrollabler table-brand table-hover table-striped dataTable">
-                                <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
+                            <table
+                                class="table table-wrapper table-scrollabler table-brand table-hover table-striped dataTable">
+                                <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                </thead>
                                 <tbody>
-                                    <tr class="child" *ngFor="let charge of chargeGrp.listCharges; let j = index; trackBy: trackByFn">
-                                            <td class="text-center">{{j + 1}}</td>
-                                            <td class="text-left">{{charge.chargeCode}}</td>
-                                            <td class="text-left " style="min-width: 150px; white-space:initial">{{charge.chargeName}}</td>
-                                            <td class="text-right">
-                                                <span>{{charge.orgNet | number: '.0-3'}} {{charge.currency}}</span>
-                                            </td>
-                                            <td class="text-center">{{charge.vatRate}}</td>
-                                            <td class="text-right">
-                                                <span>{{charge.orgAmount | number: '.0-3'}} {{charge.currency}}</span>
-                                            </td>
-                                            <td class="text-right">
-                                               <input type="number"
-                                                    [disabled]="charge.type=='OBH'? 'disabled': null"
-                                                    class="form-control text-right"
-                                                    (ngModelChange)="onChangeNetDebit(i,j,$event)"
-                                                    [ngModel]="charge.amountVND"  autoFormatCurrency/>
-                                            </td>
-                                            <td class="text-right">
-                                                <input type="number"
-                                                [disabled]="charge.type=='OBH'
+                                    <tr class="child"
+                                        *ngFor="let charge of chargeGrp.listCharges; let j = index; trackBy: trackByFn">
+                                        <td class="text-center">{{j + 1}}</td>
+                                        <td class="text-left">{{charge.chargeCode}}</td>
+                                        <td class="text-left " style="min-width: 150px; white-space:initial">
+                                            {{charge.chargeName}}</td>
+                                        <td class="text-right">
+                                            <span>{{charge.orgNet | number: '.0-3'}} {{charge.currency}}</span>
+                                        </td>
+                                        <td class="text-center">{{charge.vatRate}}</td>
+                                        <td class="text-right">
+                                            <span>{{charge.orgAmount | number: '.0-3'}} {{charge.currency}}</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <input type="number" [disabled]="charge.type=='OBH'? 'disabled': null"
+                                                class="form-control text-right"
+                                                (ngModelChange)="onChangeNetDebit(i,j,$event)"
+                                                [ngModel]="charge.amountVND" autoFormatCurrency />
+                                        </td>
+                                        <td class="text-right">
+                                            <input type="number" [disabled]="charge.type=='OBH'
                                                 || !charge.vatRate || charge.vatRate === 0 ? 'disabled': null"
-                                                 class="form-control text-right" (ngModelChange)="onChangeNetVat(i,j,$event)" [(ngModel)]="charge.vatAmountVND"  autoFormatCurrency/>
-                                            </td>
-                                            <td class="text-right">
-                                                <span>{{(charge.amountVND + charge.vatAmountVND)| number: '.0-3' }}</span>
-                                            </td>
-                                            <td class="text-right">
-                                                <span>{{charge.orgAmountVND | number: '.0-3'}}</span>
-                                            </td>
-                                            <td class="text-right">
-                                                <span>{{charge.exchangeRate | number: '.0-3'}}</span>
-                                            </td>
-                                            <td class="text-left">
-                                                <span><input type="text"
-                                                    [disabled]="charge.type=='OBH' ? 'disabled': null"
-                                                     class="form-control text-left" (ngModelChange)="onChangeNote(i,j,$event)"  [(ngModel)]="charge.note"/></span>
-                                            </td>
+                                                class="form-control text-right"
+                                                (ngModelChange)="onChangeNetVat(i,j,$event)"
+                                                [(ngModel)]="charge.vatAmountVND" autoFormatCurrency />
+                                        </td>
+                                        <td class="text-right">
+                                            <span>{{(charge.amountVND + charge.vatAmountVND)| number: '.0-3' }}</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <span>{{charge.orgAmountVND | number: '.0-3'}}</span>
+                                        </td>
+                                        <td class="text-right">
+                                            <span>{{charge.exchangeRate | number: '.0-3'}}</span>
+                                        </td>
+                                        <td class="text-left">
+                                            <span><input type="text" [disabled]="charge.type=='OBH' ? 'disabled': null"
+                                                    class="form-control text-left"
+                                                    (ngModelChange)="onChangeNote(i,j,$event)"
+                                                    [(ngModel)]="charge.note" /></span>
+                                        </td>
                                     </tr>
                                 </tbody>
-                                <tfoot >
+                                <tfoot>
                                     <tr class="font-weight-bold font-15">
                                         <td colspan="5" ALIGN="center">TOTAL</td>
-                                        <td class="text-right">{{chargeGrp.totalOrgAmountUSD | number: '.0-3'}} $ | {{chargeGrp.totalOrgAmountVND| number: '.0-3'}} Đ</td>
+                                        <td class="text-right">{{chargeGrp.totalOrgAmountUSD | number: '.0-3'}} $ |
+                                            {{chargeGrp.totalOrgAmountVND| number: '.0-3'}} Đ</td>
                                         <td class="text-right">{{chargeGrp.totalNetDebit | number: '.0-3'}}</td>
                                         <td class="text-right">{{chargeGrp.totalVat | number: '.0-3'}}</td>
                                         <td class="text-right">{{chargeGrp.totalAdjustedVND | number: '.0-3'}}</td>
@@ -148,7 +161,7 @@
                     <span>
                         <i class="la la-check-square"></i>
                         <span>
-                           Save
+                            Save
                         </span>
                     </span>
                 </button>
