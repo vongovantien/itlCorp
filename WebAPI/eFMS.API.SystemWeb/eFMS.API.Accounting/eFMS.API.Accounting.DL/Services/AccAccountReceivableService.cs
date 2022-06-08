@@ -792,7 +792,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from surGrp in grpOps.DefaultIfEmpty()
                                where surGrp.OfficeId == fe.Office && surGrp.PaymentObjectId == fe.PartnerId && surGrp.TransactionType == fe.Service
                                select surGrp;
-                }else
+                }
+                else
                 {
                     _charges = from cs in csJob
                                join csd in transactionDetailRepo.Get() on cs.Id equals csd.JobId
@@ -1304,7 +1305,8 @@ namespace eFMS.API.Accounting.DL.Services
                 receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
                 receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
             }
-            receivables.ForEach(fe => {
+            receivables.ForEach(fe =>
+            {
                 //Calculator Debit Amount
                 fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0); // Công nợ chưa billing
                 fe.DatetimeCreated = DateTime.Now;
@@ -1465,7 +1467,7 @@ namespace eFMS.API.Accounting.DL.Services
             var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
-                              //join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
+                                  //join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
                               join acctReceivable in acctReceivables on contract.Id equals acctReceivable.ContractId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
                               where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
@@ -1479,7 +1481,7 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitAmount = s.acctReceivable.DebitAmount
                 }).ToList();
             // Group by Contract ID, Service AR, Office AR
-            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office ,g.contract.OfficeId })
+            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office, g.contract.OfficeId })
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
@@ -1516,13 +1518,13 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) /(s.First().contract.TrialCreditLimited)
-                                                                    :0) * 100 ?? 0,3) :
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) / (s.First().contract.TrialCreditLimited)
+                                                                    : 0) * 100 ?? 0, 3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
                                                                     (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum()) / (s.First().contract.CreditLimit)
-                                                                    : 0) * 100 ?? 0, 3):0),
+                                                                    : 0) * 100 ?? 0, 3) : 0),
                     CusAdvanceVnd = s.First().contract.CustomerAdvanceAmountVnd ?? 0,
                     CusAdvanceUsd = s.First().contract.CustomerAdvanceAmountUsd ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
@@ -1539,9 +1541,9 @@ namespace eFMS.API.Accounting.DL.Services
                     IsOverDue = s.FirstOrDefault().contract.IsOverDue,
                     IsOverLimit = s.FirstOrDefault().contract.IsOverLimit,
                     IsExpired = s.FirstOrDefault().contract.IsExpired,
-                    
+
                 });
-                
+
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
                        join parent in acRefPartner on partner.ParentId equals parent.Id into parents
@@ -1823,14 +1825,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             var res = new List<AccountReceivableResult>();
             res = arPartnerContracts.ToList();
-            
+
             res = res.Where(x => x.DebitAmount > 0).ToList();
 
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
                 res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo).ToList();
-            if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
+            if (criteria.AgreementStatus != null && criteria.AgreementStatus != "All")
                 res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
-            if (criteria.AgreementExpiredDay !=null && criteria.AgreementExpiredDay!="All")
+            if (criteria.AgreementExpiredDay != null && criteria.AgreementExpiredDay != "All")
             {
                 switch (criteria.AgreementExpiredDay)
                 {
@@ -1868,7 +1870,7 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
             }
 
-            return res.AsQueryable().OrderByDescending(x=>x.DebitRate);
+            return res.AsQueryable().OrderByDescending(x => x.DebitRate);
         }
 
 
@@ -1997,7 +1999,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (arPartnerContracts == null) return null;
             var groupbyAgreementId = arPartnerContracts.ToList()
-                    .GroupBy(g => new { g.AgreementId})
+                    .GroupBy(g => new { g.AgreementId })
                     .Select(s => new AccountReceivableResult
                     {
                         AgreementId = s.Key.AgreementId,
@@ -2040,15 +2042,15 @@ namespace eFMS.API.Accounting.DL.Services
                         Over30Day = s.Sum(sum => sum.Over30Day),
                         ArCurrency = s.First().ArCurrency,
                         ParentNameAbbr = s.First().ParentNameAbbr,
-                        ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
-                        ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
-                        ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
+                        ObhBillingAmount = s.Sum(sum => sum.ObhBillingAmount),
+                        ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
+                        ObhUnPaidAmount = s.Sum(sum => sum.ObhUnPaidAmount),
                         DatetimeModified = s.First().DatetimeModified,
                         OfficeContract = s.First().OfficeContract,
                         IsExpired = s.First().IsExpired,
                         IsOverLimit = s.First().IsOverLimit,
                         IsOverDue = s.First().IsOverDue,
-                    }).OrderByDescending(s=>s.DebitRate).AsQueryable();
+                    }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
 
@@ -2079,7 +2081,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
-             IEnumerable<object> data = GetDataARByCriteria(criteria);
+            IEnumerable<object> data = GetDataARByCriteria(criteria);
 
             if (data == null)
             {
@@ -2307,7 +2309,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode,int overDueDay = 0)
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode, int overDueDay = 0)
         {
             if (argeementId == null || argeementId == Guid.Empty) return null;
             DbParameter[] parameters =
@@ -2322,6 +2324,12 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
         #endregion --- DETAIL ---
+
+        private bool checkingPaidLoop2(Guid acctManagementID)
+        {
+            if (acctManagementID == null || accountingManagementRepo.Get(x => x.Id == acctManagementID).FirstOrDefault().PaymentStatus != "Paid") return true;
+            return false;
+        }
 
         public DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
         {
@@ -2338,7 +2346,20 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerName = partner.ShortName,
                 Currency = contract.CurrencyId
             };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId,criteria.PartnerId,criteria.AgreementSalesmanId);
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
+            //debitAmountDetail.DebitAmountDetails.ForEach(x =>
+            //{
+            //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);
+            //});
+            for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count(); i++)
+            {
+                if (debitAmountDetail.DebitAmountDetails[i].AcctManagementID == Guid.Empty) continue;
+                if (!checkingPaidLoop2(debitAmountDetail.DebitAmountDetails[i].AcctManagementID))
+                {
+                    debitAmountDetail.DebitAmountDetails.RemoveAt(i);
+                    i--;
+                }
+            }
 
             return debitAmountDetail;
         }
@@ -2513,8 +2534,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
                     if (invs != null)
                     {
-                    // Group By InvoiceID
-                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        // Group By InvoiceID
+                        IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                         {
                             Id = s.Key.Id,
                             DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
@@ -2564,8 +2585,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
                     if (invs != null)
                     {
-                    // Group By InvoiceID
-                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        // Group By InvoiceID
+                        IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                         {
                             Id = s.Key.Id,
                             DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
@@ -2614,8 +2635,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
                     if (invs != null)
                     {
-                    // Group By InvoiceID
-                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        // Group By InvoiceID
+                        IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                         {
                             Id = s.Key.Id,
                             DatetimeCreated = s.FirstOrDefault().DatetimeCreated,

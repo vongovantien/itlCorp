@@ -24,5 +24,6 @@ namespace eFMS.API.Accounting.Service.ViewModels
         public string OfficeName { get; set; }
         public decimal PaidAmountVND { get; set; }
         public decimal PaidAmountUSD { get; set; }
+        public Guid AcctManagementID { get;set; }
     }
 }
