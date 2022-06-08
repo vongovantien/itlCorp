@@ -160,7 +160,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
         var modelSearch = new AdjustModel();
         if (this.action == "SOA") {
             modelSearch.code = this.soano;
-        } else if (this.action == "CDNOTE") {
+        } else if (this.action == "DEBIT") {
             modelSearch.jodId = this.jodId;
             modelSearch.code = this.cdNote ?? "";
         }

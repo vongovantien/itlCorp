@@ -304,7 +304,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     }
 
     adjustDebitValue(){
-        this.adjustDebitValuePopup.action='CDNOTE';
+        this.adjustDebitValuePopup.action='DEBIT';
         this.adjustDebitValuePopup.jodId=this.jobId;
         this.adjustDebitValuePopup.cdNote=this.cdNote;
         this.adjustDebitValuePopup.active();
