@@ -9,7 +9,8 @@ import { catchError, finalize } from "rxjs/operators";
 
 @Component({
     selector: 'adjust-debit-value-popup',
-    templateUrl: './adjust-debit-value.popup.html'
+    templateUrl: './adjust-debit-value.popup.html',
+    styleUrls: ['./adjust-debit-value.popup.scss']
 })
 export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
