@@ -6190,7 +6190,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[i + 1].TotalUSD;
                     debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[i + 1].TotalVND;
-                    debitAmountDetailByContractModels.RemoveAt(i+1);
+                    debitAmountDetailByContractModels.RemoveAt(i + 1);
+                    i--;
                 }
             }
             return debitAmountDetailByContractModels;
