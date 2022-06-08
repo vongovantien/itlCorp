@@ -663,11 +663,19 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CsShipmentSurchargeImportModel> data)
         {
-            var hs = csShipmentSurchargeService.Import(data);
+            var hs = csShipmentSurchargeService.Import(data, out List<Guid> Ids);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
             if (!hs.Success)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
+                    await CalculatorReceivable(modelReceivableList);
+                });
             }
             return Ok(result);
         }
