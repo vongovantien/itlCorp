@@ -1,5 +1,5 @@
-<div class="modal adjust-debit-value-popup fade" bsModal #popup="bs-modal" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+<div class="modal adjust-debit-value-popup m-animate-fade-in" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{action === 'SOA' ? 'Adjusted Soa' : 'Adjusted CD Note'}} </h5>
@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
-                    <div class="m-portlet__body modal-list">
+                    <!-- <div class="m-portlet__body"> -->
                         <div class="div-inside bg-jagged-ice">
                             <div class="row">
                                 <ng-container *ngIf="action === 'SOA'" >
@@ -35,7 +35,7 @@
                                         <span class="m--font-brand m--margin-left-5">{{data.totalVND | number: '.0-3'}}</span>
                                     </div>
                                 </ng-container>
-                                <ng-container *ngIf="action === 'CDNOTE'" >
+                                <ng-container *ngIf="action === 'DEBIT'" >
                                     <div class="col-lg-4 m--margin-bottom-10">
                                         <span class="m--font-bolder">CODE:</span>
                                         <span class="m--font-brand m--margin-left-5">{{data.code}}</span>
@@ -88,7 +88,9 @@
                                 </div>
                                 <div class="table-wrapper table-scrollable">
                                     <table class="table table-brand table-hover dataTable">
-                                        <thead app-table-header [headers]="headers"></thead>
+                                        <thead app-table-header [headers]="headers">
+                                            <th class="m--w-50 first table-actions-col"></th>
+                                        </thead>
                                         <tbody>
                                             <tr class="child" *ngFor="let charge of chargeGrp.listCharges; let j = index; trackBy: trackByFn">
                                                 <td class="text-center table-actions-col">{{j + 1}}</td>
@@ -143,7 +145,7 @@
                                 </div>
                             </ng-container>
                         </div>
-                    </div>
+                    <!-- </div> -->
                 </div>
             </div>
             <div class="modal-footer m--align-center">

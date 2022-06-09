@@ -55,7 +55,7 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['partnerShortName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','paySoano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"  [ngClass]="charge.linkFee ? 'bg-green' : ''"  [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
+                            class="m-form m-form--state" [ngClass]="charge.linkFee ? 'bg-green' : ''" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"  [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side" [ngClass]="charge.linkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge === true">
