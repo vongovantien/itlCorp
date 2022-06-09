@@ -2325,11 +2325,11 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- DETAIL ---
 
-        private bool checkingPaidLoop2(Guid acctManagementID)
-        {
-            if (acctManagementID == null || accountingManagementRepo.Get(x => x.Id == acctManagementID).FirstOrDefault().PaymentStatus != "Paid") return true;
-            return false;
-        }
+        //private bool checkingPaidLoop2(Guid acctManagementID)
+        //{
+        //    if (acctManagementID == null || accountingManagementRepo.Get(x => x.Id == acctManagementID).FirstOrDefault().PaymentStatus != "Paid") return true;
+        //    return false;
+        //}
 
         public DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
         {
@@ -2351,16 +2351,16 @@ namespace eFMS.API.Accounting.DL.Services
             //{
             //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);
             //});
-            for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count(); i++)
-            {
-                if (debitAmountDetail.DebitAmountDetails[i].AcctManagementID == Guid.Empty) continue;
-                //debitAmountDetail.DebitAmountDetails[i].PaymentStatus = debitAmountDetail.DebitAmountDetails[i].PaymentStatus == null ? "Unpaid" : debitAmountDetail.DebitAmountDetails[i].PaymentStatus;
-                if (!checkingPaidLoop2(debitAmountDetail.DebitAmountDetails[i].AcctManagementID))
-                {
-                    debitAmountDetail.DebitAmountDetails.RemoveAt(i);
-                    i--;
-                }
-            }
+            //for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count(); i++)
+            //{
+            //    if (debitAmountDetail.DebitAmountDetails[i].AcctManagementID == Guid.Empty) continue;
+            //    //debitAmountDetail.DebitAmountDetails[i].PaymentStatus = debitAmountDetail.DebitAmountDetails[i].PaymentStatus == null ? "Unpaid" : debitAmountDetail.DebitAmountDetails[i].PaymentStatus;
+            //    if (!checkingPaidLoop2(debitAmountDetail.DebitAmountDetails[i].AcctManagementID))
+            //    {
+            //        debitAmountDetail.DebitAmountDetails.RemoveAt(i);
+            //        i--;
+            //    }
+            //}
 
             return debitAmountDetail;
         }
