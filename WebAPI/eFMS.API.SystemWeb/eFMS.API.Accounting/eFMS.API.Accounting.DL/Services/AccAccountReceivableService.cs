@@ -2354,7 +2354,7 @@ namespace eFMS.API.Accounting.DL.Services
             for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count(); i++)
             {
                 if (debitAmountDetail.DebitAmountDetails[i].AcctManagementID == Guid.Empty) continue;
-                debitAmountDetail.DebitAmountDetails[i].PaymentStatus = accountingManagementRepo.Get(x => x.Id == debitAmountDetail.DebitAmountDetails[i].AcctManagementID)?.FirstOrDefault().PaymentStatus;
+                //debitAmountDetail.DebitAmountDetails[i].PaymentStatus = debitAmountDetail.DebitAmountDetails[i].PaymentStatus == null ? "Unpaid" : debitAmountDetail.DebitAmountDetails[i].PaymentStatus;
                 if (!checkingPaidLoop2(debitAmountDetail.DebitAmountDetails[i].AcctManagementID))
                 {
                     debitAmountDetail.DebitAmountDetails.RemoveAt(i);
