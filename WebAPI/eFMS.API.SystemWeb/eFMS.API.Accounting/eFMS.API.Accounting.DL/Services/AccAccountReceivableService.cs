@@ -3099,13 +3099,6 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                else
-                {
-                    foreach (var item in receivables)
-                    {
-                        item.ObhAmount = 0;
-                    }
-                }
                 #endregion OBH Amount
 
                 #region Billing Amount - Billing Unpaid
@@ -3146,8 +3139,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                 }
-                                totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                totalUnpaidAmountPerService = (totalUnpaidAmount / qtyService);
                             }
+
                             currentReceivable.BillingAmount = totalAmount;
                             currentReceivable.BillingUnpaid = totalUnpaidAmountPerService;
 
@@ -3155,13 +3149,12 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            var receivableDraftNoContract = DataContext.First(x => x.PartnerId == item.PartnerId
-                            && x.SaleMan == item.SalesmanId
-                            && x.Office == item.OfficeId
-                            && x.Service == item.Service
-                            && x.ContractId == null);
-
-                            if (receivableDraftNoContract != null)
+                            var contract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                            && x.SaleManId == item.SalesmanId
+                            && x.Active == true
+                            && x.OfficeId.Contains(item.OfficeId.ToString())
+                            && x.SaleService.Contains(item.Service));
+                            if (contract != null)
                             {
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
@@ -3169,37 +3162,46 @@ namespace eFMS.API.Accounting.DL.Services
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
-                                    if (string.IsNullOrEmpty(receivableDraftNoContract.ContractCurrency) || receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalAmount += invoice.TotalAmountVND;
+                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalAmount += invoice.TotalAmountUSD;
+                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
 
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalUnpaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
-
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
                                 }
-
-                                receivableDraftNoContract.BillingAmount = totalAmount;
-                                receivableDraftNoContract.BillingUnpaid = totalUnpaidAmountPerService;
-
-                                var receivableDraftNoContractModel = mapper.Map<AccAccountReceivableModel>(receivableDraftNoContract);
-                                receivables.Add(receivableDraftNoContractModel);
-
-                                receivableIdModified.Add(receivableDraftNoContract.Id);
+                                receivables.Add(new AccAccountReceivableModel
+                                {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    ContractCurrency = contract.CreditCurrency,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId,
+                                    ContractId = contract.Id,
+                                    SaleMan = item.SalesmanId,
+                                    UserCreated = contract.UserCreated,
+                                    UserModified = contract.UserModified,
+                                    OfficeId = fe.Office,
+                                    CompanyId = contract.CompanyId,
+                                    BillingAmount = totalAmount,
+                                    BillingUnpaid = totalUnpaidAmountPerService
+                                });
                             }
                             else
                             {
@@ -3209,36 +3211,27 @@ namespace eFMS.API.Accounting.DL.Services
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
-                                    if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalAmount += invoice.TotalAmountVND;
-                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalAmount += invoice.TotalAmountUSD;
-                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
-                                    }
+                                    totalAmount += invoice.TotalAmountVND;
+                                    totalUnpaidAmount += invoice.UnpaidAmountVND;
 
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
-                                    }
+
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
                                 }
-                                var arRow = new AccAccountReceivableModel
+                                receivables.Add(new AccAccountReceivableModel
                                 {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = null,
+                                    SaleMan = item.SalesmanId,
+                                    ContractCurrency = "VND",
                                     BillingAmount = totalAmount,
                                     BillingUnpaid = totalUnpaidAmountPerService
-                                };
-                                receivables.Add(arRow);
+                                });
                             }
                         }
                     }
@@ -3291,54 +3284,63 @@ namespace eFMS.API.Accounting.DL.Services
                             currentReceivable.ObhAmount += currentReceivable.ObhUnpaid;
 
                             receivableIdModified.Add(currentReceivable.Id);
-                        } else
+                        }
+                        else
                         {
-                            var receivableDraftNoContract = DataContext.First(x => x.PartnerId == item.PartnerId
-                            && x.SaleMan == item.SalesmanId
-                            && x.Office == item.OfficeId
-                            && x.Service == item.Service
-                            && x.ContractId == null);
-
-                            if (receivableDraftNoContract != null)
+                            var contract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                            && x.SaleManId == item.SalesmanId
+                            && x.Active == true
+                            && x.OfficeId.Contains(item.OfficeId.ToString())
+                            && x.SaleService.Contains(item.Service));
+                            if(contract != null)
                             {
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
+                                decimal? totalUnpaidAmountPerService = 0;
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
-                                    if (string.IsNullOrEmpty(receivableDraftNoContract.ContractCurrency) || receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalAmount += invoice.TotalAmountVND;
+                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalAmount += invoice.TotalAmountUSD;
+                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
 
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
-                                        totalUnpaidAmount = invoice.UnpaidAmountVND;
+                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
-                                        totalUnpaidAmount = invoice.UnpaidAmountUSD;
+                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
-
-                                    totalUnpaidAmount += totalUnpaidAmount / qtyService;
+                                    totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
                                 }
-
-                                receivableDraftNoContract.ObhBilling = totalAmount;
-                                receivableDraftNoContract.ObhUnpaid = totalUnpaidAmount;
-                                receivableDraftNoContract.ObhAmount += receivableDraftNoContract.ObhUnpaid;
-
-
-                                var receivableDraftNoContractModel = mapper.Map<AccAccountReceivableModel>(receivableDraftNoContract);
-                                receivables.Add(receivableDraftNoContractModel);
-
-                                receivableIdModified.Add(receivableDraftNoContract.Id);
+                                receivables.Add(new AccAccountReceivableModel
+                                {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    ContractCurrency = contract.CreditCurrency,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId,
+                                    ContractId = contract.Id,
+                                    SaleMan = item.SalesmanId,
+                                    UserCreated = contract.UserCreated,
+                                    UserModified = contract.UserModified,
+                                    OfficeId = fe.Office,
+                                    CompanyId = contract.CompanyId,
+                                    ObhBilling = totalAmount,
+                                    ObhUnpaid = totalUnpaidAmount,
+                                    ObhAmount = totalUnpaidAmount
+                                });
                             }
                             else
                             {
@@ -3348,38 +3350,28 @@ namespace eFMS.API.Accounting.DL.Services
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
-                                    if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalAmount += invoice.TotalAmountVND;
-                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalAmount += invoice.TotalAmountUSD;
-                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
-                                    }
+                                    totalAmount += invoice.TotalAmountVND;
+                                    totalUnpaidAmount += invoice.UnpaidAmountVND;
 
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalUnpaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalUnpaidAmount += invoice.UnpaidAmountUSD;
-                                    }
 
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
                                 }
-                                var arRow = new AccAccountReceivableModel
+                                receivables.Add(new AccAccountReceivableModel
                                 {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = null,
+                                    SaleMan = item.SalesmanId,
+                                    ContractCurrency = "VND",
                                     ObhBilling = totalAmount,
-                                    ObhUnpaid = totalUnpaidAmountPerService,
+                                    ObhUnpaid = totalUnpaidAmount,
                                     ObhAmount = totalUnpaidAmount
-                                };
-                                receivables.Add(arRow);
+                                });
                             }
                         }
                     }
@@ -3422,13 +3414,12 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            var receivableDraftNoContract = DataContext.First(x => x.PartnerId == item.PartnerId
-                            && x.SaleMan == item.SalesmanId
-                            && x.Office == item.OfficeId
-                            && x.Service == item.Service
-                            && x.ContractId == null);
-
-                            if (receivableDraftNoContract != null)
+                           var contract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                           && x.SaleManId == item.SalesmanId
+                           && x.Active == true
+                           && x.OfficeId.Contains(item.OfficeId.ToString())
+                           && x.SaleService.Contains(item.Service));
+                            if (contract != null)
                             {
                                 decimal? totalPaidAmount = 0;
                                 decimal? totalPaidAmountPerService = 0;
@@ -3438,25 +3429,33 @@ namespace eFMS.API.Accounting.DL.Services
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalPaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalPaidAmount += invoice.UnpaidAmountUSD;
                                     }
 
                                     totalPaidAmountPerService = totalPaidAmount / qtyService;
                                 }
+                                receivables.Add(new AccAccountReceivableModel
+                                {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    ContractCurrency = contract.CreditCurrency,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId,
+                                    ContractId = contract.Id,
+                                    SaleMan = item.SalesmanId,
+                                    UserCreated = contract.UserCreated,
+                                    UserModified = contract.UserModified,
+                                    OfficeId = fe.Office,
+                                    CompanyId = contract.CompanyId,
+                                    ObhPaid = totalPaidAmountPerService
 
-                                receivableDraftNoContract.ObhPaid = totalPaidAmountPerService;
-
-
-                                var receivableDraftNoContractModel = mapper.Map<AccAccountReceivableModel>(receivableDraftNoContract);
-                                receivables.Add(receivableDraftNoContractModel);
-
-                                receivableIdModified.Add(receivableDraftNoContract.Id);
+                                });
                             }
                             else
                             {
@@ -3465,26 +3464,25 @@ namespace eFMS.API.Accounting.DL.Services
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
-                                    
+                                    totalPaidAmount += invoice.UnpaidAmountVND;
+
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalPaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalPaidAmount += invoice.UnpaidAmountUSD;
-                                    }
 
                                     totalPaidAmountPerService = totalPaidAmount / qtyService;
                                 }
-                                var arRow = new AccAccountReceivableModel
+                                receivables.Add(new AccAccountReceivableModel
                                 {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = null,
+                                    SaleMan = item.SalesmanId,
+                                    ContractCurrency = "VND",
                                     ObhPaid = totalPaidAmountPerService
-                                };
-                                receivables.Add(arRow);
+                                });
                             }
                         }
                     }
@@ -3528,43 +3526,48 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            var receivableDraftNoContract = DataContext.First(x => x.PartnerId == item.PartnerId
-                            && x.SaleMan == item.SalesmanId
-                            && x.Office == item.OfficeId
-                            && x.Service == item.Service
-                            && x.ContractId == null);
-
-                            if (receivableDraftNoContract != null)
+                            var contract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                            && x.SaleManId == item.SalesmanId
+                            && x.Active == true
+                            && x.OfficeId.Contains(item.OfficeId.ToString())
+                            && x.SaleService.Contains(item.Service));
+                            if(contract != null)
                             {
                                 decimal? totalPaidAmount = 0;
                                 decimal? totalPaidAmountPerService = 0;
-
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalPaidAmount += invoice.UnpaidAmountVND;
                                     }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalPaidAmount += invoice.UnpaidAmountUSD;
                                     }
 
                                     totalPaidAmountPerService = totalPaidAmount / qtyService;
                                 }
-
-                                receivableDraftNoContract.PaidAmount = totalPaidAmountPerService;
-
-
-                                var receivableDraftNoContractModel = mapper.Map<AccAccountReceivableModel>(receivableDraftNoContract);
-                                receivables.Add(receivableDraftNoContractModel);
-
-                                receivableIdModified.Add(receivableDraftNoContract.Id);
-                            }
+                                receivables.Add(new AccAccountReceivableModel
+                                {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    ContractCurrency = contract.CreditCurrency,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId,
+                                    ContractId = contract.Id,
+                                    SaleMan = item.SalesmanId,
+                                    UserCreated = contract.UserCreated,
+                                    UserModified = contract.UserModified,
+                                    OfficeId = fe.Office,
+                                    CompanyId = contract.CompanyId,
+                                    PaidAmount = totalPaidAmountPerService
+                                });
+                            } 
                             else
                             {
                                 decimal? totalPaidAmount = 0;
@@ -3572,55 +3575,32 @@ namespace eFMS.API.Accounting.DL.Services
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
+                                    totalPaidAmount += invoice.UnpaidAmountVND;
 
                                     int qtyService = !string.IsNullOrEmpty(invoice.Service) ? invoice.Service.Split(';')
                                         .Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
-                                    if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalPaidAmount += invoice.UnpaidAmountVND;
-                                    }
-                                    else if (receivableDraftNoContract.ContractCurrency == AccountingConstants.CURRENCY_USD)
-                                    {
-                                        totalPaidAmount += invoice.UnpaidAmountUSD;
-                                    }
 
                                     totalPaidAmountPerService = totalPaidAmount / qtyService;
                                 }
-                                var arRow = new AccAccountReceivableModel
+                                receivables.Add(new AccAccountReceivableModel
                                 {
+                                    PartnerId = fe.PartnerId,
+                                    Office = fe.Office,
+                                    Service = fe.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = null,
+                                    SaleMan = item.SalesmanId,
+                                    ContractCurrency = "VND",
                                     PaidAmount = totalPaidAmountPerService
-                                };
-                                receivables.Add(arRow);
+                                });
                             }
                         }
                     }
                 }
                
                 #endregion
-                if(receivableIdModified.Count > 0)
-                {
-                    receivableIdModified = receivableIdModified.Distinct().ToList();
-                    var draft = receivables.Where(x => x.PartnerId == fe.PartnerId
-                    && x.Service == fe.Service
-                    && x.Office == fe.Office
-                    && !receivableIdModified.Contains(x.Id)
-                    && x.Id != Guid.Empty);
-                    if (draft.Count() > 0)
-                    {
-                        foreach (var item in draft)
-                        {
-                            item.SellingNoVat = 0;
-                            item.ObhAmount = 0;
-                            item.BillingUnpaid = 0;
-                            item.ObhUnpaid = 0;
-                            item.BillingAmount = 0;
-                            item.ObhBilling = 0;
-                            item.PaidAmount = 0;
-                            item.ObhPaid = 0;
-                        }
-                    }
-                }
+               
             }
 
             receivables.ForEach(fe =>
