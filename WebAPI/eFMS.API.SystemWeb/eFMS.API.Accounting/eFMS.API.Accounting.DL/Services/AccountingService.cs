@@ -2545,30 +2545,14 @@ namespace eFMS.API.Accounting.DL.Services
                 if (catagory == "SOA_DEBIT")
                 {
                     var soa = soaRepository.Get(x => x.Soano == refNo).FirstOrDefault();
-                    if (soa.Currency == AccountingConstants.CURRENCY_LOCAL)
-                    {
-                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
-                        finalExchangeRate = soa.ExcRateUsdToLocal;
-                    }
-                    else
-                    {
-                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_LOCAL);
-                        finalExchangeRate = exchangeRateIssue ?? 1;
-                    }
+                    exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                    finalExchangeRate = soa.ExcRateUsdToLocal;
                 }
                 else
                 {
                     var debit = cdNoteRepository.Get(x => x.Code == refNo).FirstOrDefault();
-                    if (debit.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                    {
-                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, debit.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
-                        finalExchangeRate = debit.ExcRateUsdToLocal;
-                    }
-                    else
-                    {
-                        exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, debit.DatetimeCreated, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_LOCAL);
-                        finalExchangeRate = debit.ExchangeRate ?? 1;
-                    }
+                    exchangeRateIssue = currencyExchangeService.CurrencyExchangeRateConvert(null, debit.DatetimeCreated, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
+                    finalExchangeRate = debit.ExcRateUsdToLocal;
                 }
             }
             string body = emailTemplate.Body;
