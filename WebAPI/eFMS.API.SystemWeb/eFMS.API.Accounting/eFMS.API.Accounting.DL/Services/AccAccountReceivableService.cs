@@ -2870,6 +2870,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.ObhBilling = 0;
                     item.PaidAmount = 0;
                     item.ObhPaid = 0;
+                    item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
                 }
                 var receivableIdModified = new List<Guid>();
 
@@ -2923,6 +2924,17 @@ namespace eFMS.API.Accounting.DL.Services
                         && x.Office == item.Office && x.Service == item.Service && x.SaleMan == item.Salesman);
                         if (currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.Salesman
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.Office.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            } 
                             decimal? totalAmount = 0;
                             foreach (var charge in surchargeInGrp)
                             {
@@ -2930,6 +2942,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             currentReceivable.SellingNoVat = totalAmount;
                             receivableIdModified.Add(currentReceivable.Id);
+
                         }
                         else
                         {
@@ -3035,6 +3048,17 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.Office == item.Office && x.Service == item.Service && x.SaleMan == item.Salesman);
                         if (currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.Salesman
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.Office.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
                             decimal? obhNoVat = 0;
                             var surchargeInGrp = item.Surcharges;
                             foreach (var charge in surchargeInGrp)
@@ -3113,6 +3137,17 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
                         if (currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.SalesmanId
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.OfficeId.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
                             decimal? totalAmount = 0;
                             decimal? totalUnpaidAmount = 0;
                             decimal? totalUnpaidAmountPerService = 0;
@@ -3251,6 +3286,18 @@ namespace eFMS.API.Accounting.DL.Services
                            && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
                         if(currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.SalesmanId
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.OfficeId.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
+
                             decimal? totalAmount = 0;
                             decimal? totalUnpaidAmount = 0;
                             decimal? totalUnpaidAmountPerService = 0;
@@ -3391,6 +3438,17 @@ namespace eFMS.API.Accounting.DL.Services
                            && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
                         if (currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.SalesmanId
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.OfficeId.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
                             decimal? totalPaidAmount = 0;
                             decimal? totalPaidAmountPerService = 0;
                             var invoicesData = item.invoices;
@@ -3502,6 +3560,17 @@ namespace eFMS.API.Accounting.DL.Services
                            && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
                         if (currentReceivable != null)
                         {
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == partner.Id
+                             && x.SaleManId == item.SalesmanId
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.OfficeId.ToString())
+                             && x.SaleService.Contains(item.Service));
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
                             decimal? totalPaidAmount = 0;
                             decimal? totalPaidAmountPerService = 0;
                             var invoicesData = item.invoices;
