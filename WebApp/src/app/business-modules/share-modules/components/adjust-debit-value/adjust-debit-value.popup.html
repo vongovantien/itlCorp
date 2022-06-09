@@ -89,11 +89,10 @@
                                 <div class="table-wrapper table-scrollable">
                                     <table class="table table-brand table-hover dataTable">
                                         <thead app-table-header [headers]="headers">
-                                            <th class="m--w-50 first table-actions-col"></th>
                                         </thead>
                                         <tbody>
                                             <tr class="child" *ngFor="let charge of chargeGrp.listCharges; let j = index; trackBy: trackByFn">
-                                                <td class="text-center table-actions-col">{{j + 1}}</td>
+                                                <td class="table-actions-col">{{j + 1}}</td>
                                                 <td class="text-left">{{charge.chargeCode}}</td>
                                                 <td class="text-left " style="min-width: 150px; white-space:initial">{{charge.chargeName}}</td>
                                                 <td class="text-right">

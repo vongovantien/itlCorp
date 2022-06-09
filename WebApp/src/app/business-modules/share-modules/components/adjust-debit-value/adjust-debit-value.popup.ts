@@ -22,7 +22,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     billingDate: AbstractControl;
     data: AdjustModel = new AdjustModel();
     headers = [
-        { title: 'No.', field: 'i', sortable: false, },
+        { title: 'No.', field: 'i', sortable: false, width: 40},
         { title: 'Charge Code', field: 'chargeCode', sortable: false },
         { title: 'Charge Name', field: 'chargeName', sortable: false },
         { title: 'Org Net', field: 'netAmount', sortable: false },
