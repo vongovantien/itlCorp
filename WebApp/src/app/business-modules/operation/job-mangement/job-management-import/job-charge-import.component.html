@@ -255,12 +255,15 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.invoiceNoError === null">
+                                    <!-- <span *ngIf="item.invoiceNoError === null">
+                                        {{item.invoiceNo}}
+                                    </span> -->
+                                    <!-- <span class="m--font-danger"
+                                    *ngIf="item.invoiceNoError !== null">{{item.invoiceNoError
+                                    }}</span> -->
+                                    <span>
                                         {{item.invoiceNo}}
                                     </span>
-                                    <span class="m--font-danger"
-                                    *ngIf="item.invoiceNoError !== null">{{item.invoiceNoError
-                                    }}</span>
                                 </td>
                                 <td>
                                     <span>
@@ -268,12 +271,15 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.serieNoError === null">
+                                    <!-- <span *ngIf="item.serieNoError === null">
                                         {{item.seriesNo}}
                                     </span>
                                     <span class="m--font-danger"
                                     *ngIf="item.serieNoError !== null">{{item.serieNoError
-                                    }}</span>
+                                    }}</span> -->
+                                    <span>
+                                        {{item.seriesNo}}
+                                    </span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.typeError === null">{{ item.type }}</span>
