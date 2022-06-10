@@ -963,8 +963,8 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    getDataDebitDetailList(agreementId: any, option: any, officeId: any, serviceCode: any, overDueDay: any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode, overDueDay: overDueDay }).pipe(
+    getDataDebitDetailList(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

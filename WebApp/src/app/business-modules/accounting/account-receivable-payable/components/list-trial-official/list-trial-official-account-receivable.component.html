@@ -17,7 +17,7 @@
                 <div class="col-lg-12 m--margin-top-20">
                     <div class="table-wrapper table-scrollable" id="payment-table">
                         <table class="table table-hover table-brand table-editable dataTable table-summary ">
-                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)" >
+                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <!-- <thead> -->
                                 <th class="first table-actions-col sticky-col first-col">
                                     Action
@@ -70,8 +70,7 @@
 
 
                                             <td class="text-right">
-                                                <a href="javascript:void(0)"
-                                                    (click)="showDebitDetail(item.agreementId,'Unpaid')">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item,'Unpaid')">
                                                     {{ (item.billingAmount +
                                                     (item.obhBillingAmount!=null?item.obhBillingAmount:0)) |
                                                     negativeNumber :'.0-3' }}
@@ -79,14 +78,13 @@
                                             </td>
                                             <td class="text-right">
                                                 <a href="javascript:void(0)"
-                                                    (click)="showDebitDetail(item.agreementId,'Paid A Part')">
+                                                    (click)="showDebitDetail(item,'Paid A Part')">
                                                     {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)
                                                     | negativeNumber:'.0-3'}}
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)"
-                                                    (click)="showDebitDetail(item.agreementId,'OutStanding')">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item,null)">
                                                     {{ item.billingUnpaid +
                                                     (item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0) |
                                                     negativeNumber:'.0-3'}}
@@ -96,7 +94,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.agreementId,'Over1To15Day')">
+                                                        (click)="showDebitDetail(item,'Over1To15Day')">
                                                         {{ item.over1To15Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -104,7 +102,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.agreementId,'Over16To30Day')">
+                                                        (click)="showDebitDetail(item,'Over16To30Day')">
                                                         {{ item.over16To30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -112,13 +110,15 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.agreementId,'Over30Day')">
+                                                        (click)="showDebitDetail(item,'Over30Day')">
                                                         {{ item.over30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
-                                            <td class="text-right"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
+                                            <td class="text-right" id="debitAmountStyle"
+                                                [contextMenu]="trialContextMenu" (onTouch)="onSelectTrial(item)">
+                                                {{item.debitAmount | negativeNumber:'.0-3'}}</td>
                                             <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}
                                             </td>
                                             <td class="text-right">{{ (item.debitAmount-item.creditLimited) |

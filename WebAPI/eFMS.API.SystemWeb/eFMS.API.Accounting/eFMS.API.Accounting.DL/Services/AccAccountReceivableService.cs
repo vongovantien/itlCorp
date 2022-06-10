@@ -207,6 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@service", Value = service},
                 new SqlParameter(){ ParameterName = "@type", Value = type},
                 new SqlParameter(){ ParameterName = "@paymentStatus", Value = paymentStatus},
+                new SqlParameter(){ ParameterName = "@salesman", Value = null },
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetBillingWithSalesman>(parameters);
             return data;
@@ -2174,16 +2175,25 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode, int overDueDay = 0)
         {
-            if (argeementId == null || argeementId == Guid.Empty) return null;
-            DbParameter[] parameters =
-            {
-                SqlParam.GetParameter("argid", argeementId),
-                SqlParam.GetParameter("option", option),
-                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
-                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:""),
-                SqlParam.GetParameter("overDueDay",overDueDay)
+            // if (model.ArgeementId == null || model.ArgeementId == Guid.Empty) return null;
+            //DbParameter[] parameters =
+            //{
+            //    SqlParam.GetParameter("argid", model.ArgeementId),
+            //    SqlParam.GetParameter("option", model.Option),
+            //    SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(model.OfficeId)?model.OfficeId:""),
+            //    SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(model.ServiceCode)?model.ServiceCode:""),
+            //    SqlParam.GetParameter("overDueDay",model.OverDueDay)
+            //};
+
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@partner", Value = model.PartnerId },
+                new SqlParameter(){ ParameterName = "@officeId", Value = model.OfficeId },
+                new SqlParameter(){ ParameterName = "@service", Value = model.ServiceCode },
+                new SqlParameter(){ ParameterName = "@type", Value = null },
+                new SqlParameter(){ ParameterName = "@paymentStatus", Value = null },
+                new SqlParameter(){ ParameterName = "@salesman", Value = model.ArSalesManId },
             };
-            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetBillingWithSalesman>(parameters);
             return data;
         }
         #endregion --- DETAIL ---

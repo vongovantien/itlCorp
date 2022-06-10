@@ -3,11 +3,11 @@ namespace eFMS.API.Accounting.Service.ViewModels
 {
     public class sp_GetBillingWithSalesman
     {
-        public Guid ID { get; set; }
         public string PartnerId { get; set; }
+        public DateTime PaymentDueDate { get; set; }
+        public string PaymentStatus { get; set; }
         public Guid OfficeId { get; set; }
         public string Service { get; set; }
-        public DateTime DatetimeCreated { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? TotalAmountVND { get; set; }
         public decimal? TotalAmountUSD { get; set; }
@@ -19,5 +19,10 @@ namespace eFMS.API.Accounting.Service.ViewModels
         public decimal? UnpaidAmountUSD { get; set; }
         public string Salesman { get; set; }
         public string SalesmanId { get; set; }
+        public string Code { get; set; }
+        public string InvoiceNo { get; set; }
+        public string BillingNo { get; set; }
+        public string Type { get; set; }
+        public int OverdueDays { get; set; }
     }
 }
