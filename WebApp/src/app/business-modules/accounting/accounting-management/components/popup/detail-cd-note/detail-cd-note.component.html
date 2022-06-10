@@ -297,9 +297,9 @@
                                 </div>
                                 <ng-container *ngIf="!!cdnoteDetail
                                 &&cdnoteDetail.cdNote.type === 'DEBIT'
-                                &&cdnoteDetail.cdNote.syncStatus !== 'Synced'
                                 &&cdnoteDetail.cdNote.currencyId === 'VND'
                                 &&cdnoteDetail.listSurcharges.length > 0">
+                                <!-- &&cdnoteDetail.cdNote.syncStatus !== 'Synced' -->
                                     <div class="col-md-auto">
                                         <strong>Total Adjust:</strong> <span class="m--margin-left-5">{{totalAdjustVND}}</span>
                                     </div>
