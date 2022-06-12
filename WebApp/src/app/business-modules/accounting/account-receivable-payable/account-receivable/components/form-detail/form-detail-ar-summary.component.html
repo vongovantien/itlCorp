@@ -4,16 +4,15 @@
             <div class="col-lg-7">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div>
-                            <h6 class="font-weight-bold">Partner Name (ABBR): </h6>
-                        </div>
-
+                        <h6 class="font-weight-bold">Partner Name (ABBR): </h6>
                     </div>
                     <div class="col-lg-8">
-                        <div>
-                            <span>{{accReceivableDetail.partnerNameAbbr}}</span>
-                        </div>
-
+                        <span class="text-info">{{accReceivableDetail.partnerNameAbbr}}</span>
+                        <span *ngIf="accReceivableDetail.partnerId">
+                            <a target="_blank" class="la la-link text-primary m--margin-left-10"
+                                [routerLink]="[ '/home/catalogue/partner-data/detail', accReceivableDetail.partnerId ]">
+                            </a>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -23,7 +22,7 @@
                         <h6 class="font-weight-bold">Tax Code: </h6>
                     </div>
                     <div class="col-lg-9">
-                        <span>{{accReceivableDetail.taxCode}}</span>
+                        <span class="text-info">{{accReceivableDetail.taxCode}}</span>
                     </div>
                 </div>
             </div>
@@ -32,16 +31,10 @@
             <div class="col-lg-7">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div>
-                            <h6 class="font-weight-bold">Partner Name (Local): </h6>
-                        </div>
-
+                        <h6 class="font-weight-bold">Partner Name (Local): </h6>
                     </div>
                     <div class="col-lg-8">
-                        <div>
-                            <span>{{accReceivableDetail.partnerNameLocal}}</span>
-                        </div>
-
+                        <span class="text-info">{{accReceivableDetail.partnerNameLocal}}</span>
                     </div>
                 </div>
             </div>
@@ -335,11 +328,11 @@
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-5">
-                        <h6 class="font-weight-bold">OutStanding Balance: </h6>
+                        <h6 class="font-weight-bold">OutStanding Balance:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div>{{ (accReceivableDetail.billingUnpaid +
-                            accReceivableDetail.obhUnPaidAmount) | number: '.0-3'}}
+                        <div>{{ (accReceivableDetail.billingUnpaid + accReceivableDetail.obhUnPaidAmount) | number:
+                            '.0-3'}}
                             <span *ngIf="accReceivableDetail.billingUnpaid">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>
@@ -462,9 +455,10 @@
                         <h6 class="font-weight-bold">Over Amount:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div><span class="text-primary">{{(accReceivableDetail.debitAmount -
+                        <div><span class="text-danger">{{(accReceivableDetail.debitAmount -
                                 accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
-                            <span *ngIf="accReceivableDetail.creditAmount">
+                            <span *ngIf="accReceivableDetail.debitAmount -
+                            accReceivableDetail.creditLimited">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>
                         </div>

@@ -242,6 +242,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.CalculateOverDueAsync(System.Collections.Generic.List{System.String})">
+            <summary>
+            CalculateOverDueAsync
+            </summary>
+            <param name="partnerIds"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.Delete(System.Guid)">
             <summary>
             Delete a payment
@@ -330,7 +337,7 @@
             <param name="argeementId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String)">
             <summary>
             Get AR detail no argeement by partner id
             </summary>

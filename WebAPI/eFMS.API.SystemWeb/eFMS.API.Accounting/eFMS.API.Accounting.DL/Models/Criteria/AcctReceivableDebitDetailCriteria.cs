@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.ReportData.Models.Criteria
+namespace eFMS.API.Accounting.DL.Models.Criteria
 {
-    public class DebitDetailCriteria
+    public class AcctReceivableDebitDetailCriteria
     {
         public string PartnerId { get; set; }
         public string OfficeId { get; set; }

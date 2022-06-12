@@ -5335,7 +5335,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
                 var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
                 //Set Title
-                excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                if(!string.IsNullOrEmpty(debitType))
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                } else
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail";
+                }
                 var rowStart = 4;
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5353,6 +5359,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("PaidUSD", item.PaidAmountUSD);
                     listKeyData.Add("UnpaidVND", item.UnpaidAmountVND);
                     listKeyData.Add("UnpaidUSD", item.UnpaidAmountUSD);
+                    listKeyData.Add("Services", item.Service);
+                    listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("OverdueDays", item.OverdueDays);
                     listKeyData.Add("DueDate", item.PaymentDueDate);
                     listKeyData.Add("Office", item.Code);

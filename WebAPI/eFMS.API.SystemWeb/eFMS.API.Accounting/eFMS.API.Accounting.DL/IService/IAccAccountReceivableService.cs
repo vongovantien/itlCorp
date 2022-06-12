@@ -2,6 +2,7 @@
 using eFMS.API.Accounting.DL.Models.AccountReceivable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -22,7 +23,7 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
         List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
         IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
-        IEnumerable<object> GetDataDebitDetail(Guid argeementId,string option,string officeId, string serviceCode,int overDueDay = 0);
+        List<sp_GetBillingWithSalesman> GetDataDebitDetail(AcctReceivableDebitDetailCriteria creteria);
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
         Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
         Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);

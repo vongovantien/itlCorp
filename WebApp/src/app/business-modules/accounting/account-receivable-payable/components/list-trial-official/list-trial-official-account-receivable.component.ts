@@ -130,21 +130,16 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         }
     }
 
-    showDebitDetail(item: TrialOfficialOtherModel, option: string) {
-        let officeId = "";
-        let overDueDay = 0;
-        //let agreeStr = '' + agreementId;
-
+    showDebitDetail(item: TrialOfficialOtherModel, status: string, overDue: string = null) {
         const body = {
             partnerId: item.partnerId,
-            option: option,
-            officeId: null,
+            type: null,
+            officeId: !!this.dataSearch.officeIds ? this.dataSearch.officeIds.join("|") : null,
             service: null,
-            overDueDay: 1,
-            arSalesManId: item.agreementSalesmanId
+            paymentStatus: status,
+            salesman: item.agreementSalesmanId,
+            overDue: overDue
         };
-        // if (this.dataSearch && this.dataSearch.officeIds) { officeId = this.dataSearch.officeIds.join("|"); }
-        // if (this.dataSearch && this.dataSearch.overDueDay) { overDueDay = this.dataSearch.overDueDay; }
         this._accountingRepo.getDataDebitDetailList(body)
             .pipe(
                 catchError(this.catchError),
@@ -153,7 +148,8 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        // this.debitDetailPopupComponent.dataSearch = { argeementId: agreeStr, option, officeId, serviceCode: '', overDueDay };
+                        this.debitDetailPopupComponent.dataSearch = body;
+
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }

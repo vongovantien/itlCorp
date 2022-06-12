@@ -7,7 +7,7 @@ import { AccountingRepo } from '@repositories';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel } from '@models';
 import { RoutingConstants } from '@constants';
 
-import { takeUntil, switchMap, switchMapTo, tap, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, switchMap, tap, catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Observable, of } from 'rxjs';
@@ -55,6 +55,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
                     if (!!p.agreementId) {
+                        this.isLoading = true;
                         return this._accoutingRepo.getDetailReceivableByArgeementId(p.agreementId);
                     }
                     return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId);
@@ -67,7 +68,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
                     this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
-                }
+                },
+                () => { },
+                () => { this.isLoading = false; }
             );
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
@@ -146,9 +149,17 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         })
     }
 
-    showDebitDetail(option, officeId, serviceCode) {
-        var argeementId = this.accReceivableDetail.agreementId;
-        this._accoutingRepo.getDataDebitDetail(argeementId, option, officeId, serviceCode)
+    showDebitDetail(item: AccReceivableOfficesDetailModel, option: string, office: string = null, service: string = null, overDue: string = null) {
+        const body = {
+            partnerId: this.accReceivableDetail.partnerId,
+            officeId: office ?? item.officeId,
+            service: service,
+            type: null,
+            paymentStatus: option,
+            salesman: this.accReceivableDetail.agreementSalesmanId,
+            overDue: overDue
+        }
+        this._accoutingRepo.getDataDebitDetailList(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -156,7 +167,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        this.debitDetailPopupComponent.dataSearch = { argeementId, option, officeId, serviceCode };
+                        this.debitDetailPopupComponent.dataSearch = body;
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }
@@ -168,40 +179,45 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         if (!this.accReceivableDetail?.partnerId) {
             return;
         }
-        const partnerIds: string[] = [this.accReceivableDetail.partnerId];
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Calculate Accounts Receivable Payable',
+            body: 'Are you sure to recalculate overdue data',
+        }, () => {
+            const partnerIds: string[] = [this.accReceivableDetail.partnerId];
+            let overDueAPI: Observable<any> = null;
 
-        let overDueAPI: Observable<any> = null;
+            switch (type) {
+                case 1:
+                    overDueAPI = this._accoutingRepo.calculateOverDue1To15(partnerIds);
+                    break;
+                case 2:
+                    overDueAPI = this._accoutingRepo.calculateOverDue15To30(partnerIds);
+                    break;
+                case 3:
+                    overDueAPI = this._accoutingRepo.calculateOverDue30(partnerIds);
+                    break;
+                default:
+                    break;
+            }
 
-        switch (type) {
-            case 1:
-                overDueAPI = this._accoutingRepo.calculateOverDue1To15(partnerIds);
-                break;
-            case 2:
-                overDueAPI = this._accoutingRepo.calculateOverDue15To30(partnerIds);
-                break;
-            case 3:
-                overDueAPI = this._accoutingRepo.calculateOverDue30(partnerIds);
-                break;
-            default:
-                break;
-        }
-
-        if (!!overDueAPI) {
-            overDueAPI.pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+            if (!!overDueAPI) {
+                overDueAPI.pipe(
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                        }
+                        return of(false);
+                    })
+                ).subscribe((data: any) => {
+                    if (!!data) {
+                        this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
+                        this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
+                            .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
                     }
-                    return of(false);
-                })
-            ).subscribe((data: any) => {
-                if (!!data) {
-                    this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
-                    this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
-                        .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
-                }
-            });
-        }
+                });
+            }
+        });
+
     }
 }

@@ -156,10 +156,10 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetDebitDetail")]
-        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode ,int overDueDay = 0)
+        [HttpPost("GetDebitDetail")]
+        public IActionResult GetDebitDetail(AcctReceivableDebitDetailCriteria criteria)
         {
-            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode, overDueDay);
+            var data = accountReceivableService.GetDataDebitDetail(criteria);
             return Ok(data);
         }
 

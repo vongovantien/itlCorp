@@ -33,6 +33,7 @@ export class TrialOfficialOtherModel {
     agreementCurrency: string = null;
 
     agreementSalesmanName: string = null;
+    agreementSalesmanId: string = null;
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
@@ -99,7 +100,7 @@ export class AccReceivableDetailModel {
     expriedDay: number = 0;
     obhAmount: number = 0;
     obhBillingAmount: number = 0;
-    obhUnpaidAmount: number = 0;
+    obhUnPaidAmount: number = 0;
     obhPaidAmount: number = 0;
     officeId: string = null;
     over1To15Day: number = 0;

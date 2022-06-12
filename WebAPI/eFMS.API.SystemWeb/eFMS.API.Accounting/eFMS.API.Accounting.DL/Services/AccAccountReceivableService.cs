@@ -208,6 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@type", Value = type},
                 new SqlParameter(){ ParameterName = "@paymentStatus", Value = paymentStatus},
                 new SqlParameter(){ ParameterName = "@salesman", Value = null },
+                new SqlParameter(){ ParameterName = "@overDue", Value = null },
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetBillingWithSalesman>(parameters);
             return data;
@@ -2173,7 +2174,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode, int overDueDay = 0)
+        public List<sp_GetBillingWithSalesman> GetDataDebitDetail(AcctReceivableDebitDetailCriteria model)
         {
             // if (model.ArgeementId == null || model.ArgeementId == Guid.Empty) return null;
             //DbParameter[] parameters =
@@ -2188,10 +2189,11 @@ namespace eFMS.API.Accounting.DL.Services
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@partner", Value = model.PartnerId },
                 new SqlParameter(){ ParameterName = "@officeId", Value = model.OfficeId },
-                new SqlParameter(){ ParameterName = "@service", Value = model.ServiceCode },
-                new SqlParameter(){ ParameterName = "@type", Value = null },
-                new SqlParameter(){ ParameterName = "@paymentStatus", Value = null },
-                new SqlParameter(){ ParameterName = "@salesman", Value = model.ArSalesManId },
+                new SqlParameter(){ ParameterName = "@service", Value = model.Service },
+                new SqlParameter(){ ParameterName = "@type", Value = model.Type },
+                new SqlParameter(){ ParameterName = "@paymentStatus", Value = model.PaymentStatus },
+                new SqlParameter(){ ParameterName = "@salesman", Value = model.Salesman },
+                new SqlParameter(){ ParameterName = "@overDue", Value = model.OverDue },
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetBillingWithSalesman>(parameters);
             return data;
