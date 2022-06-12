@@ -394,15 +394,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                 .map((surcharge: Surcharge) => this.selectedCharge.push(new Surcharge(surcharge)))
         );
-        var someResult = this.selectedCharge.some(x => {
-            if (x.type === 'OBH' && x.jobId.includes('LOG')) {
-                return (!this.utility.isWhiteSpace(x.invoiceNo) && this.utility.isWhiteSpace(x.seriesNo)) || (this.utility.isWhiteSpace(x.invoiceNo) && !this.utility.isWhiteSpace(x.seriesNo))
-            }
-        })
-        if(someResult){
-            this._toastService.warning("Series No and Invoice No Must be fill in");
-            return;
-        }
+        // var someResult = this.selectedCharge.some(x => {
+        //     if (x.type === 'OBH' && x.jobId.includes('LOG')) {
+        //         return (!this.utility.isWhiteSpace(x.invoiceNo) && this.utility.isWhiteSpace(x.seriesNo)) || (this.utility.isWhiteSpace(x.invoiceNo) && !this.utility.isWhiteSpace(x.seriesNo))
+        //     }
+        // })
+        // if(someResult){
+        //     this._toastService.warning("Series No and Invoice No Must be fill in");
+        //     return;
+        // }
 
         if (this.selectedCharge.length === 0) {
             this._toastService.warning(`None of charges are selected, Please recheck again! `);
@@ -745,20 +745,20 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         console.log('Shipment',this.shipments);
         
 
-        if(this.shipments.every(x=>x.jobId.includes('LOG'))){
-            for (const charge of this.selectedCharge) {
-                if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
-                    if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
-                        this._toastService.warning("Series No Must be fill in");
-                        return;
-                    }
-                    if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
-                        this._toastService.warning("Invoice No Must be fill in");
-                        return;
-                    }
-                }
-            }
-        }
+        // if(this.shipments.every(x=>x.jobId.includes('LOG'))){
+        //     for (const charge of this.selectedCharge) {
+        //         if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+        //             if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+        //                 this._toastService.warning("Series No Must be fill in");
+        //                 return;
+        //             }
+        //             if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+        //                 this._toastService.warning("Invoice No Must be fill in");
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
         console.log('charges', this.selectedCharge)
         if (!this.selectedCharge.length) {
             this._toastService.warning(`Don't have any charges in this period, Please check it again! `);
