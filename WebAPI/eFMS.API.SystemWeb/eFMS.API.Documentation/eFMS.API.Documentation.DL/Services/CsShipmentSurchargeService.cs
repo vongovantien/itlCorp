@@ -1575,16 +1575,16 @@ namespace eFMS.API.Documentation.DL.Services
                 //        item.IsValid = false;
                 //    }
                 //}
-                if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
-                {
-                    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
-                    item.IsValid = false;
-                }
-                if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
-                {
-                    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
-                    item.IsValid = false;
-                }
+                //if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
+                //{
+                //    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
+                //    item.IsValid = false;
+                //}
+                //if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
+                //{
+                //    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
+                //    item.IsValid = false;
+                //}
                 else
                 {
                     if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "selling" && item.Type.ToLower() != "obh")

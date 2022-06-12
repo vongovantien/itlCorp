@@ -347,17 +347,17 @@ export class UtilityHelper {
         });
     }
 
-    isWhiteSpace(input: any) {
-        if (input != null) {
-            if (input.trim().length === 0) {
-                return true;
-            }
-        }
-        if (input === null) {
-            return true;
-        }
-        return false;
-    }
+    // isWhiteSpace(input: any) {
+    //     if (input != null) {
+    //         if (input.trim().length === 0) {
+    //             return true;
+    //         }
+    //     }
+    //     if (input === null) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
 
 }
