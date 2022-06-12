@@ -16,6 +16,7 @@ import { share } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 
 import { NgxSpinnerService } from 'ngx-spinner';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class LoginComponent {
 
     selectedCompanyId: any;
     spinnerLogin: string = 'spinnerLogin';
-
+    eFMSVersion: string = environment.eFMSVersion;
     ngAfterViewInit(): void {
         // if (this.route.snapshot.paramMap.get("isEndSession")) {
         //     setTimeout(() => {

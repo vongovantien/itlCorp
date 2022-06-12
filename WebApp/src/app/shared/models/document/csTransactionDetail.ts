@@ -1,3 +1,4 @@
+import { NullLogger } from '@microsoft/signalr';
 import { Container } from './container.model';
 import { PermissionHouseBill } from './permissionHouseBill';
 

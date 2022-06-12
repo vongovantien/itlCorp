@@ -34,8 +34,9 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
-        ResultHandle ChargeFromReplicate(out List<Guid> Ids);
         Task<HandleState> ReplicateJobs(ReplicateIds model);
+        ResultHandle ChargeFromReplicate(string arrJob, out List<Guid> Ids);
         ResultHandle AutoRateReplicate();
+        Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
     }
 }

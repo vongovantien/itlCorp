@@ -1,15 +1,26 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -25,6 +36,9 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> unitRepository;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepo;
+        private readonly IContextBase<CatDepartment> catDepartmentRepo;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -37,7 +51,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShippingInstruction> csShippingInstruction,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CsMawbcontainer> csMawbcontainer,
-            IContextBase<SysSentEmailHistory> sentEmailHistory) : base(repository, mapper)
+            IContextBase<SysSentEmailHistory> sentEmailHistory,
+            IContextBase<SysEmailTemplate> sysEmailTemplate,
+            IContextBase<CatDepartment> catDepartment,
+            IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
             catPartnerRepo = catPartner;
@@ -49,6 +66,9 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             csMawbcontainerRepo = csMawbcontainer;
             sentEmailHistoryRepo = sentEmailHistory;
+            apiServiceUrl = serviceUrl;
+            sysEmailTemplateRepo = sysEmailTemplate;
+            catDepartmentRepo = catDepartment;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -64,6 +84,11 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(emailContent.Cc))
                 {
                     ccEmails = emailContent.Cc.Split(';').Where(x => x.Trim().ToString() != string.Empty).ToList();
+                }
+
+                if (SendMail.IsValidEmail(emailContent.From))
+                {
+                    SendMail._emailFrom = emailContent.From;
                 }
                 var sendMailResult = SendMail.Send(emailContent.Subject, emailContent.Body, toEmails, emailContent.AttachFiles, ccEmails);
                 
@@ -131,7 +156,17 @@ namespace eFMS.API.Documentation.DL.Services
                 _empCurrentUser?.Email);
 
             var emailContent = new EmailContentModel();
-            emailContent.From = "Info FMS";
+            var department = catDepartmentRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (department != null)
+            {
+                mailFrom = department.Email;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom;
             emailContent.To = _airlineMail; //Email của Airlines
             emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
             emailContent.Subject = _subject;
@@ -371,5 +406,116 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool SendMailContractCashWithOutstandingDebit()
+        {
+            try
+            {
+                var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
+                var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+                new LogHelper("SendMailContractCashWithOutstandingDebit", "Data : " + JsonConvert.SerializeObject(dtData, Formatting.Indented));
+                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
+                {
+                    x.SaleManId
+                });
+                var emailTemplate = sysEmailTemplateRepo.Get(x => x.Code == "CASH-WITH-OUTSTANDING-DEBIT").FirstOrDefault();
+                string subject = emailTemplate.Subject;
+                List<string> emailBCCs = new List<string>();
+                if (emailBcc != null)
+                {
+                    emailBCCs = emailBcc.ToString().Split(";").ToList();
+                }
+                foreach (var saleman in dtGrp)
+                {
+                    var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
+                    string body = emailTemplate.Body;
+                    body = body.Replace("{{SalemanName}}", saleman.FirstOrDefault().SalemanName);
+
+                    int number = 0;
+
+                    string content = string.Empty;
+                    var contractGrp = saleman.GroupBy(x => new { x.AccountNo, x.ContractId });
+                    foreach (var item in contractGrp)
+                    {
+                        string formatCurrency = item.FirstOrDefault().CreditCurrency == "VND" ? "N0" : "N02";
+                        var office = string.Join(";", item.GroupBy(x => x.OfficeName).Select(x => x.Key));
+                        string row = emailTemplate.Content;
+                        row = row.Replace("{{STT}}", (number + 1).ToString());
+                        row = row.Replace("{{Customer}}", item.FirstOrDefault().AccountNo + "-" + item.FirstOrDefault().CustomerName);
+                        row = row.Replace("{{Branch}}", office);
+                        row = row.Replace("{{Amount}}", item.FirstOrDefault().DebitAmount?.ToString(formatCurrency));
+                        row = row.Replace("{{Currency}}", item.FirstOrDefault().CreditCurrency);
+                        content += row;
+                        number++;
+                    }
+
+                    body = body.Replace("{{Content}}", content);
+
+                    string footer = emailTemplate.Footer;
+                    // Mail to
+                    var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
+                    var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
+                    // Bcc
+                    if (saleman.Count() > 0 && attachFile.Status)
+                    {
+                        string email = body + footer;
+
+                        List<string> pathFile = new List<string>() { attachFile.Data.ToString() };
+                        var s = SendMail.Send(subject, email, mailTo, pathFile, mailCC, emailBCCs);
+
+                        #region --- Ghi Log Send Mail ---
+                        var logSendMail = new SysSentEmailHistory
+                        {
+                            SentUser = SendMail._emailFrom,
+                            Receivers = string.Join("; ", mailTo),
+                            Subject = subject,
+                            Sent = s,
+                            SentDateTime = DateTime.Now,
+                            Body = body,
+                            Ccs = string.Join("; ", mailCC),
+                            Bccs = string.Join("; ", emailBCCs)
+                        };
+                        var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
+                        var hsSm = sentEmailHistoryRepo.SubmitChanges();
+                        #endregion --- Ghi Log Send Mail ---
+                    }
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                var logMessage = string.Format(" *  \n [END]: {0} * ,\n Exception message: {1}", DateTime.Now.ToString(), ex.ToString());
+                logMessage += "\n END LOG SENDMAILCONTRACTCASHWITHOUTSTANDINGDEBIT-------------------------------------------------------------------------\n";
+                new LogHelper("[EFMS_SENDMAILCONTRACTCASHWITHOUTSTANDINGDEBIT]", logMessage);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        public List<sp_GetShipmentDataWithOutstandingDebit> GetDataOustandingDebit(string salemanId)
+        {
+            var parameter = new[]{
+                new SqlParameter(){ ParameterName = "@salemanId", Value = salemanId }
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetShipmentDataWithOutstandingDebit>(parameter);
+            return data;
+        }
+
+        private async Task<ResultHandle> GetAttachExportShipmentOutstandingDebit(string salemanId)
+        {
+            Uri urlExport = new Uri(apiServiceUrl.Value.ApiUrlExport);
+
+            HttpResponseMessage resquest = await HttpClientService.GetApi(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
+            var response = await resquest.Content.ReadAsAsync<ResultHandle>();
+            return response;
+        }
     }
 }

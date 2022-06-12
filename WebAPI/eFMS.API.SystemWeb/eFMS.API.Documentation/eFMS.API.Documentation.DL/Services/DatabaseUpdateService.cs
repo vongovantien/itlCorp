@@ -47,7 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        values.Add("\'" + propertyInfo.GetValue(obj) + "\'");
+                        values.Add("N'" + propertyInfo.GetValue(obj) + "\'");
                     }
                 }
                 else

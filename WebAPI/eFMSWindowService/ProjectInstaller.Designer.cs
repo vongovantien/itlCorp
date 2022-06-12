@@ -40,6 +40,7 @@
             this.serviceInstaller5 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstaller6 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstaller7 = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstallerAlertAROutstandingDebit = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller1
             // 
@@ -121,6 +122,13 @@
             this.serviceInstaller7.ServiceName = "UpAutoRateService";
             this.serviceInstaller7.StartType = System.ServiceProcess.ServiceStartMode.Manual;
             // 
+            // serviceInstallerSendMailexpiredAgreement
+            // 
+            this.serviceInstallerAlertAROutstandingDebit.Description = "AlertCustomerContractCashWithOutstandingDebit";
+            this.serviceInstallerAlertAROutstandingDebit.DisplayName = "eFMSWindowService.AlertCustomerContractCashWithOutstandingDebit";
+            this.serviceInstallerAlertAROutstandingDebit.ServiceName = "AlertCustomerContractCashWithOutstandingDebit";
+            this.serviceInstallerAlertAROutstandingDebit.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
@@ -134,7 +142,8 @@
             this.serviceInstallerSendMailExceededCreditLimit,
             this.serviceInstallerSendMailexpiredAgreement,
             this.serviceInstaller5,
-            this.serviceInstaller7});
+            this.serviceInstaller7,
+            this.serviceInstallerAlertAROutstandingDebit});
 
         }
 
@@ -152,5 +161,6 @@
         private System.ServiceProcess.ServiceInstaller serviceInstaller5;
         private System.ServiceProcess.ServiceInstaller serviceInstaller6;
         private System.ServiceProcess.ServiceInstaller serviceInstaller7;
+        private System.ServiceProcess.ServiceInstaller serviceInstallerAlertAROutstandingDebit;
     }
 }

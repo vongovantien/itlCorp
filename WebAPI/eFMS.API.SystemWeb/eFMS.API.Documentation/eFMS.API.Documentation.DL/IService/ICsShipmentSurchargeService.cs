@@ -32,5 +32,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids);
         HandleState CancelLinkCharge(Guid chargeId);
         HandleState RevertChargeLinkFee(List<CsShipmentSurchargeModel> list);
+        HandleState UpdateChargeLinkFee(List<CsShipmentSurchargeModel> list);
     }
 }

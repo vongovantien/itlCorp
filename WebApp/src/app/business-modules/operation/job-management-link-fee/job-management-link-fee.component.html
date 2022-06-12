@@ -1,9 +1,9 @@
 <div class="bg-white p-4">
-    <button type="button" class="btn btn-success ">
+    <button type="button" class="btn btn-success " (click)="linkFeeJob()">
         <i class="la la-plus"></i> Link Fee
     </button>
-    <br/>
-    <br/>
+    <br />
+    <br />
     <div class="table-wrapper table-scrollable" id="ops-job-list-table">
         <table class="table table-hover table-brand dataTable">
             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
@@ -15,20 +15,17 @@
                         <td class="table-actions-col">
                             <div class="table-actions" style="width: 120px">
                                 <label class="m-checkbox">
-                                    <input type="checkbox" [(ngModel)]="item.isSelected" >
+                                    <input type="checkbox" [(ngModel)]="item.isSelected">
                                     <span></span>
                                 </label>
-                                <button type="button"
-                                    class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
-                                    data-toggle="collapse"
-                                    [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                    title="Collapse"
-                                    (click)="showCustomClearance(item.jobNo, i)">
+                                <button type="button" class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
+                                    data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
+                                    title="Collapse" (click)="showCustomClearance(item.jobNo, i)">
                                     <i class="la la-angle-up"></i>
                                 </button>
 
-                                <app-permission-button (onClick)="showDetailLinkFee(item.id)"
-                                    type="detail" [user]="item.userCreated">
+                                <app-permission-button (onClick)="showDetailLinkFee(item.id)" type="detail"
+                                    [user]="item.userCreated">
                                 </app-permission-button>
 
                                 <button type="button" *ngIf="item.isLocked"
@@ -37,8 +34,8 @@
                                 </button>
 
                                 <ng-container *ngIf="!item.isLocked">
-                                    <app-permission-button (onClick)="deleteSipment(item)"
-                                        type="delete" [user]="item.userCreated">
+                                    <app-permission-button (onClick)="deleteSipment(item)" type="delete"
+                                        [user]="item.userCreated">
                                     </app-permission-button>
                                 </ng-container>
 
@@ -90,8 +87,7 @@
                             <span>{{ item.datetimeModified | date:'dd/MM/yyyy' }}</span>
                         </td>
                     </tr>
-                    <tr class="collapse-panel-row" app-table-collapse-row
-                        [id]="'ops-shipment-00' + item.id + 1"
+                    <tr class="collapse-panel-row" app-table-collapse-row [id]="'ops-shipment-00' + item.id + 1"
                         [parentId]="'#ops-job-list-table'">
                         <table class="table table-secondary dataTable">
                             <thead app-table-header [headers]="headerCustomClearance"
@@ -99,8 +95,7 @@
                             </thead>
                             <tbody>
                                 <ng-container *ngIf="!!customClearances.length">
-                                    <tr
-                                        *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
+                                    <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
                                         <td>
                                             <span>{{ clearance.clearanceNo }}</span>
                                         </td>
@@ -150,3 +145,5 @@
         (onChange)="updatePagingData($event)"></app-pagination>
 </div>
 
+<permission-403-popup></permission-403-popup>
+<ng-template inject></ng-template>

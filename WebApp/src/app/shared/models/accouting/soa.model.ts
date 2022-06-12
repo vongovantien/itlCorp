@@ -44,6 +44,8 @@ export class SOA {
     totalCharge: number = 0;
     staffType: string = '';
     excRateUsdToLocal: number = 0;
+    salemanId: string = '';
+    salemanName: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

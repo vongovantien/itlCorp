@@ -829,7 +829,6 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion
 
-
             if (hs.Success)
             {
                 Response.OnCompleted(async () =>
@@ -871,6 +870,9 @@ namespace eFMS.API.ForPartner.Controllers
         [HttpDelete("DeleteVoucher")]
         public async Task<IActionResult> DeleteVoucher(VoucherSyncDeleteModel model, [Required] string apiKey, [Required] string hash)
         {
+            var _startDateProgress = DateTime.Now;
+            string _objectRequest = JsonConvert.SerializeObject(model);
+
             bool IsHasPayment = accPayableService.IsPayableHasPayment(model);
             if(IsHasPayment == true)
             {
@@ -880,6 +882,13 @@ namespace eFMS.API.ForPartner.Controllers
 
             string _message = hs.Success ? "Xóa voucher thành công" : string.Format("{0} Xóa voucher thất bại", hs.Exception?.Message);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+            #region -- Ghi Log --
+            string _funcLocal = "DeleteVoucher";
+            string _major = "Xóa voucher";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion
 
             if (hs.Success)
             {

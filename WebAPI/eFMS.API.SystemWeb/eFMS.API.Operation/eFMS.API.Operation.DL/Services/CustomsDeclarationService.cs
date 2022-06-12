@@ -420,15 +420,15 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
                 if (item.AccountNo == null)
                 {
-                    var customer = customerRepository.First(x => x.TaxCode == item.PartnerTaxCode);
+                    var customer = customerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
                     clearance.CustomerName = customer?.ShortName;
                     clearance.CustomerId = customer.Id;
                 }
                 else
                 {
-                    var customer = customerRepository.First(x => x.AccountNo == item.AccountNo);
-                    clearance.CustomerName = customer.ShortName;
-                    clearance.CustomerId = customer.Id;
+                    var customer = customerRepository.Get(x => x.AccountNo == item.AccountNo)?.FirstOrDefault();
+                    clearance.CustomerName = customer?.ShortName;
+                    clearance.CustomerId = customer?.Id;
 
                 }
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
@@ -1292,10 +1292,10 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.AccountNo = clearance.PartnerTaxCode;
             }
             var result = mapper.Map<CustomsDeclarationModel>(clearance);
-            var customer = customerRepository.Get(x => x.AccountNo == result.AccountNo).FirstOrDefault();
+            var customer = customerRepository.Get(x => x.AccountNo == result.AccountNo)?.FirstOrDefault();
 
-            result.CustomerName = customer.ShortName;
-            result.CustomerId = customer.Id;
+            result.CustomerName = customer?.ShortName;
+            result.CustomerId = customer?.Id;
 
             result.UserCreatedName = userRepository.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             result.UserModifieddName = userRepository.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;

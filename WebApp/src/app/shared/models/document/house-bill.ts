@@ -55,7 +55,7 @@ export class HouseBill extends BaseModel {
     grossWeight: number = null;
     gw: number = null; // Can be deleted.
     hbltype: string = null;
-    // * Add Field Shipment Type 
+    // * Add Field Shipment Type
     shipmentType: string = null;
     hwbno: string = null;
     inWord: string = null;
@@ -103,7 +103,7 @@ export class HouseBill extends BaseModel {
     warehouseNotice: string = null;
     packageQty: number = null;
     warehouseId: string = null;
-    // * AIR 
+    // * AIR
     flightNo: string = null;
     issuranceAmount: string = null;
     chgs: string = null;
@@ -168,6 +168,8 @@ export class HouseBill extends BaseModel {
     incotermId: string = null;
     userNameCreated: string = null;
     userNameModified: string = null;
+    wareHouseAnDate:any = null;
+
     constructor(object?: any) {
         super();
         const self = this;

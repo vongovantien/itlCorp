@@ -4,6 +4,7 @@ export class ChargeCdNote {
     hwbno: string = "";
     hbltype: string = "";
     id: string = "";
+    salemanId: string = "";
     listCharges: CsShipmentSurchargeDetail[] = new Array<CsShipmentSurchargeDetail>();
     isSelected: boolean = false;
     isDeleted: boolean = false;

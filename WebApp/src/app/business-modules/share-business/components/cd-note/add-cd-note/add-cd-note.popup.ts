@@ -280,9 +280,9 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             for (const charges of listCharge) {
                 chargesNotDeleted = charges.listCharges.filter(group => !group.isDeleted);
                 if (chargesNotDeleted.length > 0) {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, listCharges: chargesNotDeleted });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, salemanId: charges.salemanId, isSelected: charges.isSelected, listCharges: chargesNotDeleted });
                 } else {
-                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, isSelected: charges.isSelected, listCharges: [] });
+                    grpChargesNotDeleted.push({ id: charges.id, hwbno: charges.hwbno, salemanId: charges.salemanId, isSelected: charges.isSelected, listCharges: [] });
                 }
             }
         }
@@ -304,6 +304,14 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                     this.validateCDNotePopup.show();
                     return true;
                 }
+            }
+        }
+
+        if (this.selectedNoteType === "DEBIT" || this.selectedNoteType === "INVOICE"){
+            const checkMultiSaleman = [...new Set(this.listChargePartner.filter((x: ChargeCdNote) => x.listCharges.length > 0).map(x=>x.salemanId))];
+            if(!!checkMultiSaleman && checkMultiSaleman.length > 1){
+                this._toastService.warning("You can't issue Debit Note/Invoice for multiple Salesman! Please check it now");
+                return true;
             }
         }
         return false;
@@ -334,6 +342,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.notExistsChargePopup.show();
         } else {
             this.CDNote.jobId = this.currentMBLId;
+            this.CDNote.salemanId = this.listChargePartner.filter((x: ChargeCdNote) => x.listCharges.length > 0).map(x=>x.salemanId)[0];
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country

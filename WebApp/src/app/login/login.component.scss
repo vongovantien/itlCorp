@@ -49,22 +49,26 @@
 
         .m-login__wrapper-1-1 {
             width: 100%;
-            min-height: 645px;
+            //min-height: 645px;
             display: table;
             margin: 0 auto;
             .m-login__contanier {
-                margin: 0 auto;
-                display: table-cell;
+                // margin: 0 auto;
+                // display: table-cell;
+                // vertical-align: middle;
+                display: flex;
+                justify-content: space-between;
                 text-align: center;
-                vertical-align: middle;
-
+                min-height: 645px;
+                align-content: space-between;
+                flex-direction: column;
                 .m-login__content {
                     width: 100%;
                     margin: 0 auto;
                     padding: 1rem 1.5rem;
 
                     .m-login__logo {
-                        margin-bottom: 40px;
+                        margin-bottom: 30px;
                         text-align: center;
                         img {
                             max-width: 190px;

@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 

@@ -130,15 +130,30 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label" for="">
-                            Charge
-                        </label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
-                            (itemSelected)="onSelectDataFormInfo($event, 'charge')"
-                            [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields "
-                            [height]="150">
-                        </app-combo-grid-virtual-scroll>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                                    [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields "
+                                    [height]="150">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-control-label">Customer</label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomerShipment"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'customerShipment')"
+                                    [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                    [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
+                                    (remove)="selectedCustomerShipment = {field: 'id', value: null}">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -150,29 +165,51 @@
                         <option *ngFor="let comodity of commodityGroup" [ngValue]="comodity">{{comodity.groupNameEn}}
                         </option>
                     </select> -->
-                    <div class="form-group">
-                        <label class="form-control-label">AirLine Code</label>
-                        <input type="text" class="form-control" [(ngModel)]="airlineCode">
-                    </div>
-                </div>
-                <div class="col-lg-4">
                     <div class="row">
-                        <!-- <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-control-label">AirLine Code</label>
-                                <input type="text" class="form-control" [(ngModel)]="airlineCode">
-                            </div>
-                        </div> -->
                         <div class="col-lg-12">
-                            <div class="form-group">
-                                <label class="form-control-label"></label>
-                                <div><a class="pointer" style="text-decoration: underline;"
-                                        (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
-                                        class="text-warning">{{numberOfShipment}} item</span></div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">AirLine Code</label>
+                                        <input type="text" class="form-control" [(ngModel)]="airlineCode">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label"></label>
+                                        <div><a class="pointer" style="text-decoration: underline;"
+                                                (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
+                                                class="text-warning">{{numberOfShipment}} item</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isApplied && (selectedType.value === this.types[0].value) && !salemanDisplay}">
+                                <label class="form-control-label">Saleman</label>
+                                <label required *ngIf="selectedType.value === this.types[0].value"></label>
+                                <ng-select class="custom" [(ngModel)]="salemanDisplay" [items]="saleMans" bindLabel="value" bindValue="value"
+                                [clearable]="false" (change)="onSelectDataFormInfo($event, 'saleman')" 
+                                [disabled]="selectedType.value !== this.types[0].value" placeholder="">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isApplied && (selectedType.value === this.types[0].value) && !salemanDisplay">
+                                    Saleman is required!
+                                </div>
                             </div>
                         </div>
                     </div>
-
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Note
+                        </label>
+                        <textarea class="form-control m-input m-input--square" rows="6" [(ngModel)]="note" name="note"
+                            (ngModelChange)="onChangeNote($event)"></textarea>
+                        <!-- </div> -->
+                    </div>
+                
                 </div>
             </div>
             <div class="row form-charge">
@@ -193,7 +230,8 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+
+            <!-- <div class="row">
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label class="form-control-label">
@@ -203,7 +241,8 @@
                             (ngModelChange)="onChangeNote($event)"></textarea>
                     </div>
                 </div>
-            </div>
+            </div> -->
+
             <div class="form-actions">
                 <div class="row">
                     <div class="col-lg-6"></div>

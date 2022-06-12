@@ -2548,7 +2548,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             else if (_type == ForPartnerConstants.SYNCED_FROM_SOA)
             {
-                AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == Id.ToString()).FirstOrDefault();
+                AcctSoa soa = acctSOARepository.Get(x => x.Id == Id.ToString()).FirstOrDefault();
 
                 soa.Status = _status;
                 soa.UserModified = currentUser.UserID;
@@ -2581,7 +2581,7 @@ namespace eFMS.API.ForPartner.DL.Service
             switch (docType)
             {
                 case "SOA":
-                    AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == docID.ToString())?.FirstOrDefault();
+                    AcctSoa soa = acctSOARepository.Get(x => x.Id == docID.ToString())?.FirstOrDefault();
                     if (soa == null)
                     {
                         _messageInvalidDoc = string.Format("Số chứng từ SOA {0} không tồn tại", docCode);

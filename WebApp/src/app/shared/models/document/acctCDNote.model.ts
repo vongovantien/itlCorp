@@ -49,4 +49,5 @@ export class AcctCDNote {
   companyId: string = null;
   // exchangeRate:number = null;
   excRateUsdToLocal:number = null;
+  salemanId: string = null;
 }
