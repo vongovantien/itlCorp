@@ -9,7 +9,8 @@ import { catchError, finalize } from "rxjs/operators";
 
 @Component({
     selector: 'adjust-debit-value-popup',
-    templateUrl: './adjust-debit-value.popup.html'
+    templateUrl: './adjust-debit-value.popup.html',
+    styleUrls: ['./adjust-debit-value.popup.scss']
 })
 export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
@@ -21,7 +22,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     billingDate: AbstractControl;
     data: AdjustModel = new AdjustModel();
     headers = [
-        { title: 'No.', field: 'i', sortable: false, },
+        { title: 'No.', field: 'i', sortable: false, width: 40},
         { title: 'Charge Code', field: 'chargeCode', sortable: false },
         { title: 'Charge Name', field: 'chargeName', sortable: false },
         { title: 'Org Net', field: 'netAmount', sortable: false },
@@ -143,8 +144,8 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
                     return false;
                 }
                 let total = el2.orgAmountVND - (el2.amountVND + el2.vatAmountVND);
-                if (total >= 10000 || total <=-10000) {
-                    this._toastService.warning(`${el2.chargeCode} cannot enter too 10.000`);
+                if (total > 100 || total < -100) {
+                    this._toastService.warning(`${el2.chargeCode} cannot update more than 100`);
                     return false;
                 }
             }
@@ -160,7 +161,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
         var modelSearch = new AdjustModel();
         if (this.action == "SOA") {
             modelSearch.code = this.soano;
-        } else if (this.action == "CDNOTE") {
+        } else if (this.action == "DEBIT") {
             modelSearch.jodId = this.jodId;
             modelSearch.code = this.cdNote ?? "";
         }

@@ -117,6 +117,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
                     dataCdNote.listSurcharges.forEach(element => {
                         element.debit = (element.type === 'SELL' || (element.type === 'OBH' && dataCdNote.partnerId === element.paymentObjectId)) ? element.total : null;
                         element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total : null;
+                        element.adjustVND = element.amountVnd + element.vatAmountVnd;
                     });
                     this.CdNoteDetail = dataCdNote;
                     if (this.CdNoteDetail.cdNote.type == "DEBIT") {
@@ -385,7 +386,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
             );
     }
     adjustDebitValue() {
-        this.adjustDebitValuePopup.action = 'CDNOTE';
+        this.adjustDebitValuePopup.action = 'DEBIT';
         this.adjustDebitValuePopup.jodId = this.jobId;
         this.adjustDebitValuePopup.cdNote = this.cdNote;
         this.adjustDebitValuePopup.active();

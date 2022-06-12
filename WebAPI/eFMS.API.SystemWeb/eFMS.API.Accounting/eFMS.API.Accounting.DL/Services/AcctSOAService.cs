@@ -3731,7 +3731,7 @@ namespace eFMS.API.Accounting.DL.Services
             var res = new AdjustModel();
             if (model.Action == "SOA")
                 res = GetAdjustDebitValueSOA(model.CODE);
-            else if(model.Action == "CDNOTE")
+            else if(model.Action == "DEBIT")
                 res = GetAdjustDebitValueCDNOTE(new Guid(model.JodId),model.CODE);
             return res;
         }
