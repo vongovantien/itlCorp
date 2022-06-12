@@ -683,20 +683,20 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         //     }
         // }
         //}
-        if(this.selectedShipment.service==='CL'){
-            for (const charge of this.charges) {
-                if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
-                    if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
-                        this._toastService.warning("Series No Must be fill in");
-                        return;
-                    }
-                    if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
-                        this._toastService.warning("Invoice No Must be fill in");
-                        return;
-                    }
-                }
-            }
-        }
+        // if(this.selectedShipment.service==='CL'){
+        //     for (const charge of this.charges) {
+        //         if(charge.type.toLowerCase()===CommonEnum.CHARGE_TYPE.OBH.toLowerCase()){
+        //             if(!this.utility.isWhiteSpace(charge.invoiceNo )&& this.utility.isWhiteSpace(charge.seriesNo)){
+        //                 this._toastService.warning("Series No Must be fill in");
+        //                 return;
+        //             }
+        //             if(this.utility.isWhiteSpace(charge.invoiceNo) && !this.utility.isWhiteSpace(charge.seriesNo)){
+        //                 this._toastService.warning("Invoice No Must be fill in");
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
 
 
         const error = this.checkValidate();

@@ -22,7 +22,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     @Input() state: string = 'create';
 
     isShow: boolean = false;
-    isOPS: boolean = false;
+    // isOPS: boolean = false;
 
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
@@ -462,17 +462,17 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             };
             Object.assign(body, dataChargeOBH);
         }
-        if(this.selectedCharge.type==='OBH' && body.jobId.includes('LOG')){
-            if(!this.utility.isWhiteSpace(body.invoiceNo )&& this.utility.isWhiteSpace(body.seriesNo)){
-                this._toastService.warning("Series No Must be fill in");
-                return;
-            }
-            if(this.utility.isWhiteSpace(body.invoiceNo) && !this.utility.isWhiteSpace(body.seriesNo)){
-                this._toastService.warning("Invoice No Must be fill in");
-                return;
-            }
+        // if(this.selectedCharge.type==='OBH' && body.jobId.includes('LOG')){
+        //     if(!this.utility.isWhiteSpace(body.invoiceNo )&& this.utility.isWhiteSpace(body.seriesNo)){
+        //         this._toastService.warning("Series No Must be fill in");
+        //         return;
+        //     }
+        //     if(this.utility.isWhiteSpace(body.invoiceNo) && !this.utility.isWhiteSpace(body.seriesNo)){
+        //         this._toastService.warning("Invoice No Must be fill in");
+        //         return;
+        //     }
 
-        }
+        // }
 
         // TODO EMIT (UPDATE, COPY, CREATE) TO LIST SURCHARGE.
 
