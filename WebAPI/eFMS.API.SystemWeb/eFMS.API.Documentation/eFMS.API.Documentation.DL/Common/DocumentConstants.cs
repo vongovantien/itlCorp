@@ -62,6 +62,8 @@
         public const string CODE_ITL = "ITL7939";
         public const string NO_HOUSE = "N/H";
         public const string ITL_BOD = "ITL.BOD";
+        public const string OFFICE_HM = "ITLHM";
+        public const string OFFICE_BH = "ITLHBH";
 
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";

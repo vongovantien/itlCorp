@@ -241,7 +241,7 @@ namespace eFMS.API.Documentation.Controllers
             Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
@@ -383,9 +383,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult ChargeFromReplicate()
         {
             currentUser.Action = "ChargeFromReplicate";
-            ResultHandle hs = transactionService.ChargeFromReplicate();
+            ResultHandle hs = transactionService.ChargeFromReplicate(out List<Guid> Ids);
             if (!hs.Status)
                 return BadRequest(hs);
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
+                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                });
+            }
             return Ok(hs);
         }
 

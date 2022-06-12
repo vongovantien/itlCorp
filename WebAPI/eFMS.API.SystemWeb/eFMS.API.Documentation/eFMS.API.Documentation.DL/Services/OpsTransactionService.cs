@@ -2220,11 +2220,12 @@ namespace eFMS.API.Documentation.DL.Services
             return preFix;
         }
 
-        public ResultHandle ChargeFromReplicate()
+        public ResultHandle ChargeFromReplicate(out List<Guid> Ids)
         {
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", "\n-------------------------------------------------------------------------\n");
             string logMessage = string.Format(" *  \n [START][USER]: {0}{1} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"), currentUser.UserName);
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_CHARGEFROMREPLICATE]", logMessage);
+            Ids = new List<Guid>();
 
             ResultHandle hs = new ResultHandle();
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
@@ -2340,7 +2341,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 var resultUpdate = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                             }
                         }
-                        surchargeRepository.SubmitChanges();
+                        HandleState hsSurchargeAdd = surchargeRepository.SubmitChanges();
+                        if(hsSurchargeAdd.Success)
+                        {
+                            Ids.AddRange(surchargeAdds.Select(x => x.Id));
+                        }
                     }
                     else
                     {

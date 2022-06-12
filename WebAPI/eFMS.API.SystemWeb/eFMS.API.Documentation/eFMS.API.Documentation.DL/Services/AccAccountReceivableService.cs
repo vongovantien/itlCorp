@@ -19,23 +19,32 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
         private readonly IContextBase<CsTransactionDetail> csTranDetailRepository;
         private readonly IContextBase<OpsTransaction> opsTranRepository;
+        private readonly IContextBase<SysOffice> officeRepository;
+        readonly Guid? HM = Guid.Empty;
+        readonly Guid? BH = Guid.Empty;
 
         public AccAccountReceivableService(
             IContextBase<AccAccountReceivable> repository,
             ICsShipmentSurchargeService surchargeService,
             IContextBase<CsTransactionDetail> csTranDetailRepo,
             IContextBase<OpsTransaction> opsTranRepo,
+            IContextBase<SysOffice> officeRepo,
             IMapper mapper
             ) : base(repository, mapper)
         {
             csShipmentSurchargeService = surchargeService;
             csTranDetailRepository = csTranDetailRepo;
             opsTranRepository = opsTranRepo;
+            officeRepository = officeRepo;
+
+            HM = officeRepository.Get(x => x.Code == DocumentConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+            HM = officeRepository.Get(x => x.Code == DocumentConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+
         }
 
         public List<ObjectReceivableModel> GetListObjectReceivableBySurchargeIds(List<Guid> Ids)
         {
-            var surcharges = csShipmentSurchargeService.Get(x => Ids.Any(a => a == x.Id)).Where(x => x.Type != DocumentConstants.CHARGE_BUY_TYPE);
+            var surcharges = csShipmentSurchargeService.Get(x => Ids.Any(a => a == x.Id)).Where(x => x.Type != DocumentConstants.CHARGE_BUY_TYPE && x.OfficeId != HM && x.OfficeId != BH);
 
             return GetListObjectReceivable(surcharges);
         }
