@@ -43,7 +43,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isDuplicateContract: boolean = false;
     statusContract: boolean = false;
 
-    salesmanId: AbstractControl;
+    // salesmanId: AbstractControl;
     companyId: AbstractControl;
     officeId: AbstractControl;
     effectiveDate: AbstractControl;
@@ -123,6 +123,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     basesOn: Array<string> = ["Invoice Date", "Confirmed Billing"];
 
+    selectedSalesman: any = {};
     selectedSalesmanData: any = null;
     displayFieldSalesman: CommonInterface.IComboGridDisplayField[] = [
         {field: 'userName', label: 'User Name'}, 
@@ -130,8 +131,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         {field: 'userGroupName', label: 'Group'}, 
         {field: 'userDeparmentName', label: 'Department'}
     ];
-    selectedDisplaySalesman = ['userName', `userGroupName`, 'userDeparmentName'];
-
+    selectedDisplaySalesman = ['userName'];
+    salesmanName: string = '';
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
     isCustomerRequest: boolean = false;
@@ -204,7 +205,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     initForm() {
         this.formGroup = this._fb.group({
-            salesmanId: [null, Validators.required],
+            // salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
             partnerId: [null],
             officeId: [null, Validators.required],
@@ -237,7 +238,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             autoExtendDays: [],
             noDue: []
         });
-        this.salesmanId = this.formGroup.controls['salesmanId'];
+        // this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
         this.officeId = this.formGroup.controls['officeId'];
         this.effectiveDate = this.formGroup.controls['effectiveDate'];
@@ -309,7 +310,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         switch (type) {
             case 'salesman':
                 const data = $event;
-                this.salesmanId.setValue(data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId);
+                if(!data.userGroupId){
+                    this.selectedSalesman = { field: 'userId', value: data.userId };
+                } else {
+                this.selectedSalesman = { field: 'id', value: data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId };
+                }
                 this.selectedSalesmanData = data;
                 break;
             case 'company':
@@ -399,7 +404,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     resetFormControl(type: string) {
         switch (type) {
             case 'salesmanId': 
-                    this.salesmanId.setValue(null);
+                    this.selectedSalesman = null;
                     this.selectedSalesmanData = null;
                 break;
             case 'company': this.companyId.setValue(null);
@@ -411,26 +416,39 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
 
+    checkSubmitData(){
+        if (this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) {
+            return false;
+        }
+        if (!!this.contractType.value && this.contractType.value.length > 0) {
+            if (this.contractType.value === this.contractTypes[1] && !this.contractNo.value) {
+                this.isRequiredContractNo = true;
+                return false;
+            } else {
+                this.isRequiredContractNo = false;
+            }
+        }
+        if (!this.saleService.value) {
+            return false;
+        }
+
+        if(!this.selectedSalesmanData){
+            return false;
+        }
+
+        return true;
+    }
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
-        if (this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) {
+        
+        if(!this.checkSubmitData()){
             return;
         }
-        if (!!this.contractType.value && this.contractType.value.length > 0) {
-            if (this.contractType.value === this.contractTypes[1] && !this.contractNo.value) {
-                this.isRequiredContractNo = true;
-                return;
-            } else {
-                this.isRequiredContractNo = false;
-            }
-        }
-        if (!this.saleService.value) {
-            return;
-        }
+
         if (this.formGroup.valid) {
             const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.filter(x => x.contractNo === this.contractNo.value && x.contractType === "Official").length > 1 : null;
             if (objCheckContract) {
@@ -622,12 +640,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.saleService);
         // Set salemsman data info
         this.onSelectedDataFormInfo({
-            userId: this.selectedContract.saleManId, userGroupId: this.selectedContract.salesGroup,
+            userId: this.selectedContract.saleManId,
+            userGroupId: this.selectedContract.salesGroup,
             userDeparmentId: this.selectedContract.salesDepartment, userOfficeId: this.selectedContract.salesOfficeId,
             userCompanyId: this.selectedContract.salesCompanyId
         }, 'salesman');
         this.formGroup.patchValue({
-            salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId + '-' + this.selectedContract.salesGroup + '-' + this.selectedContract.salesDepartment : null,
+            // salesmanId: !!this.selectedContract.salesGroup ? this.selectedContract.saleManId + '-' + this.selectedContract.salesGroup + '-' + this.selectedContract.salesDepartment : this.selectedContract.saleManId,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
             officeId: this.activeOffice,
             contractNo: this.selectedContract.contractNo,

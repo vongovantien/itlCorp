@@ -172,7 +172,10 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.formContractPopup.isUpdate = false;
         this.formContractPopup.isSubmitted = false;
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
-        this.formContractPopup.salesmanId.setValue(userLogged.id + '-' + userLogged.groupId + '-' + userLogged.departmentId);
+        this.formContractPopup.selectedSalesman = { field: 'id', value: userLogged.id + '-' + userLogged.groupId + '-' + userLogged.departmentId };
+        this.formContractPopup.selectedSalesmanData = { userId: userLogged.id, userGroupId: userLogged.groupId,
+                                                    userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
+                                                    userCompanyId: userLogged.companyId};
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
         this.formContractPopup.autoExtendDays.setValue(0);

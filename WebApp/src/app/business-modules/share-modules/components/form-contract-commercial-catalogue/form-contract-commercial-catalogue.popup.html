@@ -45,11 +45,11 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !salesmanId.value}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedSalesmanData}">
                                 <label required>Salesman</label>
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectedDataFormInfo($event,'salesman')"
-                                    [currentActiveItemId]="{ field: 'id', value: salesmanId.value}"
+                                    [currentActiveItemId]="selectedSalesman"
                                     [selectedDisplayFields]="selectedDisplaySalesman" [dataSources]="users"
                                     [displayFields]="displayFieldSalesman"
                                     placeholder="Select Salesman" [height]="200" size="15"
