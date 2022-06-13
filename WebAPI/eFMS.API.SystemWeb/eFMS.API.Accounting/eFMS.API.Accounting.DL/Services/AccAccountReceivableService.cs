@@ -3146,7 +3146,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (var item in dataGrpSalesmanInvoice)
                     {
                         var currentReceivable = receivables.FirstOrDefault(x => x.PartnerId == item.PartnerId
-                            && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
+                            && x.Office == item.OfficeId && x.Service == fe.Service && x.SaleMan == item.SalesmanId);
                         if (currentReceivable != null)
                         {
                             // kiểm tra hop dong hien tai cua sales
@@ -3154,7 +3154,8 @@ namespace eFMS.API.Accounting.DL.Services
                              && x.SaleManId == item.SalesmanId
                              && x.Active == true
                              && x.OfficeId.Contains(item.OfficeId.ToString())
-                             && x.SaleService.Contains(item.Service));
+                             && x.SaleService == item.Service);
+
                             if (currentContract != null)
                             {
                                 currentReceivable.ContractId = currentContract.Id;
@@ -3163,6 +3164,7 @@ namespace eFMS.API.Accounting.DL.Services
                             decimal? totalAmount = 0;
                             decimal? totalUnpaidAmount = 0;
                             decimal? totalUnpaidAmountPerService = 0;
+                            decimal? totalAmountPerService = 0;
                             var invoicesData = item.invoices;
                             foreach (var invoice in invoicesData)
                             {
@@ -3187,9 +3189,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                 }
                                 totalUnpaidAmountPerService = (totalUnpaidAmount / qtyService);
+                                totalAmountPerService = (totalAmount / qtyService);
                             }
 
-                            currentReceivable.BillingAmount = totalAmount;
+                            currentReceivable.BillingAmount = totalAmountPerService;
                             currentReceivable.BillingUnpaid = totalUnpaidAmountPerService;
 
                             receivableIdModified.Add(currentReceivable.Id);
@@ -3206,6 +3209,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
                                 decimal? totalUnpaidAmountPerService = 0;
+                                decimal? totalAmountPerService = 0;
+
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
@@ -3232,6 +3237,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                    totalAmountPerService = totalAmount / qtyService;
                                 }
                                 receivables.Add(new AccAccountReceivableModel
                                 {
@@ -3246,7 +3252,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     UserModified = contract.UserModified,
                                     OfficeId = fe.Office,
                                     CompanyId = contract.CompanyId,
-                                    BillingAmount = totalAmount,
+                                    BillingAmount = totalAmountPerService,
                                     BillingUnpaid = totalUnpaidAmountPerService
                                 });
                             }
@@ -3255,6 +3261,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
                                 decimal? totalUnpaidAmountPerService = 0;
+                                decimal? totalAmountPerService = 0;
+
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
@@ -3266,6 +3274,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
 
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                    totalAmountPerService = totalAmount / qtyService;
                                 }
                                 receivables.Add(new AccAccountReceivableModel
                                 {
@@ -3276,7 +3285,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     ContractId = null,
                                     SaleMan = item.SalesmanId,
                                     ContractCurrency = "VND",
-                                    BillingAmount = totalAmount,
+                                    BillingAmount = totalAmountPerService,
                                     BillingUnpaid = totalUnpaidAmountPerService
                                 });
                             }
@@ -3313,6 +3322,8 @@ namespace eFMS.API.Accounting.DL.Services
                             decimal? totalAmount = 0;
                             decimal? totalUnpaidAmount = 0;
                             decimal? totalUnpaidAmountPerService = 0;
+                            decimal? totalAmountPerService = 0;
+
                             var invoicesData = item.invoices;
                             foreach (var invoice in invoicesData)
                             {
@@ -3337,8 +3348,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                 }
                                 totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                totalAmountPerService = totalAmount / qtyService;
                             }
-                            currentReceivable.ObhBilling = totalAmount;
+                            currentReceivable.ObhBilling = totalAmountPerService;
                             currentReceivable.ObhUnpaid = totalUnpaidAmountPerService;
                             currentReceivable.ObhAmount += currentReceivable.ObhUnpaid;
 
@@ -3356,6 +3368,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
                                 decimal? totalUnpaidAmountPerService = 0;
+                                decimal? totalAmountPerService = 0;
+
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
@@ -3382,6 +3396,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         totalUnpaidAmount += invoice.UnpaidAmountUSD;
                                     }
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                    totalAmountPerService = totalAmount / qtyService;
                                 }
                                 receivables.Add(new AccAccountReceivableModel
                                 {
@@ -3396,9 +3411,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     UserModified = contract.UserModified,
                                     OfficeId = fe.Office,
                                     CompanyId = contract.CompanyId,
-                                    ObhBilling = totalAmount,
-                                    ObhUnpaid = totalUnpaidAmount,
-                                    ObhAmount = totalUnpaidAmount
+                                    ObhBilling = totalAmountPerService,
+                                    ObhUnpaid = totalUnpaidAmountPerService,
+                                    ObhAmount = totalUnpaidAmountPerService
                                 });
                             }
                             else
@@ -3406,6 +3421,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 decimal? totalAmount = 0;
                                 decimal? totalUnpaidAmount = 0;
                                 decimal? totalUnpaidAmountPerService = 0;
+                                decimal? totalAmountPerService = 0;
+
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
@@ -3417,6 +3434,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     qtyService = (qtyService == 0) ? 1 : qtyService;
 
                                     totalUnpaidAmountPerService = totalUnpaidAmount / qtyService;
+                                    totalAmountPerService = totalAmount / qtyService;
                                 }
                                 receivables.Add(new AccAccountReceivableModel
                                 {
@@ -3427,9 +3445,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     ContractId = null,
                                     SaleMan = item.SalesmanId,
                                     ContractCurrency = "VND",
-                                    ObhBilling = totalAmount,
-                                    ObhUnpaid = totalUnpaidAmount,
-                                    ObhAmount = totalUnpaidAmount
+                                    ObhBilling = totalAmountPerService,
+                                    ObhUnpaid = totalUnpaidAmountPerService,
+                                    ObhAmount = totalUnpaidAmountPerService
                                 });
                             }
                         }
@@ -3715,6 +3733,26 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = surchargeRepo.Get(surchargesQuery);
             var objectReceivablesModel = GetObjectReceivableBySurcharges(surcharges);
             return objectReceivablesModel;
+        }
+
+        private bool IsMatchService(string saleService, string serviceTerm)
+        {
+            bool isMatch = true;
+            if (string.IsNullOrEmpty(serviceTerm))
+            {
+                return isMatch;
+            }
+            if (!string.IsNullOrEmpty(saleService))
+            {
+                var saleServiceList = saleService.Split(";").ToList();
+                var serviceTermList = serviceTerm.Split(";").ToList();
+                if (serviceTermList.Count > 0)
+                {
+                    isMatch = saleServiceList.Any(serviceTermList.Contains);
+                }
+            }
+
+            return isMatch;
         }
     }
 }

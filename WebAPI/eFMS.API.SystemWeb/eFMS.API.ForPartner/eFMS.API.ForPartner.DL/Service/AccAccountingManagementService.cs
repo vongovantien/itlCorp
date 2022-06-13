@@ -298,9 +298,16 @@ namespace eFMS.API.ForPartner.DL.Service
                     invoiceDebit.TotalAmountVnd = invoiceDebit.UnpaidAmountVnd = _totalAmountVndInvoiceDebit;
                     invoiceDebit.TotalAmountUsd = invoiceDebit.UnpaidAmountUsd = _totalAmountUsdInvoiceDebit;
 
-                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                    invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    // var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                    // invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType)
+                   .GroupBy(x => x)
+                   .Select(x => new { service = x.Key, counts = x.Count() })
+                   .OrderBy(x => x.counts)
+                   .Select(x => x.service)
+                   .ToList();
 
+                    invoiceDebit.ServiceType = _transactionTypes.FirstOrDefault();
                     //Task: 15631 - Andy - 14/04/2021
                     invoiceDebit.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceDebit.PartnerId, invoiceDebit.PaymentTerm, _transactionTypes, invoiceDebit.Date, invoiceDebit.ConfirmBillingDate);
                 }
@@ -363,9 +370,16 @@ namespace eFMS.API.ForPartner.DL.Service
                         invoiceObh.TotalAmountVnd = invoiceObh.UnpaidAmountVnd = _totalAmountVndInvoiceObh;
                         invoiceObh.TotalAmountUsd = invoiceObh.UnpaidAmountUsd = _totalAmountUsdInvoiceObh;
 
-                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                        invoiceObh.ServiceType = string.Join(";", _transactionTypes);
+                        //var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                        //invoiceObh.ServiceType = string.Join(";", _transactionTypes);
 
+                        var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType)
+                          .GroupBy(x => x)
+                          .Select(x => new { service = x.Key, counts = x.Count() })
+                          .OrderBy(x => x.counts)
+                          .Select(x => x.service)
+                          .ToList();
+                        invoiceObh.ServiceType = _transactionTypes.FirstOrDefault();
                         //Task: 15631 - Andy - 14/04/2021
                         invoiceObh.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceObh.PartnerId, invoiceObh.PaymentTerm, _transactionTypes, invoiceObh.Date, invoiceObh.ConfirmBillingDate);
                     }
