@@ -1117,7 +1117,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 hs = new HandleState((object)hsInsertOrUpdate.Message);
             }
-            WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+            WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables, model);
 
             //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
             var partnerIds = receivables.Select(s => s.PartnerId).ToList();
@@ -1143,7 +1143,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     hs = new HandleState((object)hsInsertOrUpdate.Message);
                 }
-                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables, models);
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
@@ -1155,7 +1155,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables, models);
                 return new HandleState((object)ex.Message);
             }
         }
@@ -1208,7 +1208,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     hs = new HandleState((object)hsInsertOrUpdate.Message);
                 }
-                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables, models);
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
@@ -1220,7 +1220,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables, models);
                 return new HandleState((object)ex.Message);
             }
         }
@@ -1293,11 +1293,12 @@ namespace eFMS.API.Accounting.DL.Services
             return result.FirstOrDefault();
         }
 
-        private void WriteLogInsertOrUpdateReceivable(bool status, string message, List<AccAccountReceivableModel> receivables)
+        private void WriteLogInsertOrUpdateReceivable(bool status, string message, List<AccAccountReceivableModel> receivables, List<ObjectReceivableModel> models = null)
         {
-            string logMessage = string.Format("InsertOrUpdateReceivable by {0} at {1} \n ** Message: {2} \n ** Receivables: {3} \n\n---------------------------\n\n",
+            string logMessage = string.Format("InsertOrUpdateReceivable by {0} at {1} \n ** models {2} \n ** Message: {3} \n ** Receivables: {4} \n\n---------------------------\n\n",
                             currentUser.Action,
                             DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                            models != null ? JsonConvert.SerializeObject(models) : "{}",
                             message,
                             receivables != null ? JsonConvert.SerializeObject(receivables) : "[]");
             string logName = string.Format("InsertOrUpdateReceivable_{0}_eFMS_LOG", (status ? "Success" : "Fail"));
@@ -2740,7 +2741,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     hs = new HandleState((object)hsInsertOrUpdate.Message);
                 }
-                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables, models);
 
                 var partnerIds = receivables.Select(s => s.PartnerId).Distinct().ToList();
                 var agreementIds = receivables.Select(s => s.ContractId).ToList();
@@ -2751,7 +2752,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables);
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables, models);
                 return new HandleState((object)ex.Message);
             }
         }
@@ -2871,8 +2872,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                && x.ServiceDate.Value.Date <= DateTime.Now.Date);
 
                 var currentReceivables = DataContext.Get(x => x.PartnerId == fe.PartnerId && x.Office == fe.Office && x.Service == fe.Service).ToList();
-                receivables = mapper.Map<List<AccAccountReceivableModel>>(currentReceivables);
-                foreach (var item in receivables)
+                foreach (var item in currentReceivables)
                 {
                     item.SellingNoVat = 0;
                     item.ObhAmount = 0;
@@ -2884,6 +2884,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.ObhPaid = 0;
                     item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
                 }
+                receivables.AddRange(mapper.Map<List<AccAccountReceivableModel>>(currentReceivables));
                 var receivableIdModified = new List<Guid>();
 
                 #region SellingNoVat
