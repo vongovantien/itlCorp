@@ -230,13 +230,13 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                    await CalculatorReceivable(modelReceivableList);
                 });
             }
             return Ok(hs);
         }
 
-        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
             Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
@@ -391,7 +391,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                    await CalculatorReceivable(modelReceivableList);
                 });
             }
             return Ok(hs);
