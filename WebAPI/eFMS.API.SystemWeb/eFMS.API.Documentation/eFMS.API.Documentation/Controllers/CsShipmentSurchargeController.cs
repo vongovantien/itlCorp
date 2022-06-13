@@ -698,18 +698,28 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
+        [HttpPut]
         [Route("CancelLinkCharge")]
         [Authorize]
-        public IActionResult CancelLinkCharge(Guid chargId)
+        public IActionResult CancelLinkCharge(DeleteSurchargeDeleteModel model)
         {
             currentUser.Action = "CancelLinkCharge";
-            var hs = csShipmentSurchargeService.CancelLinkCharge(chargId);
+            var hs = csShipmentSurchargeService.CancelLinkCharge(model.Id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = new List<ObjectReceivableModel>() {
+                        new ObjectReceivableModel { Office = model.Office, PartnerId = model.PartnerId, Service = model.Service }
+                    };
+                    await CalculatorReceivable(modelReceivableList);
+                });
             }
             return Ok(result);
         }

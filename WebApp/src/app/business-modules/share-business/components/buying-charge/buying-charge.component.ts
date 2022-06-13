@@ -1485,7 +1485,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.confirmCancelPopup.hide();
         if (!!this.selectedCs && this.selectedCs.id !== SystemConstants.EMPTY_GUID) {
             this._progressRef.start();
-            this._documentRepo.cancelLinkCharge(this.selectedCs.id)
+            const body = {
+                Id: this.selectedCs.id,
+                partnerId: this.selectedCs.paymentObjectId,
+                office: (!!this.selectedCs ? this.selectedCs.officeId : this.userLogged.officeId),
+                service: (!!this.selectedCs.transactionType ? this.selectedCs.transactionType : this.serviceTypeId),
+            }
+            this._documentRepo.cancelLinkCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

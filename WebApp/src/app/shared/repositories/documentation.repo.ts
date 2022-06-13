@@ -434,8 +434,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    cancelLinkCharge(chargId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, { chargId: chargId }).pipe(
+    cancelLinkCharge(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
