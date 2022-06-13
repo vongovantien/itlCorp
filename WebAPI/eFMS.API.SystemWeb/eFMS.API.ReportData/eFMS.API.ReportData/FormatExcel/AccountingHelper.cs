@@ -6176,28 +6176,28 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
-        private bool compareDebitAmountDetailByContract(DebitAmountDetailByContractModel obj1, DebitAmountDetailByContractModel obj2)
-        {
-            return obj1.JobNo == obj2.JobNo && obj1.HBLNo == obj2.HBLNo && obj2.MBLNo == obj1.MBLNo && obj1.DebitNo == obj2.DebitNo && obj1.OfficeName == obj2.OfficeName && obj1.TransactionType == obj2.TransactionType
-                && obj1.PaymentStatus == obj2.PaymentStatus && obj1.Type == obj2.Type&&obj1.InvoiceNo==obj2.InvoiceNo;
-        }
+        //private bool compareDebitAmountDetailByContract(DebitAmountDetailByContractModel obj1, DebitAmountDetailByContractModel obj2)
+        //{
+        //    return obj1.JobNo == obj2.JobNo && obj1.HBLNo == obj2.HBLNo && obj2.MBLNo == obj1.MBLNo && obj1.DebitNo == obj2.DebitNo && obj1.OfficeName == obj2.OfficeName && obj1.TransactionType == obj2.TransactionType
+        //        && obj1.PaymentStatus == obj2.PaymentStatus && obj1.Type == obj2.Type&&obj1.InvoiceNo==obj2.InvoiceNo;
+        //}
 
-        private List<DebitAmountDetailByContractModel> groupDebitAmountDetails(List<DebitAmountDetailByContractModel> debitAmountDetailByContractModels)
-        {
-            for (int i = 0; i < debitAmountDetailByContractModels.Count-2; i++)
-            {
-                for(int j = i + 1; j < debitAmountDetailByContractModels.Count - 1; j++){
-                    if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[j]))
-                    {
-                        debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[j].TotalUSD;
-                        debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[j].TotalVND;
-                        debitAmountDetailByContractModels.RemoveAt(j);
-                        j--;
-                    }
-                }
-            }
-            return debitAmountDetailByContractModels;
-        }
+        //private List<DebitAmountDetailByContractModel> groupDebitAmountDetails(List<DebitAmountDetailByContractModel> debitAmountDetailByContractModels)
+        //{
+        //    for (int i = 0; i < debitAmountDetailByContractModels.Count-2; i++)
+        //    {
+        //        for(int j = i + 1; j < debitAmountDetailByContractModels.Count - 1; j++){
+        //            if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[j]))
+        //            {
+        //                debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[j].TotalUSD;
+        //                debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[j].TotalVND;
+        //                debitAmountDetailByContractModels.RemoveAt(j);
+        //                j--;
+        //            }
+        //        }
+        //    }
+        //    return debitAmountDetailByContractModels;
+        //}
 
         /// <summary>
         /// Generate Export Generate Export Debit Amount Detail Report
@@ -6258,7 +6258,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 else
                 {
-                    debitAmountDetail.DebitAmountDetails = groupDebitAmountDetails(debitAmountDetail.DebitAmountDetails);
+                    //debitAmountDetail.DebitAmountDetails = groupDebitAmountDetails(debitAmountDetail.DebitAmountDetails);
                     for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
                     {
                         var item = debitAmountDetail.DebitAmountDetails[i];
