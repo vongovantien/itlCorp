@@ -50,8 +50,8 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectedDataFormInfo($event,'salesman')"
                                     [currentActiveItemId]="{ field: 'id', value: salesmanId.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users"
-                                    [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
+                                    [selectedDisplayFields]="selectedDisplaySalesman" [dataSources]="users"
+                                    [displayFields]="displayFieldSalesman"
                                     placeholder="Select Salesman" [height]="200" size="15"
                                     (remove)="resetFormControl('salesmanId')">
                                 </app-combo-grid-virtual-scroll>
@@ -97,25 +97,47 @@
 
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !effectiveDate.value.startDate }">
-                                <label required for="">Effective Date</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
-                                        class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !effectiveDate.value.startDate }">
+                                        <label required for="">Effective Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
+                                                class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                                name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate }">
+                                        <label required for="">Expired Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                                name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
+                                                [minDate]="minDateExpired" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="row">
-                                <div class="col-lg-7">
+                                <!-- <div class="col-lg-7">
                                     <div class="form-group">
                                         <label>Expired Date</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -131,13 +153,26 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-5">
+                                </div> -->
+                                <div class="col-lg-8">
                                     <div class="form-group">
                                         <label>Auto Extend (Year)
                                         </label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
                                             class="form-control" formControlName="autoExtendDays">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            No Due
+                                        </label>
+                                        <div>
+                                            <label class="m-checkbox m-checkbox--state-success mb-0">
+                                                <input type="checkbox" formControlName="noDue" (onclick)="onSelectedDataFormInfo($event,'noDue')">
+                                                <span></span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

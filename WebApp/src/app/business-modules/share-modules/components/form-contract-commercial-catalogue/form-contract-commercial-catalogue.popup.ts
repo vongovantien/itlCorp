@@ -63,6 +63,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     creditLimit: AbstractControl;
     trialCreditLimit: AbstractControl;
     autoExtendDays: AbstractControl;
+    noDue: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -121,6 +122,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     paymentMethods: Array<string> = ["All", "Collect", "Prepaid"];
 
     basesOn: Array<string> = ["Invoice Date", "Confirmed Billing"];
+
+    selectedSalesmanData: any = null;
+    displayFieldSalesman: CommonInterface.IComboGridDisplayField[] = [
+        {field: 'userName', label: 'User Name'}, 
+        { field: 'employeeNameVn', label: 'Full Name' },
+        {field: 'userGroupName', label: 'Group'}, 
+        {field: 'userDeparmentName', label: 'Department'}
+    ];
+    selectedDisplaySalesman = ['userName', `userGroupName`, 'userDeparmentName'];
 
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
@@ -200,7 +210,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             officeId: [null, Validators.required],
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
-            expiredDate: [],
+            expiredDate: [null, Validators.required],
             contractType: [null, Validators.required],
             saleService: [null, Validators.required],
             paymentMethod: ['All'],
@@ -224,7 +234,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             currencyId: [null, Validators.required],
             creditCurrency: [null, Validators.required],
             creditUnlimited: [],
-            autoExtendDays: []
+            autoExtendDays: [],
+            noDue: []
         });
         this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -246,6 +257,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.creditLimit = this.formGroup.controls['creditLimit'];
         this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
         this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
+        this.noDue = this.formGroup.controls['noDue'];
     }
 
     initDataForm() {
@@ -255,7 +267,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     getUsers() {
-        this._systemRepo.getSystemUsers({ active: true })
+        this._systemRepo.getUserActiveInfo()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: User[]) => {
@@ -279,7 +291,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     getOffices() {
-        this._systemRepo.getAllOffice()
+        this._systemRepo.queryOffices({ officeType : [ 'Head', 'Branch']})
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -294,17 +306,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             );
     }
     onSelectedDataFormInfo($event, type: string) {
-        if (type === 'salesman') {
-            this.salesmanId.setValue($event.id);
-        } else if (type === 'company') {
-            this.companyId.setValue($event.id);
-        } else if (type === 'office') {
-            this.officeId.setValue($event.id);
-
-        }
-        else if (type === 'partner') {
-            this.partnerIds.setValue($event.id);
-
+        switch (type) {
+            case 'salesman':
+                const data = $event;
+                this.salesmanId.setValue(data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId);
+                this.selectedSalesmanData = data;
+                break;
+            case 'company':
+                this.companyId.setValue($event.id);
+                break;
+            case 'office':
+                this.officeId.setValue($event.id);
+                break;
+            case 'partner':
+                this.partnerIds.setValue($event.id);
+                break;
+            case 'noDue':
+                break;
         }
     }
 
@@ -380,7 +398,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     resetFormControl(type: string) {
         switch (type) {
-            case 'salesmanId': this.salesmanId.setValue(null);
+            case 'salesmanId': 
+                    this.salesmanId.setValue(null);
+                    this.selectedSalesmanData = null;
                 break;
             case 'company': this.companyId.setValue(null);
                 break;
@@ -600,8 +620,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.activeOffice = this.getCurrentActiveOffice(this.selectedContract.officeId);
         }
         this.setError(this.saleService);
+        // Set salemsman data info
+        this.onSelectedDataFormInfo({
+            userId: this.selectedContract.saleManId, userGroupId: this.selectedContract.salesGroup,
+            userDeparmentId: this.selectedContract.salesDepartment, userOfficeId: this.selectedContract.salesOfficeId,
+            userCompanyId: this.selectedContract.salesCompanyId
+        }, 'salesman');
         this.formGroup.patchValue({
-            salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
+            salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId + '-' + this.selectedContract.salesGroup + '-' + this.selectedContract.salesDepartment : null,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
             officeId: this.activeOffice,
             contractNo: this.selectedContract.contractNo,
@@ -630,7 +656,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null,
             creditUnlimited: this.selectedContract.creditUnlimited,
             creditCurrency: this.selectedContract.creditCurrency,
-            autoExtendDays: this.selectedContract.autoExtendDays
+            autoExtendDays: this.selectedContract.autoExtendDays,
+            noDue: this.selectedContract.noDue
         });
         this.contractTypeDetail = this.selectedContract.contractType;
         if (this.selectedContract.contractType === 'Trial') {
@@ -645,7 +672,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         this.selectedContract.currencyId = !!this.currencyId.value ? !!this.currencyId.value.id ? this.currencyId.value.id : this.currencyId.value : null;
         this.selectedContract.active = this.selectedContract.id !== SystemConstants.EMPTY_GUID ? this.statusContract : false;
-        this.selectedContract.saleManId = this.salesmanId.value;
+        this.selectedContract.saleManId = this.selectedSalesmanData?.userId;
         this.selectedContract.companyId = this.companyId.value;
         this.selectedContract.index = this.indexDetailContract;
         this.selectedContract.contractNo = this.formGroup.controls['contractNo'].value;
@@ -716,7 +743,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
         this.selectedContract.creditCurrency = !!this.creditCurrency.value ? (!!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value) : this.selectedContract.currencyId;
-        this.selectedContract.autoExtendDays = this.autoExtendDays.value
+        this.selectedContract.autoExtendDays = this.autoExtendDays.value;
+        this.selectedContract.noDue = this.noDue.value;
+        this.selectedContract.salesGroup = this.selectedSalesmanData?.userGroupId;
+        this.selectedContract.salesDepartment = this.selectedSalesmanData?.userDeparmentId;
+        this.selectedContract.salesOfficeId = this.selectedSalesmanData?.userOfficeId;
+        this.selectedContract.salesCompanyId = this.selectedSalesmanData?.userCompanyId;
     }
 
     onSubmitActiveContract() {
@@ -933,13 +965,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     close() {
+        this.selectedSalesmanData = null;
         this.hide();
     }
 
     formatAutoExtendDays() {
         var num = this.autoExtendDays.value;
         if (num >= 0) {
-            this.autoExtendDays.setValue(Math.round(num * 10) / 10);
+            this.autoExtendDays.setValue(Math.round(num * 100) / 100);
         } else {
             this.autoExtendDays.setValue(0);
         }
