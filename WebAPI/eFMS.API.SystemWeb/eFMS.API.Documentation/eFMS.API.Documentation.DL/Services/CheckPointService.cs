@@ -311,15 +311,15 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
-            }
-
             if (currentSaleman == salemanBOD)
             {
                 isValid = true;
                 return result;
+            }
+
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
 
             int errorCode = -1;
