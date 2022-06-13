@@ -200,6 +200,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         let deliveryOrder = this.deliveryComponent.deliveryOrder;
         let proofOfDelievey = this.proofOfDeliveryComponent.proofOfDelievey;
 
+        this.arrivalNoteComponent.saveArrivalNote();
         modelUpdate.arrivalNo = arrivalNote.arrivalNo;
         modelUpdate.arrivalFirstNotice = arrivalNote.arrivalFirstNotice.startDate ? formatDate(arrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null;
         modelUpdate.arrivalSecondNotice = arrivalNote.arrivalSecondNotice.startDate ? formatDate(arrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null;
