@@ -506,8 +506,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportAccountingReceivableArSumary(AccountReceivableCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            //var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.AccountingGetDataARSumaryExportUrl, accessToken);
-            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, "http://localhost:44368/" + Urls.Accounting.AccountingGetDataARSumaryExportUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.AccountingGetDataARSumaryExportUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
