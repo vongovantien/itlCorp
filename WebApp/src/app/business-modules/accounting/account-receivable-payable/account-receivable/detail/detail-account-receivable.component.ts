@@ -140,7 +140,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                             if (this.agreementId) {
                                 return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
                             }
-                            return this._accoutingRepo.getDetailReceivableByPartnerId(this.partnerId);
+                            return this._accoutingRepo.getDetailReceivableByPartnerId(this.partnerId,this.salemanId);
                         }
                         return of(false);
                     })
