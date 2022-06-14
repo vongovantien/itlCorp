@@ -118,33 +118,33 @@
 		<div class="row">
 			<div class="col-md-4">
 				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger':(isSubmitted || hwbno.dirty) && (!hwbno.valid||formEdit.get('hwbno').value.length==0)}">
+					[ngClass]="{'m-form__group has-danger':formEdit.get('hwbno').value?.length==0||!hwbno.valid||(formEdit.get('hwbno').value==null&&isSubmitted)}">
 					<label class="form-control-label" required>
 						HBL No
 					</label>
 					<input type="text" class="form-control" placeholder="Enter text" formControlName="hwbno">
-					<div class="form-control-feedback" *ngIf="(isSubmitted || hwbno.dirty) && !hwbno.valid">
+					<div class="form-control-feedback" *ngIf="!hwbno.valid">
 						HBL No must be not have special character!
 					</div>
 					<div class="form-control-feedback"
-						*ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('hwbno').value.length==0">
+						*ngIf="formEdit.get('hwbno').value?.length==0||(formEdit.get('hwbno').value==null&&isSubmitted)">
 						HBL No is required!
 					</div>
 				</div>
 			</div>
 			<div class="col-md-4">
 				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger':(isSubmitted || mblno.dirty) && (!mblno.valid||formEdit.get('mblno').value.length==0)}">
+					[ngClass]="{'m-form__group has-danger':formEdit.get('mblno').value?.length==0||!mblno.valid||(formEdit.get('mblno').value==null&&isSubmitted)}">
 					<label class="form-control-label" required>
 						MBL No
 					</label>
 					<input type="text" class="form-control" placeholder="Enter text" formControlName="mblno">
-					<div class="form-control-feedback" *ngIf="(isSubmitted || mblno.dirty) && !mblno.valid">
+					<div class="form-control-feedback" *ngIf="!mblno.valid">
 						MBL No must be not have special charater!
 					</div>
 					<div class="form-control-feedback"
-						*ngIf="(isSubmitted || hwbno.dirty) && formEdit.get('mblno').value.length==0">
-						HBL No is required!
+						*ngIf="formEdit.get('mblno').value?.length==0||(formEdit.get('mblno').value==null&&isSubmitted)">
+						MBL No is required!
 					</div>
 				</div>
 			</div>

@@ -18,5 +18,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string UserNameModified { get; set; }
         public string CreditPayment { get; set; }
         public bool IsExistChgCurrDiffLocalCurr { get; set; }
+        public string SalemanName { get; set; }
     }
 }

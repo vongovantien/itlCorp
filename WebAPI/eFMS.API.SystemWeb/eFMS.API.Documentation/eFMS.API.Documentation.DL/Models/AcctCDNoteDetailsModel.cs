@@ -65,5 +65,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string PackageUnit { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public decimal? ExcRateUsdToLocal { get; set; }
+        public string SalemanName { get; set; }
     }
 }

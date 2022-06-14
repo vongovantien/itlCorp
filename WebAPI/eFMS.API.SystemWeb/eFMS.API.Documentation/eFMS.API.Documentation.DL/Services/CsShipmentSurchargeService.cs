@@ -316,7 +316,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Chỉ lấy những charge chưa sync
                     var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL=houseBill.ReferenceNo };
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, SalemanId = houseBill.SaleManId, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL=houseBill.ReferenceNo };
                     returnList.Add(returnObj);
                 }
             }
@@ -385,7 +385,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //Chỉ lấy những charge chưa sync
                 var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
-                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = _listCharges, FlexId = null };
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, SalemanId = houseBill.SalemanId, listCharges = _listCharges, FlexId = null };
                 returnList.Add(returnObj);
             }
 
@@ -483,8 +483,9 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = hblid,
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
-            List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
-            if (!surcharges.Any()) return result;
+            //List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
+            var surcharges = DataContext.Get(x => x.Hblid == hblid).Select(x => new { x.Type, x.AmountVnd, x.AmountUsd });
+            if (surcharges.Count() == 0) return result;
             foreach (var item in surcharges)
             {
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
@@ -1574,16 +1575,16 @@ namespace eFMS.API.Documentation.DL.Services
                 //        item.IsValid = false;
                 //    }
                 //}
-                if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
-                {
-                    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
-                    item.IsValid = false;
-                }
-                if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
-                {
-                    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
-                    item.IsValid = false;
-                }
+                //if (!string.IsNullOrEmpty(item.InvoiceNo) && string.IsNullOrEmpty(item.SeriesNo) && item.Type.ToLower() == "obh")
+                //{
+                //    item.SerieNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SERIES_NO_REQUIRED], item.ChargeCode);
+                //    item.IsValid = false;
+                //}
+                //if (!string.IsNullOrEmpty(item.SeriesNo) && string.IsNullOrEmpty(item.InvoiceNo) && item.Type.ToLower() == "obh")
+                //{
+                //    item.InvoiceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_INVOICE_NO_REQUIRED], item.ChargeCode);
+                //    item.IsValid = false;
+                //}
                 else
                 {
                     if (item.Type.ToLower() != "buying" && item.Type.ToLower() != "selling" && item.Type.ToLower() != "obh")

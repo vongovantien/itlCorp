@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SortService } from '@services';
-import { Partner, Company } from '@models';
+import { Partner, Company, Office } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { IPartnerDataState, getPartnerDataSearchParamsState } from '../../store';
 import { Store } from '@ngrx/store';
@@ -44,9 +44,9 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        this.getService();
-        this.getOffice();
-        this.getCompany();
+        //this.getService();
+        //this.getOffice();
+        //this.getCompany();
         this._store.select(getPartnerDataSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -83,6 +83,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             { title: 'Fax', field: 'fax', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'Office', field: 'officeName', sortable: true },
         ];
         localStorage.removeItem('success_add_sub');
         this.dataSearch = this.criteria;

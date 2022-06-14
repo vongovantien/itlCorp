@@ -47,7 +47,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         lastSync: 'Last Sync',
         currency: 'Currency',
         exchangeRate: 'Exc Rate',
-        reasonReject: 'Reason Reject'
+        reasonReject: 'Reason Reject',
+        saleman: 'Salesman'
     };
     airLabelDetail: any = {
         hbl: 'HAWB/ HBL',
@@ -303,7 +304,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     }
 
     adjustDebitValue(){
-        this.adjustDebitValuePopup.action='CDNOTE';
+        this.adjustDebitValuePopup.action='DEBIT';
         this.adjustDebitValuePopup.jodId=this.jobId;
         this.adjustDebitValuePopup.cdNote=this.cdNote;
         this.adjustDebitValuePopup.active();

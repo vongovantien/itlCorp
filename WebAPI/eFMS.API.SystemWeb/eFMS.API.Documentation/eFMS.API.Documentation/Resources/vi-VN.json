@@ -74,6 +74,6 @@
   "MSG_CURRENCY_EMPTY": "Currency không được để trống!",
   "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!",
 
-  "MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
-  "MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!"
+  //"MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
+  //"MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!"
 }

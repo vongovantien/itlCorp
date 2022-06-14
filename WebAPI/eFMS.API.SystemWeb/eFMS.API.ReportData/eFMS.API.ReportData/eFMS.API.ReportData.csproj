@@ -59,6 +59,9 @@
      <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-General-Preview.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
+     <None Update="FormatExcel\TemplateExport\Shipment-Oustanding-Debit-Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\Shipment-Overview-FCL.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>

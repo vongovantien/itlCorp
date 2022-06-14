@@ -147,7 +147,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && 
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted &&
                         ((formCreate.errors | equalError:'invalidPort') || (!podDescription.value || !pod.value)) }">
                         <label required>Port of Discharge (POD)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
@@ -305,11 +305,18 @@
                                 <ng-select class="custom" placeholder="Please Select" formControlName="serviceType"
                                     [items]="serviceTypes"></ng-select>
                             </div>
-                            <div class="form-group">
-                                <label>Incoterm</label>
-                                <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                            <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (incotermId.dirty && !incotermId.valid) || (isSubmitted && !incotermId.valid)}">
+                                    <label class="form-control-label" for="">
+                                        Incoterm. <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
                                     [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && (incotermId.errors | equalError: 'required') || (incotermId.errors | equalError: 'required') && incotermId.dirty">
+                                        Incoterm is required!
+                                    </div>
                             </div>
                         </div>
 

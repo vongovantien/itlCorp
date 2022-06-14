@@ -189,6 +189,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="m--margin-bottom-10" *ngIf="cdnoteDetail.cdNote.type !== 'CREDIT'">
+                                            <span class="m--font-bolder">
+                                                {{labelDetail.saleman}}:
+                                            </span>
+                                            <span>{{cdnoteDetail.salemanName}}</span>
+                                        </div>
                                     </div>
                                     <div class="col-xl-6">
                                         <div class="m--margin-bottom-10">
@@ -291,9 +297,9 @@
                                 </div>
                                 <ng-container *ngIf="!!cdnoteDetail
                                 &&cdnoteDetail.cdNote.type === 'DEBIT'
-                                &&cdnoteDetail.cdNote.syncStatus !== 'Synced'
                                 &&cdnoteDetail.cdNote.currencyId === 'VND'
                                 &&cdnoteDetail.listSurcharges.length > 0">
+                                <!-- &&cdnoteDetail.cdNote.syncStatus !== 'Synced' -->
                                     <div class="col-md-auto">
                                         <strong>Total Adjust:</strong> <span class="m--margin-left-5">{{totalAdjustVND}}</span>
                                     </div>

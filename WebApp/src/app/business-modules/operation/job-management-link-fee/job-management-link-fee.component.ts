@@ -13,6 +13,7 @@ import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from '../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Component({
@@ -20,8 +21,7 @@ import { JobConstants, RoutingConstants } from '@constants';
     templateUrl: './job-management-link-fee.component.html',
 })
 export class JobManagementLinkFeeComponent extends AppList implements OnInit {
-
-    @ViewChild(ConfirmPopupComponent) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
 
     shipments: Shipment[] = [];
@@ -36,6 +36,7 @@ export class JobManagementLinkFeeComponent extends AppList implements OnInit {
         createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
+    messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 
     constructor(
         private sortService: SortService,
@@ -138,7 +139,11 @@ export class JobManagementLinkFeeComponent extends AppList implements OnInit {
                         this.selectedShipment = new Shipment(shipment);
 
                         this.deleteMessage = `Do you want to delete job No ${shipment.jobNo}?`;
-                        this.confirmDeleteJobPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+                            title: 'Confirm',
+                            body: this.deleteMessage,
+                            labelConfirm: 'Ok'
+                        }, () => { this.onDeleteShipment(); });
                     } else {
                         this.canNotAllowActionPopup.show();
                     }
@@ -153,7 +158,6 @@ export class JobManagementLinkFeeComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.confirmDeleteJobPopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -241,6 +245,44 @@ export class JobManagementLinkFeeComponent extends AppList implements OnInit {
     gotoCreateJob() {
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
     }
+
+    linkFeeJob() {
+        let jobs = this.shipments.filter(x => x.isSelected);
+        if (!jobs.length) {
+            this._toastService.warning("Please select job");
+            return;
+        }
+        let links = jobs.filter(x => !x.serviceNo);
+        if (links.length > 0) {
+            this._toastService.warning("Please linked job");
+            return;
+        }
+
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Alert',
+            body: this.messageConfirmLinkFee,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-warning',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.onConfirmLinkFee())
+    }
+    onConfirmLinkFee() {
+        let jobs = this.shipments.filter(x => x.isSelected);
+        this._documentRepo.updateShipmentLinkFee(jobs)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (result: CommonInterface.IResult) => {
+                    if (result.status) {
+                        this._toastService.success("Fee Have Linked Success");
+                        this.getShipments();
+                    } else {
+                        this._toastService.error(result.message);
+                    }
+                }
+            );
+    }
+
 
 
 }

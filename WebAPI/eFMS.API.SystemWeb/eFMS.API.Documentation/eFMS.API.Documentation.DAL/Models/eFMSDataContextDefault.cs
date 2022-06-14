@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
+        public virtual DbSet<SysEmailTemplate> SysEmailTemplate { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
@@ -673,6 +674,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
 
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.SentByUser)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1017,6 +1022,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.PaymentNote).HasMaxLength(500);
 
                 entity.Property(e => e.PaymentStatus).HasMaxLength(50);
+
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasMaxLength(250)
@@ -2481,6 +2490,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerNameLink)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PartnerOrgId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3443,6 +3456,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("RClass")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.ReceivedBillTime).HasColumnType("datetime");
+
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
 
                 entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
@@ -3540,6 +3555,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Valpp)
                     .HasColumnName("VALPP")
                     .IsUnicode(false);
+
+                entity.Property(e => e.WareHouseAnDate).HasColumnType("datetime");
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
 
@@ -4112,6 +4129,23 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Website).HasMaxLength(1600);
+            });
+
+            modelBuilder.Entity<SysEmailTemplate>(entity =>
+            {
+                entity.ToTable("sysEmailTemplate");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<SysEmployee>(entity =>

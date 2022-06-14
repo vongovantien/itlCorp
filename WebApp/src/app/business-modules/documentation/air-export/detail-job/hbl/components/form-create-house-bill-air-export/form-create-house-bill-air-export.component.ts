@@ -72,6 +72,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     warehouseId: AbstractControl;
     rateCharge: AbstractControl;
     handingInformation: AbstractControl;
+    incotermId:AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -381,7 +382,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
             // * Array
             dimensionDetails: this._fb.array([]),
-            incotermId: []
+            incotermId: [null, Validators.required]
 
         },
             { validator: FormValidators.compareGW_CW }
@@ -416,6 +417,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.rclass = this.formCreate.controls["rclass"];
         this.rateCharge = this.formCreate.controls["rateCharge"];
         this.handingInformation = this.formCreate.controls["handingInformation"];
+        this.incotermId = this.formCreate.controls["incotermId"];
 
         this.formCreate.get('dimensionDetails')
             .valueChanges

@@ -95,6 +95,8 @@
             public const string AddReportLogUrl = "/Documentation/api/v1/en-US/ReportLog/AddNew";
 
             public const string GetDataExporDebCretInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtDebCretInvExport";
+
+            public const string GetDataOustandingDebitUrl = "/Documentation/api/v1/en-US/DocSendMail/GetDataOustandingDebit?salemanId=";
         }
 
         public class Setting

@@ -1,3 +1,4 @@
+import { NullLogger } from '@microsoft/signalr';
 import { Container } from './container.model';
 import { PermissionHouseBill } from './permissionHouseBill';
 
@@ -113,6 +114,8 @@ export class CsTransactionDetail {
   contactPerson: string = '';
   closingTime: string = '';
   incotermId: string = null;
+  receivedBillTime:any = null;
+
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

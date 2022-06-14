@@ -24,6 +24,7 @@
           <Property Name="DatetimeModified" Type="datetime" />
           <Property Name="Active" Type="bit" />
           <Property Name="InactiveOn" Type="datetime" />
+          <Property Name="SignPath" Type="nvarchar" MaxLength="1000" />
         </EntityType>
         <EntityType Name="sysSentEmailHistory">
           <Key>
@@ -79,6 +80,7 @@
           <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="InactiveOn" Type="DateTime" Precision="3" />
+          <Property Name="SignPath" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
         </EntityType>
         <ComplexType Name="sp_GetShipmentInThreeDayToSendARDept_Result">
           <Property Type="Guid" Name="ID" Nullable="false" />
@@ -120,6 +122,7 @@
           <EntitySetMapping Name="catDepartments">
             <EntityTypeMapping TypeName="eFMSTestModel.catDepartment">
               <MappingFragment StoreEntitySet="catDepartment">
+                <ScalarProperty Name="SignPath" ColumnName="SignPath" />
                 <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />

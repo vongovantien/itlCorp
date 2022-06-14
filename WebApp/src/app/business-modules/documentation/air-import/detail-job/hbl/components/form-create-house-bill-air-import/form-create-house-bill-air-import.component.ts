@@ -54,7 +54,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     flightNoOrigin: AbstractControl;
     finalPod: AbstractControl;
     packageQty: AbstractControl;
-
+    incotermId:AbstractControl;
     freightPayment: AbstractControl;
 
     currencyId: AbstractControl;
@@ -73,6 +73,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     packageType: AbstractControl;
     issueHBLDate: AbstractControl;
     desOfGoods: AbstractControl;
+    wareHouseAnDate: AbstractControl;
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
@@ -172,7 +173,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             grossWeight: shipment.grossWeight,
                             chargeWeight: shipment.chargeWeight,
                             packageType: +shipment.packageType,
-                            incontermId: shipment.incotermId
+                            incontermId: shipment.incotermId,
                         });
                     }
                 }),
@@ -279,7 +280,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             issueHBLDate: [{ startDate: new Date(), endDate: new Date() }],
             flightDateOrigin: [],
             eta: [],
-            incotermId: []
+            incotermId: [null, Validators.required],
+            wareHouseAnDate:[]
 
         },
             { validator: FormValidators.compareGW_CW }
@@ -311,6 +313,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.desOfGoods = this.formCreate.controls['desOfGoods'];
         this.notifyPartyDescription = this.formCreate.controls['notifyPartyDescription'];
         this.flightDateOrigin = this.formCreate.controls['flightDateOrigin'];
+        this.wareHouseAnDate = this.formCreate.controls['wareHouseAnDate'];
+        this.incotermId = this.formCreate.controls['incotermId'];
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -406,6 +411,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
             arrivalDate: !!data.arrivalDate ? { startDate: new Date(data.arrivalDate), endDate: new Date(data.arrivalDate) } : null,
+            wareHouseAnDate: !!data.wareHouseAnDate ? { startDate: new Date(data.wareHouseAnDate), endDate: new Date(data.wareHouseAnDate) } : null,
 
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,

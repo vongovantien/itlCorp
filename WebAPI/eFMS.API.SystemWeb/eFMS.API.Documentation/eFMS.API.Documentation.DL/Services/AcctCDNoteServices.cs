@@ -302,7 +302,10 @@ namespace eFMS.API.Documentation.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
                 model.NetOff = false;
-
+                if(model.Type.ToUpper() == "CREDIT")
+                {
+                    model.SalemanId = null;
+                }
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                 #region --- Set Currency For CD Note ---
@@ -748,7 +751,7 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var cdNote in cdNotesModel)
                     {
                         var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                        cdNote.soaNo = string.Join(", ", chargesOfCDNote.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
+                        cdNote.soaNo = cdNote.Type?.ToUpper() == "CREDIT" ? string.Join(", ", chargesOfCDNote.Where(x => !string.IsNullOrEmpty(x.PaySoano)).Select(x =>  x.PaySoano).Distinct()) : string.Join(", ", chargesOfCDNote.Where(x => !string.IsNullOrEmpty(x.Soano)).Select(x => x.Soano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
                         var _cdCurrency = chargesOfCDNote.Select(s => new
@@ -919,7 +922,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var code in cdNoList)
                 {
                     var surcharge = surchargeRepository.Get(x => x.CreditNo == code || x.DebitNo == code);
-                    if(surcharge != null)
+                    if (surcharge != null)
                     {
                         charges.AddRange(surcharge);
                     }
@@ -1149,6 +1152,13 @@ namespace eFMS.API.Documentation.DL.Services
             cdNoteDetails.IsExistChgCurrDiffLocalCurr = cdNote.CurrencyId != DocumentConstants.CURRENCY_LOCAL || listSurcharges.Any(x => x.CurrencyId != DocumentConstants.CURRENCY_LOCAL);
             cdNoteDetails.DatetimeCreated = cdNote.DatetimeCreated;
             cdNoteDetails.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
+            // Get saleman name
+            var saleman = sysUserRepo.Get(x => x.Id == cdNote.SalemanId).FirstOrDefault();
+            if (saleman != null)
+            {
+                cdNoteDetails.SalemanName = sysEmployeeRepo.Get(x => x.Id == saleman.EmployeeId).FirstOrDefault().EmployeeNameEn;
+            }
+
             return cdNoteDetails;
         }
 
@@ -1166,7 +1176,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (cdNote.SyncStatus == "Synced") return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED]);
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
+                    var isOtherSOA = cdNote.Type.ToUpper() == "CREDIT" ? charges.Any(x => !string.IsNullOrEmpty(x.PaySoano)) : charges.Any(x => !string.IsNullOrEmpty(x.Soano));
                     if (isOtherSOA == true)
                     {
                         hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);
@@ -3779,5 +3789,10 @@ namespace eFMS.API.Documentation.DL.Services
                 acctCombineBillingRepository.SubmitChanges();
             }
         }
+
+        //public HandleState CheckMultiSalemanInDebitInvCDNote(AcctCdnoteModel model)
+        //{
+
+        //}
     }
 }

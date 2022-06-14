@@ -15,6 +15,8 @@ import { JobManagementFormCreateComponent } from './components/form-create/form-
 import { NgSelectModule } from '@ng-select/ng-select';
 import { JobManagementChargeImportComponent } from './job-management-import/job-charge-import.component';
 import { JobManagementLinkFeeComponent } from '../job-management-link-fee/job-management-link-fee.component';
+import { LinkChargeJobRepPopupComponent } from './components/popup/link-charge-from-jobRep-popup/link-charge-from-job-rep.popup';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 
 const routing: Routes = [
@@ -56,6 +58,7 @@ const LIB = [
     PaginationModule.forRoot(),
     TabsModule.forRoot(),
     CollapseModule.forRoot(),
+    ModalModule,
 ];
 
 @NgModule({
@@ -71,7 +74,8 @@ const LIB = [
         JobManagementCreateJobComponent,
         JobManagementFormSearchComponent,
         JobManagementFormCreateComponent,
-        JobManagementLinkFeeComponent
+        JobManagementLinkFeeComponent,
+        LinkChargeJobRepPopupComponent
     ],
     providers: [
     ],
