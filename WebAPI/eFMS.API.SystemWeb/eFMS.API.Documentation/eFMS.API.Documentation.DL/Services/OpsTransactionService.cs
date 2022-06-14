@@ -2144,7 +2144,8 @@ namespace eFMS.API.Documentation.DL.Services
                     item.Mblno = shipment.Mblno;
                     item.OfficeId = shipment.OfficeId;
                     item.Hblid = shipment.Hblid;
-
+                    item.CombineBillingNo = null;
+                    item.ObhcombineBillingNo = null;
                     surCharges.Add(item);
                 }
             }
