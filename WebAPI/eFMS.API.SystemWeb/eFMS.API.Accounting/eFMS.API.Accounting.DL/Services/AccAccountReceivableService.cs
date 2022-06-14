@@ -1678,8 +1678,11 @@ namespace eFMS.API.Accounting.DL.Services
                     query = query.And(x => x.Over30Day > 0);
                 }
             }
+
             if (criteria.OfficeIds != null)
-                query = query.And(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId.ToString()));
+                query = query.And(x => x.Office != null && criteria.OfficeIds.Contains(x.Office.ToString().ToLower()));
+            //if (currentUser!= null)
+            //    query = query.And(x => x.OfficeId == currentUser.OfficeID );
 
             return query;
         }
@@ -2075,11 +2078,7 @@ namespace eFMS.API.Accounting.DL.Services
             var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
-
-            IQueryable<AccAccountReceivable> _acctReceivables = acctReceivables;
-            if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
-            { _acctReceivables = acctReceivables.Where(x => x.Office == criteria.OfficeId); }
-            IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(_acctReceivables, partnerContractsAll, partners);
+            IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
             if (arPartnerNoContracts != null)
                 arPartnerNoContracts = arPartnerNoContracts.Where(x => x.DebitAmount > 0);
             return arPartnerNoContracts;
@@ -2946,11 +2945,9 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AccountReceivableResult> GetARNoAgreement(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
         {
             var selectQuery = from acctReceivable in acctReceivables
-                                  //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
-                              join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
-                              from partnerContract in partnerContract2.DefaultIfEmpty()
-                              where acctReceivable.PartnerId == partnerContract.PartnerId
-                              //&& !partnerContract.SaleService.Contains(acctReceivable.Service)
+                              join partner in partners on acctReceivable.PartnerId equals partner.Id into partner2
+                              from partner in partner2.DefaultIfEmpty()
+                              where acctReceivable.PartnerId == partner.Id
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
 
