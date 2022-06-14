@@ -698,12 +698,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.trialCreditDays.setValue(null);
             this.trialExpiredDate.setValue(null);
         }
+        const isNewGuarantee = this.isCreateNewCommercial && this.contractType.value === 'Guarantee';
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
-        this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
-        this.selectedContract.creditLimit = !!this.formGroup.controls['creditLimit'].value ? this.formGroup.controls['creditLimit'].value :
-            this.formGroup.controls['trialCreditLimit'].value;
-        this.selectedContract.creditLimitRate = this.formGroup.controls['creditLimitRate'].value;
+        this.selectedContract.paymentTerm = (isNewGuarantee) ? 1 : this.formGroup.controls['paymentTerm'].value;
+        this.selectedContract.creditLimit = (isNewGuarantee) ? 20000000 : (!!this.formGroup.controls['creditLimit'].value ? this.formGroup.controls['creditLimit'].value :
+            this.formGroup.controls['trialCreditLimit'].value);
+        this.selectedContract.creditLimitRate = (isNewGuarantee) ? 120 : this.formGroup.controls['creditLimitRate'].value;
         this.selectedContract.debitAmount = this.formGroup.controls['debitAmount'].value;
         this.selectedContract.billingAmount = this.formGroup.controls['billingAmount'].value;
         this.selectedContract.paidAmount = this.formGroup.controls['paidAmount'].value;
