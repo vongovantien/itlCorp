@@ -2075,7 +2075,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
-            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null);
+            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null && x.DebitAmount > 0);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
             IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
@@ -2957,7 +2957,8 @@ namespace eFMS.API.Accounting.DL.Services
                     PartnerId = s.Key.AcRef,
                     OfficeId = s.First() != null ? s.First().Office.ToString() : null, //Office of AR
                     ArServiceCode = s.Select(se => se.Service).FirstOrDefault(),
-                    ArServiceName = string.Empty, //Get data bên dưới
+                    //ArServiceName = string.Empty, //Get data bên dưới
+                    ArServiceName = string.Join(";", CustomData.Services.Where(w =>s.Select(se => se.Service).Contains(w.Value)).Select(se => se.DisplayName)), 
                     DebitAmount = s.Select(se => se.DebitAmount).Sum(),
                     ObhAmount = s.Select(se => se.ObhAmount).Sum(),
                     BillingAmount = s.Select(se => se.BillingAmount).Sum(),
@@ -2986,7 +2987,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                            OfficeId = ar.OfficeId,
                            ArServiceCode = ar.ArServiceCode,
-                           ArServiceName = CustomData.Services.Where(w => w.Value == ar.ArServiceCode).Select(se => se.DisplayName).FirstOrDefault(),
+                           ArServiceName = ar.ArServiceName,
                            DebitAmount = ar.DebitAmount,
                            ObhAmount = ar.ObhAmount,
                            BillingAmount = ar.BillingAmount,

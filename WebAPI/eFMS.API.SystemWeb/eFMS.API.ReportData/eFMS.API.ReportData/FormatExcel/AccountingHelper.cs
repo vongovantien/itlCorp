@@ -6295,7 +6295,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 //Set format amount
                 var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
                 var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
-
+                 
                 var rowStart = 3;
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -6307,7 +6307,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("PartnerId", item.PartnerCode);
                     listKeyData.Add("PartnerName", item.PartnerNameEn);
 
-                    if (item.AgreementCurrency == "VND")
+                    if (item.ArCurrency == "VND")
                     {
                         listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
                         excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountVND;
@@ -6344,8 +6344,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     listKeyData.Add("Curr", item.ArCurrency);
                     listKeyData.Add("ServiceName", item.ArServiceName);
-
                     excel.SetData(listKeyData);
+                    excel.Worksheet.Cells.AutoFitColumns();
                     rowStart++;
                 }
                 return excel.ExcelStream();
