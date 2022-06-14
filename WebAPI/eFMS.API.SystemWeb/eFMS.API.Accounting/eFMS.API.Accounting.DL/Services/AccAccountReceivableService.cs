@@ -1683,7 +1683,7 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => x.Office != null && criteria.OfficeIds.Contains(x.Office.ToString().ToLower()));
             //if (currentUser!= null)
             //    query = query.And(x => x.OfficeId == currentUser.OfficeID );
-            if (criteria.Staffs.Count > 0)
+            if (criteria.Staffs != null && criteria.Staffs.Count > 0)
                 query = query.And(x => criteria.Staffs.Contains(x.SaleMan));
             return query;
         }
