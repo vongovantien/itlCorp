@@ -23,7 +23,7 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
-
+    @Output() onTotalListTrial: EventEmitter<any> = new EventEmitter<any>();
     trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
@@ -79,6 +79,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
+                    this.onTotalListTrial.emit(res.totalItems);
                 },
             );
     }

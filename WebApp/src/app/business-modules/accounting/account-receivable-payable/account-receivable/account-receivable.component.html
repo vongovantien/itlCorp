@@ -31,6 +31,7 @@
                             <list-other-account-receivable></list-other-account-receivable>
                         </tab> -->
                         <tab [active]="selectedSubTab === 'NO_AGREEMENT'" heading="No contract"
+                            *ngIf="menuSpecialPermission | async | specialPermission:'NoContract'"
                             (selectTab)="onSelectTabAccountReceivable('NO_AGREEMENT')">
                             <list-no-agreement-account-receivable></list-no-agreement-account-receivable>
                         </tab>

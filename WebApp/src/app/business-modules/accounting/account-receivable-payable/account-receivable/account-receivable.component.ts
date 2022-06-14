@@ -11,7 +11,7 @@ import { AccountReceivableFormSearchComponent } from '../components/form-search/
 import { RoutingConstants } from '@constants';
 import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableListState } from './store/reducers';
 import { Store } from '@ngrx/store';
-import { getCurrentUserState } from '@store';
+import { getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import { AccountReceivableNoAgreementComponent } from '../components/list-no-agreement/list-no-agreement-account-receivable.component';
 
 @Component({
@@ -46,6 +46,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
     ngOnInit() {
         this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
     ngAfterViewInit() {
         this._activeRouter
@@ -167,5 +168,8 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this.onSearchReceivable(this.dataSearch);
 
     }
-    onTotalAr(total){this.totalAr = total;}
+    onTotalAr(total){
+        if (this.selectedSubTab==='TRIAL_OFFICIAL')
+            this.totalAr = total;
+    }
 }
