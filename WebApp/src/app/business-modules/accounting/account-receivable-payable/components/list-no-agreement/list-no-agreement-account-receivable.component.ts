@@ -108,13 +108,13 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
 
     }
 
-    showDebitDetail(partnerId,option){
+    showDebitDetail(arSalesmanId,partnerId,option){
         let officeId = "";
         let overDueDay = 0;
         let agreeStr=''+partnerId;
         if(this.dataSearch && this.dataSearch.officeIds){officeId = this.dataSearch.officeIds.join("|");}
         if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
-        this._accountingRepo.getDataDebitDetailListPartnerId(partnerId, option,officeId,'',overDueDay)
+        this._accountingRepo.getDataDebitDetailListPartnerId(partnerId, option,officeId,'',overDueDay,arSalesmanId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

@@ -173,7 +173,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 },
             );
         }else{
-            this._accoutingRepo.getDataDebitDetailByPartnerId(this.accReceivableDetail.partnerId, option,officeId,serviceCode)
+            this._accoutingRepo.getDataDebitDetailByPartnerId(this.accReceivableDetail.partnerId, option,officeId,serviceCode,this.salemanId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

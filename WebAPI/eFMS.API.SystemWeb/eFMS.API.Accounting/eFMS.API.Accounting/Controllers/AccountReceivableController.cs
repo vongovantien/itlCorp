@@ -156,17 +156,17 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetDebitDetail")]
-        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode ,int overDueDay = 0)
+        [HttpPost("GetDebitDetail")]
+        public IActionResult GetDebitDetail([FromBody]ArDebitDetailCriteria model)
         {
-            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode, overDueDay);
+            var data = accountReceivableService.GetDataDebitDetail(model);
             return Ok(data);
         }
 
-        [HttpGet("GetDebitDetailByPartnerId")]
-        public IActionResult GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay = 0)
+        [HttpPost("GetDebitDetailByPartnerId")]
+        public IActionResult GetDebitDetailByPartnerId([FromBody]ArDebitDetailCriteria model)
         {
-            var data = accountReceivableService.GetDebitDetailByPartnerId(partnerId, option, officeId, serviceCode, overDueDay);
+            var data = accountReceivableService.GetDebitDetailByPartnerId(model);
             return Ok(data);
         }
         /// <summary>

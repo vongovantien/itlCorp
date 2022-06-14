@@ -2282,10 +2282,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (string.IsNullOrEmpty(partnerId)) return null;
 
-            var acctReceivables = DataContext.Get(x => x.PartnerId == partnerId && x.ContractId == null && x.Office != null);
-            if (!string.IsNullOrEmpty(saleManId))
-                acctReceivables = acctReceivables.Where(x=>x.SaleMan == saleManId);
-
+            var acctReceivables = DataContext.Get(x => x.PartnerId == partnerId && x.ContractId == null && x.Office != null && x.SaleMan == saleManId);
             var partners = partnerRepo.Get(x => x.Id == partnerId);
 
             var groupByPartner = acctReceivables.GroupBy(g => new { g.AcRef, g.Office, g.Service,g.SaleMan })
@@ -2377,16 +2374,16 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode, int overDueDay = 0)
+        public IEnumerable<object> GetDataDebitDetail(ArDebitDetailCriteria model)
         {
-            if (argeementId == null || argeementId == Guid.Empty) return null;
+            if (model.ArgeementId == null || model.ArgeementId == Guid.Empty) return null;
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("argid", argeementId),
-                SqlParam.GetParameter("option", option),
-                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
-                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:""),
-                SqlParam.GetParameter("overDueDay",overDueDay)
+                SqlParam.GetParameter("argid", model.ArgeementId),
+                SqlParam.GetParameter("option", model.Option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(model.OfficeId)?model.OfficeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(model.ServiceCode)?model.ServiceCode:""),
+                SqlParam.GetParameter("overDueDay",model.OverDueDay)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;
@@ -3019,16 +3016,17 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay)
+        public IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model)
         {
-            if (partnerId == null || partnerId == Guid.Empty) return null;
+            if (string.IsNullOrEmpty(model.PartnerId)) return null;
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("partnerId", partnerId),
-                SqlParam.GetParameter("option", option),
-                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
-                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:""),
-                SqlParam.GetParameter("overDueDay",overDueDay)
+                SqlParam.GetParameter("partnerId", model.PartnerId),
+                SqlParam.GetParameter("saleManId",!string.IsNullOrEmpty( model.ArSalesManId)?model.ArSalesManId:""),
+                SqlParam.GetParameter("option", model.Option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(model.OfficeId)?model.OfficeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(model.ServiceCode)?model.ServiceCode:""),
+                SqlParam.GetParameter("overDueDay",model.OverDueDay)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByPartnerId>(parameters);
             return data;

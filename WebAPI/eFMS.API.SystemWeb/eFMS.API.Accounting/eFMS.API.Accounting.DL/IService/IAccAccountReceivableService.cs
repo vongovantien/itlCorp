@@ -22,7 +22,7 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
         List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
         IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
-        IEnumerable<object> GetDataDebitDetail(Guid argeementId,string option,string officeId, string serviceCode,int overDueDay = 0);
+        IEnumerable<object> GetDataDebitDetail(ArDebitDetailCriteria model);
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
         Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
         Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
@@ -31,6 +31,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableDebitAmount(List<string> partnerIds);
         Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
-        IEnumerable<object> GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay = 0);
+        IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model);
     }
 }
