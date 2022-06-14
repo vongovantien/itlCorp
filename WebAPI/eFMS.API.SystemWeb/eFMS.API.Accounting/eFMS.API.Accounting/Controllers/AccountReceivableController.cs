@@ -157,6 +157,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost("GetDebitDetail")]
+        [Authorize]
         public IActionResult GetDebitDetail([FromBody]ArDebitDetailCriteria model)
         {
             var data = accountReceivableService.GetDataDebitDetail(model);
@@ -164,6 +165,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost("GetDebitDetailByPartnerId")]
+        [Authorize]
         public IActionResult GetDebitDetailByPartnerId([FromBody]ArDebitDetailCriteria model)
         {
             var data = accountReceivableService.GetDebitDetailByPartnerId(model);
