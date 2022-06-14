@@ -40,11 +40,11 @@
                                                 <a class="pointer" [routerLink]="'./detail'" [queryParams]="{partnerId: item.partnerId}">{{item.partnerCode}}</a>
                                             </td>
                                             <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}</td>
+                                            <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.partnerId,'Unpaid')">{{ item.debitAmount | number: '.0-3' }}</a>
-                                            </td>
-                                            <td class="text-right">
-                                                {{ (item.billingAmount +(item.obhBillingAmount!=null?item.obhBillingAmount:0)) | negativeNumber :'.0-3' }}
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.partnerId,'Unpaid')">
+                                                    {{ (item.billingAmount +(item.obhBillingAmount!=null?item.obhBillingAmount:0)) | negativeNumber :'.0-3' }}
+                                                </a>
                                             </td>
                                             <td class="text-right"><a href="javascript:void(0)" (click)="showDebitDetail(item.partnerId,'Paid A Part')">
                                                 {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)| negativeNumber:'.0-3'}}
@@ -77,7 +77,6 @@
                                                 </span>
                                             </td>
                                             <td class="text-right">{{ item.arCurrency }}</td>
-                                            <td class="text-right text-success">{{ item.arServiceName }}</td>
                                         </tr>
                                     </ng-container>
                                 </ng-container>
@@ -92,3 +91,4 @@
 
     </div>
 </div>
+<account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>

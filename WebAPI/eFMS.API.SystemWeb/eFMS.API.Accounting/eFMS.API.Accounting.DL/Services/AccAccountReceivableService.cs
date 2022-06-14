@@ -2072,16 +2072,16 @@ namespace eFMS.API.Accounting.DL.Services
         private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
-            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x=>x.ContractId == null);
+            var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var partnerContractsAll = contractPartnerRepo.Get();
-            //var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
+            var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
 
             IQueryable<AccAccountReceivable> _acctReceivables = acctReceivables;
             if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
             {_acctReceivables = acctReceivables.Where(x => x.Office == criteria.OfficeId);}
             IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(_acctReceivables, partnerContractsAll, partners);
-            arPartnerNoContracts = arPartnerNoContracts.Where(x => x.DebitAmount > 0);
+            if (arPartnerNoContracts != null)
+                arPartnerNoContracts = arPartnerNoContracts.Where(x => x.DebitAmount > 0);
             return arPartnerNoContracts;
         }
 
@@ -2285,7 +2285,6 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x=>x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
             var arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
-            //var arPartnerNoContracts = GetARHasContract(acctReceivables, partnerContractsAll, partners);
 
             var detail = new AccountReceivableDetailResult();
             var arPartners = arPartnerNoContracts.Where(x => x.PartnerId == partnerId);
@@ -2901,9 +2900,10 @@ namespace eFMS.API.Accounting.DL.Services
                                   //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
                               join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
                               from partnerContract in partnerContract2.DefaultIfEmpty()
-                              where acctReceivable.PartnerId == partnerContract.PartnerId 
+                              where acctReceivable.PartnerId == partnerContract.PartnerId && !partnerContract.SaleService.Contains(acctReceivable.Service)
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
+
             var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef })
                 .Select(s => new AccountReceivableResult
                 {
@@ -2954,6 +2954,21 @@ namespace eFMS.API.Accounting.DL.Services
                            ObhPaidAmount = ar.ObhPaidAmount,
                            ObhUnPaidAmount = ar.ObhUnPaidAmount
                        };
+            return data;
+        }
+
+        public IEnumerable<object> GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay)
+        {
+            if (partnerId == null || partnerId == Guid.Empty) return null;
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("partnerId", partnerId),
+                SqlParam.GetParameter("option", option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:""),
+                SqlParam.GetParameter("overDueDay",overDueDay)
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByPartnerId> (parameters);
             return data;
         }
     }

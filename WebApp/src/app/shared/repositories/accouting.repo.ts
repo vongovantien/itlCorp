@@ -1077,6 +1077,20 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+    getDataDebitDetailListPartnerId(partnerId: any, option: any, officeId: string, serviceCode: string, overDueDay: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetailByPartnerId`, { partnerId: partnerId, option: option, officeId: officeId, serviceCode: serviceCode, overDueDay: overDueDay }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    getDataDebitDetailByPartnerId(partnerId: string, option: any, officeId: any, serviceCode: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetailByPartnerId`, { partnerId: partnerId, option: option, officeId: officeId, serviceCode: serviceCode }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
 }
 
 

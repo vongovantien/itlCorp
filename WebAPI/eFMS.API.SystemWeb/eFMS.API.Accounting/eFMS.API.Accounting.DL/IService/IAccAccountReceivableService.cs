@@ -31,7 +31,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableDebitAmount(List<string> partnerIds);
         Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
-
-
+        IEnumerable<object> GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay = 0);
     }
 }

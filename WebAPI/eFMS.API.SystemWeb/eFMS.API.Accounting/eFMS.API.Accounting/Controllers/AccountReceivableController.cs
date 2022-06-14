@@ -163,6 +163,12 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpGet("GetDebitDetailByPartnerId")]
+        public IActionResult GetDebitDetailByPartnerId(Guid partnerId, string option, string officeId, string serviceCode, int overDueDay = 0)
+        {
+            var data = accountReceivableService.GetDebitDetailByPartnerId(partnerId, option, officeId, serviceCode, overDueDay);
+            return Ok(data);
+        }
         /// <summary>
         /// Update due date invoice và công nợ quá hạn sau khi update HĐ
         /// </summary>

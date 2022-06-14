@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from '@app';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SortService } from '@services';
@@ -14,6 +14,7 @@ import { getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 import { HttpResponse } from '@angular/common/http';
+import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
 
 @Component({
     selector: 'list-no-agreement-account-receivable',
@@ -21,8 +22,8 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AccountReceivableNoAgreementComponent extends AppList implements OnInit {
 
+    @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
 
-    //
     otherList: any[] = [];
 
     constructor(private _sortService: SortService,
@@ -50,7 +51,6 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 days', field: 'over30Day', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Service', field: 'service', sortable: true },
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
@@ -115,6 +115,25 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
 
     }
 
-    showDebitDetail(argId,type){
+    showDebitDetail(partnerId,option){
+        let officeId = "";
+        let overDueDay = 0;
+        let agreeStr=''+partnerId;
+        if(this.dataSearch && this.dataSearch.officeIds){officeId = this.dataSearch.officeIds.join("|");}
+        if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
+        this._accountingRepo.getDataDebitDetailListPartnerId(partnerId, option,officeId,'',overDueDay)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.debitDetailPopupComponent.dataDebitList = res || [];
+                        this.debitDetailPopupComponent.dataSearch= {argeementId:agreeStr, option,officeId,serviceCode:'',overDueDay};
+                        this.debitDetailPopupComponent.calculateTotal();
+                        this.debitDetailPopupComponent.show();
+                    }
+                },
+            );
     }
 }
