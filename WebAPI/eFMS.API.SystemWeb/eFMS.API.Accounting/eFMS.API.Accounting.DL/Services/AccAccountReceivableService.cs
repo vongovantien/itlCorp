@@ -1650,7 +1650,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Over1To15Day = ar.Over1To15Day,
                            Over16To30Day = ar.Over16To30Day,
                            Over30Day = ar.Over30Day,
-                           ArCurrency = ar.ArCurrency
+                           ArCurrency = ar.ArCurrency,
                        };
             return data;
         }
@@ -2061,8 +2061,28 @@ namespace eFMS.API.Accounting.DL.Services
             else if (arType == TermData.AR_Other)
             {
                 data = GetDataOther(criteria);
+            } 
+            else if (arType == TermData.AR_NoAgreement)
+            {
+                data = GetDataNoAgreement(criteria);
             }
             return data;
+        }
+
+        private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
+        {
+            var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x=>x.ContractId == null);
+            var partners = partnerRepo.Get();
+            var partnerContractsAll = contractPartnerRepo.Get();
+            //var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
+
+            IQueryable<AccAccountReceivable> _acctReceivables = acctReceivables;
+            if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
+            {_acctReceivables = acctReceivables.Where(x => x.Office == criteria.OfficeId);}
+            IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(_acctReceivables, partnerContractsAll, partners);
+            arPartnerNoContracts = arPartnerNoContracts.Where(x => x.DebitAmount > 0);
+            return arPartnerNoContracts;
         }
 
         public IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount)
@@ -2263,8 +2283,9 @@ namespace eFMS.API.Accounting.DL.Services
             if (string.IsNullOrEmpty(partnerId)) return null;
             var acctReceivables = DataContext.Get(x => x.Office != null);
             var partners = partnerRepo.Get();
-            var partnerContractsAll = contractPartnerRepo.Get();
-            var arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContractsAll, partners);
+            var partnerContractsAll = contractPartnerRepo.Get(x=>x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
+            var arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
+            //var arPartnerNoContracts = GetARHasContract(acctReceivables, partnerContractsAll, partners);
 
             var detail = new AccountReceivableDetailResult();
             var arPartners = arPartnerNoContracts.Where(x => x.PartnerId == partnerId);
@@ -2559,7 +2580,7 @@ namespace eFMS.API.Accounting.DL.Services
                             Id = s.Key.Id,
                             DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
                             UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
-                            UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd, 
                             UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
                             ServiceType = s.FirstOrDefault().ServiceType
 
@@ -2872,6 +2893,68 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return hs;
+        }
+
+        private IQueryable<AccountReceivableResult> GetARNoAgreement(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
+        {
+            var selectQuery = from acctReceivable in acctReceivables
+                                  //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
+                              join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
+                              from partnerContract in partnerContract2.DefaultIfEmpty()
+                              where acctReceivable.PartnerId == partnerContract.PartnerId 
+                              select acctReceivable;
+            if (selectQuery == null || !selectQuery.Any()) return null;
+            var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef })
+                .Select(s => new AccountReceivableResult
+                {
+                    PartnerId = s.Key.AcRef,
+                    OfficeId = s.First() != null ? s.First().Office.ToString() : null, //Office of AR
+                    ArServiceCode = s.Select(se => se.Service).FirstOrDefault(),
+                    ArServiceName = string.Empty, //Get data bên dưới
+                    DebitAmount = s.Select(se => se.DebitAmount).Sum(),
+                    ObhAmount = s.Select(se => se.ObhAmount).Sum(),
+                    BillingAmount = s.Select(se => se.BillingAmount).Sum(),
+                    BillingUnpaid = s.Select(se => se.BillingUnpaid).Sum(),
+                    PaidAmount = s.Select(se => se.PaidAmount).Sum(),
+                    CreditAmount = s.Select(se => se.CreditAmount).Sum(),
+                    Over1To15Day = s.Select(se => se.Over1To15Day).Sum(),
+                    Over16To30Day = s.Select(se => se.Over16To30Day).Sum(),
+                    Over30Day = s.Select(se => se.Over30Day).Sum(),
+                    ArCurrency = s.Select(se => se.ContractCurrency).FirstOrDefault(),
+                    ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
+                    ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
+                    ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
+                });
+
+            var data = from ar in groupByPartner
+                       join partner in partners on ar.PartnerId equals partner.Id
+                       select new AccountReceivableResult
+                       {
+                           PartnerId = ar.PartnerId,
+                           PartnerCode = partner.AccountNo,
+                           PartnerNameEn = partner.PartnerNameEn,
+                           PartnerNameLocal = partner.PartnerNameVn,
+                           PartnerNameAbbr = partner.ShortName,
+                           TaxCode = partner.TaxCode,
+                           PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
+                           OfficeId = ar.OfficeId,
+                           ArServiceCode = ar.ArServiceCode,
+                           ArServiceName = CustomData.Services.Where(w => w.Value == ar.ArServiceCode).Select(se => se.DisplayName).FirstOrDefault(),
+                           DebitAmount = ar.DebitAmount,
+                           ObhAmount = ar.ObhAmount,
+                           BillingAmount = ar.BillingAmount,
+                           BillingUnpaid = ar.BillingUnpaid,
+                           PaidAmount = ar.PaidAmount,
+                           CreditAmount = ar.CreditAmount,
+                           Over1To15Day = ar.Over1To15Day,
+                           Over16To30Day = ar.Over16To30Day,
+                           Over30Day = ar.Over30Day,
+                           ArCurrency = ar.ArCurrency,
+                           ObhBillingAmount = ar.ObhBillingAmount,
+                           ObhPaidAmount = ar.ObhPaidAmount,
+                           ObhUnPaidAmount = ar.ObhUnPaidAmount
+                       };
+            return data;
         }
     }
 }

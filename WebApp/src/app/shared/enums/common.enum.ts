@@ -184,6 +184,7 @@ export namespace CommonEnum {
         TrialOrOffical = 1,
         Guarantee = 2,
         Other = 3,
+        NoAgreement = 4,
     }
 
     export enum ClassColor {
