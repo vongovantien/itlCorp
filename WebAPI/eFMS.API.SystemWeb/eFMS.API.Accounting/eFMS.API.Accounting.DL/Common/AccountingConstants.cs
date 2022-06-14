@@ -230,5 +230,8 @@
         public static readonly string TRANSACTION_TYPE_PAYABLE_ADV = "ADV";
         public static readonly string TRANSACTION_TYPE_PAYABLE_COMBINE = "COMBINE";
         #endregion
+
+        public const string OFFICE_HM = "ITLHM";
+        public const string OFFICE_BH = "ITLHBH";
     }
 }

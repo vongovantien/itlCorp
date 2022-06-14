@@ -48,6 +48,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<AcctCdnote> cdNoteRepo;
 
+        readonly Guid? HM = Guid.Empty;
+        readonly Guid? BH = Guid.Empty;
+
         public AccAccountReceivableService(IContextBase<AccAccountReceivable> repository,
             IMapper mapper,
             ICurrentUser currUser,
@@ -89,6 +92,9 @@ namespace eFMS.API.Accounting.DL.Services
             employeeRepo = sysEmployee;
             officeRepo = sysOffice;
             cdNoteRepo = acctCdNote;
+
+            HM = officeRepo.Get(x => x.Code == AccountingConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+            HM = officeRepo.Get(x => x.Code == AccountingConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
         }
 
         #region --- CALCULATOR VALUE ---
@@ -1315,6 +1321,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges)
         {
+            surcharges = surcharges.Where(x => x.OfficeId != HM && x.OfficeId != BH);
             if (surcharges.Count() == 0)
             {
                 return new List<ObjectReceivableModel>();
@@ -3719,14 +3726,17 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return new List<ObjectReceivableModel>();
             }
-            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true;
+            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true && q.OfficeId != HM && q.OfficeId != BH;
             switch (billingType)
             {
                 case "SOA":
-                    surchargesQuery = surchargesQuery.And(XmlReadMode => XmlReadMode.Soano == code);
+                    surchargesQuery = surchargesQuery.And(x => x.Soano == code);
                     break;
                 case "DEBIT":
-                    surchargesQuery = surchargesQuery.And(XmlReadMode => XmlReadMode.DebitNo == code);
+                    surchargesQuery = surchargesQuery.And(x => x.DebitNo == code);
+                    break;
+                case "SETTLEMENT":
+                    surchargesQuery = surchargesQuery.And(x => x.SettlementCode == code);
                     break;
                 default:
                     break;
