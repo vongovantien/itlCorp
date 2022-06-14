@@ -29,6 +29,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     accReceivableMoreDetail: AccReceivableOfficesDetailModel[] = [];
     subHeaders: any[];
     agreementId: string;
+    partnerId: string;
 
     constructor(
         private readonly _sortService: SortService,
@@ -51,6 +52,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 takeUntil(this.ngUnsubscribe),
                 tap((p: Params) => {
                     this.agreementId = p['agreementId'];
+                    this.partnerId = p['partnerId'];
                 }),
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
@@ -133,7 +135,10 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     switchMap((res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                            if (this.agreementId) {
+                                return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                            }
+                            return this._accoutingRepo.getDetailReceivableByPartnerId(this.partnerId);
                         }
                         return of(false);
                     })
