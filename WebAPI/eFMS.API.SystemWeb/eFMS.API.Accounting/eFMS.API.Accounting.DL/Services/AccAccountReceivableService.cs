@@ -2944,6 +2944,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AccountReceivableResult> GetARNoAgreement(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
         {
+            var users = userRepo.Get();
             var selectQuery = from acctReceivable in acctReceivables
                               join partner in partners on acctReceivable.PartnerId equals partner.Id into partner2
                               from partner in partner2.DefaultIfEmpty()
@@ -2951,10 +2952,11 @@ namespace eFMS.API.Accounting.DL.Services
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
 
-            var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef })
+            var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef,g.SaleMan })
                 .Select(s => new AccountReceivableResult
                 {
                     PartnerId = s.Key.AcRef,
+                    ArSalesmanName = s.Key.SaleMan,
                     OfficeId = s.First() != null ? s.First().Office.ToString() : null, //Office of AR
                     ArServiceCode = s.Select(se => se.Service).FirstOrDefault(),
                     //ArServiceName = string.Empty, //Get data bên dưới
@@ -2976,6 +2978,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             var data = from ar in groupByPartner
                        join partner in partners on ar.PartnerId equals partner.Id
+                       join user in users on ar.ArSalesmanName equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
                        select new AccountReceivableResult
                        {
                            PartnerId = ar.PartnerId,
@@ -3000,7 +3004,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ArCurrency = ar.ArCurrency,
                            ObhBillingAmount = ar.ObhBillingAmount,
                            ObhPaidAmount = ar.ObhPaidAmount,
-                           ObhUnPaidAmount = ar.ObhUnPaidAmount
+                           ObhUnPaidAmount = ar.ObhUnPaidAmount,
+                           ArSalesmanName = user!= null?user.Username:"",
                        };
             return data;
         }

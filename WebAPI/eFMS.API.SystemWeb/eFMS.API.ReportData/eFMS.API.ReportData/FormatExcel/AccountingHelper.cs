@@ -6344,6 +6344,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     listKeyData.Add("Curr", item.ArCurrency);
                     listKeyData.Add("ServiceName", item.ArServiceName);
+                    listKeyData.Add("ArSalesmanName", item.ArSalesmanName);
                     excel.SetData(listKeyData);
                     excel.Worksheet.Cells.AutoFitColumns();
                     rowStart++;

@@ -51,6 +51,8 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 days', field: 'over30Day', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Salesman', field: 'arSalesmanName', sortable: true },
+
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
