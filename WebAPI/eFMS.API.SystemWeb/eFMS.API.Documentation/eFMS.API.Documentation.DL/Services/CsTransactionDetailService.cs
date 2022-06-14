@@ -2452,7 +2452,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etdEta, url, logoUrl);
                 List<string> toEmails = new List<string> { employeeInfo.Email };
-                List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" };
+                List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com", "alex.phuong@itlvn.com", "kenny.thuong@itlvn.com" };
                 var sendMailResult = SendMail.Send(subject, _emailFormat, toEmails, null, null, emailBCCs);
                 #region Log Send email
                 var logSendMail = new SysSentEmailHistory

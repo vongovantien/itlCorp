@@ -104,14 +104,21 @@
                                                     <tr
                                                         *ngFor="let element of item.accountReceivableGrpServices; let j = index; trackBy: trackByFn">
                                                         <td>
-                                                            <ng-container
-                                                                *ngIf="menuSpecialPermission | async | specialPermission:'ReCalculateARSummary'">
+                                                            <ng-container *ngIf="agreementId&&menuSpecialPermission | async | specialPermission:'ReCalculateARSummary'">
                                                                 <button title="Calculate Accounts Receivable Payable"
                                                                     (click)="onClickCalculateService(element,item)"
                                                                     class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
                                                                     <i class="la la-calculator"></i>
                                                                 </button>
                                                             </ng-container>
+
+                                                            <ng-container *ngIf="partnerId && menuSpecialPermission | async | specialPermission:'ReCalARSumNoContract'">
+                                                            <button title="Calculate Accounts Receivable Payable"
+                                                                (click)="onClickCalculateService(element,item)"
+                                                                class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
+                                                                <i class="la la-calculator"></i>
+                                                            </button>
+                                                        </ng-container>
                                                         </td>
                                                         <td>{{ element.serviceName }}
                                                         </td>

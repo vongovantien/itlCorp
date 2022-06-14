@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -23,7 +23,7 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
-
+    @Output() onTotalListTrial: EventEmitter<any> = new EventEmitter<any>();
     trialOfficialList: TrialOfficialOtherModel[] = [];
 
     constructor(
@@ -60,24 +60,9 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             { title: 'Expired Days', field: 'expriedDay', sortable: true },
             { title: 'Parent Partner', field: 'partnerNameAbbr', sortable: true },
         ];
-
+        this.pageSize = 50;
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        this._store.select(getAccountReceivableSearchState)
-            .pipe(
-                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
-                takeUntil(this.ngUnsubscribe),
-                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-            )
-            .subscribe(
-                (data) => {
-                    this.dataSearch = data.dataSearch;
-                    this.page = data.page;
-                    this.pageSize = data.pageSize;
-                }
-            );
-
         this.isLoading = this._store.select(getAccountReceivableLoadingListState);
-
     }
 
     sortTrialOfficalList(sortField: string, order: boolean) {
@@ -94,6 +79,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
+                    this.onTotalListTrial.emit(res.totalItems);
                 },
             );
     }
@@ -156,5 +142,6 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 },
             );
     }
+
 }
 

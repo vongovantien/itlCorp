@@ -67,7 +67,8 @@ namespace eFMS.API.Accounting.DL.Common
     {
         TrialOrOffical = 1,
         Guarantee = 2,
-        Other = 3
+        Other = 3,
+        NoAgreement = 4
     }
 
     public enum OverDueDayEnum
@@ -111,6 +112,8 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string AR_TrialOrOffical = "AR_TrialOrOffical";
         public static readonly string AR_Guarantee = "AR_Guarantee";
         public static readonly string AR_Other = "AR_Other";
+        public static readonly string AR_NoAgreement= "AR_NoAgreement";
+
 
         public static readonly List<FreightTerm> FreightTerms = new List<FreightTerm>
         {

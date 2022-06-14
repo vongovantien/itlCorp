@@ -37,6 +37,7 @@ namespace eFMS.API.ReportData.Consts
         public const string AP_Standart_Report = "AP_Standart_Report.xlsx";
         public const string AR_DebitDetail_Template = "AR_DebitDetail_Template.xlsx";
         public const string AR_SUMMARY_TEMPLATE = "AR_SUMMARY_TEMPLATE.xlsx";
+        public static string AR_SUMMARY_TEMPLATE_NO_ARGEEMENT = "AR_SUMMARY_TEMPLATE_NO_ARGEEMENT.xlsx";
         public const string Receipt_Advance_Report_Teamplate = "Receipt_Advance_Report _Teamplate.xlsx";
         public const string Statement_of_Receivable_Agency = "Statement_of_Receivable-Agency.xlsx";
         public const string Statement_of_Receivable_Customer = "Statement_of_Receivable-Customer.xlsx";
@@ -49,5 +50,6 @@ namespace eFMS.API.ReportData.Consts
         public const string PHIEU_CAN_NCTS_ALS_Template = "PHIEU-CAN-NCTS-ALS-Template.xlsx";
         public const string Shipment_Overview_FCL = "Shipment-Overview-FCL.xlsx";
         public const string ShipmentOverviewLCL = "ShipmentOverviewLCL.xlsx";
+
     }
 }

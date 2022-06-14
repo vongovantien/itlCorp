@@ -111,9 +111,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="partnerId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByPartnerId")]
-        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId)
         {
-            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId);
+            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId, saleManId);
             return Ok(data);
         }
 
@@ -163,6 +163,13 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpPost("GetDebitDetailByPartnerId")]
+        [Authorize]
+        public IActionResult GetDebitDetailByPartnerId([FromBody]ArDebitDetailCriteria model)
+        {
+            var data = accountReceivableService.GetDebitDetailByPartnerId(model);
+            return Ok(data);
+        }
         /// <summary>
         /// Update due date invoice và công nợ quá hạn sau khi update HĐ
         /// </summary>

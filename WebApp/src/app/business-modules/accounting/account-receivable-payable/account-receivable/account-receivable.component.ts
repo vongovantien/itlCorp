@@ -11,7 +11,8 @@ import { AccountReceivableFormSearchComponent } from '../components/form-search/
 import { RoutingConstants } from '@constants';
 import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableListState } from './store/reducers';
 import { Store } from '@ngrx/store';
-import { getCurrentUserState } from '@store';
+import { getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountReceivableNoAgreementComponent } from '../components/list-no-agreement/list-no-agreement-account-receivable.component';
 
 @Component({
     selector: 'app-account-receivable',
@@ -24,8 +25,10 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     @ViewChild(AccountReceivableListOtherComponent) otherListComponent: AccountReceivableListOtherComponent;
 
     @ViewChild(AccountReceivableFormSearchComponent) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
+    @ViewChild(AccountReceivableNoAgreementComponent) noAgreementListComponent: AccountReceivableNoAgreementComponent;
 
-    selectedSubTab: string = "TRIAL_OFFICIAL";
+
+    selectedSubTab: string = null;
 
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
@@ -43,7 +46,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
     ngOnInit() {
         this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
-
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
     ngAfterViewInit() {
         this._activeRouter
@@ -54,10 +57,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 // if (param.subTab) {
                 //     this.selectedSubTab = param.subTab.toUpperCase();
                 // } else {
-                this.selectedSubTab = 'trial_official'.toUpperCase();
-                this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-                //}
-
+                     //this.selectedSubTab = 'trial_official'.toUpperCase();
+                //     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+                // }
+                if(this.selectedSubTab == null){
+                    this.selectedSubTab = 'trial_official'.toUpperCase();
+                }
             });
         this._cd.detectChanges();
     }
@@ -73,6 +78,9 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 break;
             case CommonEnum.TabTypeAccountReceivableEnum.Other:
                 this.setParameterToSearch(body, this.otherListComponent);
+                break;
+            case CommonEnum.TabTypeAccountReceivableEnum.NoAgreement:
+                    this.setParameterToSearch(body, this.noAgreementListComponent);
                 break;
             default:
                 break;
@@ -92,12 +100,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
-        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
-            if (lst && lst.totalItems !== null) {
-                //let a = this.totalItems;
-                this.totalItems = lst.totalItems;
-            }
-        });
     }
 
     onSelectTabAccountReceivable(tabname: string) {
@@ -111,8 +113,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`], { queryParams: { subTab: 'guaranteed' } });
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Guarantee, this.guaranteedListComponent);
+        } else if (tabname === 'NO_AGREEMENT') {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`], { queryParams: { subTab: 'noAgreement' } });
+
+            this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.NoAgreement, this.noAgreementListComponent);
         } else {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`], { queryParams: { subTab: 'other' } });
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`], { queryParams: { subTab: 'orther' } });
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Other, this.otherListComponent);
 
@@ -120,7 +126,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
         this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
         this.accountReceivableFormComponent.initForm();
-
     }
 
     // tslint:disable-next-line:no-any
@@ -160,11 +165,11 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                     }
                 });
         tabComponent.dataSearch = this.dataSearch;
-        tabComponent.getPagingList();
-        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
-            if (lst && lst.totalItems !== null) {
-                this.totalItems = lst.totalItems;
-            }
-        });
+        this.onSearchReceivable(this.dataSearch);
+
+    }
+    onTotalAr(total){
+        if (this.selectedSubTab==='TRIAL_OFFICIAL')
+            this.totalAr = total;
     }
 }

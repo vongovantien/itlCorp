@@ -18,7 +18,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CalculatorReceivable(CalculatorReceivableModel model);
         HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
         AccountReceivableDetailResult GetDetailAccountReceivableByArgeementId(Guid argeementId);
-        AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId);
+        AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId);
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
         List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
@@ -33,5 +33,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models);
         Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
         List<ObjectReceivableModel> CalculatorReceivableByBillingCode(string code, string type);
+        IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model);
     }
 }

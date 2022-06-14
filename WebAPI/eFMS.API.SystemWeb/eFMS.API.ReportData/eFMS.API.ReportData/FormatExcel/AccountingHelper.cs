@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
+using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
@@ -5193,31 +5194,14 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
-        //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
-        //{
-        //    try
-        //    {
-        //        using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
-        //        {
-        //            excelPackage.Workbook.Worksheets.Add("Sheet1");
-        //            var workSheet = excelPackage.Workbook.Worksheets.First();
-        //            if (arType == ARTypeEnum.TrialOrOffical)
-        //            {
-        //                BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
-        //            }else if (arType == ARTypeEnum.Other)
-        //            {
-        //                BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
-        //            }
-        //            excelPackage.Save();
-        //            return excelPackage.Stream;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-        //    return null;
-        //}
+        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
+        {
+            if (arType == ARTypeEnum.TrialOrOffical)
+                return GenerateAccountingReceivableArSumary(acctMngts);
+            else if (arType == ARTypeEnum.NoAgreement)
+                return GenerateAccountingReceivableArSumaryNoAgrement(acctMngts);
+            return null;
+        }
 
         public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result)
         {
@@ -6299,6 +6283,84 @@ namespace eFMS.API.ReportData.FormatExcel
             catch (Exception ex)
             {
                 excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+        public Stream GenerateAccountingReceivableArSumaryNoAgrement(List<AccountReceivableResultExport> result)
+        {
+            try
+            {
+                var folderOfFile = GetFolderInTemplateExport("AR");
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AR_SUMMARY_TEMPLATE_NO_ARGEEMENT));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 3;
+
+                excel.StartDetailTable = 3;
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                 
+                var rowStart = 3;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", i + 1);
+                    listKeyData.Add("PartnerId", item.PartnerCode);
+                    listKeyData.Add("PartnerName", item.PartnerNameEn);
+
+                    if (item.ArCurrency == "VND")
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountVND;
+                    }
+                    else
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountUSD;
+                    }
+
+                    listKeyData.Add("Curr", item.ArCurrency);
+                    listKeyData.Add("ServiceName", item.ArServiceName);
+                    listKeyData.Add("ArSalesmanName", item.ArSalesmanName);
+                    excel.SetData(listKeyData);
+                    excel.Worksheet.Cells.AutoFitColumns();
+                    rowStart++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }

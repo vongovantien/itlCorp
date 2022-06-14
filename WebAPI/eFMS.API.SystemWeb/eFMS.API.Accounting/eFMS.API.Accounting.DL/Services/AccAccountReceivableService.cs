@@ -1531,7 +1531,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Over1To15Day = ar.Over1To15Day,
                            Over16To30Day = ar.Over16To30Day,
                            Over30Day = ar.Over30Day,
-                           ArCurrency = ar.ArCurrency
+                           ArCurrency = ar.ArCurrency,
                        };
             return data;
         }
@@ -1559,9 +1559,13 @@ namespace eFMS.API.Accounting.DL.Services
                     query = query.And(x => x.Over30Day > 0);
                 }
             }
-            if (criteria.OfficeIds != null)
-                query = query.And(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId.ToString()));
 
+            if (criteria.OfficeIds != null)
+                query = query.And(x => x.Office != null && criteria.OfficeIds.Contains(x.Office.ToString().ToLower()));
+            //if (currentUser!= null)
+            //    query = query.And(x => x.OfficeId == currentUser.OfficeID );
+            if (criteria.Staffs != null && criteria.Staffs.Count > 0)
+                query = query.And(x => criteria.Staffs.Contains(x.SaleMan));
             return query;
         }
 
@@ -1943,7 +1947,23 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 data = GetDataOther(criteria);
             }
+            else if (arType == TermData.AR_NoAgreement)
+            {
+                data = GetDataNoAgreement(criteria);
+            }
             return data;
+        }
+
+        private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
+        {
+            var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null && x.DebitAmount > 0);
+            var partners = partnerRepo.Get();
+            var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
+            IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
+            if (arPartnerNoContracts != null)
+                arPartnerNoContracts = arPartnerNoContracts.Where(x => x.DebitAmount > 0);
+            return arPartnerNoContracts;
         }
 
         public IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount)
@@ -2139,17 +2159,69 @@ namespace eFMS.API.Accounting.DL.Services
             return detail;
         }
 
-        public AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId, string saleManId)
         {
             if (string.IsNullOrEmpty(partnerId)) return null;
-            var acctReceivables = DataContext.Get(x => x.Office != null);
-            var partners = partnerRepo.Get();
-            var partnerContractsAll = contractPartnerRepo.Get();
-            var arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContractsAll, partners);
+
+            var acctReceivables = DataContext.Get(x => x.PartnerId == partnerId && x.ContractId == null && x.Office != null && x.SaleMan == saleManId);
+            var partners = partnerRepo.Get(x => x.Id == partnerId);
+
+            var groupByPartner = acctReceivables.GroupBy(g => new { g.AcRef, g.Office, g.Service,g.SaleMan })
+                .Select(s => new AccountReceivableResult
+                {
+                    PartnerId = s.Key.AcRef,
+                    OfficeId = s.First() != null ? s.First().Office.ToString() : null, //Office of AR
+                    ArServiceCode = s.Select(se => se.Service).FirstOrDefault(),
+                    ArServiceName = string.Empty, //Get data bên dưới
+                    DebitAmount = s.Select(se => se.DebitAmount).Sum(),
+                    ObhAmount = s.Select(se => se.ObhAmount).Sum(),
+                    BillingAmount = s.Select(se => se.BillingAmount).Sum(),
+                    BillingUnpaid = s.Select(se => se.BillingUnpaid).Sum(),
+                    PaidAmount = s.Select(se => se.PaidAmount).Sum(),
+                    CreditAmount = s.Select(se => se.CreditAmount).Sum(),
+                    Over1To15Day = s.Select(se => se.Over1To15Day).Sum(),
+                    Over16To30Day = s.Select(se => se.Over16To30Day).Sum(),
+                    Over30Day = s.Select(se => se.Over30Day).Sum(),
+                    ArCurrency = s.Select(se => se.ContractCurrency).FirstOrDefault(),
+                    ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
+                    ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
+                    ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
+                    ArSalesmanId = s.Key.SaleMan
+                });
+
+            var arPartnerNoContracts = from ar in groupByPartner
+                                       join partner in partners on ar.PartnerId equals partner.Id
+                                       select new AccountReceivableResult
+                                       {
+                                           PartnerId = ar.PartnerId,
+                                           PartnerCode = partner.AccountNo,
+                                           PartnerNameEn = partner.PartnerNameEn,
+                                           PartnerNameLocal = partner.PartnerNameVn,
+                                           PartnerNameAbbr = partner.ShortName,
+                                           TaxCode = partner.TaxCode,
+                                           PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
+                                           OfficeId = ar.OfficeId,
+                                           ArServiceCode = ar.ArServiceCode,
+                                           ArServiceName = CustomData.Services.Where(w => w.Value == ar.ArServiceCode).Select(se => se.DisplayName).FirstOrDefault(),
+                                           DebitAmount = ar.DebitAmount,
+                                           ObhAmount = ar.ObhAmount,
+                                           BillingAmount = ar.BillingAmount,
+                                           BillingUnpaid = ar.BillingUnpaid,
+                                           PaidAmount = ar.PaidAmount,
+                                           CreditAmount = ar.CreditAmount,
+                                           Over1To15Day = ar.Over1To15Day,
+                                           Over16To30Day = ar.Over16To30Day,
+                                           Over30Day = ar.Over30Day,
+                                           ArCurrency = ar.ArCurrency,
+                                           ObhBillingAmount = ar.ObhBillingAmount,
+                                           ObhPaidAmount = ar.ObhPaidAmount,
+                                           ObhUnPaidAmount = ar.ObhUnPaidAmount,
+                                           ArSalesmanId = ar.ArSalesmanId
+                                       };
 
             var detail = new AccountReceivableDetailResult();
             var arPartners = arPartnerNoContracts.Where(x => x.PartnerId == partnerId);
-            detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.PartnerId }).Select(s => new AccountReceivableResult
+            detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.PartnerId, g.ArServiceCode, g.OfficeId,g.ArSalesmanId }).Select(s => new AccountReceivableResult
             {
                 PartnerId = s.Key.PartnerId,
                 PartnerCode = s.Select(se => se.PartnerCode).FirstOrDefault(),
@@ -2170,7 +2242,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                 Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                 Over30Day = s.Sum(sum => sum.Over30Day),
-                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault()
+                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
+                ArSalesmanId = s.Key.ArSalesmanId
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;
@@ -3764,6 +3837,91 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return isMatch;
+        }
+
+        private IQueryable<AccountReceivableResult> GetARNoAgreement(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
+        {
+            var users = userRepo.Get();
+            var selectQuery = from acctReceivable in acctReceivables
+                              join partner in partners on acctReceivable.PartnerId equals partner.Id into partner2
+                              from partner in partner2.DefaultIfEmpty()
+                              where acctReceivable.PartnerId == partner.Id
+                              select acctReceivable;
+            if (selectQuery == null || !selectQuery.Any()) return null;
+
+            var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef,g.SaleMan })
+                .Select(s => new AccountReceivableResult
+                {
+                    PartnerId = s.Key.AcRef,
+                    ArSalesmanName = s.Key.SaleMan,
+                    OfficeId = s.First() != null ? s.First().Office.ToString() : null, //Office of AR
+                    ArServiceCode = s.Select(se => se.Service).FirstOrDefault(),
+                    //ArServiceName = string.Empty, //Get data bên dưới
+                    ArServiceName = string.Join(";", CustomData.Services.Where(w =>s.Select(se => se.Service).Contains(w.Value)).Select(se => se.DisplayName)), 
+                    DebitAmount = s.Select(se => se.DebitAmount).Sum(),
+                    ObhAmount = s.Select(se => se.ObhAmount).Sum(),
+                    BillingAmount = s.Select(se => se.BillingAmount).Sum(),
+                    BillingUnpaid = s.Select(se => se.BillingUnpaid).Sum(),
+                    PaidAmount = s.Select(se => se.PaidAmount).Sum(),
+                    CreditAmount = s.Select(se => se.CreditAmount).Sum(),
+                    Over1To15Day = s.Select(se => se.Over1To15Day).Sum(),
+                    Over16To30Day = s.Select(se => se.Over16To30Day).Sum(),
+                    Over30Day = s.Select(se => se.Over30Day).Sum(),
+                    ArCurrency = s.Select(se => se.ContractCurrency).FirstOrDefault(),
+                    ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
+                    ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
+                    ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
+                });
+
+            var data = from ar in groupByPartner
+                       join partner in partners on ar.PartnerId equals partner.Id
+                       join user in users on ar.ArSalesmanName equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       select new AccountReceivableResult
+                       {
+                           PartnerId = ar.PartnerId,
+                           PartnerCode = partner.AccountNo,
+                           PartnerNameEn = partner.PartnerNameEn,
+                           PartnerNameLocal = partner.PartnerNameVn,
+                           PartnerNameAbbr = partner.ShortName,
+                           TaxCode = partner.TaxCode,
+                           PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
+                           OfficeId = ar.OfficeId,
+                           ArServiceCode = ar.ArServiceCode,
+                           ArServiceName = ar.ArServiceName,
+                           DebitAmount = ar.DebitAmount,
+                           ObhAmount = ar.ObhAmount,
+                           BillingAmount = ar.BillingAmount,
+                           BillingUnpaid = ar.BillingUnpaid,
+                           PaidAmount = ar.PaidAmount,
+                           CreditAmount = ar.CreditAmount,
+                           Over1To15Day = ar.Over1To15Day,
+                           Over16To30Day = ar.Over16To30Day,
+                           Over30Day = ar.Over30Day,
+                           ArCurrency = ar.ArCurrency,
+                           ObhBillingAmount = ar.ObhBillingAmount,
+                           ObhPaidAmount = ar.ObhPaidAmount,
+                           ObhUnPaidAmount = ar.ObhUnPaidAmount,
+                           ArSalesmanName = user!= null?user.Username:"",
+                           ArSalesmanId = user != null ? user.Id : "",
+                       };
+            return data;
+        }
+
+        public IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model)
+        {
+            if (string.IsNullOrEmpty(model.PartnerId)) return null;
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("partnerId", model.PartnerId),
+                SqlParam.GetParameter("saleManId",!string.IsNullOrEmpty( model.ArSalesManId)?model.ArSalesManId:""),
+                SqlParam.GetParameter("option", model.Option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(model.OfficeId)?model.OfficeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(model.ServiceCode)?model.ServiceCode:""),
+                SqlParam.GetParameter("overDueDay",model.OverDueDay)
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByPartnerId>(parameters);
+            return data;
         }
     }
 }

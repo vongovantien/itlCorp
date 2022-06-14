@@ -510,13 +510,17 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
-
-            //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            //var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Trial" + " - eFMS");
+            var nameFile = "";
+            if (criteria.ArType == ARTypeEnum.TrialOrOffical)
+                nameFile = "Trial" + " - eFMS";
+            else if (criteria.ArType == ARTypeEnum.NoAgreement)
+                nameFile = "No Agreement" + " - eFMS";
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, nameFile);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }

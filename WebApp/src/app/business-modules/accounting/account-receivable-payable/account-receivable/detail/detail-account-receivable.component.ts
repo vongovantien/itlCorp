@@ -29,6 +29,8 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     accReceivableMoreDetail: AccReceivableOfficesDetailModel[] = [];
     subHeaders: any[];
     agreementId: string;
+    partnerId: string;
+    salemanId: string;
 
     constructor(
         private readonly _sortService: SortService,
@@ -51,6 +53,8 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 takeUntil(this.ngUnsubscribe),
                 tap((p: Params) => {
                     this.agreementId = p['agreementId'];
+                    this.partnerId = p['partnerId'];
+                    this.salemanId = p['salemanId'];
                 }),
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
@@ -58,7 +62,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                         this.isLoading = true;
                         return this._accoutingRepo.getDetailReceivableByArgeementId(p.agreementId);
                     }
-                    return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId);
+                    return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId, p.salemanId);
                 }),
             ).subscribe(
                 (data: any) => {
@@ -134,7 +138,10 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     switchMap((res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                            if (this.agreementId) {
+                                return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                            }
+                            return this._accoutingRepo.getDetailReceivableByPartnerId(this.partnerId, this.salemanId);
                         }
                         return of(false);
                     })
