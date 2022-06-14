@@ -2075,6 +2075,9 @@ namespace eFMS.API.Accounting.DL.Services
         private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            if (!string.IsNullOrEmpty( criteria.SalesmanId))
+                queryAcctReceivable = queryAcctReceivable.And(x => x.SaleMan == criteria.SalesmanId);
+            
             var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null && x.DebitAmount > 0);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
@@ -2277,13 +2280,19 @@ namespace eFMS.API.Accounting.DL.Services
             return detail;
         }
 
-        public AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId, string saleManId)
         {
             if (string.IsNullOrEmpty(partnerId)) return null;
-            var acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == null && x.PartnerId == partnerId);
+            Expression<Func<AccAccountReceivable, bool>> query = q => true;
+            query.And(x => x.Office != null && x.ContractId == null);
+
+            if (!string.IsNullOrEmpty(saleManId))
+                query.And(x => x.SaleMan == saleManId);
+
+            var acctReceivables = DataContext.Get(query);
             var partners = partnerRepo.Get(x => x.Id == partnerId);
 
-            var groupByPartner = acctReceivables.GroupBy(g => new { g.AcRef, g.OfficeId, g.Service })
+            var groupByPartner = acctReceivables.GroupBy(g => new { g.AcRef, g.Office, g.Service })
                 .Select(s => new AccountReceivableResult
                 {
                     PartnerId = s.Key.AcRef,
@@ -3006,6 +3015,7 @@ namespace eFMS.API.Accounting.DL.Services
                            ObhPaidAmount = ar.ObhPaidAmount,
                            ObhUnPaidAmount = ar.ObhUnPaidAmount,
                            ArSalesmanName = user!= null?user.Username:"",
+                           ArSalesmanId = user != null ? user.Id : "",
                        };
             return data;
         }

@@ -111,9 +111,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="partnerId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByPartnerId")]
-        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId)
         {
-            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId);
+            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId, saleManId);
             return Ok(data);
         }
 

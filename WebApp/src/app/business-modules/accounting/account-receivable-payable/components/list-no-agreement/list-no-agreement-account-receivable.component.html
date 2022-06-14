@@ -32,12 +32,12 @@
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
                                                     <app-permission-button type="detail"
-                                                        (click)="viewDetail(item.agreementId, item.partnerId)">
+                                                        (click)="viewDetail(item.agreementId, item.partnerId,item.arSalesmanId)">
                                                     </app-permission-button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <a class="pointer" [routerLink]="'./detail'" [queryParams]="{partnerId: item.partnerId}">{{item.partnerCode}}</a>
+                                                <a class="pointer" [routerLink]="'./detail'" [queryParams]="{partnerId: item.partnerId,salemanId:item.arSalesmanId}">{{item.partnerCode}}</a>
                                             </td>
                                             <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}</td>
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>

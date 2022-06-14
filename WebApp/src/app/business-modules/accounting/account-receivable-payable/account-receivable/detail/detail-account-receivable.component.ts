@@ -30,6 +30,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     subHeaders: any[];
     agreementId: string;
     partnerId: string;
+    salemanId: string;
 
     constructor(
         private readonly _sortService: SortService,
@@ -53,13 +54,14 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 tap((p: Params) => {
                     this.agreementId = p['agreementId'];
                     this.partnerId = p['partnerId'];
+                    this.salemanId = p['salemanId'];
                 }),
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
                     if (!!p.agreementId) {
                         return this._accoutingRepo.getDetailReceivableByArgeementId(p.agreementId);
                     }
-                    return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId);
+                    return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId,p.salemanId);
                 }),
             ).subscribe(
                 (data: any) => {

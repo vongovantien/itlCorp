@@ -670,8 +670,8 @@ export class AccountingRepo {
     }
 
     // Chỉ sử dụng khi không có argeementId
-    getDetailReceivableByPartnerId(partnerId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId }).pipe(
+    getDetailReceivableByPartnerId(partnerId: string,saleManId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId,saleManId: saleManId }).pipe(
             map((data: any) => data)
         );
     }

@@ -55,5 +55,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public bool? IsExpired { get; set; }
         public bool? IsOverLimit { get; set; }
         public string ArSalesmanName { get; set; }
+        public string ArSalesmanId { get; set; }
+
     }
 }
