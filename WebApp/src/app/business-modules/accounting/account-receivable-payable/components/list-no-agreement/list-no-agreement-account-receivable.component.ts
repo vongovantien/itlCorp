@@ -82,15 +82,7 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
                 },
             );
     }
-    viewDetail(agreementId: string, partnerId: string,salemanId:string) {
-        if (!!agreementId) {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
-                queryParams: {
-                    agreementId: agreementId,
-                    subTab: 'other',
-                }
-            });
-        } else {
+    viewDetail(partnerId: string,salemanId:string) {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
                 queryParams: {
                     partnerId: partnerId,
@@ -98,7 +90,6 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
                     subTab: 'other',
                 }
             });
-        }
 
     }
 
