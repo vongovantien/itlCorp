@@ -2072,7 +2072,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IEnumerable<object> GetDataNoAgreement(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
-            var acctReceivables = DataContext.Get(queryAcctReceivable);
+            var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x=>x.ContractId == null);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
 
@@ -2281,7 +2281,7 @@ namespace eFMS.API.Accounting.DL.Services
         public AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId)
         {
             if (string.IsNullOrEmpty(partnerId)) return null;
-            var acctReceivables = DataContext.Get(x => x.Office != null);
+            var acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == null);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get(x=>x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
             var arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
@@ -2900,7 +2900,8 @@ namespace eFMS.API.Accounting.DL.Services
                                   //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
                               join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
                               from partnerContract in partnerContract2.DefaultIfEmpty()
-                              where acctReceivable.PartnerId == partnerContract.PartnerId && !partnerContract.SaleService.Contains(acctReceivable.Service)
+                              where acctReceivable.PartnerId == partnerContract.PartnerId 
+                              //&& !partnerContract.SaleService.Contains(acctReceivable.Service)
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
 
