@@ -599,12 +599,12 @@ namespace eFMS.API.Catalogue.DL.Services
         /// <returns></returns>
         public IQueryable<CatChargeModel> GetChargesWithCurrentUserService(List<string> serviceType, string type)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
-            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
-            if (rangeSearch == PermissionRange.None)
-            {
-                return null;
-            }
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            //var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            //if (rangeSearch == PermissionRange.None)
+            //{
+            //    return null;
+            //}
 
             Expression<Func<CatCharge, bool>> query = null;
 
@@ -624,28 +624,28 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
             // Query with Permission Range.
-            switch (rangeSearch)
-            {
-                case PermissionRange.Owner:
-                    query = query.And(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
-                    break;
-                case PermissionRange.Group:
-                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                        || x.UserCreated == currentUser.UserID);
-                    break;
-                case PermissionRange.Department:
-                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                                        || x.UserCreated == currentUser.UserID);
-                    break;
-                case PermissionRange.Office:
-                    query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
-                    break;
-                case PermissionRange.Company:
-                    query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
-                    break;
-                default:
-                    break;
-            }
+            //switch (rangeSearch)
+            //{
+            //    case PermissionRange.Owner:
+            //        query = query.And(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+            //        break;
+            //    case PermissionRange.Group:
+            //        query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //                            || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Department:
+            //        query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+            //                            || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Office:
+            //        query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    case PermissionRange.Company:
+            //        query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
+            //        break;
+            //    default:
+            //        break;
+            //}
             var data = DataContext.Get(query);
 
             var datamap = data.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);

@@ -18,7 +18,7 @@ namespace eFMS.API.Common.Globals
                 _numberUSD = Decimal.Parse(_arrsourceUSD[0]);
                 _numOdd = _arrsourceUSD[1];
             }
-            string _source = currency == "USD" ? String.Format("{0:0,0}", _numberUSD) : String.Format("{0:0,0}", _number);
+            string _source = currency == "USD" ? String.Format("{0:0,0}", Math.Abs(_numberUSD)) : String.Format("{0:0,0}", Math.Abs(_number));
 
             string[] _arrsource = _source.Split(',');
 
@@ -37,12 +37,13 @@ namespace eFMS.API.Common.Globals
             if (_letter.StartsWith("lẻ"))
                 _letter = _letter.Substring(3, _letter.Length - 3);
 
+            var minusStr = (_number < 0 ? "Âm " : string.Empty); // TH số âm
             if (currency == "USD")
             {
                 string cent = Int32.Parse(_numOdd.Substring(1, 1)) >= 2 ? " cents" : " cent";
-                return String.Format("{0}{1} {2}", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency + " và " + TwoNumber2Letter(_numOdd) + cent);
+                return minusStr + String.Format("{0}{1} {2}", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency + " và " + TwoNumber2Letter(_numOdd) + cent);
             }
-            return String.Format("{0}{1} {2}.", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency);
+            return minusStr + String.Format("{0}{1} {2}.", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency);
         }
 
         private static string ThreeNumber2Letter(string _number)
