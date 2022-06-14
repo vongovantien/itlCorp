@@ -417,7 +417,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     checkSubmitData(){
-        if (this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) {
+        if ((this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) ||
+            (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null))) {
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
