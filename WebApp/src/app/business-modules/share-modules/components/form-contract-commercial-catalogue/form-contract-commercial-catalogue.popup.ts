@@ -72,7 +72,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     partnerId: string = null;
 
-    users: User[] = [];
+    users: any[] = [];
     companies: Company[] = [];
     contracts: Contract[] = [];
 
@@ -524,7 +524,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
                 this.updateContract(body);
             } else {
-                this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
+                this.selectedContract.username = this.users.find(x => x.userId === this.selectedContract.saleManId).userName;
                 if (this.selectedContract.officeId.includes(';')) {
                     const arrayOffice = this.selectedContract.officeId.split(';');
                     this.selectedContract.officeNameAbbr = '';
