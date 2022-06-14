@@ -103,7 +103,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     menuSpecialPermission: Observable<any[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
 
-    contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash"];
+    contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash", "Guarantee", "Prepaid"];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
         { id: "AI", text: "Air Import" },
