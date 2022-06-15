@@ -634,21 +634,23 @@ namespace eFMS.API.Accounting.DL.Services
                             var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
                             if (jobNoInfo.Count() > 0)
                             {
-                                var combineNo = jobNoInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = jobNoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
                             if (jobNoObhInfo.Count() > 0)
                             {
-                                var combineNo = jobNoObhInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = jobNoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
@@ -662,22 +664,24 @@ namespace eFMS.API.Accounting.DL.Services
 
                             if (hblnoInfo.Count() > 0)
                             {
-                                var combineNo = hblnoInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : hblnoInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = hblnoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(hblnoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
 
                             if (hblnoObhInfo.Count() > 0)
                             {
-                                var combineNo = hblnoObhInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : hblnoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = hblnoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(hblnoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
@@ -691,9 +695,10 @@ namespace eFMS.API.Accounting.DL.Services
                             var jobNoObhInfo = surchargeOBHInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
                             if (jobNoInfo.Count() > 0)
                             {
-                                var combineNo = jobNoInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = jobNoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
                                     existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
                                     return existCombineNo;
@@ -701,9 +706,10 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (jobNoObhInfo.Count() > 0)
                             {
-                                var combineNo = jobNoObhInfo.FirstOrDefault()?.CombineBillingNo;
-                                combineNo = !string.IsNullOrEmpty(combineNo) ? combineNo : jobNoObhInfo.FirstOrDefault()?.ObhcombineBillingNo;
-                                if (!string.IsNullOrEmpty(combineNo))
+                                var combineNo = jobNoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
                                 {
                                     existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
                                     return existCombineNo;
