@@ -10,6 +10,7 @@
                         <span class="text-info">{{accReceivableDetail.partnerNameAbbr}}</span>
                         <span *ngIf="accReceivableDetail.partnerId">
                             <a target="_blank" class="la la-link text-primary m--margin-left-10"
+                                title="Click to view detail partner"
                                 [routerLink]="[ '/home/catalogue/partner-data/detail', accReceivableDetail.partnerId ]">
                             </a>
                         </span>

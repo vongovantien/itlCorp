@@ -121,7 +121,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             partnerId: item.partnerId,
             type: null,
             officeId: !!item.arOfficeIds.length ? item.arOfficeIds.join("|") : null,
-            service: null,
+            service: !!item.arServices.length ? item.arServices.join("|") : null,
             paymentStatus: status,
             salesman: item.agreementSalesmanId,
             overDue: overDue

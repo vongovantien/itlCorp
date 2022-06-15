@@ -157,10 +157,11 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     showDebitDetail(item: AccReceivableOfficesDetailModel, option: string, office: string = null, service: string = null, overDue: string = null) {
+        console.log(item);
         const body = {
             partnerId: this.accReceivableDetail.partnerId,
             officeId: office ?? item.officeId,
-            service: service,
+            service: !!service ? service : (!!item.services.length ? item.services.join("|") : null),
             type: null,
             paymentStatus: option,
             salesman: this.accReceivableDetail?.agreementSalesmanId ?? this.accReceivableDetail?.arSalesmanId,

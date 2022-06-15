@@ -1927,7 +1927,8 @@ namespace eFMS.API.Accounting.DL.Services
                         IsExpired = s.First().IsExpired,
                         IsOverLimit = s.First().IsOverLimit,
                         IsOverDue = s.First().IsOverDue,
-                        ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList()
+                        ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList(),
+                        ArServices = s.Select(x => x.ArServiceCode).Distinct().ToList(),
                     }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -2032,6 +2033,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalObhBillingAmount = se.Select(sel => sel.ObhBillingAmount).Sum(),
                     TotalObhUnPaidAmount = se.Select(sel => sel.ObhUnPaidAmount).Sum(),
                     TotalObhPaidAmount = se.Select(sel => sel.ObhPaidAmount).Sum(),
+                    Services = se.Select(sel => sel.ArServiceCode).Distinct().ToList(),
                     AccountReceivableGrpServices = se.Select(sel => new AccountReceivableServiceResult
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
@@ -2071,7 +2073,8 @@ namespace eFMS.API.Accounting.DL.Services
                            TotalObhBillingAmount = ar.TotalObhBillingAmount,
                            TotalObhPaidAmount = ar.TotalObhPaidAmount,
                            TotalObhUnPaidAmount = ar.TotalObhUnPaidAmount,
-                           AccountReceivableGrpServices = ar.AccountReceivableGrpServices
+                           AccountReceivableGrpServices = ar.AccountReceivableGrpServices,
+                           Services = ar.Services
                        };
             return data.ToList();
         }
@@ -3872,7 +3875,8 @@ namespace eFMS.API.Accounting.DL.Services
                     ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
                     ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
                     ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
-                    ArOfficeIds = s.Select(x => x.Office.ToString()).Distinct().ToList()
+                    ArOfficeIds = s.Select(x => x.Office.ToString()).Distinct().ToList(),
+                    ArServices = s.Select(x => x.Service).Distinct().ToList()
                 });
 
             var data = from ar in groupByPartner
@@ -3906,7 +3910,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ObhUnPaidAmount = ar.ObhUnPaidAmount,
                            ArSalesmanName = user!= null?user.Username:"",
                            ArSalesmanId = user != null ? user.Id : "",
-                           ArOfficeIds = ar.ArOfficeIds
+                           ArOfficeIds = ar.ArOfficeIds,
+                           ArServices = ar.ArServices
                        };
             return data;
         }

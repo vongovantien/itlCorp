@@ -114,7 +114,7 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
             partnerId: item.partnerId,
             type: null,
             officeId: !!item.arOfficeIds.length ? item.arOfficeIds.join("|") : null,
-            service: null,
+            service: !!item.arServices.length ? item.arServices.join("|") : null,
             paymentStatus: status,
             salesman: item.arSalesmanId,
             overDue: overDue

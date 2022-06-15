@@ -40,6 +40,7 @@ export class TrialOfficialOtherModel {
     isOverDue: boolean = false;
 
     arOfficeIds: string[] = [];
+    arServices: string[] = null;
     arSalesmanId: string = null;
 
     constructor(data?: any) {
@@ -151,6 +152,8 @@ export class AccReceivableOfficesDetailModel {
     totalObhBillingAmount: number = 0;
     totalObhPaidAmount: number = 0;
     totalObhUnPaidAmount: number = 0;
+    services: string[] = [];
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
