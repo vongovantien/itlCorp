@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
@@ -15,7 +15,7 @@ import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receiva
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
-
+import { ContextMenuDirective } from "@directives";
 @Component({
     selector: 'list-trial-official-account-receivable',
     templateUrl: './list-trial-official-account-receivable.component.html',
@@ -24,7 +24,10 @@ import { HttpResponse } from '@angular/common/http';
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
     @Output() onTotalListTrial: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+
     trialOfficialList: TrialOfficialOtherModel[] = [];
+    selectedPartner: TrialOfficialOtherModel;
 
     constructor(
         private _sortService: SortService,
@@ -142,6 +145,9 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 },
             );
     }
-
+    onSelectPartner(part: TrialOfficialOtherModel) {
+        this.selectedPartner = part;
+        this.clearMenuContext(this.queryListMenuContext);
+    }
 }
 
