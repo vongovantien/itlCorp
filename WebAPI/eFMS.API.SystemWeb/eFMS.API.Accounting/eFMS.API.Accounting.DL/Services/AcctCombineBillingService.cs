@@ -700,7 +700,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
                                 if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
@@ -711,7 +711,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
                                 if (combineNo.Count > 0)
                                 {
-                                    existCombineNo = item.Trim() + " has been existed in CB: " + combineNo;
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                     return existCombineNo;
                                 }
                             }
