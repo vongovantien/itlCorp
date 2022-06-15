@@ -1,0 +1,114 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="row m--margin-bottom-10">
+            <div class="col-lg-12 d-flex align-items-center justify-content-between">
+                <div class="form-group col-lg-4 p-1"></div>
+
+                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="savePayable()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+        <div class="m-form m-form--state" [formGroup]="payableForm">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Payment Term
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="paymentTerm" autocomplete="nope" formControlName="paymentTerm">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Paid Amount
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="creditPaidAmount" readonly value={{this.creditPaidAmount}}
+                                [value]="creditAmount | number: '.0-2'">
+
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Advance Amount
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="creditAdvanceAmount" readonly value={{this.creditAdvanceAmount}}
+                                [value]="creditAmount | number: '.0-2'">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Amount
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder="" readonly
+                                name="creditAmount" autocomplete="nope" [value]="creditAmount | number: '.0-2'">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Unpaid
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                name="creditUnpaid" readonly value={{this.creditUnpaidAmount}}
+                                [value]="creditAmount | number: '.0-2'">
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency
+                                    </label>
+                                    <ng-select [clearable]="true" [items]="currencys" name="currency" class="custom"
+                                        bindLabel="text" read-only="true" formControlName="currency"
+                                        placeholder="Select Currency">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Agreement File
+                                    </label>
+                                    <input style="display:none" type="file" #file (change)="handleFileInput($event)">
+                                    <div class="form-group ">
+                                        <button (click)="file.click()" type="button"
+                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
+                                            <span>
+                                                <i class="la la-plus"></i>
+                                                <span>
+                                                    Attach Files
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <ng-container>
+                                            <li *ngFor="let file of files">
+                                                <a [href]="file.url" target="_blank" [title]="file.name"
+                                                    download>{{file.name}}</a>
+                                                <span class="pointer text-center">
+                                                    <a title="Delete" (click)="deleteFile(file)">
+                                                        <i class="la la-times fa-lg text-danger"></i>
+                                                    </a>
+                                                </span>
+                                            </li>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<confirm-popup #confirmDelete body="Are you sure to delete this file ?" labelConfirm="Yes" labelCancel="No"
+    (onSubmit)="onDeleteFile()"></confirm-popup>

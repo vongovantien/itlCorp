@@ -753,5 +753,31 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result.OrderBy(x => x.VoucherDate).ThenBy(x => x.VoucherNo).ThenBy(x => x.DocNo).ToList();
         }
+
+        public GeneralAccPayableModel GetGeneralPayable(string partnerId)
+        {
+            var accPayable = DataContext.Get(x => x.PartnerId == partnerId).ToList();
+            var crdAvdAmount = DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.PaymentAmount);
+            var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+            return new GeneralAccPayableModel
+            {
+                CreditAmount = accPayable.Sum(x=>x.TotalAmount),
+                CreditPaidAmount = accPayable.Sum(x=>x.PaymentAmount),
+                CreditUnpaidAmount = accPayable.Sum(x=>x.RemainAmount),
+                Currency = partner.Currency,
+                PaymentTerm = partner.PaymentTerm==null?0: partner.PaymentTerm,
+                CreditAdvanceAmount = crdAvdAmount
+            };
+        }
+
+        public bool UpdatePayable(string partnerId,int paymentTerm,string currency)
+        {
+            var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+            partner.PaymentTerm = paymentTerm;
+            partner.Currency = currency;
+            catPartnerRepository.Update(partner, x => x.Id == partnerId);
+            catPartnerRepository.SubmitChanges();
+            return catPartnerRepository.SubmitChanges().Success;
+        }
     }
 }

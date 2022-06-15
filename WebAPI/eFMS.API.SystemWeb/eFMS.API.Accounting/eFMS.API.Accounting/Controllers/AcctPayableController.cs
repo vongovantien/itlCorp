@@ -96,5 +96,33 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctPayableService.GetDataExportAccountingTemplate(criteria);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Get data export accounting template payable
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <returns></returns>
+        [HttpGet("GetGeneralPayable")]
+        [Authorize]
+        public IActionResult GetGeneralPayable(string partnerId)
+        {
+            var data = acctPayableService.GetGeneralPayable(partnerId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get data export accounting template payable
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <param name="paymentTerm"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        [HttpGet("UpdatePayable")]
+        [Authorize]
+        public IActionResult UpdatePayable(string partnerId, int paymentTerm, string currency)
+        {
+            var data = acctPayableService.UpdatePayable(partnerId, paymentTerm, currency);
+            return Ok(data);
+        }
     }
 }
