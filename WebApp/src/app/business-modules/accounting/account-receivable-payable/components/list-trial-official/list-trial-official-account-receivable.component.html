@@ -182,22 +182,22 @@
 <ng-template inject></ng-template>
 <app-context-menu #viewContextMenu (clickOutside)="selectedPartner = null">
     <ng-container>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Unpaid')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null)">
             <span><i class="la la-eye align-middle text-primary"></i><span>Billing</span></span>
         </div>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Paid A Part')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, 'Paid A Part')">
             <span><i class="la la-eye align-middle text-primary"></i><span>Paid a Part</span></span>
         </div>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'OutStanding')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null)">
             <span><i class="la la-eye align-middle text-primary"></i><span>OutStanding Balance</span></span>
         </div>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over1To15Day')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, 'Over1To15')">
             <span><i class="la la-eye align-middle text-primary"></i><span>Over 1-15 days</span></span>
         </div>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over16To30Day')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, 'Over15To30')">
             <span><i class="la la-eye align-middle text-primary"></i><span>Over 16-30 days</span></span>
         </div>
-        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over30Day')">
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, 'Over30')">
             <span><i class="la la-eye align-middle text-primary"></i><span>Over 30 days</span></span>
         </div>
     </ng-container>
