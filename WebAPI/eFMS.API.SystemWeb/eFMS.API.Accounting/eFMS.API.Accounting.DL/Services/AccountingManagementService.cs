@@ -1173,7 +1173,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var _transactionTypes = model.Charges.Select(s => s.TransactionType)
                          .GroupBy(x => x)
                          .Select(x => new { service = x.Key, counts = x.Count() })
-                         .OrderBy(x => x.counts)
+                         .OrderByDescending(x => x.counts)
                          .Select(x => x.service)
                          .ToList();
                 model.ServiceType = _transactionTypes.FirstOrDefault();
@@ -1355,7 +1355,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var _transactionTypes = model.Charges.Select(s => s.TransactionType)
                         .GroupBy(x => x)
                         .Select(x => new { service = x.Key, counts = x.Count() })
-                        .OrderBy(x => x.counts)
+                        .OrderByDescending(x => x.counts)
                         .Select(x => x.service)
                         .ToList();
                 model.ServiceType = _transactionTypes.FirstOrDefault();
