@@ -38,7 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepository = officeRepo;
 
             HM = officeRepository.Get(x => x.Code == DocumentConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
-            HM = officeRepository.Get(x => x.Code == DocumentConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+            BH = officeRepository.Get(x => x.Code == DocumentConstants.OFFICE_BH)?.FirstOrDefault()?.Id;
 
         }
 

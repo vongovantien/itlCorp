@@ -145,6 +145,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 },
             );
     }
+
     onSelectPartner(part: TrialOfficialOtherModel) {
         this.selectedPartner = part;
         this.clearMenuContext(this.queryListMenuContext);

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from '@services';
@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 import { HttpResponse } from '@angular/common/http';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
+import { ContextMenuDirective } from '@directives';
 
 @Component({
     selector: 'list-no-agreement-account-receivable',
@@ -24,7 +25,10 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
 
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
     @Output() onTotalListNoContract: EventEmitter<number> = new EventEmitter<number>();
-    otherList: any[] = [];
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+
+    otherList: TrialOfficialOtherModel[] = [];
+    selectedPartner: TrialOfficialOtherModel = null;
 
     constructor(private _sortService: SortService,
         private _progressService: NgProgress,
@@ -134,5 +138,11 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
                     }
                 },
             );
+    }
+
+
+    onSelectPartner(part: TrialOfficialOtherModel) {
+        this.selectedPartner = part;
+        this.clearMenuContext(this.queryListMenuContext);
     }
 }

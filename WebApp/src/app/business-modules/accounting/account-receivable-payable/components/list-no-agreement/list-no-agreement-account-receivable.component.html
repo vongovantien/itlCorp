@@ -28,7 +28,9 @@
                                 <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                                 <ng-container>
                                     <ng-container *ngFor="let item of otherList; let i = index; trackBy: trackByFn">
-                                        <tr class="">
+                                        <tr [contextMenu]="viewContextMenu" (onTouch)="onSelectPartner(item)"
+                                            [class.touch-row]="(selectedPartner?.taxCode === item.taxCode 
+                                            && selectedPartner.arSalesmanId === item.arSalesmanId)">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
                                                     <app-permission-button type="detail"
@@ -65,7 +67,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, 'Over1To15')">
+                                                        (click)="showDebitDetail(item, null, 'Over1To15')">
                                                         {{ item.over1To15Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -73,7 +75,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, 'Over15To30')">
+                                                        (click)="showDebitDetail(item, null, 'Over15To30')">
                                                         {{ item.over16To30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -81,7 +83,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, 'Over30')">
+                                                        (click)="showDebitDetail(item, null, 'Over30')">
                                                         {{ item.over30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -103,3 +105,27 @@
     </div>
 </div>
 <account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>
+
+
+<app-context-menu #viewContextMenu (clickOutside)="selectedPartner = null">
+    <ng-container>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null)">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Billing</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, 'Paid A Part')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Paid a Part</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null)">
+            <span><i class="la la-eye align-middle text-primary"></i><span>OutStanding Balance</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null, 'Over1To15')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 1-15 days</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null, 'Over15To30')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 16-30 days</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null, 'Over30')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 30 days</span></span>
+        </div>
+    </ng-container>
+</app-context-menu>

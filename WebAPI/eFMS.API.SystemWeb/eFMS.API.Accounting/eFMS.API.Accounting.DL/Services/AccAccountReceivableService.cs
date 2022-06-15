@@ -2600,213 +2600,231 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hs = new HandleState();
             contractIds = new List<Guid?>();
 
-            // Get công nợ quá hạn từ 1->15 ngày của ds đối tượng xác định hoặc lấy hết
-            var invoiceOverDue = Enumerable.Empty<AccAccountingManagement>().AsQueryable();
+            var invoiceOverDue = Enumerable.Empty<GetArBBillingWithSalesman>().AsQueryable();
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+            string overDueParam = string.Empty;
+            var receivables = DataContext.Get(x => partnerIds.Contains(x.PartnerId));            
 
-            invoiceOverDue = GetOverDuePartnerWithType(partnerIds, type);
-            if (invoiceOverDue.Count() == 0)
+            switch (type)
             {
-                var arDatas = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
-                // Nếu không có phát sinh hóa đơn nào đang nợ theo ds đối tượng hoặc toán hệ thống k còn ai nợ
-                if (partnerIds.Count() > 0)
-                {
-                    arDatas = DataContext.Get(x => partnerIds.Contains(x.PartnerId));
-                    if (arDatas.Count() > 0)
-                    {
-                        switch (type)
-                        {
-                            case 1: // 1 - 15
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over1To15Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                break;
-                            case 2: // 15 - 30
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over16To30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                break;
-                            case 3: // 30
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-
-                        hs = DataContext.SubmitChanges();
-                        contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
-                    }
-                }
-                else
-                {
-                    switch (type)
-                    {
-                        case 1: // 1 - 15
-                            arDatas = DataContext.Get(x => x.Over1To15Day != 0 && x.Over1To15Day != null);
-                            if (arDatas.Count() > 0)
-                            {
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over1To15Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
-                            }
-                            break;
-                        case 2: // 15 - 30
-                            arDatas = DataContext.Get(x => x.Over16To30Day != 0 && x.Over16To30Day != null);
-                            if (arDatas.Count() > 0)
-                            {
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over16To30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
-                            }
-                            break;
-                        case 3: // 30
-                            arDatas = DataContext.Get(x => x.Over30Day != 0 && x.Over30Day != null);
-                            if (arDatas.Count() > 0)
-                            {
-                                foreach (var item in arDatas)
-                                {
-                                    item.Over30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                contractIds = arDatas.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    hs = DataContext.SubmitChanges();
-                }
+                case 1: // 1 - 15
+                    overDueParam = "Over1To15";
+                    break;
+                case 2: // 15 - 30
+                    overDueParam = "Over15To30";
+                    break;
+                case 3: // 30
+                    overDueParam = "Over30";
+                    break;
+                default:
+                    overDueParam = null;
+                    break;
             }
-
-            if (partnerIds.Count() > 0)
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@partner", Value = partnerIds.Count > 0 ? string.Join("|", partnerIds) : null },
+                new SqlParameter(){ ParameterName = "@officeId", Value = null },
+                new SqlParameter(){ ParameterName = "@service", Value = null },
+                new SqlParameter(){ ParameterName = "@type", Value = null },
+                new SqlParameter(){ ParameterName = "@paymentStatus", Value = null },
+                new SqlParameter(){ ParameterName = "@salesman", Value = null },
+                new SqlParameter(){ ParameterName = "@overDue", Value = overDueParam },
+            };
+            var invoiceOverDueWithSalesman = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetBillingWithSalesman>(parameters);
+            if(invoiceOverDueWithSalesman.Count > 0)
             {
-                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                             && x.AcctManagementId != null && partnerIds.Contains(x.PaymentObjectId));
-            }
-            else
-            {
-                surcharges = surchargeRepo.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                            && x.AcctManagementId != null);
-            }
-
-            var invoices = from acctMngt in invoiceOverDue
-                           join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
-                           select new ReceivableInvoice
-                           {
-                               Office = surcharge.OfficeId,
-                               PartnerId = surcharge.PaymentObjectId,
-                               Service = surcharge.TransactionType,
-                               Invoice = acctMngt
-                           };
-
-            if (invoices.Count() > 0)
-            {
-                //Group by Office, PartnerId, Service
-                var grpInvoices = invoices
-                    .GroupBy(g => new { g.Office, g.PartnerId, g.Service }).Select(s => new ReceivableInvoices
-                    {
-                        Office = s.Key.Office,
-                        PartnerId = s.Key.PartnerId,
-                        Service = s.Key.Service,
-                        Invoices = s.Select(se => se.Invoice).GroupBy(x => x.Id).Select(grp => new AccAccountingManagement
-                        {
-                            Id = grp.Key,
-                            DatetimeCreated = grp.FirstOrDefault().DatetimeCreated,
-                            TotalAmount = grp.FirstOrDefault().TotalAmount,
-                            TotalAmountVnd = grp.FirstOrDefault().TotalAmountVnd,
-                            TotalAmountUsd = grp.FirstOrDefault().TotalAmountUsd,
-
-                            PaidAmount = grp.FirstOrDefault().PaidAmount,
-                            PaidAmountUsd = grp.FirstOrDefault().PaidAmountUsd,
-                            PaidAmountVnd = grp.FirstOrDefault().PaidAmountVnd,
-
-                            UnpaidAmount = grp.FirstOrDefault().UnpaidAmount,
-                            UnpaidAmountVnd = grp.FirstOrDefault().UnpaidAmountVnd,
-                            UnpaidAmountUsd = grp.FirstOrDefault().UnpaidAmountUsd,
-                            ServiceType = grp.FirstOrDefault().ServiceType
-                        }).ToList()
-                    }).ToList();
-
-                if (grpInvoices.Count() > 0)
+                var invoiceOverDueWithSalesmanGrp = invoiceOverDueWithSalesman.GroupBy(x => new { x.SalesmanId, x.OfficeId, x.PartnerId, x.Service })
+                    .Select(x => new { x.Key.SalesmanId, x.Key.PartnerId, x.Key.OfficeId, x.Key.Service, invoices = x });
+                if(invoiceOverDueWithSalesmanGrp.Count() > 0)
                 {
-                    // reset các over due của partner
-                    var partnerArIds = grpInvoices.Select(x => x.PartnerId).Distinct();
-                    foreach (var partnerId in partnerArIds)
+                    foreach (var item in invoiceOverDueWithSalesmanGrp)
                     {
-                        List<AccAccountReceivable> arOverDueToRest = DataContext.Get(x => x.PartnerId == partnerId).ToList();
-                        switch (type)
+                        var partner = partnerRepo.Get(x => x.Id == item.PartnerId).FirstOrDefault();
+                        
+                        var currentReceivable = receivables.FirstOrDefault(x => x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
+                        if(currentReceivable != null)
                         {
-                            case 1: // 1 - 15
-                                foreach (var item in arOverDueToRest)
+                            // kiểm tra hop dong hien tai cua sales
+                            var currentContract = contractPartnerRepo.First(x => x.PartnerId == item.PartnerId
+                             && x.SaleManId == item.SalesmanId
+                             && x.Active == true
+                             && x.OfficeId.Contains(item.OfficeId.ToString())
+                             && x.SaleService.Contains(item.Service));
+
+                            if (currentContract != null)
+                            {
+                                currentReceivable.ContractId = currentContract.Id;
+                                currentReceivable.ContractCurrency = currentContract.CreditCurrency;
+                            }
+
+                            decimal? totalAmountUnpaid = 0;
+                            var invoicesData = item.invoices;
+                            foreach (var invoice in invoicesData)
+                            {
+                                if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
                                 {
-                                    item.Over1To15Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                    totalAmountUnpaid += invoice.UnpaidAmountVND;
                                 }
-                                break;
-                            case 2: // 15 - 30
-                                foreach (var item in arOverDueToRest)
+                                else if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_USD)
                                 {
-                                    item.Over16To30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
+                                    totalAmountUnpaid += invoice.UnpaidAmountUSD;
                                 }
-                                break;
-                            case 3: // 30
-                                foreach (var item in arOverDueToRest)
-                                {
-                                    item.Over30Day = 0;
-                                    DataContext.Update(item, x => x.Id == item.Id, false);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    foreach (var item in grpInvoices)
-                    {
-                        AccAccountReceivable ar = DataContext.First(x => x.PartnerId == item.PartnerId
-                        && x.Office == item.Office
-                        && x.Service == item.Service);
-                        if (ar != null)
-                        {
+                            }
                             switch (type)
                             {
                                 case 1: // 1 - 15
-                                    ar.Over1To15Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    currentReceivable.Over1To15Day = totalAmountUnpaid;
+                                    DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                     break;
                                 case 2: // 15 - 30
-                                    ar.Over16To30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    currentReceivable.Over16To30Day = totalAmountUnpaid;
+                                    DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                     break;
                                 case 3: // 30
-                                    ar.Over30Day = SumUnpaidAmountOfInvoices(item.Invoices.AsQueryable(), ar.ContractCurrency);
+                                    currentReceivable.Over30Day = totalAmountUnpaid;
+                                    DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                     break;
                                 default:
                                     break;
                             }
-                            DataContext.Update(ar, x => x.Id == ar.Id, false);
-                            if (ar.ContractId != null)
+                            if (currentReceivable.ContractId != null)
                             {
-                                contractIds.Add(ar.ContractId);
+                                contractIds.Add(currentReceivable.ContractId);
                             }
                         }
+                        else
+                        {
+                            var contract = contractPartnerRepo.First(x => x.PartnerId == item.PartnerId
+                            && x.SaleManId == item.SalesmanId
+                            && x.Active == true
+                            && x.OfficeId.Contains(item.OfficeId.ToString())
+                            && x.SaleService.Contains(item.Service));
+
+                            if(contract != null)
+                            {
+                                decimal? totalAmountUnpaid = 0;
+                                var invoicesData = item.invoices;
+
+                                foreach (var invoice in invoicesData)
+                                {
+                                    if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        totalAmountUnpaid += invoice.UnpaidAmountVND;
+                                    }
+                                    else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
+                                    {
+                                        totalAmountUnpaid += invoice.UnpaidAmountUSD;
+                                    }
+                                }
+
+                                var newAr = new AccAccountReceivableModel
+                                {
+                                    PartnerId = item.PartnerId,
+                                    Office = item.OfficeId,
+                                    ContractCurrency = contract.CreditCurrency,
+                                    Service = item.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = contract.Id,
+                                    SaleMan = item.SalesmanId,
+                                    UserCreated = contract.UserCreated,
+                                    UserModified = contract.UserModified,
+                                    OfficeId = null,
+                                    CompanyId = contract.CompanyId,
+                                };
+                                switch (type)
+                                {
+                                    case 1:
+                                        newAr.Over1To15Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    case 2:
+                                        newAr.Over16To30Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    case 3:
+                                        newAr.Over30Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                                contractIds.Add(newAr.ContractId);
+                            } else
+                            {
+                                decimal? totalAmountUnpaid = 0;
+                                var invoicesData = item.invoices;
+
+                                foreach (var invoice in invoicesData)
+                                {
+                                    totalAmountUnpaid += invoice.UnpaidAmountVND;
+                                }
+                                var newAr = new AccAccountReceivableModel
+                                {
+                                    PartnerId = item.PartnerId,
+                                    Office = item.OfficeId,
+                                    Service = item.Service,
+                                    AcRef = partner.ParentId ?? partner.Id,
+                                    ContractId = null,
+                                    SaleMan = item.SalesmanId,
+                                    ContractCurrency = "VND",
+                                };
+                                switch (type)
+                                {
+                                    case 1:
+                                        newAr.Over1To15Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    case 2:
+                                        newAr.Over16To30Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    case 3:
+                                        newAr.Over30Day = totalAmountUnpaid;
+                                        DataContext.Add(newAr, false);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                        }
                     }
-                    hs = DataContext.SubmitChanges();
-                    contractIds = contractIds.Distinct().ToList();
                 }
+            } else
+            {
+                switch (type)
+                {
+                    case 1: // 1 - 15
+                        foreach (var ar in receivables)
+                        {
+                            ar.Over1To15Day = 0;
+                            DataContext.Update(ar, x => x.Id == ar.Id, false);
+                        }
+                        break;
+                    case 2: // 15 - 30
+                        foreach (var ar in receivables)
+                        {
+                            ar.Over16To30Day = 0;
+                            DataContext.Update(ar, x => x.Id == ar.Id, false);
+                        }
+                        break;
+                    case 3: // 30
+                        foreach (var ar in receivables)
+                        {
+                            ar.Over30Day = 0;
+                            DataContext.Update(ar, x => x.Id == ar.Id, false);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                contractIds = receivables.Where(x => x.ContractId != null).Select(x => x.ContractId).Distinct().ToList();
             }
+
+            hs = DataContext.SubmitChanges();
+            contractIds = contractIds.Distinct().ToList();
+
             return hs;
         }
 
