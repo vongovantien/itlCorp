@@ -2,6 +2,7 @@ export class TrialOfficialOtherModel {
     agreementId: string = null;
     partnerId: string = null;
     partnerCode: string = null;
+    officeId: string = null;
 
     partnerNameAbbr: string = null;
     parentNameAbbr: string = null;
@@ -37,6 +38,9 @@ export class TrialOfficialOtherModel {
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
+
+    arOfficeIds: string[] = [];
+    arSalesmanId: string = null;
 
     constructor(data?: any) {
         const self = this;
@@ -78,7 +82,8 @@ export class AccReceivableDetailModel {
     agreementCurrency: string = null;
     agreementId: string = null;
     agreementNo: string = null;
-    agreementSalesmanId: string = null;
+    agreementSalesmanId: string = null; // * case có contract
+    arSalesmanId: string = null; // * case no contract
     agreementSalesmanName: string = null;
     agreementStatus: string = null;
     agreementType: string = null;

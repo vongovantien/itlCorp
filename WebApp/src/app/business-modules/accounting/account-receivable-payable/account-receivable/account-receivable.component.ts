@@ -33,7 +33,8 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
     activeOther: boolean = false;
-    totalAr: any = 0;
+    totalAr: number = 0;
+    totalNoContract: number = 0;
 
     constructor(
         private _router: Router,
@@ -57,10 +58,10 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 // if (param.subTab) {
                 //     this.selectedSubTab = param.subTab.toUpperCase();
                 // } else {
-                     //this.selectedSubTab = 'trial_official'.toUpperCase();
+                //this.selectedSubTab = 'trial_official'.toUpperCase();
                 //     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
                 // }
-                if(this.selectedSubTab == null){
+                if (this.selectedSubTab == null) {
                     this.selectedSubTab = 'trial_official'.toUpperCase();
                 }
             });
@@ -80,7 +81,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 this.setParameterToSearch(body, this.otherListComponent);
                 break;
             case CommonEnum.TabTypeAccountReceivableEnum.NoAgreement:
-                    this.setParameterToSearch(body, this.noAgreementListComponent);
+                this.setParameterToSearch(body, this.noAgreementListComponent);
                 break;
             default:
                 break;
@@ -168,8 +169,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this.onSearchReceivable(this.dataSearch);
 
     }
-    onTotalAr(total){
-        if (this.selectedSubTab==='TRIAL_OFFICIAL')
+    onTotalAr(total: number) {
+        console.log(total);
+        if (this.selectedSubTab === 'TRIAL_OFFICIAL') {
             this.totalAr = total;
+        } else {
+            this.totalNoContract = total;
+        }
     }
 }

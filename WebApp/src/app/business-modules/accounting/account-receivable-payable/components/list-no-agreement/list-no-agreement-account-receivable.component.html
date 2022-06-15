@@ -37,25 +37,35 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <a class="pointer" [routerLink]="'./detail'" [queryParams]="{partnerId: item.partnerId,salemanId:item.arSalesmanId}">{{item.partnerCode}}</a>
+                                                <a class="pointer" [routerLink]="'./detail'"
+                                                    [queryParams]="{partnerId: item.partnerId,salemanId:item.arSalesmanId}">{{item.partnerCode}}</a>
                                             </td>
-                                            <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}</td>
+                                            <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}
+                                            </td>
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'Unpaid')">
-                                                    {{ (item.billingAmount +(item.obhBillingAmount!=null?item.obhBillingAmount:0)) | negativeNumber :'.0-3' }}
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item, null)">
+                                                    {{ (item.billingAmount
+                                                    +(item.obhBillingAmount!=null?item.obhBillingAmount:0)) |
+                                                    negativeNumber :'.0-3' }}
                                                 </a>
                                             </td>
-                                            <td class="text-right"><a href="javascript:void(0)" (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'Paid A Part')">
-                                                {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)| negativeNumber:'.0-3'}}
-                                            </a></td>
-                                            <td class="text-right"><a href="javascript:void(0)" (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'OutStanding')">
-                                                {{ item.billingUnpaid +(item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0) |negativeNumber:'.0-3'}}
-                                            </a></td>
+                                            <td class="text-right"><a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item, 'Paid A Part')">
+                                                    {{ item.paidAmount +
+                                                    (item.obhPaidAmount!=null?item.obhPaidAmount:0)|
+                                                    negativeNumber:'.0-3'}}
+                                                </a></td>
+                                            <td class="text-right"><a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item, null)">
+                                                    {{ item.billingUnpaid
+                                                    +(item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0)
+                                                    |negativeNumber:'.0-3'}}
+                                                </a></td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'Over1To15Day')">
+                                                        (click)="showDebitDetail(item, 'Over1To15')">
                                                         {{ item.over1To15Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -63,7 +73,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'Over16To30Day')">
+                                                        (click)="showDebitDetail(item, 'Over15To30')">
                                                         {{ item.over16To30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>
@@ -71,7 +81,7 @@
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item.arSalesmanId,item.partnerId,'Over30Day')">
+                                                        (click)="showDebitDetail(item, 'Over30')">
                                                         {{ item.over30Day | negativeNumber: '.0-3' }}
                                                     </a>
                                                 </span>

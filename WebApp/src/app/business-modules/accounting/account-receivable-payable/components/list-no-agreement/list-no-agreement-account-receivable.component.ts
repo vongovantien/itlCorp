@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { AppList } from '@app';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
@@ -8,7 +8,7 @@ import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, getAccountReceivableLoadingListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, getAccountReceivableLoadingListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
@@ -23,7 +23,7 @@ import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receiva
 export class AccountReceivableNoAgreementComponent extends AppList implements OnInit {
 
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
-
+    @Output() onTotalListNoContract: EventEmitter<number> = new EventEmitter<number>();
     otherList: any[] = [];
 
     constructor(private _sortService: SortService,
@@ -79,17 +79,18 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
                 (res: any) => {
                     this.otherList = res.data || [];
                     this.totalItems = res.totalItems;
+                    this.onTotalListNoContract.emit(res.totalItems);
                 },
             );
     }
-    viewDetail(partnerId: string,salemanId:string) {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
-                queryParams: {
-                    partnerId: partnerId,
-                    salemanId:salemanId,
-                    subTab: 'other',
-                }
-            });
+    viewDetail(partnerId: string, salemanId: string) {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
+            queryParams: {
+                partnerId: partnerId,
+                salemanId: salemanId,
+                subTab: 'other',
+            }
+        });
 
     }
 
@@ -108,13 +109,17 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
 
     }
 
-    showDebitDetail(arSalesmanId,partnerId,option){
-        let officeId = "";
-        let overDueDay = 0;
-        let agreeStr=''+partnerId;
-        if(this.dataSearch && this.dataSearch.officeIds){officeId = this.dataSearch.officeIds.join("|");}
-        if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
-        this._accountingRepo.getDataDebitDetailListPartnerId(partnerId, option,officeId,'',overDueDay,arSalesmanId)
+    showDebitDetail(item: TrialOfficialOtherModel, status: string, overDue: string = null) {
+        const body = {
+            partnerId: item.partnerId,
+            type: null,
+            officeId: !!item.arOfficeIds.length ? item.arOfficeIds.join("|") : null,
+            service: null,
+            paymentStatus: status,
+            salesman: item.arSalesmanId,
+            overDue: overDue
+        };
+        this._accountingRepo.getDataDebitDetailList(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -122,7 +127,8 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        this.debitDetailPopupComponent.dataSearch= {argeementId:agreeStr, option,officeId,serviceCode:'',overDueDay};
+                        this.debitDetailPopupComponent.dataSearch = body;
+
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }

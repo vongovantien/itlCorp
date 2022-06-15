@@ -140,8 +140,8 @@
                             <h6 class="font-weight-bold">Type:</h6>
                         </div>
                     </div>
-                    <div class="col-lg-7">
-                        <span class="badge "
+                    <div class="col-lg-7" *ngIf="!!accReceivableDetail.agreementType">
+                        <span class="badge"
                             [ngClass]="accReceivableDetail.agreementType === 'Trial' ? 'badge-warning' : 'badge-info'">
                             {{ accReceivableDetail.agreementType }}
                         </span>
@@ -204,7 +204,7 @@
                         <h6 class="font-weight-bold">Status:</h6>
 
                     </div>
-                    <div class="col-lg-7">
+                    <div class="col-lg-7" *ngIf="!!accReceivableDetail.agreementStatus">
                         <span class="badge"
                             [ngClass]=" accReceivableDetail.agreementStatus === 'Active'  ? 'badge-success' : 'badge-danger'">
                             {{accReceivableDetail.agreementStatus}}

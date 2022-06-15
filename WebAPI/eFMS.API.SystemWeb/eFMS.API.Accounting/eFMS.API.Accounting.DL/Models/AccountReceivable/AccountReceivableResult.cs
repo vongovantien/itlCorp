@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models.AccountReceivable
 {
@@ -56,6 +57,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public bool? IsOverLimit { get; set; }
         public string ArSalesmanName { get; set; }
         public string ArSalesmanId { get; set; }
-
+        public List<string> ArOfficeIds { get; set; }
     }
 }

@@ -3,12 +3,12 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableLoadingListState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, IAccountReceivableState, getAccountReceivableLoadingListState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
@@ -120,7 +120,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         const body = {
             partnerId: item.partnerId,
             type: null,
-            officeId: !!this.dataSearch.officeIds ? this.dataSearch.officeIds.join("|") : null,
+            officeId: !!item.arOfficeIds.length ? item.arOfficeIds.join("|") : null,
             service: null,
             paymentStatus: status,
             salesman: item.agreementSalesmanId,

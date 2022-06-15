@@ -163,7 +163,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             service: service,
             type: null,
             paymentStatus: option,
-            salesman: this.accReceivableDetail.agreementSalesmanId,
+            salesman: this.accReceivableDetail?.agreementSalesmanId ?? this.accReceivableDetail?.arSalesmanId,
             overDue: overDue
         }
         this._accoutingRepo.getDataDebitDetailList(body)

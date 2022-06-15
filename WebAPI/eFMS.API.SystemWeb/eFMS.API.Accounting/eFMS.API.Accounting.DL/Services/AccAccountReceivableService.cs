@@ -1695,9 +1695,9 @@ namespace eFMS.API.Accounting.DL.Services
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
                 arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
 
-                IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
-                if (arPartnerNoContracts != null)
-                    arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
+                //IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
+                //if (arPartnerNoContracts != null)
+                //    arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
 
             var res = new List<AccountReceivableResult>();
@@ -1927,6 +1927,7 @@ namespace eFMS.API.Accounting.DL.Services
                         IsExpired = s.First().IsExpired,
                         IsOverLimit = s.First().IsOverLimit,
                         IsOverDue = s.First().IsOverDue,
+                        ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList()
                     }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -3871,6 +3872,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
                     ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
                     ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
+                    ArOfficeIds = s.Select(x => x.Office.ToString()).Distinct().ToList()
                 });
 
             var data = from ar in groupByPartner
@@ -3904,6 +3906,7 @@ namespace eFMS.API.Accounting.DL.Services
                            ObhUnPaidAmount = ar.ObhUnPaidAmount,
                            ArSalesmanName = user!= null?user.Username:"",
                            ArSalesmanId = user != null ? user.Id : "",
+                           ArOfficeIds = ar.ArOfficeIds
                        };
             return data;
         }
