@@ -9,6 +9,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
@@ -66,6 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
         private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -103,6 +106,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IOptions<ApiUrl> url,
             ISysImageService imageService,
+            IAccAccountReceivableService accAccountReceivable,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -140,6 +144,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysImageService = imageService;
             opsTransactionRepository = opsTransactionRepo;
             csLinkChargeRepository = csLinkChargeRepo;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region -- INSERT & UPDATE --
@@ -577,48 +582,63 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState SoftDeleteJob(Guid jobId)
+        public HandleState SoftDeleteJob(Guid jobId, out List<ObjectReceivableModel> receivables)
         {
+            currentUser.Action = "DeleteCsTransaction";
             //Xóa mềm hiện tại chỉ cập nhật CurrentStatus = Canceled cho Shipment Documment.
+            receivables = new List<ObjectReceivableModel>(); 
             var hs = new HandleState();
-            try
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
-                ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
-                var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
-                int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
-                if (code == 403) return new HandleState(403, "");
-
-                if (job == null)
+                try
                 {
-                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
-                }
-                else
-                {
-                    job.CurrentStatus = TermData.Canceled;
-                    job.DatetimeModified = DateTime.Now;
-                    job.UserModified = currentUser.UserID;
-                    hs = DataContext.Update(job, x => x.Id == jobId);
+                    var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+                    int code = GetPermissionToDelete(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange);
+                    if (code == 403) return new HandleState(403, "");
 
-                    if (hs.Success)
+                    if (job == null)
                     {
-                        var houseBills = csTransactionDetailRepo.Get(x => x.JobId == jobId);
-                        foreach (var houseBill in houseBills)
+                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+                    }
+                    else
+                    {
+                        job.CurrentStatus = TermData.Canceled;
+                        job.DatetimeModified = DateTime.Now;
+                        job.UserModified = currentUser.UserID;
+                        hs = DataContext.Update(job, x => x.Id == jobId);
+
+                        if (hs.Success)
                         {
-                            //Xóa Job >> Xóa tất cả các phí của Job [Andy - 15611 - 06/04/2021]
-                            var surcharges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseBill.Id);
-                            foreach (var surcharge in surcharges)
+                            var houseIds = csTransactionDetailRepo.Get(x => x.JobId == jobId).Select(x => x.Id).ToList();
+                            var surChargesToDelete = csShipmentSurchargeRepo.Get(x => houseIds.Contains(x.Hblid));
+
+                            if (surChargesToDelete.Count() > 0)
                             {
-                                csShipmentSurchargeRepo.Delete(x => x.Id == surcharge.Id);
+                                receivables = accAccountReceivableService.GetListObjectReceivableBySurcharges(surChargesToDelete);
+                                foreach (var surcharge in surChargesToDelete)
+                                {
+                                    csShipmentSurchargeRepo.Delete(x => x.Id == surcharge.Id, false);
+                                }
+                                csShipmentSurchargeRepo.SubmitChanges();
                             }
                         }
+
+                        trans.Commit();
                     }
                 }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    hs = new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            catch (Exception ex)
-            {
-                hs = new HandleState(ex.Message);
-            }
+            
             return hs;
         }
 
@@ -2236,6 +2256,8 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model, out List<Guid> surchargeIds)
         {
+            currentUser.Action = "DuplicateCsTransaction";
+
             surchargeIds = new List<Guid>();
             IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId == null);
             if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE" && model.TransactionType != "SCE")

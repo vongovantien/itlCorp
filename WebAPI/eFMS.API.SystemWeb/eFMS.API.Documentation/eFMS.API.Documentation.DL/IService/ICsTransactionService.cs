@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -26,7 +27,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
         bool CheckAllowDelete(Guid jobId);
         HandleState DeleteCSTransaction(Guid jobId);
-        HandleState SoftDeleteJob(Guid jobId);
+        HandleState SoftDeleteJob(Guid jobId, out List<ObjectReceivableModel> modelReceivable);
         List<object> GetListTotalHB(Guid JobId);
         Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency);
         ResultHandle SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);

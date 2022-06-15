@@ -401,7 +401,6 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            currentUser.Action = "DeleteCsTransaction";
             if (!ModelState.IsValid) return BadRequest();
             if (!csTransactionService.Any(x => x.Id == id))
             {
@@ -413,7 +412,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
 
-            var hs = csTransactionService.SoftDeleteJob(id);
+            var hs = csTransactionService.SoftDeleteJob(id, out List<ObjectReceivableModel> modelReceivableList);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -424,6 +423,16 @@ namespace eFMS.API.Documentation.Controllers
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
             }
             return Ok(result);
         }
@@ -439,7 +448,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Import")]
         public IActionResult Import(CsTransactionEditModel model)
         {
-            currentUser.Action = "DuplicateCsTransaction";
 
             if (!ModelState.IsValid) return BadRequest();
             string checkExistMessage = CheckExist(Guid.Empty, model);
@@ -450,7 +458,6 @@ namespace eFMS.API.Documentation.Controllers
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model, out List<Guid> surchargeIds);
 
-
             if (!result.Status)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = result.Message });
@@ -460,9 +467,11 @@ namespace eFMS.API.Documentation.Controllers
 
                 Response.OnCompleted(async () =>
                 {
-                    //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    await CalculatorReceivable(modelReceivableList);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);

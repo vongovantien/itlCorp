@@ -29,6 +29,7 @@ using System.Linq.Expressions;
 using Newtonsoft.Json;
 using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -74,6 +75,8 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -108,7 +111,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
             IContextBase<SysGroup> groupRepo,
-            IDatabaseUpdateService _databaseUpdateService
+            IDatabaseUpdateService _databaseUpdateService,
+            IAccAccountReceivableService accAccountReceivable
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -147,6 +151,7 @@ namespace eFMS.API.Documentation.DL.Services
             departmentRepository = departmentRepo;
             groupRepository = groupRepo;
             databaseUpdateService = _databaseUpdateService;
+            accAccountReceivableService = accAccountReceivable;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1349,8 +1354,9 @@ namespace eFMS.API.Documentation.DL.Services
             return clearance;
         }
 
-        public HandleState SoftDeleteJob(Guid id)
+        public HandleState SoftDeleteJob(Guid id, out List<ObjectReceivableModel> modelReceivables)
         {
+            modelReceivables = new List<ObjectReceivableModel>();
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
             var result = new HandleState();
@@ -1372,6 +1378,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Xóa Job OPS xóa luôn surcharge [Andy - 05/02/2021]
                     var charges = surchargeRepository.Get(x => x.Hblid == job.Hblid);
+                    modelReceivables = accAccountReceivableService.GetListObjectReceivableBySurcharges(charges);
                     foreach (var item in charges)
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);

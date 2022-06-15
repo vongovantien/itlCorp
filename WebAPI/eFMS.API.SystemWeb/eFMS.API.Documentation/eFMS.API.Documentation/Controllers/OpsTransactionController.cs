@@ -228,9 +228,11 @@ namespace eFMS.API.Documentation.Controllers
 
                 Response.OnCompleted(async () =>
                 {
-                    //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    await CalculatorReceivable(modelReceivableList);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
                 });
             }
             return Ok(hs);
@@ -262,12 +264,22 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
-            var hs = transactionService.SoftDeleteJob(id);
+            var hs = transactionService.SoftDeleteJob(id, out List<ObjectReceivableModel> modelReceivableList);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
             }
             return Ok(result);
         }
@@ -391,7 +403,10 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    await CalculatorReceivable(modelReceivableList);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
                 });
             }
             return Ok(hs);
