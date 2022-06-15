@@ -373,7 +373,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         //var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
                         //invoiceObh.ServiceType = string.Join(";", _transactionTypes);
 
-                        var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType)
+                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType)
                           .GroupBy(x => x)
                           .Select(x => new { service = x.Key, counts = x.Count() })
                           .OrderBy(x => x.counts)

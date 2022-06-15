@@ -3236,7 +3236,7 @@ namespace eFMS.API.Accounting.DL.Services
                              && x.SaleManId == item.SalesmanId
                              && x.Active == true
                              && x.OfficeId.Contains(item.OfficeId.ToString())
-                             && x.SaleService == item.Service);
+                             && x.SaleService.Contains(item.Service));
 
                             if (currentContract != null)
                             {
