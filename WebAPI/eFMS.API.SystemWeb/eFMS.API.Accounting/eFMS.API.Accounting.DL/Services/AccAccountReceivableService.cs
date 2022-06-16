@@ -2603,8 +2603,45 @@ namespace eFMS.API.Accounting.DL.Services
             var invoiceOverDue = Enumerable.Empty<GetArBBillingWithSalesman>().AsQueryable();
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
             string overDueParam = string.Empty;
-            var receivables = DataContext.Get(x => partnerIds.Contains(x.PartnerId));            
+            var receivables = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
+            if (partnerIds.Count > 0)
+            {
+                receivables = DataContext.Get(x => partnerIds.Contains(x.PartnerId));
+                if (receivables.Count() > 0)
+                {
+                    switch (type)
+                    {
+                        case 1:
+                            foreach (var item in receivables)
+                            {
+                                item.Over1To15Day = 0;
+                                DataContext.Update(item, x => x.Id == item.Id, false);
+                            }
 
+                            break;
+                        case 2:
+                            foreach (var item in receivables)
+                            {
+                                item.Over16To30Day = 0;
+                                DataContext.Update(item, x => x.Id == item.Id, false);
+                            }
+                            break;
+                        case 3:
+                            foreach (var item in receivables)
+                            {
+                                item.Over30Day = 0;
+                                DataContext.Update(item, x => x.Id == item.Id, false);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                receivables = DataContext.Get(x => x.PartnerId  != null && x.Service != null && x.Office != null);
+            }
             switch (type)
             {
                 case 1: // 1 - 15
