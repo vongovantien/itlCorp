@@ -1188,10 +1188,10 @@ namespace eFMS.API.Accounting.DL.Services
                 // receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
                 // receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
             }
-            receivables.AddRange(newReceivableRecord);
             receivables.ForEach(fe =>
             {
-                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0);
+                //Calculator Debit Amount
+                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0); // Công nợ chưa billing
                 fe.DatetimeCreated = DateTime.Now;
                 fe.DatetimeModified = DateTime.Now;
             });
@@ -2284,6 +2284,58 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
         #endregion --- DETAIL ---
+
+        //private bool checkingPaidLoop2(Guid acctManagementID)
+        //{
+        //    if (acctManagementID == null || accountingManagementRepo.Get(x => x.Id == acctManagementID).FirstOrDefault().PaymentStatus != "Paid") return true;
+        //    return false;
+        //}
+
+        public DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
+        {
+            DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
+            var contract = contractPartnerRepo.Get(x => x.Id == criteria.AgreementId).FirstOrDefault();
+            var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId.ToString()).FirstOrDefault();
+            debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+            {
+                ContractNo = contract.ContractNo,
+                EffectiveDate = contract.EffectiveDate,
+                ContracType = contract.ContractType,
+                ExpiredDate = contract.ExpiredDate,
+                PartnerCode = partner.TaxCode,
+                PartnerName = partner.ShortName,
+                Currency = contract.CurrencyId
+            };
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
+            //debitAmountDetail.DebitAmountDetails.ForEach(x =>
+            //{
+            //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);
+            //});
+            //for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count(); i++)
+            //{
+            //    if (debitAmountDetail.DebitAmountDetails[i].AcctManagementID == Guid.Empty) continue;
+            //    //debitAmountDetail.DebitAmountDetails[i].PaymentStatus = debitAmountDetail.DebitAmountDetails[i].PaymentStatus == null ? "Unpaid" : debitAmountDetail.DebitAmountDetails[i].PaymentStatus;
+            //    if (!checkingPaidLoop2(debitAmountDetail.DebitAmountDetails[i].AcctManagementID))
+            //    {
+            //        debitAmountDetail.DebitAmountDetails.RemoveAt(i);
+            //        i--;
+            //    }
+            //}
+
+            return debitAmountDetail;
+        }
+
+        public List<sp_GetDebitAmountDetailByContract> GetDebitAmountDetailbyPartnerId(Guid argeementId, Guid partnerID, Guid salemanID)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("partnerID", partnerID),
+                SqlParam.GetParameter("argeementId", argeementId),
+                SqlParam.GetParameter("salemanId", salemanID)
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitAmountDetailByContract>(parameters);
+            return data;
+        }
 
         #region -- Update AcctManagement and overdays AccountReceivable after change payment term contract
 

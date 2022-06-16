@@ -96,6 +96,18 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Get AR detail has argeement by argeement id
         /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDebitAmountDetailByContract")]
+        public IActionResult GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
+        {
+            var data = accountReceivableService.GetDebitAmountDetailByContract(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get AR detail has argeement by argeement id
+        /// </summary>
         /// <param name="argeementId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByArgeementId")]

@@ -28,6 +28,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
     trialOfficialList: TrialOfficialOtherModel[] = [];
     selectedPartner: TrialOfficialOtherModel;
+    selectedTrialOfficial: TrialOfficialOtherModel;
 
     constructor(
         private _sortService: SortService,
@@ -149,6 +150,15 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     onSelectPartner(part: TrialOfficialOtherModel) {
         this.selectedPartner = part;
         this.clearMenuContext(this.queryListMenuContext);
+    }
+
+    exportDebitAmount() {
+        this._exportRepo.exportDebitAmountDetailByContract(this.selectedPartner)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                }
+            );
     }
 }
 

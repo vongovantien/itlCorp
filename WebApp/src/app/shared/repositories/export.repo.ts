@@ -496,5 +496,9 @@ export class ExportRepo {
     exportAcountingTemplatePayable(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
     }
+
+    exportDebitAmountDetailByContract(selectedTrialOfficial: any={}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitAmountDetailByContract`, selectedTrialOfficial, null, null, 'response');
+    }
 }
 

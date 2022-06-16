@@ -149,6 +149,7 @@
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableStandartReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
             <summary>
             Export Accounting Payable Standart Report
+            Export Accounting Payable Standart Report
             </summary>
             <param name="criteria"></param>
             <returns></returns>
@@ -158,6 +159,13 @@
             Export Accounting Payable Standart Report
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDebitAmountDetailByContract(eFMS.API.ReportData.Models.Criteria.AccAccountReceivableCriteria)">
+            <summary>
+            Export Accounting Payable Standart Report
+            </summary>
+            <param name="agreementId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
@@ -588,6 +596,13 @@
             <param name="acctPayables"></param>
             <param name="criteria"></param>
             <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportDebitAmountDetail(eFMS.API.ReportData.Models.DebitAmountDetail)">
+            <summary>
+            Generate Export Generate Export Debit Amount Detail Report
+            </summary>
+            <param name="agreementId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateMAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">

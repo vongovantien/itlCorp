@@ -34,5 +34,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculateAgreementFlag(List<Guid?> contractIds, string flag);
         List<ObjectReceivableModel> CalculatorReceivableByBillingCode(string code, string type);
         IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model);
+        DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria);
     }
 }
