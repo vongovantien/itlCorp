@@ -132,10 +132,13 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
-                                            <td class="text-right"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
-                                            <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}
+                                            <td class="text-right text-primary"> {{item.debitAmount |
+                                                negativeNumber:'.0-3'}}</td>
+                                            <td class="text-right text-success">{{ item.creditLimited | negativeNumber:
+                                                '.0-3' }}
                                             </td>
-                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited) |
+                                            <td class="text-right text-danger">{{ (item.debitAmount-item.creditLimited)
+                                                |
                                                 negativeNumber:'.0-3' }}</td>
                                             <td class="text-center text-success">{{ item.agreementSalesmanName}}</td>
                                             <td>
@@ -166,7 +169,8 @@
                                                     {{ item.expriedDay | negativeNumber}}
                                                 </span>
                                             </td>
-                                            <td style="min-width: 200px; white-space:initial">{{ item.parentNameAbbr }}
+                                            <td style="min-width: 200px; white-space:initial">{{
+                                                item.parentNameAbbr }}
                                             </td>
 
                                         </tr>
@@ -207,7 +211,7 @@
             <span><i class="la la-eye align-middle text-primary"></i><span>Over 30 days</span></span>
         </div>
         <div class="menu-context__item" (click)="exportDebitAmount()">
-            <span><i class="la la-download"></i><span> Export Debit Amount Detail </span></span>
+            <span><i class="la la-download text-primary"></i><span> Export Debit Amount Detail </span></span>
         </div>
     </ng-container>
 </app-context-menu>

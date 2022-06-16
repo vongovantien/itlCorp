@@ -140,7 +140,6 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
             );
     }
 
-
     onSelectPartner(part: TrialOfficialOtherModel) {
         this.selectedPartner = part;
         this.clearMenuContext(this.queryListMenuContext);
