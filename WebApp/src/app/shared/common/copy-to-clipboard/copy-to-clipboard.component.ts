@@ -21,10 +21,9 @@ export class CopyToClipboardComponent implements OnInit {
     get text() { return this._text; }
     get icon() { return this._icon; }
     get notification() { return this._notification}
+    
+    
     private message: string = ' was copied';
-  
-    @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
-
     private _text: string = "";
     private _icon: string = 'la la-copy';
     private _notification: string;
@@ -39,8 +38,7 @@ export class CopyToClipboardComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    onClicked(e) {
-        this.onClick.emit(e);
+    onClicked() {
         this.clipboard.copy(this._text);
         this._toastService.success(this._notification !== undefined ? this._notification: this._text + this.message);
     }
