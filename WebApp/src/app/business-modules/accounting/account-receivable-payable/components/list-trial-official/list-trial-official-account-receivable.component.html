@@ -32,36 +32,44 @@
                                     <span class="sort-indicator">Partner Name</span>
                                 </th>
                                 <th class="sortable ng-star-inserted first sticky-col four-col "
-                                    [class]="sortClass('debitRate')" (click)="sortBy('debitRate')">
+                                    [class]="sortClass('debitRate')" (click)="sortBy('debitRate')"
+                                    style="min-width: 120px">
                                     <span class="sort-indicator"> Rate (%)</span>
                                 </th>
                             </thead>
                             <tbody>
                                 <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>                                 
                                 <ng-container>
                                     <ng-container
                                         *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
-                                        <tr class="">
+                                        <tr [class.invalid-row]="item.syncStatus === 'Rejected'"
+                                            [attr.title]="item.reasonReject"
+                                            [contextMenu]="viewContextMenu" 
+                                            (onTouch)="onSelectPartner(item)"
+                                            [class.touch-row]="selectedPartner?.taxCode === item.taxCode">
                                             <td class="table-actions-col sticky-col first-col"
-                                                style="background-color: #fff;">
+                                                [ngStyle]="{'background-color': selectedPartner?.taxCode === item.taxCode ? '#dfdfdf' : '#fff'}">
                                                 <div class="table-actions" style="width: 70px">
                                                     <app-permission-button type="detail"
                                                         (click)="viewDetail(item.agreementId)">
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td class="sticky-col second-col" style="background-color: #fff;">
+                                            <td class="sticky-col second-col" 
+                                                [ngStyle]="{'background-color': selectedPartner?.taxCode === item.taxCode ? '#dfdfdf' : '#fff'}">
                                                 <a class="pointer" [routerLink]="'./detail'"
                                                     [queryParams]="{agreementId: item.agreementId}">{{
                                                     item.partnerCode }}</a>
                                             </td>
                                             <td class="sticky-col three-col"
-                                                style="background-color: #fff;min-width: 200px; white-space:initial">{{
+                                                [ngStyle]="{'background-color': selectedPartner?.taxCode === item.taxCode ? '#dfdfdf' : '#fff'}"
+                                                style="min-width: 200px; white-space:initial">{{
                                                 item.partnerNameAbbr }}
                                             </td>
-                                            <td class="sticky-col four-col text-right" style="background-color: #fff;">
+                                            <td class="sticky-col four-col text-right" 
+                                                [ngStyle]="{'background-color': selectedPartner?.taxCode === item.taxCode ? '#dfdfdf' : '#fff'}">
                                                 <span
                                                     [ngClass]="item.debitRate < 70 ? 'text-success' : item.debitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ item.debitRate | number: '.2-2'}}%
@@ -171,5 +179,29 @@
 
     </div>
 </div>
+
+<ng-template inject></ng-template>
+<app-context-menu #viewContextMenu (clickOutside)="selectedPartner = null">
+    <ng-container>       
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Unpaid')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Billing</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Paid A Part')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Paid a Part</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'OutStanding')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>OutStanding Balance</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over1To15Day')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 1-15 days</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over16To30Day')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 16-30 days</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showDebitDetail(selectedPartner?.agreementId,'Over30Day')">
+            <span><i class="la la-eye align-middle text-primary"></i><span>Over 30 days</span></span>
+        </div>
+    </ng-container>
+</app-context-menu>
 
 <account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>
