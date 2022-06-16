@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastrService } from 'ngx-toastr';
 
@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
     template:
     `
     <ng-container>
-        <span NoDbClick (click)="onClicked($event)">
+        <span NoDbClick (click)="onClicked()">
             <i class="la la-{{icon}} text-success"></i>
         </span>
     </ng-container>
