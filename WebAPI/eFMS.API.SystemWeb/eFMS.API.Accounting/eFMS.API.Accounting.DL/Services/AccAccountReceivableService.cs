@@ -94,7 +94,7 @@ namespace eFMS.API.Accounting.DL.Services
             cdNoteRepo = acctCdNote;
 
             HM = officeRepo.Get(x => x.Code == AccountingConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
-            HM = officeRepo.Get(x => x.Code == AccountingConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+            BH = officeRepo.Get(x => x.Code == AccountingConstants.OFFICE_BH)?.FirstOrDefault()?.Id;
         }
 
         #region --- CALCULATOR VALUE ---
