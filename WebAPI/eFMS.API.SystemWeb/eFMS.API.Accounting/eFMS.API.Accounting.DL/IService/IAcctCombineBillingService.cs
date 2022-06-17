@@ -27,6 +27,7 @@ namespace eFMS.API.Accounting.DL.IService
         CombineOPSModel GetDataExportCombineOps(string combineBillingNo);
         CombineShipmentModel GetDataExportCombineShipment(string combineBillingNo);
         CombineOPSModel GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria);
+        CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria);
         Crystal PreviewConfirmBilling(string combineBillingNo);
     }
 }

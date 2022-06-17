@@ -647,14 +647,14 @@ namespace eFMS.API.ReportData.Controllers
         {
             HttpResponseMessage responseFromApi;
             var accessToken = Request.Headers["Authorization"].ToString();
-            //if (string.IsNullOrEmpty(criteria.Currency))
-            //{
+            if (string.IsNullOrEmpty(criteria.Currency))
+            {
                 responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataCombineshipmentUrl + criteria.ReferenceNo[0], accessToken);
-            //}
-            //else
-            //{
-            //    responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataCombineOpsByPartnerUrl, accessToken);
-            //}
+            }
+            else
+            {
+                responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataCombineShipmentByPartnerUrl, accessToken);
+            }
             var dataObjects = responseFromApi.Content.ReadAsAsync<CombineShipmentModel>();
 
             var stream = new AccountingHelper().GenerateCombineShipmentExcel(dataObjects.Result, criteria);

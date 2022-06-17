@@ -278,6 +278,19 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get Combine OPS data with partner and currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataCombineShipmentByPartner")]
+        [Authorize]
+        public IActionResult GetDataCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
+        {
+            var data = combineBillingService.GetDataExportCombineShipmentByPartner(criteria);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("PreviewConfirmBilling")]
         [Authorize]
