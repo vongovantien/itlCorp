@@ -5614,6 +5614,73 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+
+        public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.CombineBillingByShipment));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 5;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("Date", "Từ Ngày: " + combineshipment.FromDate?.ToString("dd/MM/yyyy") + " đến:  " + combineshipment.ToDate?.ToString("dd/MM/yyyy"));
+                startRow++;
+                listKeyData.Add("SOANo", combineshipment.No);
+                startRow++;
+                listKeyData.Add("CompanyName", combineshipment.PartnerNameVN);
+                startRow++;
+                listKeyData.Add("CompanyAddress", combineshipment.BillingAddressVN);
+                excel.SetData(listKeyData);
+
+                startRow = 11;
+                excel.StartDetailTable = startRow;
+
+                for (int i = 0; i < combineshipment.exportShipment.Count; i++)
+                {
+                    var item = combineshipment.exportShipment[i];
+                    Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    mappingKeyValue.Add("STT", i+1);
+                    mappingKeyValue.Add("Commodity", item.CommodityName);
+                    mappingKeyValue.Add("JobNo", item.JobNo);
+                    mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
+                    mappingKeyValue.Add("HBLNo", item.HwbNo);
+                    mappingKeyValue.Add("InvoiceNo", item.InvoiceNo);
+                    mappingKeyValue.Add("KGS", item.KGS);
+                    mappingKeyValue.Add("CBM", item.CBM);
+                    mappingKeyValue.Add("Container", item.PackageContainer);
+                    mappingKeyValue.Add("CusFee", item.CusFee!=null? item.CusFee:0);
+                    mappingKeyValue.Add("CusVAT", item.CusVAT != null ? item.CusVAT : 0);
+                    mappingKeyValue.Add("CusTotal", (item.CusVAT!=null? item.CusVAT :0) + (item.CusFee != null ? item.CusFee  : 0));
+                    mappingKeyValue.Add("AuthFee", item.AuthFee != null ? item.AuthFee : 0);
+                    mappingKeyValue.Add("AuthVAT", item.AuthVAT != null ? item.AuthVAT : 0);
+                    mappingKeyValue.Add("AuthTotal", item.AuthVAT + item.AuthFee);
+                    mappingKeyValue.Add("CusAuthTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                    mappingKeyValue.Add("FrieghtInvoice", item.FreInvoice);
+                    mappingKeyValue.Add("FreightFee", item.FreFee != null ? item.FreFee : 0);
+                    mappingKeyValue.Add("FreightVAT", item.FreVAT != null ? item.FreVAT : 0);
+                    mappingKeyValue.Add("FreightTotal", item.FreVAT + item.FreFee);
+                    mappingKeyValue.Add("BillingNo", item.BillingNo);
+                    mappingKeyValue.Add("CombineNo", item.CombineNo);
+                    mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                    excel.SetData(mappingKeyValue);
+                    startRow++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
         public Stream GenerateCombineOPSExcel(CombineOPSModel result, AcctCombineBillingCriteria criteria, Stream stream = null)
         {
             try

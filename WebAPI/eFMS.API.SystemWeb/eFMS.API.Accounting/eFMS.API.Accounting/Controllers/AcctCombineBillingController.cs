@@ -257,6 +257,14 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpGet("GetDataExportCombineShipment")]
+        [Authorize]
+        public IActionResult GetDataExportCombineByShipment(string combineBillingNo)
+        {
+            var data = combineBillingService.GetDataExportCombineShipment(combineBillingNo);
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get Combine OPS data with partner and currency
         /// </summary>
