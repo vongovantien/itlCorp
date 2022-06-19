@@ -487,6 +487,25 @@
                                         disabled currencyMask placeholder="Net Amount">
                                 </div>
                             </td>
+                            <td class="disabled">
+                                <ng-container [ngSwitch]="charge.paymentStatus">
+                                    <span class="text-danger" *ngSwitchCase="'Unpaid'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-success" *ngSwitchDefault>
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                </ng-container>
+                            </td>
+                            <td class="disabled">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" disabled
+                                        [value]="charge.paidDate | date: 'dd/MM/yyyy'">
+                                </div>
+                            </td>
                         </tr>
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">

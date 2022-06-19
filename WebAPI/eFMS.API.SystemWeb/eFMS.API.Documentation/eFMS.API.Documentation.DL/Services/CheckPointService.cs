@@ -1,8 +1,11 @@
 ﻿using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -12,6 +15,8 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CheckPointService : ICheckPointService
     {
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)csSurchargeRepository.DC;
+
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<AccAccountingManagement> accAccountMngtRepository;
@@ -68,18 +73,35 @@ namespace eFMS.API.Documentation.DL.Services
             string salemanCurrent = null;
             if (transactionType == "CL")
             {
-                salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SalemanId;
+                if (hbl?.SalemanId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
                 }
             }
             else
             {
-                salemanCurrent = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SaleManId;
+
+                if (hbl?.SaleManId == salemanBOD)
                 {
                     return valid;
+                }
+
+                if(!string.IsNullOrEmpty(hbl?.ShipmentType) )
+                {
+                    if (hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED) {
+                        return valid;
+                    } 
+                }else
+                {
+                    var jobcs = DC.CsTransaction.FirstOrDefault(x => x.Id == hbl.JobId);
+                    if(jobcs?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
+                    {
+                        return valid;
+                    }
                 }
             }
 
@@ -289,15 +311,15 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
-            }
-
             if (currentSaleman == salemanBOD)
             {
                 isValid = true;
                 return result;
+            }
+
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
 
             int errorCode = -1;
