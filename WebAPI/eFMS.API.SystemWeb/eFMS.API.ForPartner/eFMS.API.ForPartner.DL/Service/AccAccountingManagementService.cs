@@ -2446,16 +2446,16 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
 
-                                                    //surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
-                                                    //surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
-                                                    //surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
-                                                    //surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
+                                                    // surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
+                                                    // surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
+                                                    surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
+                                                    surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
 
                                                     // CR: 17688
                                                     surcharge.VatAmountVnd =  surChargeBravo.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.AmountVnd;
-                                                    surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
-                                                    surcharge.AmountUsd = surChargeBravo.AmountUsd;
+                                                    // surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
+                                                    // surcharge.AmountUsd = surChargeBravo.AmountUsd;
 
                                                     surcharge.FinalExchangeRate = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.ExchangeRate : surcharge.FinalExchangeRate;
                                                     AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
