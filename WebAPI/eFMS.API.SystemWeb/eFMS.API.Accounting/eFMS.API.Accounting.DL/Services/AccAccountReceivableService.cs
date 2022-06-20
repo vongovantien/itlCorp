@@ -3091,7 +3091,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var surcharges = surchargesDb.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL)
                                                  && string.IsNullOrEmpty(x.InvoiceNo)
                                                  && x.AcctManagementId == null);
-                var surchargesOBH = surchargesDb.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(x.ReferenceNo));
+                var surchargesOBH = surchargesDb.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.AcctManagementId == null);
 
                 IQueryable<OpsTransaction> opsJob = opsRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED
                                                && x.ServiceDate.Value.Date <= DateTime.Now.Date);
