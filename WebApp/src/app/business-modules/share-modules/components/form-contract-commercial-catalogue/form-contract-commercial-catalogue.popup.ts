@@ -685,6 +685,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         } else {
             this.isDisabledExpiredDateField = false;
         }
+
+        this.formatAutoExtendDays();
     }
     asignValueToModel() {
         if (this.isUpdate) {
@@ -990,11 +992,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     formatAutoExtendDays() {
-        var num = this.autoExtendDays.value;
+        let num = this.autoExtendDays.value;
         if (num >= 0) {
-            this.autoExtendDays.setValue(Math.round(num * 100) / 100);
+            this.autoExtendDays.setValue(((Math.round(num * 100) / 100).toFixed(2)));
         } else {
-            this.autoExtendDays.setValue(0);
+            this.autoExtendDays.setValue(((0).toFixed(2)));
         }
     }
     

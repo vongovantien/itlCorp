@@ -158,8 +158,8 @@
                                     <div class="form-group">
                                         <label>Auto Extend (Year)
                                         </label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
-                                            class="form-control" formControlName="autoExtendDays">
+                                        <input currencyMask type="text" class="form-control" (change)="formatAutoExtendDays()"
+                                        formControlName="autoExtendDays">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
