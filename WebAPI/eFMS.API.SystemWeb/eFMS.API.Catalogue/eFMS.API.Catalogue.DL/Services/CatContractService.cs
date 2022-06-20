@@ -4,6 +4,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -12,6 +13,7 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
@@ -1210,6 +1212,9 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
 
+            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
+
             List<string> lstBCc = ListMailCC();
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
             switch (partner.PartnerType)
@@ -1299,8 +1304,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc = listEmailViewModel.ListAccountant;
 
                 lstTo.Add(objInfoSalesman?.Email);
-                lstTo.Add(objInfoCreatorPartner?.Email);
-                lstTo.Add(objInfoCreator?.Email);
+                lstTo.Add(mailRequester);
+                //lstTo.Add(objInfoCreatorPartner?.Email);
+                //lstTo.Add(objInfoCreator?.Email);
                 lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
                 resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
@@ -1338,6 +1344,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-APPROVEDREQUEST").FirstOrDefault();
                 // Subject
                 subject = new StringBuilder(emailTemplate.Subject);
+                subject.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
                 subject.Replace("{{enNameCreatetor}}", EnNameCreatetor);
 
                 // Body
@@ -1371,9 +1378,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                lstCc.Add(objInfoCreatorPartner?.Email);
-                lstCc.Add(objInfoModified?.Email);
-                lstCc.Add(objInfoCreator?.Email);
+                lstCc.Add(mailRequester);
+                //lstCc.Add(objInfoCreatorPartner?.Email);
+                //lstCc.Add(objInfoModified?.Email);
+                //lstCc.Add(objInfoCreator?.Email);
                 lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
                 resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
@@ -1407,6 +1415,10 @@ namespace eFMS.API.Catalogue.DL.Services
             string urlToSend = string.Empty;
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, string.Empty);
+            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
+
             string subject = string.Empty;
             string linkVn = string.Empty;
             string linkEn = string.Empty;
@@ -1415,45 +1427,68 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
-            if (partnerType == "Customer")
-            {
-                url = "home/commercial/customer/";
-                subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
-                customerName = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
-            }
-            else
-            {
-                url = "home/commercial/agent/";
-                subject = "Reject Agreement Agent - " + partner.PartnerNameVn;
-                customerName = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
-            }
-            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-            linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
-            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
-                        "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
-                        "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
-                        "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                        "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
-                        "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
-                        "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
-                        "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
-                        + linkEn + "</br>" + linkVn + "</br> </br>" +
-                        "<i> Thanks and Regards </i>" + "</br> </br>" +
-                        "<b> eFMS System, </b>" +
-                        "</br>"
-                        + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            #region Change use template
+            //if (partnerType == "Customer")
+            //{
+            //    url = "home/commercial/customer/";
+            //    subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
+            //    customerName = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            //}
+            //else
+            //{
+            //    url = "home/commercial/agent/";
+            //    subject = "Reject Agreement Agent - " + partner.PartnerNameVn;
+            //    customerName = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            //}
+            //linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+            //linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            //body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
+            //            "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
+            //            "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
+            //            "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+            //            "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
+            //            "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
+            //            "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
+            //            "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
+            //            + linkEn + "</br>" + linkVn + "</br> </br>" +
+            //            "<i> Thanks and Regards </i>" + "</br> </br>" +
+            //            "<b> eFMS System, </b>" +
+            //            "</br>"
+            //            + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            #endregion
 
+            string address = webUrl.Value.Url + "/en/#/home/commercial/" + (partnerType == "Customer" ? "customer" : "agent") + "/" + partner.Id;
             urlToSend = UrlClone.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+            //body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+            var logoUrl = urlToSend + "/ReportPreview/Images/logo-eFMS.png";
+
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-REJECT").FirstOrDefault();
+            // Subject
+            subject = emailTemplate.Subject;
+            subject.Replace("{{PartnerType}}", partnerType);
+            subject.Replace("{{PartnerName}}", partner.PartnerNameVn);
+
+            body = emailTemplate.Body;
+            body.Replace("{{EmployeeName}}", salesmanObj.EmployeeNameVn);
+            body.Replace("{{PartnerName}}", partner.PartnerNameVn);
+            body.Replace("{{TaxCode}}", partner.TaxCode);
+            body.Replace("{{ContractNo}}", contract.ContractNo);
+            body.Replace("{{SaleService}}", contract.SaleService);
+            body.Replace("{{ContractType}}", contract.ContractType);
+            body.Replace("{{Comment}}", comment);
+            body.Replace("{{Address}}", address);
+            body.Replace("{{LogoEFMS}}", logoUrl);
+
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
             List<string> lstCC = new List<string>();
 
-
+            lstTo.Add(mailRequester);
             lstTo.Add(salesmanObj?.Email);
-            lstCC.Add(salesmanObj?.Email);
-            lstCC.Add(userCreatedObj?.Email);
+            //lstCC.Add(salesmanObj?.Email);
+            //lstCC.Add(userCreatedObj?.Email);
+            lstCC = listEmailViewModel.ListAccountant;
             lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
@@ -1485,6 +1520,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeIdSaleman = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSaleman = sysEmployeeRepository.Get(e => e.Id == employeeIdSaleman)?.FirstOrDefault();
+
+            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
 
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
@@ -1578,8 +1616,9 @@ namespace eFMS.API.Catalogue.DL.Services
             body.Replace("{{address}}", address);
             body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-            lstCc.Add(objInfoCreator?.Email);
+            //lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoSaleman?.Email);
+            lstCc.Add(mailRequester);
             lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             bool result = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
@@ -1602,12 +1641,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<string> ListMailCC()
         {
-            List<string> lstCc = new List<string>
+            var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+            List<string> emailBCCs = new List<string>();
+            if (emailBcc != null)
             {
-                "alex.phuong@itlvn.com",
-                "kenny.thuong@itlvn.com",
-            };
-            return lstCc;
+                emailBCCs = emailBcc.ToString().Split(";").ToList();
+            }
+            return emailBCCs;
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)

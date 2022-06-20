@@ -24,6 +24,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using eFMS.API.Common.Helpers;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Catalogue.Service.Contexts;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -504,6 +506,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-APPROVEDREQUEST").FirstOrDefault();
             // Subject
             var subject = new StringBuilder(emailTemplate.Subject);
+            subject.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
             subject.Replace("{{enNameCreatetor}}", EnNameCreatetor);
 
             // Body
@@ -671,17 +674,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<string> ListMailBCC()
         {
-            List<string> lstCc = new List<string>
+            var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+            List<string> emailBCCs = new List<string>();
+            if (emailBcc != null)
             {
-                "alex.phuong@itlvn.com",
-                //"luis.quang@itlvn.com",
-                //"andy.hoa@itlvn.com",
-                //"cara.oanh@itlvn.com",
-                "lynne.loc@itlvn.com",
-                //"samuel.an@logtechub.com",
-                //"kenny.thuong@itlvn.com"
-            };
-            return lstCc;
+                emailBCCs = emailBcc.ToString().Split(";").ToList();
+            }
+            return emailBCCs;
         }
 
         private async void UploadFileContract(ContractFileUploadModel model)
