@@ -1,13 +1,11 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppForm } from '@app';
 import { ConfirmPopupComponent } from '@common';
 import { Contract, Partner } from '@models';
 import { AccountingRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { of } from 'rxjs';
-import { catchError, concatMap, finalize } from 'rxjs/operators';
-import { AccountingPayableModel } from 'src/app/shared/models/accouting/accounting-payable';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-payable',
@@ -15,11 +13,13 @@ import { AccountingPayableModel } from 'src/app/shared/models/accouting/accounti
 })
 export class PayableComponent extends AppForm {
     @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
-    @Input() partnerId: string = "";
+    @Output() savePayable: EventEmitter<any> = new EventEmitter<any>();
+
     currencys: CommonInterface.INg2Select[] = [
         { id: 'VND', text: 'VND' },
         { id: 'USD', text: 'USD' },
     ];
+    partnerId: string = "";
     fileList: any = null;
     files: any = {};
     selectedFile: any = {};
@@ -36,31 +36,25 @@ export class PayableComponent extends AppForm {
         protected _toastService: ToastrService,
         private _fb: FormBuilder,
         private _accountingRepo: AccountingRepo,
-        private _catalogueRepo: CatalogueRepo
     ) {
         super();
     }
 
     ngOnInit() {
         this.initForm();
-        this.getFileContract();
-        this.getGeneralPayable();
+        console.log(this.partnerId);
+
     }
 
-    savePayable() {
-        this._accountingRepo.updatePayable(this.partnerId, this.payableForm.get('paymentTerm').value, this.currency.value.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; }),
-            ).subscribe(
-                (res: any) => {
-                    this._toastService.success('Saved Payable Success!');
-                },
-            );
+    onSavePayable() {
+        this.savePayable.emit({
+            paymentTerm: this.payableForm.get('paymentTerm').value,
+            currency: this.currency.value.id
+        });
     }
 
-    getGeneralPayable() {
-        this._accountingRepo.getGeneralPayable(this.partnerId)
+    getGeneralPayable(partnerId: string) {
+        this._accountingRepo.getGeneralPayable(partnerId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
@@ -96,23 +90,22 @@ export class PayableComponent extends AppForm {
 
     uploadFileContract(id: string) {
         this._systemFileManageRepo.uploadFileContractPayable(id, this.fileList)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.fileList = null;
                         this._toastService.success("Upload file successfully!");
-                        this.getFileContract();
+                        this.getFileContract(this.partnerId);
                     }
                 }
             );
     }
 
-    getFileContract() {
+    getFileContract(partnertId: string) {
         this.isLoading = true;
-        this._systemFileManageRepo.getContractPayableFilesAttach(this.partnerId).
+        this._systemFileManageRepo.getContractPayableFilesAttach(partnertId).
             pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
                 this.isLoading = false;
             }))
             .subscribe(
@@ -140,7 +133,7 @@ export class PayableComponent extends AppForm {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success("File deleted successfully!");
-                        this.getFileContract();
+                        this.getFileContract(this.partnerId);
                     } else {
                         this._toastService.error("some thing wrong");
                     }

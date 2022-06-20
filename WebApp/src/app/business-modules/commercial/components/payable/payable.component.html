@@ -4,7 +4,7 @@
             <div class="col-lg-12 d-flex align-items-center justify-content-between">
                 <div class="form-group col-lg-4 p-1"></div>
 
-                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="savePayable()">
+                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onSavePayable()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -28,19 +28,17 @@
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Credit Paid Amount
-                            </label>
+                            </label> 
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditPaidAmount" readonly value={{this.creditPaidAmount}}
-                                [value]="creditAmount | number: '.0-2'">
-
+                                name="creditPaidAmount" readonly value={{this.creditPaidAmount}} [value]="creditAmount | number: '.0-2'" >
+                                
                         </div>
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Credit Advance Amount
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditAdvanceAmount" readonly value={{this.creditAdvanceAmount}}
-                                [value]="creditAmount | number: '.0-2'">
+                                name="creditAdvanceAmount" readonly value={{this.creditAdvanceAmount}} [value]="creditAmount | number: '.0-2'" >
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -49,15 +47,14 @@
                                 Credit Amount
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" readonly
-                                name="creditAmount" autocomplete="nope" [value]="creditAmount | number: '.0-2'">
+                                name="creditAmount" autocomplete="nope" [value]="creditAmount | number: '.0-2'" >
                         </div>
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Credit Unpaid
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditUnpaid" readonly value={{this.creditUnpaidAmount}}
-                                [value]="creditAmount | number: '.0-2'">
+                                name="creditUnpaid" readonly value={{this.creditUnpaidAmount}} [value]="creditAmount | number: '.0-2'" >
                         </div>
                         <div class="row">
                             <div class="col-lg-6">

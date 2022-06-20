@@ -110,19 +110,5 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        /// <summary>
-        /// Get data export accounting template payable
-        /// </summary>
-        /// <param name="partnerId"></param>
-        /// <param name="paymentTerm"></param>
-        /// <param name="currency"></param>
-        /// <returns></returns>
-        [HttpGet("UpdatePayable")]
-        [Authorize]
-        public IActionResult UpdatePayable(string partnerId, int paymentTerm, string currency)
-        {
-            var data = acctPayableService.UpdatePayable(partnerId, paymentTerm, currency);
-            return Ok(data);
-        }
     }
 }

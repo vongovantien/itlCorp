@@ -24,5 +24,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UserModifiedName { get; set; }
         public bool? IsRequestApproval { get; set; }
         public string OfficeIdContract { get; set; }
+        public int PaymentTerm { get; set; }
+        public string Currency { get; set; }
     }
 }

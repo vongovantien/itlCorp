@@ -769,15 +769,5 @@ namespace eFMS.API.Accounting.DL.Services
                 CreditAdvanceAmount = crdAvdAmount
             };
         }
-
-        public bool UpdatePayable(string partnerId,int paymentTerm,string currency)
-        {
-            var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
-            partner.PaymentTerm = paymentTerm;
-            partner.Currency = currency;
-            catPartnerRepository.Update(partner, x => x.Id == partnerId);
-            catPartnerRepository.SubmitChanges();
-            return catPartnerRepository.SubmitChanges().Success;
-        }
     }
 }
