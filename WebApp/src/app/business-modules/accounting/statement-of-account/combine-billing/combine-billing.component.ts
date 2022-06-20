@@ -211,4 +211,39 @@ deleteCombineBilling(id: string) {
     }
   }
 
+  exportCombineShipment(currency: string) {
+    this.isExport = true;
+    this.criteriaExport = this.dataSearch;
+    if (this.criteriaExport.partnerId) {
+      let combineNos = [];
+      this.billings.forEach(combine => {
+        combineNos.push(combine.combineBillingNo)
+      });
+      if (combineNos.length) {
+        this._progressRef.start();
+        this.criteriaExport.referenceNo = combineNos;
+        this.criteriaExport.currency = currency;
+        this._exportRepo.exportCombineShipment(this.criteriaExport)
+          .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+          )
+          .subscribe(
+            (response: HttpResponse<any>) => {
+              if (response!=null) {
+                this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+              } else {
+                this._toastService.warning('No data found');
+              }
+            },
+          );
+        this.isExport = false;
+      }else{
+        this._toastService.warning("No data apply. Please re-check again.")
+      }
+    }else{
+      this._toastService.warning("Please apply search with partner.")
+    }
+  }
+
 }
