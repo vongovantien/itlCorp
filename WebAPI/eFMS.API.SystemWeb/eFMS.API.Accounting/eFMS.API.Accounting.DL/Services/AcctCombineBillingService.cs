@@ -487,12 +487,30 @@ namespace eFMS.API.Accounting.DL.Services
             var combineNos = dataCombineBilling.Select(x => x.CombineBillingNo);
             var surcharges = surchargeRepo.Get(x => combineNos.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
 
+            if (criteria.ReferenceNo != null && criteria.ReferenceNo.Count > 0)
+            {
+                surcharges = surcharges.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.JobNo) ||
+                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.Soano) || criteria.ReferenceNo.Any(z => z.Trim() == x.PaySoano) ||
+                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.CreditNo) || criteria.ReferenceNo.Any(z => z.Trim() == x.DebitNo));
+                var combineNoLst = surcharges.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.CombineBillingNo);
+                var combineObhNoLst = surcharges.Where(x => !string.IsNullOrEmpty(x.ObhcombineBillingNo)).Select(x => x.ObhcombineBillingNo);
+                dataCombineBilling = dataCombineBilling.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.CombineBillingNo));
+                if(combineNoLst.Count() > 0)
+                {
+                    dataCombineBilling = dataCombineBilling.Where(x => combineNoLst.Any(z => z == x.CombineBillingNo));
+                }
+                if (combineObhNoLst.Count() > 0)
+                {
+                    dataCombineBilling = dataCombineBilling.Where(x => combineObhNoLst.Any(z => z == x.CombineBillingNo));
+                }
+            }
+
             var result = from data in dataCombineBilling
                          join part in partners on data.PartnerId equals part.Id
-                         join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
-                         from surcharge in grpCombine.DefaultIfEmpty()
-                         join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.CombineBillingNo into grpCombineObh
-                         from surcharge2 in grpCombineObh.DefaultIfEmpty()
+                         //join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
+                         //from surcharge in grpCombine.DefaultIfEmpty()
+                         //join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.ObhcombineBillingNo into grpCombineObh
+                         //from surcharge2 in grpCombineObh.DefaultIfEmpty()
                          join us in users on data.UserCreated equals us.Id
                          join emp in employeeRepo.Get() on us.EmployeeId equals emp.Id
                          select new AcctCombineBillingResult
@@ -503,21 +521,14 @@ namespace eFMS.API.Accounting.DL.Services
                              UserCreated = data.UserCreated,
                              TotalAmountVnd = data.TotalAmountVnd,
                              TotalAmountUsd = data.TotalAmountUsd,
-                             JobNo = surcharge != null ? surcharge.JobNo : surcharge2.JobNo,
-                             Soano = surcharge != null ? surcharge.Soano : surcharge2.Soano,
-                             PaySoano = surcharge != null ? surcharge.PaySoano : surcharge2.PaySoano,
-                             CreditNo = surcharge != null ? surcharge.CreditNo : surcharge2.CreditNo,
-                             DebitNo = surcharge != null ? surcharge.DebitNo : surcharge2.DebitNo,
+                             //JobNo = surcharge != null ? surcharge.JobNo : surcharge2.JobNo,
+                             //Soano = surcharge != null ? surcharge.Soano : surcharge2.Soano,
+                             //PaySoano = surcharge != null ? surcharge.PaySoano : surcharge2.PaySoano,
+                             //CreditNo = surcharge != null ? surcharge.CreditNo : surcharge2.CreditNo,
+                             //DebitNo = surcharge != null ? surcharge.DebitNo : surcharge2.DebitNo,
                              UserCreatedName = emp == null ? string.Empty : emp.EmployeeNameEn,
                              DatetimeCreated = data.DatetimeCreated
                          };
-            if (criteria.ReferenceNo != null && criteria.ReferenceNo.Count > 0)
-            {
-                result = result.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.CombineBillingNo) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.JobNo) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.Soano) || criteria.ReferenceNo.Any(z => z.Trim() == x.PaySoano) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.CreditNo) || criteria.ReferenceNo.Any(z => z.Trim() == x.DebitNo));
-            }
             IQueryable<AcctCombineBillingResult> dataResult = null;
             if (result != null && result.Count() > 0)
             {

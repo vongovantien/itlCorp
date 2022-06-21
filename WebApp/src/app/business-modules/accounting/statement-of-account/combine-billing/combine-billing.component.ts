@@ -30,7 +30,7 @@ export class CombineBillingComponent extends AppList implements OnInit {
   billings: CombineBilling[] = [];
   // Get data with 6 month from current
   dataSearch : any = {
-    createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 3, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
   };
   criteriaExport: any = {};
