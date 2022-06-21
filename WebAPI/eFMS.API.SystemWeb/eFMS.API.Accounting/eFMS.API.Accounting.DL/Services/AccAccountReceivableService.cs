@@ -2362,13 +2362,13 @@ namespace eFMS.API.Accounting.DL.Services
             //    }
             //}
 
-            debitAmountDetail.DebitAmountDetails.ToList().ForEach(x =>
-            {
-                if (x.InvoiceNo == null && x.ServiceDate > DateTime.Now)
-                {
-                    debitAmountDetail.DebitAmountDetails.Remove(x);
-                }
-            });
+            //debitAmountDetail.DebitAmountDetails.ToList().ForEach(x =>
+            //{
+            //    if (x.InvoiceNo == null && x.ServiceDate > DateTime.Now)
+            //    {
+            //        debitAmountDetail.DebitAmountDetails.Remove(x);
+            //    }
+            //});
 
             return debitAmountDetail;
         }
