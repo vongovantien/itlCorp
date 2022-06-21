@@ -292,7 +292,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             airlineInfo: [],
 
             isHawb: [false],
-            incotermId: [],
+            isMawb: [true],
+            incotermId: [null,Validators.required],
             ata: [],
             atd: []
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
