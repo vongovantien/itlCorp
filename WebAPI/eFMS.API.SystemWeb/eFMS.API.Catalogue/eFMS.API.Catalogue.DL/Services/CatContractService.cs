@@ -1466,19 +1466,19 @@ namespace eFMS.API.Catalogue.DL.Services
             var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-REJECT").FirstOrDefault();
             // Subject
             subject = emailTemplate.Subject;
-            subject.Replace("{{PartnerType}}", partnerType);
-            subject.Replace("{{PartnerName}}", partner.PartnerNameVn);
+            subject = subject.Replace("{{PartnerType}}", partnerType);
+            subject = subject.Replace("{{PartnerName}}", partner.PartnerNameVn);
 
             body = emailTemplate.Body;
-            body.Replace("{{EmployeeName}}", salesmanObj.EmployeeNameVn);
-            body.Replace("{{PartnerName}}", partner.PartnerNameVn);
-            body.Replace("{{TaxCode}}", partner.TaxCode);
-            body.Replace("{{ContractNo}}", contract.ContractNo);
-            body.Replace("{{SaleService}}", contract.SaleService);
-            body.Replace("{{ContractType}}", contract.ContractType);
-            body.Replace("{{Comment}}", comment);
-            body.Replace("{{Address}}", address);
-            body.Replace("{{LogoEFMS}}", logoUrl);
+            body = body.Replace("{{EmployeeName}}", salesmanObj.EmployeeNameVn);
+            body = body.Replace("{{PartnerName}}", partner.PartnerNameVn);
+            body = body.Replace("{{TaxCode}}", partner.TaxCode);
+            body = body.Replace("{{ContractNo}}", contract.ContractNo);
+            body = body.Replace("{{SaleService}}", contract.SaleService);
+            body = body.Replace("{{ContractType}}", contract.ContractType);
+            body = body.Replace("{{Comment}}", comment);
+            body = body.Replace("{{Address}}", address);
+            body = body.Replace("{{LogoEFMS}}", logoUrl);
 
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
