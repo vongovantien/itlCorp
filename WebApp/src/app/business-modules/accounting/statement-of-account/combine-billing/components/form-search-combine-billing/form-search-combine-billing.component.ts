@@ -117,7 +117,6 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
         case 'partner':
             this.partnerId.setValue((data as Partner).id);
             if(!!this.partnerId.value){
-              console.log('5456')
               this.isExport = false;
             }
             break;

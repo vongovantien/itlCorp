@@ -484,24 +484,20 @@ namespace eFMS.API.Accounting.DL.Services
             var users = userRepo.Get(x => userId.Any(z => z == x.Id));
             var partnerId= dataCombineBilling.Select(x => x.PartnerId);
             var partners = partnerRepo.Get(x => partnerId.Any(z => z == x.Id));
-            var combineNos = dataCombineBilling.Select(x => x.CombineBillingNo);
-            var surcharges = surchargeRepo.Get(x => combineNos.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
 
             if (criteria.ReferenceNo != null && criteria.ReferenceNo.Count > 0)
             {
-                surcharges = surcharges.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.JobNo) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.Soano) || criteria.ReferenceNo.Any(z => z.Trim() == x.PaySoano) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.CreditNo) || criteria.ReferenceNo.Any(z => z.Trim() == x.DebitNo));
-                var combineNoLst = surcharges.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.CombineBillingNo);
-                var combineObhNoLst = surcharges.Where(x => !string.IsNullOrEmpty(x.ObhcombineBillingNo)).Select(x => x.ObhcombineBillingNo);
-                dataCombineBilling = dataCombineBilling.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.CombineBillingNo));
-                if(combineNoLst.Count() > 0)
+                criteria.ReferenceNo = criteria.ReferenceNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                var combineNos = new List<string>();
+                var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                var chargesFilter = surcharges.Where(x => criteria.ReferenceNo.Any(z => z == x.JobNo || z == x.Soano || z == x.PaySoano || z == x.CreditNo || z == x.DebitNo));
+                combineNos.AddRange(chargesFilter.Select(x => x.CombineBillingNo));
+                combineNos.AddRange(chargesFilter.Select(x => x.ObhcombineBillingNo));
+                combineNos.AddRange(dataCombineBilling.Where(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo)).Select(x => x.CombineBillingNo));
+                combineNos = combineNos.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                if (combineNos.Count() > 0)
                 {
-                    dataCombineBilling = dataCombineBilling.Where(x => combineNoLst.Any(z => z == x.CombineBillingNo));
-                }
-                if (combineObhNoLst.Count() > 0)
-                {
-                    dataCombineBilling = dataCombineBilling.Where(x => combineObhNoLst.Any(z => z == x.CombineBillingNo));
+                    dataCombineBilling = dataCombineBilling.Where(x => combineNos.Any(z => z == x.CombineBillingNo));
                 }
             }
 
@@ -532,19 +528,13 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<AcctCombineBillingResult> dataResult = null;
             if (result != null && result.Count() > 0)
             {
-                dataResult = result.Where(x => x.Id != null).GroupBy(x => new { x.Id, x.CombineBillingNo }).Select(x => new AcctCombineBillingResult
-                {
-                    Id = x.Key.Id,
-                    CombineBillingNo = x.Key.CombineBillingNo,
-                    TotalAmountVnd = x.FirstOrDefault() == null ? 0 : (x.FirstOrDefault().TotalAmountVnd ?? 0),
-                    TotalAmountUsd = x.FirstOrDefault() == null ? 0 : (x.FirstOrDefault().TotalAmountUsd ?? 0),
-                    PartnerName = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().PartnerName,
-                    UserCreatedName = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().UserCreatedName,
-                    DatetimeCreated = x.FirstOrDefault() == null ? null : x.FirstOrDefault().DatetimeCreated,
-                    UserCreated = x.FirstOrDefault() == null ? string.Empty : x.FirstOrDefault().UserCreated
-                });
+                dataResult = result.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
             }
-            return dataResult.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
+            else
+            {
+                return null;
+            }
+            return dataResult;
         }
 
         /// <summary>
