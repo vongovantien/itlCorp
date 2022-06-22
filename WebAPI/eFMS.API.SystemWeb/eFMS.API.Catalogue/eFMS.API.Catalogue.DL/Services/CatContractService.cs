@@ -1344,12 +1344,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-APPROVEDREQUEST").FirstOrDefault();
                 // Subject
                 subject = new StringBuilder(emailTemplate.Subject);
-                subject.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
                 subject.Replace("{{enNameCreatetor}}", EnNameCreatetor);
 
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
+                body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);

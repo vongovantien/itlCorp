@@ -506,12 +506,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-APPROVEDREQUEST").FirstOrDefault();
             // Subject
             var subject = new StringBuilder(emailTemplate.Subject);
-            subject.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
             subject.Replace("{{enNameCreatetor}}", EnNameCreatetor);
 
             // Body
             var body = new StringBuilder(emailTemplate.Body);
             string urlToSend = UrlClone.Replace("Catalogue", "");
+            body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
             body.Replace("{{title}}", title);
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{accountNo}}", partner.AccountNo);
