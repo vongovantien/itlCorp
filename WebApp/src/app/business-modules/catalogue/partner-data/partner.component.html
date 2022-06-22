@@ -79,7 +79,7 @@
             <div class="tab-content" id="partnerDataTabContent">
 
                 <div class="tab-pane fade show active" id="all-tabview-data" role="tabpanel" aria-labelledby="">
-                    <app-partner-list [criteria]="criteria" *ngIf="activeTab === 'allTab' && activeTab != null"
+                    <app-partner-list [criteria]="criteria" *ngIf="activeTab === 'allTab' && activeTab != null" 
                         (deleteConfirm)="showConfirmDelete($event)" (detail)="showDetail($event)"> </app-partner-list>
                 </div>
                 <div class="tab-pane fade" id="carrier-tabview-data" role="tabpanel" aria-labelledby="">

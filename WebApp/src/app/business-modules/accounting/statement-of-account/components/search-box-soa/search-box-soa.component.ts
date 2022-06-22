@@ -25,12 +25,14 @@ export class StatementOfAccountSearchComponent extends AppForm {
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
-        displayFields: [],
+        displayFields: [{ field: 'taxCode', label: 'Taxcode' },
+        { field: 'shortName', label: 'Name (ABR)' },
+        { field: 'partnerNameEn', label: 'Customer Name [EN]' },],
         dataSource: [],
-        selectedDisplayFields: [],
+        selectedDisplayFields: ['partnerNameEn'],
     };
     partners: Partner[] = [];
-    selectedPartner: any = {};
+    selectedPartner: any = { field: 'partnerNameEn', value: 'All' };;
 
     currencyList: Currency[] = [];
     selectedCurrency: any = null;
@@ -39,7 +41,15 @@ export class StatementOfAccountSearchComponent extends AppForm {
     userLogged: User;
     currentUser: User = null;
 
-    statusSOA: any[] = [];
+    statusSOA: any[] = [
+        { title: 'New', name: 'New' },
+        { title: 'Issued Voucher', name: 'Issued Voucher' },
+        { title: 'Issued Invoice', name: 'Issued Invoice' },
+        { title: 'Request Confirmed', name: 'Request Confirmed' },
+        { title: 'Confirmed ', name: 'Confirmed ' },
+        { title: 'Need Revise', name: 'Need Revise' },
+        { title: 'Done', name: 'Done' },
+    ];
     selectedStatus: any = null;
 
     reference: string = '';
@@ -56,10 +66,15 @@ export class StatementOfAccountSearchComponent extends AppForm {
     }
 
     ngOnInit(): void {
-        this.getBasicData();
-        this.getStatus();
+        //this.getBasicData();
+        this.getPartner();
+        //this.getStatus();
+        this.getCurrency();
+        this.getUser();
         this.getUserLogged();
         this.subscriptionSearchParamState();
+
+
     }
 
     getUserLogged() {
@@ -73,57 +88,93 @@ export class StatementOfAccountSearchComponent extends AppForm {
             )
             .subscribe(
                 (data: any) => {
-                    if (!!data) {
-                        this.reference=data.dataSearch.strCodes;
+                    if (!!data) {                   
+                        if (data.dataSearch !== undefined) {
+                            if(!!data.dataSearch.soaFromDateCreate&&!!data.dataSearch.soaToDateCreate){
+                                this.selectedRange={};
+                                this.selectedRange.startDate = new Date(data.dataSearch?.soaFromDateCreate);
+                                this.selectedRange.endDate = new Date(data.dataSearch?.soaToDateCreate);
+                            }
+                            //this.selectedStatus = { title: data.dataSearch?.soaStatus, name: data.dataSearch?.soaStatus };
+                            this.reference = !!data.dataSearch.strCodes ? data.dataSearch.strCodes : "";
+                            this.selectedPartner = Object.assign({},!!! data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : { field: 'id', value: data.dataSearch.customerID });
+                            this.selectedStatus = !!data.dataSearch.soaStatus? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0]: null;
+                            this.selectedCurrency = Object.assign({},!!! data.dataSearch.soaCurrency ? { id: 'All' } : { id: data.dataSearch.soaCurrency });
+                            this.currentUser = !!data.dataSearch.currentUser?this.users.filter((us) => us.id == data.dataSearch.currentUser)[0]:null;
+                        }
+                       
+                       
                     }
                 }
             );
     }
 
-    getBasicData() {
-        forkJoin([ // ? forkJoin like Promise.All
-            this._catalogueRepo.getListCurrency(),
-            this._sysRepo.getListSystemUser(),
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
-        ]).pipe(takeUntil(this.ngUnsubscribe))
+    getPartner() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                ([dataCurrency, dataSystemUser, dataPartner]: any) => {
+                (dataPartner: any) => {
                     this.partners = this.mapModel(dataPartner, Partner);
-                    // * add all value into partners data
                     this.partners.push(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' }));
-                    this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
-
                     this.partners = this._sortService.sort(this.partners, 'shortName', true);
-                    this.currencyList = dataCurrency || [];
-                    this.users = dataSystemUser || [];
-                    // * set config for combogird
                     this.configPartner.dataSource = this.partners;
-                    this.configPartner.displayFields = [
-                        { field: 'taxCode', label: 'Taxcode' },
-                        { field: 'shortName', label: 'Name (ABR)' },
-                        { field: 'partnerNameEn', label: 'Customer Name [EN]' },
-                    ];
-                    this.configPartner.selectedDisplayFields = ['partnerNameEn'];
-
-                    this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, dataCurrency);
                     this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
-                    this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
-                },
-            );
+                }
+            )
     }
 
-    getStatus() {
-        this.statusSOA = [
-            { title: 'New', name: 'New' },
-            { title: 'Issued Voucher', name: 'Issued Voucher' },
-            { title: 'Issued Invoice', name: 'Issued Invoice' },
-            { title: 'Request Confirmed', name: 'Request Confirmed' },
-            { title: 'Confirmed ', name: 'Confirmed ' },
-            { title: 'Need Revise', name: 'Need Revise' },
-            { title: 'Done', name: 'Done' },
-        ];
-        // this.selectedStatus = this.statusSOA[0];
+    getCurrency(){
+        this._catalogueRepo.getListCurrency()
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (currencies: any) => {
+                this.currencyList = currencies || [];
+                this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, currencies);
+            }
+        )
     }
+
+    getUser(){
+        this._sysRepo.getListSystemUser()
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (user: any) => {
+                this.users = user || [];
+                this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, user);
+            }
+        )
+    }
+
+    // getBasicData() {
+    //     forkJoin([ // ? forkJoin like Promise.All
+    //         //this._catalogueRepo.getListCurrency(),
+    //         this._sysRepo.getListSystemUser(),
+    //         //this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
+    //     ]).pipe(takeUntil(this.ngUnsubscribe))
+    //         .subscribe(
+    //             ([ dataSystemUser]: any) => {
+    //                 //this.partners = this.mapModel(dataPartner, Partner);
+    //                 // * add all value into partners data
+    //                 //this.partners.push(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' }));
+
+    //                 // this.partners = this._sortService.sort(this.partners, 'shortName', true);
+    //                 //this.currencyList = dataCurrency || [];
+    //                 this.users = dataSystemUser || [];
+    //                 // * set config for combogird
+    //                 // this.configPartner.dataSource = this.partners;
+    //                 // this.configPartner.displayFields = [
+    //                 //     { field: 'taxCode', label: 'Taxcode' },
+    //                 //     { field: 'shortName', label: 'Name (ABR)' },
+    //                 //     { field: 'partnerNameEn', label: 'Customer Name [EN]' },
+    //                 // ];
+    //                 //this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+
+    //                 // this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, dataCurrency);
+    //                 // this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
+    //                 this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
+    //             },
+    //         );
+    // }
 
     onSelectDataFormSearch(data: any, key: string) {
         switch (key.toLowerCase()) {
@@ -138,6 +189,8 @@ export class StatementOfAccountSearchComponent extends AppForm {
                 break;
             case 'status':
                 this.selectedStatus = data;
+                console.log(data);
+                
                 break;
             default:
                 break;
@@ -166,7 +219,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
             CurrencyLocal: "VND"
         };
         this._store.dispatch(SearchListSOA({ dataSearch: body }));
-        this.onSearch.emit(body);
+        // this.onSearch.emit(body);
     }
 
     // * reset data in form search
@@ -181,11 +234,11 @@ export class StatementOfAccountSearchComponent extends AppForm {
         this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
     }
 
-    resetDate(){
+    resetDate() {
         this.selectedRange = null;
     }
 
-    resetPersonalHandle(){
+    resetPersonalHandle() {
         this.currentUser = null;
     }
 

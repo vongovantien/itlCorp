@@ -107,6 +107,8 @@ export class PartnerComponent extends AppList implements OnInit {
                 (data: any) => {
                     if (!!data && !!data.keyword) {
                         this.dataSearchs = data;
+                        console.log(data);
+                        this.activeTab = data.activetab;
                     }
 
                 }
@@ -180,6 +182,7 @@ export class PartnerComponent extends AppList implements OnInit {
 
         this.allPartnerComponent.requestList();
     }
+
     tabSelect(tabName) {
         this.pager.currentPage = 1;
         this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
@@ -203,6 +206,8 @@ export class PartnerComponent extends AppList implements OnInit {
         if (tabName === this.tabName.allTab) {
             this.criteria.partnerGroup = PartnerGroupEnum.ALL;
         }
+
+        this._store.dispatch(SearchList({ payload: { activetab: tabName } }));
     }
 
     ngAfterViewInit() {

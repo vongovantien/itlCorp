@@ -16,7 +16,7 @@ export interface PartnerListState {
     isLoaded: boolean;
     dataSearch: any;
     pagingData: any;
-    
+
 }
 
 export const initialState: PartnerListState = {
@@ -29,9 +29,10 @@ export const initialState: PartnerListState = {
 
 const partnerDataReducer = createReducer(
     initialState,
-    on(Types.SearchList, (state: PartnerListState, data: any) => ({
-        ...state, dataSearch: { ...data.payload }
-    })),
+    on(Types.SearchList, (state: PartnerListState, data: any) => {
+        console.log({ state, data });
+        return { ...state, dataSearch: { ...{ ...state.dataSearch, ...data.payload } }, };
+    }),
     on(
         Types.LoadListPartner, (state: PartnerListState, payload: CommonInterface.IParamPaging) => {
             return { ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size } };
