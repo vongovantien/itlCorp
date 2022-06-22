@@ -196,7 +196,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
                 var obhCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
-                var idsInCharges = model.Charges.Select(x => x.ChargeId).ToList();
+                var idsInCharges = model.Charges.Select(x => x.ChargeId);
                 var surchargesLookupId = surchargeRepo.Get(x => idsInCharges.Any(z => z == x.Id)).ToLookup(x => x.Id);
 
                 /*var chargeNotExistsInSurcharge = GetChargeNotExistsInSurcharge(model.Charges, surchargesLookupId);
@@ -2089,7 +2089,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 charge.VoucherIddate = null;
                                 charge.SyncedFrom = null;
                             }
-                            charge.ReferenceNo = null;
+                            // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                            //charge.ReferenceNo = null;
                             surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
 
@@ -2485,8 +2486,10 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.SeriesNo = surChargeBravo.SerieNo;
                                                 surcharge.DatetimeModified = voucher.DatetimeCreated;
                                                 surcharge.UserModified = currentUser.UserID;
-                                                surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                if(surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
+                                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                                //surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
+                                                                                               
+                                                if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
                                                     surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
@@ -2712,7 +2715,8 @@ namespace eFMS.API.ForPartner.DL.Service
                             var surcharge = surcharges.Where(x => x.Id == item.ChargeID)?.FirstOrDefault();
                             if (surcharge != null)
                             {
-                                surcharge.ReferenceNo = item.BravoRefNo;
+                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                //surcharge.ReferenceNo = item.BravoRefNo;
                                 surcharge.UserModified = currentUser.UserID;
                                 surcharge.DatetimeModified = DateTime.Now;
 
@@ -2819,7 +2823,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 */
 
                                 surcharge.UserModified = currentUser.UserID;
-                                surcharge.ReferenceNo = null; //remove số ref của bravo sync trước đó
+                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                //surcharge.ReferenceNo = null; //remove số ref của bravo sync trước đó
                                 surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
 
                             }
