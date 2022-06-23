@@ -3109,7 +3109,14 @@ namespace eFMS.API.Accounting.DL.Services
                     item.ObhBilling = 0;
                     item.PaidAmount = 0;
                     item.ObhPaid = 0;
-                    item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
+                    if(item.ContractId != null)
+                    {
+                        var contractC = contractPartnerRepo.First(x => x.PartnerId == item.PartnerId && x.Id == item.ContractId);
+                        if(contractC == null || contractC.Active == false)
+                        {
+                            item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
+                        }
+                    }
                 }
                 receivables.AddRange(mapper.Map<List<AccAccountReceivableModel>>(currentReceivables));
                 var receivableIdModified = new List<Guid>();
