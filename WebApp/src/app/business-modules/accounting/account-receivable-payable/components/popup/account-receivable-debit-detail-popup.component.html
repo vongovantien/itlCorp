@@ -13,14 +13,10 @@
                                 <ng-container>
                                     <ng-container *ngFor="let item of dataDebitList; let i = index; trackBy: trackByFn">
                                         <tr class="">
-                                            <td>{{i+1}} </td>
-                                            <td class="text-primary"> {{item.billingNo}}
-                                                <span>
-                                                    <app-copy-to-clipboard text = "{{item.billingNo}}"> 
-                                                    </app-copy-to-clipboard>
-                                                </span>
+                                            <td> {{i+1}} </td>
+                                            <td class = "text-primary" app-copy-to-clipboard [text] = "item.billingNo" [hasIcon] = "false" icon ="la la-copy">                                                                                      
                                             </td>
-                                            <td ALIGN="center">{{item.type }}</td>
+                                            <td ALIGN="center" >{{item.type }}</td>
                                             <td ALIGN="center">{{item.invoiceNo }}
                                                     <ng-container [ngSwitch]="item.paymentStatus">
                                                         <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
