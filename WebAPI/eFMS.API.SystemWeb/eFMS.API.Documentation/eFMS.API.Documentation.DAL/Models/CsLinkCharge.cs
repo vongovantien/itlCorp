@@ -22,6 +22,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string MblnoOrg { get; set; }
         public string MblnoLink { get; set; }
         public string PartnerOrgId { get; set; }
+        public string PartnerNameOrg { get; set; }
         public string PartnerLinkId { get; set; }
         public string PartnerNameLink { get; set; }
     }
