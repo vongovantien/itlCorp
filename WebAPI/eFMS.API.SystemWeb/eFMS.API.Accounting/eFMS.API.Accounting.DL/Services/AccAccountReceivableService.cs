@@ -3111,7 +3111,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.ObhPaid = 0;
                     if(item.ContractId != null)
                     {
-                        var contractC = contractPartnerRepo.First(x => x.PartnerId == item.PartnerId && x.Id == item.ContractId);
+                        var contractC = contractPartnerRepo.First(x => x.PartnerId == item.PartnerId && x.Id == item.ContractId && x.SaleManId == item.SaleMan);
                         if(contractC == null || contractC.Active == false)
                         {
                             item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
