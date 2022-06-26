@@ -55,5 +55,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? PaidAmountVnd { get; set; }
         public decimal? PaidAmountUsd { get; set; }
         public string TransactionType { get; set; }
+        public string SalesmanId { get; set; }
     }
 }
