@@ -2315,12 +2315,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             bool isMatch = true;
 
-            if(!string.IsNullOrEmpty(saleService))
+            if (!string.IsNullOrEmpty(saleService) && !string.IsNullOrEmpty(serviceTerm))
             {
-                var serviceList = saleService.Split(";").ToList();
-                if(serviceList.Count > 0)
+                var serviceList = saleService.ToLower().Split(";").ToList();
+                if (serviceList.Count > 0)
                 {
-                    isMatch = serviceList.Contains(serviceTerm);
+                    isMatch = serviceList.Any(z => z == serviceTerm.ToLower());
                 }
             }
 
@@ -2331,12 +2331,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             bool isMatch = true;
 
-            if (!string.IsNullOrEmpty(saleOffice))
+            if (!string.IsNullOrEmpty(saleOffice) && !string.IsNullOrEmpty(officeTerm))
             {
-                var officeList = saleOffice.Split(";").ToList();
+                var officeList = saleOffice.ToLower().Split(";").ToList();
                 if (officeList.Count > 0)
                 {
-                    isMatch = officeList.Contains(officeTerm);
+                    isMatch = officeList.Any(z => z == officeTerm.ToLower());
                 }
             }
 

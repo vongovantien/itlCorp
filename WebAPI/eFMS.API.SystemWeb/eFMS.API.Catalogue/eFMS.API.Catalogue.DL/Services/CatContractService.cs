@@ -236,6 +236,12 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
+            if(contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
+            {
+                contract.PaymentTerm = 1;
+                contract.CreditLimit = 20000000;
+                contract.CreditLimitRate = 120;
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)

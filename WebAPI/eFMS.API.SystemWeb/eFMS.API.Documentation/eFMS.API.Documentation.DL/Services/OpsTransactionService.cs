@@ -2243,7 +2243,6 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID), arrJob);
            
-
             using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
@@ -2522,93 +2521,35 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
             string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
-            CatPartner partnerInternal = new CatPartner();
-            var date = new DateTime(2022, 01, 31);
-            var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.ReplicatedId == null && x.ServiceDate.Value.Date > date.Date);
             List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
             var hs = new ResultHandle();
             var surchargesAddHis = new List<CsLinkCharge>();
-
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            var chargesBuyReps = GetChargeAutoRateReplicate();
+            using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    foreach (var jobRep in lstJobRep)
+                    foreach (var chargeBuy in chargesBuyReps)
                     {
-                        var jobOps = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
-                        if (jobOps == null)
+                        if (chargeBuy.DebitCharge == null)
+                            continue;
+                        if (chargesBuyReps.Where(x => x.ChargeId == chargeBuy.DebitCharge).FirstOrDefault() != null)
                             continue;
 
-                        if (jobOps.OfficeId != null)
-                        {
-                            var offi = GetInfoOfficeOfUser(jobOps.OfficeId);
-                            if (offi != null && string.IsNullOrEmpty(offi.InternalCode))
-                            {
-                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} - {2} * ", jobOps.JobNo, jobOps.OfficeId, "OFFICE NULL");
-                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
-                                continue;
-                            }
-                            var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
-                            if (part == null)
-                            {
-                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} -{2} * ", jobOps.JobNo, jobOps.OfficeId, "Partner Null");
-                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
-                                continue;
-                            }
-                            if (part.FirstOrDefault() == null)
-                            {
-                                logMessage = string.Format(" *  \n [JOBNO]-[OFFICE]-[MESS]: {0} - {1} -{2} * ", jobOps.JobNo, jobOps.OfficeId, "Partner First Null");
-                                new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE][CONTINUE]", logMessage);
-                                continue;
-                            }
-                            partnerInternal = part.FirstOrDefault();
-                        }
+                        CsShipmentSurcharge surcharge = MapChargeBuytoSell(chargeBuy);
+                        surchargeSells.Add(surcharge);
 
-                        var chargeJob = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo);
-                        if (chargeJob == null)
-                            continue;
+                        var surchargesHis = new CsLinkCharge();
+                        surchargesHis.Id = Guid.NewGuid();
+                        surchargesHis.JobNoOrg = surcharge.JobNo;
+                        surchargesHis.ChargeOrgId = chargeBuy.Id.ToString();
+                        surchargesHis.JobNoLink = chargeBuy.JobNo;
+                        surchargesHis.ChargeLinkId = surcharge.Id.ToString();
+                        surchargesHis.DatetimeCreated = DateTime.Now;
+                        surchargesHis.UserCreated = DocumentConstants.USER_EFMS_SYSTEM;
+                        surchargesHis.LinkChargeType = "AUTO_RATE";
 
-                        var chargeBuys = chargeJob.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Type == "BUY" && (x.UnitPrice != null && x.UnitPrice > 0));
-                        if (chargeBuys == null)
-                            continue;
-
-                        foreach (var chargeBuy in chargeBuys)
-                        {
-                            if (acctSettlementPayment.Get(x => x.SettlementNo == chargeBuy.SettlementCode && x.StatusApproval == "Done").FirstOrDefault() == null)
-                                continue;
-                            var catCharge = catChargeRepository.Get(x => x.Id == chargeBuy.ChargeId).FirstOrDefault();
-                            if (catCharge != null && catCharge.DebitCharge == null)
-                                continue;
-                            if (chargeBuys.Where(x => x.ChargeId == catCharge.DebitCharge).FirstOrDefault() != null)
-                                continue;
-                            var links = csLinkChargeRepository.Get(x => x.ChargeOrgId == chargeBuy.Id.ToString() && x.LinkChargeType == "AUTO_RATE");
-                            if (links != null)
-                            {
-                                var checkex = false;
-                                foreach (var i in links)
-                                {
-                                    if (surchargeRepository.Get(x => x.Id == Guid.Parse(i.ChargeLinkId)).FirstOrDefault() != null)
-                                        checkex = true;
-                                }
-                                if (checkex)
-                                    continue;
-                            }
-
-                            CsShipmentSurcharge surcharge = MapChargeBuytoSell(chargeBuy, jobRep, partnerInternal, catCharge);
-                            surchargeSells.Add(surcharge);
-
-                            var surchargesHis = new CsLinkCharge();
-                            surchargesHis.Id = Guid.NewGuid();
-                            surchargesHis.JobNoOrg = surcharge.JobNo;
-                            surchargesHis.ChargeOrgId = chargeBuy.Id.ToString();
-                            surchargesHis.JobNoLink = chargeBuy.JobNo;
-                            surchargesHis.ChargeLinkId = surcharge.Id.ToString();
-                            surchargesHis.DatetimeCreated = DateTime.Now;
-                            surchargesHis.UserCreated = DocumentConstants.USER_EFMS_SYSTEM;
-                            surchargesHis.LinkChargeType = "AUTO_RATE";
-
-                            surchargesAddHis.Add(surchargesHis);
-                        }
+                        surchargesAddHis.Add(surchargesHis);
                     }
                     var result = new HandleState();
                     if (surchargeSells.Count > 0)
@@ -2654,23 +2595,22 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
             return hs;
-
         }
-        private CsShipmentSurcharge MapChargeBuytoSell(CsShipmentSurcharge chargeBuy, OpsTransaction jobRep, CatPartner partnerInternal, CatCharge catCharge)
+
+        private CsShipmentSurcharge MapChargeBuytoSell(sp_GetChargeAutoRateReplicate chargeBuy)
         {
             CsShipmentSurcharge surcharge = new CsShipmentSurcharge();
 
             var propInfo = chargeBuy.GetType().GetProperties();
             foreach (var item in propInfo)
-                surcharge.GetType().GetProperty(item.Name).SetValue(surcharge, item.GetValue(chargeBuy, null), null);
+            {
+                var p = surcharge.GetType().GetProperty(item.Name);
+                if (p != null) { p.SetValue(surcharge, item.GetValue(chargeBuy, null), null); }
+            }
 
             surcharge.Id = Guid.NewGuid();
-            surcharge.JobNo = jobRep.JobNo;
-            surcharge.Hblid = jobRep.Hblid;
-            surcharge.Hblno = jobRep.Hwbno;
-            surcharge.Mblno = jobRep.Mblno;
             surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
-            surcharge.ChargeId = catCharge.DebitCharge ?? Guid.Empty;
+            surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = 1;
             surcharge.Vatrate = 8;
@@ -2723,15 +2663,14 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
             surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-            if (!string.IsNullOrEmpty(partnerInternal.Id))
+            if (!string.IsNullOrEmpty(chargeBuy.PartnerInternal_Id))
             {
-                surcharge.PaymentObjectId = partnerInternal.Id;
-                surcharge.OfficeId = jobRep.OfficeId;
+                surcharge.PaymentObjectId = chargeBuy.PartnerInternal_Id;
+                surcharge.OfficeId = chargeBuy.OfficeId_JobRep;
             }
             surcharge.DatetimeCreated = DateTime.Now;
             return surcharge;
         }
-
         public async Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list)
         {
             var result = new HandleState();
@@ -2771,6 +2710,11 @@ namespace eFMS.API.Documentation.DL.Services
                 new SqlParameter(){ ParameterName = "@jobRepNo", Value = string.IsNullOrEmpty(arrJob)?null:arrJob},
             };
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeReplicateToLinkCharge>(parameters);
+            return listSurcharges;
+        }
+        private List<sp_GetChargeAutoRateReplicate> GetChargeAutoRateReplicate()
+        {
+            var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeAutoRateReplicate>();
             return listSurcharges;
         }
     }

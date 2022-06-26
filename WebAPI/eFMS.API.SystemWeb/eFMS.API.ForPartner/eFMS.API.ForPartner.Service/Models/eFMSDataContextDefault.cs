@@ -390,6 +390,10 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
+                entity.Property(e => e.SalesmanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServiceType).HasMaxLength(100);
 
                 entity.Property(e => e.SourceCreated)
@@ -821,6 +825,10 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
 
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.SentByUser)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1194,9 +1202,6 @@ namespace eFMS.API.ForPartner.Service.Models
             {
                 entity.ToTable("acctSOA");
 
-                entity.HasIndex(e => e.DatetimeCreated)
-                    .HasName("Idx_DatetimeCreated_acctSOA");
-
                 entity.HasIndex(e => e.Soano)
                     .HasName("AcctSOA")
                     .IsUnique();
@@ -1260,6 +1265,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.PaymentNote).HasMaxLength(500);
 
                 entity.Property(e => e.PaymentStatus).HasMaxLength(50);
+
+                entity.Property(e => e.SalemanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ServiceTypeId)
                     .HasMaxLength(250)
