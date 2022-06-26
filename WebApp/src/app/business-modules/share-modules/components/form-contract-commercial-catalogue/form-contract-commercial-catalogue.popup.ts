@@ -103,7 +103,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     menuSpecialPermission: Observable<any[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
 
-    contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash"];
+    contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash", "Guarantee", "Prepaid"];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
         { id: "AI", text: "Air Import" },
@@ -864,6 +864,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
                 });
             }
+        } else if($event === 'Guarantee' && this.isCreateNewCommercial){
+            this.formGroup.controls['paymentTerm'].setValue(1);
+            this.formGroup.controls['creditLimit'].setValue(20000000);
+            this.formGroup.controls['creditLimitRate'].setValue(120);
         } else {
             this.isDisabledExpiredDateField = false;
         }
