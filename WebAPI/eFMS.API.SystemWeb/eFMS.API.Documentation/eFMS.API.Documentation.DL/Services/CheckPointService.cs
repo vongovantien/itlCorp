@@ -1,11 +1,8 @@
 ﻿using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
-using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -341,7 +338,8 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case "Trial":
                 case "Official":
-                    if(checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                case "Guarantee":
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
                     {
                         isValid = true;
                         break;
