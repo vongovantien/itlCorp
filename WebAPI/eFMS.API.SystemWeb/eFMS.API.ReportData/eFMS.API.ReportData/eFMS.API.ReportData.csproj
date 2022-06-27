@@ -41,6 +41,12 @@
      <None Update="FormatExcel\TemplateExport\AccountPayable\AP_Standart_Report.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_DebitDetail_Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_SUMMARY_TEMPLATE_NO_ARGEEMENT.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_SUMMARY_TEMPLATE.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>

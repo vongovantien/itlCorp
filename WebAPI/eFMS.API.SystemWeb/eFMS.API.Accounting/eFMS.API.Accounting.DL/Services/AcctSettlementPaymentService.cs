@@ -5423,11 +5423,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode)
         {
-            //Get list charge by SettlementCode
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode);
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+            if(surcharges.Count() > 0)
+            {
+                return new List<ObjectReceivableModel>();
+            }
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ cho Partner, Service, Office có trong charge của Settlement
-            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Settlement ---

@@ -39,6 +39,7 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly IOptions<ApiUrl> apiUrl;
         private readonly IAccountPayableService accPayableService;
+        private readonly IAccountReceivableService accReceivableService;
 
         /// <summary>
         /// Accounting Contructor
@@ -47,6 +48,7 @@ namespace eFMS.API.ForPartner.Controllers
             IStringLocalizer<LanguageSub> localizer,
             IActionFuncLogService actionFuncLog,
             IAccountPayableService payableService,
+            IAccountReceivableService accReceivable,
             IOptions<ApiUrl> aUrl)
         {
             accountingManagementService = service;
@@ -54,6 +56,7 @@ namespace eFMS.API.ForPartner.Controllers
             actionFuncLogService = actionFuncLog;
             apiUrl = aUrl;
             accPayableService = payableService;
+            accReceivableService = accReceivable;
         }
 
         /// <summary>
@@ -255,7 +258,7 @@ namespace eFMS.API.ForPartner.Controllers
                     {
                         //Tính công nợ sau khi tạo mới hóa đơn thành công
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
-                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
+                        var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
                         await CalculatorReceivable(modelReceivable);
                         if (Id != Guid.Empty)
                         {
@@ -368,7 +371,7 @@ namespace eFMS.API.ForPartner.Controllers
                     {
                         //Tính công nợ sau khi replace invoice thành công
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
-                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
+                        var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
                         await CalculatorReceivable(modelReceivable);
                         if (IdDelete != Guid.Empty)
                         {
@@ -433,7 +436,7 @@ namespace eFMS.API.ForPartner.Controllers
                     {
                         //Tính công nợ sau khi cancel invoice thành công
                         var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
-                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+                        var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
                         await CalculatorReceivable(modelReceivable);
                         if(Id != Guid.Empty)
                         {
@@ -639,17 +642,11 @@ namespace eFMS.API.ForPartner.Controllers
         }
         #endregion --- PRIVATE ---
         
-        [HttpPost("CalculatorReceivableNotAuthorize_Test")]
-        public async Task<IActionResult> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
-        {
-            var cr = await CalculatorReceivable(model);
-            return Ok(cr);
-        }
         
-        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
             var urlApiAcct = apiUrl.Value.Url + "/Accounting";//"http://localhost:44368";//
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, null);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }

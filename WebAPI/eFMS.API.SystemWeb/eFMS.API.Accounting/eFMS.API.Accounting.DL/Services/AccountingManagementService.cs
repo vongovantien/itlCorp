@@ -520,7 +520,9 @@ namespace eFMS.API.Accounting.DL.Services
                                          RequesterId = null,
                                          ChargeType = sur.Type,
                                          IsFromShipment = sur.IsFromShipment,
-                                         IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
+                                         IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE")),
+                                         TransactionType = sur.TransactionType
+                                         
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -573,7 +575,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              RequesterId = null,
                                              ChargeType = sur.Type,
                                              IsFromShipment = sur.IsFromShipment,
-                                             IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
+                                             IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE")),
+                                             TransactionType = sur.TransactionType
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -1165,8 +1168,15 @@ namespace eFMS.API.Accounting.DL.Services
 
                 model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
 
-                List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
-                model.ServiceType = GetTransactionType(jobNoGrouped);
+                // List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
+                // model.ServiceType = GetTransactionType(jobNoGrouped);
+                var _transactionTypes = model.Charges.Select(s => s.TransactionType)
+                         .GroupBy(x => x)
+                         .Select(x => new { service = x.Key, counts = x.Count() })
+                         .OrderByDescending(x => x.counts)
+                         .Select(x => x.service)
+                         .ToList();
+                model.ServiceType = _transactionTypes.FirstOrDefault();
 
                 //Task: 15631 - Andy - 14/04/2021
                 model.PaymentDueDate = GetDueDateIssueAcctMngt(model.PartnerId, model.PaymentTerm, model.ServiceType, model.Date, model.ConfirmBillingDate);
@@ -1343,8 +1353,17 @@ namespace eFMS.API.Accounting.DL.Services
                 accounting.PaymentDueDate = dueDate;*/
 
                 // Cập nhật lại service
-                List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
-                accounting.ServiceType = GetTransactionType(jobNoGrouped);
+                //List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
+                //accounting.ServiceType = GetTransactionType(jobNoGrouped);
+
+                var _transactionTypes = model.Charges.Select(s => s.TransactionType)
+                        .GroupBy(x => x)
+                        .Select(x => new { service = x.Key, counts = x.Count() })
+                        .OrderByDescending(x => x.counts)
+                        .Select(x => x.service)
+                        .ToList();
+                model.ServiceType = _transactionTypes.FirstOrDefault();
+
 
                 //Task: 15631 - Andy - 14/04/2021
                 model.PaymentDueDate = GetDueDateIssueAcctMngt(accounting.PartnerId, accounting.PaymentTerm, accounting.ServiceType, accounting.Date, acctCurrent.ConfirmBillingDate);

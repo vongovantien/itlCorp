@@ -299,9 +299,16 @@ namespace eFMS.API.ForPartner.DL.Service
                     invoiceDebit.TotalAmountVnd = invoiceDebit.UnpaidAmountVnd = _totalAmountVndInvoiceDebit;
                     invoiceDebit.TotalAmountUsd = invoiceDebit.UnpaidAmountUsd = _totalAmountUsdInvoiceDebit;
 
-                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                    invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    // var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                    // invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType)
+                   .GroupBy(x => x)
+                   .Select(x => new { service = x.Key, counts = x.Count() })
+                   .OrderByDescending(x => x.counts)
+                   .Select(x => x.service)
+                   .ToList();
 
+                    invoiceDebit.ServiceType = _transactionTypes.FirstOrDefault();
                     //Task: 15631 - Andy - 14/04/2021
                     invoiceDebit.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceDebit.PartnerId, invoiceDebit.PaymentTerm, _transactionTypes, invoiceDebit.Date, invoiceDebit.ConfirmBillingDate);
                 }
@@ -364,9 +371,16 @@ namespace eFMS.API.ForPartner.DL.Service
                         invoiceObh.TotalAmountVnd = invoiceObh.UnpaidAmountVnd = _totalAmountVndInvoiceObh;
                         invoiceObh.TotalAmountUsd = invoiceObh.UnpaidAmountUsd = _totalAmountUsdInvoiceObh;
 
-                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                        invoiceObh.ServiceType = string.Join(";", _transactionTypes);
+                        //var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                        //invoiceObh.ServiceType = string.Join(";", _transactionTypes);
 
+                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType)
+                          .GroupBy(x => x)
+                          .Select(x => new { service = x.Key, counts = x.Count() })
+                          .OrderByDescending(x => x.counts)
+                          .Select(x => x.service)
+                          .ToList();
+                        invoiceObh.ServiceType = _transactionTypes.FirstOrDefault();
                         //Task: 15631 - Andy - 14/04/2021
                         invoiceObh.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceObh.PartnerId, invoiceObh.PaymentTerm, _transactionTypes, invoiceObh.Date, invoiceObh.ConfirmBillingDate);
                     }
@@ -2177,36 +2191,6 @@ namespace eFMS.API.ForPartner.DL.Service
 
         #endregion --- REJECT & REMOVE DATA ---
 
-        private List<ObjectReceivableModel> GetListObjectReceivableBySurchargeIds(List<Guid> surchargeIds)
-        {
-            var surcharges = surchargeRepo.Get(x => surchargeIds.Any(a => a == x.Id));
-            var objPO = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objPR = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PayerId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objMerge = objPO.Union(objPR).ToList();
-            var objectReceivables = objMerge.GroupBy(g => new { Service = g.Service, PartnerId = g.PartnerId, Office = g.Office })
-                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
-            return objectReceivables.ToList();
-        }
-
-        public CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action)
-        {
-            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
-            CalculatorReceivableNotAuthorizeModel modelReceivable = new CalculatorReceivableNotAuthorizeModel
-            {
-                UserID = _currentUser.UserID,
-                GroupId = _currentUser.GroupId,
-                DepartmentId = _currentUser.DepartmentId,
-                OfficeID = _currentUser.OfficeID,
-                CompanyID = _currentUser.CompanyID,
-                Action = action,
-                ObjectReceivable = GetListObjectReceivableBySurchargeIds(surchargeIds)
-            };
-            return modelReceivable;
-        }
 
         public List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo)
         {

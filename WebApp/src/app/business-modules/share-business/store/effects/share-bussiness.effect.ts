@@ -1,14 +1,14 @@
 import { Injectable } from "@angular/core";
 import { Action } from '@ngrx/store';
-import { Actions, Effect, ofType } from "@ngrx/effects";
+import { Actions, createEffect, Effect, ofType } from "@ngrx/effects";
 
-import { DocumentationRepo } from "src/app/shared/repositories";
+import { CatalogueRepo, DocumentationRepo } from "src/app/shared/repositories";
 
-import { Observable, of } from "rxjs";
+import { EMPTY, Observable, of } from "rxjs";
 
-import { mergeMap, catchError, map, } from "rxjs/operators";
+import { mergeMap, catchError, map, switchMap, } from "rxjs/operators";
 import {
-    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction, ShareBussinessCatalogueActionTypes, ISearchPartnerForKeyInSurcharge, LoadListPartnerForKeyInSurchargeSuccess
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 import { CsTransaction } from "@models";
@@ -19,7 +19,8 @@ export class ShareBussinessEffects {
 
     constructor(
         private actions$: Actions,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _catalogueRepo: CatalogueRepo
     ) { }
 
 
@@ -200,5 +201,16 @@ export class ShareBussinessEffects {
                         catchError(err => of(new GetHBLOtherChargeFailAction(err)))
                     ))
         );
+
+    getListPartnerForKeyInSurchargeEffect$: Observable<Action> = createEffect(() => this.actions$.pipe(
+        ofType(ShareBussinessCatalogueActionTypes.LOAD_PARTNER_KEYIN_CHARGE),
+        switchMap(
+            (param: ISearchPartnerForKeyInSurcharge) => this._catalogueRepo.getPartnerForKeyingCharge(true, param.service, param.office, param.salemanId)
+                .pipe(
+                    catchError(() => EMPTY),
+                    map((data: any[]) => LoadListPartnerForKeyInSurchargeSuccess({ data })),
+                )
+        )
+    ));
 
 }

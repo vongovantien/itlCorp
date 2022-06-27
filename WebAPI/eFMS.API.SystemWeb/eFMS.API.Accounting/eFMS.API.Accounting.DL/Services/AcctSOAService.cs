@@ -3568,15 +3568,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PRIVATE METHOD ---
 
         #region --- Calculator Receivable SOA ---
-        public List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo)
-        {
-            //Get list charge of by Soa No
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
-            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ từng Partner, Service, Office có trong list charge của SOA
-            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
-            return objectReceivablesModel;
-        }
+        
 
         #endregion --- Calculator Receivable SOA ---
 

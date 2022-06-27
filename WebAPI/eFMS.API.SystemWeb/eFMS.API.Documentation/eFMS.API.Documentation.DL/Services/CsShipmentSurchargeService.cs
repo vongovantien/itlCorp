@@ -1729,8 +1729,9 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list,  out List<Guid> Ids)
         {
+            Ids = new List<Guid>(); // ds charge dùng để tính công nợ
             var chargeGroup = catChargeGroupRepository.Get();
             var listImport = new List<CsShipmentSurchargeImportModel>();
             foreach (var item in list)
@@ -1779,6 +1780,8 @@ namespace eFMS.API.Documentation.DL.Services
                     //{
                     //    item.Type = "SELL";
                     //}
+
+                    Ids.Add(item.Id);
                 }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(listImport);

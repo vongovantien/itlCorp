@@ -18,21 +18,21 @@
                             (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
                             <ng-template tabHeading>
                                 <span class="m--margin-right-10">Summary</span>
-                                <span class="badge badge-info">{{totalItems}}</span>
-                                <!-- <ng-container *ngIf="!!totalAr">
-
-                                </ng-container> -->
+                                <span class="badge badge-info">{{totalAr}}</span>
                             </ng-template>
-                            <list-trial-official-account-receivable></list-trial-official-account-receivable>
+                            <list-trial-official-account-receivable (onTotalListTrial)="onTotalAr($event)">
+                            </list-trial-official-account-receivable>
                         </tab>
-                        <!-- <tab [active]="selectedSubTab === 'GUARANTEED'" heading="Guaranteed"
-                            (selectTab)="onSelectTabAccountReceivable('GUARANTEED')">
-                            <list-guaranteed-account-receivable></list-guaranteed-account-receivable>
-                        </tab> -->
-                        <!-- <tab [active]="selectedSubTab === 'OTHER'" heading="Cash"
-                            (selectTab)="onSelectTabAccountReceivable('OTHER')">
-                            <list-other-account-receivable></list-other-account-receivable>
-                        </tab> -->
+                        <tab [active]="selectedSubTab === 'NO_AGREEMENT'" heading="No contract"
+                            *ngIf="menuSpecialPermission | async | specialPermission:'NoContract'"
+                            (selectTab)="onSelectTabAccountReceivable('NO_AGREEMENT')">
+                            <ng-template tabHeading>
+                                <span class="badge badge-info m--margin-left-10"
+                                    *ngIf="!!totalNoContract">{{totalNoContract}}</span>
+                            </ng-template>
+                            <list-no-agreement-account-receivable (onTotalListNoContract)="onTotalAr($event)">
+                            </list-no-agreement-account-receivable>
+                        </tab>
                     </tabset>
 
 

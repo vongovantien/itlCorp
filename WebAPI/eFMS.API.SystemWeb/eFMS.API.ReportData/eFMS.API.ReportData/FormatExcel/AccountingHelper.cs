@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
+using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
@@ -5193,31 +5194,14 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
-        //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
-        //{
-        //    try
-        //    {
-        //        using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
-        //        {
-        //            excelPackage.Workbook.Worksheets.Add("Sheet1");
-        //            var workSheet = excelPackage.Workbook.Worksheets.First();
-        //            if (arType == ARTypeEnum.TrialOrOffical)
-        //            {
-        //                BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
-        //            }else if (arType == ARTypeEnum.Other)
-        //            {
-        //                BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
-        //            }
-        //            excelPackage.Save();
-        //            return excelPackage.Stream;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-        //    return null;
-        //}
+        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
+        {
+            if (arType == ARTypeEnum.TrialOrOffical)
+                return GenerateAccountingReceivableArSumary(acctMngts);
+            else if (arType == ARTypeEnum.NoAgreement)
+                return GenerateAccountingReceivableArSumaryNoAgrement(acctMngts);
+            return null;
+        }
 
         public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result)
         {
@@ -5335,7 +5319,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
                 var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
                 //Set Title
-                excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                if(!string.IsNullOrEmpty(debitType))
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                } else
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail";
+                }
                 var rowStart = 4;
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5353,6 +5343,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("PaidUSD", item.PaidAmountUSD);
                     listKeyData.Add("UnpaidVND", item.UnpaidAmountVND);
                     listKeyData.Add("UnpaidUSD", item.UnpaidAmountUSD);
+                    listKeyData.Add("Services", item.Service);
+                    listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("OverdueDays", item.OverdueDays);
                     listKeyData.Add("DueDate", item.PaymentDueDate);
                     listKeyData.Add("Office", item.Code);
@@ -6149,6 +6141,186 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        private string convertServiceType(string serviceCode)
+        {
+            switch (serviceCode)
+            {
+                case "AE":
+                    return "Air Export";
+                case "AI":
+                    return "Air Import";
+                case "CL":
+                    return "Custom Logistic";
+                case "SCE":
+                    return "Sea Consol Export";
+                case "SCI":
+                    return "Sea Consol Import";
+                case "SFE":
+                    return "Sea FCL Export";
+                case "SFI":
+                    return "Sea FCL Import";
+                case "SLE":
+                    return "Sea LCL Export";
+                case "SLI":
+                    return "Sea LCL Import";
+                default: return null;
+            }
+
+        }
+
+        //private bool compareDebitAmountDetailByContract(DebitAmountDetailByContractModel obj1, DebitAmountDetailByContractModel obj2)
+        //{
+        //    return obj1.JobNo == obj2.JobNo && obj1.HBLNo == obj2.HBLNo && obj2.MBLNo == obj1.MBLNo && obj1.DebitNo == obj2.DebitNo && obj1.OfficeName == obj2.OfficeName && obj1.TransactionType == obj2.TransactionType
+        //        && obj1.PaymentStatus == obj2.PaymentStatus && obj1.Type == obj2.Type&&obj1.InvoiceNo==obj2.InvoiceNo;
+        //}
+
+        //private List<DebitAmountDetailByContractModel> groupDebitAmountDetails(List<DebitAmountDetailByContractModel> debitAmountDetailByContractModels)
+        //{
+        //    for (int i = 0; i < debitAmountDetailByContractModels.Count-2; i++)
+        //    {
+        //        for(int j = i + 1; j < debitAmountDetailByContractModels.Count - 1; j++){
+        //            if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[j]))
+        //            {
+        //                debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[j].TotalUSD;
+        //                debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[j].TotalVND;
+        //                debitAmountDetailByContractModels.RemoveAt(j);
+        //                j--;
+        //            }
+        //        }
+        //    }
+        //    return debitAmountDetailByContractModels;
+        //}
+
+        /// <summary>
+        /// Generate Export Generate Export Debit Amount Detail Report
+        /// </summary>
+        /// <param name="agreementId"></param>
+        /// <returns></returns>
+        public Stream GenerateExportDebitAmountDetail(DebitAmountDetail debitAmountDetail)
+        {
+
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.DebitAmountDetailByContract));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 3;
+                var listKeyData = new Dictionary<string, object>();
+                Double SumTotalVND = 0, SumTotalUSD = 0, PaidAmountVND = 0, PaidAmountUSD = 0, DebitAmountVND = 0, DebitAmountUSD = 0;
+                //listKeyData.Add("PartnerCode", string.Format("From date: {0} To date: {0}", DateTime.Parse(criteria.FromPaymentDate).ToString("dd/MM/yyyy"), DateTime.Parse(criteria.ToPaymentDate).ToString("dd/MM/yyyy")));
+                listKeyData.Add("PartnerCode", debitAmountDetail.DebitAmountGeneralInfo.PartnerCode);
+                listKeyData.Add("ContractNo", debitAmountDetail.DebitAmountGeneralInfo.ContractNo);
+                startRow++;
+                listKeyData.Add("PartnerName", debitAmountDetail.DebitAmountGeneralInfo.PartnerName);
+                listKeyData.Add("EffectiveDate", debitAmountDetail.DebitAmountGeneralInfo.EffectiveDate?.ToString("dd/MM/yyyy"));
+                startRow++;
+                listKeyData.Add("ContractType", debitAmountDetail.DebitAmountGeneralInfo.ContracType);
+                listKeyData.Add("ExpiredDate", debitAmountDetail.DebitAmountGeneralInfo.ExpiredDate?.ToString("dd/MM/yyyy"));
+                excel.SetData(listKeyData);
+
+                startRow = 8;
+                excel.StartDetailTable = startRow;
+
+                if (debitAmountDetail.DebitAmountDetails.Count == 0)
+                {
+                    listKeyData = new Dictionary<string, object>();
+
+                    excel.SetGroupsTable();
+                    listKeyData.Add("No", 0);
+                    listKeyData.Add("JobNo", "");
+                    listKeyData.Add("HblNo", "");
+                    listKeyData.Add("MblNo", "");
+                    listKeyData.Add("BillingNo", "");
+                    listKeyData.Add("Type", "");
+                    listKeyData.Add("InvoiceNo", "");
+                    listKeyData.Add("TotalVND", 0);
+                    listKeyData.Add("TotalUSD", 0);
+                    listKeyData.Add("Office", "");
+                    listKeyData.Add("SalesMan", "");
+                    listKeyData.Add("ServiceDate", "");
+                    listKeyData.Add("ETD", "");
+                    listKeyData.Add("ETA", "");
+                    listKeyData.Add("Service","");
+                    listKeyData.Add("InvoicePaymentStatus", "");
+                }
+                else
+                {
+                    //debitAmountDetail.DebitAmountDetails = groupDebitAmountDetails(debitAmountDetail.DebitAmountDetails);
+                    for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
+                    {
+                        var item = debitAmountDetail.DebitAmountDetails[i];
+                        listKeyData = new Dictionary<string, object>();
+                        excel.SetGroupsTable();
+                        listKeyData.Add("No", i + 1);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("HblNo", item.HBLNo);
+                        listKeyData.Add("MblNo", item.MBLNo);
+                        listKeyData.Add("BillingNo", item.DebitNo);
+                        listKeyData.Add("Type", item.Type == "SELL" ? "DEBIT" : "OBH");
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                        listKeyData.Add("TotalVND", item.TotalVND);
+                        listKeyData.Add("TotalUSD", item.TotalUSD);
+                        listKeyData.Add("Office", item.OfficeName);
+                        listKeyData.Add("SalesMan", item.UserName);
+                        listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("Service", convertServiceType(item.TransactionType));
+                        listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
+                        SumTotalUSD += item.TotalUSD;
+                        SumTotalVND += item.TotalVND;
+                        //PaidAmountUSD += item.PaidAmountUSD != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountVND += item.PaidAmountVND != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountVND ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountUSD += item.PaidAmountUSD;
+                        //PaidAmountVND += item.PaidAmountVND;
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
+                }
+                PaidAmountUSD = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountUSD);
+                PaidAmountVND = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountVND);
+                DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
+                DebitAmountVND = SumTotalVND - PaidAmountVND;
+                startRow++;
+                listKeyData.Add("SumTotalVND", SumTotalVND);
+                listKeyData.Add("SumTotalUSD", SumTotalUSD);
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("PaidAmountVND", PaidAmountVND);
+                    listKeyData.Add("PaidAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("PaidAmountVND", null);
+                    listKeyData.Add("PaidAmountUSD", PaidAmountUSD);
+                }
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("DebitAmountVND", DebitAmountVND);
+                    listKeyData.Add("DebitAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("DebitAmountVND", null);
+                    listKeyData.Add("DebitAmountUSD", DebitAmountUSD);
+                }
+                excel.SetData(listKeyData);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
         public Stream GenerateExportAccountingTemplateReport(List<AccountingTemplateExport> acctPayables, AccountPayableCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AP");
@@ -6291,6 +6463,84 @@ namespace eFMS.API.ReportData.FormatExcel
             catch (Exception ex)
             {
                 excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+        public Stream GenerateAccountingReceivableArSumaryNoAgrement(List<AccountReceivableResultExport> result)
+        {
+            try
+            {
+                var folderOfFile = GetFolderInTemplateExport("AR");
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AR_SUMMARY_TEMPLATE_NO_ARGEEMENT));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 3;
+
+                excel.StartDetailTable = 3;
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                 
+                var rowStart = 3;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", i + 1);
+                    listKeyData.Add("PartnerId", item.PartnerCode);
+                    listKeyData.Add("PartnerName", item.PartnerNameEn);
+
+                    if (item.ArCurrency == "VND")
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountVND;
+                    }
+                    else
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountUSD;
+                    }
+
+                    listKeyData.Add("Curr", item.ArCurrency);
+                    listKeyData.Add("ServiceName", item.ArServiceName);
+                    listKeyData.Add("ArSalesmanName", item.ArSalesmanName);
+                    excel.SetData(listKeyData);
+                    excel.Worksheet.Cells.AutoFitColumns();
+                    rowStart++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }
