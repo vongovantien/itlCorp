@@ -1488,26 +1488,45 @@ namespace eFMS.API.Catalogue.DL.Services
             lstTo.Add(salesmanObj?.Email);
             //lstCC.Add(salesmanObj?.Email);
             //lstCC.Add(userCreatedObj?.Email);
-            lstCC = listEmailViewModel.ListAccountant;
+            lstCC = GetEmailsArAccDepartmentUser();
             lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             bool result = SendMail.Send(subject, body, lstTo, null, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
-                SentUser = SendMail._emailFrom,
-                Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
-                Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
-                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
-                Subject = subject,
-                Sent = result,
-                SentDateTime = DateTime.Now,
-                Body = body
+               SentUser = SendMail._emailFrom,
+               Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
+               Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
+               Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
+               Subject = subject,
+               Sent = result,
+               SentDateTime = DateTime.Now,
+               Body = body
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
             return result;
 
+        }
+
+        /// <summary>
+        /// Get email of dept type ar or acct current user
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GetEmailsArAccDepartmentUser()
+        {
+            var departmentsUser = userlevelRepository.Get(x => x.UserId == currentUser.UserID).Select(x => x.DepartmentId).ToList();
+            var departments = catDepartmentRepository.Get(x => (x.DeptType == "AR" || x.DeptType == "ACCOUNTANT") && departmentsUser.Any(z => z == x.Id));
+            if(departments.Count() > 1)
+            {
+                var department = departments.Where(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+                return (department == null ? new List<string>() : department.Email?.Split(";").ToList());
+            }
+            else
+            {
+                return (departments.FirstOrDefault() == null ? new List<string>() : departments.FirstOrDefault().Email?.Split(";").ToList());
+            }
         }
 
         public bool SendMailARConfirmed(string partnerId, string contractId, string partnerType)
