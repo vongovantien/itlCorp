@@ -184,7 +184,8 @@
 
                     </div>
                     <div class="col-lg-7 text-success text-uppercase ">
-                        {{accReceivableDetail?.agreementSalesmanName}}
+                        {{ accReceivableDetail.agreementSalesmanName !== null ?
+                        accReceivableDetail.agreementSalesmanName : accReceivableDetail.arSalesmanName }}
                     </div>
                 </div>
             </div>

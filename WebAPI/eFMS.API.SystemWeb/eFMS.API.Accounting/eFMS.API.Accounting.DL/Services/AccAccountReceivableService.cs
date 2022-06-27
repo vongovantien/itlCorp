@@ -2192,9 +2192,11 @@ namespace eFMS.API.Accounting.DL.Services
                     ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
                     ArSalesmanId = s.Key.SaleMan
                 });
+            var users = userRepo.Get();
 
             var arPartnerNoContracts = from ar in groupByPartner
                                        join partner in partners on ar.PartnerId equals partner.Id
+                                       join u in users on ar.ArSalesmanId equals u.Id
                                        select new AccountReceivableResult
                                        {
                                            PartnerId = ar.PartnerId,
@@ -2220,7 +2222,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            ObhBillingAmount = ar.ObhBillingAmount,
                                            ObhPaidAmount = ar.ObhPaidAmount,
                                            ObhUnPaidAmount = ar.ObhUnPaidAmount,
-                                           ArSalesmanId = ar.ArSalesmanId
+                                           ArSalesmanId = ar.ArSalesmanId,
+                                           ArSalesmanName = u.Username
                                        };
 
             var detail = new AccountReceivableDetailResult();
@@ -2247,7 +2250,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                 Over30Day = s.Sum(sum => sum.Over30Day),
                 ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
-                ArSalesmanId = s.Key.ArSalesmanId
+                ArSalesmanId = s.Key.ArSalesmanId,
+                ArSalesmanName = s.Select(x => x.ArSalesmanName).FirstOrDefault()
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;

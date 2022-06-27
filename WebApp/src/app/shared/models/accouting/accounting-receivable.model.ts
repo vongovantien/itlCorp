@@ -126,6 +126,7 @@ export class AccReceivableDetailModel {
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
+    arSalesmanName: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
