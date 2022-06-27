@@ -6274,13 +6274,16 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
                         SumTotalUSD += item.TotalUSD;
                         SumTotalVND += item.TotalVND;
-                        PaidAmountUSD += item.PaidAmountUSD;
-                        PaidAmountVND += item.PaidAmountVND;
+                        //PaidAmountUSD += item.PaidAmountUSD != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountVND += item.PaidAmountVND != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountVND ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountUSD += item.PaidAmountUSD;
+                        //PaidAmountVND += item.PaidAmountVND;
                         excel.SetData(listKeyData);
                         startRow++;
                     }
                 }
-
+                PaidAmountUSD = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountUSD);
+                PaidAmountVND = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountVND);
                 DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
                 DebitAmountVND = SumTotalVND - PaidAmountVND;
                 startRow++;
