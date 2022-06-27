@@ -26,8 +26,9 @@ namespace eFMSWindowService
             _aTimer.Enabled = true;
             
             // Execute mỗi 1 hour
-            var tillNextInterval = int.Parse(ConfigurationManager.AppSettings["intervalExchangeRate"].ToString());
-            _aTimer.Interval = tillNextInterval;
+            // var tillNextInterval = int.Parse(ConfigurationManager.AppSettings["intervalExchangeRate"].ToString());
+            // _aTimer.Interval = tillNextInterval;
+            _aTimer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
             _aTimer.Elapsed += _aTimer_Elapsed;
         }
 
