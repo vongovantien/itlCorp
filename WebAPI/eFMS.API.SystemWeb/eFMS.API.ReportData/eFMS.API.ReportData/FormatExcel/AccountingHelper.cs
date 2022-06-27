@@ -6290,8 +6290,8 @@ namespace eFMS.API.ReportData.FormatExcel
                         startRow++;
                     }
                 }
-                PaidAmountUSD = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => x.InvoiceNo).Sum(x => x.FirstOrDefault().PaidAmountUSD);
-                PaidAmountVND = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => x.InvoiceNo).Sum(x => x.FirstOrDefault().PaidAmountVND);
+                PaidAmountUSD = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountUSD);
+                PaidAmountVND = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountVND);
                 DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
                 DebitAmountVND = SumTotalVND - PaidAmountVND;
                 startRow++;
