@@ -117,7 +117,7 @@ export class AppComponent {
             .pipe(takeUntil(this._destroyService))
             .subscribe((event) => {
                 console.log(`current`, event.current, `available `, event.available);
-                if (confirm('update available for eFMS, Reload to update')) {
+                if (confirm(`version ${environment.eFMSVersion} available for eFMS, Reload to update`)) {
                     this._SwUpdates.activateUpdate().then(() => location.reload());
                 }
             });

@@ -1282,6 +1282,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlementPaymentRepo.SubmitChanges();
                             }
                         }
+                        else
+                        {
+                            accounting.SalesmanId = GetSalemanOfBilling(chargesOfAcct, model.PartnerId);
+                        }
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
@@ -2603,5 +2607,47 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- Calculator Receivable Accounting Management ---
 
+        /// <summary>
+        /// Get saleman 
+        /// </summary>
+        /// <param name="chargesOfAcct"></param>
+        /// <param name="partnerId"></param>
+        /// <returns></returns>
+        private string GetSalemanOfBilling(List<ChargeOfAccountingManagementModel> chargesOfAcct, string partnerId)
+        {
+            var salesMan = string.Empty;
+            var chargIds = chargesOfAcct.Select(x => x.SurchargeId).ToList();
+            var surcharges = surchargeRepo.Get(x => chargIds.Any(z => z == x.Id));
+            var noneBillingNo = surcharges.Where(x => string.IsNullOrEmpty(x.Soano.Trim())).Count();
+            var cdNos = surcharges.Select(x => x.DebitNo).Distinct().ToList();
+            var soaNos = surcharges.Select(x => x.Soano).Distinct().ToList();
+            if (noneBillingNo > 0) // Get saleman cdnote
+            {
+                noneBillingNo = surcharges.Where(x => string.IsNullOrEmpty(x.DebitNo)).Count();
+                if (noneBillingNo <= 0)
+                {
+                    salesMan = cdNos.Count > 1 ? salesMan : cdNoteRepo.Get(x => x.Code == cdNos.FirstOrDefault()).Select(x => x.SalemanId).FirstOrDefault();
+                }
+            }
+            else // Get saleman soa
+            {
+                salesMan = soaNos.Count > 1 ? salesMan : soaRepo.Get(x => x.Soano == soaNos.FirstOrDefault()).Select(x => x.SalemanId).FirstOrDefault();
+            }
+            if (string.IsNullOrEmpty(salesMan)) // Get saleman with most charges shipment
+            {
+                var transType = surcharges.GroupBy(x => x.TransactionType).Max(x => x.Key);
+                var hblIds = surcharges.Where(x => x.TransactionType == transType).Select(x => x.Hblid).Distinct().ToList();
+                var salesManShipment = opsTransactionRepo.Get(x => hblIds.Any(z => z == x.Hblid)).Select(x => x.SalemanId);
+                salesManShipment = salesManShipment.Distinct().Count() == 0 ? csTransactionDetailRepo.Get(x => hblIds.Any(z => z == x.Id)).Select(x => x.SaleManId) : salesManShipment;
+                salesMan = salesManShipment.Distinct().Count() > 1 ? salesMan : salesManShipment.FirstOrDefault();
+                if (string.IsNullOrEmpty(salesMan))
+                {
+                    var hblIdTop = surcharges.Where(x => hblIds.Any(z => z == x.Hblid)).GroupBy(x => x.Hblid).Max(x => x.Key);
+                    salesMan = opsTransactionRepo.Get(x => x.Hblid == hblIdTop).Select(x => x.SalemanId).FirstOrDefault();
+                    salesMan = string.IsNullOrEmpty(salesMan) ? csTransactionDetailRepo.Get(x => x.Id == hblIdTop).Select(x => x.SaleManId).FirstOrDefault() : salesMan;
+                }
+            }
+            return salesMan;
+        }
     }
 }

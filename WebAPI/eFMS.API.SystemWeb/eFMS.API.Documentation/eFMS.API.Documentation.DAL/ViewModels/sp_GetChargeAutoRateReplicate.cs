@@ -4,8 +4,12 @@ using System.Text;
 
 namespace eFMS.API.Documentation.Service.ViewModels
 {
-    public class spc_GetSurchargeByHouseBill
+    public class sp_GetChargeAutoRateReplicate
     {
+        public string PartnerInternal_Id { get; set; }
+        public Guid OfficeId_JobRep { get; set; }
+        public Guid? CreditCharge { get; set; }
+        public Guid? DebitCharge { get; set; }
         public Guid Id { get; set; }
         public Guid Hblid { get; set; }
         public string Type { get; set; }
@@ -17,7 +21,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CurrencyId { get; set; }
         public bool? IncludedVat { get; set; }
         public decimal? Vatrate { get; set; }
-        public decimal? NetAmount { get; set; }
         public decimal Total { get; set; }
         public string PayerId { get; set; }
         public string ObjectBePaid { get; set; }
@@ -39,52 +42,46 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CreditNo { get; set; }
         public string DebitNo { get; set; }
         public string Soano { get; set; }
-        public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
+        public bool? IsFromShipment { get; set; }
+        public string TypeOfFee { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public string ChargeNameEn { get; set; }
-        public string ChargeCode { get; set; }
-        public string UnitNameEn { get; set; }
-        public string UnitCode { get; set; }
-        public string PartnerName { get; set; }
-        public string ReceiverName { get; set; }
-        public string PayerName { get; set; }
-        public string CurrencyCode { get; set; }
-        public decimal RateToLocal { get; set; }
-        public decimal RateToUSD { get; set; }
-        public string PartnerShortName { get; set; }
-        public string ReceiverShortName { get; set; }
-        public string PayerShortName { get; set; }
-        public Decimal? FinalExchangeRate { get; set; }
-        public string AdvanceNo { get; set; }
-        public string JobNo { get; set; }
-        public string MBLNo { get; set; }
-        public string HBLNo { get; set; }
         public string VoucherId { get; set; }
         public DateTime? VoucherIddate { get; set; }
         public string VoucherIdre { get; set; }
         public DateTime? VoucherIdredate { get; set; }
-        public Guid? ChargeGroup { get; set; }
-        public Guid? OfficeId { get; set; }
-        public string TransactionType { get; set; }
+        public decimal? FinalExchangeRate { get; set; }
+        public bool? Kb { get; set; }
+        public string AdvanceNo { get; set; }
+        public string JobNo { get; set; }
+        public string Mblno { get; set; }
+        public string Hblno { get; set; }
         public Guid? AcctManagementId { get; set; }
         public Guid? PayerAcctManagementId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public decimal? AmountUsd { get; set; }
         public decimal? VatAmountUsd { get; set; }
-        public Guid? CompanyId { get; set; }
-        public string PaySyncedFrom { get; set; }
-        public string SyncedFrom { get; set; }
+        public Guid? ChargeGroup { get; set; }
+        public string TransactionType { get; set; }
+        public Guid? OfficeId { get; set; }
         public string ReferenceNo { get; set; }
+        public Guid? CompanyId { get; set; }
+        public string SyncedFrom { get; set; }
+        public string PaySyncedFrom { get; set; }
+        public decimal? NetAmount { get; set; }
         public string VatPartnerId { get; set; }
-        public string VatPartnerShortName { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
+        public string AdvanceNoFor { get; set; }
         public bool? LinkFee { get; set; }
+        public DateTime? ModifiedDateLinkFee { get; set; }
+        public Guid? UserIdLinkFee { get; set; }
+        public string UserNameLinkFee { get; set; }
         public string LinkChargeId { get; set; }
-        public string PaymentStatus { get; set; }
-        public DateTime? PaidDate { get; set; }
+
     }
 }

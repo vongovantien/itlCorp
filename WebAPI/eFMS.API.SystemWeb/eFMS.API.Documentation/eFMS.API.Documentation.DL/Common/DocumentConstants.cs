@@ -67,7 +67,8 @@
 
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
-
+        public static readonly string SHIPMENT_TYPE_NOMINATED = "Nominated";
+        public static readonly string SHIPMENT_TYPE_FREEHAND = "Freehand";
 
         public const string PERMISSION_RANGE_ALL = "All";
         public const string PERMISSION_RANGE_OWNER = "Owner";

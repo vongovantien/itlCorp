@@ -130,6 +130,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Voucher ID', field: 'voucherId', sortable: true, width: 210 },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true, width: 160 },
             { title: 'Net Amount', field: 'netAmount', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+            { title: 'Paid Date', field: 'paidDate', sortable: true },
         ];
     }
 
