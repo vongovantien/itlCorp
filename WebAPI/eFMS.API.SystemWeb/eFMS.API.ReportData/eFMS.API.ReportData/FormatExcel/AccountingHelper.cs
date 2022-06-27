@@ -6282,9 +6282,6 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
                         SumTotalUSD += item.TotalUSD;
                         SumTotalVND += item.TotalVND;
-                        if(item.PaidAmountUSD != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD ){
-                            Console.Write("hú hú hú");
-                        }
                         //PaidAmountUSD += item.PaidAmountUSD != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
                         //PaidAmountVND += item.PaidAmountVND != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountVND ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
                         //PaidAmountUSD += item.PaidAmountUSD;
