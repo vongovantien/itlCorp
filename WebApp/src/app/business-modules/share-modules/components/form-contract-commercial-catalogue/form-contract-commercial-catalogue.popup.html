@@ -117,8 +117,9 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate }">
-                                        <label required for="">Expired Date</label>
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!expiredDate.value.startDate && contractType.value !=='Cash') }">
+                                        <label *ngIf="contractType.value !=='Cash'" required for="">Expired Date</label>
+                                        <label *ngIf="contractType.value === 'Cash'" for="">Expired Date</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                                 [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
