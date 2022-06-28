@@ -1999,6 +1999,20 @@ namespace eFMS.API.Documentation.DL.Services
                 return result;
             }
         }
+
+        public List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids)
+        {
+            List<AmountSurchargeResult> results = new List<AmountSurchargeResult>();
+
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            foreach (var item in surcharges)
+            {
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, 20000);
+                results.Add(amountSurcharge);
+            }
+
+            return results; 
+        }
     }
 }
 
