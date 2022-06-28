@@ -23,13 +23,6 @@ namespace eFMSWindowService
             _scheduleTime = DateTime.Today.AddDays(1).AddHours(3);
 
         }
-
-        protected override void OnStart(string[] args)
-        {
-            if (ConfigurationManager.AppSettings["LogUpdateOverDueService"] == "1")
-                this.Start();
-        }
-
         public void Start()
         {
             FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDueService] [START]:" + DateTime.Now);
@@ -42,6 +35,10 @@ namespace eFMSWindowService
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer
             _timer.Enabled = true;
+        }
+        protected override void OnStart(string[] args)
+        {
+            this.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)

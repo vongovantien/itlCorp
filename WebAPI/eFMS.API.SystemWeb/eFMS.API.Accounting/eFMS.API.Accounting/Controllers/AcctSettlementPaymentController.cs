@@ -177,13 +177,7 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
-
-            //if (hs.Success)
-            //{
-            //    // Sau khi xóa thành công >> tính lại công nợ dựa vào settlement no
-            //    acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
-            //}
+            }         
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -194,13 +188,16 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
-                acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
+
+                // acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
                 Response.OnCompleted(async () =>
                 {
-                    
-                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(settlementNo, "SETTLEMENT");
+                    acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -437,9 +434,11 @@ namespace eFMS.API.Accounting.Controllers
                 // Tính công nợ sau khi insert Settlement
                 Response.OnCompleted(async () =>
                 {
-                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Settlement.SettlementNo, "SETTLEMENT");
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -497,9 +496,11 @@ namespace eFMS.API.Accounting.Controllers
                 // Tính công nợ sau khi update Settlement
                 Response.OnCompleted(async () =>
                 {
-                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Settlement.SettlementNo, "SETTLEMENT");
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
@@ -706,8 +707,11 @@ namespace eFMS.API.Accounting.Controllers
             // Tính công nợ sau khi Save And Send Request
             Response.OnCompleted(async () =>
             {
-                List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(approve.SettlementNo);
-                await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(approve.SettlementNo, "SETTLEMENT");
+                if (modelReceivableList.Count > 0)
+                {
+                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                }
 
             });
             return Ok(_result);

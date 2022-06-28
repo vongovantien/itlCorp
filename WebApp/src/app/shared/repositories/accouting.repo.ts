@@ -638,9 +638,16 @@ export class AccountingRepo {
 
     // Tính công nợ theo {surchargeId, partnerId, office, service}
     calculatorReceivable(body: any) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body, null, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
+    }
+
+    calculatorDebitAmount(body: any, isHideSpinner: boolean = true) {
+        if (!!isHideSpinner) {
+            return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body, null, { "hideSpinner": "true" });
+        }
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculateDebitAmount`, body);
     }
 
     // Tính công nợ theo {partnerId, office, service}
@@ -670,8 +677,8 @@ export class AccountingRepo {
     }
 
     // Chỉ sử dụng khi không có argeementId
-    getDetailReceivableByPartnerId(partnerId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId }).pipe(
+    getDetailReceivableByPartnerId(partnerId: string, saleManId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId, saleManId: saleManId }).pipe(
             map((data: any) => data)
         );
     }
@@ -951,13 +958,13 @@ export class AccountingRepo {
 
 
     getDataDebitDetail(agreementId: any, option: any, officeId: any, serviceCode: any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode }).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
-    getDataDebitDetailList(agreementId: any, option: any, officeId: any, serviceCode: any, overDueDay: any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode, overDueDay: overDueDay }).pipe(
+    getDataDebitDetailList(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1042,7 +1049,7 @@ export class AccountingRepo {
         );
     }
 
- 
+
 
     payablePaging(page: number, size: number, body: any) {
         console.log('payablePaging', body)
@@ -1067,16 +1074,45 @@ export class AccountingRepo {
     getListJobGroupSurchargeDetailSettlement(settleNo: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
     }
+
     getAdjustDebitValue(model: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetAdjustDebitValue`, model).pipe(
             map((data: any) => data)
         );
     }
+
     updateAdjustDebitValue(data: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/UpdateAdjustDebitValue`, data).pipe(
             map((data: any) => data)
         );
     }
+
+    calculateOverDue1To15(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue1To15`, partnerIds);
+    }
+
+    calculateOverDue15To30(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue15To30`, partnerIds);
+    }
+
+    calculateOverDue30(partnerIds: string[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue30`, partnerIds);
+    }
+
+    getDataDebitDetailListPartnerId(partnerId: any, option: any, officeId: string, serviceCode: string, overDueDay: number, arSalesManId: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetailByPartnerId`, { partnerId: partnerId, option: option, officeId: officeId, serviceCode: serviceCode, overDueDay: overDueDay, arSalesManId: arSalesManId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    getDataDebitDetailByPartnerId(partnerId: string, option: any, officeId: any, serviceCode: any, arSalesManId: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetailByPartnerId`, { partnerId: partnerId, option: option, officeId: officeId, serviceCode: serviceCode, arSalesManId: arSalesManId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
 }
 
 

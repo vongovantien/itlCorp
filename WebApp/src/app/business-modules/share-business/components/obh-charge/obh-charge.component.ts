@@ -8,13 +8,14 @@ import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories'
 import { SortService } from '@services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { takeUntil, catchError, finalize, switchMap } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner, Charge, Unit } from '@models';
 
 import * as fromStore from './../../store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
+import { getPartnerForKeyingChargeState, LoadListPartnerForKeyInSurcharge } from './../../store';
 
 @Component({
     selector: 'obh-charge',
@@ -62,34 +63,15 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getPartner() {
-        this._spinner.show(this.spinnerpartner);
+        this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+            { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId })
+        );
 
-        this._store.select(fromStore.getTransactionDetailCsTransactionState)
-            .pipe(
-                switchMap(
-                    (data) => {
-                        if (!!data?.officeId) {
-                            return this._catalogueRepo.getPartnerForKeyingCharge(
-                                true,
-                                this.serviceTypeId,
-                                data?.officeId,
-                                this.hbl.saleManId
-                            ).pipe(
-                                finalize(() => {
-                                    this._spinner.hide(this.spinnerpartner);
-                                    this.isShowLoadingPartner = false;
-                                }),
-                            );
-                        }
-                    }
-                ),
-                catchError(this.catchError),
-                takeUntil(this.ngUnsubscribe),
-            ).subscribe(
-                (partners: any[]) => {
-                    this.listPartner = partners;
-                }
-            );
+        this._store.select(getPartnerForKeyingChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((partners: any[]) => {
+                this.listPartner = partners;
+            });
 
         this._catalogueRepo.getListPartner(null, null, { active: true })
             .subscribe(
@@ -154,11 +136,12 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH }).subscribe(
-            (charges: Charge[]) => {
-                this.listCharges = charges;
-            }
-        );
+        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.OBH })
+        // .subscribe(
+        //     (charges: Charge[]) => {
+        //         this.listCharges = charges;
+        //     }
+        // );
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {
@@ -335,9 +318,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 (result: CommonInterface.IResult) => {
                     if (result.status) {
                         this._toastService.success(result.message);
-
-                        // Tính công nợ
-                        // this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);

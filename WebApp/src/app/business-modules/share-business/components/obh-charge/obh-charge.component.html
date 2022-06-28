@@ -48,7 +48,8 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['receiverName','payerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''" [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
+                            [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
@@ -254,7 +255,7 @@
                                                 [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                [dataSources]="listCharges"
+                                                [dataSources]="listCharges$ | async"
                                                 [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                                 placeholder="Select charge" (remove)="charge.chargeId = null">
                                             </app-combo-grid-virtual-scroll>
@@ -643,12 +644,13 @@
 <confirm-popup [body]="'Are you sure want to delete this Charge'" (onSubmit)="onDeleteShipmentSurcharge('OBH')">
 </confirm-popup>
 
-<confirm-popup #confirmCancelPopup [body]="'Are you sure want to cancel link charge'" (onSubmit)="onCancelLinkCharge('OBH')">
+<confirm-popup #confirmCancelPopup [body]="'Are you sure want to cancel link charge'"
+    (onSubmit)="onCancelLinkCharge('OBH')">
 </confirm-popup>
 
-<app-context-menu #linkFeeContextMenu >
+<app-context-menu #linkFeeContextMenu>
     <ng-container *ngIf="selectedCs&&selectedCs.linkChargeId&&shipment.replicatedId">
-        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
+        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)">
             <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
         </div>
     </ng-container>

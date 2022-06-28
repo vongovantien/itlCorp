@@ -22,7 +22,7 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
     billingDate: AbstractControl;
     data: AdjustModel = new AdjustModel();
     headers = [
-        { title: 'No.', field: 'i', sortable: false, width: 40},
+        { title: 'No.', field: 'i', sortable: false, width: 40 },
         { title: 'Charge Code', field: 'chargeCode', sortable: false },
         { title: 'Charge Name', field: 'chargeName', sortable: false },
         { title: 'Org Net', field: 'netAmount', sortable: false },
@@ -135,11 +135,11 @@ export class ShareBussinessAdjustDebitValuePopupComponent extends PopupBase {
             let el = this.data.listChargeGrp[i];
             for (let j = 0; j < this.data.listChargeGrp[i].listCharges.length; j++) {
                 let el2 = this.data.listChargeGrp[i].listCharges[j];
-                if (!el2.amountVND&&el2.amountVND!=0) {
+                if (!el2.amountVND && el2.amountVND != 0) {
                     this._toastService.warning(`${el2.chargeCode} cannot empty NetDebit`);
                     return false;
                 }
-                if (!el2.vatAmountVND && el2.vatAmountVND!=0) {
+                if (!el2.vatAmountVND && el2.vatAmountVND != 0) {
                     this._toastService.warning(`${el2.chargeCode} cannot empty Vat`);
                     return false;
                 }

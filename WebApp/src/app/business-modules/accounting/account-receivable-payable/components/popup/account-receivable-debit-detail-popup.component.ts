@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { SystemConstants } from '@constants';
 import { ExportRepo } from '@repositories';
 import { SortService } from '@services';
@@ -23,6 +23,8 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
         { title: 'Paid USD', field: 'paidAmountUSD', sortable: true },
         { title: 'Unpaid VND', field: 'unpaidAmountVND', sortable: true },
         { title: "Unpaid USD", field: 'unpaidAmountUSD', sortable: true },
+        { title: "Services", field: 'service', sortable: true },
+        { title: "Salesman", field: 'salesman', sortable: true },
         { title: "Overdue Days", field: 'overdueDays', sortable: true },
         { title: "Due Days", field: 'paymentDueDate', sortable: true },
         { title: 'Office', field: 'code', sortable: true },
@@ -54,7 +56,7 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
         this.hide();
     }
 
-    resetForm(){
+    resetForm() {
         this.dataDebitList = [];
 
         this.sumTotalObj.totalVND = 0;
@@ -81,12 +83,12 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
     }
 
     exportExcel() {
-            this._exportRepo.exportAccountingReceivableDebitDetail(this.dataSearch)
-                .subscribe(
-                    (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'DebitDetail.xlsx');
-                    }
-                );
-        }
+        this._exportRepo.exportAccountingReceivableDebitDetail(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'DebitDetail.xlsx');
+                }
+            );
+    }
 
 }

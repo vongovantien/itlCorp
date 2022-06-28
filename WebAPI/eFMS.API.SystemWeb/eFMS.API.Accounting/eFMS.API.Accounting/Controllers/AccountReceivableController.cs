@@ -96,6 +96,18 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Get AR detail has argeement by argeement id
         /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDebitAmountDetailByContract")]
+        public IActionResult GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
+        {
+            var data = accountReceivableService.GetDebitAmountDetailByContract(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get AR detail has argeement by argeement id
+        /// </summary>
         /// <param name="argeementId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByArgeementId")]
@@ -111,9 +123,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="partnerId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByPartnerId")]
-        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId)
         {
-            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId);
+            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId, saleManId);
             return Ok(data);
         }
 
@@ -156,13 +168,20 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetDebitDetail")]
-        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode ,int overDueDay = 0)
+        [HttpPost("GetDebitDetail")]
+        public IActionResult GetDebitDetail(AcctReceivableDebitDetailCriteria criteria)
         {
-            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode, overDueDay);
+            var data = accountReceivableService.GetDataDebitDetail(criteria);
             return Ok(data);
         }
 
+        [HttpPost("GetDebitDetailByPartnerId")]
+        [Authorize]
+        public IActionResult GetDebitDetailByPartnerId([FromBody]ArDebitDetailCriteria model)
+        {
+            var data = accountReceivableService.GetDebitDetailByPartnerId(model);
+            return Ok(data);
+        }
         /// <summary>
         /// Update due date invoice và công nợ quá hạn sau khi update HĐ
         /// </summary>
@@ -234,9 +253,9 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPut("CalculateDebitAmount")]
-        public IActionResult CalculateDebitAmount([FromBody] List<string> partnerIds)
+        public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
-            var hs = accountReceivableService.CalculatorReceivableDebitAmount(partnerIds);
+            var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)

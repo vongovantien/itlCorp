@@ -2,7 +2,7 @@ import { InitProfitHBLAction, GetDetailHBLAction } from './../../store/actions/h
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
-import { getHBLSState, IShareBussinessState, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction } from "../../store";
+import { getHBLSState, IShareBussinessState, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction, LoadListPartnerForKeyInSurcharge } from "../../store";
 import { Store } from "@ngrx/store";
 import { Params, ActivatedRoute } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -138,7 +138,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             { title: 'Department', field: 'department', sortable: true }
         ];
     }
-    
+
     sortLocal(sort: string): void {
         this.houseBills = this._sortService.sort(this.houseBills, sort, this.order);
     }
@@ -201,15 +201,20 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                 this._store.dispatch(new GetContainerAction({ mblid: this.jobId }));
             }
             this._store.dispatch(new GetProfitHBLAction(this.selectedHbl.id));
-
             switch (this.selectedTabSurcharge) {
                 case 'BUY':
                     this._store.dispatch(new GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
                     break;
                 case 'SELL':
+                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                        { office: (this.selectedHbl as any)?.officeId, salemanId: (this.selectedHbl as any).saleManId, service: this.selectedHbl.transactionType })
+                    );
                     this._store.dispatch(new GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
                     break;
                 case 'OBH':
+                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                        { office: (this.selectedHbl as any)?.officeId, salemanId: (this.selectedHbl as any).saleManId, service: this.selectedHbl.transactionType })
+                    );
                     this._store.dispatch(new GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
                     break;
                 default:

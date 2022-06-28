@@ -79,13 +79,13 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Product Service', field: 'productService', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
-            { title: 'Department', field: 'departmentName', sortable: true },
-            { title: 'Group', field: 'groupName', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
             { title: 'CBM', field: 'sumCbm', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
+            { title: 'Department', field: 'departmentName', sortable: true },
+            { title: 'Group', field: 'groupName', sortable: true },
             { title: 'Modified Date', field: 'modifiedDate', sortable: true },
         ];
 

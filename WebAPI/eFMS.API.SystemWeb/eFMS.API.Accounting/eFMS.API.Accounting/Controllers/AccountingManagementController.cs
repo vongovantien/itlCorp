@@ -102,7 +102,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(id);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     if(type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         acctDebitArService.DeleteDebit(id);
@@ -225,7 +225,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         await acctDebitArService.AddAndUpdate(model.Id);
@@ -306,7 +306,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         await acctDebitArService.AddAndUpdate(model.Id);
@@ -505,7 +505,7 @@ namespace eFMS.API.Accounting.Controllers
                     Response.OnCompleted(async () =>
                     {
                         List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(acctMngtId);
-                        await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
 
                     });
                 }

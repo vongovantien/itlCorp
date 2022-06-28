@@ -46,6 +46,7 @@
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
             public const string GetDebitDetailUrl = "/api/v1/en-US/AccountReceivable/GetDebitDetail";
+            public const string GetDetailARByArgeementIdUrl = "/api/v1/en-US/AccountReceivable/GetDebitAmountDetailByContract";
 
             public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
             public const string SettlementPaymentDetailListUrl = "/api/v1/en-US/AcctSettlementPayment/GetDataExportSettlementDetail";

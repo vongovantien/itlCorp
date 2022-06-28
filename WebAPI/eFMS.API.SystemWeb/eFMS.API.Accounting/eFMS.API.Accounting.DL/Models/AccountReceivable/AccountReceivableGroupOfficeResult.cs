@@ -22,5 +22,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? TotalObhPaidAmount { get; set; }
         public decimal? TotalObhUnPaidAmount { get; set; }
         public List<AccountReceivableServiceResult> AccountReceivableGrpServices { get; set; }
+        public List<string> Services { get; set; }
     }
 }

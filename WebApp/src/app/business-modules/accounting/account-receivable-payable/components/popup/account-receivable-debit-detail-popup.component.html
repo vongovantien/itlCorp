@@ -12,36 +12,44 @@
                             <tbody>
                                 <ng-container>
                                     <ng-container *ngFor="let item of dataDebitList; let i = index; trackBy: trackByFn">
-                                        <tr class="">
+                                        <tr class="" [contextMenu]="receiptContextMenu">
                                             <td>{{i+1}} </td>
                                             <td class="text-primary"> {{item.billingNo }}</td>
                                             <td ALIGN="center">{{item.type }}</td>
-                                            <td ALIGN="center">{{item.invoiceNo }}
-                                                    <ng-container [ngSwitch]="item.paymentStatus">
-                                                        <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
-                                                            {{item.paymentStatus}}
-                                                        </span>
-                                                        <span class="m-badge m-badge--warning m-badge--wide text-white"
-                                                            *ngSwitchCase="'Paid A Part'">
-                                                            {{item.paymentStatus}}
-                                                        </span>
-                                                        <span class="m-badge m-badge--danger m-badge--wide" *ngSwitchDefault>
-                                                            {{item.paymentStatus}}
-                                                        </span>
-                                                    </ng-container>
+                                            <td ALIGN="right">{{item.invoiceNo }}
+                                                <ng-container [ngSwitch]="item.paymentStatus">
+                                                    <span class="m-badge m-badge--success m-badge--wide"
+                                                        *ngSwitchCase="'Paid'">
+                                                        {{item.paymentStatus}}
+                                                    </span>
+                                                    <span class="m-badge m-badge--warning m-badge--wide text-white"
+                                                        *ngSwitchCase="'Paid A Part'">
+                                                        {{item.paymentStatus}}
+                                                    </span>
+                                                    <span class="m-badge m-badge--danger m-badge--wide"
+                                                        *ngSwitchDefault>
+                                                        {{item.paymentStatus}}
+                                                    </span>
+                                                </ng-container>
                                             </td>
-                                            <td class="text-right" ALIGN="right">{{ item.totalAmountVND | number: '.0-3'
+                                            <td class="text-right" ALIGN="right">{{ item.totalAmountVND |
+                                                negativeNumber:'.0-3': '.0-3'
                                                 }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.totalAmountUSD | number: '.0-3'
+                                            <td class="text-right" ALIGN="right">{{ item.totalAmountUSD |
+                                                negativeNumber: '.0-2'
                                                 }}</td>
                                             <td class="text-right text-success" ALIGN="right">{{ item.paidAmountVND |
                                                 number: '.0-3' }}</td>
                                             <td class="text-right text-success" ALIGN="right">{{ item.paidAmountUSD |
-                                                number: '.0-3' }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountVND | number:
+                                                number: '.0-2' }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountVND |
+                                                negativeNumber:
                                                 '.0-3' }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountUSD | number:
-                                                '.0-3' }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountUSD |
+                                                negativeNumber:
+                                                '.0-2' }}</td>
+                                            <td class="text-right text-primary">{{ item.service }}</td>
+                                            <td class="text-right text-success">{{ item.salesman }}</td>
                                             <td class="text-right">{{ item.overdueDays }}</td>
                                             <td class="text-right">{{ item.paymentDueDate | date: 'dd/MM/yyyy' }}</td>
                                             <td class="text-right text-success">{{ item.code }}</td>
@@ -72,7 +80,7 @@
                                     <td rowspan="4" ALIGN="center" class="text-right">
                                         {{sumTotalObj.totalunpaidUSD | number:'.0-3'}}
                                     </td>
-                                    <td colspan="4"></td>
+                                    <td colspan="6"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -80,7 +88,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <app-permission-button type="export"  (onClick)="exportExcel()">
+                <app-permission-button type="export" (onClick)="exportExcel()">
                 </app-permission-button>
                 <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="closePopup()">
                     <span>
@@ -94,3 +102,9 @@
         </div>
     </div>
 </div>
+
+<app-context-menu #receiptContextMenu>
+    <div class="menu-context__item" (click)="exportExcel()">
+        <span><i class="la la-download"></i><span> Export</span></span>
+    </div>
+</app-context-menu>
