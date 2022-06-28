@@ -1212,8 +1212,8 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
 
-            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
+            // var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            // var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
 
             List<string> lstBCc = ListMailCC();
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
@@ -1304,9 +1304,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc = listEmailViewModel.ListAccountant;
 
                 lstTo.Add(objInfoSalesman?.Email);
-                lstTo.Add(mailRequester);
                 //lstTo.Add(objInfoCreatorPartner?.Email);
-                //lstTo.Add(objInfoCreator?.Email);
+                lstTo.Add(objInfoCreator?.Email);
                 lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
                 resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
@@ -1378,10 +1377,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                lstCc.Add(mailRequester);
                 //lstCc.Add(objInfoCreatorPartner?.Email);
                 //lstCc.Add(objInfoModified?.Email);
-                //lstCc.Add(objInfoCreator?.Email);
+                lstCc.Add(objInfoCreator?.Email);
                 lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
                 resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
@@ -1416,8 +1414,6 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, string.Empty);
-            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
 
             string subject = string.Empty;
             string linkVn = string.Empty;
@@ -1484,10 +1480,9 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
             List<string> lstCC = new List<string>();
 
-            lstTo.Add(mailRequester);
             lstTo.Add(salesmanObj?.Email);
             //lstCC.Add(salesmanObj?.Email);
-            //lstCC.Add(userCreatedObj?.Email);
+            lstTo.Add(userCreatedObj?.Email);
             lstCC = GetEmailsArAccDepartmentUser();
             lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
@@ -1539,9 +1534,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeIdSaleman = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoSaleman = sysEmployeeRepository.Get(e => e.Id == employeeIdSaleman)?.FirstOrDefault();
-
-            var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-            var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
 
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
@@ -1635,9 +1627,8 @@ namespace eFMS.API.Catalogue.DL.Services
             body.Replace("{{address}}", address);
             body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-            //lstCc.Add(objInfoCreator?.Email);
+            lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoSaleman?.Email);
-            lstCc.Add(mailRequester);
             lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             bool result = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
