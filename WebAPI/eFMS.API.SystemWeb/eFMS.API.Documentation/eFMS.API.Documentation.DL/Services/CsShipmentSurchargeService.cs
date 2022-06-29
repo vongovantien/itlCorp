@@ -1702,6 +1702,17 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_USD) // Error if total > 100,000usd
+                        {
+                            var _roundDecimal = 2;
+                            var _netAmount = NumberHelper.RoundNumber((item.UnitPrice * item.Quantity) ?? 0, _roundDecimal);
+                            var _vatAmount = NumberHelper.RoundNumber(item.Vatrate < 0 ? Math.Abs(item.Vatrate ?? 0) : ((_netAmount * item.Vatrate) ?? 0) / 100, _roundDecimal);
+                            if ((_netAmount + _vatAmount) > 100000)
+                            {
+                                item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_OVER_LIMIT], item.CurrencyId);
+                                item.IsValid = false;
+                            }
+                        }
                     }
                 }
             });

@@ -62,6 +62,18 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         }
     }
 
+    checkValidSettle() {
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if(!this.formCreateSurcharge.dueDate.value){
+            return false;
+        }
+        return true;
+    }
+
     saveSettlement() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
@@ -77,6 +89,10 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         //         s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
         //     }
         // });
+
+        if(!this.checkValidSettle()){
+            return;
+        }
 
         this.formatInvoiceDateSurcharge();
 

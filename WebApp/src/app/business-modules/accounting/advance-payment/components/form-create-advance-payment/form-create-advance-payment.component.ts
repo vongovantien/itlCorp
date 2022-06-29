@@ -49,6 +49,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     paymentTerm: AbstractControl;
     payee: AbstractControl;
     advanceFor: AbstractControl;
+    dueDate: AbstractControl;
 
     selectedPayee: Partner;
     banks: Observable<Bank[]>;
@@ -115,7 +116,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             bankName: [],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],
             bankCode: [{ value: null, disabled: true }],
-            advanceFor: [this.advanceForDatas[0]]
+            advanceFor: [this.advanceForDatas[0]],
+            dueDate: [null, Validators.required]
         });
 
         this.advanceNo = this.formCreate.controls['advanceNo'];
@@ -133,6 +135,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.payee = this.formCreate.controls['payee'];
         this.bankCode = this.formCreate.controls['bankCode'];
         this.advanceFor = this.formCreate.controls['advanceFor'];
+        this.dueDate = this.formCreate.controls['dueDate'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(

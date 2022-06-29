@@ -73,7 +73,7 @@
 
   "MSG_CURRENCY_EMPTY": "Currency không được để trống!",
   "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!",
-
+  "MSG_TOTAL_OVER_LIMIT": "Tổng tiền quá lớn với mã tiền tệ {0}",
   //"MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
   //"MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!"
 }

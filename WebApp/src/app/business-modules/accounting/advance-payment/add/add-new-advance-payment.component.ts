@@ -77,7 +77,11 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         }
     }
 
-    checkValidListAdvanceRequest(){
+    checkInvalidListAdvanceRequest(){
+        this.formCreateComponent.isSubmitted = true;
+        if(!this.formCreateComponent.dueDate.value){
+            return true;
+        }
         if(!this.isAdvCarrier){
             if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
                 this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '');
@@ -89,7 +93,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             }
         }else{
             this.listAdvancePaymentCarrierComponent.isSubmitted = true;
-            this.formCreateComponent.isSubmitted = true;
+            
             if (!this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.length) {
                 this._toastService.warning(`Advance Payment don't have any detail in this period, Please check it again! `, '');
                 return true;
@@ -104,13 +108,18 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '');
                 return true;
             }
-            this.formCreateComponent.isSubmitted = false;
+            // Error if total > 100,000usd
+            if (this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.some(item => item.currencyId === 'USD' && item.total > 100000)) {
+                this._toastService.error('Amount is too large, please check again.');
+                return true;
+            }
         }
+        this.formCreateComponent.isSubmitted = false;
         return false;
     }
 
     saveAdvancePayment() {
-        if (this.checkValidListAdvanceRequest()) {
+        if (this.checkInvalidListAdvanceRequest()) {
             return;
         } else {
             const body = this.getFormData();
@@ -138,7 +147,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     }
 
     sendRequest() {
-        if (this.checkValidListAdvanceRequest()) {
+        if (this.checkInvalidListAdvanceRequest()) {
             return;
         } else {
             const body = this.getFormData();
@@ -180,7 +189,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
                 bankName: this.formCreateComponent.bankName.value,
                 payee: this.formCreateComponent.payee.value,
-                bankCode: this.formCreateComponent.bankCode.value
+                bankCode: this.formCreateComponent.bankCode.value,
+                dueDate: formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en')
 
             };
             return body;
@@ -200,7 +210,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 bankName: this.formCreateComponent.bankName.value,
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
-                advanceFor: this.formCreateComponent.advanceFor.value
+                advanceFor: this.formCreateComponent.advanceFor.value,
+                dueDate: formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en')
             };
             return body;
         }
