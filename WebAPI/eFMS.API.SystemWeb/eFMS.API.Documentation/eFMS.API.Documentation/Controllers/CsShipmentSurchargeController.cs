@@ -704,6 +704,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpPut("GetAmountSurcharge")]
+        public IActionResult GetAmountSurcharge([FromBody] List<Guid> Ids)
+        {
+            var hs = csShipmentSurchargeService.GetAmountSurchargeResult(Ids);
+            ResultHandle _result = new ResultHandle { Data = hs };
+            return Ok(_result);
+        }
+
         [HttpPut]
         [Route("CancelLinkCharge")]
         [Authorize]

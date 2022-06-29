@@ -33,5 +33,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState CancelLinkCharge(Guid chargeId);
         HandleState RevertChargeLinkFee(List<CsShipmentSurchargeModel> list);
         HandleState UpdateChargeLinkFee(List<CsShipmentSurchargeModel> list);
+        List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids);
     }
 }
