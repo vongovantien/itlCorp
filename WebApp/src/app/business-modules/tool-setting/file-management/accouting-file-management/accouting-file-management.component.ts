@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';;
+import { Router } from '@angular/router'; import { Office } from '@models';
+;
 import { SettingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 
 export interface IFileItem { name: string, dateCreated: string, userModified: string, folderName: string, url: string, classIcon: string }
-
 @Component({
     selector: 'accouting-file-management',
     templateUrl: './accouting-file-management.component.html'
@@ -68,12 +68,15 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         this.itemsDefault = items;
     }
 
-    // onGetFolerItems(data: IFileItem) {
-    //     this.isActiveClick = !this.isActiveClick;
-    //     this.folderName = data.folderName;
-    //     this.dataSearch = { folder: data.folderName };
-    //     this.getFolderFileManagement();
-    // }
+    onGetFolerItems(data: IFileItem) {
+        if (this.isActiveClick == false) {
+            this.isActiveClick = !this.isActiveClick;
+            this.folderName = data.folderName;
+            this.dataSearch = { folder: data.folderName };
+            this.getFolderFileManagement();
+        }
+
+    }
 
     getFolderFileManagement() {
         this.isActiveSearch = true;
@@ -85,7 +88,6 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
                     this.pushTypeForItem(res.data);
                 },
             );
-
     }
 
     onSelectFile(item: string) {
@@ -96,10 +98,10 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
     }
 
     onSearchValue(event: { field: string; searchString: any; }) {
-        // if(event.searchString != null){
-        //     window.open(`${item}`, "_blank");
-        // }
         this.dataSearch = event;
+        if (this.folderName != null && this.folderName != undefined) {
+            this.dataSearch.folder = this.folderName;
+        }
         this.getFolderFileManagement();
     }
 }

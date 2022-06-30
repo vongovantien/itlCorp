@@ -15,7 +15,7 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-md-2">
-                            <sidebar-file-management>
+                            <sidebar-file-management [folderName]="folderName">
                             </sidebar-file-management>
                         </div>
                         <div class="col-md-10">
@@ -49,7 +49,7 @@
                                     <tbody>
                                         <tr *ngFor="let item of itemsDefault" [contextMenu]="fileManagementContextMenu"
                                             (onTouch)="onSelectFile(item.url)"
-                                            (click)="onSearchValue({folder : item.folder})">
+                                            (click)="isActiveClick ? $event.stopPropagation(): onGetFolerItems(item)">
                                             <td>
                                                 <i class="{{item.classIcon}}"></i>
                                                 &nbsp;

@@ -7,8 +7,8 @@ export const environment = {
     local: false,
     HOST: {
         WEB_URL: "uat-api-efms.itlvn.com",
-        // ACCOUNTING: "uat-api-efms.itlvn.com/Accounting",
-        ACCOUNTING: "localhost:44363",
+        ACCOUNTING: "uat-api-efms.itlvn.com/Accounting",
+        // ACCOUNTING: "localhost:44363",
 
         DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
         // DOCUMENTATION: "localhost:44324/",

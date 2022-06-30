@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Event, NavigationEnd, Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
 
 @Component({
@@ -7,9 +7,19 @@ import { RoutingConstants } from '@constants';
     templateUrl: './sidebar-file-management.component.html'
 })
 export class SidebarFileManagementComponent implements OnInit {
-    constructor(private _router: Router) { }
+    @Input() folderName: string;
+    title: string;
+    constructor(private route: ActivatedRoute, private _router: Router) {
 
+    }
     ngOnInit() {
+        console.log(this.folderName);
+        if (this.folderName != null && this.folderName != undefined) {
+            this.title = this.route.snapshot.data['title'] + ">" + this.folderName;
+        }
+        else {
+            this.title = this.route.snapshot.data['title']
+        }
     }
 
     navigateFileMngt(moduleUrl: string) {

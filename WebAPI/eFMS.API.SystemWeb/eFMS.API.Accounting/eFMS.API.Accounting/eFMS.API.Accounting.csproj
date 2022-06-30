@@ -59,6 +59,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.Accounting.DL\eFMS.API.Accounting.DL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="eFMS.API.Accounting.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Accounting.DL.dll</HintPath>
     </Reference>
