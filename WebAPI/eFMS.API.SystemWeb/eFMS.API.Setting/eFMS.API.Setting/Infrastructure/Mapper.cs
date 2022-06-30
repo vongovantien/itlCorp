@@ -15,6 +15,7 @@ namespace eFMS.API.Setting.Infrastructure
             CreateMap<SetTariff, TariffViewModel>();
             CreateMap<SetTariffModel, TariffViewModel>();
             CreateMap<CsRuleLinkFee, RuleLinkFeeModel>();
+            CreateMap<SysImage, SysImageModel>();
 
             // map to entity model
             CreateMap<SetTariffModel, SetTariff>();
@@ -24,6 +25,7 @@ namespace eFMS.API.Setting.Infrastructure
             CreateMap<SetUnlockRequestJob, SetUnlockRequestJobModel>();
             CreateMap<SetUnlockRequestApprove, SetUnlockRequestApproveModel>();
             CreateMap<RuleLinkFeeModel, CsRuleLinkFee>();
+            CreateMap<SysImageModel, SysImage>();
         }
     }
 }

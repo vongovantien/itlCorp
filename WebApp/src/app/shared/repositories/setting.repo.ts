@@ -142,11 +142,11 @@ export class SettingRepo {
             );
     }
 
-    generatePaymentId(paymentNo: string, type: number){
-        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`,{paymentNo:paymentNo,type:type})
-        .pipe(
-            map((data: any) => data)
-        );
+    generatePaymentId(paymentNo: string, type: number) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`, { paymentNo: paymentNo, type: type })
+            .pipe(
+                map((data: any) => data)
+            );
     }
 
     getRule(page?: number, size?: number, body: any = {}) {
@@ -194,6 +194,16 @@ export class SettingRepo {
 
     downloadRuleLinkFeeExcel() {
         return this._api.downloadfile(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/RuleLinkFee/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getListFileManagement(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

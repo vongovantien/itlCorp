@@ -1,0 +1,40 @@
+<div class="m-content pt-5 mt-4">
+    <ul class="m-menu__nav navbar-nav">
+        <li class="m-menu__item my-3" routerLinkActive="m-menu__item--open m-menu__item--active">
+            <a (click)="navigateFileMngt('accounting')"
+                class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-calculator m__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Accounting
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item my-3" routerLinkActive="m-menu__item--open m-menu__item--active">
+            <a (click)="navigateFileMngt('document')"
+                class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-file-text2 m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Document
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item my-3" routerLinkActive="m-menu__item--open m-menu__item--active">
+            <a (click)="navigateFileMngt('catalogue')"
+                class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-books m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Catalogue
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item my-3" routerLinkActive="m-menu__item--open m-menu__item--active">
+            <a (click)="navigateFileMngt('system')"
+                class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-database m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    System
+                </span>
+            </a>
+        </li>
+    </ul>
+</div>
