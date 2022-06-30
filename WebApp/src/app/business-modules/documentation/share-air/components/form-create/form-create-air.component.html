@@ -18,11 +18,17 @@
                             <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb' 
                             ">
                                 MAWB inputted is not correct format
-                            </div> -->
-                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
+                            
+                            </div>
+                            -->
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
                             mawb.errors | equalError:'pattern':''">
                                 MAWB must be xxx-xxxxxxxx
-                            </div> -->
+                            </div>
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === true &&
+                            mawb.errors | equalError:'pattern':''">
+                                MAWB No must be not have special charater!
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
