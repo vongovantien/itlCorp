@@ -98,9 +98,10 @@ namespace eFMSWindowService
                         string body = dear + headerBody + tableBody + footerBody;
                         body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
                         List<string> mail = new List<string> { item.Key.Email };
+                        var emailCC = item.FirstOrDefault().AREmail?.Split(';').ToList();
                         var configBCC = ConfigurationManager.AppSettings["SendMailBCC"];
                         List<string> emailBCCs = configBCC.Split(',').ToList<string>();
-                        var s = SendMailHelper.Send(subject, body, mail, null, null, emailBCCs);
+                        var s = SendMailHelper.Send(subject, body, mail, null, emailCC, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
                         var logSendMail = new sysSentEmailHistory
