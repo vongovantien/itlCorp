@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 
-export interface IFileItem { name: string, dateCreated: string, userModified: string, folderName: string, url: string }
+export interface IFileItem { name: string, dateCreated: string, userModified: string, folderName: string, url: string, classIcon: string }
 
 @Component({
     selector: 'accouting-file-management',
@@ -18,6 +18,7 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         dateCreated: "19/03/2022",
         userModified: "22/03/2022",
         folderName: "SOA",
+        classIcon: "la la-folder",
         url: ""
     },
     {
@@ -25,6 +26,7 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         dateCreated: "19/03/2022",
         userModified: "22/03/2022",
         folderName: "Settlement",
+        classIcon: "la la-folder",
         url: ""
     },
     {
@@ -32,6 +34,7 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         dateCreated: "19/03/2022",
         userModified: "22/03/2022",
         folderName: "Advance",
+        classIcon: "la la-folder",
         url: ""
     }]
 
@@ -48,12 +51,29 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
     ngOnInit() {
     }
 
-    onGetFolerItems(data: IFileItem) {
-        this.isActiveClick = !this.isActiveClick;
-        this.folderName = data.folderName;
-        this.dataSearch = { folder: data.folderName };
-        this.getFolderFileManagement();
+    pushTypeForItem(items: any) {
+        for (let item of items) {
+            let arr = item.name.split(".");
+            switch (arr[arr.length - 1]) {
+                case 'pdf':
+                    item.classIcon = "la la-file-pdf-o"
+                    break;
+                case 'xlsx':
+                    item.classIcon = "la la-file-excel-o"
+                    break;
+                default:
+                    item.classIcon = "la la-file-image-o"
+            }
+        }
+        this.itemsDefault = items;
     }
+
+    // onGetFolerItems(data: IFileItem) {
+    //     this.isActiveClick = !this.isActiveClick;
+    //     this.folderName = data.folderName;
+    //     this.dataSearch = { folder: data.folderName };
+    //     this.getFolderFileManagement();
+    // }
 
     getFolderFileManagement() {
         this.isActiveSearch = true;
@@ -62,9 +82,10 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
             .subscribe(
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
-                    this.itemsDefault = res.data || [];
+                    this.pushTypeForItem(res.data);
                 },
             );
+
     }
 
     onSelectFile(item: string) {
@@ -75,6 +96,9 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
     }
 
     onSearchValue(event: { field: string; searchString: any; }) {
+        // if(event.searchString != null){
+        //     window.open(`${item}`, "_blank");
+        // }
         this.dataSearch = event;
         this.getFolderFileManagement();
     }

@@ -7,18 +7,17 @@ import { RoutingConstants } from '@constants';
     templateUrl: './sidebar-file-management.component.html'
 })
 export class SidebarFileManagementComponent implements OnInit {
-
     constructor(private _router: Router) { }
 
     ngOnInit() {
     }
 
     navigateFileMngt(moduleUrl: string) {
-        if (moduleUrl === 'accounting')
+        if (moduleUrl === 'accounting') {
             this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT]);
+        }
         else {
             this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT + "/" + moduleUrl]);
         }
     }
-
 }

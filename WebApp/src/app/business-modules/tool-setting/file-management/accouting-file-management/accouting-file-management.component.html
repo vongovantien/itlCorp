@@ -46,12 +46,12 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody *ngFor="let item of itemsDefault">
-                                        <tr [contextMenu]="fileManagementContextMenu" (onTouch)="onSelectFile(item.url)"
-                                            (click)="onGetFolerItems(item)"
-                                            [ngStyle]="{'pointer-events': isActiveClick == 'true' ? 'none' : '' }">
+                                    <tbody>
+                                        <tr *ngFor="let item of itemsDefault" [contextMenu]="fileManagementContextMenu"
+                                            (onTouch)="onSelectFile(item.url)"
+                                            (click)="onSearchValue({folder : item.folder})">
                                             <td>
-                                                <i class="la la-folder"></i>
+                                                <i class="{{item.classIcon}}"></i>
                                                 &nbsp;
                                                 <span>{{item.name}}</span>
                                             </td>
@@ -79,9 +79,6 @@
     <ng-container>
         <div class="menu-context__item " (click)="onRedirectLink(itemSelect)">
             <span><i class="la la-delete"></i><span> View</span></span>
-        </div>
-        <div class="menu-context__item">
-            <span><i class="la la-move"></i><span> Move</span></span>
         </div>
     </ng-container>
 </app-context-menu>
