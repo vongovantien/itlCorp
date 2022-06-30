@@ -4093,5 +4093,26 @@ namespace eFMS.API.Accounting.DL.Services
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByPartnerId>(parameters);
             return data;
         }
+
+        public async Task<HandleState> MoveReceivableData(AccountReceivableMoveDataSalesman model)
+        {
+            HandleState result = new HandleState();
+
+            var receivables = DataContext.Get(x => x.PartnerId == model.PartnerId && x.SaleMan == model.FromSalesman);
+            if(receivables.Count() > 0)
+            {
+                foreach (var item in receivables)
+                {
+                    item.ContractId = model.ContractId;
+                    item.SaleMan = model.ToSalesman;
+
+                    var hs = await DataContext.UpdateAsync(item, x => x.Id == item.Id, false);
+                }
+
+                result = DataContext.SubmitChanges();
+            }
+
+            return result;
+        }
     }
 }

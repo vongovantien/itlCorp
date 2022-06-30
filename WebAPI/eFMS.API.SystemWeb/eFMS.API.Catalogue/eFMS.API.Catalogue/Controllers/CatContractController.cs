@@ -361,15 +361,37 @@ namespace eFMS.API.Catalogue.Controllers
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid id, string partnerId, [FromBody]SalesmanCreditModel credit)
+        public IActionResult ActiveInactiveContract(Guid Id, string partnerId, [FromBody]SalesmanCreditModel credit)
         {
-            var hs = catContractService.ActiveInActiveContract(id, partnerId, credit);
+            var hs = catContractService.ActiveInActiveContract(Id, partnerId, credit, out bool active);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    var existedContract = catContractService.CheckExistedContractInActive(Id, partnerId);
+                    if(existedContract != null && existedContract.FirstOrDefault() != null)
+                    {
+                        string accessToken = Request.Headers["Authorization"].ToString();
+                        /// cal API để chuyển công nợ
+                        Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+                        var currentContract = catContractService.GetContractById(Id);
+                        var model = new {
+                            PartnerId = partnerId,
+                            FromSalesman = existedContract.FirstOrDefault().SaleManId,
+                            ToSalesman = currentContract.SaleManId,
+                            ContractId = Id
+                        };
+                        HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "api/v1/e/AccountReceivable/MoveSalesmanReceivableData", model, accessToken);
+                    }
+                });
+            }
+
             return Ok(result);
         }
 

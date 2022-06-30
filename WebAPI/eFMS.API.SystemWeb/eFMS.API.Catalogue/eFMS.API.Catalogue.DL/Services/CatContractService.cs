@@ -597,8 +597,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit, out bool active)
         {
+            active = false;
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             var DataCheckExisted = CheckExistedContractActive(id, partnerId);
@@ -615,6 +616,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
+                active = objUpdate.Active ?? false;
                 if (credit.CreditLimit != null)
                 {
                     objUpdate.CreditLimit = credit.CreditLimit;
@@ -652,11 +654,35 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
+            if(ContractActive.Count() == 0)
+            {
+                return null;
+            }
             var IsExisted = ContractActive
                 .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
             if (IsExisted)
             {
                 return ContractActive;
+            }
+            return null;
+        }
+
+        public IQueryable<CatContract> CheckExistedContractInActive(Guid id, string partnerId)
+        {
+            var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var contractInacActive = DataContext.Where(x => x.Active == false && x.PartnerId == partnerId && x.Id != id);
+            if (contractInacActive.Count() == 0)
+            {
+                return null;
+            }
+            var isExisted = contractInacActive.Any(x => x.SaleManId == contract.SaleManId 
+                && x.OfficeId.Intersect(contract.OfficeId).Any() 
+                && x.SaleService.Intersect(contract.SaleService).Any()
+                && x.OfficeId.Intersect(contract.OfficeId).Any()
+                );
+            if (isExisted)
+            {
+                return contractInacActive;
             }
             return null;
         }
@@ -1773,6 +1799,11 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             return results;
+        }
+
+        public CatContract GetContractById(Guid Id)
+        {
+            return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
         }
     }
 }
