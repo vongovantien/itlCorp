@@ -2351,9 +2351,16 @@ namespace eFMS.API.Accounting.DL.Services
 
         #region -- Update AcctManagement and overdays AccountReceivable after change payment term contract
 
+        /// <summary>
+        /// Update due date invoice và công nợ quá hạn sau khi update HĐ
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <returns></returns>
         public async Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
         {
             var listInvoices = new List<AccAccountingManagement>();
+            contractModel.SaleService = contractModel.SaleService.ToLower();
+            contractModel.OfficeId = contractModel.OfficeId.ToLower();
             var hs = UpdateDueDateAcctManagement(contractModel, out listInvoices);
             if (listInvoices.Count > 0)
             {
@@ -2362,9 +2369,15 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
+        /// <summary>
+        /// Update payment due date invoices
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <param name="listInvoices"></param>
+        /// <returns></returns>
         public HandleState UpdateDueDateAcctManagement(CatContractModel contractModel, out List<AccAccountingManagement> listInvoices)
         {
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = accountingManagementRepo.DC.Database.BeginTransaction())
             {
                 HandleState hs = new HandleState();
                 listInvoices = new List<AccAccountingManagement>();
@@ -2372,10 +2385,31 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     currentUser.Action = "UpdateDueDateAcctMngAfterChangePaymentTerm";
                     var invoiceData = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
-                                             contractModel.SaleService.Contains(x.ServiceType) &&
-                                            contractModel.OfficeId.Contains(x.OfficeId.ToString()) &&
-                                            (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE) &&
-                                            x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList();
+                                             (!string.IsNullOrEmpty(x.ServiceType) && contractModel.SaleService.Contains(x.ServiceType.ToLower())) &&
+                                            (x.OfficeId != null && contractModel.OfficeId.Contains(x.OfficeId.ToString().ToLower())) &&
+                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList();
+                    var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
+                                             contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
+                                             x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+                    if (acctOBH.Count() > 0)
+                    {
+                        var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
+                        var invOBHsurcharges = from acc in acctOBH
+                                               join surcharge in surcharges on acc.Id equals surcharge.AcctManagementId
+                                               select new
+                                               {
+                                                   acc,
+                                                   BillingNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano
+                                               };
+                        var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
+                        foreach(var item in invOBHGrp)
+                        {
+                            if(item.Any(x=>x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                            {
+                                invoiceData.AddRange(item.Select(x => x.acc));
+                            }
+                        }
+                    }
                     if (invoiceData.Count > 0)
                     {
                         foreach (var invoice in invoiceData)
@@ -2398,7 +2432,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (contractModel.BaseOn == "Invoice Date" || contractModel.BaseOn == "Confirmed Billing")
                     {
                         listInvoices = invoiceData;
-                        accountingManagementRepo.SubmitChanges();
+                        hs = accountingManagementRepo.SubmitChanges();
                     }
                     trans.Commit();
                     return hs;
@@ -2414,6 +2448,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        /// <summary>
+        /// Update Over due payment invoices
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <param name="invoiceData"></param>
+        /// <returns></returns>
         public Task<HandleState> UpdateOverDayAcctReceivables(CatContractModel contractModel, List<AccAccountingManagement> invoiceData)
         {
             var acctReceivablesModel = new List<AccAccountReceivableModel>();
@@ -2424,12 +2464,11 @@ namespace eFMS.API.Accounting.DL.Services
                 //Get DS Công nợ có cùng PartnerId, Saleman, Service, Office của Agreement
                 var receivables = DataContext.Get(x => x.PartnerId == contractModel.PartnerId
                                                     && x.SaleMan == contractModel.SaleManId
-                                                    && contractModel.SaleService.Contains(x.Service)
-                                                    && contractModel.OfficeId.Contains(x.Office.ToString())).ToList();
+                                                    && (!string.IsNullOrEmpty(x.Service) && contractModel.SaleService.Contains(x.Service.ToLower()))
+                                                    && (x.Office != null && contractModel.OfficeId.Contains(x.Office.ToString().ToLower()))).ToList();
                 if (receivables != null && receivables.Count() > 0)
                 {
-                    var acctMngts = invoiceData.Where(x => x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
-                                                           && x.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED
+                    var acctMngts = invoiceData.Where(x => x.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED
                                                            && x.PaymentDueDate.HasValue).AsQueryable();
                     //Surcharge thuộc Office, Service, PartnerId của Receivable
                     var surcharges = surchargeRepo.Get(x => receivables.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
