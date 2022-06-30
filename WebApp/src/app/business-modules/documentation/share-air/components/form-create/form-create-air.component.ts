@@ -25,7 +25,7 @@ import {
 import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip, shareReplay} from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 
@@ -558,10 +558,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             console.log('check response is ', response);
             if (response === true) {
                 this.formGroup.get('mawb').clearValidators();
-                this.formGroup.get('mawb').setValidators(Validators.required);
+                this.formGroup.get('mawb').setValidators(FormValidators.required);
             }
             else {
-                this.formGroup.get('mawb').setValidators([Validators.required,
+                this.formGroup.get('mawb').setValidators([FormValidators.required,
                 Validators.pattern(SystemConstants.CPATTERN.MAWB),
                 FormValidators.validateSpecialChar]);
             }
