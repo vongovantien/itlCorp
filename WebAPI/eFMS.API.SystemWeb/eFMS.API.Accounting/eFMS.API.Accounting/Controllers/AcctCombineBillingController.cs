@@ -279,7 +279,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// Get Combine OPS data with partner and currency
+        /// Get Combine Shipment data with partner and currency
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>

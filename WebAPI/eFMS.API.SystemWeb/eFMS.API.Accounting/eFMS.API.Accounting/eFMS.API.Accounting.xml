@@ -669,6 +669,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetDataCombineShipmentByPartner(eFMS.API.Accounting.DL.Models.Criteria.AcctCombineBillingCriteria)">
+            <summary>
+            Get Combine Shipment data with partner and currency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctPayableController">
             <summary>
             A base class for an MVC controller without view support.

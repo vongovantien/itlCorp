@@ -663,7 +663,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return null;
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No, stream, "SOA OPS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No, stream, "Combine Billing By Job");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
