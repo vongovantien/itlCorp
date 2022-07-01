@@ -114,7 +114,7 @@ export class CombineBillingComponent extends AppList implements OnInit {
                 (res: any) => {
                     this.billings = res.data || [];
                     this.totalItems = res.totalItems || 0;
-                    //this.getListCombineBillingNo(res.totalItems);
+                    this.getListCombineBillingNo(res.totalItems);
                 },
             );
   }
@@ -194,7 +194,7 @@ deleteCombineBilling(id: string) {
   exportCombineOPS(currency: string) {
     this.isExport = true;
     this.criteriaExport = this.dataSearch;
-    this.getListCombineBillingNo(this.totalItems);
+    //this.getListCombineBillingNo(this.totalItems);
     if (this.criteriaExport.partnerId) {
       // let combineNos = [];
       // this.billings.forEach(combine => {
@@ -231,7 +231,7 @@ deleteCombineBilling(id: string) {
     this.isExport = true;
     this.criteriaExport = this.dataSearch;
     if (this.criteriaExport.partnerId) {
-      this.getListCombineBillingNo(this.totalItems);
+      //this.getListCombineBillingNo(this.totalItems);
       // let combineNos = [];
       // this.billings.forEach(combine => {
       //   combineNos.push(combine.combineBillingNo)

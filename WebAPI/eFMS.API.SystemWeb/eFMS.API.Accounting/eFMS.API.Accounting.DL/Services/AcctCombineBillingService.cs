@@ -1804,22 +1804,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public string GetBillingNo(CsShipmentSurcharge sur)
         {
-            if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
-            {
-                switch (sur.PaySyncedFrom)
-                {
-                    case "SOA":
-                        return sur.PaySoano;
-                    case "CDNOTE":
-                        return sur.DebitNo;
-                    case "VOUCHER":
-                        return sur.VoucherId;
-                    case "SETTLEMENT":
-                        return sur.SettlementCode;
-                    default: return "";
-                }
-            }
-            else
+            if(sur.Type== AccountingConstants.TYPE_CHARGE_SELL)
             {
                 switch (sur.SyncedFrom)
                 {
@@ -1827,13 +1812,32 @@ namespace eFMS.API.Accounting.DL.Services
                         return sur.Soano;
                     case "CDNOTE":
                         return sur.DebitNo;
-                    case "VOUCHER":
-                        return sur.VoucherId;
-                    case "SETTLEMENT":
-                        return sur.SettlementCode;
                     default: return "";
                 }
             }
+            else if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            {
+                switch (sur.SyncedFrom)
+                {
+                    case "SOA":
+                        return sur.PaySoano;
+                    case "CDNOTE":
+                        return sur.DebitNo;
+                    default: return "";
+                }
+            }
+            else if(sur.Type== AccountingConstants.TYPE_CHARGE_OBH_BUY)
+            {
+                switch (sur.SyncedFrom)
+                {
+                    case "SOA":
+                        return sur.PaySoano;
+                    case "CDNOTE":
+                        return sur.CreditNo;
+                    default: return "";
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -1935,12 +1939,12 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.CBM = grpData.CBM;
                 exportCombineShipment.CombineNo = grpData.CombineNo;
                 exportCombineShipment.BillingNo = grpData.BillingNo;
-                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => t.AmountVND).Sum();
-                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => t.VATAmountLocal).Sum();
-                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.AmountVND).Sum();
-                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.VATAmount).Sum();
-                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => t.AmountVND).Sum();
-                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => t.VATAmountLocal).Sum();
+                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t =>criteria.Currency=="VND"? t.AmountVND: t.AmountUSD).Sum();
+                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
+                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
+                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.VATAmountLocal).Sum();
+                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
+                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
                 exportCombineShipment.HwbNo = grpData.HBL;
                 exportCombineShipment.PackageContainer = grpData.PackageContainer;
                 lstShipment.Add(exportCombineShipment);
