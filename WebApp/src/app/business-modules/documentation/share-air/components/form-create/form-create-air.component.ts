@@ -556,12 +556,13 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
     handleValidatorChange() {
         this.formGroup.get('isMawb').valueChanges.subscribe(response => {
-            this.isCheckedActive = !this.isCheckedActive;
             if (response === true) {
+                this.isCheckedActive = true;
                 this.formGroup.get('mawb').clearValidators();
                 this.formGroup.get('mawb').setValidators([FormValidators.required, Validators.pattern(/^[a-zA-Z0-9-/_ ]*$/)]);
             }
             else {
+                this.isCheckedActive = false;
                 this.formGroup.get('mawb').setValidators([FormValidators.required,
                 Validators.pattern(SystemConstants.CPATTERN.MAWB),
                 FormValidators.validateSpecialChar]);
