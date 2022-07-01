@@ -53,7 +53,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
                 }),
                 concatMap((data: ProofOfDelivery) => {
                     // * Update deliveryOrder model from dataDefault.
-                    this.proofOfDelievey.deliveryDate = data.deliveryDate;
+                    this.proofOfDelievey.deliveryDate = (!!data.deliveryDate) ? { startDate: new Date(data.deliveryDate), endDate: new Date(data.deliveryDate) } : null;
                     this.proofOfDelievey.referenceNo = data.referenceNo;
                     this.proofOfDelievey.deliveryPerson = data.deliveryPerson;
                     this.proofOfDelievey.note = data.note;

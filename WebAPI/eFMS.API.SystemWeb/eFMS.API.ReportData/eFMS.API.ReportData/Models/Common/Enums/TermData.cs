@@ -9,7 +9,8 @@ namespace eFMS.API.ReportData.Models.Common.Enums
     {
         TrialOrOffical = 1,
         Guarantee = 2,
-        Other = 3
+        Other = 3,
+        NoAgreement = 4
     }
     public enum OverDueDayEnum
     {

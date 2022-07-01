@@ -28,10 +28,11 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria);
-        HandleState Import(List<CsShipmentSurchargeImportModel> data);
+        HandleState Import(List<CsShipmentSurchargeImportModel> data, out List<Guid> Ids);
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids);
         HandleState CancelLinkCharge(Guid chargeId);
         HandleState RevertChargeLinkFee(List<CsShipmentSurchargeModel> list);
         HandleState UpdateChargeLinkFee(List<CsShipmentSurchargeModel> list);
+        List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids);
     }
 }

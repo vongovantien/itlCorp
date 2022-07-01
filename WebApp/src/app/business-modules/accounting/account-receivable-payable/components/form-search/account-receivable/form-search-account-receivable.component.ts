@@ -151,7 +151,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
                     if(this.formSearch){
                         this.subscriptionSearchParamState();
-                        this.submitSearch();
+                        //this.submitSearch();
                     }
                 }
             }

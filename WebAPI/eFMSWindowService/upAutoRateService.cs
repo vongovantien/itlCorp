@@ -22,17 +22,16 @@ namespace eFMSWindowService
         public UpAutoRateService()
         {
             InitializeComponent();
-            _scheduleTime = DateTime.Today.AddDays(1).AddHours(23).AddMinutes(30);
         }
 
         public void Start()
         {
-            FileHelper.WriteToFile("UpAutoRateService", "\n--------------------------------------------------------\n");
-            FileHelper.WriteToFile("UpAutoRateService", "[UpAutoRateService] [START]:" + DateTime.Now);
+            _scheduleTime = DateTime.Now.AddMinutes(240);
             // Tạo 1 timer từ libary System.Timers
+            TimeSpan timeSpan = _scheduleTime.Subtract(DateTime.Now);
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
-            _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            _timer.Interval = timeSpan.TotalMilliseconds;
             //_timer.Interval = 10000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
@@ -42,6 +41,8 @@ namespace eFMSWindowService
 
         protected override void OnStart(string[] args)
         {
+            FileHelper.WriteToFile("UpAutoRateService", "\n--------------------------------------------------------\n");
+            FileHelper.WriteToFile("UpAutoRateService", "[UpAutoRateService] [START]:" + DateTime.Now);
             this.Start();
         }
 
@@ -54,15 +55,22 @@ namespace eFMSWindowService
             //string api = "https://api-efms.itlvn.com/Documentation/api/v1/vi/OpsTransaction/AutoRateReplicate";
             string api = ConfigurationManager.AppSettings["Api_AutoRateReplicateService"];
 
-            FileHelper.WriteToFile("UpAutoRateService", "[UpAutoRateService] [CALL_API]:" + DateTime.Now);
-            FileHelper.WriteToFile("autoRateService", "[autoRateService] [CALL_API]:" + api);
-            var pool = new WebClient().DownloadString(api);
-            FileHelper.WriteToFile("autoRateService", "[autoRateService] [CALL_API]:" + pool);
-
-            if (_timer.Interval != 24 * 60 * 60 * 1000)
+            string myIP = Dns.GetHostByName(Dns.GetHostName()).AddressList[0].ToString();
+            FileHelper.WriteToFile("UpAutoRateService", string.Format("[UpAutoRateService][HOST_NAME:{0}][IP:{1}][CALL_API]:{2}", Dns.GetHostName(), myIP, api));
+            var pool = new WebClient();
+            pool.DownloadStringCompleted += (q, s) =>
             {
-                _timer.Interval = 24 * 60 * 60 * 1000;
-            }
+                FileHelper.WriteToFile("UpAutoRateService", string.Format("[UpAutoRateService][HOST_NAME:{0}][IP:{1}][CALL_API]:{2}", Dns.GetHostName(), myIP, s.Result));
+
+                if (_timer.Interval != 24 * 60 * 60 * 1000)
+                {
+                    _timer.Interval = 24 * 60 * 60 * 1000;
+                }
+                this.Start();
+
+            };
+
+            pool.DownloadStringAsync(new Uri(api));
         }
 
         public new void Stop()

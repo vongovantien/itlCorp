@@ -1729,8 +1729,9 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list,  out List<Guid> Ids)
         {
+            Ids = new List<Guid>(); // ds charge dùng để tính công nợ
             var chargeGroup = catChargeGroupRepository.Get();
             var listImport = new List<CsShipmentSurchargeImportModel>();
             foreach (var item in list)
@@ -1779,6 +1780,8 @@ namespace eFMS.API.Documentation.DL.Services
                     //{
                     //    item.Type = "SELL";
                     //}
+
+                    Ids.Add(item.Id);
                 }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(listImport);
@@ -1995,6 +1998,20 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 return result;
             }
+        }
+
+        public List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids)
+        {
+            List<AmountSurchargeResult> results = new List<AmountSurchargeResult>();
+
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            foreach (var item in surcharges)
+            {
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, 20000);
+                results.Add(amountSurcharge);
+            }
+
+            return results; 
         }
     }
 }

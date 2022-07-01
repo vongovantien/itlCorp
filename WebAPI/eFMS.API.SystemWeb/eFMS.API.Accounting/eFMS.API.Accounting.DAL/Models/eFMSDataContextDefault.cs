@@ -79,7 +79,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AccAccountPayable>(entity =>
             {
@@ -416,6 +416,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
+                entity.Property(e => e.SalesmanId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ServiceType).HasMaxLength(100);
 
@@ -1922,6 +1926,16 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SalesCompanyId)
+                    .HasColumnName("SalesCompanyID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SalesOfficeId)
+                    .HasColumnName("SalesOfficeID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.TrialCreditLimited).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TrialEffectDate).HasColumnType("datetime");
@@ -3234,6 +3248,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("RClass")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.ReceivedBillTime).HasColumnType("datetime");
+
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
 
                 entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
@@ -3331,6 +3347,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Valpp)
                     .HasColumnName("VALPP")
                     .IsUnicode(false);
+
+                entity.Property(e => e.WareHouseAnDate).HasColumnType("datetime");
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
 

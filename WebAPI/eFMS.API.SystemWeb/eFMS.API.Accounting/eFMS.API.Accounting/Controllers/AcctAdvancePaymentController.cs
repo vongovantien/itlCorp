@@ -182,15 +182,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
-            }
+           
             return Ok(result);
         }
 
@@ -265,15 +257,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
-            }
+            
             return Ok(result);
         }
 
@@ -384,15 +368,6 @@ namespace eFMS.API.Accounting.Controllers
             if (!hs.Success)
             {
                 return BadRequest(result);
-            }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-                   
-                });
             }
             return Ok(result);
         }
@@ -555,13 +530,6 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
-
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
 
                 return Ok(result);
             }

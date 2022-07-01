@@ -510,13 +510,17 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
-
-            //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            //var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Trial" + " - eFMS");
+            var nameFile = "";
+            if (criteria.ArType == ARTypeEnum.TrialOrOffical)
+                nameFile = "Trial" + " - eFMS";
+            else if (criteria.ArType == ARTypeEnum.NoAgreement)
+                nameFile = "No Agreement" + " - eFMS";
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, nameFile);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -531,14 +535,14 @@ namespace eFMS.API.ReportData.Controllers
         [Authorize]
         public async Task<IActionResult> ExportDebitDetail(DebitDetailCriteria criteria)
         {
-            var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode + "&overDueDay=" + criteria.overDueDay;
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl + urlRequest);
+            // var urlRequest = "?argeementId=" + criteria.argeementId + "&option=" + criteria.option + "&officeId=" + criteria.officeId + "&serviceCode=" + criteria.serviceCode + "&overDueDay=" + criteria.overDueDay;
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDebitDetailUrl, null);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<DebitDetail>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
             //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
-            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, criteria.option);
+            var stream = new AccountingHelper().GenerateAccountingReceivableDebitDetail(dataObjects.Result, criteria.PaymentStatus);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
@@ -641,6 +645,7 @@ namespace eFMS.API.ReportData.Controllers
 
         /// <summary>
         /// Export Accounting Payable Standart Report
+        /// Export Accounting Payable Standart Report
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -701,6 +706,39 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return null;
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "APAccountReport");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Accounting Payable Standart Report
+        /// </summary>
+        /// <param name="agreementId"></param>
+        /// <returns></returns>
+        [Route("ExportDebitAmountDetailByContract")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            //var responseFromApi = await HttpServiceExtension.PostAPI(agreementId, aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria,aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = "AR Debit Amount Report",
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<DebitAmountDetail>();
+
+            var stream = new AccountingHelper().GenerateExportDebitAmountDetail(dataObjects.Result);
+            if (stream == null) return null;
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "DebitAmountDetail");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }

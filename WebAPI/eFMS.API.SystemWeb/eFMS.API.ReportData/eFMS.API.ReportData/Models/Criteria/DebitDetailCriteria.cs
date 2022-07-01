@@ -4,10 +4,12 @@ namespace eFMS.API.ReportData.Models.Criteria
 {
     public class DebitDetailCriteria
     {
-        public Guid argeementId { get; set; }
-        public string option { get; set; }
-        public string officeId { get; set; }
-        public string serviceCode { get; set; }
-        public int overDueDay { get; set; } = 0;
+        public string PartnerId { get; set; }
+        public string OfficeId { get; set; }
+        public string Service { get; set; }
+        public string Type { get; set; }
+        public string PaymentStatus { get; set; }
+        public string Salesman { get; set; }
+        public string OverDue { get; set; }
     }
 }

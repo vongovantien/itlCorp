@@ -2,6 +2,7 @@ export class TrialOfficialOtherModel {
     agreementId: string = null;
     partnerId: string = null;
     partnerCode: string = null;
+    officeId: string = null;
 
     partnerNameAbbr: string = null;
     parentNameAbbr: string = null;
@@ -33,9 +34,14 @@ export class TrialOfficialOtherModel {
     agreementCurrency: string = null;
 
     agreementSalesmanName: string = null;
+    agreementSalesmanId: string = null;
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
+
+    arOfficeIds: string[] = [];
+    arServices: string[] = null;
+    arSalesmanId: string = null;
 
     constructor(data?: any) {
         const self = this;
@@ -77,7 +83,8 @@ export class AccReceivableDetailModel {
     agreementCurrency: string = null;
     agreementId: string = null;
     agreementNo: string = null;
-    agreementSalesmanId: string = null;
+    agreementSalesmanId: string = null; // * case có contract
+    arSalesmanId: string = null; // * case no contract
     agreementSalesmanName: string = null;
     agreementStatus: string = null;
     agreementType: string = null;
@@ -99,7 +106,7 @@ export class AccReceivableDetailModel {
     expriedDay: number = 0;
     obhAmount: number = 0;
     obhBillingAmount: number = 0;
-    obhUnpaidAmount: number = 0;
+    obhUnPaidAmount: number = 0;
     obhPaidAmount: number = 0;
     officeId: string = null;
     over1To15Day: number = 0;
@@ -119,6 +126,7 @@ export class AccReceivableDetailModel {
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
+    arSalesmanName: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
@@ -145,6 +153,8 @@ export class AccReceivableOfficesDetailModel {
     totalObhBillingAmount: number = 0;
     totalObhPaidAmount: number = 0;
     totalObhUnPaidAmount: number = 0;
+    services: string[] = [];
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
