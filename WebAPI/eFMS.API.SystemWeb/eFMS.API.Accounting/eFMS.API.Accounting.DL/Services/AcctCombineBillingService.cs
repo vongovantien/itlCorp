@@ -1802,7 +1802,7 @@ namespace eFMS.API.Accounting.DL.Services
             return opsModel;
         }
 
-        public string GetBillingNo(CsShipmentSurcharge sur)
+        private string GetBillingNo(CsShipmentSurcharge sur)
         {
             if(sur.Type== AccountingConstants.TYPE_CHARGE_SELL)
             {
@@ -1839,6 +1839,34 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return null;
         }
+
+        private string getCommonditiJobService(string code)
+        {
+            switch (code)
+            {
+                case "AI":
+                    return "Air Import";
+                case "AE":
+                    return "Air Export";
+                case "SFE": 
+                    return "Sea FCL Export";
+                case "SLE": 
+                    return "Sea LCL Export";
+                case "SFI": 
+                    return "Sea FCL Import";
+                case "SLI": 
+                    return "Sea LCL Import";
+                case "SCE": 
+                    return "Sea Consol Export";
+                case "SCI": 
+                    return "Sea Consol Import";
+                case "IT": 
+                    return "Inland Trucking";
+                default:return null;
+
+            }
+        }
+
 
         /// <summary>
         /// Get Combine OPS data with partner and currency
@@ -1899,9 +1927,9 @@ namespace eFMS.API.Accounting.DL.Services
                               HBL = sur.Hblno,
                               CustomNo = sur.ClearanceNo,
                               InvoiceNo = sur.InvoiceNo,
-                              Commodity = csTran.Commodity,
+                              Commodity = getCommonditiJobService(csTran.TransactionType),
                               UnitId = sur.UnitId,
-                              ChargeWeight = csTransDe.GrossWeight,
+                              ChargeWeight = csTran.GrossWeight,
                               CBM = csTransDe.Cbm,
                               PackageContainer = csTransDe.PackageContainer,
                               AmountVND = sur.AmountVnd,
@@ -1935,7 +1963,7 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.CustomDeclarationNo = grpData.CustomNo;
                 exportCombineShipment.InvoiceNo = String.Join(";", grp.Where(t => t.TransactionType != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
                 exportCombineShipment.FreInvoice = String.Join(";", grp.Where(t => t.TransactionType == "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
-                exportCombineShipment.KGS = grp.Sum(x => x.ChargeWeight);
+                exportCombineShipment.KGS = grpData.ChargeWeight;
                 exportCombineShipment.CBM = grpData.CBM;
                 exportCombineShipment.CombineNo = grpData.CombineNo;
                 exportCombineShipment.BillingNo = grpData.BillingNo;
