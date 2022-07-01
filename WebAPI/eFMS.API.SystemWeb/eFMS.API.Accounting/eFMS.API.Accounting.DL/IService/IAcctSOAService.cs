@@ -42,5 +42,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateAdjustDebitValue(AdjustModel model);
         HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string action);
         Task<HandleState> UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string action);
+        List<string> GetSOANoByIds(List<string> Ids);
     }
 }
