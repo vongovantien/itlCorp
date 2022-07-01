@@ -4096,23 +4096,75 @@ namespace eFMS.API.Accounting.DL.Services
 
         public async Task<HandleState> MoveReceivableData(AccountReceivableMoveDataSalesman model)
         {
-            HandleState result = new HandleState();
-
-            var receivables = DataContext.Get(x => x.PartnerId == model.PartnerId && x.SaleMan == model.FromSalesman);
-            if(receivables.Count() > 0)
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                foreach (var item in receivables)
+                try
                 {
-                    item.ContractId = model.ContractId;
-                    item.SaleMan = model.ToSalesman;
+                    HandleState result = new HandleState();
 
-                    var hs = await DataContext.UpdateAsync(item, x => x.Id == item.Id, false);
+                    var receivables = DataContext.Get(x => x.PartnerId == model.PartnerId && x.SaleMan == model.FromSalesman);
+                    List<Guid> contractIds = new List<Guid>();
+                    if (receivables.Count() > 0)
+                    {
+                        foreach (var item in receivables)
+                        {
+                            contractIds.Add(item.ContractId ?? Guid.Empty);
+                            item.ContractId = model.ContractId;
+                            item.SaleMan = model.ToSalesman;
+                            var hs = await DataContext.UpdateAsync(item, x => x.Id == item.Id, false);
+                        }
+
+                        result = DataContext.SubmitChanges();
+                        if (result.Success)
+                        {
+                            var newContract = contractPartnerRepo.Get(x => x.Id == model.ContractId)?.FirstOrDefault();
+                            if (newContract != null)
+                            {
+                                var contractNeedUpdate = CalculatorAgreement(newContract);
+                                await contractPartnerRepo.UpdateAsync(contractNeedUpdate, x => x.Id == contractNeedUpdate.Id, false);
+                            }
+                            var cIDs = contractIds.ToList().Distinct().ToList();
+                            foreach (var item in cIDs)
+                            {
+                                var contractNeedReset = contractPartnerRepo.Get(x => x.Id == item)?.FirstOrDefault();
+                                if (newContract != null)
+                                {
+                                    contractNeedReset.BillingAmount = 0;
+                                    contractNeedReset.CustomerAdvanceAmountUsd = 0;
+                                    contractNeedReset.CustomerAdvanceAmountVnd = 0;
+                                    contractNeedReset.DebitAmount = 0;
+                                    contractNeedReset.PaidAmount = 0;
+                                    contractNeedReset.UnpaidAmount = 0;
+                                    contractNeedReset.CreditAmount = 0;
+                                    contractNeedReset.CreditRate = 0;
+                                    contractNeedReset.IsOverLimit = false;
+                                    contractNeedReset.IsOverDue = false;
+                                }
+                                HandleState hsUpdateReset = await contractPartnerRepo.UpdateAsync(contractNeedReset, x => x.Id == contractNeedReset.Id, false);
+                            }
+                            var hsUpdateListContract = contractPartnerRepo.SubmitChanges();
+                            if (hsUpdateListContract.Success)
+                            {
+                                trans.Commit();
+                            }
+                            else
+                            {
+                                trans.Rollback();
+                            }
+                        }
+                    }
+                    return result;
                 }
-
-                result = DataContext.SubmitChanges();
-            }
-
-            return result;
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.ToString());
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }                
         }
     }
 }
