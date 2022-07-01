@@ -23,12 +23,10 @@ import {
     IShareBussinessState,
 } from '@share-bussiness';
 import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
-
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
-import { clear } from 'console';
 
 @Component({
     selector: 'app-form-create-air',
@@ -246,10 +244,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                // * 15375
-                // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
-                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                // FormValidators.validateMAWB,
+                Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                FormValidators.validateMAWB,
                 FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
@@ -294,7 +290,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
             isHawb: [false],
             isMawb: [true],
-            incotermId: [null,Validators.required],
+            incotermId: [null, Validators.required],
             ata: [],
             atd: []
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
@@ -556,7 +552,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
     handleValidatorChange() {
         if (this.type !== 'import') {
-            this.formGroup.get('isMawb').valueChanges.subscribe(response => {
+            this.formGroup.get('isMawb').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(response => {
                 if (response === true) {
                     this.isCheckedActive = true;
                     this.formGroup.get('mawb').clearValidators();
