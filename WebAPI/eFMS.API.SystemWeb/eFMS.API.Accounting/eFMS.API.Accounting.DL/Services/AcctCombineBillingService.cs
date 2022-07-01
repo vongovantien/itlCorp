@@ -1562,8 +1562,9 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public CombineOPSModel GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria)
         {
+            var combineDatas = GetData(criteria);
             var opsModel = new CombineOPSModel();
-            var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
+            //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return opsModel; }
             var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
             var chargeDatas = catChargeRepo.Get();
@@ -1875,8 +1876,10 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
         {
+            var combineDatas = GetData(criteria);
+
             var shipmentModel = new CombineShipmentModel();
-            var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
+            //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return shipmentModel; }
             var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo) || criteria.ReferenceNo.Contains(x.ObhcombineBillingNo));
             var chargeDatas = catChargeRepo.Get();

@@ -195,6 +195,7 @@ deleteCombineBilling(id: string) {
     this.isExport = true;
     this.criteriaExport = this.dataSearch;
     //this.getListCombineBillingNo(this.totalItems);
+
     if (this.criteriaExport.partnerId) {
       // let combineNos = [];
       // this.billings.forEach(combine => {
@@ -202,7 +203,7 @@ deleteCombineBilling(id: string) {
       // });
       if (this.billingsNo.length) {
         this._progressRef.start();
-        this.criteriaExport.referenceNo = this.billingsNo;
+        //this.criteriaExport.referenceNo = this.billingsNo;
         this.criteriaExport.currency = currency;
         this._exportRepo.exportCombineOps(this.criteriaExport)
           .pipe(
@@ -238,7 +239,7 @@ deleteCombineBilling(id: string) {
       // });
       if (this.billingsNo.length) {
         this._progressRef.start();
-        this.criteriaExport.referenceNo = this.billingsNo;
+        //this.criteriaExport.referenceNo = this.billingsNo;
         this.criteriaExport.currency = currency;
         this._exportRepo.exportCombineShipment(this.criteriaExport)
           .pipe(
