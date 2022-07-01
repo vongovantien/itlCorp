@@ -1566,7 +1566,7 @@ namespace eFMS.API.Accounting.DL.Services
             var opsModel = new CombineOPSModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return opsModel; }
-            var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
+            var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo) || criteria.ReferenceNo.Contains(x.ObhcombineBillingNo));
             var chargeDatas = catChargeRepo.Get();
             var unitDatas = catUnitRepo.Get();
             var clearanceDatas = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
