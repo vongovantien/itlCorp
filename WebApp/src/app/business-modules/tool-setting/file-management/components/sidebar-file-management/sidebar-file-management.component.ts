@@ -13,7 +13,10 @@ export class SidebarFileManagementComponent implements OnInit {
 
     }
     ngOnInit() {
-        console.log(this.folderName);
+        this.changeBreadcrumb();
+    }
+
+    changeBreadcrumb(){
         if (this.folderName != null && this.folderName != undefined) {
             this.title = this.route.snapshot.data['title'] + ">" + this.folderName;
         }
@@ -21,7 +24,6 @@ export class SidebarFileManagementComponent implements OnInit {
             this.title = this.route.snapshot.data['title']
         }
     }
-
     navigateFileMngt(moduleUrl: string) {
         if (moduleUrl === 'accounting') {
             this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT]);

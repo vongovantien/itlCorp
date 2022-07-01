@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SettingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-file-management',

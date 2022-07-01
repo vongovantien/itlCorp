@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router'; import { Office } from '@models';
 ;
-import { SettingRepo } from '@repositories';
+import { AccountingRepo, SettingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
+import { listenerCount } from 'process';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 
@@ -43,7 +44,7 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
     folderName: string;
     itemSelect: string;
 
-    constructor(private _settingRepo: SettingRepo, private readonly _toastService: ToastrService, private _router: Router) {
+    constructor(private _settingRepo: SettingRepo, private readonly _toastService: ToastrService, private _router: Router, private _accountingRepo: AccountingRepo) {
         super();
     }
 
@@ -89,6 +90,9 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
                 },
             );
     }
+    getFolderFileByObjectIDs(){
+        this._accountingRepo.getListSOANoByIds()
+    }\
 
     onSelectFile(item: string) {
         this.itemSelect = item;
