@@ -30,7 +30,6 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<SysImageModel> Get(SysImageCriteria criteria, int page, int size, out int rowsCount)
         {
-
             var data = DataContext.Get();
             if (!string.IsNullOrEmpty(criteria.Name))
             {
