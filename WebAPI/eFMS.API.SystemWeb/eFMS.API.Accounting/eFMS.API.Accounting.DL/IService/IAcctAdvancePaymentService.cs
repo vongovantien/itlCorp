@@ -102,5 +102,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<ObjectReceivableModel> CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests);
         string CheckDuplicateCharge(AcctAdvancePaymentModel model);
         string CheckAdvanceAllowDenyDelete(List<Guid> Ids);
+
+        List<string> GetAdvanceNobyIDs(List<Guid> Ids); 
     }
 }

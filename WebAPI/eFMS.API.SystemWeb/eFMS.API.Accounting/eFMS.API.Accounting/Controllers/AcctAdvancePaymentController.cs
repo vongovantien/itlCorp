@@ -915,5 +915,13 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("GetAdvenNosByIDs")]
+        public IActionResult GetAdvenNoByAdvanceIds(List<Guid> Ids)
+        {
+            var data = acctAdvancePaymentService.GetAdvanceNobyIDs(Ids);
+            return Ok(data);
+        }
     }
 }
