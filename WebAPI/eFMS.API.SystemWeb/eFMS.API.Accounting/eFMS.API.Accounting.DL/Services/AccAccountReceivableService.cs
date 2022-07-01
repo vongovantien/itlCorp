@@ -982,11 +982,15 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- CRUD ---
         private CatContract CalculatorAgreement(CatContract agreement)
         {
-            //Get DS Công nợ có cùng PartnerId, Saleman, Service, Office của Agreement
             var receivables = DataContext.Get(x => x.PartnerId == agreement.PartnerId
                                                 && x.SaleMan == agreement.SaleManId
                                                 && agreement.SaleService.Contains(x.Service)
                                                 && agreement.OfficeId.Contains(x.Office.ToString()));
+            return ModifiedAgreementWithReceivables(agreement, receivables);
+        }
+
+        private CatContract ModifiedAgreementWithReceivables(CatContract agreement, IQueryable<AccAccountReceivable> receivables)
+        {
             if (receivables != null && receivables.Count() > 0)
             {
                 var partnerChildIds = partnerRepo.Get(x => x.ParentId == agreement.PartnerId).Select(s => s.Id).ToList();
@@ -997,7 +1001,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 agreement.BillingAmount = receivables.Sum(su => (su.BillingAmount ?? 0) + (su.ObhBilling ?? 0)); //Sum BillingAmount + BillingOBH
-                //Credit Amount ~ Debit Amount
+                                                                                                                 //Credit Amount ~ Debit Amount
                 agreement.DebitAmount = receivables.Sum(su => su.DebitAmount ?? 0) + contractChildOfPartner.Sum(su => su.DebitAmount ?? 0); //Sum DebitAmount + Debit Amount (của các đối tượng con)
                 agreement.UnpaidAmount = receivables.Sum(su => (su.BillingUnpaid ?? 0) + (su.ObhUnpaid ?? 0)) + contractChildOfPartner.Sum(su => su.UnpaidAmount ?? 0); //Sum BillingUnpaid + ObhUnpaid + BillingUnpaid (của các đối tượng con)
                 agreement.PaidAmount = receivables.Sum(su => (su.PaidAmount ?? 0) + (su.ObhPaid ?? 0)) + contractChildOfPartner.Sum(su => su.PaidAmount ?? 0); //Sum PaidAmount + ObhPaid + PaidAmount (của các đối tượng con)
@@ -4120,7 +4124,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var newContract = contractPartnerRepo.Get(x => x.Id == model.ContractId)?.FirstOrDefault();
                             if (newContract != null)
                             {
-                                var contractNeedUpdate = CalculatorAgreement(newContract);
+                                var contractNeedUpdate = ModifiedAgreementWithReceivables(newContract, receivables);
                                 await contractPartnerRepo.UpdateAsync(contractNeedUpdate, x => x.Id == contractNeedUpdate.Id, false);
                             }
                             var cIDs = contractIds.ToList().Distinct().ToList();
