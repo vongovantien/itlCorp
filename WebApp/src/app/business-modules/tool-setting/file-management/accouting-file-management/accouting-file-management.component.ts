@@ -7,7 +7,7 @@ import { listenerCount } from 'process';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 
-export interface IFileItem { name: string, dateCreated: string, userModified: string, folderName: string, url: string, classIcon: string }
+export interface IFileItem { name: string, dateCreated: string, userModified: string, folderName: string, url: string, classIcon: string, objectId: string }
 @Component({
     selector: 'accouting-file-management',
     templateUrl: './accouting-file-management.component.html'
@@ -20,7 +20,8 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         userModified: "22/03/2022",
         folderName: "SOA",
         classIcon: "la la-folder",
-        url: ""
+        url: "",
+        objectId: ""
     },
     {
         name: "Settlement Folder",
@@ -28,7 +29,8 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         userModified: "22/03/2022",
         folderName: "Settlement",
         classIcon: "la la-folder",
-        url: ""
+        url: "",
+        objectId: ""
     },
     {
         name: "Advance Folder",
@@ -36,7 +38,8 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
         userModified: "22/03/2022",
         folderName: "Advance",
         classIcon: "la la-folder",
-        url: ""
+        url: "",
+        objectId: ""
     }]
 
     isActiveClick: boolean = false;
@@ -90,9 +93,12 @@ export class AccoutingFileManagementComponent extends AppList implements OnInit 
                 },
             );
     }
-    getFolderFileByObjectIDs(){
-        this._accountingRepo.getListSOANoByIds()
-    }\
+    getFolderFileByObjectIDs() {
+        this.getFolderFileManagement();
+        let datas;
+        this.itemsDefault.map(s => datas.push(s.objectId));
+        this._accountingRepo.getListSOANoByIds(datas);
+    }
 
     onSelectFile(item: string) {
         this.itemSelect = item;
