@@ -499,6 +499,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     dataCombineBilling = dataCombineBilling.Where(x => combineNos.Any(z => z == x.CombineBillingNo));
                 }
+                else
+                {
+                    return null;
+                }
             }
 
             var result = from data in dataCombineBilling
