@@ -2611,6 +2611,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
+            currentUser.Action = "CalculateOverDue";
+            currentUser.UserID = "System";
             HandleState hs = CalculatorReceivableOverDue(partnerIds, 1, out List<Guid?> contractIdsNeedUpdate);
             contractIds = contractIdsNeedUpdate;
             return hs;
@@ -2618,12 +2620,16 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
+            currentUser.Action = "CalculateOverDue";
+            currentUser.UserID = "System";
             HandleState hs = CalculatorReceivableOverDue(partnerIds, 2, out List<Guid?> contractIdsNeedUpdate);
             contractIds = contractIdsNeedUpdate;
             return hs;
         }
         public HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
+            currentUser.Action = "CalculateOverDue";
+            currentUser.UserID = "System";
             HandleState hs = CalculatorReceivableOverDue(partnerIds, 3, out List<Guid?> contractIdsNeedUpdate);
             contractIds = contractIdsNeedUpdate;
             return hs;
@@ -2744,7 +2750,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var partner = partnerRepo.Get(x => x.Id == item.PartnerId).FirstOrDefault();
 
-                            var currentReceivable = receivables.FirstOrDefault(x => x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
+                            var currentReceivable = receivables.FirstOrDefault(x => x.PartnerId == item.PartnerId && x.Office == item.OfficeId && x.Service == item.Service && x.SaleMan == item.SalesmanId);
                             if (currentReceivable != null)
                             {
                                 // kiểm tra hop dong hien tai cua sales
