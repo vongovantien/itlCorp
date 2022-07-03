@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_ETD_CANNOT_CHANGE_MONTH = "MSG_ETD_CANNOT_CHANGE_MONTH";
         public static readonly string MSG_ETA_CANNOT_CHANGE_MONTH = "MSG_ETA_CANNOT_CHANGE_MONTH";
         public static readonly string MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH = "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH";
-
+        public static readonly string MSG_CDNOTE_ISSUED_COMBINE = "MSG_CDNOTE_ISSUED_COMBINE";
 
         // IMPORT SURCHARE 
         public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";

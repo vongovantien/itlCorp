@@ -14,13 +14,13 @@ export const initialState: IAccountPayablePaymentReducerState = {
     isLoaded: false,
     isLoading: false,
     dataSearch: null,
-    pagingData: { page: 1, pageSize: 50 }
+    pagingData: { page: 1, pageSize: 30 }
 };
 
 export const accountPayablePaymentPaymentMangReducer = createReducer(
     initialState,
     on(AccountPayableActions.SearchListAccountPayableDetail, (state: IAccountPayablePaymentReducerState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 50 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
     })),
     on(AccountPayableActions.LoadListAccountPayableDetail, (state: IAccountPayablePaymentReducerState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }

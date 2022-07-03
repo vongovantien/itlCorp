@@ -146,7 +146,8 @@ export class FormGetBillingListComponent extends AppForm {
       // personInCharge: !this.personInCharge.value ? this.personInCharges.map((item: any) => item.id).join(';') : this.personInCharge.value.join(';'),
       services: this.getServiceData(dataForm.service),
       documentType: dataForm.documentType,
-      documentNo: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null
+      documentNo: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
+      combineNo: this.billingNo.value
     };
     this.onSearch.emit(body);
   }
@@ -213,4 +214,5 @@ interface ISearchListShipment {
   services: string[];
   documentType: string;
   documentNo: string[];
+  combineNo: string;
 }
