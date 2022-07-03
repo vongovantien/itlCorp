@@ -57,6 +57,16 @@
                                                     <app-permission-button type="detail"
                                                         (click)="viewDetail(item.agreementId)">
                                                     </app-permission-button>
+                                                    <span *ngIf="!!item.isExpired" title="Contract is expired">
+                                                        <i class="la la-history la-lg"></i>
+                                                    </span>
+                                                    <span *ngIf="!!item.isOverDue" title="Contract have overdued">
+                                                        <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                                    </span>
+                                                    <span *ngIf="!!item.isOverLimit"
+                                                        title="Contract is over credit limit">
+                                                        <i class="la la-exclamation la-lg text-danger"></i>
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td class="sticky-col second-col"
@@ -151,15 +161,7 @@
                                                     [ngClass]="item.agreementType === 'Trial' ? 'badge-warning' : 'badge-info'">
                                                     {{ item.agreementType }}
                                                 </span>
-                                                <span *ngIf="!!item.isExpired" title="Contract is expired">
-                                                    <i class="la la-history la-lg"></i>
-                                                </span>
-                                                <span *ngIf="!!item.isOverDue" title="Contract have overdued">
-                                                    <i class="la la-exclamation-triangle la-lg text-warning"></i>
-                                                </span>
-                                                <span *ngIf="!!item.isOverLimit" title="Contract is over credit limit">
-                                                    <i class="la la-exclamation la-lg text-danger"></i>
-                                                </span>
+
 
                                             </td>
 
