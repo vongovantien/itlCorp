@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
-import { PermissionSample, PermissionSampleGeneral, PermissionGeneralItem } from 'src/app/shared/models';
+import { PermissionSample, PermissionSampleGeneral, PermissionGeneralItem, PermissionSampleSpecial} from 'src/app/shared/models';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
 import { PermissionFormCreateComponent } from 'src/app/business-modules/system/permission/components/form-create-permission/form-create-permission.component';
@@ -251,7 +251,10 @@ export class ShareSystemDetailPermissionComponent extends AppPage {
                 break;
         }
     }
-
-
-
+    onChangeQuickSetupSP(data: string | boolean, type: string, permissionModuleGroup: PermissionSampleSpecial){
+        if (type === 'isAllow'){
+            let permission: any[] = permissionModuleGroup.sysPermissionSpecials.map(p => p['permissionSpecialActions']);
+            permission = permission.map(y => y.forEach(x => x.isAllow = data as boolean));          
+        }
+    }
 }
