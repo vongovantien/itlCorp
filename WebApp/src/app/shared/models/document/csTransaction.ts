@@ -103,6 +103,7 @@ export class CsTransaction extends BaseModel {
     mawbShipper: string = null;
     airlineInfo: string = null;
     isHawb: boolean = false;
+    isMawb: boolean = false;
     polDescription: string = null;
     podDescription: string = null;
 
