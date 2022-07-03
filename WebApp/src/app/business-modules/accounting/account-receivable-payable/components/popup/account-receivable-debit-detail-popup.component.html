@@ -14,7 +14,9 @@
                                     <ng-container *ngFor="let item of dataDebitList; let i = index; trackBy: trackByFn">
                                         <tr class="" [contextMenu]="receiptContextMenu">
                                             <td>{{i+1}} </td>
-                                            <td class="text-primary"> {{item.billingNo }}</td>
+                                            <td class="text-primary" app-copy-to-clipboard [text]="item.billingNo"
+                                                [hasIcon]="false" icon="la la-copy">
+                                            </td>
                                             <td ALIGN="center">{{item.type }}</td>
                                             <td ALIGN="right">{{item.invoiceNo }}
                                                 <ng-container [ngSwitch]="item.paymentStatus">

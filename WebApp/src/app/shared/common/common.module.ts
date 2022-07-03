@@ -17,6 +17,8 @@ import { RouterModule } from '@angular/router';
 import { AppCombogridItemComponent } from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { LoadingPopupComponent } from './popup/loading/loading.popup';
+import { CopyToClipboardComponent } from './copy-to-clipboard/copy-to-clipboard.component';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 const COMPONENTS = [
     SubHeaderComponent,
     InputTableLayoutComponent,
@@ -45,7 +47,8 @@ const COMPONENTS = [
     NoneRecordPlaceholderComponent,
     AppDropdownComponent,
     LoadingPopupComponent,
-    AppContextMenuComponent
+    AppContextMenuComponent,
+    CopyToClipboardComponent
 ];
 
 @NgModule({
@@ -63,7 +66,8 @@ const COMPONENTS = [
         DirectiveModule,
         PipeModule,
         TooltipModule.forRoot(),
-        BsDropdownModule.forRoot()
+        BsDropdownModule.forRoot(),
+        ClipboardModule
     ],
     exports: [
         ...COMPONENTS
