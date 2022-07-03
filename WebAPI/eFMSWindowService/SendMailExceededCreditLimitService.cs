@@ -131,13 +131,15 @@ namespace eFMSWindowService
                         string body = dear + headerBody + tableBody + footerBody;
                         body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
                         List<string> mail = new List<string> { item.Key.Email };
+                        var emailCC = new List<string>();
+                        emailCC.AddRange(string.Join(";", item.Select(x => x.AREmail))?.Split(';').Distinct());
                         var configBCC = ConfigurationManager.AppSettings["SendMailBCC"];
                         List<string> emailBCCs = configBCC.Split(',').ToList<string>();
                         if (exceededCreditLimits != null && exceededCreditLimits.Count > 0
                             && (exceededCreditsMore70.Count > 0 || exceededCreditsMore100.Count > 0 || exceededCreditsMore120.Count > 0)
                             && mail != null && mail.Count > 0)
                         {
-                            var s = SendMailHelper.Send(subject, body, mail, null, null, emailBCCs);
+                            var s = SendMailHelper.Send(subject, body, mail, null, emailCC, emailBCCs);
 
                             #region --- Ghi Log Send Mail ---
                             var logSendMail = new sysSentEmailHistory

@@ -13,6 +13,14 @@
                                     </label>
                                     <input type="text" class="form-control" placeholder="Enter text"
                                         formControlName="hwbno">
+                                    <div class="form-control-feedback"
+                                        *ngIf="(isSubmitted || hwbno.dirty) && (formCreate.get('hwbno').value?.length==0||formCreate.get('hwbno').value==null)">
+                                        HBL No is required!
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="(isSubmitted || hwbno.dirty) && !hwbno.valid&&!(formCreate.get('hwbno').value?.length==0||formCreate.get('hwbno').value==null)">
+                                        HBL No must be not have special charater!
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -23,6 +31,15 @@
                                     </label>
                                     <input type="text" class="form-control" placeholder="Enter text"
                                         formControlName="mblno">
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="(isSubmitted || mblno.dirty) && (formCreate.get('mblno').value?.length==0||formCreate.get('mblno').value==null)">
+                                        MBL No is required!
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="(isSubmitted || mblno.dirty) && !mblno.valid && !(formCreate.get('mblno').value?.length==0||formCreate.get('mblno').value==null)">
+                                        MBL No must be not have special charater!
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">

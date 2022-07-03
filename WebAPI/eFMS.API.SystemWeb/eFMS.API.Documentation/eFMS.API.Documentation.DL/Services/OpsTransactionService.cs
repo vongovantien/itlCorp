@@ -2151,7 +2151,8 @@ namespace eFMS.API.Documentation.DL.Services
                     item.Mblno = shipment.Mblno;
                     item.OfficeId = shipment.OfficeId;
                     item.Hblid = shipment.Hblid;
-
+                    item.CombineBillingNo = null;
+                    item.ObhcombineBillingNo = null;
                     surCharges.Add(item);
                 }
             }
@@ -2288,6 +2289,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 {
                                     charge.ChargeId = charge.CreditCharge ?? Guid.Empty;
                                     charge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                    charge.PayerId = null;
                                     if (!string.IsNullOrEmpty(charge.PartnerInternal_Id))
                                         charge.PaymentObjectId = charge.PartnerInternal_Id;
                                 }

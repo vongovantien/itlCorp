@@ -2749,6 +2749,8 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PayerAcctManagementId = null;
                     item.VoucherIdre = null;
                     item.VoucherIdredate = null;
+                    item.CombineBillingNo = null;
+                    item.ObhcombineBillingNo = null;
 
                     surCharges.Add(item);
                 }

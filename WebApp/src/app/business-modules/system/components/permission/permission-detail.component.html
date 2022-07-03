@@ -211,7 +211,12 @@
                         <ul class="list-group list-module">
                             <li class="list-group-item"
                                 *ngFor="let permissionModulegroup of permissionSample.sysPermissionSampleSpecials; let i = index; trackBy: trackByFn">
-                                <span class="font-15 font-weight-bold">{{permissionModulegroup.moduleName}}</span>
+                                <div class="row">
+                                    <div class = "col-md-2 d-flex align-items-center font-15 font-weight-bold"> {{permissionModulegroup.moduleName}}</div>
+                                    <div class = "col-md-1 d-flex align-items-center"><app-switch [size]="'sm'"
+                                        (toggleChange)="onChangeQuickSetupSP($event,'isAllow',permissionModulegroup)">                                                                       
+                                    </app-switch>All</div>                    
+                                </div>                               
                                 <ul class="list-group m--margin-top-10 list-permission ">
                                     <li *ngFor="let permission of permissionModulegroup.sysPermissionSpecials; let j = index"
                                         class="list-group-item">

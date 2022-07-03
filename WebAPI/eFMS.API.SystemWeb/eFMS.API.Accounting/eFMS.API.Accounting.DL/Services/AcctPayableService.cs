@@ -94,7 +94,7 @@ namespace eFMS.API.Accounting.DL.Services
             //               join partner in catPartnerRepository.Get(x => x.Active == true) on payable.PartnerId equals partner.Id into grpPartner
             //               from partner in grpPartner.DefaultIfEmpty()
             //               select new { payable, ShortName = partner != null ? partner.ShortName : string.Empty, AccountNo = partner != null ? partner.AccountNo : string.Empty }).ToList();
-            var payableGrp = data.ToList().GroupBy(x => new { x.RefId, x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType }).ToList();
+            var payableGrp = data.OrderByDescending(x => x.VoucherDate).GroupBy(x => new { x.RefId, x.PartnerId, x.VoucherNo, x.VoucherDate, x.InvoiceNo, x.BillingNo, x.TransactionType });
 
             var acctPayables = new List<AccAccountPayableModel>();
             var partnerData = catPartnerRepository.Get(x => x.Active == true);
@@ -103,36 +103,33 @@ namespace eFMS.API.Accounting.DL.Services
                 var acct = new AccAccountPayableModel();
                 var advValue = item.Key.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE ? (-1) : 1; // dòng adv hiện giá trị âm
                 var partner = partnerData.Where(x => x.Id == item.Key.PartnerId).FirstOrDefault();
-                acct.RefId = item.Key.RefId?.ToString(); ;
-                acct.ReferenceNo = item.Key.VoucherNo;
-                acct.PartnerName = partner?.ShortName;
-                acct.AccountNo = partner?.AccountNo;
-                acct.TransactionType = item.Key.TransactionType;
-                acct.VoucherDate = item.Key.VoucherDate;
-                acct.InvoiceNo = item.Key.InvoiceNo;
-                if (!string.IsNullOrEmpty(acct.InvoiceNo)) // [CR 15/03/22: Leyla invoice date null or =01/01/1900 => inv date = acct date + pm term ]
+                var paymentAmount = GetAmountWithCurrency(item.Select(z => z).AsQueryable(), criteria.FromPaymentDate);
+                var paymentAmountOrigin = paymentAmount.Where(x => x.Currency == "Origin").FirstOrDefault();
+                var paymentAmountVnd = paymentAmount.Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL).FirstOrDefault();
+                acctPayables.Add(new AccAccountPayableModel
                 {
-                    acct.InvoiceDate = item.FirstOrDefault().InvoiceDate == null || item.FirstOrDefault().InvoiceDate.Value.Date == DateTime.Parse("01/01/1900").Date ? item.FirstOrDefault().PaymentDueDate : item.FirstOrDefault().InvoiceDate;
-                }
-                else
-                {
-                    acct.InvoiceDate = null;
-                }
-                acct.BravoRefNo = item.FirstOrDefault().ReferenceNo;
-                acct.BillingNo = item.FirstOrDefault().BillingNo;
-                acct.Currency = item.FirstOrDefault().Currency;
-                acct.PaymentTerm = item.FirstOrDefault().PaymentTerm;
-                acct.PaymentDueDate = item.FirstOrDefault().PaymentDueDate;
-                var paymentAmount = GetAmountWithCurrency(string.Empty, item.Select(z => z).AsQueryable(), criteria.FromPaymentDate);
-                acct.TotalAmount = paymentAmount[0] == null ? paymentAmount[0] : paymentAmount[0] * advValue;
-                acct.PaymentAmount = paymentAmount[1] == null ? paymentAmount[1] : paymentAmount[1] * advValue;
-                acct.RemainAmount = paymentAmount[2] == null ? paymentAmount[2] : paymentAmount[2] * advValue;
-                var paymentAmountVnd = GetAmountWithCurrency(AccountingConstants.CURRENCY_LOCAL, item.Select(z => z).AsQueryable(), criteria.FromPaymentDate);
-                acct.TotalAmountVnd = paymentAmountVnd[0] == null ? paymentAmountVnd[0] : paymentAmountVnd[0] * advValue;
-                acct.PaymentAmountVnd = paymentAmountVnd[1] == null ? paymentAmountVnd[1] : paymentAmountVnd[1] * advValue;
-                acct.RemainAmountVnd = paymentAmountVnd[2] == null ? paymentAmountVnd[2] : paymentAmountVnd[2] * advValue;
-                acct.NotShowDetail = item.FirstOrDefault().InRangeType == "OutRange";
-                acctPayables.Add(acct);
+                    RefId = item.Key.RefId?.ToString(),
+                    ReferenceNo = item.Key.VoucherNo,
+                    PartnerName = partner?.ShortName,
+                    AccountNo = partner?.AccountNo,
+                    TransactionType = item.Key.TransactionType,
+                    VoucherDate = item.Key.VoucherDate,
+                    InvoiceNo = item.Key.InvoiceNo,
+                    // InvoiceDate [CR 15/03/22: Leyla invoice date null or =01/01/1900 => inv date = acct date + pm term ]
+                    InvoiceDate = item.Key.InvoiceNo == null ? null : (item.FirstOrDefault().InvoiceDate == null || item.FirstOrDefault().InvoiceDate.Value.Date == DateTime.Parse("01/01/1900").Date ? item.FirstOrDefault().PaymentDueDate : item.FirstOrDefault().InvoiceDate),
+                    BravoRefNo = item.FirstOrDefault().ReferenceNo,
+                    BillingNo = item.FirstOrDefault().BillingNo,
+                    Currency = item.FirstOrDefault().Currency,
+                    PaymentTerm = item.FirstOrDefault().PaymentTerm,
+                    PaymentDueDate = item.FirstOrDefault().PaymentDueDate,
+                    TotalAmount = paymentAmountOrigin.Total * advValue,
+                    PaymentAmount = paymentAmountOrigin.PaidAmount * advValue,
+                    RemainAmount = paymentAmountOrigin.RemainAmount * advValue,
+                    TotalAmountVnd = paymentAmountVnd.Total * advValue,
+                    PaymentAmountVnd = paymentAmountVnd.PaidAmount * advValue,
+                    RemainAmountVnd = paymentAmountVnd.RemainAmount * advValue,
+                    NotShowDetail = item.FirstOrDefault().InRangeType == "OutRange"
+                });
             }
             return acctPayables.AsQueryable();
         }
@@ -143,127 +140,85 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="currency"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private decimal?[] GetAmountWithCurrency(string currency, IQueryable<AcctPayablePaymentDetailModel> data, string toDate)
+        private List<AmountWithCurrencyModel> GetAmountWithCurrency(IQueryable<AcctPayablePaymentDetailModel> data, string toDate)
         {
             var paymentdata = data.Where(x => x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE || (x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE && x.PaymentType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE)).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.PaymentAcctId, x.PaymentDate, x.PaymentType });
-            string type = data.FirstOrDefault().InRangeType;
-            decimal? total = 0;
-            decimal? paidAmount = 0;
-            decimal? remainAmount = 0;
+            var firstDataGrp = data.FirstOrDefault();
+            string type = firstDataGrp.InRangeType;
+            decimal? total = 0, totalVnd = 0, totalUsd = 0;
+            decimal? paidAmount = 0, paidAmountVnd = 0, paidAmountUsd = 0;
+            decimal? remainAmount = 0, remainAmountVnd = 0, remainAmountUsd = 0;
             switch (type)
             {
                 case "InRange":
                     // Transaction AP Phát sinh trong thời gian được chọn => lấy số dư đầu kì
-                    if (currency == AccountingConstants.CURRENCY_LOCAL)
                     {
-                        total = data.FirstOrDefault().TotalAmountVnd ?? 0;
+                        totalVnd = firstDataGrp.TotalAmountVnd ?? 0;
                     }
-                    else if (currency == AccountingConstants.CURRENCY_USD)
                     {
-                        total = data.FirstOrDefault().TotalAmountUsd ?? 0;
+                        totalUsd = firstDataGrp.TotalAmountUsd ?? 0;
                     }
-                    else
                     {
-                        total = data.FirstOrDefault().TotalAmount ?? 0;
+                        total = firstDataGrp.TotalAmount ?? 0;
                     }
                     break;
                 case "PMInRange":
                     // Transaction AP phát sinh trước thời gian được chọn và có AP payment trong khoảng thời gian được chọn: Begin Amount => lấy remain amount của payment gần nhất (Cận dưới from date), trường hợp không có payment => Total Amount
                     var outRangePM = paymentdata.Where(x => x.FirstOrDefault().PaymentDate < (DateTime.Parse(toDate).Date)).OrderByDescending(x => x.FirstOrDefault().PaymentDate).ThenByDescending(x => x.FirstOrDefault().PaymentDatetimeCreated).FirstOrDefault();
-                    if (currency == AccountingConstants.CURRENCY_LOCAL)
                     {
                         //if (data.Any(x => x.PaymentRemainAmountVnd == null))
-                        if(outRangePM == null) // nếu không có payment thì lấy total amount
+                        if (outRangePM == null) // nếu không có payment thì lấy total amount
                         {
-                            total = data.FirstOrDefault().TotalAmountVnd ?? 0;
-                        }
-                        else
-                        {
-                            total = outRangePM.FirstOrDefault()?.PaymentRemainAmountVnd ?? 0;// data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.PaymentRemainAmountVnd ?? 0;
-                        }
-                    }
-                    else if (currency == AccountingConstants.CURRENCY_USD)
-                    {
-                        if (outRangePM == null)
-                        {
-                            total = data.FirstOrDefault().TotalAmountUsd ?? 0;
-                        }
-                        else
-                        {
-                            total = outRangePM.FirstOrDefault()?.PaymentRemainAmountUsd ?? 0;
-                        }
-                    }
-                    else
-                    {
-                        if (outRangePM == null)
-                        {
-                            total = data.FirstOrDefault().TotalAmount ?? 0;
+                            total = firstDataGrp.TotalAmount ?? 0;
+                            totalVnd = firstDataGrp.TotalAmountVnd ?? 0;
+                            totalUsd = firstDataGrp.TotalAmountUsd ?? 0;
                         }
                         else
                         {
                             total = outRangePM.FirstOrDefault()?.PaymentRemainAmount ?? 0;
+                            totalVnd = outRangePM.FirstOrDefault()?.PaymentRemainAmountVnd ?? 0;// data.OrderByDescending(x => x.PaymentDate).FirstOrDefault()?.PaymentRemainAmountVnd ?? 0;
+                            totalUsd = outRangePM.FirstOrDefault()?.PaymentRemainAmountUsd ?? 0;
                         }
                     }
                     break;
                 case "OutRange":
                     // Transaction AP chưa trả hết(Unpaid/ Paid a Part) trước và không có payment trướcng khoảng thời được chọn => lấy remain amount của AP cận trên đó, Trường hợp remain không có giá trị sẽ lấy Total Amount
-                    if (currency == AccountingConstants.CURRENCY_LOCAL)
                     {
-                        total = (data.FirstOrDefault().RemainAmountVnd == null || data.FirstOrDefault().RemainAmountVnd == 0 || data.FirstOrDefault().PaymentRemainAmountVnd == null) ? data.FirstOrDefault().TotalAmount : data.FirstOrDefault().PaymentRemainAmountVnd;
+                        totalVnd = (firstDataGrp.RemainAmountVnd == null || firstDataGrp.RemainAmountVnd == 0 || firstDataGrp.PaymentRemainAmountVnd == null) ? firstDataGrp.TotalAmount : firstDataGrp.PaymentRemainAmountVnd;
                     }
-                    else if (currency == AccountingConstants.CURRENCY_USD)
                     {
-                        total = (data.FirstOrDefault().RemainAmountUsd == null || data.FirstOrDefault().RemainAmountUsd == 0 || data.FirstOrDefault().PaymentRemainAmountUsd == null) ? data.FirstOrDefault().TotalAmountUsd : data.FirstOrDefault().PaymentRemainAmountUsd;
+                        totalUsd = (firstDataGrp.RemainAmountUsd == null || firstDataGrp.RemainAmountUsd == 0 || firstDataGrp.PaymentRemainAmountUsd == null) ? firstDataGrp.TotalAmountUsd : firstDataGrp.PaymentRemainAmountUsd;
                     }
-                    else
                     {
-                        total = (data.FirstOrDefault().OrgRemainAmount == null || data.FirstOrDefault().OrgRemainAmount == 0 || data.FirstOrDefault().PaymentRemainAmount == null) ? data.FirstOrDefault().TotalAmount : data.FirstOrDefault().PaymentRemainAmount;
+                        total = (firstDataGrp.OrgRemainAmount == null || firstDataGrp.OrgRemainAmount == 0 || firstDataGrp.PaymentRemainAmount == null) ? firstDataGrp.TotalAmount : firstDataGrp.PaymentRemainAmount;
                     }
                     break;
             }
-            if (currency == AccountingConstants.CURRENCY_LOCAL)
-            {
-                foreach (var item in paymentdata)
-                {
-                    paidAmount += item.Sum(x => x.PaymentAmountVnd ?? 0);
-                    remainAmount += item.FirstOrDefault().PaymentRemainAmountVnd;
-                }
-                // [CR: 15/03/22] TH ghi nhận trong kì thì lấy total = total amount ban đầu, remain = remain trên AP
-                if (type == "InRange")
-                {
-                    remainAmount = data.FirstOrDefault().RemainAmountVnd;
-                }
-            }
-            else if (currency == AccountingConstants.CURRENCY_USD)
-            {
-                foreach (var item in paymentdata)
-                {
-                    paidAmount += item.Sum(x => x.PaymentAmountUsd ?? 0);
-                    remainAmount += item.FirstOrDefault().PaymentRemainAmountUsd;
-                }
-                if (type == "InRange")
-                {
-                    remainAmount = data.FirstOrDefault().RemainAmountUsd;
-                }
-            }
-            else
             {
                 foreach (var item in paymentdata)
                 {
                     paidAmount += item.Sum(x => x.PaymentAmount ?? 0);
                     remainAmount += item.FirstOrDefault().PaymentRemainAmount;
+
+                    paidAmountVnd += item.Sum(x => x.PaymentAmountVnd ?? 0);
+                    remainAmountVnd += item.FirstOrDefault().PaymentRemainAmountVnd;
+
+                    paidAmountUsd += item.Sum(x => x.PaymentAmountUsd ?? 0);
+                    remainAmountUsd += item.FirstOrDefault().PaymentRemainAmountUsd;
                 }
+                // [CR: 15/03/22] TH ghi nhận trong kì thì lấy total = total amount ban đầu, remain = remain trên AP
                 if (type == "InRange")
                 {
-                    remainAmount = data.FirstOrDefault().OrgRemainAmount;
+                    remainAmount = firstDataGrp.OrgRemainAmount;
+                    remainAmountVnd = firstDataGrp.RemainAmountVnd;
+                    remainAmountUsd = firstDataGrp.RemainAmountUsd;
                 }
             }
-
             
             if (type == "OutRange")
             {
-                paidAmount = null;
-                remainAmount = null;
+                paidAmount = paidAmountVnd = paidAmountUsd = null;
+                remainAmount = remainAmountVnd = remainAmountUsd = null;
             }
 
             // TH transaction type adv nhưng không có payment
@@ -285,8 +240,11 @@ namespace eFMS.API.Accounting.DL.Services
             //        remainAmount = data.FirstOrDefault().PaymentRemainAmount;
             //    }
             //}
-
-            return new[] { total, paidAmount, remainAmount };
+            var result = new List<AmountWithCurrencyModel>();
+            result.Add(new AmountWithCurrencyModel() { Currency = "Origin", Total = total, PaidAmount = paidAmount, RemainAmount = remainAmount });
+            result.Add(new AmountWithCurrencyModel() { Currency = AccountingConstants.CURRENCY_LOCAL, Total = totalVnd, PaidAmount = paidAmountVnd, RemainAmount = remainAmountVnd });
+            result.Add(new AmountWithCurrencyModel() { Currency = AccountingConstants.CURRENCY_USD, Total = totalUsd, PaidAmount = paidAmountUsd, RemainAmount = remainAmountUsd });
+            return result;
         }
 
         /// <summary>
@@ -387,6 +345,14 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => !string.IsNullOrEmpty(x.ReferenceNo));
             }
+
+            // Get data within 1 months if search without anything
+            if (IsInitSearch(criteria))
+            {
+                var maxDate = (DataContext.Get().Max(x => x.VoucherDate) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-1).AddDays(-1).Date; // Start from 1 months ago
+                query = query.And(x => x.VoucherDate != null && (x.VoucherDate.Value > minDate && x.VoucherDate.Value < maxDate));
+            }
             return query;
         }
 
@@ -429,19 +395,17 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.FromPaymentDate != null)
             {
                 // Lấy AP có payment trong khoảng thời gian đã chọn theo voucher date
+                var filterStatus = (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0);
                 var apInRangeDates = data.Where(x => DateTime.Parse(criteria.FromPaymentDate).Date <= x.VoucherDate.Value.Date && x.VoucherDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date &&
-                (x.payment == null || !string.IsNullOrEmpty(x.payment.PaymentNo))).Select(x => new { x, InRangeType = "InRange" });
+                (x.payment == null || !string.IsNullOrEmpty(x.payment.PaymentNo)) && (!filterStatus || criteria.PaymentStatus.Any(status => status == x.Status))).Select(x => new { x, InRangeType = "InRange" });
                 // Lấy AP trước khoảng thời gian đã chọn nhưng payment nằm trong khoảng thời gian
-                var paymentInRangedates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && x.payment != null && (DateTime.Parse(criteria.FromPaymentDate).Date <= x.payment.PaymentDate.Value.Date && x.payment.PaymentDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date)).Select(x => new { x, InRangeType = "PMInRange" });
+                var paymentInRangedates = data.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.VoucherDate.Value.Date) && x.payment != null && 
+                (DateTime.Parse(criteria.FromPaymentDate).Date <= x.payment.PaymentDate.Value.Date && x.payment.PaymentDate.Value.Date <= DateTime.Parse(criteria.ToPaymentDate).Date)).Select(x => new { x, InRangeType = "PMInRange" });
 
                 var dataGrp = apInRangeDates;
-                if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0) // Filter status
-                {
-                    dataGrp = dataGrp.Where(d => criteria.PaymentStatus.Any(status => status == d.x.Status));
-                }
                 if (paymentInRangedates.Count() > 0)
                 {
-                    if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0) // Filter status cho PMInRange
+                    if (filterStatus) // Filter status cho PMInRange
                     {
                         paymentInRangedates = paymentInRangedates.Where(d => (d.x.payment == null && criteria.PaymentStatus.Any(status => status == d.x.Status)) || (!string.IsNullOrEmpty(d.x.payment.PaymentNo) && criteria.PaymentStatus.Any(status => status == d.x.payment.Status)));
                     }
