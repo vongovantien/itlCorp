@@ -314,6 +314,12 @@ export class SystemRepo {
         );
     }
 
+    queryOffices(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Query`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     addNewDepartment(body: any) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Add`, body).pipe(
             map((data: any) => data)
@@ -454,6 +460,15 @@ export class SystemRepo {
 
     queryUserLevels(body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/Query`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+    getUserActiveInfo() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/GetUserActiveInfo`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;

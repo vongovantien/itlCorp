@@ -499,5 +499,13 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("GetUserActiveInfo")]
+        public IActionResult GetUserActiveInfo()
+        {
+            var results = userLevelService.GetUserActiveInfo();
+            return Ok(results);
+        }
     }
 }

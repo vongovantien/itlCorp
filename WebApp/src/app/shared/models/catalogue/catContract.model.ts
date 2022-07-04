@@ -53,6 +53,11 @@ export class Contract {
     autoExtendDays: number = null;
     customerAdvanceAmountVnd: number = null;
     customerAdvanceAmountUsd: number = null;
+    noDue: boolean = false;
+    salesGroup: string = null;
+    salesDepartment: string = null;
+    salesOfficeId: string = null;
+    salesCompanyId: string = null;
 
     constructor(data?: any) {
         const self = this;
