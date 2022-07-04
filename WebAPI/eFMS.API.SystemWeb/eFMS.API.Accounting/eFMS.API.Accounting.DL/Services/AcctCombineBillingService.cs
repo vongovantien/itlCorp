@@ -1565,7 +1565,7 @@ namespace eFMS.API.Accounting.DL.Services
             var combineDatas = GetData(criteria);
             if (criteria.ReferenceNo == null)
             {
-                criteria.ReferenceNo = AppendCombineNo(combineDatas);
+                criteria.ReferenceNo = combineDatas == null ? new List<string>() : AppendCombineNo(combineDatas);
             }
             var opsModel = new CombineOPSModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
@@ -1890,9 +1890,9 @@ namespace eFMS.API.Accounting.DL.Services
         public CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
         {
             var combineDatas = GetData(criteria);
-            if(criteria.ReferenceNo == null)
+            if(criteria.ReferenceNo == null && combineDatas !=null)
             {
-                criteria.ReferenceNo = AppendCombineNo(combineDatas);
+                criteria.ReferenceNo = combineDatas == null ? new List<string>() : AppendCombineNo(combineDatas);
             }
             var shipmentModel = new CombineShipmentModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
