@@ -130,7 +130,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
             CatPartnerModel partner = GetModelToAdd(entity);
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -181,7 +180,6 @@ namespace eFMS.API.Catalogue.DL.Services
                             });
                             var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
-                        trans.Commit();
                         if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
                         {
                             SendMailCreatedSuccess(partner);
@@ -194,13 +192,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     var result = new HandleState(ex.Message);
                     return new { model = new object { }, result };
-                }
-                finally
-                {
-                    trans.Dispose();
                 }
             }
         }
