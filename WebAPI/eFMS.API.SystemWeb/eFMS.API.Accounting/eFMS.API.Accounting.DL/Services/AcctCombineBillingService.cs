@@ -1921,7 +1921,7 @@ namespace eFMS.API.Accounting.DL.Services
                               UnitId = sur.UnitId,
                               ChargeWeight = opst.SumGrossWeight,
                               CBM = opst.SumCbm,
-                              PackageContainer = String.Empty,
+                              PackageContainer = opst.ContainerDescription,
                               AmountVND = sur.AmountVnd,
                               AmountUSD = sur.AmountUsd,
                               VATAmountLocal = sur.VatAmountVnd,
@@ -1980,8 +1980,9 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.CommodityName = grpData.Commodity;
                 exportCombineShipment.JobNo = grpData.JobId;
                 exportCombineShipment.CustomDeclarationNo = grpData.CustomNo;
-                exportCombineShipment.InvoiceNo = String.Join(";", grp.Where(t => t.TransactionType != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
-                exportCombineShipment.FreInvoice = String.Join(";", grp.Where(t => t.TransactionType == "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.InvoiceNo = String.Join(";", grp.Where(t => t.TransactionType == "CL" && t.TypeCharge != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.OBHInvoice = String.Join(";", grp.Where(t => t.TypeCharge == "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.FreInvoice = String.Join(";", grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
                 exportCombineShipment.KGS = grpData.ChargeWeight;
                 exportCombineShipment.CBM = grpData.CBM;
                 exportCombineShipment.CombineNo = grpData.CombineNo;

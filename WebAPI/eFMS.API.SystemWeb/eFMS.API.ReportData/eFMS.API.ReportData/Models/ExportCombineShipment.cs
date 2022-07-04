@@ -19,7 +19,7 @@
         public string FreInvoice { get; set; }
         public decimal? FreFee { get; set; }
         public decimal? FreVAT { get; set; }
-        public string OBHInvoiceNo { get; set; }
+        public string OBHInvoice { get; set; }
         public string InvoiceNo { get; set; }
     }
 }
