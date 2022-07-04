@@ -1,7 +1,7 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-menu-preview-hbl-sea-import hblDetail="hblDetail"></app-menu-preview-hbl-sea-import>
+            <app-menu-preview-hbl-sea-import [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-import>
 
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
                 *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
