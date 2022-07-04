@@ -1563,6 +1563,10 @@ namespace eFMS.API.Accounting.DL.Services
         public CombineOPSModel GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria)
         {
             var combineDatas = GetData(criteria);
+            if (criteria.ReferenceNo == null)
+            {
+                criteria.ReferenceNo = AppendCombineNo(combineDatas);
+            }
             var opsModel = new CombineOPSModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return opsModel; }
@@ -1869,6 +1873,15 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
 
+        private List<string> AppendCombineNo(IQueryable<AcctCombineBillingResult> combineDatas)
+        {
+            List<string> combineList = new List<string>();
+            combineDatas.ToList().ForEach(x =>
+            combineList.Add(x.CombineBillingNo)
+            );
+            return combineList;
+        }
+
         /// <summary>
         /// Get Combine OPS data with partner and currency
         /// </summary>
@@ -1877,11 +1890,14 @@ namespace eFMS.API.Accounting.DL.Services
         public CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
         {
             var combineDatas = GetData(criteria);
-
+            if(criteria.ReferenceNo == null)
+            {
+                criteria.ReferenceNo = AppendCombineNo(combineDatas);
+            }
             var shipmentModel = new CombineShipmentModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return shipmentModel; }
-            var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo) || criteria.ReferenceNo.Contains(x.ObhcombineBillingNo));
+            var surcharges =  surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo));
             var chargeDatas = catChargeRepo.Get();
             var unitDatas = catUnitRepo.Get();
             // var clearanceDatas = customsDeclarationRepo.Get();
