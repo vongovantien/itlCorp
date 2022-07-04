@@ -89,7 +89,8 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
@@ -107,7 +108,8 @@
                 </div>
             </div>
             <div class="col-lg-3">
-                <div class="form-group">
+                <div class="form-group"
+                [ngClass]="{'m-form__group has-danger':((bankName.dirty) && !bankName.valid) }">
                     <label class="form-control-label">
                         Bank Name:
                     </label>

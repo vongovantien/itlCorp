@@ -118,8 +118,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         //     return;
         // }
 
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -227,14 +227,29 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             );
     }
 
+    checkValidSettle() {
+        if (this.formCreateSurcharge.checkStaffPartner()) {
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return false;
+        }
+
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if(!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.form.valid){
+            return false;
+        }
+        return true;
+    }
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        if(!this.checkValidSettle()){
             return;
         }
 

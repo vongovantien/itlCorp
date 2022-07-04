@@ -9,6 +9,7 @@ import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogu
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { SystemConstants } from '@constants';
 
 
 @Component({
@@ -111,9 +112,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             note: [],
             currency: [],
             paymentTerm: [9],
-            bankAccountNo: [],
+            bankAccountNo: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
+            ])],
             bankAccountName: [],
-            bankName: [],
+            bankName: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.VIETNAMESE_REGEX),
+            ])],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],
             bankCode: [{ value: null, disabled: true }],
             advanceFor: [this.advanceForDatas[0]],

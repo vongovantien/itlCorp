@@ -339,6 +339,10 @@ export class AdvancePaymentDetailComponent
     }
 
     checkInvalidListAdvanceRequest() {
+        this.formCreateComponent.isSubmitted = true;
+        if(!this.formCreateComponent.formCreate.valid){
+            return true;
+        }
         if (!this.isAdvCarrier) {
             if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
                 this._toastService.warning(
@@ -357,7 +361,6 @@ export class AdvancePaymentDetailComponent
 
         } else {
             this.listAdvancePaymentCarrierComponent.isSubmitted = true;
-            this.formCreateComponent.isSubmitted = true;
             if (!this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.length) {
                 this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, "");
                 return true;
