@@ -176,5 +176,8 @@
 
         public static readonly string STATUS_CANCEL_RECEIPT = "Cancel";
         public static readonly string STATUS_DONE_RECEIPT = "Done";
+
+        public const string OFFICE_HM = "ITLHM";
+        public const string OFFICE_BH = "ITLHBH";
     }
 }
