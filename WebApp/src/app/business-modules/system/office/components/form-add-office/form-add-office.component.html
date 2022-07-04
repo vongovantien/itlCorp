@@ -62,8 +62,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-
+                    <div class="col-lg-2">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (taxcode.dirty && !taxcode.valid) || (isSubmited && !taxcode.valid)}">
                             <label class="form-control-label" for="">
@@ -77,7 +76,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (officeType.dirty && !officeType.valid) || (isSubmited && !officeType.valid)}">
+                            <label class="form-control-label">
+                                Office Type
+                                <span class="text-danger">*</span>
+                            </label>
+                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !company.value}">
                             <label class="form-control-label">
                                 Company <span class="m--font-danger">(*)</span>
@@ -92,17 +102,6 @@
                             <div class="form-control-feedback" *ngIf="isSubmited && !company.value ">
                                 Company is required!
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-1">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (officeType.dirty && !officeType.valid) || (isSubmited && !officeType.valid)}">
-                            <label class="form-control-label">
-                                Office Type
-                                <span class="text-danger">*</span>
-                            </label>
-                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes">
-                            </ng-select>
                         </div>
                     </div>
                 </div>

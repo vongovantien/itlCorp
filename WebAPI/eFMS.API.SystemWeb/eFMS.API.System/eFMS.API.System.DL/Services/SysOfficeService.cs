@@ -103,7 +103,7 @@ namespace eFMS.API.System.DL.Services
 
         public List<SysOfficeViewModel> Query(SysOfficeCriteria criteria)
         {
-            var SysOffices = GetOffices();
+            var SysOffices = DataContext.Get();
             var sysBu = sysBuRepository.Get();
             var query = (from branch in SysOffices
                          join bu in sysBu on branch.Buid equals bu.Id 
@@ -118,6 +118,7 @@ namespace eFMS.API.System.DL.Services
                            && (x.branch.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.branch.Taxcode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.companyName ?? "").IndexOf(criteria.CompanyName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (criteria.OfficeType == null || criteria.OfficeType.Count == 0 || criteria.OfficeType.Any(z => z == x.branch.OfficeType))
                            && (x.branch.Active == criteria.Active || criteria.Active == null));
             }
             else
