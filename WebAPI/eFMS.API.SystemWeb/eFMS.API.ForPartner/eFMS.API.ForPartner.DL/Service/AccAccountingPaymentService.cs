@@ -6,6 +6,7 @@ using eFMS.API.ForPartner.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace eFMS.API.ForPartner.DL.Service
@@ -18,13 +19,14 @@ namespace eFMS.API.ForPartner.DL.Service
             acctReceiptRepository = acctReceiptRepo;
         }
 
-        public bool CheckInvoicePayment(Guid Id)
+        public bool CheckInvoicePayment(List<Guid> Ids)
         {
             bool result = false;
+            if (Ids.Count == 0) return result;
             var receipts = acctReceiptRepository.Get(x => x.Status != ForPartnerConstants.STATUS_CANCEL_RECEIPT);
             var query = from payment in DataContext.Get()
                         join receipt in receipts on payment.ReceiptId equals receipt.Id
-                        where payment.RefId == Id.ToString()
+                        where Ids.Contains(Guid.Parse(payment.RefId))
                         select receipt;
 
             if (query.Any())
