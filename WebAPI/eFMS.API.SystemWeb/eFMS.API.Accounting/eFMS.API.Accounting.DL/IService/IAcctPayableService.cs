@@ -17,6 +17,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria);
         List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria);
         IQueryable<AccAccountPayablePaymentModel> GetBy(AcctPayableViewDetailCriteria criteria);
-        GeneralAccPayableModel GetGeneralPayable(string partnerId);
+        GeneralAccPayableModel GetGeneralPayable(string partnerId,string currency);
     }
 }

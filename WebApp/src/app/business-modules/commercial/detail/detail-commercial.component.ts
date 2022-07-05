@@ -1,5 +1,6 @@
+import { Currency } from './../../../shared/models/catalogue/catCurrency.model';
 import { partnerState } from './../../catalogue/partner-data/store/reducers/index';
-import { PayableComponent } from './../components/payable/payable.component';
+import { PayableComponent } from '../components/payable/payable.component';
 import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -85,7 +86,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
                     this.payableComponent.partnerId=res.partnerId;
-                    this.payableComponent.getGeneralPayable(res.partnerId);
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {
                     this.gotoList();
@@ -124,6 +124,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
                         this.formCreate.getShippingProvinces(res.countryShippingId);
                         this.formCreate.getBillingProvinces(res.countryId);
+                        this.payableComponent.getGeneralPayable(this.partner.id,this.partner.currency===null?"VND":this.partner.currency);
                     }
                     else {
                         this.back();
@@ -253,6 +254,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);
+        console.log(this.partner);
+        
+        this.payableComponent.getGeneralPayable(this.partner.id,payable.currency);
     }
 
     onSaveDetail() {

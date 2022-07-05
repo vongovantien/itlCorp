@@ -26,6 +26,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepository;
         private readonly IContextBase<AccAccountPayablePayment> accountPayablePaymentRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
+        private readonly IContextBase<CatCurrencyExchange> exchangeRateRepository;
+
         public AcctPayableService(
             IContextBase<AccAccountPayable> repository,
             IMapper mapper,
@@ -34,6 +36,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> catPartnerRepo,
             IContextBase<AccAccountPayablePayment> accountPayablePaymentRepo,
             IContextBase<SysOffice> sysOfficeRepo,
+            IContextBase<CatCurrencyExchange> exchangeRateRepo,
             IOptions<WebUrl> wUrl
 
             ) : base(repository, mapper)
@@ -43,6 +46,7 @@ namespace eFMS.API.Accounting.DL.Services
             catPartnerRepository = catPartnerRepo;
             accountPayablePaymentRepository = accountPayablePaymentRepo;
             sysOfficeRepository = sysOfficeRepo;
+            exchangeRateRepository = exchangeRateRepo;
         }
 
         /// <summary>
@@ -754,16 +758,33 @@ namespace eFMS.API.Accounting.DL.Services
             return result.OrderBy(x => x.VoucherDate).ThenBy(x => x.VoucherNo).ThenBy(x => x.DocNo).ToList();
         }
 
-        public GeneralAccPayableModel GetGeneralPayable(string partnerId)
+        //private decimal RateAmount(decimal? amountVND,decimal? amountUSD,string currencySrc,string currencyDest)
+        //{
+        //    var rate = exchangeRateRepository.Get().OrderByDescending(x => x.DatetimeCreated).FirstOrDefault().Rate;
+        //    if (amountVND != 0 && amountUSD == 0 && currencyDest=="USD" && currencySrc=="VND")
+        //    {
+        //        return (decimal)amountVND / rate;
+        //    }else if(amountVND == 0 && amountUSD != 0 && currencyDest=="VND" && currencySrc=="USD")
+        //    {
+        //        return (decimal)amountUSD * rate;
+        //    }
+        //    return currencyDest == "VND" ? (decimal)amountVND : (decimal)amountUSD;
+        //}
+
+        public GeneralAccPayableModel GetGeneralPayable(string partnerId,string currency)
         {
             var accPayable = DataContext.Get(x => x.PartnerId == partnerId).ToList();
-            var crdAvdAmount = DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.PaymentAmount);
+            var crdAvdAmount = currency=="VND"?DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.TotalAmountVnd): DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.TotalAmountUsd);
             var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+
             return new GeneralAccPayableModel
             {
-                CreditAmount = accPayable.Sum(x=>x.TotalAmount),
-                CreditPaidAmount = accPayable.Sum(x=>x.PaymentAmount),
-                CreditUnpaidAmount = accPayable.Sum(x=>x.RemainAmount),
+                CreditAmount = currency == "VND" ? accPayable.Sum(x => x.TotalAmountVnd) : accPayable.Sum(x => x.TotalAmountUsd),
+                CreditPaidAmount = currency == "VND" ? accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => x.PaymentAmountVnd) : accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => x.PaymentAmountUsd),
+                CreditUnpaidAmount = currency == "VND" ? (accPayable.Sum(x => x.RemainAmountVnd) <= 0 ? 0 : accPayable.Sum(x => x.RemainAmountVnd)) : (accPayable.Sum(x => x.RemainAmountUsd) <= 0 ? 0 : accPayable.Sum(x => x.RemainAmountUsd)),
+                //CreditAmount = accPayable.Sum(x => RateAmount(x.TotalAmountVnd, x.TotalAmountUsd, x.Currency, currency)),
+                //CreditPaidAmount = accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => RateAmount(x.PaymentAmountVnd, x.PaymentAmountUsd, x.Currency, currency)),
+                //CreditUnpaidAmount = accPayable.Sum(x => RateAmount(x.RemainAmountVnd, x.RemainAmountUsd, x.Currency, currency)),
                 Currency = partner.Currency,
                 PaymentTerm = partner.PaymentTerm==null?0: partner.PaymentTerm,
                 CreditAdvanceAmount = crdAvdAmount

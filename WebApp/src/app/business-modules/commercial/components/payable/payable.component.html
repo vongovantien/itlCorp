@@ -30,7 +30,7 @@
                                 Credit Paid Amount
                             </label> 
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditPaidAmount" readonly value={{this.creditPaidAmount}} [value]="creditAmount | number: '.0-2'" >
+                                name="creditPaidAmount" readonly  [value]="this.creditPaidAmount | number: '.0-2'" >
                                 
                         </div>
                         <div class="form-group">
@@ -38,7 +38,7 @@
                                 Credit Advance Amount
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditAdvanceAmount" readonly value={{this.creditAdvanceAmount}} [value]="creditAmount | number: '.0-2'" >
+                                name="creditAdvanceAmount" readonly [value]="this.creditAdvanceAmount | number: '.0-2'" >
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -54,7 +54,7 @@
                                 Credit Unpaid
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                name="creditUnpaid" readonly value={{this.creditUnpaidAmount}} [value]="creditAmount | number: '.0-2'" >
+                                name="creditUnpaidAmount" readonly  [value]="this.creditUnpaidAmount | number: '.0-2'" >
                         </div>
                         <div class="row">
                             <div class="col-lg-6">

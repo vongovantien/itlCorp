@@ -1077,8 +1077,8 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    getGeneralPayable(partnerId:string){
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/GetGeneralPayable?partnerId=${partnerId}`);
+    getGeneralPayable(partnerId:string, currency: string){
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/GetGeneralPayable?partnerId=${partnerId}&currency=${currency}`);
     }
     updatePayable(partnerId:string,paymentTerm:number,currency:string){
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/UpdatePayable?partnerId=${partnerId}&paymentTerm=${paymentTerm}&currency=${currency}`);

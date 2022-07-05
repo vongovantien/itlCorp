@@ -1,3 +1,4 @@
+import { Currency } from './../../../../shared/models/catalogue/catCurrency.model';
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppForm } from '@app';
@@ -53,13 +54,15 @@ export class PayableComponent extends AppForm {
         });
     }
 
-    getGeneralPayable(partnerId: string) {
-        this._accountingRepo.getGeneralPayable(partnerId)
+    getGeneralPayable(partnerId: string,currency: string) {
+        this._accountingRepo.getGeneralPayable(partnerId,currency)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
             ).subscribe(
                 (res: any) => {
+                    console.log(res);
+                    res.currency=res.currency===null?'VND':res.currency;
                     this.creditAmount = res.creditAmount;
                     this.creditAdvanceAmount = res.creditAdvanceAmount;
                     this.creditPaidAmount = res.creditPaidAmount;
@@ -70,6 +73,7 @@ export class PayableComponent extends AppForm {
                     })
                     this.currency.setValue(res.currency);
                 },
+                
             );
     }
 
