@@ -96,7 +96,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'payee': [],
             'beneficiaryName': [],
             'bankAccountNo': [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
             ])],
             'bankName': [],
             'bankNameDescription': [null, Validators.compose([
@@ -243,5 +243,9 @@ export class SettlementFormCreateComponent extends AppForm {
             return true;
         }
         return false;
+    }
+
+    onUpdateRequestDate(value: { startDate: any; endDate: any }) {
+        this.minDate = value.startDate;
     }
 }

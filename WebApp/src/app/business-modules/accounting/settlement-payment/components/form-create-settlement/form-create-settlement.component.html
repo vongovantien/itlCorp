@@ -37,7 +37,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" placeholder="Select request date" [autoApply]="true"
-                                        formControlName="requestDate" [attr.disabled]="isDisabled" calendar />
+                                        formControlName="requestDate" (datesUpdated)="onUpdateRequestDate($event)" [attr.disabled]="isDisabled" calendar />
                                 </div>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="dueDateRange" placeholder="Select due date" [autoApply]="true"
-                                        formControlName="dueDate" calendar />
+                                        formControlName="dueDate" [minDate]="minDate" calendar />
                                 </div>
                             </div>
                         </div>
