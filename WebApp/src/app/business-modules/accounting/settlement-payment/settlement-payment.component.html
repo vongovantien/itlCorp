@@ -110,7 +110,7 @@
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <ng-container
-                                                            *ngIf="(settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied');else dblock">
+                                                            *ngIf="((settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied') && !settlePayment.issuedSoa);else dblock">
                                                             <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete"
                                                                 (click)="prepareDeleteAdvance(settlePayment)">

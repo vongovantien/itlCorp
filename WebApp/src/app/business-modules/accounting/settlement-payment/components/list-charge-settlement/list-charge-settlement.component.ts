@@ -212,8 +212,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-
-                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) === -1 && chargeIds.indexOf(x.jobId) === -1 && !x.isFromShipment && x.hasNotSynce);
+                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 || chargeIds.indexOf(x.id) === -1)  && !x.isFromShipment && x.hasNotSynce);
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
@@ -255,6 +254,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this._toastService.warning('Charge already synced');
                 return;
             }
+            if(!surcharge.isFromShipment && surcharge.hadIssued){
+                this._toastService.warning('Charge had issued Soa/CdNote');
+                return;
+            }
+
             this.selectedSurcharge = surcharge;
             this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
 
@@ -376,7 +380,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 if (charge.isFromShipment) {
                     charge.isSelected = true;
                 }
-                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce) {
+                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued) {
                     charge.isSelected = true;
                 }
             } else {
@@ -495,13 +499,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.settlementCode = this.settlementCode || null;
             this.existingChargePopup.show();
         } else {
+            if(charge.hadIssued){
+                this._toastService.warning('Charge had issued Soa/CdNote');
+                return;
+            }
+
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {
                 this.tableListChargePopup.selectedShipment = shipment;
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 
