@@ -6,23 +6,26 @@ import { RoutingConstants } from '@constants';
     selector: 'sidebar-file-management',
     templateUrl: './sidebar-file-management.component.html'
 })
-export class SidebarFileManagementComponent implements OnInit {
+export class SidebarFileManagementComponent implements OnInit, AfterViewInit {
     @Input() folderName: string;
-    title: string;
+    title: string = "Accounting/";
     constructor(private route: ActivatedRoute, private _router: Router) {
 
     }
+
+    ngAfterViewInit(): void {
+        this.changeBreadcrumb();
+    }
+
     ngOnInit() {
         this.changeBreadcrumb();
     }
 
-    changeBreadcrumb(){
-        if (this.folderName != null && this.folderName != undefined) {
-            this.title = this.route.snapshot.data['title'] + ">" + this.folderName;
-        }
-        else {
-            this.title = this.route.snapshot.data['title']
-        }
+    changeBreadcrumb() {
+        this.title += this.folderName + "/";
+        // if (this.folderName != null && this.folderName != undefined) {
+        //     this.title = this.route.snapshot.data['title'] + "/" + this.folderName;
+        // }
     }
     navigateFileMngt(moduleUrl: string) {
         if (moduleUrl === 'accounting') {

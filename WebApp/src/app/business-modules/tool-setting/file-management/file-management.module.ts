@@ -8,39 +8,39 @@ import { ShareFileManagementModule } from './share-file-management.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routing: Routes = [
-  {
-    path: '', loadChildren: () => import('./accouting-file-management/accouting-file-management.module').then(m => m.AccoutingFileManagementModule),
-    data: { name: 'Accounting', title: 'Accouting' }
-  },
-  {
-    path: 'document', loadChildren: () => import('./document-file-management/document-file-management.module').then(m => m.DocumentFileManagementModule),
-    data: { name: 'Document', title: 'Document' }
-  },
-  {
-    path: 'catalogue', loadChildren: () => import('./catelogue-file-management/catelogue-file-management.module').then(m => m.CatelogueFileManagementModule),
-    data: { name: 'Catalogue', title: 'Catalogue' }
-  },
-  {
-    path: 'system', loadChildren: () => import('./system-file-management/system-file-management.module').then(m => m.SystemFileManagementModule),
-    data: { name: 'System', title: 'System' }
-  }
+    {
+        path: '', loadChildren: () => import('./accounting-file-management/accounting-file-management.module').then(m => m.AccountingFileManagementModule),
+        data: { name: 'Accounting', title: 'Accounting' }
+    },
+    {
+        path: 'document', loadChildren: () => import('./document-file-management/document-file-management.module').then(m => m.DocumentFileManagementModule),
+        data: { name: 'Document', title: 'Document' }
+    },
+    {
+        path: 'catalogue', loadChildren: () => import('./catalogue-file-management/catalogue-file-management.module').then(m => m.CatalogueFileManagementModule),
+        data: { name: 'Catalogue', title: 'Catalogue' }
+    },
+    {
+        path: 'system', loadChildren: () => import('./system-file-management/system-file-management.module').then(m => m.SystemFileManagementModule),
+        data: { name: 'System', title: 'System' }
+    }
 ]
 
 @NgModule({
-  declarations: [
-    FileManagementComponent,
-  ],
+    declarations: [
+        FileManagementComponent,
+    ],
 
-  imports: [
-    TabsModule.forRoot(),
-    RouterModule.forChild(routing),
-    SharedModule,
-    ModalModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ShareFileManagementModule
-  ],
-  exports: [RouterModule]
+    imports: [
+        TabsModule.forRoot(),
+        RouterModule.forChild(routing),
+        SharedModule,
+        ModalModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ShareFileManagementModule
+    ],
+    exports: [RouterModule]
 
 })
 export class FilesManagementModule { }

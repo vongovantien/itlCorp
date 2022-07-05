@@ -21,14 +21,59 @@ namespace eFMS.API.Setting.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<AcctSoa> acctSOARepo;
+        private readonly IContextBase<AcctSettlementPayment> acctSettleRepo;
+        private readonly IContextBase<AcctAdvancePayment> acctAdvanceRepo;
 
-        public FileManagementService(IStringLocalizer<LanguageSub> localizer, IContextBase<SysImage> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        public FileManagementService(IStringLocalizer<LanguageSub> localizer, IContextBase<SysImage> repository, IContextBase<AcctSoa> acctSOA, IContextBase<AcctSettlementPayment> accSettle, IContextBase<AcctAdvancePayment> acctAdvance, IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            acctSOARepo = acctSOA;
+            acctSettleRepo = accSettle;
+            acctAdvanceRepo = acctAdvance;
+        }
+        public List<object> Get(string folderName, List<string> Ids)
+        {
+            if(Ids.Count() == 0)
+            {
+                var objectIds = DataContext.Get().Where(s => s.Folder == folderName).Select(s => s.ObjectId).Distinct().Take(10).ToList();
+                Ids.AddRange(objectIds);
+            }
+            List<object> data = new List<object>();
+            if (!string.IsNullOrEmpty(folderName))
+            {
+                switch (folderName)
+                {
+                    case "SOA":
+                        foreach (var Id in Ids)
+                        {
+                            var folderNames = acctSOARepo.Get().Where(s => s.Id == Id ).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.Soano }).Take(10).ToList();
+                            data.AddRange(folderNames);
+                        }
+                        break;
+                    case "Settlement":
+                        foreach (var Id in Ids)
+                        {
+                            var folderNames = acctSettleRepo.Get().Where(s => s.Id.ToString() == Id).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.SettlementNo }).Take(10).ToList();
+                            data.AddRange(folderNames);
+                        }
+                        break;
+                    case "Advance":
+                        foreach (var Id in Ids)
+                        {
+                            var folderNames = acctAdvanceRepo.Get().Where(s => s.Id.ToString() == Id).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.AdvanceNo }).Take(10).ToList();
+                            data.AddRange(folderNames);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return data;
         }
 
-        public List<SysImageModel> Get(SysImageCriteria criteria, int page, int size, out int rowsCount)
+        public List<SysImageModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = DataContext.Get();
             if (!string.IsNullOrEmpty(criteria.Name))

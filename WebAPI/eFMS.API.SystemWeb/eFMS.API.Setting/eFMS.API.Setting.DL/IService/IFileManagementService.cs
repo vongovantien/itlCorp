@@ -11,6 +11,7 @@ namespace eFMS.API.Setting.DL.IService
 {
     public interface IFileManagementService: IRepositoryBase<SysImage, SysImageModel>
     {
-        List<SysImageModel> Get(SysImageCriteria criteria, int page, int size, out int rowsCount);
+        List<SysImageModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount);
+        List<object> Get(string folderName, List<string> Ids);
     }
 }

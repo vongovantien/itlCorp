@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -34,9 +35,23 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost]
         [Route("Get")]
         [Authorize]
+        public IActionResult Get(string folderName, List<string> Ids)
+        {
+            var data = fileManagementService.Get(folderName, Ids);
+            if (data == null)
+            {
+                return BadRequest();
+            }
+            var result = new { data };
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Search")]
+        [Authorize]
         public IActionResult Search(SysImageCriteria criteria, int pageNumber, int pageSize)
         {
-            var data = fileManagementService.Get(criteria, pageNumber, pageSize, out int rowCount);
+            var data = fileManagementService.Search(criteria, pageNumber, pageSize, out int rowCount);
             if (data == null)
             {
                 return BadRequest();

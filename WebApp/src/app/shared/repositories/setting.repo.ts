@@ -199,12 +199,18 @@ export class SettingRepo {
         );
     }
 
-    getListFileManagement(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get`, body, {
+    getListFileByFolderName(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Search`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
         }).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getListFolderName(folderParent: string, body: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?folderName=${folderParent}`, body).pipe(
             map((data: any) => data)
         );
     }
