@@ -205,6 +205,12 @@
                                             class="btn btn-default  m-btn--icon m-btn--uppercase">Reset
                                             Password</button>
                                     </div>
+                                    <div class="c-btn-form-group" *ngIf = "(currentUserType == 'Super Admin') && (infoCurrentUserId != SelectedUser.id)">
+                                        <button class="btn btn-success m-btn--icon btn-sm font-14" (click)="switchUser(SelectedUser)" routerLink = "/home">
+                                            <div class = "la la-user-plus align-items-center">
+                                            </div> Log in
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ namespace eFMS.IdentityServer.DL.IService
 {
     public interface IAuthenUserService : IRepositoryBase<SysUser, UserModel>
     {
-        int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, PermissionInfo permissionInfo = null);
+        int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, string userType, PermissionInfo permissionInfo = null);
 
         UserViewModel GetUserById(string id);
 

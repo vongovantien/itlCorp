@@ -7,7 +7,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UserLevel } from 'src/app/shared/models/system/userlevel';
 import { SystemConstants } from '@constants';
-
+//SwitchUser
+import { HttpHeaders } from '@angular/common/http';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Company } from '@models';
+import { Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
+import { RSAHelper } from 'src/helper/RSAHelper';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -36,7 +43,13 @@ export class FormAddUserComponent extends AppList {
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
     userRole: AbstractControl;
-
+    //
+    currentUserType : string = '';
+    company$: Observable<Company[]>;
+    selectedCompanyId: any;
+    infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims(); //Get info of current ser.
+    infoCurrentUserId : string = this.infoCurrentUser.id;
+ 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -86,7 +99,8 @@ export class FormAddUserComponent extends AppList {
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-
+        private _oauthService: OAuthService,
+        private _spinner: NgxSpinnerService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -160,7 +174,8 @@ export class FormAddUserComponent extends AppList {
             { title: 'Department', field: 'departmentName' },
             { title: 'Position', field: 'position' },
         ];
-
+        this.getCurrentUserType();
+        this.getCurrentCompanyId();
     }
 
 
@@ -184,8 +199,58 @@ export class FormAddUserComponent extends AppList {
     }
 
 
+    getCurrentUserType() {
+        this._systemRepo.getDetailUser(this.infoCurrentUser.id)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this.currentUserType = res.data.userType;
+                    }
+                }
+            );
+    }
 
+    getCurrentCompanyId(){
+        this.company$ = this._systemRepo.getListCompanyPermissionLevel().pipe(share());
+        this.company$.subscribe(
+            (companies: any) => {
+                this.selectedCompanyId = companies[0].id;
+            }
+        );
+    }
 
+    switchUser(user: any) {
+        this._oauthService.loadDiscoveryDocument().then((a) => {
+            this._oauthService.tryLogin().then((b) => {
+                let header: HttpHeaders = new HttpHeaders({
+                    companyId: this.selectedCompanyId,
+                    userType: 'Super Admin',
+                });
+                const Username = user.username;
+                const Password = '@';
+                if (!!Username && !!Password) {
+                    this._oauthService.fetchTokenUsingPasswordFlow(Username, RSAHelper.serverEncode(Password), header)
+                        .then((tokenInfo: SystemInterface.IToken) => {
+                            localStorage.setItem(SystemConstants.ACCESS_TOKEN, tokenInfo.access_token);
+                            return this._oauthService.loadUserProfile();
+                        }).then((userInfo: SystemInterface.IClaimUser) => {
+                            this._spinner.hide();
+                            localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
+                            window.location.reload();
+                        }).catch((err) => {
+                            this._spinner.hide();
+                        });
+                } else {
+                    throw new Error("Can't access to user's account, please check credentials");
+                }
+            }).catch(
+                (err) => {
+                    this._toastService.error(err + '');
+                    this._spinner.hide();
+                });
+        });
+    }
 
 
 }
