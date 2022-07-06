@@ -1629,7 +1629,7 @@ namespace eFMS.API.Accounting.DL.Services
                               GrossWeight = opst.SumGrossWeight,
                               ChargeWeight = opst.SumChargeWeight,
                               CBM = opst.SumCbm,
-                              PackageContainer = string.Empty,
+                              PackageContainer = opst.ContainerDescription,
                               CreditNo = sur.CreditNo,
                               DebitNo = sur.DebitNo,
                               DatetimeModified = sur.DatetimeModified,
@@ -1897,7 +1897,7 @@ namespace eFMS.API.Accounting.DL.Services
             var shipmentModel = new CombineShipmentModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return shipmentModel; }
-            var surcharges =  surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo));
+            var surcharges =  surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo)).Where(x=>x.TransactionType!="BUY");
             var chargeDatas = catChargeRepo.Get();
             var unitDatas = catUnitRepo.Get();
             // var clearanceDatas = customsDeclarationRepo.Get();
@@ -1972,7 +1972,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             List<ExportCombineShipment> lstShipment = new List<ExportCombineShipment>();
 
-            var res = dataCharges.OrderBy(x => x.CombineNo).GroupBy(x => new { x.CombineNo, x.JobId, x.HBL }).ToList();
+            var res = dataCharges.OrderBy(x => x.CombineNo).GroupBy(x => new { x.CombineNo, x.JobId, x.HBL, x.BillingNo }).ToList();
             foreach (var grp in res)
             {
                 var grpData = grp.FirstOrDefault();
@@ -1995,6 +1995,7 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
                 exportCombineShipment.HwbNo = grpData.HBL;
                 exportCombineShipment.PackageContainer = grpData.PackageContainer;
+                exportCombineShipment.TransactionType = grpData.TransactionType;
                 lstShipment.Add(exportCombineShipment);
             }
 

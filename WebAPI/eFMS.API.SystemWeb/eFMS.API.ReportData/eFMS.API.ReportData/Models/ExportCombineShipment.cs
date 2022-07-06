@@ -21,5 +21,6 @@
         public decimal? FreVAT { get; set; }
         public string OBHInvoice { get; set; }
         public string InvoiceNo { get; set; }
+        public string TransactionType { get; set; }
     }
 }
