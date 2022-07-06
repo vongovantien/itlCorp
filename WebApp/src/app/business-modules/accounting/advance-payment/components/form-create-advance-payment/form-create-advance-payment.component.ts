@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
-
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -22,7 +22,15 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     @Input() mode: string = 'create';
     @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
     @Output() onChangeAdvanceFor: EventEmitter<string> = new EventEmitter<string>();
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
 
+    get readonlyForm(): boolean {
+        return this._readonly;
+    }
+
+    private _readonly: boolean = false;
     methods: CommonInterface.ICommonTitleValue[] = [
         { title: 'Cash', value: 'Cash' },
         { title: 'Bank Transfer', value: 'Bank' },
@@ -47,6 +55,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     bankAccountName: AbstractControl;
     bankAccountNo: AbstractControl;
     bankName: AbstractControl;
+    bankNameDescription: AbstractControl;
     paymentTerm: AbstractControl;
     payee: AbstractControl;
     advanceFor: AbstractControl;
@@ -116,7 +125,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
             ])],
             bankAccountName: [],
-            bankName: [null, Validators.compose([
+            bankName: [],
+            bankNameDescription: [null, Validators.compose([
                 Validators.pattern(SystemConstants.CPATTERN.VIETNAMESE_REGEX),
             ])],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],
@@ -141,6 +151,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.bankCode = this.formCreate.controls['bankCode'];
         this.advanceFor = this.formCreate.controls['advanceFor'];
         this.dueDate = this.formCreate.controls['dueDate'];
+        this.bankNameDescription = this.formCreate.controls['bankNameDescription'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(
@@ -192,7 +203,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             if (!this.payee.value) {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
-                this.bankName.setValue(this.userLogged.bankName || null);
+                this.bankNameDescription.setValue(this.userLogged.bankName || null);
+                this.bankName.setValue(this.userLogged.bankCode || null);
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
@@ -201,6 +213,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         else {
             this.bankAccountName.setValue(null);
             this.bankAccountNo.setValue(null);
+            this.bankNameDescription.setValue(null);
             this.bankName.setValue(null);
             this.bankCode.setValue(null);
         }
@@ -223,14 +236,20 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     setBankInfoForPayee(payee: Partner) {
         this.bankAccountNo.setValue(payee.bankAccountNo);
         this.bankAccountName.setValue(payee.bankAccountName);
-        this.bankName.setValue(payee.bankName);
-        this.bankCode.setValue(payee.bankCode);
+        this.bankNameDescription.setValue(payee.bankName);
+        this.bankName.setValue(payee.bankCode);
+        this.mapBankCode(payee.bankCode);
     }
 
     onSelectDataBankInfo(data: any) {
         if (data) {
-            this.bankName.setValue(data.bankNameEn);
-            this.bankCode.setValue(data.code);
+            this.bankName.setValue(data.code);
+            this.bankNameDescription.setValue(data.bankNameEn);
+            this.mapBankCode(data.code);
         }
+    }
+
+    mapBankCode(data: any) {
+        this.bankCode.setValue(data);
     }
 }

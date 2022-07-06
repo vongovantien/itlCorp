@@ -160,6 +160,7 @@ export class AdvancePaymentDetailComponent
                         bankAccountNo: this.advancePayment.bankAccountNo,
                         bankAccountName: this.advancePayment.bankAccountName,
                         bankName: this.advancePayment.bankName,
+                        bankNameDescription: this.advancePayment.bankName,
                         payee: this.advancePayment.payee,
                         bankCode: this.advancePayment.bankCode,
                         advanceFor: this.advancePayment.advanceFor,
@@ -241,7 +242,7 @@ export class AdvancePaymentDetailComponent
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: this.formCreateComponent.bankNameDescription.value,
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 dueDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en') : null
@@ -277,7 +278,7 @@ export class AdvancePaymentDetailComponent
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: this.formCreateComponent.bankNameDescription.value,
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 advanceFor: this.formCreateComponent.advanceFor.value,
@@ -340,7 +341,7 @@ export class AdvancePaymentDetailComponent
 
     checkInvalidListAdvanceRequest() {
         this.formCreateComponent.isSubmitted = true;
-        if(!this.formCreateComponent.formCreate.valid){
+        if(!this.formCreateComponent.dueDate.value || (['New','Denied'].indexOf(this.formCreateComponent.statusApproval.value) !== -1 && !this.formCreateComponent.formCreate.valid)){
             return true;
         }
         if (!this.isAdvCarrier) {

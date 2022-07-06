@@ -79,7 +79,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     checkInvalidListAdvanceRequest(){
         this.formCreateComponent.isSubmitted = true;
-        if(!this.formCreateComponent.dueDate.value || !this.formCreateComponent.formCreate.valid){
+        if(!this.formCreateComponent.dueDate.value || (['New','Denied'].indexOf(this.formCreateComponent.statusApproval.value) !== -1 && !this.formCreateComponent.formCreate.valid)){
             return true;
         }
         if(!this.isAdvCarrier){
@@ -187,7 +187,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: this.formCreateComponent.bankNameDescription.value,
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 dueDate: formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en')
@@ -207,7 +207,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: this.formCreateComponent.bankNameDescription.value,
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 advanceFor: this.formCreateComponent.advanceFor.value,
