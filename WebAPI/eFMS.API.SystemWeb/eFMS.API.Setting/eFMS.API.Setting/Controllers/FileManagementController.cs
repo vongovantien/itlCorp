@@ -35,14 +35,14 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost]
         [Route("Get")]
         [Authorize]
-        public IActionResult Get(string folderName, List<string> Ids)
+        public IActionResult Get(string folderName, int page, int size)
         {
-            var data = fileManagementService.Get(folderName, Ids);
+            var data = fileManagementService.Get(folderName, page, size, out int rowsCount);
             if (data == null)
             {
                 return BadRequest();
             }
-            var result = new { data };
+            var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
 

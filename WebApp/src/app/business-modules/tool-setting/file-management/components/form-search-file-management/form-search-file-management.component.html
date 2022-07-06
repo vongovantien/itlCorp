@@ -3,8 +3,8 @@
         <div class="col-md-8">
             <form [formGroup]="formSearch" (ngSubmit)="onClickSearch()">
                 <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
-                    <input type="text" class="form-control" (keyup)="onClickSearch()" placeholder="Input text to search"
-                        formControlName="name">
+                    <input type="text" class="form-control" (keyup)="onClickSearch()"
+                        placeholder="Input text to search..." formControlName="name">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit" title="Search">
                             <i class="la la-search"></i>
@@ -14,7 +14,7 @@
             </form>
         </div>
         <div class="col-md-4">
-            <button class="btn btn-success">Upload Files <i class="la la-upload"></i></button>
+            <button class="btn btn-success"><i class="la la-upload"></i>Upload Files</button>
         </div>
     </div>
 </div>

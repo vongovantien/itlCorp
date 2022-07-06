@@ -33,44 +33,62 @@ namespace eFMS.API.Setting.DL.Services
             acctSettleRepo = accSettle;
             acctAdvanceRepo = acctAdvance;
         }
-        public List<object> Get(string folderName, List<string> Ids)
+        public List<SysImageModel> Get(string folderName, int page, int size, out int rowsCount)
         {
-            if(Ids.Count() == 0)
-            {
-                var objectIds = DataContext.Get().Where(s => s.Folder == folderName).Select(s => s.ObjectId).Distinct().Take(10).ToList();
-                Ids.AddRange(objectIds);
-            }
-            List<object> data = new List<object>();
+            var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).ToList().GroupBy(x=>x.ObjectId).Select(x=>x.FirstOrDefault());
+
+            var items = mapper.Map<List<SysImageModel>>(data);
+
             if (!string.IsNullOrEmpty(folderName))
             {
                 switch (folderName)
                 {
                     case "SOA":
-                        foreach (var Id in Ids)
+                        foreach (var item in items)
                         {
-                            var folderNames = acctSOARepo.Get().Where(s => s.Id == Id ).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.Soano }).Take(10).ToList();
-                            data.AddRange(folderNames);
+                            var folderNames = acctSOARepo.Get().Where(s => s.Id == item.ObjectId).Select(s => s.Soano).FirstOrDefault();
+                            item.folderName = folderNames;
                         }
                         break;
                     case "Settlement":
-                        foreach (var Id in Ids)
+                        foreach (var item in items)
                         {
-                            var folderNames = acctSettleRepo.Get().Where(s => s.Id.ToString() == Id).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.SettlementNo }).Take(10).ToList();
-                            data.AddRange(folderNames);
+                            var folderNames = acctSettleRepo.Get().Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.SettlementNo).FirstOrDefault();
+                            item.folderName = folderNames;
                         }
                         break;
                     case "Advance":
-                        foreach (var Id in Ids)
+                        foreach (var item in items)
                         {
-                            var folderNames = acctAdvanceRepo.Get().Where(s => s.Id.ToString() == Id).OrderBy(s => s.DatetimeModified).Select(s => new { s.Id, name = s.AdvanceNo }).Take(10).ToList();
-                            data.AddRange(folderNames);
+                            var folderNames = acctAdvanceRepo.Get().Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.AdvanceNo).FirstOrDefault();
+                            item.folderName = folderNames;
                         }
                         break;
                     default:
                         break;
                 }
             }
-            return data;
+            items = items.Where(s => s.folderName != null).ToList();
+            if (items == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
+            //Phân trang
+            var _totalItem = items.ToList().Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                items = items.Skip((page - 1) * size).Take(size).ToList();
+            }
+            
+            
+            return items;
         }
 
         public List<SysImageModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
