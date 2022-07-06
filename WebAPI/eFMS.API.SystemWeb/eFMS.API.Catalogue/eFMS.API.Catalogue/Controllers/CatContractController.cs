@@ -376,8 +376,8 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     if(active == true)
                     {
-                        var existedContract = catContractService.CheckExistedContractInActive(Id, partnerId);
-                        if (existedContract != null && existedContract.FirstOrDefault() != null)
+                        var existedContract = catContractService.CheckExistedContractInActive(Id, partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
+                        if (existedContract != null && existedContract != null)
                         {
                             string accessToken = Request.Headers["Authorization"].ToString();
                             /// cal API để chuyển công nợ
@@ -386,11 +386,12 @@ namespace eFMS.API.Catalogue.Controllers
                             var model = new
                             {
                                 PartnerId = partnerId,
-                                FromSalesman = existedContract.FirstOrDefault().SaleManId,
+                                FromSalesman = existedContract.SaleManId,
                                 ToSalesman = currentContract.SaleManId,
-                                ContractId = Id
+                                ContractId = Id,
+                                ServiceOffice = serviceOfficeGrps
                             };
-                            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/MoveSalesmanReceivableData", model, accessToken);
+                            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "api/v1/vi/AccountReceivable/MoveSalesmanReceivableData", model, accessToken);
                         }
                     }
                 });
@@ -405,6 +406,13 @@ namespace eFMS.API.Catalogue.Controllers
             var result = catContractService.CheckExistedContractActive(id, partnerId);
             bool IsExisted = result != null && result.Count() > 0  ? true : false;
             return Ok(IsExisted);
+        }
+
+        [HttpGet("CheckExistedContractInactive")]
+        public IActionResult CheckExistedContractInactive(Guid id, string partnerId)
+        {
+            var result = catContractService.CheckExistedContractInActive(id, partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
+            return Ok(serviceOfficeGrps);
         }
 
 

@@ -238,7 +238,7 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
-            if(contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
+            if (contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
             {
                 contract.PaymentTerm = 1;
                 contract.CreditLimit = 20000000;
@@ -656,7 +656,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
-            if(ContractActive.Count() == 0)
+            if (ContractActive.Count() == 0)
             {
                 return null;
             }
@@ -669,8 +669,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return null;
         }
 
-        public IQueryable<CatContract> CheckExistedContractInActive(Guid id, string partnerId)
+        public CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps)
         {
+            serviceOfficeGrps = new List<ServiceOfficeGroup>();
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var contractOffices = contract.OfficeId.Split(";").ToList();
             var contractServices = contract.SaleService.Split(";").ToList();
@@ -685,10 +686,18 @@ namespace eFMS.API.Catalogue.DL.Services
             var offices = contractInacActive.OfficeId.Split(";").ToList();
             var services = contractInacActive.SaleService.Split(";").ToList();
 
-            var isExisted = (contractInacActive.SaleManId == contract.SaleManId && contractOffices.Intersect(offices).Any() && contractServices.Intersect(services).Any());
-                
+            var officeInterset = contractOffices.Intersect(offices);
+            var serviceInterset = contractServices.Intersect(services);
+            var isExisted = (contractInacActive.SaleManId == contract.SaleManId && officeInterset.Any() && serviceInterset.Any());
             if (isExisted)
             {
+                foreach (string service in serviceInterset)
+                {
+                    foreach (string office in officeInterset)
+                    {
+                        serviceOfficeGrps.Add(new ServiceOfficeGroup { Office = office, Service = service });
+                    }
+                }
                 return contractInacActive;
             }
             return null;

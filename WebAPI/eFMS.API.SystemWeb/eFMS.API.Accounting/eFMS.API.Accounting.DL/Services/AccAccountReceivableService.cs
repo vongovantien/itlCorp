@@ -1964,7 +1964,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable).Where(x => x.ContractId == null && x.DebitAmount > 0);
-            var partners = partnerRepo.Get();
+            var partners = QueryPartner(criteria);
+
             var partnerContractsAll = contractPartnerRepo.Get(x => x.ContractType != AccountingConstants.ARGEEMENT_TYPE_CASH);
             IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoAgreement(acctReceivables, partnerContractsAll, partners);
             if (arPartnerNoContracts != null)
@@ -4150,12 +4151,21 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     HandleState result = new HandleState();
-
                     var receivables = DataContext.Get(x => x.PartnerId == model.PartnerId && x.SaleMan == model.FromSalesman);
-                    List<Guid> contractIds = new List<Guid>();
-                    if (receivables.Count() > 0)
+                    var receivablesToUpdate = new List<AccAccountReceivable>();
+                    foreach (var item in model.ServiceOffice)
                     {
-                        foreach (var item in receivables)
+                        var receivableItem = receivables.FirstOrDefault(x => x.Service == item.Service && x.Office.ToString() == item.Office);
+                        if(receivableItem != null)
+                        {
+                            receivablesToUpdate.Add(receivableItem);
+                        }
+                    }
+
+                    List<Guid> contractIds = new List<Guid>();
+                    if (receivablesToUpdate.Count() > 0)
+                    {
+                        foreach (var item in receivablesToUpdate)
                         {
                             contractIds.Add(item.ContractId ?? Guid.Empty);
                             item.ContractId = model.ContractId;
@@ -4169,7 +4179,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var newContract = contractPartnerRepo.Get(x => x.Id == model.ContractId)?.FirstOrDefault();
                             if (newContract != null)
                             {
-                                var contractNeedUpdate = ModifiedAgreementWithReceivables(newContract, receivables);
+                                var contractNeedUpdate = ModifiedAgreementWithReceivables(newContract, receivablesToUpdate.AsQueryable());
                                 await contractPartnerRepo.UpdateAsync(contractNeedUpdate, x => x.Id == contractNeedUpdate.Id, false);
                             }
                             var cIDs = contractIds.ToList().Distinct().ToList();
