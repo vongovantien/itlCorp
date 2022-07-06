@@ -114,7 +114,7 @@
                         Bank Name:
                     </label>
                     <ng-container *ngIf="!readonlyForm; else bankTpl">
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event); mapBankCode($event.code)"
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
                             [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)"
                             placeholder="Please Select Bank Name" allowFreeText formControlName="bankNameDescription">
