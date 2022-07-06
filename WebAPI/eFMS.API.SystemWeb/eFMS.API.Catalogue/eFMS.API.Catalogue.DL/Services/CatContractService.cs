@@ -487,6 +487,19 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(Guid id)
         {
+            var contract = DataContext.First(x => x.Id == id);
+            if(contract == null)
+            {
+                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+            }
+            if(contract.Active == true)
+            {
+                return new HandleState((object)string.Format("The Contract is active"));
+            }
+            if (contract.DebitAmount != null && contract.DebitAmount != 0)
+            {
+                return new HandleState((object)string.Format("The contract is recording the receivable"));
+            }
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
