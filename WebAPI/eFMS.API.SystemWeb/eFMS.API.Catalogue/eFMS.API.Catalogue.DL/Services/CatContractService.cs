@@ -610,7 +610,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
                     item.Active = false;
-                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id);
+                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id, false);
                 }
             }
             if (objUpdate != null)
@@ -670,16 +670,21 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatContract> CheckExistedContractInActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var contractInacActive = DataContext.Where(x => x.Active == false && x.PartnerId == partnerId && x.Id != id);
-            if (contractInacActive.Count() == 0)
+            var contractOffices = contract.OfficeId.Split(";").ToList();
+            var contractServices = contract.SaleService.Split(";").ToList();
+
+            var contractInacActive = DataContext.First(x => x.Active == false && x.PartnerId == partnerId && x.Id != id);
+
+            if (contractInacActive == null)
             {
                 return null;
             }
-            var isExisted = contractInacActive.Any(x => x.SaleManId == contract.SaleManId 
-                && x.OfficeId.Intersect(contract.OfficeId).Any() 
-                && x.SaleService.Intersect(contract.SaleService).Any()
-                && x.OfficeId.Intersect(contract.OfficeId).Any()
-                );
+
+            var offices = contractInacActive.OfficeId.Split(";").ToList();
+            var services = contractInacActive.SaleService.Split(";").ToList();
+
+            var isExisted = (contractInacActive.SaleManId == contract.SaleManId && contractOffices.Intersect(offices).Any() && contractServices.Intersect(services).Any());
+                
             if (isExisted)
             {
                 return contractInacActive;
