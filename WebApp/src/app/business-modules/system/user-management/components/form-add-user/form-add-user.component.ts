@@ -4,17 +4,16 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, takeUntil } from 'rxjs/operators';
 import { UserLevel } from 'src/app/shared/models/system/userlevel';
 import { SystemConstants } from '@constants';
 //SwitchUser
 import { HttpHeaders } from '@angular/common/http';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { Company } from '@models';
-import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
 import { RSAHelper } from 'src/helper/RSAHelper';
+import { getCurrentUserState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -44,12 +43,11 @@ export class FormAddUserComponent extends AppList {
     creditRate: AbstractControl;
     userRole: AbstractControl;
     //
-    currentUserType : string = '';
-    company$: Observable<Company[]>;
+    currentUserType: string = '';
     selectedCompanyId: any;
     infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims(); //Get info of current ser.
-    infoCurrentUserId : string = this.infoCurrentUser.id;
- 
+    infoCurrentUserId: string = this.infoCurrentUser.id;
+
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -101,6 +99,7 @@ export class FormAddUserComponent extends AppList {
         private _progressService: NgProgress,
         private _oauthService: OAuthService,
         private _spinner: NgxSpinnerService,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -175,7 +174,11 @@ export class FormAddUserComponent extends AppList {
             { title: 'Position', field: 'position' },
         ];
         this.getCurrentUserType();
-        this.getCurrentCompanyId();
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((currentUser) => {
+                this.selectedCompanyId = currentUser.companyId; 
+            });
     }
 
 
@@ -209,15 +212,6 @@ export class FormAddUserComponent extends AppList {
                     }
                 }
             );
-    }
-
-    getCurrentCompanyId(){
-        this.company$ = this._systemRepo.getListCompanyPermissionLevel().pipe(share());
-        this.company$.subscribe(
-            (companies: any) => {
-                this.selectedCompanyId = companies[0].id;
-            }
-        );
     }
 
     switchUser(user: any) {
