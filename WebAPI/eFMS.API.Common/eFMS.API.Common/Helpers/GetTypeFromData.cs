@@ -93,5 +93,9 @@ namespace eFMS.API.Common.Helpers
             }
             return result;
         }
+        public static string GetTranctionTypeName(string transactionType)
+        {
+            return CustomData.Services.Find(x => x.Value == transactionType).DisplayName;
+        }
     }
 }

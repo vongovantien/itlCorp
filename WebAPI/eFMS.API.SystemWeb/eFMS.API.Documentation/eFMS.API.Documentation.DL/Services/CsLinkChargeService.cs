@@ -163,6 +163,8 @@ namespace eFMS.API.Documentation.DL.Services
                 chargeBuy.PaySyncedFrom = null;
                 chargeBuy.PaySoano = null;
                 chargeBuy.PaymentRefNo = null;
+                chargeBuy.CombineBillingNo = null;
+                chargeBuy.ObhcombineBillingNo = null;
 
                 surchargesAddBuy.Add(chargeBuy);
 

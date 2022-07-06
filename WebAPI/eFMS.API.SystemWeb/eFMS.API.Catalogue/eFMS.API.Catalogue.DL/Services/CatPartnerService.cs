@@ -24,6 +24,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using eFMS.API.Common.Helpers;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Catalogue.Service.Contexts;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -128,7 +130,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
             CatPartnerModel partner = GetModelToAdd(entity);
-            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
@@ -179,7 +180,6 @@ namespace eFMS.API.Catalogue.DL.Services
                             });
                             var hsEmail = catpartnerEmailRepository.Add(emails);
                         }
-                        trans.Commit();
                         if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
                         {
                             SendMailCreatedSuccess(partner);
@@ -192,13 +192,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     var result = new HandleState(ex.Message);
                     return new { model = new object { }, result };
-                }
-                finally
-                {
-                    trans.Dispose();
                 }
             }
         }
@@ -509,6 +504,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Body
             var body = new StringBuilder(emailTemplate.Body);
             string urlToSend = UrlClone.Replace("Catalogue", "");
+            body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
             body.Replace("{{title}}", title);
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{accountNo}}", partner.AccountNo);
@@ -671,17 +667,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<string> ListMailBCC()
         {
-            List<string> lstCc = new List<string>
+            var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+            List<string> emailBCCs = new List<string>();
+            if (emailBcc != null)
             {
-                "alex.phuong@itlvn.com",
-                //"luis.quang@itlvn.com",
-                //"andy.hoa@itlvn.com",
-                //"cara.oanh@itlvn.com",
-                "lynne.loc@itlvn.com",
-                //"samuel.an@logtechub.com",
-                //"kenny.thuong@itlvn.com"
-            };
-            return lstCc;
+                emailBCCs = emailBcc.ToString().Split(";").ToList();
+            }
+            return emailBCCs;
         }
 
         private async void UploadFileContract(ContractFileUploadModel model)
