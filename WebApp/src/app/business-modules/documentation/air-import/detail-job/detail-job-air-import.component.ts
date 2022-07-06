@@ -95,9 +95,10 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
-                    // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
-                    this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
+                    if (this.selectedTab === this.tabList[0]) {
+                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                        this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
+                    }
 
                     this.getDetailShipment(jobId);
                 } else {
@@ -248,7 +249,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         }
     }
 
-    previewPLsheet(currency: string, ) {
+    previewPLsheet(currency: string,) {
         const hblid = "00000000-0000-0000-0000-000000000000";
         this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
             .pipe(catchError(this.catchError))

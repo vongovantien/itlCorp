@@ -314,7 +314,7 @@ export class DocumentationRepo {
     }
 
     getPartners(id: any, isHouseBillID: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`, { Id: id, IsHouseBillID: isHouseBillID }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`, { Id: id, IsHouseBillID: isHouseBillID }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -440,15 +440,15 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    getShipmentTotalProfit(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }).pipe(
+    GetShipmentTotalProfit(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     getHBLTotalProfit(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

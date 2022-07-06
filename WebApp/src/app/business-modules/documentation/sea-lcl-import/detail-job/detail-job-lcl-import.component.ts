@@ -94,7 +94,9 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    if (this.selectedTab === this.tabList[0]) {
+                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    }
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 
                     this.getDetailSeaFCLImport();
