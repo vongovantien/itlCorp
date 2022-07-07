@@ -5651,7 +5651,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 decimal? PTSumTotal=0, CusFeeTotal = 0, CusVATTotal = 0, CusSumTotal = 0, AuthFeeTotal = 0, AuthVATTotal = 0, AuthSumTotal = 0, CusAuthSumTotal = 0, FreFeeTotal = 0, FreVATTotal = 0, FreSumTotal = 0;
 
-                if (combineshipment.exportShipment != null)
+                if (combineshipment.exportShipment != null && combineshipment.exportShipment.Count>0)
                 {
                     for (int i = 0; i < combineshipment.exportShipment.Count; i++)
                     {
@@ -5716,7 +5716,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
                     excel.SetGroupsTable();
-                    mappingKeyValue.Add("STT", 1);
+                    mappingKeyValue.Add("STT", null);
                     mappingKeyValue.Add("Commodity", null);
                     mappingKeyValue.Add("JobNo", null);
                     mappingKeyValue.Add("CustomsDeclarationNo", null);
@@ -5725,21 +5725,22 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("KGS", null);
                     mappingKeyValue.Add("CBM", null);
                     mappingKeyValue.Add("Container", null);
-                    mappingKeyValue.Add("CusFee", "-");
-                    mappingKeyValue.Add("CusVAT", "-");
-                    mappingKeyValue.Add("CusTotal", "-");
-                    mappingKeyValue.Add("AuthFee", "-");
-                    mappingKeyValue.Add("AuthVAT", "-");
-                    mappingKeyValue.Add("AuthTotal", "-");
-                    mappingKeyValue.Add("CusAuthTotal", "-");
+                    mappingKeyValue.Add("CusFee", null);
+                    mappingKeyValue.Add("CusVAT", null);
+                    mappingKeyValue.Add("CusTotal", null);
+                    mappingKeyValue.Add("AuthFee", null);
+                    mappingKeyValue.Add("AuthVAT", null);
+                    mappingKeyValue.Add("AuthTotal", null);
+                    mappingKeyValue.Add("CusAuthTotal", null);
                     mappingKeyValue.Add("FrieghtInvoice", null);
-                    mappingKeyValue.Add("FreightFee", "-");
-                    mappingKeyValue.Add("FreightVAT", "-");
-                    mappingKeyValue.Add("FreightTotal", "-");
+                    mappingKeyValue.Add("FreightFee", null);
+                    mappingKeyValue.Add("FreightVAT", null);
+                    mappingKeyValue.Add("FreightTotal", null);
                     mappingKeyValue.Add("BillingNo", null);
                     mappingKeyValue.Add("CombineNo", null);
                     mappingKeyValue.Add("OBHInvoiceNo", null);
                     mappingKeyValue.Add("PTTotal", "-");
+                    mappingKeyValue.Add("FrieghtOBHInvoice", null);
                     Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
                     mappingTotalValue.Add("CusFeeTotal", "-");
                     mappingTotalValue.Add("CusVATTotal", "-");

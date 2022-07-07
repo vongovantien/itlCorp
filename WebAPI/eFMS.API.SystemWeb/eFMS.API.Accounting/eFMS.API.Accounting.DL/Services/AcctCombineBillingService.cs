@@ -1890,14 +1890,14 @@ namespace eFMS.API.Accounting.DL.Services
         public CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
         {
             var combineDatas = GetData(criteria);
-            if(criteria.ReferenceNo == null && combineDatas !=null)
+            if(criteria.ReferenceNo == null)
             {
                 criteria.ReferenceNo = combineDatas == null ? new List<string>() : AppendCombineNo(combineDatas);
             }
             var shipmentModel = new CombineShipmentModel();
             //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return shipmentModel; }
-            var surcharges =  surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo));
+            var surcharges =  surchargeRepo.Get(x => criteria.ReferenceNo.Contains(x.CombineBillingNo) || criteria.ReferenceNo.Contains(x.ObhcombineBillingNo));
             var chargeDatas = catChargeRepo.Get();
             var unitDatas = catUnitRepo.Get();
             // var clearanceDatas = customsDeclarationRepo.Get();
@@ -1990,7 +1990,7 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t =>criteria.Currency=="VND"? t.AmountVND: t.AmountUSD).Sum();
                 exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
                 exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
-                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.VATAmountLocal).Sum();
+                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
                 exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
                 exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
                 exportCombineShipment.HwbNo = grpData.HBL;
