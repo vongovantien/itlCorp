@@ -1,9 +1,8 @@
 <div class="m-content">
     <ul class="m-menu__nav navbar-nav">
         <li class="m-menu__item my-3">
-            <span class="m-menu__link-text ml-3">
-                {{title}}
-            </span>
+            <span *ngIf="folderName === undefined"#one class="m-menu__link-text">{{title}} </span>
+            <span *ngIf="folderName !== undefined" class="m-menu__menu__link-text" (click)="onChangeBreadcrumb()">{{title}}/ {{folderName}}</span>
         </li>
         <li class="m-menu__item my-3">
             <a (click)="navigateFileMngt('accounting')"

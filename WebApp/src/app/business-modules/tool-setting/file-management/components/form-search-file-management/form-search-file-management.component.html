@@ -1,9 +1,9 @@
 <div class="m-container">
     <div class="row">
         <div class="col-md-8">
-            <form [formGroup]="formSearch" (ngSubmit)="onClickSearch()">
+            <form *ngIf="isSearchFolder === true"[formGroup]="formSearch" (ngSubmit)="onClickSearch()">
                 <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
-                    <input type="text" class="form-control" (keyup)="onClickSearch()"
+                    <input type="text" class="form-control"
                         placeholder="Input text to search..." formControlName="name">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit" title="Search">

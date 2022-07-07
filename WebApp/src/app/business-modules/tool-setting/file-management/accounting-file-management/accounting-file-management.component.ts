@@ -20,9 +20,6 @@ export interface IFileItem {
     templateUrl: "./accounting-file-management.component.html",
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit {
-    listFolderName: IFileItem | any = [];
-    stringBreadcrumb: string;
-    folderName: string;
     itemsDefault: IFileItem[] = [
         {
             name: "SOA Folder",
@@ -56,6 +53,10 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         },
     ];
 
+    listFolderName: IFileItem | any = [];
+    stringBreadcrumb: string;
+    folderName: string;
+    folderChild: any;
     isActiveClick: boolean = false;
     isDisplayFolderParent: boolean = false;
     isActiveSearch: boolean = false;
@@ -93,7 +94,8 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     onGetFolderItems(data: any) {
         if (this.isActiveClick == false) {
             this.isActiveClick = !this.isActiveClick;
-            this.dataSearch = { folder: this.folderName, objectId: data.id };
+            this.dataSearch = { folder: this.folderName, objectId: data.objectId };
+            this.folderChild = { folder: this.folderName, objectId: data.objectId, folderName: data.folderName };
             this.getFolderFileManagement();
         }
     }
@@ -116,7 +118,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.isDisplayFolderParent = !this.isDisplayFolderParent;
         this.folderName = folderName;
         this._settingRepo
-            .getListFolderName(folderName, this.page, this.pageSize, [])
+            .getListFolderName(folderName, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -144,5 +146,8 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         }
         this.getFolderFileManagement();
         this.isDisplayFolderParent = false;
+    }
+    onBackFromChild($event) {
+        this.getListFolderName($event);
     }
 }

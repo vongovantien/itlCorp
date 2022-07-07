@@ -209,8 +209,8 @@ export class SettingRepo {
         );
     }
 
-    getListFolderName(folderParent: string, page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?folderName=${folderParent}`, body, {
+    getListFolderName(folderParent: string, page?: number, size?: number, keyWord?: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?folderName=${folderParent}&keyWord=${keyWord},`, {
             page: '' + page,
             size: '' + size
         }).pipe(

@@ -15,12 +15,13 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-md-2">
-                            <sidebar-file-management [folderName]="folderName">
+                            <sidebar-file-management [folderName]="folderName" [folderChild]="folderChild"
+                                (newItemEvent)="onBackFromChild($event)">
                             </sidebar-file-management>
                         </div>
                         <div class="col-md-10">
                             <div *ngIf="isActiveSearch;else mySearch">
-                                <form-search-file-management [folderName]="folderName"
+                                <form-search-file-management [folderName]="folderName" [isSearchFolder]="isSearchFolder"
                                     (keySearch)=onSearchValue($event)>
                                 </form-search-file-management>
                             </div>
@@ -28,7 +29,7 @@
                                 <div class="mt-5"></div>
                             </ng-template>
                             <br />
-                            <div>
+                            <div class="table-wrapper table-scrollable m--margin-top-20">
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -87,9 +88,7 @@
                                             </tr>
                                         </ng-container>
                                     </tbody>
-
                                 </table>
-
                             </div>
                             <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
                                 (onChange)="updatePagingData($event)"></app-pagination>

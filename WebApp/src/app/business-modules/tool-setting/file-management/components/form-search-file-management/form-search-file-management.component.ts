@@ -13,7 +13,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     @Input() folderName: string;
     formSearch: FormGroup;
     name: AbstractControl;
-
+    @Input() isSearchFolder: boolean;
     constructor(private _fb: FormBuilder) {
         super();
     }
@@ -29,6 +29,11 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     onClickSearch() {
         let valueSearch = { name: this.name.value, folder: this.folderName };
         this.keySearch.emit(valueSearch);
+    }
+
+    onClickSearchFolder() {
+        let valueSearch = { name: this.name };
+        this.keySearch.emit(valueSearch)
     }
 
 }

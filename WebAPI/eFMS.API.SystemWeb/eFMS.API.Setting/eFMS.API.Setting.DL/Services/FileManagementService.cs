@@ -33,7 +33,7 @@ namespace eFMS.API.Setting.DL.Services
             acctSettleRepo = accSettle;
             acctAdvanceRepo = acctAdvance;
         }
-        public List<SysImageModel> Get(string folderName, int page, int size, out int rowsCount)
+        public List<SysImageModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount)
         {
             var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).ToList().GroupBy(x=>x.ObjectId).Select(x=>x.FirstOrDefault());
 
@@ -46,21 +46,21 @@ namespace eFMS.API.Setting.DL.Services
                     case "SOA":
                         foreach (var item in items)
                         {
-                            var folderNames = acctSOARepo.Get().Where(s => s.Id == item.ObjectId).Select(s => s.Soano).FirstOrDefault();
+                            var folderNames = acctSOARepo.Where(s => s.Id == item.ObjectId).Select(s => s.Soano).FirstOrDefault();
                             item.folderName = folderNames;
                         }
                         break;
                     case "Settlement":
                         foreach (var item in items)
                         {
-                            var folderNames = acctSettleRepo.Get().Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.SettlementNo).FirstOrDefault();
+                            var folderNames = acctSettleRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.SettlementNo).FirstOrDefault();
                             item.folderName = folderNames;
                         }
                         break;
                     case "Advance":
                         foreach (var item in items)
                         {
-                            var folderNames = acctAdvanceRepo.Get().Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.AdvanceNo).FirstOrDefault();
+                            var folderNames = acctAdvanceRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.AdvanceNo).FirstOrDefault();
                             item.folderName = folderNames;
                         }
                         break;
@@ -69,6 +69,10 @@ namespace eFMS.API.Setting.DL.Services
                 }
             }
             items = items.Where(s => s.folderName != null).ToList();
+            if (!string.IsNullOrEmpty(keyWord))
+            {
+                items.Where(s => s.folderName == folderName);
+            }
             if (items == null)
             {
                 rowsCount = 0;
