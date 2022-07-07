@@ -190,9 +190,17 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost("UpdateDueDateAndOverDaysAfterChangePaymentTerm")]
         [Authorize]
-        public IActionResult UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
+        public async Task<IActionResult> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
         {
-            var result = accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            var result = await accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            List<string> partnerIds = new List<string> { contractModel.PartnerId };
+          
+            Response.OnCompleted(async () =>
+            {
+                CalculateOverDue1To15(partnerIds);
+                CalculateOverDue15To30(partnerIds);
+                CalculateOverDue30(partnerIds);
+            });
             return Ok(result);
         }
 

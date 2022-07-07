@@ -392,7 +392,11 @@ namespace eFMS.API.Catalogue.Controllers
                                 ServiceOffice = serviceOfficeGrps
                             };
                             HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "api/v1/vi/AccountReceivable/MoveSalesmanReceivableData", model, accessToken);
+
+                            var catContractModel = mapper.Map<CatContractModel>(currentContract);
+                            await UpdateDueDateAndOverDaysAfterChangePaymentTerm(catContractModel);
                         }
+
                     }
                 });
             }
