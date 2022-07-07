@@ -2450,7 +2450,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-
+        #endregion
         public HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIds)
         {
             currentUser.Action = "CalculateOverDue";
