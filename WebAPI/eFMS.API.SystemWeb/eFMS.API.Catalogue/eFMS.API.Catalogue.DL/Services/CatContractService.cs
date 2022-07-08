@@ -668,7 +668,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
+            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
             if (ContractActive.Count() == 0)
             {
                 return null;
@@ -689,7 +689,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var contractOffices = contract.OfficeId.Split(";").ToList();
             var contractServices = contract.SaleService.Split(";").ToList();
 
-            var contractInacActive = DataContext.First(x => x.Active == false && x.PartnerId == partnerId && x.Id != id);
+            var contractInacActive = DataContext.First(x => x.Active == false && x.PartnerId == partnerId && x.Id != id && x.SaleManId == contract.SaleManId);
 
             if (contractInacActive == null)
             {

@@ -3948,7 +3948,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 try
                 {
-                    new LogHelper("eFMS_MoveReceivable", JsonConvert.SerializeObject(model));
+                    new LogHelper("eFMS_MoveReceivable", JsonConvert.SerializeObject(model) + "\n");
                     HandleState result = new HandleState();
                     var receivables = DataContext.Get(x => x.PartnerId == model.PartnerId && x.SaleMan == model.FromSalesman);
                     var receivablesToUpdate = new List<AccAccountReceivable>();

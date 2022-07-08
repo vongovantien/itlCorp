@@ -276,6 +276,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPut("MoveSalesmanReceivableData")]
+        [Authorize]
         public async Task<IActionResult> MoveSalesmanReceivableData(AccountReceivableMoveDataSalesman model)
         {
             var hs = await accountReceivableService.MoveReceivableData(model);
