@@ -4853,7 +4853,7 @@ namespace eFMS.API.Accounting.DL.Services
                                               JobID = cst.JobNo,
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
-                                              SettlementAmount = sur.Total,
+
                                               CustomNo = string.Empty,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
@@ -4861,7 +4861,8 @@ namespace eFMS.API.Accounting.DL.Services
                                               Requester = requesterName,
                                               RequestDate = currentSettlement.RequestDate,
                                               ApproveDate = approveDate,
-                                              Description = sur.Notes
+                                              Description = sur.Notes,
+                                              SettlementAmount = sur.Total,
                                           };
 
                         var data = dataOperation.Union(dataService).ToList();
@@ -5423,11 +5424,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode)
         {
-            //Get list charge by SettlementCode
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode);
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+            if(surcharges.Count() > 0)
+            {
+                return new List<ObjectReceivableModel>();
+            }
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ cho Partner, Service, Office có trong charge của Settlement
-            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Settlement ---

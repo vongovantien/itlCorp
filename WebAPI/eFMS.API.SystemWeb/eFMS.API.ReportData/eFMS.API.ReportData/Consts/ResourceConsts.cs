@@ -49,6 +49,7 @@ namespace eFMS.API.ReportData.Consts
         public const string PHIEU_CAN_NCTS_ALS_Template = "PHIEU-CAN-NCTS-ALS-Template.xlsx";
         public const string Shipment_Overview_FCL = "Shipment-Overview-FCL.xlsx";
         public const string ShipmentOverviewLCL = "ShipmentOverviewLCL.xlsx";
-        public const string CombineBillingByShipment = "CombingBillingByJob.xlsx";
+        public const string CombineBillingByShipmentVND = "CombingBillingByJobVND.xlsx";
+        public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
     }
 }

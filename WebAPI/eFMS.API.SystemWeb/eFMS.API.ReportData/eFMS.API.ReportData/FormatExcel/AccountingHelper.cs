@@ -5614,20 +5614,20 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
-        private string FormatNumberByCurrency(decimal? numberIn,string currency) 
-        {
-            if (currency == "VND")
-            {
-                return String.Format("{0:n0}", numberIn);
-            }
-            return String.Format("{0:n}", numberIn);
-        }
+        //private string FormatNumberByCurrency(decimal? numberIn,string currency) 
+        //{
+        //    if (currency == "VND")
+        //    {
+        //        return numberIn > 0 ? String.Format("{0:n0}", numberIn) : "(" + String.Format("{0:n0}", numberIn*-1) + ")";
+        //    }
+        //    return numberIn > 0 ? String.Format("{0:n}", numberIn) : "(" + String.Format("{0:n}", numberIn*-1) + ")";
+        //}
 
 
         public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AR");
-            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.CombineBillingByShipment));
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, criteria.Currency=="VND"? ResourceConsts.CombineBillingByShipmentVND:ResourceConsts.CombineBillingByShipmentUSD));
             var path = f.FullName;
             if (!File.Exists(path))
             {
@@ -5667,50 +5667,50 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("KGS", item.KGS);
                         mappingKeyValue.Add("CBM", item.CBM);
                         mappingKeyValue.Add("Container", item.PackageContainer);
-                        mappingKeyValue.Add("CusFee", item.CusFee != 0 ? FormatNumberByCurrency(item.CusFee, criteria.Currency) : "-");
-                        mappingKeyValue.Add("CusVAT", item.CusVAT != 0 ? FormatNumberByCurrency(item.CusVAT, criteria.Currency) : "-");
-                        mappingKeyValue.Add("CusTotal", item.CusVAT+ item.CusFee!=0?FormatNumberByCurrency((item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0), criteria.Currency):"-");
-                        mappingKeyValue.Add("AuthFee", item.AuthFee != 0 ? FormatNumberByCurrency(item.AuthFee, criteria.Currency) : "-");
-                        mappingKeyValue.Add("AuthVAT", item.AuthVAT != 0 ? FormatNumberByCurrency(item.AuthVAT, criteria.Currency) : "-");
-                        mappingKeyValue.Add("AuthTotal", item.AuthVAT + item.AuthFee!=0?FormatNumberByCurrency(item.AuthVAT + item.AuthFee,criteria.Currency):"-");
-                        mappingKeyValue.Add("CusAuthTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee!=0?FormatNumberByCurrency(item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee,criteria.Currency):"-");
+                        mappingKeyValue.Add("CusFee", item.CusFee );
+                        mappingKeyValue.Add("CusVAT", item.CusVAT);
+                        mappingKeyValue.Add("CusTotal", item.CusVAT+ item.CusFee);
+                        mappingKeyValue.Add("AuthFee", item.AuthFee);
+                        mappingKeyValue.Add("AuthVAT", item.AuthVAT);
+                        mappingKeyValue.Add("AuthTotal", item.AuthVAT+ item.AuthFee);
+                        mappingKeyValue.Add("CusAuthTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
                         //mappingKeyValue.Add("FrieghtInvoice", item.FreInvoice);
-                        mappingKeyValue.Add("FreightFee", item.FreFee != 0 ? FormatNumberByCurrency(item.FreFee, criteria.Currency) : "-");
-                        mappingKeyValue.Add("FreightVAT", item.FreVAT != 0 ? FormatNumberByCurrency(item.FreVAT, criteria.Currency) : "-");
-                        mappingKeyValue.Add("FreightTotal", item.FreVAT + item.FreFee!=0?FormatNumberByCurrency((item.FreVAT + item.FreFee), criteria.Currency):"-");
+                        mappingKeyValue.Add("FreightFee", item.FreFee);
+                        mappingKeyValue.Add("FreightVAT", item.FreVAT);
+                        mappingKeyValue.Add("FreightTotal", item.FreVAT + item.FreFee);
                         mappingKeyValue.Add("BillingNo", item.BillingNo);
                         mappingKeyValue.Add("CombineNo", item.CombineNo);
                         //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
-                        mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT!=0? FormatNumberByCurrency((item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT), criteria.Currency):"-");
+                        mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
                         mappingKeyValue.Add("FrieghtOBHInvoice", item.FreInvoice);
-                        CusFeeTotal += item.CusFee;
-                        CusVATTotal += item.CusVAT;
-                        CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
-                        AuthFeeTotal += item.AuthFee;
-                        AuthVATTotal += item.AuthVAT;
-                        AuthSumTotal += (item.AuthVAT + item.AuthFee);
-                        CusAuthSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
-                        FreFeeTotal += item.FreFee;
-                        FreVATTotal += item.FreVAT;
-                        FreSumTotal += (item.FreVAT + item.FreFee);
-                        PTSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                        //CusFeeTotal += item.CusFee;
+                        //CusVATTotal += item.CusVAT;
+                        //CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
+                        //AuthFeeTotal += item.AuthFee;
+                        //AuthVATTotal += item.AuthVAT;
+                        //AuthSumTotal += (item.AuthVAT + item.AuthFee);
+                        //CusAuthSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                        //FreFeeTotal += item.FreFee;
+                        //FreVATTotal += item.FreVAT;
+                        //FreSumTotal += (item.FreVAT + item.FreFee);
+                        //PTSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
                         excel.SetData(mappingKeyValue);
                         startRow++;
                     }
-                    Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
-                    mappingTotalValue.Add("CusFeeTotal", CusFeeTotal!=0?FormatNumberByCurrency(CusFeeTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("CusVATTotal", CusVATTotal!=0? FormatNumberByCurrency(CusVATTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("CusSumTotal", CusSumTotal!=0? FormatNumberByCurrency(CusSumTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("AuthFeeTotal", AuthFeeTotal!=0? FormatNumberByCurrency(AuthFeeTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("AuthVATTotal", AuthVATTotal!=0? FormatNumberByCurrency(AuthVATTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("AuthSumTotal", AuthSumTotal!=0? FormatNumberByCurrency(AuthSumTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("CusAuthSumTotal", CusAuthSumTotal!=0? FormatNumberByCurrency(CusAuthSumTotal,criteria.Currency):"-");
-                    mappingTotalValue.Add("FreFeeTotal", FreFeeTotal != 0 ? FormatNumberByCurrency(FreFeeTotal, criteria.Currency) : "-");
-                    mappingTotalValue.Add("FreVATTotal", FreVATTotal != 0 ? FormatNumberByCurrency(FreVATTotal, criteria.Currency) : "-");
-                    mappingTotalValue.Add("FreSumTotal", FreSumTotal != 0 ? FormatNumberByCurrency(FreSumTotal, criteria.Currency) : "-");
-                    mappingTotalValue.Add("PTSumTotal", PTSumTotal != 0 ? FormatNumberByCurrency(PTSumTotal, criteria.Currency) : "-");
-                    mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total ("+criteria.Currency+")");
-                    excel.SetData(mappingTotalValue);
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", CusFeeTotal);
+                    //mappingTotalValue.Add("CusVATTotal", CusVATTotal);
+                    //mappingTotalValue.Add("CusSumTotal", CusSumTotal);
+                    //mappingTotalValue.Add("AuthFeeTotal", AuthFeeTotal);
+                    //mappingTotalValue.Add("AuthVATTotal", AuthVATTotal);
+                    //mappingTotalValue.Add("AuthSumTotal", AuthSumTotal);
+                    //mappingTotalValue.Add("CusAuthSumTotal", CusAuthSumTotal);
+                    //mappingTotalValue.Add("FreFeeTotal", FreFeeTotal);
+                    //mappingTotalValue.Add("FreVATTotal", FreVATTotal);
+                    //mappingTotalValue.Add("FreSumTotal", FreSumTotal);
+                    //mappingTotalValue.Add("PTSumTotal", PTSumTotal);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total ("+criteria.Currency+")");
+                    //excel.SetData(mappingTotalValue);
                 }
                 else
                 {
@@ -5741,20 +5741,20 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("OBHInvoiceNo", null);
                     mappingKeyValue.Add("PTTotal", "-");
                     mappingKeyValue.Add("FrieghtOBHInvoice", null);
-                    Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
-                    mappingTotalValue.Add("CusFeeTotal", "-");
-                    mappingTotalValue.Add("CusVATTotal", "-");
-                    mappingTotalValue.Add("CusSumTotal", "-");
-                    mappingTotalValue.Add("AuthFeeTotal", "-");
-                    mappingTotalValue.Add("AuthVATTotal", "-");
-                    mappingTotalValue.Add("AuthSumTotal", "-");
-                    mappingTotalValue.Add("CusAuthSumTotal", "-");
-                    mappingTotalValue.Add("FreFeeTotal", "-");
-                    mappingTotalValue.Add("FreVATTotal", "-");
-                    mappingTotalValue.Add("FreSumTotal", "-");
-                    mappingTotalValue.Add("PTSumTotal", "-");
-                    mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total (" + criteria.Currency + ")");
-                    excel.SetData(mappingTotalValue);
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", null);
+                    //mappingTotalValue.Add("CusVATTotal", null);
+                    //mappingTotalValue.Add("CusSumTotal", null);
+                    //mappingTotalValue.Add("AuthFeeTotal", null);
+                    //mappingTotalValue.Add("AuthVATTotal", null);
+                    //mappingTotalValue.Add("AuthSumTotal", null);
+                    //mappingTotalValue.Add("CusAuthSumTotal", null);
+                    //mappingTotalValue.Add("FreFeeTotal", null);
+                    //mappingTotalValue.Add("FreVATTotal", null);
+                    //mappingTotalValue.Add("FreSumTotal", null);
+                    //mappingTotalValue.Add("PTSumTotal", null);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total (" + criteria.Currency + ")");
+                    //excel.SetData(mappingTotalValue);
                     excel.SetData(mappingKeyValue);
                 }
                 

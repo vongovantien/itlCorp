@@ -1809,38 +1809,48 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GetBillingNo(CsShipmentSurcharge sur)
         {
-            if(sur.Type== AccountingConstants.TYPE_CHARGE_SELL)
+            //if(sur.Type== AccountingConstants.TYPE_CHARGE_SELL)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.Soano;
+            //        case "CDNOTE":
+            //            return sur.DebitNo;
+            //        default: return "";
+            //    }
+            //}
+            //else if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.PaySoano;
+            //        case "CDNOTE":
+            //            return sur.DebitNo;
+            //        default: return "";
+            //    }
+            //}
+            //else if(sur.Type== AccountingConstants.TYPE_CHARGE_OBH_BUY)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.PaySoano;
+            //        case "CDNOTE":
+            //            return sur.CreditNo;
+            //        default: return "";
+            //    }
+            //}
+            var soaData = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && (x.CombineBillingNo.Contains(sur.CombineBillingNo)||x.CombineBillingNo.Contains(sur.ObhcombineBillingNo)) && (x.Soano == sur.Soano || x.Soano == sur.PaySoano)).FirstOrDefault();
+            if (soaData != null)
             {
-                switch (sur.SyncedFrom)
-                {
-                    case "SOA":
-                        return sur.Soano;
-                    case "CDNOTE":
-                        return sur.DebitNo;
-                    default: return "";
-                }
+                return soaData.Soano;
             }
-            else if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            else
             {
-                switch (sur.SyncedFrom)
-                {
-                    case "SOA":
-                        return sur.PaySoano;
-                    case "CDNOTE":
-                        return sur.DebitNo;
-                    default: return "";
-                }
-            }
-            else if(sur.Type== AccountingConstants.TYPE_CHARGE_OBH_BUY)
-            {
-                switch (sur.SyncedFrom)
-                {
-                    case "SOA":
-                        return sur.PaySoano;
-                    case "CDNOTE":
-                        return sur.CreditNo;
-                    default: return "";
-                }
+                var cdNote = cdNoteRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && (x.CombineBillingNo.Contains(sur.CombineBillingNo) || x.CombineBillingNo.Contains(sur.ObhcombineBillingNo)) && (x.Code == sur.CreditNo || x.Code == sur.DebitNo)).FirstOrDefault();
+                return cdNote.Code;
             }
             return null;
         }
@@ -1930,9 +1940,9 @@ namespace eFMS.API.Accounting.DL.Services
                               TypeCharge = sur.Type,
                               BillingNo = GetBillingNo(sur),
                               TransactionType = sur.TransactionType,
-                              ExchangeDate = sur.ExchangeDate
-
-
+                              ExchangeDate = sur.ExchangeDate,
+                              CreditNo=sur.CreditNo,
+                              DebitNo=sur.DebitNo,
                           };
             var dataDoc = from sur in surcharges
                           join charge in chargeDatas on sur.ChargeId equals charge.Id
@@ -1959,7 +1969,9 @@ namespace eFMS.API.Accounting.DL.Services
                               TypeCharge = sur.Type,
                               BillingNo = GetBillingNo(sur),
                               TransactionType = sur.TransactionType,
-                              ExchangeDate = sur.ExchangeDate
+                              ExchangeDate = sur.ExchangeDate,
+                              CreditNo = sur.CreditNo,
+                              DebitNo = sur.DebitNo,
                           };
             #endregion
             var dataCharges = Enumerable.Empty<ChargeCombineResult>().AsQueryable();
@@ -1987,12 +1999,12 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.CBM = grpData.CBM;
                 exportCombineShipment.CombineNo = grpData.CombineNo;
                 exportCombineShipment.BillingNo = grpData.BillingNo;
-                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t =>criteria.Currency=="VND"? t.AmountVND: t.AmountUSD).Sum();
-                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
-                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
-                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
-                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.AmountVND:t.AmountUSD).Sum();
-                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? t.VATAmountLocal:t.VATAmountUSD).Sum();
+                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.AmountVND * -1 : t.AmountVND) : (t.TypeCharge == "BUY" ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.VATAmountLocal*-1:t.VATAmountLocal) : (t.TypeCharge == "BUY" ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
+                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? (t.CreditNo!=null && t.DebitNo==null? t.AmountVND*-1:t.AmountVND) : ((t.CreditNo != null && t.DebitNo == null) ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? (t.CreditNo != null && t.DebitNo == null ? t.VATAmountLocal*-1: t.VATAmountLocal): ((t.CreditNo != null && t.DebitNo == null) ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
+                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.AmountVND * -1 : t.AmountVND) : (t.TypeCharge == "BUY" ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.VATAmountLocal*-1: t.VATAmountLocal) : (t.TypeCharge == "BUY" ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
                 exportCombineShipment.HwbNo = grpData.HBL;
                 exportCombineShipment.PackageContainer = grpData.PackageContainer;
                 exportCombineShipment.TransactionType = grpData.TransactionType;
