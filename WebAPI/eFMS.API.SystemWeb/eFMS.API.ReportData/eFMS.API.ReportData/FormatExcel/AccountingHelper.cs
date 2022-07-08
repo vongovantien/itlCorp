@@ -5663,7 +5663,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("JobNo", item.JobNo);
                         mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
                         mappingKeyValue.Add("HBLNo", item.HwbNo);
-                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ?item.InvoiceNo +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + item.OBHInvoice:""):""): (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " +item.OBHInvoice:""));
+                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ?item.InvoiceNo +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + item.OBHInvoice:"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? item.OBHInvoice : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " +item.OBHInvoice:""));
                         mappingKeyValue.Add("KGS", item.KGS);
                         mappingKeyValue.Add("CBM", item.CBM);
                         mappingKeyValue.Add("Container", item.PackageContainer);
