@@ -67,11 +67,6 @@ export class FormValidators extends Validators {
     public static validateSpecialChar(controls: AbstractControl | FormControl | FormGroup): ValidationErrors {
         if (controls.valid && controls.value) {
             const billNo: string = controls.value;
-            // const mawbNumber: number = +(mawbNo.replace(/\s+/g, '').substring(4, mawbNo.length - 1));
-            // const checkDigit: number = +mawbNo.slice(-1);
-            // if ((mawbNumber % 7) !== checkDigit) {
-            //     return { invalidMawb: true };
-            // }
             if (billNo.match(/['\":*<>;?]/m)) {
                 return { invalidSpecial: false };
             }
