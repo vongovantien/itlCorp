@@ -67,7 +67,7 @@ export class FormValidators extends Validators {
     public static validateSpecialChar(controls: AbstractControl | FormControl | FormGroup): ValidationErrors {
         if (controls.valid && controls.value) {
             const billNo: string = controls.value;
-            if (billNo.match(/['\":*<>;?]/m)) {
+            if (billNo.match(/['\\":*<>;?]/m)) {
                 return { invalidSpecial: false };
             }
             return null;
