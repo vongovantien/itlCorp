@@ -765,11 +765,14 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 charge.AcctManagementId = null;
                                 charge.ReferenceNo = null;
-                                charge.InvoiceNo = null;
-                                charge.InvoiceDate = null;
+                                if(charge.Type == ForPartnerConstants.TYPE_CHARGE_SELL)
+                                {
+                                    charge.InvoiceNo = null;
+                                    charge.SeriesNo = null;
+                                    charge.InvoiceDate = null;
+                                }
                                 charge.VoucherId = null;
                                 charge.VoucherIddate = null;
-                                charge.SeriesNo = null;
                                 //charge.FinalExchangeRate = null;
                                 //charge.AmountVnd = charge.VatAmountVnd = null;
                                 charge.DatetimeModified = DateTime.Now;
