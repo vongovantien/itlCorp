@@ -47,6 +47,12 @@
      <None Update="FormatExcel\TemplateExport\AccountReceivable\CombingBillingByJob.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\CombingBillingByJobUSD.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\CombingBillingByJobVND.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\AccountReceivable\Receipt_Advance_Report _Teamplate.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
