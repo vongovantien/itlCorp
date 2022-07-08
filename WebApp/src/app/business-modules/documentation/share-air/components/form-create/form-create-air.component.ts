@@ -554,7 +554,6 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this.formGroup.get('isMawb').valueChanges
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(response => {
-                console.log(response);
                 if (response === true) {
                     this.isCheckedActive = true;
                     this.formGroup.get('mawb').clearValidators();
