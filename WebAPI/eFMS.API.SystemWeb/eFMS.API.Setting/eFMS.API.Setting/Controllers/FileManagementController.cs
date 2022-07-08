@@ -32,7 +32,7 @@ namespace eFMS.API.Setting.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("Get")]
         [Authorize]
         public IActionResult Get(string folderName, string keyWord, int page, int size)

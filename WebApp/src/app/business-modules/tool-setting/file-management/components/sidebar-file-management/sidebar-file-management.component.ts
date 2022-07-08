@@ -9,18 +9,21 @@ import { Location } from '@angular/common';
 export class SidebarFileManagementComponent implements OnInit, OnChanges {
     @Input() folderName: string;
     @Input() folderChild: any;
-    @ViewChild('one') d1: ElementRef;
+    @Input() listBreadcrumb: Array<object>;
     @Output() newItemEvent = new EventEmitter<string>();
-
+    @Output() isDisplayDefaultFolder = new EventEmitter<string>();
+    displayDefaultFolder: boolean;
     title: string;
     urlRedirect: UrlRedirectOptions[];
     constructor(private route: ActivatedRoute, private _router: Router, private _location: Location) {
     }
     ngOnChanges(changes: SimpleChanges): void {
         this.title = this.route.snapshot.data['title']
+        console.log(this.listBreadcrumb)
     }
 
     ngOnInit() {
+
     }
 
     ngAfterViewInit() {
@@ -28,26 +31,7 @@ export class SidebarFileManagementComponent implements OnInit, OnChanges {
     }
 
     changeBreadcrumb() {
-        console.log(this.folderChild)
-        if (this.folderName !== null && this.folderName !== undefined) {
-            // if (this.folderChild !== null && this.folderChild !== undefined) {
-            //     return this.title = this.route.snapshot.data['title'] + '/' + this.folderName + "/" + this.folderChild.folderName
-            // }
-            this.title = this.route.snapshot.data['title'] + '/' + this.folderName
-        }
-        else {
-            this.title = this.route.snapshot.data['title']
-        }
-        // if (this.folderName !== undefined) {
-        //     if (this.folderChild !== undefined) {
-        //         return this.d1.nativeElement.insertAdjacentHTML('beforeend', `${this.folderName}/ ${this.folderChild.folderName}}`);
-        //     }
-        //     return this.d1.nativeElement.insertAdjacentHTML('beforeend', `${this.folderName}`);
-
-        // }
-        // else {
-        //     this.d1.nativeElement.remove();
-        // }
+        this.title = this.route.snapshot.data['title']
     }
 
     navigateFileMngt(moduleUrl: string) {
@@ -58,8 +42,13 @@ export class SidebarFileManagementComponent implements OnInit, OnChanges {
             this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT + "/" + moduleUrl]);
         }
     }
+
     onChangeBreadcrumb() {
         this.newItemEvent.emit(this.folderName);
+    }
+
+    onBreadcrumbActive(item: any) {
+        this.listBreadcrumb.pop()
     }
 }
 

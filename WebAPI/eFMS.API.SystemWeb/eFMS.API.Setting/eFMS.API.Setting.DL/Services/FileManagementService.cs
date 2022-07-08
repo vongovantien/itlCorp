@@ -33,11 +33,11 @@ namespace eFMS.API.Setting.DL.Services
             acctSettleRepo = accSettle;
             acctAdvanceRepo = acctAdvance;
         }
-        public List<SysImageModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount)
+        public List<SysImageViewModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount)
         {
-            var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).ToList().GroupBy(x=>x.ObjectId).Select(x=>x.FirstOrDefault());
+            var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).GroupBy(s => s.ObjectId).Distinct();
 
-            var items = mapper.Map<List<SysImageModel>>(data);
+            var items = mapper.Map<List<SysImageViewModel>>(data);
 
             if (!string.IsNullOrEmpty(folderName))
             {
@@ -47,31 +47,31 @@ namespace eFMS.API.Setting.DL.Services
                         foreach (var item in items)
                         {
                             var folderNames = acctSOARepo.Where(s => s.Id == item.ObjectId).Select(s => s.Soano).FirstOrDefault();
-                            item.folderName = folderNames;
+                            item.FolderName = folderNames;
                         }
                         break;
                     case "Settlement":
                         foreach (var item in items)
                         {
                             var folderNames = acctSettleRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.SettlementNo).FirstOrDefault();
-                            item.folderName = folderNames;
+                            item.FolderName = folderNames;
                         }
                         break;
                     case "Advance":
                         foreach (var item in items)
                         {
                             var folderNames = acctAdvanceRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.AdvanceNo).FirstOrDefault();
-                            item.folderName = folderNames;
+                            item.FolderName = folderNames;
                         }
                         break;
                     default:
                         break;
                 }
             }
-            items = items.Where(s => s.folderName != null).ToList();
+            items = items.Where(s => s.FolderName != null).ToList();
             if (!string.IsNullOrEmpty(keyWord))
             {
-                items.Where(s => s.folderName == folderName);
+                items = items.Where(x => x.FolderName.ToLower() == keyWord.ToLower()).ToList();
             }
             if (items == null)
             {
@@ -95,9 +95,12 @@ namespace eFMS.API.Setting.DL.Services
             return items;
         }
 
-        public List<SysImageModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
+        public List<SysImageViewModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = DataContext.Get();
+            
+            var result = mapper.Map<List<SysImageViewModel>>(data);
+
             if (!string.IsNullOrEmpty(criteria.Name))
             {
               data = data.Where(x => x.Name.ToLower().Contains(criteria.Name.ToLower()));
@@ -150,7 +153,7 @@ namespace eFMS.API.Setting.DL.Services
 
             data=data.OrderBy(x => x.Name);
 
-            var result = mapper.Map<List<SysImageModel>>(data);
+            
 
             return result;
         }

@@ -15,14 +15,14 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-md-2">
-                            <sidebar-file-management [folderName]="folderName" [folderChild]="folderChild"
-                                (newItemEvent)="onBackFromChild($event)">
+                            <sidebar-file-management [folderName]="folderName" [folderChild]="folderChild" [listBreadcrumb]="listBreadcrumb"
+                                (newItemEvent)="onBackFromChild($event)" (isDisplayDefaultFolder)="onDisplayDefaultFolder()">
                             </sidebar-file-management>
                         </div>
                         <div class="col-md-10">
                             <div *ngIf="isActiveSearch;else mySearch">
                                 <form-search-file-management [folderName]="folderName" [isSearchFolder]="isSearchFolder"
-                                    (keySearch)=onSearchValue($event)>
+                                    (keySearch)="onSearchValue($event)">
                                 </form-search-file-management>
                             </div>
                             <ng-template #mySearch>
@@ -52,7 +52,7 @@
                                             <tr *ngFor="let item of itemsDefault"
                                                 [contextMenu]="fileManagementContextMenu"
                                                 (onTouch)="onSelectFile(item.url)"
-                                                (click)="isActiveClick ? $event.stopPropagation(): getListFolderName(item.folderName)">
+                                                (click)="isActiveClick ? $event.stopPropagation(): onDisplayListFolder(item)">
                                                 <td>
                                                     <i class="{{item.classIcon}} {{item.classColor}}"></i>
                                                     &nbsp;

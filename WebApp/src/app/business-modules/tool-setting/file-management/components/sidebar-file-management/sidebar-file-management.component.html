@@ -1,8 +1,10 @@
 <div class="m-content">
     <ul class="m-menu__nav navbar-nav">
         <li class="m-menu__item my-3">
-            <span *ngIf="folderName === undefined"#one class="m-menu__link-text">{{title}} </span>
-            <span *ngIf="folderName !== undefined" class="m-menu__menu__link-text" (click)="onChangeBreadcrumb()">{{title}}/ {{folderName}}</span>
+            <span class="m-menu__link-text" (click)="onBreadcrumbActive(title)">{{title}}</span>
+            <ng-container *ngFor="let item of listBreadcrumb| keyvalue; let i = index">
+                <span class="m-menu__link-text" (click)="i===listBreadcrumb.length-1 ? $event.stopPropagation(): onBreadcrumbActive(item)"> > {{item.value.folderName}}</span>
+            </ng-container>
         </li>
         <li class="m-menu__item my-3">
             <a (click)="navigateFileMngt('accounting')"

@@ -13,6 +13,9 @@ const routing: Routes = [
         data: { name: 'Accounting', title: 'Accounting' }
     },
     {
+        path:'accounting', redirectTo : '' , pathMatch : 'full'
+    },
+    {
         path: 'document', loadChildren: () => import('./document-file-management/document-file-management.module').then(m => m.DocumentFileManagementModule),
         data: { name: 'Document', title: 'Document' }
     },

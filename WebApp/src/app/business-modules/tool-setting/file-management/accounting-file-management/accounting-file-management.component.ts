@@ -61,13 +61,14 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     isDisplayFolderParent: boolean = false;
     isActiveSearch: boolean = false;
     itemSelect: string;
-
+    listBreadcrumb: Array<object> = [];
     constructor(
         private _settingRepo: SettingRepo,
         private readonly _toastService: ToastrService,
         private _router: Router
     ) {
         super();
+        this.requestList = this.getListFolderName;
     }
 
     ngOnInit() { }
@@ -112,13 +113,12 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.pushTypeForItem(res.data);
             });
         this.isDisplayFolderParent = !this.isDisplayFolderParent;
+        this.listBreadcrumb.push(this.folderChild)
     }
 
-    getListFolderName(folderName: string) {
-        this.isDisplayFolderParent = !this.isDisplayFolderParent;
-        this.folderName = folderName;
+    getListFolderName() {
         this._settingRepo
-            .getListFolderName(folderName, this.page, this.pageSize)
+            .getListFolderName(this.folderName, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -127,8 +127,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.totalItems = res.totalItems || 0;
                 this.listFolderName = res.data;
             });
-        this.isActiveSearch = !this.isActiveSearch;
-        this.stringBreadcrumb = this.folderName;
     }
 
     onSelectFile(item: string) {
@@ -139,15 +137,38 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         window.open(`${item}`, "_blank");
     }
 
-    onSearchValue(event: { field: string; searchString: any }) {
+    onSearchValue(event) {
         this.dataSearch = event;
         if (this.folderName != null && this.folderName != undefined) {
             this.dataSearch.folder = this.folderName;
         }
-        this.getFolderFileManagement();
-        this.isDisplayFolderParent = false;
+        this._settingRepo
+            .onSearchListFolderName(this.folderName, event.name, this.page, this.pageSize)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe((res: any) => {
+                this.totalItems = res.totalItems || 0;
+                this.listFolderName = res.data;
+            });
     }
+
     onBackFromChild($event) {
-        this.getListFolderName($event);
+        this.getListFolderName();
+    }
+
+    onDisplayListFolder(item: any) {
+        this.isDisplayFolderParent = !this.isDisplayFolderParent;
+        this.isActiveSearch = !this.isActiveSearch;
+        this.stringBreadcrumb = this.folderName;
+
+        this.folderName = item.folderName
+        this.getListFolderName();
+        this.listBreadcrumb.push({ folderName: this.folderName })
+    }
+
+    onDisplayDefaultFolder() {
+        this.isDisplayFolderParent = true;
     }
 }

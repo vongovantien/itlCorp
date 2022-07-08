@@ -209,11 +209,14 @@ export class SettingRepo {
         );
     }
 
-    getListFolderName(folderParent: string, page?: number, size?: number, keyWord?: string) {
-        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?folderName=${folderParent}&keyWord=${keyWord},`, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
+    getListFolderName(folderParent: string, page?: number, size?: number) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?page=${page}&size=${size}&folderName=${folderParent}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    onSearchListFolderName(folderParent: string, keyWord?: string, page?: number, size?: number) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?page=${page}&size=${size}&folderName=${folderParent}&keyWord=${keyWord}`).pipe(
             map((data: any) => data)
         );
     }
