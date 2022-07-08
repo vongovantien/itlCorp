@@ -55,7 +55,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     bankAccountName: AbstractControl;
     bankAccountNo: AbstractControl;
     bankName: AbstractControl;
-    bankNameDescription: AbstractControl;
     paymentTerm: AbstractControl;
     payee: AbstractControl;
     advanceFor: AbstractControl;
@@ -126,9 +125,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             ])],
             bankAccountName: [],
             bankName: [],
-            bankNameDescription: [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.VIETNAMESE_REGEX),
-            ])],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],
             bankCode: [{ value: null, disabled: true }],
             advanceFor: [this.advanceForDatas[0]],
@@ -151,7 +147,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.bankCode = this.formCreate.controls['bankCode'];
         this.advanceFor = this.formCreate.controls['advanceFor'];
         this.dueDate = this.formCreate.controls['dueDate'];
-        this.bankNameDescription = this.formCreate.controls['bankNameDescription'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(
@@ -203,8 +198,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             if (!this.payee.value) {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
-                this.bankNameDescription.setValue(this.userLogged.bankName || null);
-                this.bankName.setValue(this.userLogged.bankCode || null);
+                this.bankName.setValue(this.userLogged.bankName || null);
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
@@ -213,7 +207,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         else {
             this.bankAccountName.setValue(null);
             this.bankAccountNo.setValue(null);
-            this.bankNameDescription.setValue(null);
             this.bankName.setValue(null);
             this.bankCode.setValue(null);
         }
@@ -236,15 +229,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     setBankInfoForPayee(payee: Partner) {
         this.bankAccountNo.setValue(payee.bankAccountNo);
         this.bankAccountName.setValue(payee.bankAccountName);
-        this.bankNameDescription.setValue(payee.bankName);
-        this.bankName.setValue(payee.bankCode);
+        this.bankName.setValue(payee.bankName);
         this.mapBankCode(payee.bankCode);
     }
 
     onSelectDataBankInfo(data: any) {
         if (data) {
-            this.bankName.setValue(data.code);
-            this.bankNameDescription.setValue(data.bankNameEn);
+            this.bankName.setValue(data.bankNameEn);
             this.mapBankCode(data.code);
         }
     }

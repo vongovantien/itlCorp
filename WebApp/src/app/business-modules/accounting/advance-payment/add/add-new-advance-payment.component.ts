@@ -187,7 +187,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankNameDescription.value,
+                bankName: !this.formCreateComponent.bankName.value ? this.formCreateComponent.bankName.value : this.formCreateComponent.bankName.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 dueDate: formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en')
@@ -207,7 +207,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankNameDescription.value,
+                bankName: !this.formCreateComponent.bankName.value ? this.formCreateComponent.bankName.value : this.formCreateComponent.bankName.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
                 advanceFor: this.formCreateComponent.advanceFor.value,

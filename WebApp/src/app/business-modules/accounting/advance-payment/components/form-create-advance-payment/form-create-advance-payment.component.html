@@ -108,20 +108,19 @@
                 </div>
             </div>
             <div class="col-lg-3">
-                <div class="form-group"
-                [ngClass]="{'m-form__group has-danger':((statusApproval.value === 'New' || statusApproval.value === 'Denied')&& bankNameDescription.dirty && !bankNameDescription.valid) }">
+                <div class="form-group">
                     <label class="form-control-label">
                         Bank Name:
                     </label>
                     <ng-container *ngIf="!readonlyForm; else bankTpl">
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                            [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)"
-                            placeholder="Please Select Bank Name" allowFreeText formControlName="bankNameDescription">
+                            [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName)"
+                            placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
                         </app-combo-grid-virtual-scroll>
                     </ng-container>
                     <ng-template #bankTpl>
-                        <input type="text" class="form-control" formControlName="bankNameDescription">
+                        <input type="text" class="form-control" formControlName="bankName">
                     </ng-template>
                 </div>
             </div>

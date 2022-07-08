@@ -99,9 +99,7 @@ export class SettlementFormCreateComponent extends AppForm {
                 Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
             ])],
             'bankName': [],
-            'bankNameDescription': [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.VIETNAMESE_REGEX),
-            ])],
+            'bankNameDescription': [],
             'advanceAmount': [],
             'balanceAmount': [],
             'bankCode': [],

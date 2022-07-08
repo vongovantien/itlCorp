@@ -203,7 +203,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankCode: this.formCreateSurcharge.bankCode.value,
             dueDate: !!this.formCreateSurcharge.dueDate.value && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };

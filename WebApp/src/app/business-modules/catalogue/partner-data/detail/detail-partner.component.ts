@@ -433,6 +433,7 @@ export class PartnerDetailComponent extends AppList {
             partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
             id: this.isAddSubPartner ? null : this.partner.id,
             creditPayment: !!formBody.creditPayment ? formBody.creditPayment.id : null,
+            bankName: !!formBody.bankName ? formBody.bankName.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : null
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);

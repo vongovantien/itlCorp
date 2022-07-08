@@ -92,7 +92,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             statusApproval: this.settlementPayment.settlement.statusApproval,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             payee: this.formCreateSurcharge.payee.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankCode: this.formCreateSurcharge.bankCode.value,

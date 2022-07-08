@@ -153,6 +153,7 @@
                                                 <td class="text-info" style="min-width: 200px; white-space:initial">
                                                     {{settlePayment.payeeName}}</td>
                                                 <td>{{settlePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{settlePayment.dueDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="settlePayment.statusApprovalName">
                                                     <div *ngSwitchCase="'New'" class="text-danger">
                                                         {{settlePayment.statusApprovalName}}</div>
