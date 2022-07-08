@@ -6,28 +6,18 @@ import { Location } from '@angular/common';
     selector: 'sidebar-file-management',
     templateUrl: './sidebar-file-management.component.html'
 })
-export class SidebarFileManagementComponent implements OnInit, OnChanges {
-    @Input() folderName: string;
-    @Input() folderChild: any;
+export class SidebarFileManagementComponent implements OnChanges {
+
     @Input() listBreadcrumb: Array<object>;
-    @Output() newItemEvent = new EventEmitter<string>();
     @Output() isDisplayDefaultFolder = new EventEmitter<string>();
-    displayDefaultFolder: boolean;
+    @Output() objectBack = new EventEmitter<any>();
     title: string;
-    urlRedirect: UrlRedirectOptions[];
+
     constructor(private route: ActivatedRoute, private _router: Router, private _location: Location) {
     }
     ngOnChanges(changes: SimpleChanges): void {
         this.title = this.route.snapshot.data['title']
         console.log(this.listBreadcrumb)
-    }
-
-    ngOnInit() {
-
-    }
-
-    ngAfterViewInit() {
-
     }
 
     changeBreadcrumb() {
@@ -43,12 +33,12 @@ export class SidebarFileManagementComponent implements OnInit, OnChanges {
         }
     }
 
-    onChangeBreadcrumb() {
-        this.newItemEvent.emit(this.folderName);
-    }
-
     onBreadcrumbActive(item: any) {
-        this.listBreadcrumb.pop()
+        if (item === "Accounting") {
+            this.listBreadcrumb.splice(0, 2);
+        }
+        this.listBreadcrumb.pop();
+        this.objectBack = item
     }
 }
 

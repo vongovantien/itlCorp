@@ -94,7 +94,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
 
     onGetFolderItems(data: any) {
         if (this.isActiveClick == false) {
-            this.isActiveClick = !this.isActiveClick;
+            this.isActiveClick = true;
+            this.isDisplayFolderParent = false;
+            this.isActiveSearch = false;
             this.dataSearch = { folder: this.folderName, objectId: data.objectId };
             this.folderChild = { folder: this.folderName, objectId: data.objectId, folderName: data.folderName };
             this.getFolderFileManagement();
@@ -112,7 +114,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.totalItems = res.totalItems || 0;
                 this.pushTypeForItem(res.data);
             });
-        this.isDisplayFolderParent = !this.isDisplayFolderParent;
         this.listBreadcrumb.push(this.folderChild)
     }
 
@@ -154,13 +155,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             });
     }
 
-    onBackFromChild($event) {
-        this.getListFolderName();
-    }
-
     onDisplayListFolder(item: any) {
-        this.isDisplayFolderParent = !this.isDisplayFolderParent;
-        this.isActiveSearch = !this.isActiveSearch;
+        this.isDisplayFolderParent = true;
+        this.isActiveSearch = true;
         this.stringBreadcrumb = this.folderName;
 
         this.folderName = item.folderName
@@ -170,5 +167,10 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
 
     onDisplayDefaultFolder() {
         this.isDisplayFolderParent = true;
+        console.log()
+    }
+
+    getValueBreadcrumb($event: any) {
+        console.log($event)
     }
 }

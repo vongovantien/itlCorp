@@ -15,8 +15,9 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-md-2">
-                            <sidebar-file-management [folderName]="folderName" [folderChild]="folderChild" [listBreadcrumb]="listBreadcrumb"
-                                (newItemEvent)="onBackFromChild($event)" (isDisplayDefaultFolder)="onDisplayDefaultFolder()">
+                            <sidebar-file-management [listBreadcrumb]="listBreadcrumb"
+                                (isDisplayDefaultFolder)="onDisplayDefaultFolder()"
+                                (objectBack)="getValueBreadcrumb($event)">
                             </sidebar-file-management>
                         </div>
                         <div class="col-md-10">
@@ -52,7 +53,7 @@
                                             <tr *ngFor="let item of itemsDefault"
                                                 [contextMenu]="fileManagementContextMenu"
                                                 (onTouch)="onSelectFile(item.url)"
-                                                (click)="isActiveClick ? $event.stopPropagation(): onDisplayListFolder(item)">
+                                                (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)">
                                                 <td>
                                                     <i class="{{item.classIcon}} {{item.classColor}}"></i>
                                                     &nbsp;

@@ -71,7 +71,7 @@ namespace eFMS.API.Setting.DL.Services
             items = items.Where(s => s.FolderName != null).ToList();
             if (!string.IsNullOrEmpty(keyWord))
             {
-                items = items.Where(x => x.FolderName.ToLower() == keyWord.ToLower()).ToList();
+                items = items.Where(x => x.FolderName.Contains(keyWord)).OrderByDescending(s => s.FolderName).ToList();
             }
             if (items == null)
             {
