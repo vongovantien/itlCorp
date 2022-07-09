@@ -3172,6 +3172,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if(contractC == null || contractC.Active == false)
                         {
                             item.ContractId = null; // những khách cũ k đi hàng, hd đang inactive, cn vẫn tính có contract.
+                            item.ContractCurrency = "VND";
                         }
                     }
                 }
