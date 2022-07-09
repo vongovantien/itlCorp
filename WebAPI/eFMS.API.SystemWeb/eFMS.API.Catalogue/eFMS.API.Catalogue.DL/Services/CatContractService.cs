@@ -238,7 +238,7 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
-            if(contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
+            if (contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
             {
                 contract.PaymentTerm = 1;
                 contract.CreditLimit = 20000000;
@@ -487,6 +487,19 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(Guid id)
         {
+            var contract = DataContext.First(x => x.Id == id);
+            if(contract == null)
+            {
+                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+            }
+            if(contract.Active == true)
+            {
+                return new HandleState((object)string.Format("The Contract is active"));
+            }
+            if (contract.DebitAmount != null && contract.DebitAmount != 0)
+            {
+                return new HandleState((object)string.Format("The contract is recording the receivable"));
+            }
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -599,8 +612,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit, out bool active)
         {
+            active = false;
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             var DataCheckExisted = CheckExistedContractActive(id, partnerId);
@@ -611,12 +625,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
                     item.Active = false;
-                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id);
+                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id, false);
                 }
             }
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
+                active = objUpdate.Active ?? false;
                 if (credit.CreditLimit != null)
                 {
                     objUpdate.CreditLimit = credit.CreditLimit;
@@ -653,12 +668,50 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
+            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
+            if (ContractActive.Count() == 0)
+            {
+                return null;
+            }
             var IsExisted = ContractActive
                 .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
             if (IsExisted)
             {
                 return ContractActive;
+            }
+            return null;
+        }
+
+        public CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps)
+        {
+            serviceOfficeGrps = new List<ServiceOfficeGroup>();
+            var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var contractOffices = contract.OfficeId.Split(";").ToList();
+            var contractServices = contract.SaleService.Split(";").ToList();
+
+            var contractInacActive = DataContext.First(x => x.Active == false && x.PartnerId == partnerId && x.Id != id && x.SaleManId == contract.SaleManId);
+
+            if (contractInacActive == null)
+            {
+                return null;
+            }
+
+            var offices = contractInacActive.OfficeId.Split(";").ToList();
+            var services = contractInacActive.SaleService.Split(";").ToList();
+
+            var officeInterset = contractOffices.Intersect(offices);
+            var serviceInterset = contractServices.Intersect(services);
+            var isExisted = (contractInacActive.SaleManId == contract.SaleManId && officeInterset.Any() && serviceInterset.Any());
+            if (isExisted)
+            {
+                foreach (string service in serviceInterset)
+                {
+                    foreach (string office in officeInterset)
+                    {
+                        serviceOfficeGrps.Add(new ServiceOfficeGroup { Office = office, Service = service });
+                    }
+                }
+                return contractInacActive;
             }
             return null;
         }
@@ -1823,6 +1876,11 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             return results;
+        }
+
+        public CatContract GetContractById(Guid Id)
+        {
+            return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
         }
     }
 }

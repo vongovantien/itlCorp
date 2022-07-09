@@ -360,16 +360,47 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [Authorize]
-        [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid id, string partnerId, [FromBody]SalesmanCreditModel credit)
+        [HttpPut("ActiveInactiveContract/{Id}/{partnerId}")]
+        public IActionResult ActiveInactiveContract(Guid Id, string partnerId, [FromBody]SalesmanCreditModel credit)
         {
-            var hs = catContractService.ActiveInActiveContract(id, partnerId, credit);
+            var hs = catContractService.ActiveInActiveContract(Id, partnerId, credit, out bool active);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    if(active == true)
+                    {
+                        var existedContract = catContractService.CheckExistedContractInActive(Id, partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
+                        if (existedContract != null && existedContract != null)
+                        {
+                            string accessToken = Request.Headers["Authorization"].ToString();
+                            /// cal API để chuyển công nợ
+                            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+                            var currentContract = catContractService.GetContractById(Id);
+                            var model = new
+                            {
+                                PartnerId = partnerId,
+                                FromSalesman = existedContract.SaleManId,
+                                ToSalesman = currentContract.SaleManId,
+                                ContractId = Id,
+                                ServiceOffice = serviceOfficeGrps
+                            };
+                            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/vi/AccountReceivable/MoveSalesmanReceivableData", model, accessToken);
+
+                            var catContractModel = mapper.Map<CatContractModel>(currentContract);
+                            await UpdateDueDateAndOverDaysAfterChangePaymentTerm(catContractModel);
+                        }
+
+                    }
+                });
+            }
+
             return Ok(result);
         }
 
@@ -379,6 +410,13 @@ namespace eFMS.API.Catalogue.Controllers
             var result = catContractService.CheckExistedContractActive(id, partnerId);
             bool IsExisted = result != null && result.Count() > 0  ? true : false;
             return Ok(IsExisted);
+        }
+
+        [HttpGet("CheckExistedContractInactive")]
+        public IActionResult CheckExistedContractInactive(Guid id, string partnerId)
+        {
+            var result = catContractService.CheckExistedContractInActive(id, partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
+            return Ok(serviceOfficeGrps);
         }
 
 

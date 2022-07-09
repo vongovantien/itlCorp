@@ -35,5 +35,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<ObjectReceivableModel> CalculatorReceivableByBillingCode(string code, string type);
         IEnumerable<object> GetDebitDetailByPartnerId(ArDebitDetailCriteria model);
         DebitAmountDetail GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria);
+        Task<HandleState> MoveReceivableData(AccountReceivableMoveDataSalesman model);
     }
 }

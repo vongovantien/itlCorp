@@ -213,6 +213,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     switchMap((res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
+                            if (this.subTab === 'noAgreement') {
+                                return this._accoutingRepo.getDetailReceivableByPartnerId(this.partnerId, this.salemanId);
+                            }
                             return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
                         }
                         return of(false);
