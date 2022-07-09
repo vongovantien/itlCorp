@@ -76,5 +76,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string CombineNo { get; set; }
         public string CombineBillingType { get; set; }
         public string BillingType { get; set; }
+        public string BillingNo { get; set; }
     }
 }

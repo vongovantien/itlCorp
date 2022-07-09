@@ -51,5 +51,7 @@ namespace eFMS.API.ReportData.Consts
         public const string Shipment_Overview_FCL = "Shipment-Overview-FCL.xlsx";
         public const string ShipmentOverviewLCL = "ShipmentOverviewLCL.xlsx";
         public const string DebitAmountDetailByContract = "DebitAmountDetailByContract.xlsx";
+        public const string CombineBillingByShipmentVND = "CombingBillingByJobVND.xlsx";
+        public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
     }
 }

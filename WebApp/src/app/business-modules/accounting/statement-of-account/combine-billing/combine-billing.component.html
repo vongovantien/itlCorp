@@ -35,14 +35,40 @@
                                                 </button>
                                 
                                                 <app-dropdown #dropdownMenu>
-                                                    <a class="dropdown-item pointer" (click)="exportCombineOPS('VND')">
+                                                    <span class="dropdown-item pointer" [dpToggle]="exportVND" trigger="hover" position="rightTop">
                                                         <span>
                                                             <span>Export VND</span>
                                                         </span>
-                                                    </a>
-                                                    <a class="dropdown-item pointer" (click)="exportCombineOPS('USD')">
+                                                    </span>
+                                                    <span class="dropdown-item pointer" [dpToggle]="exportUSD" trigger="hover" position="rightTop">
                                                         <span>
                                                             <span>Export USD</span>
+                                                        </span>
+                                                    </span>
+                                                </app-dropdown>
+
+                                                <app-dropdown #exportVND>
+                                                    <a class="dropdown-item pointer" (click)="exportCombineOPS('VND')">
+                                                        <span>
+                                                            <span>Combine Detail Report</span>
+                                                        </span>
+                                                    </a>
+                                                    <a class="dropdown-item pointer" (click)="exportCombineShipment('VND')">
+                                                        <span>
+                                                            <span>Combine Report By Shipment</span>
+                                                        </span>
+                                                    </a>
+                                                </app-dropdown>
+
+                                                <app-dropdown #exportUSD>
+                                                    <a class="dropdown-item pointer" (click)="exportCombineOPS('USD')">
+                                                        <span>
+                                                            <span>Combine Detail Report</span>
+                                                        </span>
+                                                    </a>
+                                                    <a class="dropdown-item pointer" (click)="exportCombineShipment('USD')">
+                                                        <span>
+                                                            <span>Combine Report By Shipment</span>
                                                         </span>
                                                     </a>
                                                 </app-dropdown>

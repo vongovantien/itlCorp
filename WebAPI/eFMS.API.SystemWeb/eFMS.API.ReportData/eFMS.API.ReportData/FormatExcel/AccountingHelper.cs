@@ -5606,6 +5606,159 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        //private string FormatNumberByCurrency(decimal? numberIn,string currency) 
+        //{
+        //    if (currency == "VND")
+        //    {
+        //        return numberIn > 0 ? String.Format("{0:n0}", numberIn) : "(" + String.Format("{0:n0}", numberIn*-1) + ")";
+        //    }
+        //    return numberIn > 0 ? String.Format("{0:n}", numberIn) : "(" + String.Format("{0:n}", numberIn*-1) + ")";
+        //}
+
+
+        public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, criteria.Currency=="VND"? ResourceConsts.CombineBillingByShipmentVND:ResourceConsts.CombineBillingByShipmentUSD));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 5;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("Date", "Từ Ngày: " + combineshipment.FromDate?.ToString("dd/MM/yyyy") + " đến:  " + combineshipment.ToDate?.ToString("dd/MM/yyyy"));
+                startRow++;
+                listKeyData.Add("SOANo", combineshipment.No);
+                startRow++;
+                listKeyData.Add("CompanyName", combineshipment.PartnerNameVN);
+                startRow++;
+                listKeyData.Add("CompanyAddress", combineshipment.BillingAddressVN);
+                excel.SetData(listKeyData);
+
+                startRow = 11;
+                excel.StartDetailTable = startRow;
+                decimal? PTSumTotal=0, CusFeeTotal = 0, CusVATTotal = 0, CusSumTotal = 0, AuthFeeTotal = 0, AuthVATTotal = 0, AuthSumTotal = 0, CusAuthSumTotal = 0, FreFeeTotal = 0, FreVATTotal = 0, FreSumTotal = 0;
+
+                if (combineshipment.exportShipment != null && combineshipment.exportShipment.Count>0)
+                {
+                    for (int i = 0; i < combineshipment.exportShipment.Count; i++)
+                    {
+                        var item = combineshipment.exportShipment[i];
+                        Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                        excel.SetGroupsTable();
+                        mappingKeyValue.Add("STT", i + 1);
+                        mappingKeyValue.Add("Commodity", item.CommodityName);
+                        mappingKeyValue.Add("JobNo", item.JobNo);
+                        mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
+                        mappingKeyValue.Add("HBLNo", item.HwbNo);
+                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ?item.InvoiceNo +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + item.OBHInvoice:"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? item.OBHInvoice : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " +item.OBHInvoice:""));
+                        mappingKeyValue.Add("KGS", item.KGS);
+                        mappingKeyValue.Add("CBM", item.CBM);
+                        mappingKeyValue.Add("Container", item.PackageContainer);
+                        mappingKeyValue.Add("CusFee", item.CusFee );
+                        mappingKeyValue.Add("CusVAT", item.CusVAT);
+                        mappingKeyValue.Add("CusTotal", item.CusVAT+ item.CusFee);
+                        mappingKeyValue.Add("AuthFee", item.AuthFee);
+                        mappingKeyValue.Add("AuthVAT", item.AuthVAT);
+                        mappingKeyValue.Add("AuthTotal", item.AuthVAT+ item.AuthFee);
+                        mappingKeyValue.Add("CusAuthTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                        //mappingKeyValue.Add("FrieghtInvoice", item.FreInvoice);
+                        mappingKeyValue.Add("FreightFee", item.FreFee);
+                        mappingKeyValue.Add("FreightVAT", item.FreVAT);
+                        mappingKeyValue.Add("FreightTotal", item.FreVAT + item.FreFee);
+                        mappingKeyValue.Add("BillingNo", item.BillingNo);
+                        mappingKeyValue.Add("CombineNo", item.CombineNo);
+                        //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
+                        mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                        mappingKeyValue.Add("FrieghtOBHInvoice", item.FreInvoice);
+                        //CusFeeTotal += item.CusFee;
+                        //CusVATTotal += item.CusVAT;
+                        //CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
+                        //AuthFeeTotal += item.AuthFee;
+                        //AuthVATTotal += item.AuthVAT;
+                        //AuthSumTotal += (item.AuthVAT + item.AuthFee);
+                        //CusAuthSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                        //FreFeeTotal += item.FreFee;
+                        //FreVATTotal += item.FreVAT;
+                        //FreSumTotal += (item.FreVAT + item.FreFee);
+                        //PTSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                        excel.SetData(mappingKeyValue);
+                        startRow++;
+                    }
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", CusFeeTotal);
+                    //mappingTotalValue.Add("CusVATTotal", CusVATTotal);
+                    //mappingTotalValue.Add("CusSumTotal", CusSumTotal);
+                    //mappingTotalValue.Add("AuthFeeTotal", AuthFeeTotal);
+                    //mappingTotalValue.Add("AuthVATTotal", AuthVATTotal);
+                    //mappingTotalValue.Add("AuthSumTotal", AuthSumTotal);
+                    //mappingTotalValue.Add("CusAuthSumTotal", CusAuthSumTotal);
+                    //mappingTotalValue.Add("FreFeeTotal", FreFeeTotal);
+                    //mappingTotalValue.Add("FreVATTotal", FreVATTotal);
+                    //mappingTotalValue.Add("FreSumTotal", FreSumTotal);
+                    //mappingTotalValue.Add("PTSumTotal", PTSumTotal);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total ("+criteria.Currency+")");
+                    //excel.SetData(mappingTotalValue);
+                }
+                else
+                {
+                    Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    mappingKeyValue.Add("STT", null);
+                    mappingKeyValue.Add("Commodity", null);
+                    mappingKeyValue.Add("JobNo", null);
+                    mappingKeyValue.Add("CustomsDeclarationNo", null);
+                    mappingKeyValue.Add("HBLNo", null);
+                    mappingKeyValue.Add("InvoiceNo", null);
+                    mappingKeyValue.Add("KGS", null);
+                    mappingKeyValue.Add("CBM", null);
+                    mappingKeyValue.Add("Container", null);
+                    mappingKeyValue.Add("CusFee", null);
+                    mappingKeyValue.Add("CusVAT", null);
+                    mappingKeyValue.Add("CusTotal", null);
+                    mappingKeyValue.Add("AuthFee", null);
+                    mappingKeyValue.Add("AuthVAT", null);
+                    mappingKeyValue.Add("AuthTotal", null);
+                    mappingKeyValue.Add("CusAuthTotal", null);
+                    mappingKeyValue.Add("FrieghtInvoice", null);
+                    mappingKeyValue.Add("FreightFee", null);
+                    mappingKeyValue.Add("FreightVAT", null);
+                    mappingKeyValue.Add("FreightTotal", null);
+                    mappingKeyValue.Add("BillingNo", null);
+                    mappingKeyValue.Add("CombineNo", null);
+                    mappingKeyValue.Add("OBHInvoiceNo", null);
+                    mappingKeyValue.Add("PTTotal", "-");
+                    mappingKeyValue.Add("FrieghtOBHInvoice", null);
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", null);
+                    //mappingTotalValue.Add("CusVATTotal", null);
+                    //mappingTotalValue.Add("CusSumTotal", null);
+                    //mappingTotalValue.Add("AuthFeeTotal", null);
+                    //mappingTotalValue.Add("AuthVATTotal", null);
+                    //mappingTotalValue.Add("AuthSumTotal", null);
+                    //mappingTotalValue.Add("CusAuthSumTotal", null);
+                    //mappingTotalValue.Add("FreFeeTotal", null);
+                    //mappingTotalValue.Add("FreVATTotal", null);
+                    //mappingTotalValue.Add("FreSumTotal", null);
+                    //mappingTotalValue.Add("PTSumTotal", null);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total (" + criteria.Currency + ")");
+                    //excel.SetData(mappingTotalValue);
+                    excel.SetData(mappingKeyValue);
+                }
+                
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
         public Stream GenerateCombineOPSExcel(CombineOPSModel result, AcctCombineBillingCriteria criteria, Stream stream = null)
         {
             try

@@ -4853,7 +4853,7 @@ namespace eFMS.API.Accounting.DL.Services
                                               JobID = cst.JobNo,
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
-                                              SettlementAmount = sur.Total,
+
                                               CustomNo = string.Empty,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
@@ -4861,7 +4861,8 @@ namespace eFMS.API.Accounting.DL.Services
                                               Requester = requesterName,
                                               RequestDate = currentSettlement.RequestDate,
                                               ApproveDate = approveDate,
-                                              Description = sur.Notes
+                                              Description = sur.Notes,
+                                              SettlementAmount = sur.Total,
                                           };
 
                         var data = dataOperation.Union(dataService).ToList();
