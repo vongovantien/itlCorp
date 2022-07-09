@@ -95,7 +95,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     this.jobId = jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    if (this.selectedTab === this.tabList[0]) {
+                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    }
 
                     this.getDetailSeaFCLImport();
                     this.getListContainer();

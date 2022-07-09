@@ -97,8 +97,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
-                    // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    if (this.selectedTab === this.tabList[0]) {
+                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    }
                     this.getDetailShipment(this.jobId);
                 } else {
                     this.gotoList();
