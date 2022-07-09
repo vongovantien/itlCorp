@@ -680,7 +680,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser, out AccAccountingManagement data)
         {
             string invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE;
-            List<Guid?> IdsInvoiceTemps = new List<Guid?>();
+            List<Guid> IdsInvoiceTemps = new List<Guid>();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -715,8 +715,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                         if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
                         {
-                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId).Distinct().ToList();
-
+                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId ?? Guid.Empty).Distinct().ToList();
+                            if (accPaymentService.CheckInvoicePayment(IdsInvoiceTemps))
+                            {
+                                return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR)", model.ReferenceNo));
+                            }
                             foreach (var Id in IdsInvoiceTemps)
                             {
                                 DataContext.Delete(x => x.Id == Id, false);
@@ -735,7 +738,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             return new HandleState((object)"Không tìm thấy hóa đơn");
                         }
 
-                        if(accPaymentService.CheckInvoicePayment(invoiceToDelete.Id))
+                        if(accPaymentService.CheckInvoicePayment(new List<Guid> { invoiceToDelete.Id }))
                         {
                             return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
                         }
@@ -753,7 +756,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         else
                         {
-                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId ?? Guid.Empty) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
                         }
 
                         if (charges != null)
@@ -762,11 +765,14 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 charge.AcctManagementId = null;
                                 charge.ReferenceNo = null;
-                                charge.InvoiceNo = null;
-                                charge.InvoiceDate = null;
+                                if(charge.Type == ForPartnerConstants.TYPE_CHARGE_SELL)
+                                {
+                                    charge.InvoiceNo = null;
+                                    charge.SeriesNo = null;
+                                    charge.InvoiceDate = null;
+                                }
                                 charge.VoucherId = null;
                                 charge.VoucherIddate = null;
-                                charge.SeriesNo = null;
                                 //charge.FinalExchangeRate = null;
                                 //charge.AmountVnd = charge.VatAmountVnd = null;
                                 charge.DatetimeModified = DateTime.Now;
