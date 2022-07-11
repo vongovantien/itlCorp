@@ -5615,7 +5615,19 @@ namespace eFMS.API.ReportData.FormatExcel
         //    return numberIn > 0 ? String.Format("{0:n}", numberIn) : "(" + String.Format("{0:n}", numberIn*-1) + ")";
         //}
 
-
+        private string DistinctInvoice(string invoiceNos)
+        {
+            if (string.IsNullOrEmpty(invoiceNos)){
+                return null;
+            }
+            var itemINV = invoiceNos.Split(';').Distinct();
+            string result = "";
+            foreach(var item in itemINV.ToList())
+            {
+                result += item + ';';
+            }
+            return result.Remove(result.Length-1);
+        }
         public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AR");
@@ -5655,7 +5667,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("JobNo", item.JobNo);
                         mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
                         mappingKeyValue.Add("HBLNo", item.HwbNo);
-                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ?item.InvoiceNo +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + item.OBHInvoice:"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? item.OBHInvoice : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " +item.OBHInvoice:""));
+                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ? DistinctInvoice(item.InvoiceNo) +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + DistinctInvoice(item.OBHInvoice):"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? DistinctInvoice(item.OBHInvoice) : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " + DistinctInvoice(item.OBHInvoice):""));
                         mappingKeyValue.Add("KGS", item.KGS);
                         mappingKeyValue.Add("CBM", item.CBM);
                         mappingKeyValue.Add("Container", item.PackageContainer);
@@ -5674,7 +5686,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("CombineNo", item.CombineNo);
                         //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
                         mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
-                        mappingKeyValue.Add("FrieghtOBHInvoice", item.FreInvoice);
+                        mappingKeyValue.Add("FrieghtOBHInvoice", DistinctInvoice(item.FreInvoice));
                         //CusFeeTotal += item.CusFee;
                         //CusVATTotal += item.CusVAT;
                         //CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
