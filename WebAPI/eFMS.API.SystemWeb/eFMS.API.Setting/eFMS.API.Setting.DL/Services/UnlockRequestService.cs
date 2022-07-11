@@ -606,15 +606,15 @@ namespace eFMS.API.Setting.DL.Services
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
             rowsCount = (_totalItem > 0) ? _totalItem : 0;
-            //if (size > 0)
-            //{
-            //    if (page < 1)
-            //    {
-            //        page = 1;
-            //    }
-            //    data = data.Skip((page - 1) * size).Take(size);
-            //    var dataP = data.Paging(1, 10, data);
-            //}
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+                var dataP = data.Paging(1, 10, data);
+            }
 
             return data.ToList();
         }
