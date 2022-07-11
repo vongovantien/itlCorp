@@ -613,7 +613,6 @@ namespace eFMS.API.Setting.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
-                var dataP = data.Paging(1, 10, data);
             }
 
             return data.ToList();
