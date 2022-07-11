@@ -4494,16 +4494,5 @@ namespace eFMS.API.Accounting.DL.Services
 
             return dataDuplicate;
         }
-
-        public List<string> GetAdvanceNobyIDs(List<Guid> Ids)
-        {
-            List<string> data = new List<string>();
-            foreach (var Id in Ids)
-            {
-                var itemAdvanNo = DataContext.Where(s => s.Id == Id).Select(s => s.AdvanceNo).ToList();
-                data.AddRange(itemAdvanNo);
-            }
-            return data;
-        }
     }
 }

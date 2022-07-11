@@ -1,11 +1,9 @@
-import { NgModule } from '@angular/core';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgModule } from '@angular/core'
 import { Router, RouterModule, Routes } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FileManagementComponent } from './file-management.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ShareFileManagementModule } from './share-file-management.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routing: Routes = [
     {
@@ -38,9 +36,6 @@ const routing: Routes = [
         TabsModule.forRoot(),
         RouterModule.forChild(routing),
         SharedModule,
-        ModalModule,
-        FormsModule,
-        ReactiveFormsModule,
         ShareFileManagementModule
     ],
     exports: [RouterModule]

@@ -121,50 +121,5 @@ namespace eFMS.API.Setting.DL.Services
             var result = mapper.Map<List<SysImageViewModel>>(data);
             return result;
         }
-
-
-        public List<SysImageViewModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
-        {
-            var data = DataContext.Get();
-            
-            var result = mapper.Map<List<SysImageViewModel>>(data);
-
-            if (!string.IsNullOrEmpty(criteria.Name))
-            {
-              data = data.Where(x => x.Name.ToLower().Contains(criteria.Name.ToLower()));
-            }
-            if (!string.IsNullOrEmpty(criteria.ObjectId))
-            {
-                data = data.Where(x => x.ObjectId == criteria.ObjectId);
-            }
-            if (!string.IsNullOrEmpty(criteria.Folder))
-            {
-                data = data.Where(x => x.Folder == criteria.Folder);
-            }
-
-            if (data == null)
-            {
-                rowsCount = 0;
-                return null;
-            }
-
-            //Phân trang
-            var _totalItem = data.Select(s => s.Id).Count();
-            rowsCount = (_totalItem > 0) ? _totalItem : 0;
-            if (size > 0)
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                data = data.Skip((page - 1) * size).Take(size);
-            }
-
-            data=data.OrderBy(x => x.Name);
-
-            
-
-            return result;
-        }
     }
 }

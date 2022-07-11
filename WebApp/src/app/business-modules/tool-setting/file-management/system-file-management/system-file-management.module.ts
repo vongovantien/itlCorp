@@ -8,22 +8,22 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 const routing: Routes = [
-  {
-    path: '',
-    component: SystemFileManagementComponent,
-    data: { name: '' },
-  },
+    {
+        path: '',
+        component: SystemFileManagementComponent,
+        data: { name: '' },
+    },
 ]
 
 @NgModule({
-  declarations: [SystemFileManagementComponent],
-  imports: [
-    CommonModule,
-		RouterModule.forChild(routing),
-		ShareFileManagementModule,
-		TabsModule.forRoot(),
-		SharedModule,
-		ModalModule,
-  ]
+    declarations: [SystemFileManagementComponent],
+    imports: [
+        CommonModule,
+        RouterModule.forChild(routing),
+        ShareFileManagementModule,
+        TabsModule.forRoot(),
+        SharedModule,
+        ModalModule,
+    ]
 })
 export class SystemFileManagementModule { }

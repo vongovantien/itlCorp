@@ -20,7 +20,6 @@ namespace eFMS.API.Setting.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
-    [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class UnlockRequestApproveController : ControllerBase
     {

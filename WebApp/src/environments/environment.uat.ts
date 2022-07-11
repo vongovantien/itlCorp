@@ -15,7 +15,7 @@ export const environment = {
         REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",
         EXPORT: "uat-api-efms.itlvn.com/Export",
         SETTING: "uat-api-efms.itlvn.com/Setting",
-        // SETTING: "localhost:44389",
+        //SETTING: "localhost:44389",
         INDENTITY_SERVER_URL: "https://uat-api-efms.itlvn.com/identityserver",
         EXPORT_CRYSTAL: "https://uat-api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         PARTNER_API: "uat-api-efms.itlvn.com/partner",

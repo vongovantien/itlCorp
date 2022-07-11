@@ -3995,16 +3995,5 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
-
-        public List<string> GetSOANoByIds(List<string> Ids)
-        {
-            List<string> data = new List<string>();
-            foreach (var Id in Ids)
-            {
-                var itemAdvanNo = DataContext.Where(s => s.Id == Id).Select(s => s.Soano).ToList();
-                data.AddRange(itemAdvanNo);
-            }
-            return data;
-        }
     }
 }

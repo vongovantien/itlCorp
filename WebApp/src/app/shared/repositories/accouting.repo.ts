@@ -1111,10 +1111,6 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-
-    getListSOANoByIds(Ids: string[]){
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctSOA/GetAdvenNosByIDs`, Ids)
-    }
 }
 
 

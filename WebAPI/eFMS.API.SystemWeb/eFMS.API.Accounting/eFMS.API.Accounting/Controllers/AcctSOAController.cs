@@ -530,13 +530,5 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(dt);
         }
-
-        [HttpPost]
-        [Route("GetAdvenNosByIDs")]
-        public IActionResult GetSOANoByIds(List<string> Ids)
-        {
-            var data = acctSOAService.GetSOANoByIds(Ids);
-            return Ok(data);
-        }
     }
 }

@@ -58,19 +58,5 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(data);
         }
-
-        [HttpPost]
-        [Route("SearchFileManagement")]
-        [Authorize]
-        public IActionResult Search(SysImageCriteria criteria, int pageNumber, int pageSize)
-        {
-            var data = fileManagementService.Search(criteria, pageNumber, pageSize, out int rowCount);
-            if (data == null)
-            {
-                return BadRequest();
-            }
-            var result = new { data, totalItems = rowCount, pageNumber, pageSize };
-            return Ok(result);
-        }
     }
 }
