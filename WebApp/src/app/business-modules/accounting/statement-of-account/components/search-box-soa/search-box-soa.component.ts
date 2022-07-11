@@ -12,17 +12,13 @@ import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { SearchListSOA } from '../../store/actions';
 import { getDataSearchSOAState, getSOAPagingState } from '../../store/reducers';
-
 @Component({
     selector: 'soa-search-box',
     templateUrl: './search-box-soa.component.html',
 })
 export class StatementOfAccountSearchComponent extends AppForm {
-
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
-
     selectedRange: any;
-
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [{ field: 'taxCode', label: 'Taxcode' },
@@ -33,14 +29,21 @@ export class StatementOfAccountSearchComponent extends AppForm {
     };
     partners: Partner[] = [];
     selectedPartner: any = { field: 'partnerNameEn', value: 'All' };;
-
-    currencyList: Currency[] = [];
+    currencyList: any[] = [
+        { id: 'VND', value: 'VND' },
+        { id: 'USD', value: 'USD' },
+    ];
     selectedCurrency: any = null;
-
     users: User[] = [];
+    configUser: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Select Personal Handle',
+        displayFields: [{ field: 'username', label: 'User Name' },
+        { field: 'employeeNameVn', label: 'Full Name' },],
+        dataSource: [],
+        selectedDisplayFields: ['username'],
+    };
     userLogged: User;
-    currentUser: User = null;
-
+    currentUser: any = null;
     statusSOA: any[] = [
         { title: 'New', name: 'New' },
         { title: 'Issued Voucher', name: 'Issued Voucher' },
@@ -51,9 +54,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
         { title: 'Done', name: 'Done' },
     ];
     selectedStatus: any = null;
-
     reference: string = '';
-
     constructor(
         private _sysRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
@@ -64,7 +65,6 @@ export class StatementOfAccountSearchComponent extends AppForm {
         super();
         this.requestReset = this.reset;
     }
-
     ngOnInit(): void {
         //this.getBasicData();
         this.getPartner();
@@ -73,14 +73,10 @@ export class StatementOfAccountSearchComponent extends AppForm {
         this.getUser();
         this.getUserLogged();
         this.subscriptionSearchParamState();
-
-
     }
-
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
     }
-
     subscriptionSearchParamState() {
         this._store.select(getDataSearchSOAState)
             .pipe(
@@ -88,27 +84,26 @@ export class StatementOfAccountSearchComponent extends AppForm {
             )
             .subscribe(
                 (data: any) => {
-                    if (!!data) {                   
+                    if (!!data) {
                         if (data.dataSearch !== undefined) {
-                            if(!!data.dataSearch.soaFromDateCreate&&!!data.dataSearch.soaToDateCreate){
-                                this.selectedRange={};
+                            if (!!data.dataSearch.soaFromDateCreate && !!data.dataSearch.soaToDateCreate) {
+                                this.selectedRange = {};
                                 this.selectedRange.startDate = new Date(data.dataSearch?.soaFromDateCreate);
                                 this.selectedRange.endDate = new Date(data.dataSearch?.soaToDateCreate);
                             }
                             //this.selectedStatus = { title: data.dataSearch?.soaStatus, name: data.dataSearch?.soaStatus };
                             this.reference = !!data.dataSearch.strCodes ? data.dataSearch.strCodes : "";
-                            this.selectedPartner = Object.assign({},!!! data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : { field: 'id', value: data.dataSearch.customerID });
-                            this.selectedStatus = !!data.dataSearch.soaStatus? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0]: null;
-                            this.selectedCurrency = Object.assign({},!!! data.dataSearch.soaCurrency ? { id: 'All' } : { id: data.dataSearch.soaCurrency });
-                            this.currentUser = !!data.dataSearch.currentUser?this.users.filter((us) => us.id == data.dataSearch.currentUser)[0]:null;
+                            this.selectedPartner = Object.assign({}, !!!data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : null);
+                            this.selectedStatus = !!data.dataSearch.soaStatus ? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0] : null;
+                            this.selectedCurrency = !!data.dataSearch.soaCurrency ? this.currencyList.filter((cur) => cur.id === data.dataSearch.soaCurrency)[0] : null;
+                            if (!!data.dataSearch.soaUserCreate) {
+                                this.currentUser = Object.assign({}, !!!data.dataSearch.soaUserCreate ? { field: 'id', value: data.dataSearch.soaUserCreate } : { field: 'id', value: null });
+                            }
                         }
-                       
-                       
                     }
                 }
             );
     }
-
     getPartner() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -122,29 +117,29 @@ export class StatementOfAccountSearchComponent extends AppForm {
                 }
             )
     }
-
-    getCurrency(){
+    getCurrency() {
         this._catalogueRepo.getListCurrency()
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (currencies: any) => {
-                this.currencyList = currencies || [];
-                this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, currencies);
-            }
-        )
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (currencies: any) => {
+                    //this.currencyList = currencies || [];
+                    this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, currencies);
+                    //console.log(currencies);
+                }
+            )
     }
-
-    getUser(){
+    getUser() {
         this._sysRepo.getListSystemUser()
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (user: any) => {
-                this.users = user || [];
-                this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, user);
-            }
-        )
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (user: any) => {
+                    //this.users = user || [];
+                    this.users = this.mapModel(user, User);
+                    this.configUser.dataSource = this.users;
+                    this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, user);
+                }
+            )
     }
-
     // getBasicData() {
     //     forkJoin([ // ? forkJoin like Promise.All
     //         //this._catalogueRepo.getListCurrency(),
@@ -156,7 +151,6 @@ export class StatementOfAccountSearchComponent extends AppForm {
     //                 //this.partners = this.mapModel(dataPartner, Partner);
     //                 // * add all value into partners data
     //                 //this.partners.push(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' }));
-
     //                 // this.partners = this._sortService.sort(this.partners, 'shortName', true);
     //                 //this.currencyList = dataCurrency || [];
     //                 this.users = dataSystemUser || [];
@@ -168,14 +162,12 @@ export class StatementOfAccountSearchComponent extends AppForm {
     //                 //     { field: 'partnerNameEn', label: 'Customer Name [EN]' },
     //                 // ];
     //                 //this.configPartner.selectedDisplayFields = ['partnerNameEn'];
-
     //                 // this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, dataCurrency);
     //                 // this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
     //                 this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
     //             },
     //         );
     // }
-
     onSelectDataFormSearch(data: any, key: string) {
         switch (key.toLowerCase()) {
             case 'partner':
@@ -185,28 +177,22 @@ export class StatementOfAccountSearchComponent extends AppForm {
                 this.selectedCurrency = data;
                 break;
             case 'user':
-                this.currentUser = data;
+                this.currentUser = <any>{ field: data.username, value: data.id };
                 break;
             case 'status':
                 this.selectedStatus = data;
-                console.log(data);
-                
                 break;
             default:
                 break;
         }
-
     }
-
     mapModel(data: any[], Model: any) {
         try {
             return (data || []).map((item: any) => new Model(item));
         } catch (error) {
             // Todo handle error.
-            console.log(error + '');
         }
     }
-
     search() {
         const body = {
             strCodes: this.reference.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').split(',').toString().trim(),
@@ -214,14 +200,13 @@ export class StatementOfAccountSearchComponent extends AppForm {
             soaFromDateCreate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
             soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
             soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
-            soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.id : null,
-            soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
+            soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.value : null,
+            soaUserCreate: !!this.currentUser ? this.currentUser.value : null,
             CurrencyLocal: "VND"
         };
         this._store.dispatch(SearchListSOA({ dataSearch: body }));
         // this.onSearch.emit(body);
     }
-
     // * reset data in form search
     reset() {
         this.reference = '';
@@ -233,13 +218,10 @@ export class StatementOfAccountSearchComponent extends AppForm {
         // ? search again!
         this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
     }
-
     resetDate() {
         this.selectedRange = null;
     }
-
     resetPersonalHandle() {
         this.currentUser = null;
     }
-
 }
