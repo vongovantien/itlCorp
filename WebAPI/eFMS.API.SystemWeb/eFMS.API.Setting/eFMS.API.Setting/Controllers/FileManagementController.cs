@@ -33,7 +33,7 @@ namespace eFMS.API.Setting.Controllers
         }
 
         [HttpGet]
-        [Route("Get")]
+        [Route("GetFileManagement")]
         [Authorize]
         public IActionResult Get(string folderName, string keyWord, int page, int size)
         {
@@ -46,8 +46,21 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("GetDetailFileManagement")]
+        [Authorize]
+        public IActionResult GetDetail(string folderName, string objectId)
+        {
+            var data = fileManagementService.GetDetail(folderName, objectId);
+            if (data == null)
+            {
+                return BadRequest();
+            }
+            return Ok(data);
+        }
+
         [HttpPost]
-        [Route("Search")]
+        [Route("SearchFileManagement")]
         [Authorize]
         public IActionResult Search(SysImageCriteria criteria, int pageNumber, int pageSize)
         {

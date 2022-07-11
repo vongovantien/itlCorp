@@ -5,29 +5,29 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError } from 'rxjs/operators';
 
 @Component({
-  selector: 'document-file-management',
-  templateUrl: './document-file-management.component.html'
+    selector: 'document-file-management',
+    templateUrl: './document-file-management.component.html'
 })
 export class DocumentFileManagementComponent extends AppList implements OnInit {
 
-  constructor(
-    private fileRepo:SystemFileManageRepo,
-    private readonly _toastService: ToastrService,
-  ) { 
-    super();
-  }
+    constructor(
+        private fileRepo: SystemFileManageRepo,
+        private readonly _toastService: ToastrService,
+    ) {
+        super();
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
-  deleteFileManagerment(contractId: string, fileName: string) {
-    this.fileRepo.deleteContractFilesAttach(contractId, fileName)
-      .pipe(catchError(this.catchError))
-      .subscribe(
-        (res: any) => {
-          this._toastService.warning(res.message);
-        },
-      );
-  }
+    deleteFileManagerment(contractId: string, fileName: string) {
+        this.fileRepo.deleteContractFilesAttach(contractId, fileName)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this._toastService.warning(res.message);
+                },
+            );
+    }
 
 }

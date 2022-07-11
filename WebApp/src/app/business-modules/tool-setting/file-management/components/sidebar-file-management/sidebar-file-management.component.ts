@@ -4,7 +4,8 @@ import { RoutingConstants } from '@constants';
 import { Location } from '@angular/common';
 @Component({
     selector: 'sidebar-file-management',
-    templateUrl: './sidebar-file-management.component.html'
+    templateUrl: './sidebar-file-management.component.html',
+    styleUrls: ['./sidebar-file-management.component.scss']
 })
 export class SidebarFileManagementComponent implements OnChanges {
 
@@ -13,11 +14,10 @@ export class SidebarFileManagementComponent implements OnChanges {
     @Output() objectBack = new EventEmitter<any>();
     title: string;
 
-    constructor(private route: ActivatedRoute, private _router: Router, private _location: Location) {
+    constructor(private route: ActivatedRoute, private _router: Router) {
     }
     ngOnChanges(changes: SimpleChanges): void {
         this.title = this.route.snapshot.data['title']
-        console.log(this.listBreadcrumb)
     }
 
     changeBreadcrumb() {
@@ -38,7 +38,7 @@ export class SidebarFileManagementComponent implements OnChanges {
             this.listBreadcrumb.splice(0, 2);
         }
         this.listBreadcrumb.pop();
-        this.objectBack = item
+        this.objectBack.emit(item)
     }
 }
 

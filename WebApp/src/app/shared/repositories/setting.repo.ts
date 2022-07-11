@@ -200,7 +200,7 @@ export class SettingRepo {
     }
 
     getListFileByFolderName(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Search`, body, {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/SearchFileManagement`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
         }).pipe(
@@ -210,15 +210,21 @@ export class SettingRepo {
     }
 
     getListFolderName(folderParent: string, page?: number, size?: number) {
-        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?page=${page}&size=${size}&folderName=${folderParent}`).pipe(
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetFileManagement?page=${page}&size=${size}&folderName=${folderParent}`).pipe(
             map((data: any) => data)
         );
     }
 
-    onSearchListFolderName(folderParent: string, keyWord?: string, page?: number, size?: number) {
-        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/Get?page=${page}&size=${size}&folderName=${folderParent}&keyWord=${keyWord}`).pipe(
+    searchListFolderName(folderParent: string, keyWord?: string, page?: number, size?: number) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetFileManagement?page=${page}&size=${size}&folderName=${folderParent}&keyWord=${keyWord}`).pipe(
             map((data: any) => data)
         );
+    }
+
+    getDetailFileManagement(folderName: string, objectId: string){
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetDetailFileManagement`, {folderName, objectId}).pipe(
+            map((data: any) => data)
+        );;
     }
 }
 

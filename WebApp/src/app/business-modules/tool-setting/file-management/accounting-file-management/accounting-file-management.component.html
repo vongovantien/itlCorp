@@ -52,12 +52,15 @@
                                         <ng-container *ngIf="isDisplayFolderParent === false">
                                             <tr *ngFor="let item of itemsDefault"
                                                 [contextMenu]="fileManagementContextMenu"
-                                                (onTouch)="onSelectFile(item.url)"
-                                                (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)">
+                                                (onTouch)="onSelectFile(item.url)">
                                                 <td>
-                                                    <i class="{{item.classIcon}} {{item.classColor}}"></i>
-                                                    &nbsp;
-                                                    <span>{{item.name}}</span>
+                                                    <a href="javascript:;" class="pointer"
+                                                        (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)"><i
+                                                            class="{{item.classIcon}} {{item.classColor}}"></i>
+                                                        &nbsp;
+                                                        <span class="text-dark">{{item.name}}</span>
+                                                    </a>
+
                                                 </td>
                                                 <td>
                                                     <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
@@ -71,11 +74,14 @@
                                             </tr>
                                         </ng-container>
                                         <ng-container *ngIf="isDisplayFolderParent === true">
-                                            <tr *ngFor="let item2 of listFolderName" (click)="onGetFolderItems(item2)">
+                                            <tr *ngFor="let item2 of listFolderName">
                                                 <td>
-                                                    <i class="la la-folder text-info"></i>
-                                                    &nbsp;
-                                                    <span>{{item2.folderName }}</span>
+                                                    <a href="javascript:;" class="pointer"
+                                                        (click)="onGetFolderItems(item2)">
+                                                        <i class="la la-folder text-info"></i>
+                                                        &nbsp;
+                                                        <span class="text-dark">{{item2.folderName }}</span>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <span>{{item2.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
@@ -91,8 +97,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
-                                (onChange)="updatePagingData($event)"></app-pagination>
+                            <app-pagination *ngIf="isActiveSearch === true" [total]="totalItems" [pageNum]="page"
+                                [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                            </app-pagination>
                         </div>
                     </div>
 

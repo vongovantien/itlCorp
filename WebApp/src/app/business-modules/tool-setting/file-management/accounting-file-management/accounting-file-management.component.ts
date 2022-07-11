@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { listAnimation } from './../../../../shared/animations/index';
+import { Component, OnChanges, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { SettingRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
@@ -19,8 +20,9 @@ export interface IFileItem {
     selector: "accounting-file-management",
     templateUrl: "./accounting-file-management.component.html",
 })
-export class AccountingFileManagementComponent extends AppList implements OnInit {
-    itemsDefault: IFileItem[] = [
+export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
+    itemsDefault: IFileItem[];
+    dataDefault: IFileItem[] = [
         {
             name: "SOA Folder",
             dateCreated: "19/03/2022",
@@ -71,7 +73,11 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.requestList = this.getListFolderName;
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this.itemsDefault = this.dataDefault;
+    }
+    ngOnChanges(): void {
+    }
     pushTypeForItem(items: any) {
         for (let item of items) {
             let arr = item.name.split(".");
@@ -97,10 +103,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             this.isActiveClick = true;
             this.isDisplayFolderParent = false;
             this.isActiveSearch = false;
-            this.dataSearch = { folder: this.folderName, objectId: data.objectId };
-            this.folderChild = { folder: this.folderName, objectId: data.objectId, folderName: data.folderName };
-            this.getFolderFileManagement();
+            this.getDetailFileManagement(this.folderName, data.objectId);
         }
+        this.listBreadcrumb.push(data);
     }
 
     getFolderFileManagement() {
@@ -114,7 +119,16 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.totalItems = res.totalItems || 0;
                 this.pushTypeForItem(res.data);
             });
-        this.listBreadcrumb.push(this.folderChild)
+    }
+
+    getDetailFileManagement(folderName: string, objectId: string) {
+        this._settingRepo.getDetailFileManagement(folderName, objectId).pipe(
+            catchError(this.catchError),
+            finalize(() => { })
+        )
+            .subscribe((res: any) => {
+                this.pushTypeForItem(res);
+            });
     }
 
     getListFolderName() {
@@ -138,13 +152,24 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         window.open(`${item}`, "_blank");
     }
 
-    onSearchValue(event) {
-        this.dataSearch = event;
+    onSearchValue($event) {
+        console.log($event)
+        console.log(this.dataSearch)
+        if ($event === undefined) {
+            this.dataSearch.name = "";
+        }
+        else {
+            this.dataSearch.name = $event.name;
+
+        }
+
         if (this.folderName != null && this.folderName != undefined) {
             this.dataSearch.folder = this.folderName;
         }
+        console.log(this.dataSearch)
+
         this._settingRepo
-            .onSearchListFolderName(this.folderName, event.name, this.page, this.pageSize)
+            .searchListFolderName(this.folderName, this.dataSearch.name, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -159,7 +184,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.isDisplayFolderParent = true;
         this.isActiveSearch = true;
         this.stringBreadcrumb = this.folderName;
-
         this.folderName = item.folderName
         this.getListFolderName();
         this.listBreadcrumb.push({ folderName: this.folderName })
@@ -171,6 +195,17 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getValueBreadcrumb($event: any) {
-        console.log($event)
+        if ($event === "Accounting") {
+            this.isDisplayFolderParent = false;
+            this.itemsDefault = this.dataDefault;
+            this.isActiveSearch = false;
+            this.isActiveClick = false;
+        }
+        else {
+            this.isDisplayFolderParent = true;
+            this.getListFolderName();
+            this.isActiveSearch = true;
+            this.isActiveClick = false;
+        }
     }
 }

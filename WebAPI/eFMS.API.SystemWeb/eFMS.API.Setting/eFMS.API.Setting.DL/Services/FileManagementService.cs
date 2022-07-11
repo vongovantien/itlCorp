@@ -35,52 +35,10 @@ namespace eFMS.API.Setting.DL.Services
         }
         public List<SysImageViewModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount)
         {
-            var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).GroupBy(s => s.ObjectId).Distinct();
-
-            var items = mapper.Map<List<SysImageViewModel>>(data);
-
-            if (!string.IsNullOrEmpty(folderName))
-            {
-                switch (folderName)
-                {
-                    case "SOA":
-                        foreach (var item in items)
-                        {
-                            var folderNames = acctSOARepo.Where(s => s.Id == item.ObjectId).Select(s => s.Soano).FirstOrDefault();
-                            item.FolderName = folderNames;
-                        }
-                        break;
-                    case "Settlement":
-                        foreach (var item in items)
-                        {
-                            var folderNames = acctSettleRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.SettlementNo).FirstOrDefault();
-                            item.FolderName = folderNames;
-                        }
-                        break;
-                    case "Advance":
-                        foreach (var item in items)
-                        {
-                            var folderNames = acctAdvanceRepo.Where(s => s.Id.ToString() == item.ObjectId).Select(s => s.AdvanceNo).FirstOrDefault();
-                            item.FolderName = folderNames;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            items = items.Where(s => s.FolderName != null).ToList();
-            if (!string.IsNullOrEmpty(keyWord))
-            {
-                items = items.Where(x => x.FolderName.Contains(keyWord)).OrderByDescending(s => s.FolderName).ToList();
-            }
-            if (items == null)
-            {
-                rowsCount = 0;
-                return null;
-            }
+            var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).ToList().GroupBy(x => x.ObjectId).Select(x => x.FirstOrDefault());
 
             //Phân trang
-            var _totalItem = items.ToList().Count();
+            var _totalItem = data.Count();
             rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
             {
@@ -88,12 +46,82 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     page = 1;
                 }
+
+                var items = mapper.Map<List<SysImageViewModel>>(data);
                 items = items.Skip((page - 1) * size).Take(size).ToList();
+                if (items == null)
+                {
+                    rowsCount = 0;
+                    return null;
+                }
+                if (!string.IsNullOrEmpty(folderName))
+                {
+                    switch (folderName)
+                    {
+                        case "SOA":
+                            foreach (var item in items)
+                            {
+                                var folderNames = acctSOARepo.Where(s => s.Id == item.ObjectId).FirstOrDefault();
+                                if (folderNames != null)
+                                {
+                                    item.FolderName = folderNames?.Soano;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            break;
+                        case "Settlement":
+                            foreach (var item in items)
+                            {
+                                var sm = acctSettleRepo.Where(s => s.Id.ToString() == item.ObjectId).FirstOrDefault();
+                                if (sm != null)
+                                {
+                                    item.FolderName = sm?.SettlementNo;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            break;
+                        case "Advance":
+                            foreach (var item in items)
+                            {
+                                var folderNames = acctAdvanceRepo.Where(s => s.Id.ToString() == item.ObjectId).FirstOrDefault();
+                                if (folderNames != null)
+                                {
+                                    item.FolderName = folderNames?.AdvanceNo;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                items = items.Where(s => s.FolderName != null).ToList();
+                if (!string.IsNullOrEmpty(keyWord))
+                {
+                    items = items.Where(x => x.FolderName.Contains(keyWord)).OrderByDescending(s => s.FolderName).ToList();
+                    rowsCount = items.Count();
+                }
+                
+                return items;   
             }
-            
-            
-            return items;
+            return new List<SysImageViewModel>();
         }
+        public List<SysImageViewModel> GetDetail(string folderName, string objectId)
+        {
+            var data = DataContext.Where(s => s.ObjectId == objectId && s.Folder == folderName).ToList();
+            var result = mapper.Map<List<SysImageViewModel>>(data);
+            return result;
+        }
+
 
         public List<SysImageViewModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount)
         {
@@ -112,25 +140,6 @@ namespace eFMS.API.Setting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Folder))
             {
                 data = data.Where(x => x.Folder == criteria.Folder);
-            }
-            if (criteria.DateType != null)
-            {
-                if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
-                {
-                    switch (criteria.DateType)
-                    {
-                        case "CreateDate":
-                            data = data.Where(x => x.DateTimeCreated.Value.Date >= criteria.FromDate.Value.Date &&
-                            x.DateTimeCreated.Value.Date <= criteria.ToDate.Value.Date);
-                            break;
-                        case "ModifiedDate":
-                            data = data.Where(x => x.DatetimeModified.Value.Date >= criteria.FromDate.Value.Date
-                            && x.DatetimeModified.Value.Date <= criteria.ToDate.Value.Date);
-                            break;
-                        default:
-                            break;
-                    }
-                }
             }
 
             if (data == null)

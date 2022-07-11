@@ -13,5 +13,6 @@ namespace eFMS.API.Setting.DL.IService
     {
         List<SysImageViewModel> Search(SysImageCriteria criteria, int page, int size, out int rowsCount);
         List<SysImageViewModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount);
+        List<SysImageViewModel> GetDetail(string folderName, string objectId);
     }
 }

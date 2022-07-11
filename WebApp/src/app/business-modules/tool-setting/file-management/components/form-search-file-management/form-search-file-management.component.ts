@@ -25,7 +25,13 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     onClickSearch() {
-        let valueSearch = { name: this.name.value };
+        let valueSearch = { name: this.name.value.trim() }
+        this.formSearch.controls['name'].setValue(this.name.value.trim());
+        this.keySearch.emit(valueSearch);
+    }
+
+    resetSearch() {
+        let valueSearch = { name: "" };
         this.keySearch.emit(valueSearch);
     }
 
