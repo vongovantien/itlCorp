@@ -6009,7 +6009,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = formatNumberStr;
 
                     workSheet.Cells[i + addressStartContent, 18].Value = item.Charges.Select(t => t.CombineBillingType).FirstOrDefault() == "SOA" ? item.Charges.Select(t => t.SOANo).FirstOrDefault() : item.Charges.Select(t => t.CDNote).FirstOrDefault();
-                    workSheet.Cells[i + addressStartContent, 19].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
+                    workSheet.Cells[i + addressStartContent, 19].Value = DistinctInvoice(string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)));
                     workSheet.Cells[i + addressStartContent, 20].Value = "";
                     workSheet.Cells[i + addressStartContent, 21].Value = item.Charges.Select(t => t.CombineNo).FirstOrDefault();
                     workSheet.Cells[i + addressStartContent, 22].Value = item.Charges.Select(t => t.ServiceDate?.ToString("dd/MM/yyyy")).FirstOrDefault();
