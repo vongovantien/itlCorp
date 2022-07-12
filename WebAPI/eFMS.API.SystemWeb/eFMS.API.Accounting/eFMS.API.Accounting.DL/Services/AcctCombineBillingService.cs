@@ -2001,6 +2001,7 @@ namespace eFMS.API.Accounting.DL.Services
                               ExchangeDate = sur.ExchangeDate,
                               CreditNo=sur.CreditNo,
                               DebitNo=sur.DebitNo,
+                              ServiceDate=opst.ServiceDate,
                           };
             var dataDoc = from sur in surcharges
                           join charge in chargeDatas on sur.ChargeId equals charge.Id
@@ -2030,6 +2031,7 @@ namespace eFMS.API.Accounting.DL.Services
                               ExchangeDate = sur.ExchangeDate,
                               CreditNo = sur.CreditNo,
                               DebitNo = sur.DebitNo,
+                              ServiceDate=csTran.ServiceDate,
                           };
             #endregion
             var dataCharges = Enumerable.Empty<ChargeCombineResult>().AsQueryable();
@@ -2066,6 +2068,7 @@ namespace eFMS.API.Accounting.DL.Services
                 exportCombineShipment.HwbNo = grpData.HBL;
                 exportCombineShipment.PackageContainer = grpData.PackageContainer;
                 exportCombineShipment.TransactionType = grpData.TransactionType;
+                exportCombineShipment.ServiceDate = grpData.ServiceDate;
                 lstShipment.Add(exportCombineShipment);
             }
 
