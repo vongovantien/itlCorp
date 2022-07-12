@@ -393,31 +393,64 @@ namespace eFMS.API.Setting.DL.Services
             {
                 if (string.IsNullOrEmpty(item.RuleName))
                 {
+                    item.RuleNameError = SettingLanguageSub.MSG_RULE_NAME__EMPTY;
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ServiceBuying))
                 {
+                    item.ServiceBuyError = SettingLanguageSub.MSG_SERVICE_BUY_EMPTY;
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ServiceSelling))
                 {
+                    item.ServiceSellError = SettingLanguageSub.MSG_SERVICE_SELL_EMPTY;
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ChargeBuying))
                 {
+                    item.ChargeBuyError = SettingLanguageSub.MSG_CHARGE_BUY_EMPTY;
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.ChargeSelling))
                 {
+                    item.ChargeSellError = SettingLanguageSub.MSG_CHARGE_SELL_EMPTY;
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.PartnerBuying))
                 {
+                    item.PartnerBuyError = SettingLanguageSub.MSG_PARTNER_BUY_EMPTY;
                     item.IsValid = false;
                 }
-                if (!CheckCharge(item.ChargeBuying, item.ChargeSelling, ConvertService(item.ServiceBuying), ConvertService(item.ServiceSelling)) || ConvertService(item.ServiceBuying) is null ||ConvertService(item.ServiceSelling) is null)
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.StatusError = SettingLanguageSub.MSG_PARTNER_STATUS_EMPTY;
+                    item.IsValid = false;
+                }
+                //if (!CheckCharge(item.ChargeBuying, item.ChargeSelling, ConvertService(item.ServiceBuying), ConvertService(item.ServiceSelling)) || ConvertService(item.ServiceBuying) is null ||ConvertService(item.ServiceSelling) is null)
+                if (!ValidServiceCode(item.ServiceBuying))
+                {
+                    item.ServiceBuyError = SettingLanguageSub.MSG_SERVICE_BUY_NOT_VALID;
+                    item.IsValid = false;
+                }
+                if (!ValidServiceCode(item.ServiceSelling))
+                {
+                    item.ServiceSellError = SettingLanguageSub.MSG_SERVICE_SELL_NOT_VALID;
+                    item.IsValid = false;
+                }
+                if (CheckCharge(item.ChargeBuying, item.ChargeSelling, item.ServiceBuying, item.ServiceSelling) != "BOTH")
                 {
                     item.IsValid = false;
+                    switch(CheckCharge(item.ChargeBuying, item.ChargeSelling, item.ServiceBuying, item.ServiceSelling)){
+                        case null: 
+                            item.ChargeBuyError = SettingLanguageSub.MSG_CHARGE_BUY_NOT_MATCH;
+                            item.ChargeSellError = SettingLanguageSub.MSG_CHARGE_SELL_NOT_MATCH;
+                            break;
+                        case "SELL":
+                            item.ChargeSellError = SettingLanguageSub.MSG_CHARGE_SELL_NOT_MATCH;
+                            break;
+                        default: item.ChargeBuyError = SettingLanguageSub.MSG_CHARGE_BUY_NOT_MATCH;
+                            break;
+                    }
                 }
                 results.Add(item);
             }
@@ -427,9 +460,19 @@ namespace eFMS.API.Setting.DL.Services
                     int j = i+1;
                     while (j < list.Count())
                     {
-                        if (list[i].RuleName == list[j].RuleName||(list[i].ServiceBuying == list[j].ServiceBuying&& list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling ))
+                        if(list[i].RuleName == list[j].RuleName)
                         {
                             list[i].IsValid = false;
+                            list[i].RuleNameError = SettingLanguageSub.MSG_PARTNER_BUY_EXIST; ;
+                        }
+                        if ((list[i].ServiceBuying == list[j].ServiceBuying&& list[i].ServiceSelling == list[j].ServiceSelling && list[i].ChargeBuying == list[j].ChargeBuying && list[i].ChargeSelling == list[j].ChargeSelling && list[i].PartnerBuying == list[j].PartnerBuying && list[i].PartnerSelling == list[j].PartnerSelling))
+                        {
+                            list[i].IsValid = false;
+                            list[i].ServiceBuyError = SettingLanguageSub.MSG_SERVICE_BUY_EXIST;
+                            list[i].ServiceSellError = SettingLanguageSub.MSG_SERVICE_SELL_EXIST;
+                            list[i].ChargeSellError = SettingLanguageSub.MSG_CHARGE_SELL_EXIST;
+                            list[i].ChargeBuyError = SettingLanguageSub.MSG_CHARGE_BUY_EXIST;
+                            list[i].PartnerBuyError = SettingLanguageSub.MSG_PARTNER_BUY_EXIST;
                         }
                         j++;
                     }
@@ -438,45 +481,85 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        private string ConvertService(string serviceName)
-        {
-            switch (serviceName)
-            {
-                case "Air Import":
-                    return "AI";
-                case "Custom Logistic":
-                    return "CL";
-                case "Air Export":
-                    return "AE";
-                case "Sea FCL Export":
-                    return "SFE";
-                case "Sea FCL Import":
-                    return "SFI";
-                case "Sea LCL Export":
-                    return "SLE";
-                case "Sea LCL Import":
-                    return "SLI";
-                case "Inland Trucking":
-                    return "IT";
-                case "Sea Consol Export":
-                    return "SCE";
-                case "Sea Consol Import":
-                    return "SCI";
-                default:
-                    return null;
-            }
-        }
+        //private string CheckDuppImport(RuleLinkFeeImportModel rule)
+        //{
+        //    if (DataContext.Where(x => x.ServiceBuying == rule.ServiceBuying && x.ServiceSelling == rule.ServiceSelling && x.PartnerBuying == rule.PartnerBuying && x.PartnerSelling == rule.PartnerSelling
+        //    &&(x.EffectiveDate<=rule.EffectiveDate&&(x.ExpiredDate>=rule.ExpiredDate||(x.ExpiredDate==null&&rule.ExpiredDate==null)||((x.ExpiredDate == null && rule.ExpiredDate != null))))
+        //    ).FirstOrDefault() != null)
+        //    {
+        //        if (DataContext.Where(x => x.RuleName == rule.RuleName).FirstOrDefault() != null)
+        //        {
+        //            return "AllDupp";
+        //        }
+        //        return "RuleDupp";
+        //    }
+        //    if (DataContext.Where(x => x.RuleName == rule.RuleName).FirstOrDefault() != null)
+        //    {
+        //        return "NameDupp";
+        //    }
+        //    return null;
+        //}
 
-        private bool CheckCharge(string chargeBuying, string chargeSelling, string serviceBuying, string serviceSelling)
+        private bool ValidServiceCode(string code)
         {
-            var charge = catChargeRepo.Get();
-            var buying = charge.Where(x => x.Code==chargeBuying && x.Type == "CREDIT" && x.ServiceTypeId.Contains(serviceBuying)).FirstOrDefault();
-            var selling = charge.Where(x => x.Code==chargeSelling && x.Type == "DEBIT" && x.ServiceTypeId.Contains(serviceSelling)).FirstOrDefault();
-            if (buying!=null&&selling!=null)
+            if (code == "AI" || code == "CL" || code == "SFE" || code == "AE" || code == "SFI" || code == "SLI" || code == "SLE" || code == "IT" || code == "SCE"||code=="SCI")
             {
                 return true;
             }
             return false;
+        }
+
+        //private string ConvertService(string serviceName)
+        //{
+        //    switch (serviceName)
+        //    {
+        //        case "Air Import":
+        //            return "AI";
+        //        case "Custom Logistic":
+        //            return "CL";
+        //        case "Air Export":
+        //            return "AE";
+        //        case "Sea FCL Export":
+        //            return "SFE";
+        //        case "Sea FCL Import":
+        //            return "SFI";
+        //        case "Sea LCL Export":
+        //            return "SLE";
+        //        case "Sea LCL Import":
+        //            return "SLI";
+        //        case "Inland Trucking":
+        //            return "IT";
+        //        case "Sea Consol Export":
+        //            return "SCE";
+        //        case "Sea Consol Import":
+        //            return "SCI";
+        //        default:
+        //            return null;
+        //    }
+        //}
+
+        private string CheckCharge(string chargeBuying, string chargeSelling, string serviceBuying, string serviceSelling)
+        {
+            var charge = catChargeRepo.Get();
+            if (!ValidServiceCode(serviceBuying) || !ValidServiceCode(serviceSelling))
+            {
+                return null;
+            }
+            var buying = charge.Where(x => x.Code==chargeBuying && x.Type == "CREDIT" && x.ServiceTypeId.Contains(serviceBuying)).FirstOrDefault();
+            var selling = charge.Where(x => x.Code==chargeSelling && x.Type == "DEBIT" && x.ServiceTypeId.Contains(serviceSelling)).FirstOrDefault();
+            if(buying != null && selling != null)
+            {
+                return "BOTH";
+            }
+            if (buying!=null && selling == null)
+            {
+                return "BUY";
+            }
+            if(selling != null&& buying == null)
+            {
+                return "SELL";
+            }
+            return null;
         }
 
         public HandleState Import(List<RuleLinkFeeImportModel> data)
@@ -487,7 +570,7 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
-                    if (!CheckCharge(item.ChargeBuying,item.ChargeSelling, ConvertService(item.ServiceBuying), ConvertService(item.ServiceSelling)))
+                    if (CheckCharge(item.ChargeBuying, item.ChargeSelling, item.ServiceBuying, item.ServiceSelling) != "BOTH")
                     {
                         return new HandleState(false, "Charge Buying or Selling not match Type");
                     }
@@ -500,8 +583,8 @@ namespace eFMS.API.Setting.DL.Services
                         ChargeSelling = charge.Where(x => x.Code==item.ChargeSelling && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
                         PartnerBuying = partner.Where(x => x.AccountNo==item.PartnerBuying).FirstOrDefault().Id,
                         PartnerSelling = item.PartnerSelling != null ? partner.Where(x => x.AccountNo==item.PartnerSelling).FirstOrDefault().Id : null,
-                        ServiceBuying = ConvertService(item.ServiceBuying),
-                        ServiceSelling = ConvertService(item.ServiceSelling),
+                        ServiceBuying = item.ServiceBuying,
+                        ServiceSelling = item.ServiceSelling,
                         EffectiveDate = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         DatetimeCreated = DateTime.Now,

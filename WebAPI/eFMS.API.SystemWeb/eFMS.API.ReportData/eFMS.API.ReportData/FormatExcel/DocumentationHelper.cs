@@ -1326,7 +1326,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.Shipment_Overview_FCL));
-                var path = f.FullName+".xlsx";
+                var path = f.FullName;
                 if (!File.Exists(path))
                 {
                     return null;
