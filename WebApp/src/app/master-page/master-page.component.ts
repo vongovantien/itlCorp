@@ -89,6 +89,7 @@ export class MasterPageComponent implements OnInit {
     logout() {
         this.cookieService.delete("__p", "/", window.location.hostname);
         this.cookieService.delete("__u", "/", window.location.hostname);
+        localStorage.removeItem(SystemConstants.USER_ACCESS_PERMISSION);
         this.oauthService.logoutUrl = window.location.origin + '/#/login';
         if (this.oauthService.hasValidAccessToken()) {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
@@ -159,6 +160,9 @@ export class MasterPageComponent implements OnInit {
                         companyId: companyId,
                         officeId: officeId,
                     });
+                }
+                if (localStorage.getItem(SystemConstants.USER_ACCESS_PERMISSION) === 'authorized') {
+                    header = header.append('userType', 'Super Admin');             
                 }
                 this.password = this.getUserPassword();
                 this.username = this.getUserName();

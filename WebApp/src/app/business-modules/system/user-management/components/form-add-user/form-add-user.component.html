@@ -206,10 +206,10 @@
                                             Password</button>
                                     </div>
                                     <div class = "form-group m--align-right" *ngIf = "(currentUserType == 'Super Admin') && (infoCurrentUserId != SelectedUser.id)">
-                                        <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="switchUser(SelectedUser)" routerLink = "/home">
+                                        <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="switchUser(SelectedUser)" >
                                             <span>
                                                 <i class = "la la-user-plus"></i>
-                                                <span> Log In </span>
+                                                <span>Log In</span>
                                             </span>
                                         </button>
                                     </div>

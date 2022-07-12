@@ -14,6 +14,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { getCurrentUserState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+
+import { CookieService } from 'ngx-cookie-service';
+import crypto_js from 'crypto-js';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -99,7 +102,8 @@ export class FormAddUserComponent extends AppList {
         private _progressService: NgProgress,
         private _oauthService: OAuthService,
         private _spinner: NgxSpinnerService,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private cookieService: CookieService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -181,7 +185,13 @@ export class FormAddUserComponent extends AppList {
             });
     }
 
+    updateCookies(username: string, password: string){
+        const username_encrypt = crypto_js.AES.encrypt(username, SystemConstants.SECRET_KEY).toString();
+        this.cookieService.set("__u", username_encrypt, 1, "/", window.location.hostname);
 
+        const password_encrypt = crypto_js.AES.encrypt(password, SystemConstants.SECRET_KEY).toString();
+        this.cookieService.set("__p", password_encrypt, 1, "/", window.location.hostname);
+    }
 
     resetPassword(id: string) {
         this.isLoading = true;
@@ -231,6 +241,9 @@ export class FormAddUserComponent extends AppList {
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
+                            localStorage.setItem(SystemConstants.USER_ACCESS_PERMISSION, 'authorized');
+                            this.updateCookies(userInfo.userName, Password);
+                            window.location.replace("#/home");
                             window.location.reload();
                         }).catch((err) => {
                             this._spinner.hide();
