@@ -770,8 +770,8 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportAccountingManagementDebCreInvoice(AccAccountingManagementCriteriaDebCreInvoice criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExporDebCretInvUrl,accessToken);
-
+            //var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExporDebCretInvUrl,accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, "https://localhost:44324/api/v1/en-US/AcctCDNote/GetDataAcctMngtDebCretInvExport", accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
