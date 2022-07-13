@@ -514,6 +514,7 @@ export class PartnerDetailComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
+                            this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
                             this._toastService.success(res.message);
                         } else {
