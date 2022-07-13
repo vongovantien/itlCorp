@@ -32,12 +32,12 @@ namespace eFMS.API.Setting.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetFileManagement")]
         [Authorize]
-        public IActionResult Get(string folderName, string keyWord, int page, int size)
+        public IActionResult Get(string folderName, List<string> keyWords, int page, int size)
         {
-            var data = fileManagementService.Get(folderName, keyWord, page, size, out int rowsCount);
+            var data = fileManagementService.Get(folderName, keyWords, page, size, out int rowsCount);
             if (data == null)
             {
                 return BadRequest();

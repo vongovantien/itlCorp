@@ -1,3 +1,8 @@
+import { SystemConstants } from 'src/constants/system.const';
+import { FormGroup } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
+import { AppForm } from 'src/app/app.form';
 import { AfterViewInit, Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, EventEmitter, Output } from '@angular/core';
 import { ActivatedRoute, Event, NavigationEnd, Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
@@ -7,17 +12,32 @@ import { Location } from '@angular/common';
     templateUrl: './sidebar-file-management.component.html',
     styleUrls: ['./sidebar-file-management.component.scss']
 })
-export class SidebarFileManagementComponent implements OnChanges {
-
+export class SidebarFileManagementComponent extends AppForm implements OnChanges, OnInit {
+    @Input() isActiveSearch: boolean;
     @Input() listBreadcrumb: Array<object>;
     @Output() isDisplayDefaultFolder = new EventEmitter<string>();
     @Output() objectBack = new EventEmitter<any>();
+    @Output() listKeySearch = new EventEmitter<any>();
     title: string;
+    formSearch: FormGroup;
+    listKeyWord: AbstractControl;
 
-    constructor(private route: ActivatedRoute, private _router: Router) {
+    constructor(private _fb: FormBuilder, private route: ActivatedRoute, private _router: Router) {
+        super();
     }
+    ngOnInit(): void {
+        this.initForm();
+    }
+
     ngOnChanges(changes: SimpleChanges): void {
         this.title = this.route.snapshot.data['title']
+    }
+
+    initForm() {
+        this.formSearch = this._fb.group({
+            listKeyWord: []
+        })
+        this.listKeyWord = this.formSearch.controls['listKeyWord']
     }
 
     changeBreadcrumb() {
@@ -40,12 +60,8 @@ export class SidebarFileManagementComponent implements OnChanges {
         this.listBreadcrumb.pop();
         this.objectBack.emit(item)
     }
-}
-
-interface UrlRedirectOptions {
-    title: string,
-    path: string,
-    folderName: string,
-    objectId: string,
-    folder: string
+    onSubmitSearch() {
+        let dataSearch = !!this.listKeyWord.value ? this.listKeyWord.value.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null;
+        this.listKeySearch.emit(dataSearch)
+    }
 }

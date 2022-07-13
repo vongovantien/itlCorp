@@ -1,4 +1,3 @@
-import { listAnimation } from './../../../../shared/animations/index';
 import { Component, OnChanges, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { SettingRepo } from "@repositories";
@@ -22,6 +21,8 @@ export interface IFileItem {
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
     itemsDefault: IFileItem[];
+    isActiveDownload: boolean;
+    isActiveView: boolean;
     dataDefault: IFileItem[] = [
         {
             name: "SOA Folder",
@@ -62,7 +63,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     isActiveClick: boolean = false;
     isDisplayFolderParent: boolean = false;
     isActiveSearch: boolean = false;
-    itemSelect: string;
+    itemSelect: any;
     listBreadcrumb: Array<object> = [];
     constructor(
         private _settingRepo: SettingRepo,
@@ -85,14 +86,31 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 case "pdf":
                     item.classIcon = "la la-file-pdf-o";
                     item.classColor = "text-danger"
+                    item.fileType = 'pdf'
                     break;
                 case "xlsx":
                     item.classIcon = "la la-file-excel-o";
                     item.classColor = "text-success"
+                    item.fileType = 'xlsx'
                     break;
-                default:
+                case "doc":
+                    item.classIcon = "la la-file-word-o";
+                    item.classColor = "text-primary"
+                    item.fileType = 'doc'
+                    break;
+                case "zip":
+                    item.classIcon = "la la-file-zip-o";
+                    item.classColor = "text-warning"
+                    item.fileType = 'zip'
+                    break;
+                case "png":
                     item.classIcon = "la la-file-image-o";
                     item.classColor = "text-primary"
+                    item.fileType = 'png'
+                default:
+                    item.classIcon = "la la-folder";
+                    item.classColor = "text-info"
+                    item.fileType = 'folder'
             }
         }
         this.itemsDefault = items;
@@ -110,7 +128,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
 
     getFolderFileManagement() {
         this._settingRepo
-            .getListFileByFolderName(this.page, this.pageSize, this.dataSearch)
+            .getListFilesByFolderName(this.folderName, this.dataSearch, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -133,7 +151,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
 
     getListFolderName() {
         this._settingRepo
-            .getListFolderName(this.folderName, this.page, this.pageSize)
+            .getListFolderName(this.folderName, [], this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -144,41 +162,60 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             });
     }
 
-    onSelectFile(item: string) {
+    onSelectFile(item: any) {
+        switch (item.fileType) {
+            case "png":
+                this.isActiveDownload = false;
+                this.isActiveView = true;
+                break;
+            case "pdf":
+                this.isActiveDownload = false;
+                this.isActiveView = true;
+                break;
+            case "zip":
+                this.isActiveDownload = true;
+                this.isActiveView = false;
+                break;
+            default:
+                this.isActiveDownload = true;
+                this.isActiveView = true;
+                break;
+        }
         this.itemSelect = item;
     }
 
-    onRedirectLink(item: string) {
-        window.open(`${item}`, "_blank");
+    onRedirectLink(item: any, action: string) {
+        let allowedViewFiles = /(\.xlsx|\.doc)$/i;
+        if (!allowedViewFiles.exec(item.fileType) && action === 'view') {
+            if (item.fileType === "zip" || item.fileType === "pdf" || item.fileType === 'png' || item.fileType === 'jpg') {
+                window.open(`${item.url}`, '_blank');
+            } else {
+                window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${item.url}`, '_blank');
+            }
+        } else if (action === 'download') {
+            window.open(`${item.url}`, '_blank');
+        }
+    }
+
+    escapeRegExp(str) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
     onSearchValue($event) {
-        console.log($event)
-        console.log(this.dataSearch)
-        if ($event === undefined) {
-            this.dataSearch.name = "";
-        }
-        else {
-            this.dataSearch.name = $event.name;
-
-        }
-
-        if (this.folderName != null && this.folderName != undefined) {
-            this.dataSearch.folder = this.folderName;
-        }
-        console.log(this.dataSearch)
-
-        this._settingRepo
-            .searchListFolderName(this.folderName, this.dataSearch.name, this.page, this.pageSize)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe((res: any) => {
-                this.totalItems = res.totalItems || 0;
-                this.listFolderName = res.data;
-            });
+        let listTemp = this.listFolderName;
+        let searches = $event.name.split(" ").filter(String)
+        let s = "";
+        searches.forEach(e => s = s + "(?=.*" + this.escapeRegExp(e) + ")");
+        s = s + ".*"
+        console.log(s);
+        let matches = listTemp.filter((i) => {
+            const r = new RegExp(s);
+            return r.test(i.folderName);
+        });
+        this.listFolderName = matches;
     }
+
+
 
     onDisplayListFolder(item: any) {
         this.isDisplayFolderParent = true;
@@ -191,7 +228,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
 
     onDisplayDefaultFolder() {
         this.isDisplayFolderParent = true;
-        console.log()
     }
 
     getValueBreadcrumb($event: any) {
@@ -207,5 +243,20 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             this.isActiveSearch = true;
             this.isActiveClick = false;
         }
+    }
+
+    getValueSearch($event: any) {
+        console.log($event);
+        const body = { keyWords: $event, folderName: this.folderName };
+        this._settingRepo
+            .getListFilesByFolderName(this.folderName, body, this.page, this.pageSize)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe((res: any) => {
+                this.totalItems = res.totalItems || 0;
+                this.listFolderName = res.data;
+            });
     }
 }

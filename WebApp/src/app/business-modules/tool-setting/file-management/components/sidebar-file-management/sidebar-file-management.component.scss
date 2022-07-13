@@ -1,3 +1,19 @@
 .active-side-file {
     background-color: rgba(grey, 0.5);
+    position: relative;
+    ::after{
+        content: "";
+        width: 5px;
+        display: block;
+        background-color: #fb4b58;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+    }
 }
+
+.font-breadcrumb-files-management{
+    font-size: 11px;
+}
+

@@ -33,7 +33,7 @@ namespace eFMS.API.Setting.DL.Services
             acctSettleRepo = accSettle;
             acctAdvanceRepo = acctAdvance;
         }
-        public List<SysImageViewModel> Get(string folderName, string keyWord, int page, int size, out int rowsCount)
+        public List<SysImageViewModel> Get(string folderName, List<string> keyWords, int page, int size, out int rowsCount)
         {
             var data = DataContext.Where(s => s.Folder == folderName).OrderByDescending(s => s.DatetimeModified).ToList().GroupBy(x => x.ObjectId).Select(x => x.FirstOrDefault());
 
@@ -48,12 +48,7 @@ namespace eFMS.API.Setting.DL.Services
                 }
 
                 var items = mapper.Map<List<SysImageViewModel>>(data);
-                items = items.Skip((page - 1) * size).Take(size).ToList();
-                if (items == null)
-                {
-                    rowsCount = 0;
-                    return null;
-                }
+
                 if (!string.IsNullOrEmpty(folderName))
                 {
                     switch (folderName)
@@ -104,13 +99,27 @@ namespace eFMS.API.Setting.DL.Services
                             break;
                     }
                 }
-                items = items.Where(s => s.FolderName != null).ToList();
-                if (!string.IsNullOrEmpty(keyWord))
+                items = items.Where(x => x.FolderName != null).ToList();
+                if (keyWords.Count > 0)
                 {
-                    items = items.Where(x => x.FolderName.Contains(keyWord)).OrderByDescending(s => s.FolderName).ToList();
-                    rowsCount = items.Count();
+                    List<SysImageViewModel> results = new List<SysImageViewModel>();
+                    foreach (var kw in keyWords)
+                    {
+                        var item = items.Where(x => x.FolderName.Contains(kw)).OrderByDescending(s => s.FolderName).FirstOrDefault();
+                        results.Add(item);
+                    }
+                    rowsCount = results.Count();
+                    return results;
                 }
-                
+
+                items = items.Skip((page - 1) * size).Take(size).ToList();
+
+
+                if (items == null)
+                {
+                    rowsCount = 0;
+                    return null;
+                }
                 return items;   
             }
             return new List<SysImageViewModel>();
