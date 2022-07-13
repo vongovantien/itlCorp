@@ -94,7 +94,7 @@
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
-                        <div class="form-control-feedback" *ngIf="isSubmitted && 
+                        <div class="form-control-feedback" *ngIf="isSubmitted || 
                             ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                             Tax Code include 8 - 14 characters!
                         </div>
