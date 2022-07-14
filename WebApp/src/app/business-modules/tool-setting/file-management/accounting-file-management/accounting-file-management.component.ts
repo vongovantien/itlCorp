@@ -77,40 +77,43 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     ngOnInit() {
         this.itemsDefault = this.dataDefault;
     }
-    ngOnChanges(): void {
-    }
+
     pushTypeForItem(items: any) {
         for (let item of items) {
             let arr = item.name.split(".");
             switch (arr[arr.length - 1]) {
                 case "pdf":
                     item.classIcon = "la la-file-pdf-o";
-                    item.classColor = "text-danger"
-                    item.fileType = 'pdf'
+                    item.classColor = "text-danger";
+                    item.fileType = 'pdf';
                     break;
                 case "xlsx":
                     item.classIcon = "la la-file-excel-o";
-                    item.classColor = "text-success"
-                    item.fileType = 'xlsx'
+                    item.classColor = "text-success";
+                    item.fileType = 'xlsx';
                     break;
                 case "doc":
                     item.classIcon = "la la-file-word-o";
-                    item.classColor = "text-primary"
-                    item.fileType = 'doc'
+                    item.classColor = "text-primary";
+                    item.fileType = 'doc';
                     break;
                 case "zip":
                     item.classIcon = "la la-file-zip-o";
-                    item.classColor = "text-warning"
-                    item.fileType = 'zip'
+                    item.classColor = "text-warning";
+                    item.fileType = 'zip';
                     break;
                 case "png":
+                case "jpg":
+                case "jpeg":
                     item.classIcon = "la la-file-image-o";
-                    item.classColor = "text-primary"
-                    item.fileType = 'png'
+                    item.classColor = "text-primary";
+                    item.fileType = 'png';
+                    break;
                 default:
                     item.classIcon = "la la-folder";
-                    item.classColor = "text-info"
-                    item.fileType = 'folder'
+                    item.classColor = "text-info";
+                    item.fileType = 'folder';
+                    break;
             }
         }
         this.itemsDefault = items;
@@ -126,19 +129,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.listBreadcrumb.push(data);
     }
 
-    getFolderFileManagement() {
-        this._settingRepo
-            .getListFilesByFolderName(this.folderName, this.dataSearch, this.page, this.pageSize)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe((res: any) => {
-                this.totalItems = res.totalItems || 0;
-                this.pushTypeForItem(res.data);
-            });
-    }
-
     getDetailFileManagement(folderName: string, objectId: string) {
         this._settingRepo.getDetailFileManagement(folderName, objectId).pipe(
             catchError(this.catchError),
@@ -150,22 +140,26 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getListFolderName() {
+        const body = {
+            folderName: this.folderName,
+            keyWords: [],
+        }
         this._settingRepo
-            .getListFolderName(this.folderName, [], this.page, this.pageSize)
+            .getListFolderName(this.page, this.pageSize, body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
             )
             .subscribe((res: any) => {
                 this.totalItems = res.totalItems || 0;
-                this.listFolderName = res.data;
+                this.listFolderName = res.data
             });
     }
 
     onSelectFile(item: any) {
         switch (item.fileType) {
             case "png":
-                this.isActiveDownload = false;
+                this.isActiveDownload = true;
                 this.isActiveView = true;
                 break;
             case "pdf":
@@ -176,9 +170,14 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.isActiveDownload = true;
                 this.isActiveView = false;
                 break;
-            default:
+            case "doc":
+            case "xlsx":
                 this.isActiveDownload = true;
                 this.isActiveView = true;
+                break;
+            default:
+                this.isActiveDownload = false;
+                this.isActiveView = false;
                 break;
         }
         this.itemSelect = item;
@@ -193,35 +192,18 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${item.url}`, '_blank');
             }
         } else if (action === 'download') {
+            if(item.fileType=== 'png'){
+                
+            }
             window.open(`${item.url}`, '_blank');
         }
     }
-
-    escapeRegExp(str) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-    }
-
-    onSearchValue($event) {
-        let listTemp = this.listFolderName;
-        let searches = $event.name.split(" ").filter(String)
-        let s = "";
-        searches.forEach(e => s = s + "(?=.*" + this.escapeRegExp(e) + ")");
-        s = s + ".*"
-        console.log(s);
-        let matches = listTemp.filter((i) => {
-            const r = new RegExp(s);
-            return r.test(i.folderName);
-        });
-        this.listFolderName = matches;
-    }
-
-
 
     onDisplayListFolder(item: any) {
         this.isDisplayFolderParent = true;
         this.isActiveSearch = true;
         this.stringBreadcrumb = this.folderName;
-        this.folderName = item.folderName
+        this.folderName = item.folderName;
         this.getListFolderName();
         this.listBreadcrumb.push({ folderName: this.folderName })
     }
@@ -246,10 +228,13 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getValueSearch($event: any) {
-        console.log($event);
-        const body = { keyWords: $event, folderName: this.folderName };
+        console.log($event)
+        const body = {
+            folderName: this.folderName,
+            keyWords: $event,
+        }
         this._settingRepo
-            .getListFilesByFolderName(this.folderName, body, this.page, this.pageSize)
+            .getListFolderName(this.page, this.pageSize, body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

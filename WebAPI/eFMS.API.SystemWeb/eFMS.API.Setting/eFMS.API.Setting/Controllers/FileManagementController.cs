@@ -35,9 +35,10 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost]
         [Route("GetFileManagement")]
         [Authorize]
-        public IActionResult Get(string folderName, List<string> keyWords, int page, int size)
+        public IActionResult Get(SysImageCriteria criteria, int page, int size)
         {
-            var data = fileManagementService.Get(folderName, keyWords, page, size, out int rowsCount);
+            criteria.KeyWorks = criteria.KeyWorks ?? new List<string>();
+            var data = fileManagementService.Get(criteria, page, size, out int rowsCount);
             if (data == null)
             {
                 return BadRequest();
