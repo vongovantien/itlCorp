@@ -1,5 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.API.Setting.DL.IService;
+using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.API.Setting.Service.Models;
@@ -35,14 +37,14 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost]
         [Route("GetFileManagement")]
         [Authorize]
-        public IActionResult Get(string folderName, List<string> keyWords, int page, int size)
+        public IActionResult Get(FileManagementCriteria criteria, int page, int size)
         {
-            var data = fileManagementService.Get(folderName, keyWords, page, size, out int rowsCount);
+            var data = fileManagementService.Get(criteria, page, size, out int rowsCount);
             if (data == null)
             {
                 return BadRequest();
             }
-            var result = new { data, totalItems = rowsCount, page, size };
+            var result = new ResponsePagingModel<SysImageViewModel> { Data = data, Page = page, Size = size, TotalItems = rowsCount };
             return Ok(result);
         }
 

@@ -1,17 +1,15 @@
 ﻿using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
-using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace eFMS.API.Setting.DL.IService
 {
     public interface IFileManagementService: IRepositoryBase<SysImage, SysImageModel>
     {
-        List<SysImageViewModel> Get(string folderName, List<string> keyWord, int page, int size, out int rowsCount);
+        IQueryable<SysImageViewModel> Get(FileManagementCriteria criteria, int page, int size, out int rowsCount);
         List<SysImageViewModel> GetDetail(string folderName, string objectId);
     }
 }

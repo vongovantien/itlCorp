@@ -1,6 +1,7 @@
 import { Component, OnChanges, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { SettingRepo } from "@repositories";
+import { SortService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
@@ -20,7 +21,7 @@ export interface IFileItem {
     templateUrl: "./accounting-file-management.component.html",
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
-    itemsDefault: IFileItem[];
+    itemsDefault: IFileItem[] = [];
     isActiveDownload: boolean;
     isActiveView: boolean;
     dataDefault: IFileItem[] = [
@@ -67,18 +68,26 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     listBreadcrumb: Array<object> = [];
     constructor(
         private _settingRepo: SettingRepo,
-        private readonly _toastService: ToastrService,
-        private _router: Router
+        private _sortService: SortService
     ) {
         super();
         this.requestList = this.getListFolderName;
+        this.requestSort = this.sortData;
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'Name', field: 'name', sortable: true },
+            { title: 'Date Created', field: 'dateTimeCreated', sortable: true },
+            { title: 'User Created', field: 'userCreated', sortable: true },
+        ]
         this.itemsDefault = this.dataDefault;
     }
-    ngOnChanges(): void {
+
+    sortData(sort: string): void {
+        this.listFolderName = this._sortService.sort(this.listFolderName, sort, this.order);
     }
+
     pushTypeForItem(items: any) {
         for (let item of items) {
             let arr = item.name.split(".");
@@ -126,35 +135,28 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.listBreadcrumb.push(data);
     }
 
-    getFolderFileManagement() {
-        this._settingRepo
-            .getListFilesByFolderName(this.folderName, this.dataSearch, this.page, this.pageSize)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-            .subscribe((res: any) => {
-                this.totalItems = res.totalItems || 0;
-                this.pushTypeForItem(res.data);
-            });
-    }
-
     getDetailFileManagement(folderName: string, objectId: string) {
+        this.isLoading = true;
         this._settingRepo.getDetailFileManagement(folderName, objectId).pipe(
             catchError(this.catchError),
-            finalize(() => { })
+            finalize(() => { this.isLoading = false })
         )
             .subscribe((res: any) => {
-                this.pushTypeForItem(res);
+                this.pushTypeForItem(res || []);
             });
     }
 
     getListFolderName() {
+        this.isLoading = true;
+        const body = {
+            folderName: this.folderName,
+            keywords: []
+        }
         this._settingRepo
-            .getListFolderName(this.folderName, [], this.page, this.pageSize)
+            .getListFolderName(body, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this.isLoading = false })
             )
             .subscribe((res: any) => {
                 this.totalItems = res.totalItems || 0;
@@ -198,6 +200,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     escapeRegExp(str) {
+        // * Save Regex into System
         return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
@@ -214,8 +217,6 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         });
         this.listFolderName = matches;
     }
-
-
 
     onDisplayListFolder(item: any) {
         this.isDisplayFolderParent = true;
@@ -246,10 +247,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getValueSearch($event: any) {
-        console.log($event);
         const body = { keyWords: $event, folderName: this.folderName };
         this._settingRepo
-            .getListFilesByFolderName(this.folderName, body, this.page, this.pageSize)
+            .getListFolderName(body, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

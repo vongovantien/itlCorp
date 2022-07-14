@@ -29,10 +29,14 @@
                                         (keySearch)="onSearchValue($event)">
                                     </form-search-file-management>
                                 </div> -->
-                                <div
-                                    class="col-md-12 border border-file-management border-right-0 border-left-0 pl-5 py-1">
-                                    <input type="text" class="form-control" placeholder="Input text to search..."
-                                        [(ngModel)]="keyword">
+                                <div class=" row border border-file-management border-right-0 border-left-0 pl-5 py-1">
+                                    <div class="col-md-6  m-input-icon m-input-icon--right">
+                                        <input type="text" class="form-control border-0 bg"
+                                            placeholder="Input text to search..." [(ngModel)]="keyword">
+                                        <span class="m-input-icon__icon m-input-icon__icon--right"><span><i
+                                                    class="la la-search"></i></span></span>
+                                    </div>
+
                                 </div>
                             </ng-container>
 
@@ -44,20 +48,10 @@
 
                             <br />
                             <div
-                                class="pl-5 table-wrapper table-scrollable m--margin-top-20 border-file-management border-right border-right-0">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <span>Name</span>
-                                            </th>
-                                            <th>
-                                                <span>Date Created</span>
-                                            </th>
-                                            <th>
-                                                <span>User Created</span>
-                                            </th>
-                                        </tr>
+                                class="pl-5 table-wrapper table-scrollable m--margin-top-10 border-file-management border-right border-right-0">
+                                <table class="table dataTable-edit">
+                                    <thead app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     </thead>
                                     <tbody>
                                         <ng-container *ngIf="isDisplayFolderParent === false">
@@ -77,9 +71,11 @@
                                                     <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{item.userCreated}}</span>
+                                                    <span class="text-success">{{item.userCreated}}</span>
                                                 </td>
                                             </tr>
+                                            <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                            <tr app-table-none-record *ngIf="!isLoading && !itemsDefault.length"></tr>
                                         </ng-container>
                                         <ng-container *ngIf="isDisplayFolderParent === true">
                                             <tr
@@ -98,16 +94,19 @@
                                                     <span>{{item2.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
                                                 </td>
                                                 <td>
-                                                    <span [innerHTML]="item2.userCreated | highlight : keyword"></span>
+                                                    <span class="text-success"
+                                                        [innerHTML]="item2.userCreated | highlight : keyword"></span>
                                                 </td>
                                             </tr>
+                                            <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                            <tr app-table-none-record *ngIf="!isLoading && !listFolderName.length"></tr>
                                         </ng-container>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="ml-3">
+                            <div class="ml-3" *ngIf="!!listFolderName.length">
                                 <app-pagination *ngIf="isActiveSearch === true" [total]="totalItems" [pageNum]="page"
-                                    [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                                    [itemPerPage]="pageSize" (onChange)="updatePagingData($event)" [size]="3">
                                 </app-pagination>
                             </div>
                         </div>

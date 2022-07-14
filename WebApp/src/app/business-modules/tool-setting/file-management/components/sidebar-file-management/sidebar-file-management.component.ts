@@ -18,13 +18,17 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
     @Output() isDisplayDefaultFolder = new EventEmitter<string>();
     @Output() objectBack = new EventEmitter<any>();
     @Output() listKeySearch = new EventEmitter<any>();
+    @Output() resetSearch = new EventEmitter<any>();
+
     title: string;
     formSearch: FormGroup;
     listKeyWord: AbstractControl;
 
     constructor(private _fb: FormBuilder, private route: ActivatedRoute, private _router: Router) {
         super();
+        this.requestReset = this.onResetSearch
     }
+
     ngOnInit(): void {
         this.initForm();
     }
@@ -60,8 +64,13 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
         this.listBreadcrumb.pop();
         this.objectBack.emit(item)
     }
+
     onSubmitSearch() {
         let dataSearch = !!this.listKeyWord.value ? this.listKeyWord.value.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null;
         this.listKeySearch.emit(dataSearch)
+    }
+
+    onResetSearch() {
+        this.listKeySearch.emit([]);
     }
 }
