@@ -1,7 +1,6 @@
 import { Component, OnChanges, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
 import { SettingRepo } from "@repositories";
-import { ToastrService } from "ngx-toastr";
+import { SortService } from "@services";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 
@@ -20,7 +19,7 @@ export interface IFileItem {
     templateUrl: "./accounting-file-management.component.html",
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
-    itemsDefault: IFileItem[];
+    itemsDefault: IFileItem[] = [];
     isActiveDownload: boolean;
     isActiveView: boolean;
     dataDefault: IFileItem[] = [
@@ -67,15 +66,24 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     listBreadcrumb: Array<object> = [];
     constructor(
         private _settingRepo: SettingRepo,
-        private readonly _toastService: ToastrService,
-        private _router: Router
+        private _sortService: SortService
     ) {
         super();
         this.requestList = this.getListFolderName;
+        this.requestSort = this.sortData;
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'Name', field: 'name', sortable: true },
+            { title: 'Date Created', field: 'dateTimeCreated', sortable: true },
+            { title: 'User Created', field: 'userCreated', sortable: true },
+        ]
         this.itemsDefault = this.dataDefault;
+    }
+
+    sortData(sort: string): void {
+        this.listFolderName = this._sortService.sort(this.listFolderName, sort, this.order);
     }
 
     pushTypeForItem(items: any) {
@@ -83,6 +91,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             let arr = item.name.split(".");
             switch (arr[arr.length - 1]) {
                 case "pdf":
+                case "PDF":
                     item.classIcon = "la la-file-pdf-o";
                     item.classColor = "text-danger";
                     item.fileType = 'pdf';
@@ -93,6 +102,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                     item.fileType = 'xlsx';
                     break;
                 case "doc":
+                case "docx":
                     item.classIcon = "la la-file-word-o";
                     item.classColor = "text-primary";
                     item.fileType = 'doc';
@@ -130,25 +140,27 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getDetailFileManagement(folderName: string, objectId: string) {
+        this.isLoading = true;
         this._settingRepo.getDetailFileManagement(folderName, objectId).pipe(
             catchError(this.catchError),
-            finalize(() => { })
+            finalize(() => { this.isLoading = false })
         )
             .subscribe((res: any) => {
-                this.pushTypeForItem(res);
+                this.pushTypeForItem(res || []);
             });
     }
 
     getListFolderName() {
+        this.isLoading = true;
         const body = {
             folderName: this.folderName,
-            keyWords: [],
+            keywords: []
         }
         this._settingRepo
-            .getListFolderName(this.page, this.pageSize, body)
+            .getListFolderName(body, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this.isLoading = false })
             )
             .subscribe((res: any) => {
                 this.totalItems = res.totalItems || 0;
@@ -193,10 +205,29 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             }
         } else if (action === 'download') {
             if(item.fileType=== 'png'){
-                
+
             }
             window.open(`${item.url}`, '_blank');
         }
+    }
+
+    escapeRegExp(str) {
+        // * Save Regex into System
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
+
+    onSearchValue($event) {
+        let listTemp = this.listFolderName;
+        let searches = $event.name.split(" ").filter(String)
+        let s = "";
+        searches.forEach(e => s = s + "(?=.*" + this.escapeRegExp(e) + ")");
+        s = s + ".*"
+        console.log(s);
+        let matches = listTemp.filter((i) => {
+            const r = new RegExp(s);
+            return r.test(i.folderName);
+        });
+        this.listFolderName = matches;
     }
 
     onDisplayListFolder(item: any) {
@@ -228,13 +259,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getValueSearch($event: any) {
-        console.log($event)
-        const body = {
-            folderName: this.folderName,
-            keyWords: $event,
-        }
+        const body = { keyWords: $event, folderName: this.folderName };
         this._settingRepo
-            .getListFolderName(this.page, this.pageSize, body)
+            .getListFolderName(body, this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })

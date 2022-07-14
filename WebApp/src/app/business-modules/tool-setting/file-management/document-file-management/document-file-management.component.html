@@ -6,23 +6,45 @@
     </div>
 </div>
 
-<div class="m-content">
-    <tabset class="customer-payment-wrapper m-animate-fade-in tab-container">
-        <tab heading="My Attachments">
-        </tab>
+<div class="m-content p-4 m-portlet__body fs-5">
+    <tabset class="customer-payment-wrapper m-animate-fade-in tab-container custom-class-tab">
+        <!-- <tab heading="My Attachments">
+        </tab> -->
         <tab heading="e-FMS Docs" class="active">
             <div class="m-portlet">
                 <div class="m-portlet__body">
                     <div class="row">
-                        <div class="col-md-2">
-                            <sidebar-file-management>
+                        <div class="col-md-3 border-file-management border-right pr-0">
+                            <sidebar-file-management [listBreadcrumb]="listBreadcrumb"
+                                (isDisplayDefaultFolder)="onDisplayDefaultFolder()"
+                                (objectBack)="getValueBreadcrumb($event)" (listKeySearch)="getValueSearch($event)"
+                                [isActiveSearch]="isActiveSearch">
                             </sidebar-file-management>
+
                         </div>
-                        <div class="col-md-10">
-                            <form-search-file-management>
-                            </form-search-file-management>
+                        <div class="col-md-9 border-file-management border-left-0 pl-0">
+                            <ng-container *ngIf="isActiveSearch; else templateTemp">
+                                <!-- <div class="col-md-12 border border-file-management border-right-0 border-left-0">
+                                    <form-search-file-management [folderName]="folderName"
+                                        (keySearch)="onSearchValue($event)">
+                                    </form-search-file-management>
+                                </div> -->
+                                <div
+                                    class="col-md-12 border border-file-management border-right-0 border-left-0 pl-5 py-1">
+                                    <input type="text" class="form-control" placeholder="Input text to search..."
+                                        [(ngModel)]="keyword">
+                                </div>
+                            </ng-container>
+
+                            <ng-template #templateTemp>
+                                <div class="col-md-12 border border-file-management border-right-0 border-left-0">
+                                    <div class="py-4"></div>
+                                </div>
+                            </ng-template>
+
                             <br />
-                            <div>
+                            <div
+                                class="pl-5 table-wrapper table-scrollable m--margin-top-20 border-file-management border-right border-right-0">
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -30,86 +52,79 @@
                                                 <span>Name</span>
                                             </th>
                                             <th>
-                                                <span>Dectetive Created</span>
+                                                <span>Date Created</span>
                                             </th>
                                             <th>
-                                                <span>User Modifed</span>
+                                                <span>User Created</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th>
-                                                <i class="la la-folder"></i>
-                                                &nbsp;
-                                                <span>SOA Folder</span>
-                                            </th>
-                                            <th>
-                                                <span>19/03/2022</span>
-                                            </th>
-                                            <th>
-                                                <span>22/03/2022</span>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>
-                                                <i class="la la-folder"></i>
-                                                &nbsp;
-                                                <span>SOA Folder</span>
-                                            </th>
-                                            <th>
-                                                <span>19/03/2022</span>
-                                            </th>
-                                            <th>
-                                                <span>22/03/2022</span>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>
-                                                <i class="la la-folder"></i>
-                                                &nbsp;
-                                                <span>SOA Folder</span>
-                                            </th>
-                                            <th>
-                                                <span>19/03/2022</span>
-                                            </th>
-                                            <th>
-                                                <span>22/03/2022</span>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th>
-                                                <i class="la la-folder"></i>
-                                                &nbsp;
-                                                <span>SOA Folder</span>
-                                            </th>
-                                            <th>
-                                                <span>19/03/2022</span>
-                                            </th>
-                                            <th>
-                                                <span>22/03/2022</span>
-                                            </th>
-                                        </tr>
+                                        <ng-container *ngIf="isDisplayFolderParent === false">
+                                            <tr *ngFor="let item of itemsDefault"
+                                                [contextMenu]="item.objectId !== '' ? fileManagementContextMenu: ''"
+                                                (onTouch)="onSelectFile(item)">
+                                                <td>
+                                                    <a href="javascript:;" class="pointer"
+                                                        (click)="isActiveClick === false ? $event.stopPropagation(): onRedirectLink(item, 'download')"
+                                                        (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)">
+                                                        <i class="{{item.classIcon}} {{item.classColor}}"></i>
+                                                        &nbsp;
+                                                        <span class="text-dark">{{item.name}}</span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{item.userCreated}}</span>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                        <ng-container *ngIf="isDisplayFolderParent === true">
+                                            <tr
+                                                *ngFor="let item2 of listFolderName | filter: keyword: ['folderName', 'userCreated']">
+                                                <td>
+                                                    <a href="javascript:;" class="pointer"
+                                                        (click)="onGetFolderItems(item2)">
+                                                        <i class="la la-folder text-info"></i>
+                                                        &nbsp;
+                                                        <span
+                                                            [innerHTML]="item2.folderName | highlight : keyword"></span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span>{{item2.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span [innerHTML]="item2.userCreated | highlight : keyword"></span>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="ml-3">
+                                <app-pagination *ngIf="isActiveSearch === true" [total]="totalItems" [pageNum]="page"
+                                    [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                                </app-pagination>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </tab>
     </tabset>
 </div>
-<app-context-menu #linkFeeContextMenu>
+<app-context-menu #fileManagementContextMenu>
     <ng-container>
-        <div class="menu-context__item ">
-            <span><i class="la la-delete"></i><span> Delete</span></span>
+        <div *ngIf="isActiveView === true" class="menu-context__item" (click)="onRedirectLink(itemSelect, 'view')">
+            <span><i class="la la-info-circle"></i><span> View</span></span>
         </div>
-        <div class="menu-context__item">
-            <span><i class="la la-"></i><span> Move</span></span>
-        </div>
-        <div class="menu-context__item">
-            <span><i class="la la-edit"></i><span> Download</span></span>
+        <div *ngIf="isActiveDownload === true" class="menu-context__item"
+            (click)="onRedirectLink(itemSelect, 'download')">
+            <span><i class="la la-cloud-download"></i><span> Download</span></span>
         </div>
     </ng-container>
 </app-context-menu>

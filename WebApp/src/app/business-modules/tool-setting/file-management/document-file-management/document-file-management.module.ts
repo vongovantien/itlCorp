@@ -10,11 +10,14 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 const routing: Routes = [
     {
         path: '',
-        component: DocumentFileManagementComponent,
         data: { name: '' },
+        children: [
+            {
+                path: '', component: DocumentFileManagementComponent
+            },
+        ]
     },
 ]
-
 @NgModule({
     declarations: [DocumentFileManagementComponent],
     imports: [

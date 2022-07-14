@@ -67,12 +67,11 @@
                                                 <td>
                                                     <a href="javascript:;" class="pointer"
                                                         (click)="isActiveClick === false ? $event.stopPropagation(): onRedirectLink(item, 'download')"
-                                                        (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)"><i
-                                                            class="{{item.classIcon}} {{item.classColor}}"></i>
+                                                        (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)">
+                                                        <i class="{{item.classIcon}} {{item.classColor}}"></i>
                                                         &nbsp;
                                                         <span class="text-dark">{{item.name}}</span>
                                                     </a>
-                                                    <a href="{{}}"></a>
                                                 </td>
                                                 <td>
                                                     <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
@@ -89,6 +88,7 @@
                                                     <a href="javascript:;" class="pointer"
                                                         (click)="onGetFolderItems(item2)">
                                                         <i class="la la-folder text-info"></i>
+                                                        &nbsp;
                                                         <span
                                                             [innerHTML]="item2.folderName | highlight : keyword"></span>
                                                     </a>

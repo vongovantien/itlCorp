@@ -1,5 +1,5 @@
 .active-side-file {
-    background-color: rgba(grey, 0.5);
+    background-color: #e5e5e5;
     position: relative;
     ::after{
         content: "";
@@ -15,5 +15,17 @@
 
 .font-breadcrumb-files-management{
     font-size: 11px;
+}
+
+.menu-sidebar-file-management {
+    li {
+        &:hover {
+            background-color: #e5e5e5;
+            transition: linear 0.2s;
+        }
+        i {
+            font-size: 25px;
+        }
+    }
 }
 
