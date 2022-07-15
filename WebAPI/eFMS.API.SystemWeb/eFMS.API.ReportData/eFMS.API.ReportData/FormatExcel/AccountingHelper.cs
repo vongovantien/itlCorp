@@ -5126,7 +5126,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "HBLNo",//3
                 "VoucherID",//4
                 "Accounting Date",//5
-                "Debit No",//6
+                "CD Note",//6
                 "SOA",//7
                 "Code_Type",//1+7
                 "ChargeType",//1+8
