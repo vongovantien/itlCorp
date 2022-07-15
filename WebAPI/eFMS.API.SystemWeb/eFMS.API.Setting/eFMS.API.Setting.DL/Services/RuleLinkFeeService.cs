@@ -551,11 +551,11 @@ namespace eFMS.API.Setting.DL.Services
             {
                 return "BOTH";
             }
-            if (buying!=null && selling == null)
+            if (buying==null && selling != null)
             {
                 return "BUY";
             }
-            if(selling != null&& buying == null)
+            if(selling == null&& buying != null)
             {
                 return "SELL";
             }
