@@ -1226,4 +1226,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    validateCheckPointMultiplePartner(body: DocumentationInterface.ICheckPointCriteria) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointMultiplePartner`, body);
+    }
+
+    getPartnerForCheckPointInShipment
 }

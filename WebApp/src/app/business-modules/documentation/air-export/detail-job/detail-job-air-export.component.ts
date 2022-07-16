@@ -10,7 +10,7 @@ import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, Info
 import { DIM, CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
 
-import { combineLatest, of, Observable, merge } from 'rxjs';
+import { combineLatest, of, Observable, merge, forkJoin } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
@@ -20,6 +20,7 @@ import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommonEnum } from '@enums';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -352,6 +353,24 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateConfirm() {
+        .pipe(
+        takeUntil(this.ngUnsubscribe),
+        switchMap((data: any[]) => {
+            const surchargesCheckPoint = [...data[0], ...data[1]];
+            if (!!surchargesCheckPoint.length) {
+                const criteria: DocumentationInterface.ICheckPointCriteria = {
+                    partnerIds: [...new Set(surchargesCheckPoint.map(x => x.paymentObjectId))],
+                    hblId: this.opsTransaction.hblid,
+                    transactionType: 'DOC',
+                    type: 5,
+                    settlementCode: null,
+                };
+                return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+            }
+            return of({ data: null, message: null, status: true });
+        })
+    )
+
         this.action = { action: 'copy' };
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
             queryParams: this.action

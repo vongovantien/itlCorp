@@ -1,7 +1,9 @@
 ﻿
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace eFMS.API.Documentation.DL.IService
@@ -10,10 +12,11 @@ namespace eFMS.API.Documentation.DL.IService
     {
         HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType);
         HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode);
+        HandleState ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria criteria);
         HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
-
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
+        List<string> GetPartnerForCheckPointInShipment(Guid Id, string transactionType);
     }
 
     public enum CHECK_POINT_TYPE
