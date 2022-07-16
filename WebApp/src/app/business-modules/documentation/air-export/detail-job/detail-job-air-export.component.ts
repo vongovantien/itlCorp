@@ -10,17 +10,15 @@ import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, Info
 import { DIM, CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
 
-import { combineLatest, of, Observable, merge, forkJoin } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
+import { combineLatest, of, Observable, merge } from 'rxjs';
+import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
-import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
-import { CommonEnum } from '@enums';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -31,11 +29,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild('Permission403PopupComponent') permissionPopup: Permission403PopupComponent;
-    @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
-
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
@@ -68,6 +62,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         super(_toastService, _documentRepo, _router, _store);
 
         this._progressRef = this._ngProgressService.ref();
+
+        this.requestCancel = this.handleCancelForm;
     }
 
     ngOnInit() {
@@ -145,7 +141,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -157,7 +153,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
@@ -272,7 +271,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -302,22 +301,22 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             )
             .subscribe((value: number) => {
                 if (value === 403) {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
                     return;
                 }
                 if (value === 200) {
-                    this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
                         body: 'You you sure you want to delete this Job?',
                         title: 'Alert',
                         labelConfirm: 'Yes',
                     }, () => {
                         this.onDeleteJob();
-                    })
+                    });
                     return;
                 } else {
-                    this.showPopupDynamicRender(InfoPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
                         body: 'You are not allowed to delete this job?',
-                    })
+                    });
                 }
             });
     }
@@ -343,47 +342,51 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     showDuplicateConfirm() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Duplicate job detail',
             body: 'The system will open the Job Create Screen. Are you sure you want to leave?',
             labelConfirm: 'Yes'
         }, () => {
             this.duplicateConfirm();
-        })
-    }
-
-    duplicateConfirm() {
-        .pipe(
-        takeUntil(this.ngUnsubscribe),
-        switchMap((data: any[]) => {
-            const surchargesCheckPoint = [...data[0], ...data[1]];
-            if (!!surchargesCheckPoint.length) {
-                const criteria: DocumentationInterface.ICheckPointCriteria = {
-                    partnerIds: [...new Set(surchargesCheckPoint.map(x => x.paymentObjectId))],
-                    hblId: this.opsTransaction.hblid,
-                    transactionType: 'DOC',
-                    type: 5,
-                    settlementCode: null,
-                };
-                return this._documentRepo.validateCheckPointMultiplePartner(criteria)
-            }
-            return of({ data: null, message: null, status: true });
-        })
-    )
-
-        this.action = { action: 'copy' };
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
-            queryParams: this.action
         });
     }
 
+    duplicateConfirm() {
+        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            partnerIds: partnerIds,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            transactionType: 'DOC',
+                            type: 6,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.action = { action: 'copy' };
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
+                            queryParams: this.action
+                        });
+                    }
+                }
+            )
+    }
+
     lockShipment() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             body: 'Do you want to lock this shipment ?',
             labelConfirm: 'Yes'
         }, () => {
             this.onLockShipment();
-        })
+        });
     }
 
     onLockShipment() {
@@ -410,7 +413,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     showSyncHBL() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Sync HAWB',
             body: this.confirmSyncHBLText,
             labelConfirm: 'Yes'
@@ -423,7 +426,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this.formCreateComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
@@ -469,12 +475,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
         if (isEdited) {
-            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
                 body: 'All entered data will be discard. Are you sure you want to leave?',
                 labelConfirm: 'Yes'
             }, () => {
                 this.confirmCancel();
-            })
+            });
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -502,7 +508,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
         // * Trường hợp user confirm cancel
         if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
-            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
                 body: 'All entered data will be discard. Are you sure you want to leave?',
                 labelConfirm: 'Yes'
             }, () => {
@@ -515,8 +521,22 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 }
 

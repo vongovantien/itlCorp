@@ -594,33 +594,27 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     onSubmitDuplicateConfirm() {
-        forkJoin([
-            this._documentRepo.getSurchargeByHbl(CommonEnum.SurchargeTypeEnum.SELLING_RATE, this.opsTransaction.hblid),
-            this._documentRepo.getSurchargeByHbl(CommonEnum.SurchargeTypeEnum.OBH, this.opsTransaction.hblid)
-        ]).pipe(
-            takeUntil(this.ngUnsubscribe),
-            switchMap((data: any[]) => {
-                const surchargesCheckPoint = [...data[0], ...data[1]];
-                if (!!surchargesCheckPoint.length) {
-                    const criteria: DocumentationInterface.ICheckPointCriteria = {
-                        partnerIds: [...new Set(surchargesCheckPoint.map(x => x.paymentObjectId))],
-                        hblId: this.opsTransaction.hblid,
-                        transactionType: 'DOC',
-                        type: 5,
-                        settlementCode: null,
-                    };
-                    return this._documentRepo.validateCheckPointMultiplePartner(criteria)
-                }
-                return of({ data: null, message: null, status: true });
-            })
-        )
+        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, 'CL')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            partnerIds: partnerIds,
+                            hblId: this.opsTransaction.hblid,
+                            transactionType: 'CL',
+                            type: 5,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.editForm.isSubmitted = false;
-                        // this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-                        //     queryParams: { action: 'copy' }
-                        // });
                         this.tab = 'job-edit'
                         this.isDuplicate = true;
                         this.editForm.isJobCopy = this.isDuplicate;

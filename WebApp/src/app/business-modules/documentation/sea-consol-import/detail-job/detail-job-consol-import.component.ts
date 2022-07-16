@@ -9,7 +9,7 @@ import { DocumentationRepo } from '@repositories';
 import { ICanComponentDeactivate } from '@core';
 import { CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, SubHeaderComponent, ReportPreviewComponent } from '@common';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';
@@ -30,14 +30,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild("deleteConfirmTemplate") confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment") confirmLockShipmentPopup: ConfirmPopupComponent;
-    @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
-
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
@@ -64,9 +56,8 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
 
         this._progressRef = this._ngProgressService.ref();
+        this.requestCancel = this.handleCancelForm;
     }
-
-
 
     ngAfterViewInit() {
         this.subscription = combineLatest([
@@ -152,7 +143,10 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     onUpdateShipmentDetail() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelUpdate = this.onSubmitData();
@@ -270,14 +264,22 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
             )
             .subscribe((value: number) => {
                 if (value === 403) {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
                     return;
                 }
                 if (value === 200) {
-                    this.confirmDeletePopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You you sure you want to delete this Job?',
+                        title: 'Alert',
+                        labelConfirm: 'Yes',
+                    }, () => {
+                        this.onDeleteJob();
+                    });
                     return;
                 } else {
-                    this.canNotDeleteJobPopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You are not allowed to delete this job?',
+                    });
                 }
             });
     }
@@ -289,7 +291,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.confirmDeletePopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -304,12 +305,15 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     }
 
     lockShipment() {
-        this.confirmLockShipmentPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to lock this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onLockShipment();
+        });
     }
 
     onLockShipment() {
-        this.confirmLockShipmentPopup.hide();
-
         this._progressRef.start();
         this._documenRepo.LockCsTransaction(this.jobId)
             .pipe(
@@ -331,10 +335,23 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
             );
     }
 
+    showSyncHBL() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Sync HAWB',
+            body: this.confirmSyncHBLText,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onSyncHBL();
+        })
+    }
+
     onSyncHBL() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
@@ -369,15 +386,42 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     }
 
     showDuplicateConfirm() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Duplicate job detail',
+            body: 'The system will open the Job Create Screen. Are you sure you want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.duplicateConfirm();
+        });
     }
 
     duplicateConfirm() {
-        this.action = { action: 'copy' };
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
-        });
-        this.confirmDuplicatePopup.hide();
+        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            partnerIds: partnerIds,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            transactionType: 'DOC',
+                            type: 6,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.action = { action: 'copy' };
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], {
+                            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+                        });
+                    }
+                }
+            )
     }
 
     gotoList() {
@@ -392,7 +436,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -407,7 +451,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -418,7 +462,12 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
         if (isEdited) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            });
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -426,7 +475,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     }
 
     confirmCancel() {
-        this.confirmCancelPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -445,7 +493,12 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
 
         if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            });
             return;
         }
 
@@ -454,7 +507,21 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 }

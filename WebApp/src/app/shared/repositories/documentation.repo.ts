@@ -1231,5 +1231,8 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointMultiplePartner`, body);
     }
 
-    getPartnerForCheckPointInShipment
+    getPartnerForCheckPointInShipment(id: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartnerForCheckPointInShipment`, { id, transactionType });
+
+    }
 }

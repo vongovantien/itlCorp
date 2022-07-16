@@ -27,10 +27,7 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
 })
 
 export class AirExportCreateJobComponent extends AppForm implements OnInit {
-
-    // @ViewChild(ShareBusinessFormCreateAirComponent, { static: false }) formCreateComponent: ShareBusinessFormCreateAirComponent;
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
@@ -43,6 +40,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         protected _store: Store<IShareBussinessState>
     ) {
         super();
+        this.requestCancel = this.gotoList;
     }
 
     ngOnInit() {
@@ -70,7 +68,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     checkValidateForm() {
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
-                                                    || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
+            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
             valid = false;
         }
         return valid;
@@ -80,7 +78,10 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         this.formCreateComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -134,6 +135,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         this.formImportJobDetailPopup.selectedShipment = null;
         this.formImportJobDetailPopup.show();
     }
+
     importJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(
