@@ -387,7 +387,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");
-                        this.getDetailSOA(this.soa.soano, this.soa.currency);
+                        this.soa.syncStatus = "Synced";
+                        // this.getDetailSOA(this.soa.soano, this.soa.currency);
                     } else {
                         this._toastService.error("Send Data Fail");
                     }

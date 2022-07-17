@@ -3321,7 +3321,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //Sắp xếp giảm dần theo số Job
-            soaCharges = soaCharges.ToArray().OrderByDescending(o => o.JobNo).ToList();
+            // soaCharges = soaCharges.ToArray().OrderByDescending(o => o.JobNo).ToList();
 
             //Info Company, Office of User Created SOA
             //var company = sysCompanyRepo.Get(x => x.Id == soa.CompanyId).FirstOrDefault();

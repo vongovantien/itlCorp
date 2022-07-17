@@ -85,7 +85,7 @@ export class ShareBussinessEffects {
             ofType<TransactionActions>(TransactionActionTypes.GET_PROFIT),
             map((payload: any) => payload.payload),
             mergeMap(
-                (jobId: string) => this._documentRepo.getShipmentTotalProfit(jobId)
+                (jobId: string) => this._documentRepo.GetShipmentTotalProfit(jobId)
                     .pipe(
                         map((data: ITransactionProfit[]) => new TransactionGetProfitSuccessAction(data)),
                         catchError(err => of(new TransactionGetProfitFailFailAction(err)))

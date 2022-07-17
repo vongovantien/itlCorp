@@ -118,13 +118,13 @@ export class FormAddPartnerComponent extends AppForm {
     creditPayments: Array<string> = ['Credit', 'Direct'];
 
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
-    
+
     banks: Observable<Bank[]>;
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name EN' },
     ];
-    bankCode:AbstractControl;
+    bankCode: AbstractControl;
 
     constructor(
         private _fb: FormBuilder,
@@ -300,7 +300,7 @@ export class FormAddPartnerComponent extends AppForm {
             partnerAccountRef: [],
             taxCode: [null, Validators.compose([
                 Validators.maxLength(14),
-                Validators.minLength(7),
+                Validators.minLength(8),
                 Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
                 Validators.required
             ])],
@@ -443,7 +443,7 @@ export class FormAddPartnerComponent extends AppForm {
                 this.bankName.setValue(data.bankNameEn);
                 this.bankCode.setValue(data.code);
                 break;
-            default:    
+            default:
                 break;
         }
     }
@@ -538,7 +538,7 @@ export class FormAddPartnerComponent extends AppForm {
             internalCode: partner.internalCode,
             creditPayment: partner.creditPayment,
             bankName: partner.bankName,
-            bankCode:partner.bankCode
+            bankCode: partner.bankCode
         });
         if (this.partnerAccountRef.value !== partner.parentId) {
             this.isDisabled = false;
@@ -605,5 +605,5 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
-    
+
 }

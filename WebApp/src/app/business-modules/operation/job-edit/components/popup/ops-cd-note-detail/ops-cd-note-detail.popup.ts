@@ -373,7 +373,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");
-                        this.getDetailCdNote(this.jobId, this.cdNote);
+                        // this.getDetailCdNote(this.jobId, this.cdNote);
+                        this.CdNoteDetail.syncStatus = AccountingConstants.SYNC_STATUS.SYNCED;
                         // Gọi onDelete để refresh lại list cd note
                         this.onDeleted.emit();
                     } else {

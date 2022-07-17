@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.AccountReceivable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
@@ -189,9 +190,17 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost("UpdateDueDateAndOverDaysAfterChangePaymentTerm")]
         [Authorize]
-        public IActionResult UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
+        public async Task<IActionResult> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
         {
-            var result = accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            var result = await accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            List<string> partnerIds = new List<string> { contractModel.PartnerId };
+          
+            Response.OnCompleted(async () =>
+            {
+                CalculateOverDue1To15(partnerIds);
+                CalculateOverDue15To30(partnerIds);
+                CalculateOverDue30(partnerIds);
+            });
             return Ok(result);
         }
 
@@ -256,6 +265,21 @@ namespace eFMS.API.Accounting.Controllers
         public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
             var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
+
+        [HttpPut("MoveSalesmanReceivableData")]
+        [Authorize]
+        public async Task<IActionResult> MoveSalesmanReceivableData(AccountReceivableMoveDataSalesman model)
+        {
+            var hs = await accountReceivableService.MoveReceivableData(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)

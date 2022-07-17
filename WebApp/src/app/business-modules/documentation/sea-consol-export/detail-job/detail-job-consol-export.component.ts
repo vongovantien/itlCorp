@@ -95,7 +95,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
             (jobId: string) => {
                 if (!!jobId) {
                     if (isUUID(jobId)) {
-                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                        if (this.selectedTab === this.tabList[0]) {
+                            this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                        }
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: jobId }));
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 

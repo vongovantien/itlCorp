@@ -13,6 +13,7 @@ export class SystemConstants {
     // Security
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
+    public static readonly USER_ACCESS_PERMISSION = 'USER_ACCESS_PERMISSION';
     public static readonly ACCESS_TOKEN = 'access_token';
     public static readonly ID_TOKEN = 'id_token';
     public static readonly ISCHANGE_OFFICE = 'ISCHANGE_OFFICE';

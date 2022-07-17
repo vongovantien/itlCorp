@@ -1274,7 +1274,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             try
             {
-                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, "Air Export - NCTS & ALS"));
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.PHIEU_CAN_NCTS_ALS_Template));
                 var path = f.FullName;
                 if (!File.Exists(path))
                 {

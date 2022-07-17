@@ -92,7 +92,7 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
             queryParams: {
                 partnerId: partnerId,
                 salemanId: salemanId,
-                subTab: 'other',
+                subTab: 'noAgreement',
             }
         });
 

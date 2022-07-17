@@ -72,15 +72,33 @@ namespace eFMS.IdentityServer.DL.Services
             result.Active = active;
             return result;
         }
-        public int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, PermissionInfo permissionInfo)
-        {
+        public int Login(string username, string password, Guid companyId, out LoginReturnModel modelReturn, string userType, PermissionInfo permissionInfo)
+        {           
             SearchResult ldapInfo = null;
             bool isAuthenticated = false;
             SysUserLevel userLevel = null;
             PermissionInfo info = null;
-
+            
             SysUser sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
+            if (userType == "Super Admin")
+            {
+                SysUserLevel levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
+                userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
+                info = new PermissionInfo
+                {
+                    OfficeID = userLevel.OfficeId,
+                    DepartmentID = userLevel.DepartmentId != null ? (short)userLevel.DepartmentId : (short?)null,
+                    GroupID = userLevel.GroupId,
+                    CompanyID = userLevel.CompanyId
+                };
 
+                modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
+                modelReturn.companyId = companyId;
+
+                LogUserLogin(sysUser, companyId);
+
+                return 1;
+            }
             if (sysUser == null)
             {
                 modelReturn = null;

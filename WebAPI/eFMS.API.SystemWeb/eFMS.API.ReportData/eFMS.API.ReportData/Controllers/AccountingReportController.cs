@@ -615,6 +615,7 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+
         [Route("ExportCombineOps")]
         [HttpPost]
         [Authorize]
@@ -639,6 +640,34 @@ namespace eFMS.API.ReportData.Controllers
                 return null;
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No, stream, "SOA OPS");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        [Route("ExportCombineShipment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportCombineShipment(AcctCombineBillingCriteria criteria)
+        {
+            HttpResponseMessage responseFromApi;
+            var accessToken = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(criteria.Currency))
+            {
+                responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataCombineshipmentUrl + criteria.ReferenceNo[0], accessToken);
+            }
+            else
+            {
+                responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataCombineShipmentByPartnerUrl, accessToken);
+            }
+            var dataObjects = responseFromApi.Content.ReadAsAsync<CombineShipmentModel>();
+
+            var stream = new AccountingHelper().GenerateCombineShipmentExcel(dataObjects.Result, criteria);
+
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(dataObjects.Result.No, stream, "Combine Billing By Job");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
