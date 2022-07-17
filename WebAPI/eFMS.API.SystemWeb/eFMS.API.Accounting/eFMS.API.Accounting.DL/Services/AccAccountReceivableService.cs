@@ -1704,48 +1704,48 @@ namespace eFMS.API.Accounting.DL.Services
                 //    arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
 
-            var res = new List<AccountReceivableResult>();
-            res = arPartnerContracts.ToList();
+            //var res = new List<AccountReceivableResult>();
+            //res = arPartnerContracts.ToList();
 
-            res = res.Where(x => x.DebitAmount > 0).ToList();
+            var res = arPartnerContracts.Where(x => x.DebitAmount > 0);
 
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
-                res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo).ToList();
+                res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo);
             if (criteria.AgreementStatus != null && criteria.AgreementStatus != "All")
-                res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
+                res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus);
             if (criteria.AgreementExpiredDay != null && criteria.AgreementExpiredDay != "All")
             {
                 switch (criteria.AgreementExpiredDay)
                 {
                     case "Normal":
-                        res = res.Where(x => x.ExpriedDay > 30).ToList();
+                        res = res.Where(x => x.ExpriedDay > 30);
                         break;
                     case "30Day":
-                        res = res.Where(x => x.ExpriedDay == 30).ToList();
+                        res = res.Where(x => x.ExpriedDay == 30);
                         break;
                     case "15Day":
-                        res = res.Where(x => x.ExpriedDay <= 15).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 15);
                         break;
                     case "Expired":
-                        res = res.Where(x => x.ExpriedDay <= 0).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 0);
                         break;
                 }
             }
             if (criteria.Staffs != null && criteria.Staffs.Count > 0)
-                res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
+                res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId));
             if (criteria.OfficeIds != null && criteria.OfficeIds.Count > 0)
-                res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId)).ToList();
+                res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId));
 
             switch (criteria.OverDueDay)
             {
                 case OverDueDayEnum.Over1_15:
-                    res = res.Where(x => x.Over1To15Day > 0).ToList();
+                    res = res.Where(x => x.Over1To15Day > 0);
                     break;
                 case OverDueDayEnum.Over16_30:
-                    res = res.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over16To30Day > 0);
                     break;
                 case OverDueDayEnum.Over30:
-                    res = res.Where(x => x.Over30Day > 0).ToList();
+                    res = res.Where(x => x.Over30Day > 0);
                     break;
                 case OverDueDayEnum.All:
                     break;
