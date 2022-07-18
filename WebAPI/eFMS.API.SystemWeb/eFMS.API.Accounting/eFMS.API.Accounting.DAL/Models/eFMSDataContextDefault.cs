@@ -45,6 +45,7 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<CatPartnerEmail> CatPartnerEmail { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
+        public virtual DbSet<CsLinkCharge> CsLinkCharge { get; set; }
         public virtual DbSet<CsMawbcontainer> CsMawbcontainer { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
@@ -662,6 +663,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DueDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
 
@@ -2478,6 +2481,88 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.UnitType)
                     .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CsLinkCharge>(entity =>
+            {
+                entity.ToTable("csLinkCharge");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeLinkId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChargeOrgId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.HbllinkId)
+                    .HasColumnName("HBLLinkId")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HblnoLink)
+                    .HasColumnName("HBLNoLink")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HblnoOrg)
+                    .HasColumnName("HBLNoOrg")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HblorgId)
+                    .HasColumnName("HBLOrgId")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.JobNoLink)
+                    .HasColumnName("JobNoLInk")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.JobNoOrg)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LinkChargeType).HasMaxLength(50);
+
+                entity.Property(e => e.MblnoLink)
+                    .HasColumnName("MBLNoLink")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MblnoOrg)
+                    .HasColumnName("MBLNoOrg")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerLinkId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerNameLink)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerOrgId)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)

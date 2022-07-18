@@ -712,7 +712,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                 }
-
+                if (approve.IsValidAutoRate)
+                {
+                    await acctSettlementPaymentService.AutoRateReplicateFromSettle(approve.SettlementNo);
+                }
             });
             return Ok(_result);
         }

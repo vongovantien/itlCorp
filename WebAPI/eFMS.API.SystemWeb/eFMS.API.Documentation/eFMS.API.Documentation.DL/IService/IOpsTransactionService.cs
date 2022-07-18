@@ -37,7 +37,7 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
         Task<HandleState> ReplicateJobs(ReplicateIds model);
         ResultHandle ChargeFromReplicate(string arrJob, out List<Guid> Ids);
-        ResultHandle AutoRateReplicate();
+        ResultHandle AutoRateReplicate(string settleNo, string jobNo);
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
     }
 }

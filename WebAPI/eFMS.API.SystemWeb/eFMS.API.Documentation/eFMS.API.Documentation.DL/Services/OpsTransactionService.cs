@@ -2530,16 +2530,12 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public ResultHandle AutoRateReplicate()
+        public ResultHandle AutoRateReplicate(string settleNo, string jobNo)
         {
-            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
-            string logMessage = string.Format(" *  \n [START]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
-            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
             List<CsShipmentSurcharge> surchargeSells = new List<CsShipmentSurcharge>();
             var hs = new ResultHandle();
             var surchargesAddHis = new List<CsLinkCharge>();
-            var chargesBuyReps = GetChargeAutoRateReplicate();
-            using (var trans = surchargeRepository.DC.Database.BeginTransaction())
+            var chargesBuyReps = GetChargeAutoRateReplicate(settleNo, jobNo);
             {
                 try
                 {
@@ -2559,55 +2555,35 @@ namespace eFMS.API.Documentation.DL.Services
                         surchargesHis.ChargeOrgId = chargeBuy.Id.ToString();
                         surchargesHis.JobNoLink = chargeBuy.JobNo;
                         surchargesHis.ChargeLinkId = surcharge.Id.ToString();
-                        surchargesHis.DatetimeCreated = DateTime.Now;
-                        surchargesHis.UserCreated = DocumentConstants.USER_EFMS_SYSTEM;
+                        surchargesHis.DatetimeCreated = surchargesHis.DatetimeModified = DateTime.Now;
+                        surchargesHis.UserCreated = surchargesHis.UserModified = DocumentConstants.USER_EFMS_SYSTEM;
                         surchargesHis.LinkChargeType = "AUTO_RATE";
 
                         surchargesAddHis.Add(surchargesHis);
                     }
                     var result = new HandleState();
-                    if (surchargeSells.Count > 0)
+                    if (surchargeSells.Count > 0 || surchargesAddHis.Count > 0)
                     {
-                        logMessage = string.Format(" *  \n [SURCHARGE_SELLS]: {0} * ", JsonConvert.SerializeObject(surchargeSells));
-                        new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
-
-                        surchargeRepository.Add(surchargeSells, false);
-                        result = surchargeRepository.SubmitChanges();
+                        var resultUpd = databaseUpdateService.InsertChargesAutoRateToDB(surchargeSells, surchargesAddHis);
+                        if(resultUpd.TotalRowAffected > 0)
+                        {
+                            result = new HandleState(resultUpd.Status, (object)"AUTORATEREPLICATE SCCUESS");
+                        }
+                        else
+                        {
+                            result = new HandleState(resultUpd.Status, (object)"AUTORATEREPLICATE CHARGE EMPTY");
+                        }
                     }
-                    if (surchargesAddHis.Count > 0)
-                    {
-                        csLinkChargeRepository.Add(surchargesAddHis, false);
-                        result = csLinkChargeRepository.SubmitChanges();
-                    }
-
-                    if (result.Success)
-                    {
-                        trans.Commit();
-                        hs.Status = true;
-                        hs.Message = "AUTORATEREPLICATE SCCUESS";
-                    }
-                    else
-                    {
-                        trans.Rollback();
-                        hs.Status = true;
-                        hs.Message = "AUTORATEREPLICATE CHARGE EMPTY";
-                    }
+                    new LogHelper("eFMS_AUTORATEREPLICATE", "Success: " + result.Success + "\n Status: " + result.Message + "\n SettleNo/JobNo: " + (!string.IsNullOrEmpty(settleNo) ? settleNo : jobNo)
+                        + "\n Surcharges: " + JsonConvert.SerializeObject(chargesBuyReps));
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
                     new LogHelper("eFMS_AUTORATEREPLICATE", ex.ToString());
                     hs.Status = false;
                     hs.Message = "AUTORATEREPLICATE FALSE";
                 }
-                finally
-                {
-                    trans.Dispose();
-                }
             }
-            logMessage = string.Format(" *  \n [END]: {0} * ", DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
-            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", logMessage);
-            new LogHelper("[EFMS_OPSTRANSACTIONSERVICE_AUTORATEREPLICATE]", "\n-------------------------------------------------------------------------\n");
             return hs;
         }
 
@@ -2682,7 +2658,8 @@ namespace eFMS.API.Documentation.DL.Services
                 surcharge.PaymentObjectId = chargeBuy.PartnerInternal_Id;
                 surcharge.OfficeId = chargeBuy.OfficeId_JobRep;
             }
-            surcharge.DatetimeCreated = DateTime.Now;
+            surcharge.UserCreated = surcharge.UserModified = DocumentConstants.USER_EFMS_SYSTEM;
+            surcharge.DatetimeCreated = surcharge.DatetimeModified = DateTime.Now;
             return surcharge;
         }
         public async Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list)
@@ -2726,9 +2703,20 @@ namespace eFMS.API.Documentation.DL.Services
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeReplicateToLinkCharge>(parameters);
             return listSurcharges;
         }
-        private List<sp_GetChargeAutoRateReplicate> GetChargeAutoRateReplicate()
+
+        /// <summary>
+        /// Get Charge AutoRate Replicate
+        /// </summary>
+        /// <param name="settleNo"></param>
+        /// <param name="jobNo"></param>
+        /// <returns></returns>
+        private List<sp_GetChargeAutoRateReplicate> GetChargeAutoRateReplicate(string settleNo, string jobNo)
         {
-            var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeAutoRateReplicate>();
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@settlementNo", Value = settleNo},
+                new SqlParameter(){ ParameterName = "@jobNo", Value = jobNo}
+            };
+            var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeAutoRateReplicate>(parameters);
             return listSurcharges;
         }
     }

@@ -412,11 +412,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(hs);
         }
 
+        /// <summary>
+        /// Calling AutoRateReplicate
+        /// </summary>
+        /// <param name="settleNo">Settlement Code</param>
+        /// <param name="jobNo">Job No</param>
+        /// <returns></returns>
         [HttpGet("AutoRateReplicate")]
-        public IActionResult AutoRateReplicate()
+        public IActionResult AutoRateReplicate(string settleNo, string jobNo)
         {
             currentUser.Action = "AutoRateReplicate";
-            ResultHandle hs = transactionService.AutoRateReplicate();
+            ResultHandle hs = transactionService.AutoRateReplicate(settleNo, jobNo);
             if (!hs.Status)
                 return BadRequest(hs);
             return Ok(hs);
