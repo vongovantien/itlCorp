@@ -21,7 +21,7 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
     serviceType: CommonType.SERVICE_TYPE = 'air';
 
     constructor(
-        private _router: Router,
+        protected _router: Router,
         protected _store: Store<IShareBussinessState>,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
@@ -31,7 +31,7 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         protected _activedRoute: ActivatedRoute
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
     }
 
     gotoList() {
@@ -76,12 +76,6 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
         }
-    }
-
-    duplicateConfirm() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
-        });
     }
 
     listenShortcutMovingTab() {

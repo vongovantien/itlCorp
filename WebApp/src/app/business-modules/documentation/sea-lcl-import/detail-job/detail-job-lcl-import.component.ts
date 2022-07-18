@@ -306,10 +306,9 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 switchMap((partnerIds: string[]) => {
                     if (!!partnerIds.length) {
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
-                            partnerIds: partnerIds,
-                            hblId: SystemConstants.EMPTY_GUID,
+                            data: partnerIds,
                             transactionType: 'DOC',
-                            type: 6,
+                            type: 5,
                             settlementCode: null,
                         };
                         return this._documenRepo.validateCheckPointMultiplePartner(criteria)

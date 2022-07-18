@@ -600,8 +600,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 switchMap((partnerIds: string[]) => {
                     if (!!partnerIds.length) {
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
-                            partnerIds: partnerIds,
-                            hblId: this.opsTransaction.hblid,
+                            data: partnerIds,
                             transactionType: 'CL',
                             type: 5,
                             settlementCode: null,

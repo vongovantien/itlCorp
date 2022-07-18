@@ -18,7 +18,7 @@ import { RoutingConstants } from '@constants';
 })
 export class SeaFCLImportHBLComponent extends AppShareHBLBase {
     constructor(
-        private _router: Router,
+        protected _router: Router,
         protected _sortService: SortService,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
@@ -28,19 +28,19 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
         protected _spinner: NgxSpinnerService,
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
     }
 
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
                 break;
             case 'cdNote':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
@@ -65,7 +65,7 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
     }
 
     gotoCreate() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/new`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/new`]);
     }
 
 
@@ -77,7 +77,7 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/${id}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${id}`]);
                     } else {
                         this.info403Popup.show();
                     }
@@ -85,13 +85,7 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
             );
     }
 
-    duplicateConfirm() {
-        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
-        });
-    }
-
     gotoList() {
-        this._router.navigate(["home/documentation/sea-fcl-import"]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}`]);
     }
 }

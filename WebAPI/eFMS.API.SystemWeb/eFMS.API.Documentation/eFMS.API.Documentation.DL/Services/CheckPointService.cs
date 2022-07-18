@@ -293,11 +293,11 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria criteria)
         {
             HandleState result = new HandleState();
-            if (criteria.PartnerIds.Count == 0) return result;
-
-            foreach (var partner in criteria.PartnerIds)
+            if (criteria.Data.Count == 0) return result;
+          
+            foreach (var partner in criteria.Data)
             {
-                var isValid = ValidateCheckPointPartnerSurcharge(partner, Guid.Parse(criteria.Hblid), criteria.TransactionType, criteria.Type, criteria.SettlementCode);
+                var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
                 if (!isValid.Success)
                 {
                     return isValid;
@@ -560,9 +560,9 @@ namespace eFMS.API.Documentation.DL.Services
             return isApply;
         }
 
-        public List<string> GetPartnerForCheckPointInShipment(Guid Id, string transactionType)
+        public List<CheckPointPartnerHBLDataGroup> GetPartnerForCheckPointInShipment(Guid Id, string transactionType)
         {
-            List<string> partners = new List<string>();
+            List<CheckPointPartnerHBLDataGroup> partners = new List<CheckPointPartnerHBLDataGroup>();
             IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
             Expression<Func<CsShipmentSurcharge, bool>> querySurcharge = x => x.OfficeId != HM
                 && x.OfficeId != BH
@@ -581,7 +581,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (surcharges.Count() > 0)
             {
-                partners = surcharges.Select(x => x.PaymentObjectId).Distinct().ToList();
+                partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
             }
 
             return partners;

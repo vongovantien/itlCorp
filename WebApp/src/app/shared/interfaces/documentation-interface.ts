@@ -13,9 +13,8 @@ namespace DocumentationInterface {
     }
 
     export interface ICheckPointCriteria {
-        partnerIds: string[];
+        data: string[];
         settlementCode: string;
-        hblId: string;
         type: number;
         /*
          1 - SHIPMENT
@@ -27,5 +26,6 @@ namespace DocumentationInterface {
          7 - Preview HBL
         */
         transactionType: string;
+        [name: string]: any;
     }
 }

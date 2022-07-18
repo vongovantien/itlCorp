@@ -224,14 +224,14 @@ namespace eFMS.API.Documentation.Controllers
             var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE)).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
-                CheckPointCriteria CheckPointCriteria = new CheckPointCriteria
-                {
-                    PartnerIds = partnersNeedValidate.Select(x => x.PaymentObjectId).Distinct().ToList(),
-                    Hblid = partnersNeedValidate.FirstOrDefault().Hblid.ToString(),
-                    TransactionType = "DOC",
-                    Type = CHECK_POINT_TYPE.SURCHARGE
-                };
-                var hsCheckpoint = checkPointService.ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria);
+                //CheckPointCriteria CheckPointCriteria = new CheckPointCriteria
+                //{
+                //    PartnerIds = partnersNeedValidate.Select(x => x.PaymentObjectId).Distinct().ToList(),
+                //    Hblid = partnersNeedValidate.FirstOrDefault().Hblid.ToString(),
+                //    TransactionType = "DOC",
+                //    Type = CHECK_POINT_TYPE.SURCHARGE
+                //};
+                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[0].PaymentObjectId, partnersNeedValidate[0].Hblid, "DOC", CHECK_POINT_TYPE.SURCHARGE, null);
                 if (!hsCheckpoint.Success)
                 {
                     return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
@@ -779,13 +779,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost("ValidateCheckPointMultiplePartner")]
         [Authorize]
         public IActionResult ValidateCheckPointMultiplePartner(CheckPointCriteria criteria)
-        {
-            Guid _hblId = Guid.Empty;
-            if (!string.IsNullOrEmpty(criteria.Hblid))
-            {
-                _hblId = Guid.Parse(criteria.Hblid);
-            }
-
+        {           
             HandleState hs = checkPointService.ValidateCheckPointMultiplePartnerSurcharge(criteria);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
 

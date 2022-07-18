@@ -4,7 +4,7 @@ import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
 import { getHBLSState, IShareBussinessState, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction, LoadListPartnerForKeyInSurcharge } from "../../store";
 import { Store } from "@ngrx/store";
-import { Params, ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ViewChild, Directive } from "@angular/core";
@@ -13,10 +13,11 @@ import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
-import { takeUntil, catchError, finalize, map } from "rxjs/operators";
+import { takeUntil, catchError, finalize, map, switchMap } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
-import { combineLatest } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 
 @Directive()
@@ -45,6 +46,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     spinnerSurcharge: string = 'spinnerSurcharge';
 
     serviceType: CommonType.SERVICE_TYPE = 'sea';
+    transactionType: string;
 
     constructor(
         protected _sortService: SortService,
@@ -53,8 +55,8 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         protected _progressService: NgProgress,
         protected _toastService: ToastrService,
         protected _documentRepo: DocumentationRepo,
-        protected _activedRoute: ActivatedRoute
-
+        protected _activedRoute: ActivatedRoute,
+        protected _router: Router
 
     ) {
         super();
@@ -66,9 +68,10 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     ngOnInit() {
         this.subscription = combineLatest([
             this._activedRoute.params,
-            this._activedRoute.queryParams
+            this._activedRoute.queryParams,
+            this._activedRoute.data
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams })),
+            map(([params, qParams, qData]) => ({ ...params, ...qParams, ...qData })),
             takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (param: any) => {
@@ -76,6 +79,9 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                     this.jobId = param.jobId;
                     if (param.selected) {
                         this.selectedHblId = param.selected;
+                    }
+                    if (param.serviceId) {
+                        this.transactionType = param.serviceId;
                     }
 
                     this._store.dispatch(new GetListHBLAction({ jobId: this.jobId }));
@@ -91,16 +97,6 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
 
         this.isLocked = this._store.select(getTransactionLocked);
         this.isLoading = this._store.select(getHBLLoadingState);
-
-        // this._store.select(getSurchargeLoadingState).subscribe(
-        //     (loading: boolean) => {
-        //         if (loading) {
-        //             this._spinner.show(this.spinnerSurcharge);
-        //         } else {
-        //             this._spinner.hide(this.spinnerSurcharge);
-        //         }
-        //     }
-        // );
 
         this.listenShortcutMovingTab();
     }
@@ -353,11 +349,39 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             );
     }
 
+    duplicateConfirm() {
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, this.transactionType)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            data: partnerIds,
+                            transactionType: 'DOC',
+                            type: 5,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], {
+                            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
+                        });
+                    }
+                }
+            )
+
+    }
+
     abstract gotoList(): void;
     abstract gotoCreate(): void;
     abstract gotoDetail(id: string): void;
     abstract onSelectTab(tabName: string): void;
-    abstract duplicateConfirm(): void;
+    // abstract duplicateConfirm(): void;
 
     public listenShortcutMovingTab(): void { }
 
