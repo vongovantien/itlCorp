@@ -131,7 +131,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     initForm() {
         this.formMail = this._fb.group({
-            from: this.serviceId !== ChargeConstants.AI_CODE ? null : ['',
+            from: ['',
                 Validators.compose([
                     Validators.required,
                     Validators.pattern(SystemConstants.CPATTERN.EMAIL_SINGLE)
