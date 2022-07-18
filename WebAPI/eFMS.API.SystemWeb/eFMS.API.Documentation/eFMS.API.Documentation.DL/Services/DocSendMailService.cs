@@ -193,13 +193,14 @@ namespace eFMS.API.Documentation.DL.Services
             var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
             var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
             var incoterm = catIncotermRepo.Get(x => x.Id == _housebill.IncotermId).FirstOrDefault()?.Code;
-            incoterm = string.IsNullOrEmpty(incoterm) ? string.Empty : ("/ " + incoterm);
 
             var mawb = string.IsNullOrEmpty(_housebill.Mawb) ? shipmentInfo.Mawb : _housebill.Mawb;
             var flightNo = string.IsNullOrEmpty(_housebill.FlightNo) ? shipmentInfo.FlightVesselName : _housebill.FlightNo;
             flightNo = string.IsNullOrEmpty(flightNo) ? string.Empty : ("/ " + flightNo);
+            var remark = string.IsNullOrEmpty(_housebill.Remark) ? _housebill.ShippingMark : _housebill.Remark;
             //string _subject = string.Format(@"Pre-alert {0}/{1} {2}", _pol?.Code, _pod?.Code, _housebill.Hwbno);
-            string _subject = string.Format(@"PRE-ALERT{0} {1} / {2} / {3} {4} / Remark", incoterm, polPod, mawb, _housebill.Hwbno, flightNo);
+            string _subject = string.Format(@"PRE-ALERT{0} {1} / {2} / {3} {4} {5}", string.IsNullOrEmpty(incoterm) ? string.Empty : ("/ " + incoterm), polPod, mawb, _housebill.Hwbno, flightNo,
+                string.IsNullOrEmpty(remark) ? string.Empty : ("/ " + remark.Replace("\n"," ")));
             string _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div><div>Please find attd docs and confirm receipt for below Pre-Alert.</div><br/>
                                             <div>{0}</div>
                                             <div>MAWB : {1}</div>
@@ -222,15 +223,19 @@ namespace eFMS.API.Documentation.DL.Services
                 _shipper?.PartnerNameEn,
                 _consignee?.PartnerNameEn,
                 _housebill.PackageQty,
-                _housebill.GrossWeight,
-                _housebill.ChargeWeight,
+                string.Format("0:n2", _housebill.GrossWeight),
+                string.Format("0:n2", _housebill.ChargeWeight),
                 incoterm,
-                string.IsNullOrEmpty(_housebill.Remark) ? _housebill.ShippingMark : _housebill.Remark);
+                remark);
 
             // Get email from of person in charge
-            var _picId = shipmentInfo?.PersonIncharge;
+            var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault().Email; //Email to
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            }
 
             var emailContent = new EmailContentModel();
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
