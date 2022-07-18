@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepo;
         private readonly IContextBase<CatDepartment> catDepartmentRepo;
+        private readonly IContextBase<CatIncoterm> catIncotermRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
@@ -54,6 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysSentEmailHistory> sentEmailHistory,
             IContextBase<SysEmailTemplate> sysEmailTemplate,
             IContextBase<CatDepartment> catDepartment,
+            IContextBase<CatIncoterm> catIncoterm,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -69,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
             apiServiceUrl = serviceUrl;
             sysEmailTemplateRepo = sysEmailTemplate;
             catDepartmentRepo = catDepartment;
+            catIncotermRepo = catIncoterm;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -179,31 +182,61 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
             if (_housebill == null) return null;
-            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
-            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
-            var _pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault(); // Departure Airport
-            var _pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault(); // Destination Airpor
+            var shipmentInfo = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            //var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            //var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.Code; // Departure Airport
+            _pol = string.IsNullOrEmpty(_pol) ? string.Empty : _pol;
+            var _pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault()?.Code; // Destination Airpor
+            var polPod = (!string.IsNullOrEmpty(_pol) && !string.IsNullOrEmpty(_pod)) ? string.Format("/ {0}-{1}", _pol, _pod) : ("/ " + _pol + _pod);
+
             var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
             var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var incoterm = catIncotermRepo.Get(x => x.Id == _housebill.IncotermId).FirstOrDefault()?.Code;
+            incoterm = string.IsNullOrEmpty(incoterm) ? string.Empty : ("/ " + incoterm);
 
-            string _subject = string.Format(@"Pre-alert {0}/{1} {2}", _pol?.Code, _pod?.Code, _housebill.Hwbno);
-            string _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div><div>Enclosed pls find attd docs and confirm receipt for below Pre-Alert.</div><br/><div>MAWB : {0} (FREIGHT {1})</div><div>Flight : {2}/{3}. {4} - {5}</div><br/><div>HAWB : {6} (FREIGHT {1})</div><div>Shipper : {7}</div><div>Consignee : {8}</div><div>Notify : {9}</div><div>{10}</div><p>Attached herewith 4 pages ( HAWB, MAWB, CN & MANIFEST ) for your ref. Please check docs and confirm by return. The original Hawb#, Mawb#, and Manifest were enclosed with cargo.</p>",
-                _housebill.Mawb,
-                _housebill.FreightPayment,
+            var mawb = string.IsNullOrEmpty(_housebill.Mawb) ? shipmentInfo.Mawb : _housebill.Mawb;
+            var flightNo = string.IsNullOrEmpty(_housebill.FlightNo) ? shipmentInfo.FlightVesselName : _housebill.FlightNo;
+            flightNo = string.IsNullOrEmpty(flightNo) ? string.Empty : ("/ " + flightNo);
+            //string _subject = string.Format(@"Pre-alert {0}/{1} {2}", _pol?.Code, _pod?.Code, _housebill.Hwbno);
+            string _subject = string.Format(@"PRE-ALERT{0} {1} / {2} / {3} {4} / Remark", incoterm, polPod, mawb, _housebill.Hwbno, flightNo);
+            string _body = string.Format(@"<div><b>Dear Sir/Madam,</b></div><div>Please find attd docs and confirm receipt for below Pre-Alert.</div><br/>
+                                            <div>{0}</div>
+                                            <div>MAWB : {1}</div>
+                                            <div>Flight : {2}/{3}</div>
+                                            <div>HAWB : {4} (FREIGHT {5})</div>
+                                            <div>Shipper : {6}</div>
+                                            <div>Consignee : {7}</div>
+                                            <div>Quantity : {8} // {9} // {10}</div>
+                                            <div>Term : {11}</div>
+                                            <div>Com : </div>
+                                            <div>Remark : {12}</div>
+                                            <div>Attached here with HAWB, Cargo Manifest, MAWB, INV & PKL for your ref. Please check docs and confirm by return. The original {4}, {1}, and Manifest were enclosed with cargo.</div>
+                                            <p>Pls inform us when the cnee pickup the shipment.</p>",
+                (!string.IsNullOrEmpty(_pol) && !string.IsNullOrEmpty(_pod)) ? string.Format("{0} - {1}", _pol, _pod) : (_pol + _pod),
+                mawb,
                 _housebill.FlightNo,
-                (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty,
-                _pol?.Code,
-                _pod?.Code,
+                (_housebill.Etd != null) ? _housebill.Etd.Value.ToString("dd MMM, yyyy") : string.Empty,
                 _housebill.Hwbno,
+                _housebill.FreightPayment,
                 _shipper?.PartnerNameEn,
                 _consignee?.PartnerNameEn,
-                _housebill.Notify,
-                _housebill.HandingInformation);
+                _housebill.PackageQty,
+                _housebill.GrossWeight,
+                _housebill.ChargeWeight,
+                incoterm,
+                string.IsNullOrEmpty(_housebill.Remark) ? _housebill.ShippingMark : _housebill.Remark);
+
+            // Get email from of person in charge
+            var _picId = shipmentInfo?.PersonIncharge;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault().Email; //Email to
 
             var emailContent = new EmailContentModel();
-            emailContent.From = "Info FMS";
-            emailContent.To = string.Empty;
-            emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
+            var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
+            emailContent.From = mailFrom;
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
+            emailContent.Cc = @"air@itlvn.com";
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
@@ -390,7 +423,7 @@ namespace eFMS.API.Documentation.DL.Services
 
 
             var emailContent = new EmailContentModel();
-            emailContent.From = "Info FMS";
+            emailContent.From = @"sea@itlvn.com";
             emailContent.To = _agentDetail?.Email;
             emailContent.Cc = _salemanDetail?.Email; //Email của Current User
             emailContent.Subject = _subject;
