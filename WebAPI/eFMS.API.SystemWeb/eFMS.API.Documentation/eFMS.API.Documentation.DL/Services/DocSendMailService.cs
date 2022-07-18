@@ -223,8 +223,8 @@ namespace eFMS.API.Documentation.DL.Services
                 _shipper?.PartnerNameEn,
                 _consignee?.PartnerNameEn,
                 _housebill.PackageQty,
-                string.Format("0:n2", _housebill.GrossWeight),
-                string.Format("0:n2", _housebill.ChargeWeight),
+                string.Format("{0:n2}", _housebill.GrossWeight),
+                string.Format("{0:n2}", _housebill.ChargeWeight),
                 incoterm,
                 remark);
 
