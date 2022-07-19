@@ -545,13 +545,6 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             this._toastService.warning(`${currentSm.settlementNo} had denied, Please recheck!`);
             return;
         }
-        // this.showPopupDynamicRender<ConfirmPopupComponent>(
-        //     ConfirmPopupComponent,
-        //     this.confirmPopupContainerRef.viewContainerRef,
-        //     { body: `Are you sure you want to deny settle <span class="font-weight-bold">${currentSm.settlementNo}</span> payments ?`, center: true },
-        //     (v: boolean) => {
-        //         this.onDenySettlePayments([currentSm.id]);
-        //     });
         this._accoutingRepo.checkAllowDenySettlement([currentSm.id])
             .subscribe(
                 (res: any) => {
