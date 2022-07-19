@@ -6202,9 +6202,9 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public async Task<ResultHandle> AutoRateReplicateFromSettle(string settleNo)
         {
-            Uri urlExport = new Uri(apiUrl.Value.Url);
-
-            HttpResponseMessage resquest = await HttpClientService.GetApi(urlExport + "api/v1/en-US/OpsTransaction/AutoRateReplicate?settleNo=" + settleNo + "&&jobNo=null", null);
+            Uri urlDocumentation = new Uri(apiUrl.Value.Url);
+            string urlAutorate = new Uri(urlDocumentation, "Documentation/api/v1/en-US/OpsTransaction/AutoRateReplicate?settleNo=" + settleNo + "&&jobNo=null").ToString();
+            HttpResponseMessage resquest = await HttpClientService.GetApi(urlAutorate, null);
             var response = await resquest.Content.ReadAsAsync<ResultHandle>();
             return response;
         }
