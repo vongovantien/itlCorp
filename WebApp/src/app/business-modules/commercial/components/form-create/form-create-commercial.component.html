@@ -51,8 +51,9 @@
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
                                     [attr.disabled]="active ? 'disabled' : null">
-                                <div class="form-control-feedback" *ngIf="isSubmitted || 
-                        ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
+                                <div class="form-control-feedback"
+                                    *ngIf="(isSubmitted &&
+                                ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                                     Tax Code include 8 - 14 characters!
                                 </div>
                                 <div class="form-control-feedback"

@@ -86,7 +86,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && taxCode.invalid }">
+                        [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && (taxCode.invalid|| (taxCode.errors | equalError:'maxlength' || taxCode.errors | equalError:'minlength')) }">
                         <label class="form-control-label" for="">
                             Tax Code <span class="m--font-danger">(*)</span>
                         </label>
@@ -94,8 +94,9 @@
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
-                        <div class="form-control-feedback" *ngIf="isSubmitted || 
-                            ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
+                        <div class="form-control-feedback"
+                            *ngIf="(isSubmitted &&
+                            ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                             Tax Code include 8 - 14 characters!
                         </div>
                         <div class="form-control-feedback"
