@@ -109,8 +109,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             'customerId': [],
             'fieldOps': [],
             'createdDate': [],
-            'linkJobSearch':[],
-            'linkFeeSearch':[]
+            'linkJobSearch': [],
+            'linkFeeSearch': []
         });
 
         this.searchText = this.formSearch.controls['searchText'];
@@ -148,9 +148,9 @@ export class JobManagementFormSearchComponent extends AppForm {
             mblno: this.filterType.value.value === 'mblno' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
             clearanceNo: this.filterType.value.value === 'clearanceNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
             creditDebitInvoice: this.filterType.value.value === 'creditDebitInvoice' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
-            productService: !!this.productService.value ? this.productService.value.id : null,
-            serviceMode: !!this.serviceMode.value ? this.serviceMode.value.id : null,
-            shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.id : null,
+            productService: !!this.productService.value ? this.productService.value : null,
+            serviceMode: !!this.serviceMode.value ? this.serviceMode.value : null,
+            shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value : null,
             serviceDateFrom: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: this.customerId.value,
@@ -161,6 +161,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             linkFeeSearch: !!this.linkFeeSearch.value ? this.linkFeeSearch.value : null
         };
         this.onSearch.emit(body);
+        console.log(body);
+        console.log(this.productService.value);
 
         this._store.dispatch(new fromOpsStore.OPSTransactionSearchListAction(body));
     }
