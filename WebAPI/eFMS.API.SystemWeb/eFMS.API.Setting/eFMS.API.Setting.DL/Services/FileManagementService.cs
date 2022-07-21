@@ -61,9 +61,15 @@ namespace eFMS.API.Setting.DL.Services
                                                 FolderName = shm.JobNo,
                                                 DateTimeCreated = d.DateTimeCreated,
                                                 UserCreated = d.UserCreated,
-                                                ObjectId = d.ObjectId
+                                                ObjectId = d.ObjectId,
+                                                FolderType = shm.TransactionType,
                                             };
-                    query = queryJoinShipment.AsQueryable();
+                    if (!string.IsNullOrEmpty(criteria.FolderType))
+                    {
+                        query = queryJoinShipment.Where(s => s.FolderType == criteria.FolderType).AsQueryable();
+                        break;
+                    }
+                    query = queryJoinShipment.GroupBy(s => s.FolderType).Select(s => s.FirstOrDefault()).AsQueryable();
                     break;
                 case "SOA":
                     var queryJoinSoa = from d in data

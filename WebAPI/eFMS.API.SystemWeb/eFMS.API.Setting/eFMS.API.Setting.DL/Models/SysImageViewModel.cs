@@ -13,5 +13,6 @@ namespace eFMS.API.Setting.DL.Models
         public string UserCreated { get; set; }
         public DateTime? DateTimeCreated { get; set; }
         public string FolderName { get; set; }
+        public string FolderType { get; set; }
     }
 }
