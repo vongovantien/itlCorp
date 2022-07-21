@@ -38,9 +38,7 @@ export class SeaFclExportManifestComponent extends AppList {
         typeButton: ButtonType.save
     };
 
-    cancelButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.cancel
-    };
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     checkAll = false;

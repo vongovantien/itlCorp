@@ -22,18 +22,15 @@
                     Report</a>
             </div>
         </div>
-        <ng-container *ngIf="(isLocked | async) === false">
-            <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
-                    (click)="confirmRefresh.show()">
+        <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+            <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="confirmRefresh.show()">
+                <span>
+                    <i class="la la-refresh"></i>
                     <span>
-                        <i class="la la-refresh"></i>
-                        <span>
-                            Refresh
-                        </span>
+                        Refresh
                     </span>
-                </button>
-            </ng-container>
+                </span>
+            </button>
         </ng-container>
 
         <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">

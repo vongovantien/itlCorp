@@ -30,9 +30,9 @@
         </button>
     </ng-container>
     <div class="c-button-actions">
-        <ng-container *ngIf="shipmentDetail?.isLocked === false || isDuplicate">
+        <ng-container>
             <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
-                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete && !isDuplicate">
+                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete && !isDuplicate && !shipmentDetail.isLocked">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -40,6 +40,7 @@
                     </span>
                 </span>
             </button>
+
             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()"
                 [disabled]="selectedTab !== 'SHIPMENT'" *ngIf="shipmentDetail?.permission?.allowUpdate && !isDuplicate">
             </app-default-button>
