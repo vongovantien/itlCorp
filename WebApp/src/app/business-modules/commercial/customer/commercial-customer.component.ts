@@ -42,6 +42,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     dataSearchs: any = [];
 
+    isSearching: boolean = false;
 
     selectedCustomer: Customer;
 
@@ -136,6 +137,11 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.onSearch(this.dataSearch);
     }
 
+    onSearching(event: CommonInterface.ISearchOption) {
+        this.isSearching = true;
+        this.onSearch(event);
+    }
+
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
         this.dataSearch.partnerType = 'Customer';
@@ -151,20 +157,20 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         //this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
         this._store.select(getCustomerListState)
-        .pipe(
-            takeUntil(this.ngUnsubscribe),
-            map((data: any) => {
-                return {
-                    page:data.page,
-                    pageSize:data.size
-                };
-            })
-        ).subscribe(
-            (res: any) => {
-                this.page=!!res.page?res.page:1,
-                this.pageSize=!!res.pageSize?res.pageSize:15
-            }
-        );
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
+                    return {
+                        page: data.page,
+                        pageSize: data.size
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.page = !!res.page ? res.page : 1,
+                        this.pageSize = !!res.pageSize ? res.pageSize : 15
+                }
+            );
 
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
@@ -249,8 +255,8 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         //             this.totalItems = res.totalItems;
         //         }
         //     );
-
-        this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this._store.dispatch(LoadListCustomer({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this.isSearching = false;
     }
 
     sortPartners() {

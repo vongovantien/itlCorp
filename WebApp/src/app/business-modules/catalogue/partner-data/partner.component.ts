@@ -85,7 +85,6 @@ export class PartnerComponent extends AppList implements OnInit {
     dataSearchs: any = [];
 
 
-
     constructor(private router: Router,
         private _ngProgressService: NgProgress,
         private _exportRepo: ExportRepo,
@@ -131,6 +130,13 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     resetSearch(event) {
+        this.onSearch(event);
+    }
+
+    onSearching(event) {
+        this.allPartnerComponent.isSearching = true;
+        console.log(this.allPartnerComponent.isSearching);
+
         this.onSearch(event);
     }
 

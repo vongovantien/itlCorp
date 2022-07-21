@@ -68,24 +68,24 @@ export class StatementOfAccountComponent extends AppList {
             CurrencyLocal: "VND"
         };
         this._store.select(getDataSearchSOAState)
-          .pipe(
-            withLatestFrom(this._store.select(getSOAPagingState)),
-            takeUntil(this.ngUnsubscribe),
-            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-          )
-          .subscribe(
-            (data: any) => {
-              if (!!data.dataSearch) {
-                this.dataSearch = data.dataSearch;
-              }
-              if (!!data.dataSearch.dataSearch) {
-                this.dataSearch = data.dataSearch.dataSearch;
-              }
-              this.page = data.page;
-              this.pageSize = data.pageSize;
-              this.requestSearchSOA();
-            }
-          );
+            .pipe(
+                withLatestFrom(this._store.select(getSOAPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+                    if (!!data.dataSearch.dataSearch) {
+                        this.dataSearch = data.dataSearch.dataSearch;
+                    }
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+                    this.requestSearchSOA();
+                }
+            );
         this.getSOAs();
     }
 
@@ -125,7 +125,6 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     onSearchSoa(data: any) {
-        this.page = 1;
         this.dataSearch = data;
         this.requestSearchSOA();
         this.getSOAs();
@@ -153,28 +152,30 @@ export class StatementOfAccountComponent extends AppList {
         //         this.totalItems = res.totalItems || 0;
         //     });
         this._store.select(getSOAListState)
-        .pipe(
-            catchError(this.catchError),
-            map((data: any) => {
-                return {
-                    data: !!data ? data.data : [],
-                    totalItems: data.totalItems,
-                };
-            }),
-            takeUntil(this.ngUnsubscribe),
-        )
-        .subscribe(
-            (res: any) => {
-                this.SOAs = res.data || [];
-                this.totalItems = res.totalItems || 0;
-                this.isLoading = false;
-                this._progressRef.complete();
-            },
-        );
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data ? data.data : [],
+                        totalItems: data.totalItems,
+                    };
+                }),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.SOAs = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                    this.isLoading = false;
+                    this._progressRef.complete();
+                },
+            );
     }
 
-    requestSearchSOA(){
-        this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    requestSearchSOA() {
+        if (!!this.dataSearch.isSearching) {
+            this._store.dispatch(LoadListSOA({ page: 1, size: this.pageSize, dataSearch: this.dataSearch }));
+        } else { this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch })); }
     }
 
     sortLocal(sort: string): void {

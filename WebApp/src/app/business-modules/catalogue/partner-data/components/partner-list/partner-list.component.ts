@@ -17,6 +17,7 @@ import { Store } from '@ngrx/store';
 export class PartnerListComponent extends AppList implements OnInit {
     // @Input() type = 0;
     @Input() criteria: any = {};
+    @Input() isSearching: boolean = false;
     @Output() deleteConfirm = new EventEmitter<Partner>();
     @Output() detail = new EventEmitter<Partner>();
     partners: any[] = [];
@@ -51,7 +52,7 @@ export class PartnerListComponent extends AppList implements OnInit {
             .pipe(
                 withLatestFrom(this._store.select(getPartnerDataListPagingState)),
                 takeUntil(this.ngUnsubscribe),
-                map(([dataSearch, pagingData])=>({page:pagingData.page,pageSize:pagingData.pageSize,dataSearch:dataSearch}))
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (data: any) => {
@@ -62,13 +63,13 @@ export class PartnerListComponent extends AppList implements OnInit {
                             this.dataSearchs.type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
                             this.criteria[this.dataSearchs.type] = this.dataSearchs.keyword;
                         }
-                        this.page=data.page;
-                        this.pageSize=data.pageSize;
+                        this.page = data.page;
+                        this.pageSize = data.pageSize;
                     }
 
                 }
             );
-            this._store.select(getPartnerDataListState)
+        this._store.select(getPartnerDataListState)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 map((data: any) => {
@@ -84,7 +85,7 @@ export class PartnerListComponent extends AppList implements OnInit {
                     this.totalItems = res.totalItems || 0;
                 },
             );
-            
+
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
@@ -215,8 +216,10 @@ export class PartnerListComponent extends AppList implements OnInit {
         //             this.totalItems = res.totalItems;
         //         }
         //     );
-            this._store.dispatch(LoadListPartner({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-            
+        console.log(this.isSearching);
+
+        this._store.dispatch(LoadListPartner({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this.isSearching = false;
         // this._store.select(getPartnerDataListState)
         //     .pipe(
         //         catchError(this.catchError),

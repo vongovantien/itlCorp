@@ -40,6 +40,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     saleMans: Contract[] = [];
 
     dataSearchs: any = [];
+    isSearching: boolean = false;
 
     selectedAgent: Partner;
 
@@ -69,15 +70,15 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             .pipe(
                 withLatestFrom(this._store.select(getAgentPagingState)),
                 takeUntil(this.ngUnsubscribe),
-                map(([dataSearch, pagingData])=>({page:pagingData.page,pageSize:pagingData.pageSize,dataSearch:dataSearch}))
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (data: any) => {
                     if (!!data.dataSearch) {
                         this.dataSearchs = data.dataSearch;
                     }
-                    this.page=data.page;
-                    this.pageSize=data.pageSize;
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
                 }
             );
         this._store.select(getAgentDataListState)
@@ -201,14 +202,19 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             type: !!event.field ? event.field : this.dataSearchs.type,
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
-        this.page = 1;
+        console.log(this.isSearching);
+
         this._store.dispatch(SearchList({ payload: searchData }));
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
         this.requestList();
-        //this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch)}));
+    }
+
+    onSearching(event: CommonInterface.ISearchOption) {
+        this.isSearching = true;
+        this.onSearch(event);
     }
 
     getPartners() {
@@ -224,7 +230,10 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         //             this.totalItems = res.totalItems;
         //         }
         //     );
-        this._store.dispatch(LoadListAgent({page: this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch)}));
+        console.log(this.isSearching);
+
+        this._store.dispatch(LoadListAgent({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch) }));
+        this.isSearching = false;
     }
 
     sortPartners() {

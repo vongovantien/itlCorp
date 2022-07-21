@@ -202,9 +202,11 @@ export class StatementOfAccountSearchComponent extends AppForm {
             soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
             soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.value : null,
             soaUserCreate: !!this.currentUser ? this.currentUser.value : null,
-            CurrencyLocal: "VND"
+            CurrencyLocal: "VND",
+            isSearching: true
         };
         this._store.dispatch(SearchListSOA({ dataSearch: body }));
+
         // this.onSearch.emit(body);
     }
     // * reset data in form search
@@ -217,6 +219,20 @@ export class StatementOfAccountSearchComponent extends AppForm {
         this.selectedCurrency = null;
         // ? search again!
         this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
+        this.resetStore();
+    }
+    resetStore() {
+        const bodyEmpty = {
+            strCodes: '',
+            customerID: '',
+            soaFromDateCreate: null,
+            soaToDateCreate: null,
+            soaStatus: null,
+            soaCurrency: null,
+            soaUserCreate: null,
+            CurrencyLocal: "VND"
+        };
+        this._store.dispatch(SearchListSOA({ dataSearch: bodyEmpty }));
     }
     resetDate() {
         this.selectedRange = null;
