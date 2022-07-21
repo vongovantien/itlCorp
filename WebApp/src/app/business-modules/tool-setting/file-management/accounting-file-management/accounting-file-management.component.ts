@@ -20,6 +20,7 @@ export interface IFileItem {
     templateUrl: "./accounting-file-management.component.html",
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
+
     itemsDefault: IFileItem[] = [];
     isActiveView: boolean;
     isActiveDownload: boolean;
@@ -231,6 +232,10 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     }
 
     getValueBreadcrumb($event: any) {
+        this.onResetFilterValue()
+        this.page = 1
+        this.pageSize = this.numberToShow[0];
+
         if ($event === "Accounting") {
             this.isDisplayFolderParent = false;
             this.itemsDefault = this.dataDefault;
@@ -285,5 +290,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                     }
                 );
         }
+    }
+
+    onResetFilterValue() {
+        this.keyword = '';
     }
 }

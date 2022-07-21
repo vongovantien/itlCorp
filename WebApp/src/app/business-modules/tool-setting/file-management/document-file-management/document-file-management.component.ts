@@ -149,7 +149,6 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
 
     onDisplayListFolder(item: any) {
         this.isActiveUpload = false;
-        this.isDisplayFolderType === false
         this.isDisplayFolderParent = false;
         this.folderName = item.folderName;
         this.getListFolderName();
@@ -251,6 +250,10 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
     }
 
     getValueBreadcrumb($event: any) {
+        this.onResetFilterValue()
+        this.page = 1
+        this.pageSize = this.numberToShow[0];
+        
         if ($event === "Document") {
             this.isDisplayFolderParent = true;
             this.itemsDefault = this.dataDefault;
@@ -259,6 +262,7 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
         }
         if ($event === this.folderType) {
             this.isDisplayFolderParent = false;
+            this.isDisplayFolderType = true;
             this.getListFolderByType();
             this.isActiveSearch = true;
             this.isActiveClick = true;
@@ -312,5 +316,9 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
                     }
                 );
         }
+    }
+
+    onResetFilterValue() {
+        this.keyword = '';
     }
 }

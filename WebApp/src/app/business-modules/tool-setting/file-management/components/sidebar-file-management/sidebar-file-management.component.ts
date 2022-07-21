@@ -36,6 +36,7 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
     ngOnChanges(changes: SimpleChanges): void {
         this.title = this.route.snapshot.data['title']
         this.onActiveRouting(this.title);
+        this.formSearch.reset()
     }
 
     initForm() {

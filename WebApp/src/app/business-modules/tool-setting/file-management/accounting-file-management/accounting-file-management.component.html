@@ -111,10 +111,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="ml-3" *ngIf="!!listFolderName.length">
-                                <app-pagination *ngIf="isActiveSearch === true && this.folderType" [total]="totalItems"
-                                    [pageNum]="page" [itemPerPage]="pageSize" (onChange)="updatePagingData($event)"
-                                    [size]="3">
+                            <div class="ml-3">
+                                <app-pagination *ngIf="isActiveSearch === true " [total]="totalItems" [pageNum]="page"
+                                    [itemPerPage]="pageSize" (onChange)="updatePagingData($event)" [size]="3">
                                 </app-pagination>
                             </div>
                         </div>
