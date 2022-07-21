@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
+        <div class="table-wrapper table-editable m--margin-top-20 table-horizontal" [class.h]="!!charges.length">
             <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -390,7 +390,7 @@
                                             <input type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
-                                                placeholder="Please Select" readonly [autoApply]="true"
+                                                placeholder="DD/MM/YYYY" readonly [autoApply]="true"
                                                 [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                                 [(ngModel)]="charge.invoiceDate" calendar />
                                         </div>
