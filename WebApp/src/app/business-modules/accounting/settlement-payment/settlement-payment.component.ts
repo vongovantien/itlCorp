@@ -531,7 +531,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                                 });
                         }
                     }
-                },
+                }
             )
     }
 

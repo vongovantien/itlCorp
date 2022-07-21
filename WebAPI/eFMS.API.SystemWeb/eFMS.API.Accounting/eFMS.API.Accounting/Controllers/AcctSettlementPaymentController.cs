@@ -712,10 +712,8 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                 }
-                if (approve.IsValidAutoRate)
-                {
-                    await acctSettlementPaymentService.AutoRateReplicateFromSettle(approve.SettlementNo);
-                }
+                // Check auto rate fees of settlement 
+                await acctSettlementPaymentService.AutoRateReplicateFromSettle(approve.Id);
             });
             return Ok(_result);
         }
@@ -760,6 +758,11 @@ namespace eFMS.API.Accounting.Controllers
             else
             {
                 _result = new ResultHandle { Status = updateApproval.Success };
+                Response.OnCompleted(async () =>
+                {
+                    // Check auto rate fees of settlement 
+                    await acctSettlementPaymentService.AutoRateReplicateFromSettle(settlementId);
+                });
                 return Ok(_result);
             }
         }

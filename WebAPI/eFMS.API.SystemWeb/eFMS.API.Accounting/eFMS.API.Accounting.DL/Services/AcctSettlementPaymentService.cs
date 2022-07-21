@@ -2691,13 +2691,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
                                 //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
                                 acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
-
-                                var jobNo = surcharges.FirstOrDefault().JobNo;
-                                var validAutorate = opsTransactionRepo.Any(x => x.JobNo == jobNo && x.LinkSource == AccountingConstants.TYPE_LINK_SOURCE_SHIPMENT && x.ReplicatedId == null);
-                                if (validAutorate) // Get auto rate fees when settle done
-                                {
-                                    approve.IsValidAutoRate = true;
-                                }
                             }
                             else
                             {
@@ -6200,13 +6193,39 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="settleNo"></param>
         /// <returns></returns>
-        public async Task<ResultHandle> AutoRateReplicateFromSettle(string settleNo)
+        public async Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId)
         {
-            Uri urlDocumentation = new Uri(apiUrl.Value.Url);
-            string urlAutorate = new Uri(urlDocumentation, "Documentation/api/v1/en-US/OpsTransaction/AutoRateReplicate?settleNo=" + settleNo + "&&jobNo=null").ToString();
-            HttpResponseMessage resquest = await HttpClientService.GetApi(urlAutorate, null);
-            var response = await resquest.Content.ReadAsAsync<ResultHandle>();
-            return response;
+            var settlement = DataContext.Get(x => x.Id == settleId).FirstOrDefault();
+            if(settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE) // Get Auto rate fees when settlement Done
+            {
+                return new ResultHandle();
+            }
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+            try
+            {
+                var jobNos = surcharges.Select(x => x.JobNo);
+                var validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && x.LinkSource == AccountingConstants.TYPE_LINK_SOURCE_SHIPMENT && x.ReplicatedId == null);
+                if (!validAutorate)
+                {
+                    var outSourceOffice = sysOfficeRepo.Get(x => x.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE).Select(x => x.Id);
+                    validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && outSourceOffice.Any(ofi => ofi == x.OfficeId));
+                }
+                var response = new ResultHandle();
+                if (validAutorate)
+                {
+                    Uri urlDocumentation = new Uri(apiUrl.Value.Url);
+                    string urlAutorate = new Uri(urlDocumentation, "Documentation/api/v1/en-US/OpsTransaction/AutoRateReplicate?settleNo=" + settlement.SettlementNo + "&&jobNo=null").ToString();
+                    HttpResponseMessage resquest = await HttpClientService.GetApi(urlAutorate, null);
+                    response = await resquest.Content.ReadAsAsync<ResultHandle>();
+                }
+                new LogHelper("EFMS_AutoRateReplicate_Called", "Settle :" + settlement.SettlementNo + " - Total of fees: " + surcharges.Count() + " Status: " + response?.Status);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("EFMS_AutoRateReplicate_Error", "Settle :" + settlement.SettlementNo + " - Total of fees: " + surcharges.Count() + " Error: " + ex.Message);
+                return new ResultHandle();
+            }
         }
     }
 }
