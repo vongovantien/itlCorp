@@ -4651,7 +4651,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(s.ClearanceNo) ? string.Empty : s.ClearanceNo) }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -6203,11 +6203,11 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
             try
             {
-                var jobNos = surcharges.Select(x => x.JobNo);
+                var jobNos = surcharges.Select(x => x.JobNo).Distinct().ToList();
                 var validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && x.LinkSource == AccountingConstants.TYPE_LINK_SOURCE_SHIPMENT && x.ReplicatedId == null);
                 if (!validAutorate)
                 {
-                    var outSourceOffice = sysOfficeRepo.Get(x => x.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE).Select(x => x.Id);
+                    var outSourceOffice = sysOfficeRepo.Get(x => x.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE).Select(x => x.Id).ToList();
                     validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && outSourceOffice.Any(ofi => ofi == x.OfficeId));
                 }
                 var response = new ResultHandle();
