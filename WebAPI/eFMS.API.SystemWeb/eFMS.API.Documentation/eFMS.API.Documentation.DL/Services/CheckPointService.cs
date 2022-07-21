@@ -567,14 +567,15 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<CsShipmentSurcharge, bool>> querySurcharge = x => x.OfficeId != HM
                 && x.OfficeId != BH
                 && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-
+            var hbls = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
             if (transactionType == "CL")
             {
                 querySurcharge = querySurcharge.And(x => x.Hblid == Id);
             }
             else
             {
-                var hblIds = csTransactionDetail.Get(x => x.JobId == Id).Select(x => x.Id).ToList();
+                hbls = csTransactionDetail.Get(x => x.JobId == Id);
+                var hblIds = hbls.Select(x => x.Id).ToList();
                 querySurcharge = querySurcharge.And(x => hblIds.Contains(x.Hblid));
             }
             surcharges = csSurchargeRepository.Get(querySurcharge);
@@ -582,6 +583,23 @@ namespace eFMS.API.Documentation.DL.Services
             if (surcharges.Count() > 0)
             {
                 partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
+            } else
+            {
+                if(transactionType == "CL")
+                {
+                    var opsJob = opsTransactionRepository.First(x => x.Hblid == Id);
+                    if(opsJob != null)
+                    {
+                        partners.Add(new CheckPointPartnerHBLDataGroup { HblId = opsJob.Hblid, PartnerId = opsJob.CustomerId });
+
+                        return partners;
+                    }
+                }
+                if(hbls.Count() == 0)
+                {
+                    return partners;
+                }
+                partners = hbls.Select(x => new CheckPointPartnerHBLDataGroup { HblId = x.Id, PartnerId = x.CustomerId }).ToList();
             }
 
             return partners;
