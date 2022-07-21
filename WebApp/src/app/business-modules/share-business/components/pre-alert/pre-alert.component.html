@@ -32,7 +32,7 @@
                             <div class="col-md-11">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': (from.dirty && !from.valid) || (isSubmited && !from.valid)}">
-                                    <input class="form-control" [attr.disabled]="serviceId !== 'AI' ? true : null" formControlName="from" />
+                                    <input class="form-control" [attr.disabled]="null" formControlName="from" />
                                 </div>
                             </div>
                         </div>
