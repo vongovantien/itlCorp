@@ -157,6 +157,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         //else => TH có số bravo no
                         {
+                            List<AccAccountPayable> payablesWithRefNo = new List<AccAccountPayable>();
                             var grpVoucherDetail = voucherDetail.Where(z => !string.IsNullOrEmpty(z.BravoRefNo))
                                                                 .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
                                                                 .Select(s => s).ToList();
@@ -201,9 +202,9 @@ namespace eFMS.API.ForPartner.DL.Service
                                     Description = c.FirstOrDefault().Description
                                 };
 
-                                payables.Add(payable);
+                                payablesWithRefNo.Add(payable);
                             });
-                            foreach (var item in payables)
+                            foreach (var item in payablesWithRefNo)
                             {
                                 item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
                                 item.RemainAmount = item.TotalAmount;

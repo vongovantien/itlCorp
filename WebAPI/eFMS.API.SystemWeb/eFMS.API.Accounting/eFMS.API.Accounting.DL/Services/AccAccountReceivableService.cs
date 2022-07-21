@@ -1007,15 +1007,15 @@ namespace eFMS.API.Accounting.DL.Services
                 agreement.PaidAmount = receivables.Sum(su => (su.PaidAmount ?? 0) + (su.ObhPaid ?? 0)) + contractChildOfPartner.Sum(su => su.PaidAmount ?? 0); //Sum PaidAmount + ObhPaid + PaidAmount (của các đối tượng con)
 
                 decimal? _creditRate = agreement.CreditRate;
-                if (agreement.ContractType == "Trial")
+                if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL)
                 {
                     _creditRate = DataTypeEx.IsNullOrValue(agreement.TrialCreditLimited, 0) ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount - CusAdv)/TrialCreditLimit)*100
                 }
-                if (agreement.ContractType == "Official")
+                if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                 {
                     _creditRate = DataTypeEx.IsNullOrValue(agreement.TrialCreditLimited, 0) ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount - CusAdv)/CreditLimit)*100
                 }
-                if (agreement.ContractType == "Parent Contract")
+                if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT)
                 {
                     var parentId = partnerRepo.Get(x => x.Id == agreement.PartnerId).FirstOrDefault()?.ParentId;
                     if (parentId != null)
@@ -1347,17 +1347,18 @@ namespace eFMS.API.Accounting.DL.Services
                                   //join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
                               join acctReceivable in acctReceivables on contract.Id equals acctReceivable.ContractId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
-                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
+                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.ToLower().Contains(acctReceivable.Office.ToString().ToLower(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
             if (selectQuery == null || !selectQuery.Any()) return null;
 
-            var contractsGuaranteed = selectQuery.Where(x => x.contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED)
+            var contractsGuaranteed = selectQuery.Where(x => x.contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementSalesmanId = s.contract.SaleManId,
                     DebitAmount = s.acctReceivable.DebitAmount
                 }).ToList();
             // Group by Contract ID, Service AR, Office AR
+            var typeCashOfficialGuar = new List<string>() { AccountingConstants.ARGEEMENT_TYPE_OFFICIAL, AccountingConstants.ARGEEMENT_TYPE_CASH, AccountingConstants.ARGEEMENT_TYPE_GUARANTEE };
             var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office, g.contract.OfficeId })
                 .Select(s => new AccountReceivableResult
                 {
@@ -1378,12 +1379,12 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeContract = s.Key.OfficeId.ToString(), //Office AR chứa trong Office Argeement
                     ArServiceCode = s.Key.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
-                    EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
-                    ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.ExpiredDate : null),
-                    ExpriedDay = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (int?)((s.First().contract.TrialExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (int?)((s.First().contract.ExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : 0),
-                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (s.First().contract.TrialCreditLimited ?? 0) : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (s.First().contract.CreditLimit ?? 0) : 0),
-                    CreditTerm = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (s.First().contract.TrialCreditDays ?? 0) : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (s.First().contract.PaymentTerm ?? 0) : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED ? (int?)30 : 0)),
-                    CreditRateLimit = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (s.First().contract.CreditLimitRate == null || s.First().contract.CreditLimitRate == 0 ? 120 : s.First().contract.CreditLimitRate) : 0,
+                    EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : ((typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? s.First().contract.EffectiveDate : null)),
+                    ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? s.First().contract.ExpiredDate : null),
+                    ExpriedDay = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (int?)((s.First().contract.TrialExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : (typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? (int?)((s.First().contract.ExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : 0),
+                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (s.First().contract.TrialCreditLimited ?? 0) : (typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? (s.First().contract.CreditLimit ?? 0) : 0),
+                    CreditTerm = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (s.First().contract.TrialCreditDays ?? 0) : (typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? (s.First().contract.PaymentTerm ?? 0) : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE ? (int?)30 : 0)),
+                    CreditRateLimit = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || typeCashOfficialGuar.Any(z => z == s.First().contract.ContractType) ? (s.First().contract.CreditLimitRate == null || s.First().contract.CreditLimitRate == 0 ? 120 : s.First().contract.CreditLimitRate) : 0,
                     SaleCreditLimited = null, //Get data bên dưới
                     SaleDebitAmount = contractsGuaranteed.Where(w => w.AgreementSalesmanId == s.First().contract.SaleManId).Sum(su => su.DebitAmount),
                     SaleDebitRate = null, //Tính toán bên dưới
@@ -1673,6 +1674,11 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        /// <summary>
+        /// Get Data Trial, Official, Cash and Guarantee
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         private IQueryable<AccountReceivableResult> GetDataTrialOfficial(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
@@ -1683,7 +1689,8 @@ namespace eFMS.API.Accounting.DL.Services
             var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT
-            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
 
             var partnerContracts = QueryContractPartner(contracts, criteria);
 
@@ -1760,7 +1767,7 @@ namespace eFMS.API.Accounting.DL.Services
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED);
+            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
             var partnerContracts = QueryContractPartner(contracts, criteria);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
             if (arPartnerContracts == null || !arPartnerContracts.Any())
