@@ -1,5 +1,6 @@
+import { ToastrService } from 'ngx-toastr';
 import { Component, OnChanges, OnInit } from "@angular/core";
-import { SettingRepo } from "@repositories";
+import { AccountingRepo, SettingRepo } from "@repositories";
 import { SortService } from "@services";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
@@ -20,8 +21,8 @@ export interface IFileItem {
 })
 export class AccountingFileManagementComponent extends AppList implements OnInit, OnChanges {
     itemsDefault: IFileItem[] = [];
-    isActiveDownload: boolean;
     isActiveView: boolean;
+    isActiveDownload: boolean;
     dataDefault: IFileItem[] = [
         {
             name: "SOA Folder",
@@ -66,7 +67,9 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     listBreadcrumb: Array<object> = [];
     constructor(
         private _settingRepo: SettingRepo,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _accountingRepo: AccountingRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this.requestList = this.getListFolderName;
@@ -97,6 +100,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                     item.fileType = 'pdf';
                     break;
                 case "xlsx":
+                case "xls":
                     item.classIcon = "la la-file-excel-o";
                     item.classColor = "text-success";
                     item.fileType = 'xlsx';
@@ -115,6 +119,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 case "png":
                 case "jpg":
                 case "jpeg":
+                case "PNG":
                     item.classIcon = "la la-file-image-o";
                     item.classColor = "text-primary";
                     item.fileType = 'png';
@@ -136,11 +141,12 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
             this.isActiveSearch = false;
             this.getDetailFileManagement(this.folderName, data.objectId);
         }
-        this.listBreadcrumb.push(data);
+        this.listBreadcrumb.push(data.folderName);
     }
 
     getDetailFileManagement(folderName: string, objectId: string) {
         this.isLoading = true;
+        this.folderChild = objectId;
         this._settingRepo.getDetailFileManagement(folderName, objectId).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false })
@@ -204,30 +210,11 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${item.url}`, '_blank');
             }
         } else if (action === 'download') {
-            if(item.fileType=== 'png'){
+            if (item.fileType === 'png') {
 
             }
             window.open(`${item.url}`, '_blank');
         }
-    }
-
-    escapeRegExp(str) {
-        // * Save Regex into System
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-    }
-
-    onSearchValue($event) {
-        let listTemp = this.listFolderName;
-        let searches = $event.name.split(" ").filter(String)
-        let s = "";
-        searches.forEach(e => s = s + "(?=.*" + this.escapeRegExp(e) + ")");
-        s = s + ".*"
-        console.log(s);
-        let matches = listTemp.filter((i) => {
-            const r = new RegExp(s);
-            return r.test(i.folderName);
-        });
-        this.listFolderName = matches;
     }
 
     onDisplayListFolder(item: any) {
@@ -236,7 +223,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
         this.stringBreadcrumb = this.folderName;
         this.folderName = item.folderName;
         this.getListFolderName();
-        this.listBreadcrumb.push({ folderName: this.folderName })
+        this.listBreadcrumb.push(item.folderName)
     }
 
     onDisplayDefaultFolder() {
@@ -270,5 +257,33 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this.totalItems = res.totalItems || 0;
                 this.listFolderName = res.data;
             });
+    }
+
+    chooseUploadFile($event: any) {
+        const fileList = event.target['files'];
+        if (fileList.length > 0) {
+            let validSize: boolean = true;
+
+            for (let i = 0; i <= fileList.length - 1; i++) {
+                const fileSize: number = fileList[i].size / Math.pow(1024, 2);
+                if (fileSize >= 100) {
+                    validSize = false;
+                    break;
+                }
+            }
+            if (!validSize) {
+                this._toastService.warning("maximum file size < 100Mb");
+                return;
+            }
+            this._accountingRepo.uploadAttachedFiles(this.folderName, this.folderChild, fileList)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.getDetailFileManagement(this.folderName, this.folderChild);
+                        }
+                    }
+                );
+        }
     }
 }

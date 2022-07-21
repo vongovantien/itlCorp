@@ -31,7 +31,6 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
 
     ngOnInit(): void {
         this.initForm();
-        console.log(this.title)
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -60,10 +59,15 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
     }
 
     onBreadcrumbActive(item: any) {
-        if (item === "Accounting") {
-            this.listBreadcrumb.splice(0, 2);
+        if (item === "Document" || item === "Accounting") {
+            this.listBreadcrumb.splice(0, 3);
+        } else {
+            for (let index = 0; index < this.listBreadcrumb.length; index++) {
+                if (item === this.listBreadcrumb[index]) {
+                    this.listBreadcrumb.length = index + 1;
+                }
+            }
         }
-        this.listBreadcrumb.pop();
         this.objectBack.emit(item)
     }
 

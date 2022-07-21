@@ -13,12 +13,12 @@
                 (click)="i===listBreadcrumb.length-1 ? $event.stopPropagation(): onBreadcrumbActive(item)"> >
 
                 <ng-container *ngIf="i===listBreadcrumb.length-1">
-                    {{item.folderName}}
+                    {{item}}
                 </ng-container>
 
                 <a *ngIf="i!==listBreadcrumb.length-1" href="javascript:;"
                     class="pe-auto m-nav__link-text active-route">
-                    {{item.folderName}}</a>
+                    {{item}}</a>
             </span>
         </ng-container>
     </div>

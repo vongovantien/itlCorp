@@ -16,58 +16,57 @@
                     <div class="row">
                         <div class="col-md-3 border-file-management border-right pr-0">
                             <sidebar-file-management [listBreadcrumb]="listBreadcrumb"
-                                (isDisplayDefaultFolder)="onDisplayDefaultFolder()"
                                 (objectBack)="getValueBreadcrumb($event)" (listKeySearch)="getValueSearch($event)"
                                 [isActiveSearch]="isActiveSearch">
                             </sidebar-file-management>
-
                         </div>
                         <div class="col-md-9 border-file-management border-left-0 pl-0">
-                            <ng-container *ngIf="isActiveSearch; else templateTemp">
-                                <!-- <div class="col-md-12 border border-file-management border-right-0 border-left-0">
-                                    <form-search-file-management [folderName]="folderName"
-                                        (keySearch)="onSearchValue($event)">
-                                    </form-search-file-management>
-                                </div> -->
-                                <div
-                                    class="col-md-12 border border-file-management border-right-0 border-left-0 pl-5 py-1">
-                                    <input type="text" class="form-control" placeholder="Input text to search..."
-                                        [(ngModel)]="keyword">
+                            <ng-container *ngIf="isActiveSearch === true; else templateTemp">
+                                <div class="row border border-file-management border-right-0 border-left-0 d-flex">
+                                    <div class="col-md-12 pl-5 py-1">
+                                        <input type="text" class="form-control" placeholder="Input text to search..."
+                                            [(ngModel)]="keyword">
+                                    </div>
                                 </div>
                             </ng-container>
 
                             <ng-template #templateTemp>
-                                <div class="col-md-12 border border-file-management border-right-0 border-left-0">
-                                    <div class="py-4"></div>
+                                <div class="row justify-content-end">
+                                    <div *ngIf="isActiveUpload === true" class="col-md-4 pl-5 py-1">
+                                        <button class="btn btn-success" (click)="uploader.click()"><i
+                                                class="la la-upload"></i>
+                                            <input hidden #uploader type="file" multiple
+                                                (change)="chooseUploadFile($event)"
+                                                [accept]="'image/*,.txt,.pdf,.doc,.xlsx,.xls'" title="Upload files" />
+                                            Upload Files
+                                        </button>
+                                    </div>
                                 </div>
                             </ng-template>
-
                             <br />
                             <div
-                                class="pl-5 table-wrapper table-scrollable m--margin-top-20 border-file-management border-right border-right-0">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <span>Name</span>
-                                            </th>
-                                            <th>
-                                                <span>Date Created</span>
-                                            </th>
-                                            <th>
-                                                <span>User Created</span>
-                                            </th>
-                                        </tr>
+                                class="pl-5 table-wrapper table-scrollable m--margin-top-10 border-file-management border-right border-right-0">
+                                <table class="table dataTable-edit">
+                                    <thead *ngIf="isDisplayFolderParent === false; else template" app-table-header
+                                        [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     </thead>
+                                    <ng-template #template>
+                                        <thead>
+                                            <th>Name</th>
+                                            <th>Date Created</th>
+                                            <th>User Created</th>
+                                        </thead>
+                                    </ng-template>
                                     <tbody>
-                                        <ng-container *ngIf="isDisplayFolderParent === false">
+                                        <ng-container *ngIf="isDisplayFolderParent === true">
                                             <tr *ngFor="let item of itemsDefault"
                                                 [contextMenu]="item.objectId !== '' ? fileManagementContextMenu: ''"
                                                 (onTouch)="onSelectFile(item)">
                                                 <td>
                                                     <a href="javascript:;" class="pointer"
-                                                        (click)="isActiveClick === false ? $event.stopPropagation(): onRedirectLink(item, 'download')"
-                                                        (click)="isActiveClick === true ? $event.stopPropagation(): onDisplayListFolder(item)">
+                                                        (click)="item.url === ''  ? $event.stopPropagation(): onRedirectLink(item, 'view')"
+                                                        (click)="item.url !== '' ? $event.stopPropagation(): onDisplayListFolder(item)">
                                                         <i class="{{item.classIcon}} {{item.classColor}}"></i>
                                                         &nbsp;
                                                         <span class="text-dark">{{item.name}}</span>
@@ -77,36 +76,41 @@
                                                     <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{item.userCreated}}</span>
+                                                    <span class="text-success">{{item.userCreated}}</span>
                                                 </td>
                                             </tr>
+                                            <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                            <tr app-table-none-record *ngIf="!isLoading && !itemsDefault.length"></tr>
                                         </ng-container>
-                                        <ng-container *ngIf="isDisplayFolderParent === true">
+                                        <ng-container *ngIf="isDisplayFolderParent === false">
                                             <tr
-                                                *ngFor="let item2 of listFolderName | filter: keyword: ['folderName', 'userCreated']">
+                                                *ngFor="let item of listFolderName | filter: keyword: ['folderName', 'userCreated']">
                                                 <td>
                                                     <a href="javascript:;" class="pointer"
-                                                        (click)="onGetFolderItems(item2)">
+                                                        (click)="onGetFolderItems(item)">
                                                         <i class="la la-folder text-info"></i>
                                                         &nbsp;
                                                         <span
-                                                            [innerHTML]="item2.folderName | highlight : keyword"></span>
+                                                            [innerHTML]="isDisplayFolderType === true ? (item.folderType | highlight : keyword) : (item.folderName | highlight : keyword)"></span>
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <span>{{item2.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
+                                                    <span>{{item.dateTimeCreated | date:'dd/MM/yyyy'}}</span>
                                                 </td>
                                                 <td>
-                                                    <span [innerHTML]="item2.userCreated | highlight : keyword"></span>
+                                                    <span class="text-success"
+                                                        [innerHTML]="item.userCreated | highlight : keyword"></span>
                                                 </td>
                                             </tr>
+                                            <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                            <tr app-table-none-record *ngIf="!isLoading && !listFolderName.length"></tr>
                                         </ng-container>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="ml-3">
-                                <app-pagination *ngIf="isActiveSearch === true" [total]="totalItems" [pageNum]="page"
-                                    [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                            <div class="ml-3" *ngIf="isDisplayFolderParent === false">
+                                <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                                    (onChange)="updatePagingData($event)" [size]="3">
                                 </app-pagination>
                             </div>
                         </div>
