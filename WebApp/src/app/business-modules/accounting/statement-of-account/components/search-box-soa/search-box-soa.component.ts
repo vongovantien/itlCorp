@@ -96,8 +96,9 @@ export class StatementOfAccountSearchComponent extends AppForm {
                             this.selectedPartner = Object.assign({}, !!!data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : null);
                             this.selectedStatus = !!data.dataSearch.soaStatus ? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0] : null;
                             this.selectedCurrency = !!data.dataSearch.soaCurrency ? this.currencyList.filter((cur) => cur.id === data.dataSearch.soaCurrency)[0] : null;
-                            if (!!data.dataSearch.soaUserCreate) {
-                                this.currentUser = Object.assign({}, !!!data.dataSearch.soaUserCreate ? { field: 'id', value: data.dataSearch.soaUserCreate } : { field: 'id', value: null });
+
+                            if (data.dataSearch.soaUserCreate !== null) {
+                                this.currentUser = Object.assign({}, data.dataSearch.soaUserCreate !== null ? { field: 'id', value: data.dataSearch.soaUserCreate } : { field: 'id', value: null });
                             }
                         }
                     }
@@ -217,6 +218,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
         this.selectedStatus = null;
         this.selectedRange = null;
         this.selectedCurrency = null;
+        this.currentUser = null;
         // ? search again!
         this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
         this.resetStore();
