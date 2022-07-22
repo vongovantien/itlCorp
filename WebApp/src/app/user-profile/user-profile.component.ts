@@ -119,7 +119,6 @@ export class UserProfilePageComponent extends AppForm {
     ngAfterViewInit() {
         this.initImageLibary();
         this.initSignatureImage();
-        //console.log(this.signatureUrl);
     }
 
     initSignatureImage() {
