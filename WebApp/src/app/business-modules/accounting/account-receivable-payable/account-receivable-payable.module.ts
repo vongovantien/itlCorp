@@ -21,6 +21,10 @@ const routing: Routes = [
                 path: 'history-payment', loadChildren: () => import('./history-payment/history-payment.module').then(m => m.ARHistoryPaymentModule),
                 data: { name: 'History Payment', title: 'eFMS AR History Payment' }
             },
+            {
+                path: 'prepaid-payment', loadChildren: () => import('./prepaid-payment/prepaid-payment.module').then(m => m.ARPrepaidPaymentModule),
+                data: { name: 'PrePaid Payment', title: 'eFMS AR Pre Paid Payment' }
+            },
 
         ]
     },

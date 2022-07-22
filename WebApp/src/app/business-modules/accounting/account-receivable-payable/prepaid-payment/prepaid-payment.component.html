@@ -1,0 +1,60 @@
+<div class="acc-receive-payable-wrapper  m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab>
+                    <ng-template tabHeading>
+                        <a routerLink="/home/accounting/account-receivable-payable" style="color:#6f727d">
+                            Customer/Agency Payment
+                        </a>
+                    </ng-template>
+                </tab>
+                <tab>
+                    <ng-template tabHeading>
+                        <a routerLink="/home/accounting/account-receivable-payable" style="color:#6f727d">
+                            AR Summary
+                        </a>
+                    </ng-template>
+                </tab>
+                <tab>
+                    <ng-template tabHeading>
+                        <a routerLink="/home/accounting/account-receivable-payable/history-payment"
+                            style="color:#6f727d">
+                            Payment History
+                        </a>
+                    </ng-template>
+                </tab>
+                <tab heading="PrePaid" [active]="true">
+                    <form-search-prepaid-payment></form-search-prepaid-payment>
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <table class="table table-hover table-brand dataTable table-hover">
+                                        <thead app-table-header [headers]="headers"
+                                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                            <th class="first table-actions-col" style="min-width:40px">
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="loading-wrapper" *ngIf="(isLoading | async) "
+                                                app-table-row-loading>
+                                            </tr>
+                                            <tr *ngIf="!(isLoading | async)  && !debitNotes.length"
+                                                app-table-none-record>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <app-pagination [total]="totalItems" [pageNum]="page" [data]="dataSearch"
+                                        [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
+                                    </app-pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>
