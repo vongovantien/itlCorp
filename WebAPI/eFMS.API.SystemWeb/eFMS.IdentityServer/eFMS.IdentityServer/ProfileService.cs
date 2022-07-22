@@ -50,7 +50,7 @@ namespace eFMS.IdentityServer
             var employee = employeeService.First(x => x.Id == user.EmployeeId);
             SysCompany company = sysCompanyRepository.Get(x => x.Id.ToString() == companyClaim.Value.ToString())?.FirstOrDefault();
             SysOffice office = sysOfficeRepository.Get(x => x.Id.ToString() == officeClaim.Value)?.FirstOrDefault();
-
+            
             var claims = new List<Claim>
                 {
                     new Claim(JwtClaimTypes.Id, user.Id),
@@ -73,6 +73,7 @@ namespace eFMS.IdentityServer
                     new Claim("internalCode", !string.IsNullOrEmpty(office.InternalCode) ? office.InternalCode: ""),
                     new Claim("CompanyCode", company.Code),
                     new Claim("OfficeCode", office.Code),
+                    new Claim("SignatureImage", employee.SignatureImage ?? ""),
                     companyClaim,
                     officeClaim,
                     departmentclaim,
