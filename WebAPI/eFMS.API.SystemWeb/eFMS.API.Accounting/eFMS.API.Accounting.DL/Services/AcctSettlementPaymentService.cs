@@ -5765,12 +5765,14 @@ namespace eFMS.API.Accounting.DL.Services
             #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
             var invalidSettles = new List<Guid>();
             var invalidCodeSettles = new List<string>();
+
             var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && x.JobNo.Contains("R"));
+            var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
             var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
             foreach (var settlementId in ids)
             {
-                var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+                var detail = settlementData.First(x => x.Id == settlementId);
                 if (detail == null) return null;
 
                 #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
@@ -5793,7 +5795,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
                 var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
-                var listJob = surcharges.Select(x => x.JobNo);
                 var chargesLinked = from sur in surchargesSettle
                                     join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
                                     join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
