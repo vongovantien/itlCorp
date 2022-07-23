@@ -915,6 +915,5 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
-
     }
 }

@@ -1,0 +1,31 @@
+.active-side-file {
+    background-color: #e5e5e5;
+    position: relative;
+    ::after{
+        content: "";
+        width: 5px;
+        display: block;
+        background-color: #fb4b58;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+    }
+}
+
+.font-breadcrumb-files-management{
+    font-size: 11px;
+}
+
+.menu-sidebar-file-management {
+    li {
+        &:hover {
+            background-color: #e5e5e5;
+            transition: linear 0.2s;
+        }
+        i {
+            font-size: 25px;
+        }
+    }
+}
+

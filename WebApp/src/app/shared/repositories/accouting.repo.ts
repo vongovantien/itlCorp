@@ -1091,7 +1091,6 @@ export class AccountingRepo {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue30`, partnerIds);
     }
 
-
 }
 
 

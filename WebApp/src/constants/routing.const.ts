@@ -82,6 +82,7 @@ export class RoutingConstants {
         SUPPLIER: `${RoutingConstants.ROOT_TOOL}/supplier`,
         LOG_VIEWER: `${RoutingConstants.ROOT_TOOL}/log-viewer`,
         UNLOCK: `${RoutingConstants.ROOT_TOOL}/unlock`,
+        FILE_MANAGMENT: `${RoutingConstants.ROOT_TOOL}/file-management`,
     };
 
     public static readonly REPORT = {
