@@ -438,7 +438,8 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <!--Bank account no-->
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
                                         <label class="form-control-label" for="">
                                             Bank Account No
                                         </label>

@@ -61,7 +61,7 @@ export class FormCreateBankPopupComponent extends PopupBase implements OnInit {
             const body: IBank = {
                 Id :this.id,
                 BankNameVN: formData.bankNameVN,
-                BankNameEN: formData.bankNameEN,
+                BankNameEN: !formData.bankNameEN ? formData.bankNameEN : formData.bankNameEN.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 Code: formData.bankNameCode,
                 Active: !!this.isUpdate ? formData.active : true
             };

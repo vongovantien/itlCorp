@@ -474,6 +474,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Requester = advancePayment.Requester,
                            RequesterName = user.Username,
                            RequestDate = advancePayment.RequestDate,
+                           DueDate = advancePayment.DueDate,
                            DeadlinePayment = advancePayment.DeadlinePayment,
                            UserCreated = advancePayment.UserCreated,
                            DatetimeCreated = advancePayment.DatetimeCreated,

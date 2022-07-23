@@ -442,6 +442,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Requester = settlePayment.Requester,
                            RequesterName = user.Username,
                            RequestDate = settlePayment.RequestDate,
+                           DueDate = settlePayment.DueDate,
                            StatusApproval = settlePayment.StatusApproval,
                            PaymentMethod = settlePayment.PaymentMethod,
                            Note = settlePayment.Note,
