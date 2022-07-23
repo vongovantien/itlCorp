@@ -50,8 +50,8 @@
                                         Taxcode field was required!
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="isSubmitted && 
-                                        ((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength'))">
+                                        *ngIf="(isSubmitted &&
+                                    ((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength')))||((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength'))">
                                         Tax Code include 8 - 14 characters!
                                     </div>
                                     <div class="form-control-feedback"
