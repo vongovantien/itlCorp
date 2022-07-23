@@ -19,6 +19,7 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
 import * as fromShareBusiness from '../../../share-business/store';
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Component({
@@ -29,7 +30,6 @@ import _merge from 'lodash/merge';
 export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
@@ -43,6 +43,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         protected _cd: ChangeDetectorRef
     ) {
         super();
+        this.requestCancel = this.gotoList;
     }
 
     ngOnInit() {
@@ -78,7 +79,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
     checkValidateForm() {
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
-                                                    || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
+            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
             valid = false;
         }
         return valid;
@@ -88,7 +89,10 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         this.formCreateComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
 

@@ -49,7 +49,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     };
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
-    isSearchLinkFeea:boolean = false;
+    isSearchLinkFeea: boolean = false;
 
     constructor(
         private sortService: SortService,
@@ -74,6 +74,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Replicate Job', field: 'replicateJobNo', sortable: true },
+            { title: 'MBL', field: 'mblno', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Product Service', field: 'productService', sortable: true },
@@ -303,7 +304,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
-    onSelectTab(tabName:any){
+    onSelectTab(tabName: any) {
         this.isSearchLinkFeea = !this.isSearchLinkFeea;
     }
 
@@ -328,7 +329,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             );
     }
 
-    chargeFromJobRep(){
+    chargeFromJobRep() {
         this.linkChargeFromRep.show();
     }
 

@@ -18,7 +18,7 @@ import { RoutingConstants } from '@constants';
 })
 export class SeaConsolImportHBLComponent extends AppShareHBLBase {
     constructor(
-        private _router: Router,
+        protected _router: Router,
         protected _sortService: SortService,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
@@ -27,7 +27,7 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
         protected _activedRoute: ActivatedRoute,
         protected _spinner: NgxSpinnerService
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
     }
 
     onSelectTab(tabName: string) {
@@ -82,12 +82,6 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
                     }
                 },
             );
-    }
-
-    duplicateConfirm() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
-        });
     }
 
     gotoList() {

@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo } from '@repositories';
-import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent, getSellingSurChargeState, getSurchargeState, ISurcharge } from '@share-bussiness';
 import { ConfirmPopupComponent, InfoPopupComponent, SubHeaderComponent } from '@common';
 import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
@@ -19,14 +19,15 @@ import { AppForm } from '@app';
 import { JobManagementFormEditComponent, ILinkAirSeaInfoModel } from './components/form-edit/form-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, map, takeUntil, tap, switchMap, concatMap } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, map, takeUntil, tap, switchMap, concatMap, withLatestFrom, takeLast, last } from 'rxjs/operators';
+import { combineLatest, EMPTY, forkJoin, Observable, of } from 'rxjs';
 import * as fromShareBussiness from './../../share-business/store';
 
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
 import { HttpErrorResponse } from '@angular/common/http';
+import { take } from 'lodash';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
@@ -264,8 +265,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         if (!this.editForm.formEdit.valid
             || (!!this.editForm.serviceDate.value && !this.editForm.serviceDate.value.startDate)
             || (!!this.editForm.finishDate.value.startDate && this.editForm.serviceDate.value.startDate > this.editForm.finishDate.value.startDate)
-            || (this.editForm.hwbno.value===null || this.editForm.hwbno.value?.length===0)
-            || (this.editForm.mblno.value===null || this.editForm.mblno.value?.length===0)
+            || (this.editForm.hwbno.value === null || this.editForm.hwbno.value?.length === 0)
+            || (this.editForm.mblno.value === null || this.editForm.mblno.value?.length === 0)
         ) {
             valid = false;
         }
@@ -593,20 +594,40 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     onSubmitDuplicateConfirm() {
-        this.editForm.isSubmitted = false;
-        // this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${this.jobId}`], {
-        //     queryParams: { action: 'copy' }
-        // });
-        this.tab = 'job-edit'
-        this.isDuplicate = true;
-        this.editForm.isJobCopy = this.isDuplicate;
-        this.editForm.opsTransaction.serviceNo = null;
-        this.editForm.setFormValue();
-        if (this.isDuplicate) {
-            this.editForm.getBillingOpsId();
-            this.headerComponent.resetBreadcrumb("Create Job");
-            if (this.selectedTabSurcharge == CommonEnum.SurchargeTypeEnum.SELLING_RATE)
-                this.getSurCharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
-        }
+        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, 'CL')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            data: partnerIds,
+                            transactionType: 'CL',
+                            type: 5,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.editForm.isSubmitted = false;
+                        this.tab = 'job-edit'
+                        this.isDuplicate = true;
+                        this.editForm.isJobCopy = this.isDuplicate;
+                        this.editForm.opsTransaction.serviceNo = null;
+                        this.editForm.setFormValue();
+                        if (this.isDuplicate) {
+                            this.editForm.getBillingOpsId();
+                            this.headerComponent.resetBreadcrumb("Create Job");
+                            if (this.selectedTabSurcharge == CommonEnum.SurchargeTypeEnum.SELLING_RATE)
+                                this.getSurCharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);
+                        }
+                    }
+                }
+            )
+
     }
 }

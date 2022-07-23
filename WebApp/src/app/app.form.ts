@@ -2,17 +2,21 @@ import { AppPage } from './app.base';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
-import { ViewChildren, QueryList, HostListener, ElementRef, Directive } from '@angular/core';
+import { ViewChildren, QueryList, HostListener, ElementRef, Directive, ViewChild } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 import { Observable, fromEvent, merge, combineLatest, Subject } from 'rxjs';
 import { distinctUntilChanged, share, filter, takeUntil } from 'rxjs/operators';
+import { InjectViewContainerRefDirective } from './shared/directives/inject-view-container-ref.directive';
+import { ConfirmPopupComponent, InfoPopupComponent } from './shared/common/popup';
 
 @Directive()
 export abstract class AppForm extends AppPage {
     @ViewChildren(ComboGridVirtualScrollComponent) comboGrids: QueryList<ComboGridVirtualScrollComponent>;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     requestSearch: any = null;
     requestReset: any = null;
+    requestCancel: Function = null;
 
     isDisabled: boolean = null;
     isSubmitted: boolean = false;
@@ -43,6 +47,8 @@ export abstract class AppForm extends AppPage {
     confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";
     confirmUpdateHblText: string = 'You are about to update HBL, are you sure all entered details are correct?';
     confirmCreateHblText: string = 'Are you sure you want to create HBL?';
+    confirmLockShipment: string = 'Do you want to lock this shipment?';
+    confirmDeleteJob: string = 'You you sure you want to delete this Job?';
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
     errorETA: string = 'ETA must be greater than or equal ETD';
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
@@ -169,7 +175,15 @@ export abstract class AppForm extends AppPage {
             .subscribe(cb);
     }
 
+    onCancel() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: this.confirmCancelFormText
+        }, () => { this.requestCancel() });
+    }
 
+    onCancelDeactivate() {
+        this.requestCancel();
+    }
 }
 
 
