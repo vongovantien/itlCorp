@@ -425,6 +425,10 @@ namespace eFMS.API.Accounting.DL.Services
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
             IQueryable<CatDepartment> departments = catDepartmentRepo.Get();
+            var settleNos = settlementPayments.Select(x => x.SettlementNo).ToList();
+            var surchargesIssued = csShipmentSurchargeRepo.Get(x => settleNos.Any(z => z == x.SettlementCode) && x.IsFromShipment == false &&
+                    !(string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.PaySoano) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.VoucherIdre)))
+                    .Select(x=> x.SettlementCode).Distinct().ToList();
 
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
@@ -457,7 +461,9 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
                            PayeeName = partnerGrp.ShortName,
-                           DepartmentName = deptGrp.DeptNameAbbr
+                           DepartmentName = deptGrp.DeptNameAbbr,
+
+                           IssuedSoa = surchargesIssued.Any(z => z == settlePayment.SettlementNo)
                        };
             return data;
         }
