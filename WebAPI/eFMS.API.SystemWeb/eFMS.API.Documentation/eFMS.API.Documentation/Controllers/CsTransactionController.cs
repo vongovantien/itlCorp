@@ -611,7 +611,7 @@ namespace eFMS.API.Documentation.Controllers
                     && x.OfficeId == currentUser.OfficeID
                     && x.CurrentStatus != TermData.Canceled))
                     {
-                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
+                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mawb].Value;
                     }
                 }
             }
@@ -626,7 +626,7 @@ namespace eFMS.API.Documentation.Controllers
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {
-                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
+                        message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mawb].Value;
                     }
                 }
             }

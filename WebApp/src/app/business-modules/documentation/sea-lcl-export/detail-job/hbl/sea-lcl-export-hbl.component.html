@@ -14,33 +14,22 @@
                 </div>
             </div>
 
-            <ng-container *ngIf="(isLocked | async) === false">
-                <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
-                    (click)="duplicateConfirm()">
+            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="duplicateConfirm()">
+                <span>
+                    <i class="la la-search-plus"></i>
                     <span>
-                        <i class="la la-search-plus"></i>
-                        <span>
-                            Duplicate
-                        </span>
+                        Duplicate
                     </span>
-                </button>
+                </span>
+            </button>
 
+            <ng-container *ngIf="(isLocked | async) === false">
                 <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
                     *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
                             Delete
-                        </span>
-                    </span>
-                </button>
-
-
-                <button type="button" class="btn btn-primary  m-btn--icon m-btn--uppercase" disabled>
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save
                         </span>
                     </span>
                 </button>

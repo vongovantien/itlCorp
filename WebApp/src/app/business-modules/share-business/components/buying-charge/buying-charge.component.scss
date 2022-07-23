@@ -151,4 +151,12 @@
     .detail-linkfee{
         text-align: left;
     }
+
+    .table-horizontal {
+        th {
+            background-color: #fff;
+            top: -1px !important;
+            z-index: 10;
+        }
+    }
 }

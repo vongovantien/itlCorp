@@ -160,6 +160,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+        modelAdd.isLocked = this.shipmentDetail.isLocked;
 
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelAdd);
