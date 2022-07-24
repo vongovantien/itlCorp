@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,7 +39,49 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AccPrePaidPaymentResult> GetQuery(AccountingPrePaidPaymentCriteria criteria)
         {
             Expression<Func<AcctCdnote, bool>> query = x => x.CurrencyId == criteria.Currency && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                query = query.And(x => x.PartnerId == criteria.PartnerId);
+            }
+            if (!string.IsNullOrEmpty(criteria.Currency))
+            {
+                query = query.And(x => x.CurrencyId == criteria.Currency);
+            }
+            if (!string.IsNullOrEmpty(criteria.Status))
+            {
+                query = query.And(x => x.Status == criteria.Status);
+            }
+            if (!string.IsNullOrEmpty(criteria.SalesmanId))
+            {
+                query = query.And(x => x.SalemanId == criteria.SalesmanId);
+            }
+            if (criteria.Keywords.Count > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "JobID":
+                        var jobs = DC.CsTransaction.Where(x => criteria.Keywords.Contains(x.JobNo)).Select(x => x.Id);
+                        if (jobs.Count() > 0)
+                        {
+                            query = query.And(x => jobs.Contains(x.JobId));
+                        }
+                        break;
+                    case "DebitNote":
+                        query = query.And(x => criteria.Keywords.Contains(x.Code));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            var cdNotes = DC.AcctCdnote.Select(query);
+            if(cdNotes.Count() > 0)
+            {
+                var d = cdNotes.Select(x => new AccPrePaidPaymentResult {
+                    Id = x.,
+                    Currency = x.cur
 
+                });
+            }
             return null;
         }
     }

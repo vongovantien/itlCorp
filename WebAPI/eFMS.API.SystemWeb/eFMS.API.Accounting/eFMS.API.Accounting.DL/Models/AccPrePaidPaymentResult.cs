@@ -26,7 +26,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string SearchType { get; set; }
         public List<string> Keywords { get; set; }
         public string PartnerId { get; set; }
-        public Guid SalesmanId { get; set; }
+        public string SalesmanId { get; set; }
         public string Currency { get; set; }
         public string Status { get; set; }
         public string AgreementType { get; set; }
