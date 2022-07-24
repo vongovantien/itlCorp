@@ -739,7 +739,7 @@ namespace eFMS.API.Accounting.DL.Services
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
                     // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
-                    ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
+                    // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
