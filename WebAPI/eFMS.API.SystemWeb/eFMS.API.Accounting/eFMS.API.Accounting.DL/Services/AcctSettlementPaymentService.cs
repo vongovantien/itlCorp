@@ -1887,6 +1887,7 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState((object)"Fail to create settlment. Please try again.");
                 }
                 var settlement = mapper.Map<AcctSettlementPayment>(DataContext.Get(x => x.Id == entity.Id).FirstOrDefault());
+                databaseUpdateService.LogAddEntity(settlement);
                 model.Settlement.SettlementNo = settlement.SettlementNo;
                 model.Settlement.Requester = settlement.Requester;
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;

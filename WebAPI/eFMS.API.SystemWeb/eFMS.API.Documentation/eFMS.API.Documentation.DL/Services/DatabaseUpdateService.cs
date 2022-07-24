@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                new LogHelper("EFMS-InsertDataToDB", "Error : " + ex.ToString() + "\nAction: " + currentUser.Action + "\nValue: Table " + obj.GetType().Name.Replace("Model", "") + " Value: " + sql);
+                new LogHelper("EFMS_InsertDataToDB", "Error : " + ex.ToString() + "\nAction: " + currentUser.Action + "\nValue: Table " + obj.GetType().Name.Replace("Model", "") + " Value: " + sql);
                 return null;
             }
         }
