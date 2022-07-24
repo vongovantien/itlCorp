@@ -21,16 +21,34 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">
-                        Request Date:
-                    </label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                            name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="requestDate" [attr.disabled]="isDisabled" [maxDate]="maxDate"
-                            (datesUpdated)="onUpdateRequestDate($event)" calendar />
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label" required>
+                                Request Date:
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                    name="daterange" placeholder="Select request date" [autoApply]="true"
+                                    formControlName="requestDate" [attr.disabled]="isDisabled" [maxDate]="maxDate"
+                                    (datesUpdated)="onUpdateRequestDate($event)" calendar />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 due-date-picker">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!dueDate.value || !dueDate.value.startDate)}">
+                            <label class="form-control-label" required>
+                                Due Date
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                    name="dueDateRange" placeholder="Select due date" [autoApply]="true" formControlName="dueDate"
+                                    [minDate]="minDate" calendar />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,7 +78,7 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label">
-                        Deadline Payment:
+                        ADV Clearance Date:
                     </label>
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -71,7 +89,8 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
@@ -93,11 +112,16 @@
                     <label class="form-control-label">
                         Bank Name:
                     </label>
-                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
-                        [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                        [displayFields]="displayFieldBank" (remove)="resetFormControl(bankCode)"
-                        placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
-                    </app-combo-grid-virtual-scroll>
+                    <ng-container *ngIf="!readonlyForm; else bankTpl">
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
+                            [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                            [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName)"
+                            placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
+                        </app-combo-grid-virtual-scroll>
+                    </ng-container>
+                    <ng-template #bankTpl>
+                        <input type="text" class="form-control" formControlName="bankName">
+                    </ng-template>
                 </div>
             </div>
             <div class="col-lg-1">

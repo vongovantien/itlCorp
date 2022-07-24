@@ -54,6 +54,7 @@ export class AdvancePayment {
     bankCode: string = null;
     departmentName: string = null;
     advanceFor: string = null;
+    dueDate: string = '';
     
     constructor(object?: any) {
         const self = this;

@@ -337,7 +337,9 @@ export class FormAddPartnerComponent extends AppForm {
             workPhoneEx: [null],
             email: [null],
 
-            bankAccountNo: [null],
+            bankAccountNo: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+            ])],
             bankAccountName: [null],
             bankAccountAddress: [null],
             swiftCode: [null],

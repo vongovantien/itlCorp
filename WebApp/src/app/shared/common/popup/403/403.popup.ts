@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, EventEmitter, Output } from '@angular/core';
 import { eFMSPopup } from '../popup';
 
 @Component({
@@ -9,10 +9,17 @@ import { eFMSPopup } from '../popup';
 
 export class Permission403PopupComponent extends eFMSPopup {
     @Input() center: boolean = false;
+    @Output() onSubmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+
     constructor() {
         super();
     }
 
     ngOnInit(): void { }
+
+    close() {
+        this.hide();
+        this.onSubmit.emit(true);
+    }
 
 }

@@ -43,6 +43,7 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<IUnlockRequestApproveService, UnlockRequestApproveService>();
             services.AddTransient<IUserBaseService, UserBaseService>();
             services.AddTransient<IRuleLinkFeeService, RuleLinkFeeService>();
+            services.AddTransient<IFileManagementService, FileManagementService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

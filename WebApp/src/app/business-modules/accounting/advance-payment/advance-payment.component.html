@@ -169,6 +169,7 @@
                                                         style="min-width: 200px; white-space:initial">{{advancePayment.payeeName}}</span>
                                                 </td>
                                                 <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{advancePayment.dueDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="advancePayment.statusApprovalName">

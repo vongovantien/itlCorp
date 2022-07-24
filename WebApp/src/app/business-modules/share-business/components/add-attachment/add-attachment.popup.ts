@@ -13,6 +13,7 @@ import { ConfirmPopupComponent } from "@common";
 @Component({
     selector: "add-attachment-popup",
     templateUrl: "./add-attachment.popup.html",
+    styleUrls: ['./../../../accounting/components/attach-file/attach-file-list.component.scss']
 })
 export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implements OnInit {
     checkAll: boolean = false;
@@ -45,7 +46,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                 }
             });
         this.headers = [
-            { title: 'Attach File', field: 'name' }
+            { title: 'Attach File', field: 'name' },
+            { title : '', field: ''}
         ];
     }
 

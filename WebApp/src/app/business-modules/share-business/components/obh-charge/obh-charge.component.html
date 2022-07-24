@@ -37,7 +37,7 @@
                 </ng-container>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
+        <div class="table-wrapper table-editable m--margin-top-20 table-horizontal" [class.h]="!!charges.length">
             <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -414,7 +414,8 @@
                                 </div>
                             </td>
                             <td class="disabled">
-                                <div class="form-group ">
+                                <div class="form-group "
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
                                         currencyMask placeholder="Total">
                                 </div>

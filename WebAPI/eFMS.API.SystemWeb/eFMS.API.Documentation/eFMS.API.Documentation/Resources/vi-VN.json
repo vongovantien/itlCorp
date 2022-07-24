@@ -67,5 +67,6 @@
   "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!",
   "MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
   "MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!",
-  "MSG_CDNOTE_ISSUED_COMBINE": "CD Note đã làm combine billing {0}. Vui lòng xóa CD Note khỏi Combine trên để thực hiện thao tác."
+  "MSG_CDNOTE_ISSUED_COMBINE": "CD Note đã làm combine billing {0}. Vui lòng xóa CD Note khỏi Combine trên để thực hiện thao tác.",
+  "MSG_TOTAL_OVER_LIMIT": "Tổng tiền quá lớn với mã tiền tệ {0}"
 }

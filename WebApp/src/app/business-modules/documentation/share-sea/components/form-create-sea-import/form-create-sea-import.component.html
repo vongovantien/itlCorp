@@ -171,15 +171,15 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && (!serviceDate.valid || !serviceDate.value.startDate)}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!serviceDate.valid || !serviceDate.value.startDate)}">
                             <label required>Service Date</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" formControlName="serviceDate"
-                                    [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate"
-                                    (remove)="resetFormControl(serviceDate)" calendar />
+                                    [alwaysShowCalendars]="true" formControlName="serviceDate" [allowRemove]="false"
+                                    calendar />
                             </div>
                         </div>
                     </div>

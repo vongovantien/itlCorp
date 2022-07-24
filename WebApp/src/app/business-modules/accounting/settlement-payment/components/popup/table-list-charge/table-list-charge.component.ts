@@ -715,6 +715,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             return;
         }
 
+        // Error if total > 100,000usd
+        if(this.charges.some((chargeItem: Surcharge) => chargeItem.currencyId === 'USD' && chargeItem.total > 100000)){
+            this._toastService.error('Amount is too large, please check again.');
+            return;
+        }
+
         const listChargesToSave = cloneDeep(this.charges);
 
         const formData = this.formGroup.getRawValue();

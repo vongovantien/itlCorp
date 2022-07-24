@@ -110,7 +110,7 @@
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <ng-container
-                                                            *ngIf="(settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied');else dblock">
+                                                            *ngIf="((settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied') && !settlePayment.issuedSoa);else dblock">
                                                             <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Delete"
                                                                 (click)="prepareDeleteAdvance(settlePayment)">
@@ -153,6 +153,7 @@
                                                 <td class="text-info" style="min-width: 200px; white-space:initial">
                                                     {{settlePayment.payeeName}}</td>
                                                 <td>{{settlePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{settlePayment.dueDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="settlePayment.statusApprovalName">
                                                     <div *ngSwitchCase="'New'" class="text-danger">
                                                         {{settlePayment.statusApprovalName}}</div>

@@ -108,6 +108,6 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PARTER_CODE_NOT_VALID_TYPE = "MSG_PARTER_CODE_NOT_VALID_TYPE";
         public static readonly string MSG_PARTNER_CODE_DUPLICATE = "MSG_PARTNER_CODE_DUPLICATE";
         public static readonly string MSG_CHARGE_CODE_WRONG_SERVICE = "MSG_CHARGE_CODE_WRONG_SERVICE";
-
+        public static readonly string MSG_TOTAL_OVER_LIMIT = "MSG_TOTAL_OVER_LIMIT";
     }
 }

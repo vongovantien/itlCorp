@@ -62,21 +62,38 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         }
     }
 
+    checkValidSettle() {
+        if (this.formCreateSurcharge.checkStaffPartner()) {
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return false;
+        }
+
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if(!this.formCreateSurcharge.dueDate.value || (['New','Denied'].indexOf(this.formCreateSurcharge.statusApproval.value) !== -1 && !this.formCreateSurcharge.form.valid)){
+            return false;
+        }
+        return true;
+    }
+
     saveSettlement() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
 
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
-            return;
-        }
         // this.requestSurchargeListComponent.surcharges.forEach(s => {
         //     if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
         //         s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
         //     }
         // });
+
+        if(!this.checkValidSettle()){
+            return;
+        }
 
         this.formatInvoiceDateSurcharge();
 
@@ -113,9 +130,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -188,7 +203,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankCode: this.formCreateSurcharge.bankCode.value,
             dueDate: !!this.formCreateSurcharge.dueDate.value && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };

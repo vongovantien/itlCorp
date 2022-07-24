@@ -1,7 +1,7 @@
 <div class="sea-fcl-export-detail-job-page">
     <app-sub-header>
         <job-detail-button-list [shipmentDetail]="shipmentDetail" [isDuplicate]="isDuplicate"
-            [selectedTab]="selectedTab" (onCancel)="handleCancelForm()" (onDelete)="prepareDeleteJob()"
+            [selectedTab]="selectedTab" (onCancel)="onCancelDeactivate()" (onDelete)="prepareDeleteJob()"
             (onDuplicate)="showDuplicateConfirm()" (onSave)="onSaveJob()" (onPreviewPL)="previewPLsheet($event)"
             (onLock)="lockShipment()">
         </job-detail-button-list>
@@ -76,14 +76,5 @@
         </li>
     </ul>
 </div>
-
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
-
-<info-popup [body]="'Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update Job'"></info-popup>
-
-<permission-403-popup></permission-403-popup>
 
 <ng-template inject></ng-template>

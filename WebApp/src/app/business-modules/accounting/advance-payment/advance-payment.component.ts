@@ -91,6 +91,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Department', field: 'departmentName', sortable: true },
             { title: 'Payee', field: 'payeeName', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
+            { title: 'Due Date', field: 'dueDate', sortable: true },
             { title: 'Deadline Date', field: 'deadlinePayment', sortable: true },
             { title: 'Modified Date', field: 'datetimeModified', sortable: true },
             { title: 'Status Approval', field: 'statusApprovalName', sortable: true },

@@ -37,9 +37,7 @@ export class SeaFclImportManifestComponent extends AppList {
         typeButton: ButtonType.save
     };
     portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
-    cancelButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.cancel
-    };
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     checkAll = false;

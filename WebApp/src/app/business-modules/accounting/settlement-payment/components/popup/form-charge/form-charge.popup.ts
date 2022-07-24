@@ -442,6 +442,12 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             obhPartnerIssued: this.selectedSurcharge.obhPartnerIssued
         });
 
+        // Error if total > 100,000usd
+        if(body.currencyId === 'USD' && body.total > 100000){
+            this._toastService.error('Amount is too large, please check again.');
+            return;
+        }
+
         if (!!this.selectedCharge && this.selectedCharge.type === 'CREDIT') {
             const dataChargeCredit = {
                 objectBePaid: 'OTHER',

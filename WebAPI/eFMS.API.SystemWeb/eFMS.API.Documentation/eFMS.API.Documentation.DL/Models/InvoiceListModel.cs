@@ -38,6 +38,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string AccountNo { get; set; }
         public string BillingType { get; set; }
         public string PaymentStatus { get; set; }
-
+        public string SoaNo { get; set; }
     }
 }

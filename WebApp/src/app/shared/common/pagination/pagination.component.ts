@@ -25,17 +25,22 @@ export class AppPaginationComponent extends AppList implements OnInit {
     @Input() set pageNum(currenctPage: number) {
         this._page = currenctPage;
     }
+    @Input() set size(size: number) {
+        this._maxSize = size;
+    }
 
     get pageNum() { return this._page; }
     get itemPerPage() { return this._pageSize; }
     get total() { return this._totalItems; }
     get data() { return this._data; }
+    get size() { return this._maxSize; }
 
 
     private _page: number = this.page;
     private _pageSize: number = this.pageSize;
     private _totalItems: number = this.totalItems;
     private _data: any = this.dataSearch;
+    private _maxSize: any = this.maxSize;
 
     constructor() {
         super();

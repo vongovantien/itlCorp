@@ -95,13 +95,15 @@ export class SettlementFormCreateComponent extends AppForm {
             'statusApproval': ['New'],
             'payee': [],
             'beneficiaryName': [],
-            'bankAccountNo': [],
+            'bankAccountNo': [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+            ])],
             'bankName': [],
             'bankNameDescription': [],
             'advanceAmount': [],
             'balanceAmount': [],
             'bankCode': [],
-            'dueDate': []
+            'dueDate': [null, Validators.required]
         });
 
 
@@ -239,5 +241,9 @@ export class SettlementFormCreateComponent extends AppForm {
             return true;
         }
         return false;
+    }
+
+    onUpdateRequestDate(value: { startDate: any; endDate: any }) {
+        this.minDate = value.startDate;
     }
 }

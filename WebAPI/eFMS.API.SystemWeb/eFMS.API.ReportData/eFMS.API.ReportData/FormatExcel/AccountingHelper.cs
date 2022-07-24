@@ -4949,39 +4949,40 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Width = 14; //Cột E
             workSheet.Column(6).Width = 14; //Cột F
             workSheet.Column(7).Width = 14; //Cột G
-            workSheet.Column(8).Width = 18; //Cột H
-            workSheet.Column(9).Width = 19; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
-            workSheet.Column(11).Width = 12; //Cột K
-            workSheet.Column(12).Width = 20; //Cột L
-            workSheet.Column(13).Width = 10; //Cột M
-            workSheet.Column(14).Width = 16; //Cột N
-            workSheet.Column(15).Width = 15; //Cột O
-            workSheet.Column(16).Width = 15; //Cột P
-            workSheet.Column(17).Width = 20; //Cột Q
-            workSheet.Column(18).Width = 20; //Cột R
-            workSheet.Column(19).Width = 20; //Cột S
-            workSheet.Column(20).Width = 20; //Cột T
-            workSheet.Column(21).Width = 15; //Cột U
-            workSheet.Column(22).Width = 30; //Cột V
-            workSheet.Column(23).Width = 16; //Cột W
-            workSheet.Column(24).Width = 14; //Cột X
-            workSheet.Column(25).Width = 18; //Cột Y
-            workSheet.Column(26).Width = 10; //Cột Z
-            workSheet.Column(27).Width = 12; //Cột AA
-            workSheet.Column(28).Width = 8; //Cột AB
-            workSheet.Column(29).Width = 10; //Cột AC
-            workSheet.Column(30).Width = 14; //Cột AD
-            workSheet.Column(31).Width = 10; //Cột AE
-            workSheet.Column(32).Width = 15; //Cột AF
-            workSheet.Column(33).Width = 12; //Cột AG
-            workSheet.Column(34).Width = 10; //Cột AH
-            workSheet.Column(35).Width = 10; //Cột AI
-            workSheet.Column(36).Width = 30; //Cột AJ
-            workSheet.Column(37).Width = 15; //Cột AK
-            workSheet.Column(38).Width = 18; //Cột AL
-            workSheet.Column(39).Width = 20; //Cột AM
-            workSheet.Column(40).Width = 25; //Cột AN
+            workSheet.Column(8).Width = 14; //Cột H
+            workSheet.Column(1 + 8).Width = 18; //Cột 1+H
+            workSheet.Column(1 + 9).Width = 19; //Cột 1+I
+            workSheet.Column(1 + 10).Width = 15; //Cột 1+J
+            workSheet.Column(1 + 11).Width = 12; //Cột 1+K
+            workSheet.Column(1 + 12).Width = 20; //Cột 1+L
+            workSheet.Column(1 + 13).Width = 10; //Cột 1+M
+            workSheet.Column(1 + 14).Width = 16; //Cột 1+N
+            workSheet.Column(1 + 15).Width = 15; //Cột 1+O
+            workSheet.Column(1 + 16).Width = 15; //Cột 1+P
+            workSheet.Column(1 + 17).Width = 20; //Cột 1+Q
+            workSheet.Column(1 + 18).Width = 20; //Cột 1+R
+            workSheet.Column(1 + 19).Width = 20; //Cột 1+S
+            workSheet.Column(1 + 20).Width = 20; //Cột 1+T
+            workSheet.Column(1 + 21).Width = 15; //Cột 1+U
+            workSheet.Column(1 + 22).Width = 30; //Cột 1+V
+            workSheet.Column(1 + 23).Width = 16; //Cột 1+W
+            workSheet.Column(1 + 24).Width = 14; //Cột 1+X
+            workSheet.Column(1 + 25).Width = 18; //Cột 1+Y
+            workSheet.Column(1 + 26).Width = 10; //Cột 1+Z
+            workSheet.Column(1 + 27).Width = 12; //Cột 1+AA
+            workSheet.Column(1 + 28).Width = 8; //Cột 1+AB
+            workSheet.Column(1 + 29).Width = 10; //Cột 1+AC
+            workSheet.Column(1 + 30).Width = 14; //Cột 1+AD
+            workSheet.Column(1 + 31).Width = 10; //Cột 1+AE
+            workSheet.Column(1 + 32).Width = 15; //Cột 1+AF
+            workSheet.Column(1 + 33).Width = 12; //Cột 1+AG
+            workSheet.Column(1 + 34).Width = 10; //Cột 1+AH
+            workSheet.Column(1 + 35).Width = 10; //Cột 1+AI
+            workSheet.Column(1 + 36).Width = 30; //Cột 1+AJ
+            workSheet.Column(1 + 37).Width = 15; //Cột 1+AK
+            workSheet.Column(1 + 38).Width = 18; //Cột 1+AL
+            workSheet.Column(1 + 39).Width = 20; //Cột 1+AM
+            workSheet.Column(1 + 40).Width = 25; //Cột 1+AN
         }
 
         private void BindingDataAccoutingManagementExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
@@ -5114,8 +5115,9 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
             workSheet.Column(6).Width = 20; //Cột F
-            workSheet.Column(7).Width = 20; //Cột F
-            workSheet.Column(13).Width = 20; //Cột M
+            workSheet.Column(7).Width = 20; //Cột G
+            workSheet.Column(8).Width = 20; //Cột H
+            workSheet.Column(14).Width = 20; //Cột M
             List<string> headers = new List<string>
             {
                 "JobNo",//0
@@ -5124,21 +5126,22 @@ namespace eFMS.API.ReportData.FormatExcel
                 "HBLNo",//3
                 "VoucherID",//4
                 "Accounting Date",//5
-                "Reference No",//6
-                "Code_Type",//7
-                "ChargeType",//8
-                "PayerID",//9
-                "Payer_Name",//10
-                "PartnerType",//11
-                "Curr",//12
-                "Amount",//13
-                "Issued_by",//14
-                "BU",//15
-                "Service Date",//16
-                "Issue Date",//17
-                "Account No",//18
-                "ETD",//19
-                "ETA"//20
+                "CD Note",//6
+                "SOA",//7
+                "Code_Type",//1+7
+                "ChargeType",//1+8
+                "PayerID",//1+9
+                "Payer_Name",//1+10
+                "PartnerType",//1+11
+                "Curr",//1+12
+                "Amount",//1+13
+                "Issued_by",//1+14
+                "BU",//1+15
+                "Service Date",//1+16
+                "Issue Date",//1+17
+                "Account No",//1+18
+                "ETD",//1+19
+                "ETA"//1+20
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -5162,36 +5165,37 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
                 workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 8].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 9].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 10].Value = item.PayerId;
-                workSheet.Cells[rowStart, 11].Value = item.PayerName;
-                workSheet.Cells[rowStart, 12].Value = item.PayerType;
-                workSheet.Cells[rowStart, 13].Value = item.Currency;
+                workSheet.Cells[rowStart, 8].Value = item.SoaNo;
+                workSheet.Cells[rowStart, 1 + 8].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 1 + 9].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 1 + 10].Value = item.PayerId;
+                workSheet.Cells[rowStart, 1 + 11].Value = item.PayerName;
+                workSheet.Cells[rowStart, 1 + 12].Value = item.PayerType;
+                workSheet.Cells[rowStart, 1 + 13].Value = item.Currency;
 
-                workSheet.Cells[rowStart, 14].Value = item.Amount;
-                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
+                workSheet.Cells[rowStart, 1 + 14].Value = item.Amount;
+                workSheet.Cells[rowStart, 1 + 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
 
-                workSheet.Cells[rowStart, 15].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 16].Value = item.Bu;
-                workSheet.Cells[rowStart, 17].Value = item.ServiceDate;
-                workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 18].Value = item.IssueDate;
-                workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 15].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 1 + 16].Value = item.Bu;
+                workSheet.Cells[rowStart, 1 + 17].Value = item.ServiceDate;
+                workSheet.Cells[rowStart, 1 + 17].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 18].Value = item.IssueDate;
+                workSheet.Cells[rowStart, 1 + 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
-                workSheet.Cells[rowStart, 19].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 20].Value = item.ETD;
-                workSheet.Cells[rowStart, 20].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 21].Value = item.ETA;
-                workSheet.Cells[rowStart, 21].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 19].Value = item.AccountNo;
+                workSheet.Cells[rowStart, 1 + 20].Value = item.ETD;
+                workSheet.Cells[rowStart, 1 + 20].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 21].Value = item.ETA;
+                workSheet.Cells[rowStart, 1 + 21].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
@@ -5615,7 +5619,19 @@ namespace eFMS.API.ReportData.FormatExcel
         //    return numberIn > 0 ? String.Format("{0:n}", numberIn) : "(" + String.Format("{0:n}", numberIn*-1) + ")";
         //}
 
-
+        private string DistinctInvoice(string invoiceNos)
+        {
+            if (string.IsNullOrEmpty(invoiceNos)){
+                return null;
+            }
+            var itemINV = invoiceNos.Split(';').Distinct();
+            string result = "";
+            foreach(var item in itemINV.ToList())
+            {
+                result += item + ';';
+            }
+            return result.Remove(result.Length-1);
+        }
         public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
         {
             var folderOfFile = GetFolderInTemplateExport("AR");
@@ -5655,7 +5671,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("JobNo", item.JobNo);
                         mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
                         mappingKeyValue.Add("HBLNo", item.HwbNo);
-                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ?item.InvoiceNo +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + item.OBHInvoice:"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? item.OBHInvoice : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " +item.OBHInvoice:""));
+                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ? DistinctInvoice(item.InvoiceNo) +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + DistinctInvoice(item.OBHInvoice):"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? DistinctInvoice(item.OBHInvoice) : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " + DistinctInvoice(item.OBHInvoice):""));
                         mappingKeyValue.Add("KGS", item.KGS);
                         mappingKeyValue.Add("CBM", item.CBM);
                         mappingKeyValue.Add("Container", item.PackageContainer);
@@ -5675,6 +5691,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
                         mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
                         mappingKeyValue.Add("FrieghtOBHInvoice", item.FreInvoice);
+                        mappingKeyValue.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
                         //CusFeeTotal += item.CusFee;
                         //CusVATTotal += item.CusVAT;
                         //CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
@@ -5733,6 +5750,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("OBHInvoiceNo", null);
                     mappingKeyValue.Add("PTTotal", "-");
                     mappingKeyValue.Add("FrieghtOBHInvoice", null);
+                    mappingKeyValue.Add("ServiceDate", null);
                     //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
                     //mappingTotalValue.Add("CusFeeTotal", null);
                     //mappingTotalValue.Add("CusVATTotal", null);
@@ -5815,7 +5833,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "SOA/CD Note", // 12
                "Số HĐ/Invoice No", // 13
                "Ngày HĐ/Invoice Date", // 14
-               "Reference No/Số tham chiếu" // 15
+               "Reference No/Số tham chiếu" ,// 15
+               "Service Date/Ngày dịch vụ"//16
             };
 
             List<string> subheaderTable = new List<string>()
@@ -5890,6 +5909,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["S9:S10"].Merge = true;
             workSheet.Cells["T9:T10"].Merge = true;
             workSheet.Cells["U9:U10"].Merge = true;
+            workSheet.Cells["V9:V10"].Merge = true;
 
             // Tạo header
             int colNum = 1;
@@ -5932,10 +5952,10 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["O10"].Value = subheaderTable[4];
             workSheet.Cells["P10"].Value = subheaderTable[5];
 
-            workSheet.Cells[9, 1, 10, 21].Style.Font.Bold = true;
-            workSheet.Cells[9, 1, 10, 21].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[9, 1, 10, 21].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[9, 1, 10, 21].Style.WrapText = true;
+            workSheet.Cells[9, 1, 10, 22].Style.Font.Bold = true;
+            workSheet.Cells[9, 1, 10, 22].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 22].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 22].Style.WrapText = true;
 
             int addressStartContent = 11;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
@@ -5954,8 +5974,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 for (int i = 0; i < lstSoa.exportOPS.Count; i++)
                 {
                     var item = lstSoa.exportOPS[i];
-                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 21].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 21].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 22].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 22].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                     workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
                     workSheet.Cells[i + addressStartContent, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -5993,9 +6013,10 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = formatNumberStr;
 
                     workSheet.Cells[i + addressStartContent, 18].Value = item.Charges.Select(t => t.CombineBillingType).FirstOrDefault() == "SOA" ? item.Charges.Select(t => t.SOANo).FirstOrDefault() : item.Charges.Select(t => t.CDNote).FirstOrDefault();
-                    workSheet.Cells[i + addressStartContent, 19].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
+                    workSheet.Cells[i + addressStartContent, 19].Value = DistinctInvoice(string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)));
                     workSheet.Cells[i + addressStartContent, 20].Value = "";
                     workSheet.Cells[i + addressStartContent, 21].Value = item.Charges.Select(t => t.CombineNo).FirstOrDefault();
+                    workSheet.Cells[i + addressStartContent, 22].Value = item.Charges.Select(t => t.ServiceDate?.ToString("dd/MM/yyyy")).FirstOrDefault();
 
                     for (int j = 0; j < item.Charges.Count; j++)
                     {
@@ -6053,9 +6074,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 addressStartContent = addressStartContent + lstSoa.exportOPS.Count;
 
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Top.Style = ExcelBorderStyle.Thin;
 
 
                 workSheet.Cells[addressStartContent, 1].Value = headers[3]; //Total
@@ -6152,6 +6173,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Column(19).Width = 20; //Cột S
                 workSheet.Column(20).Width = 20; //Cột T
                 workSheet.Column(21).Width = 16; //Cột U
+                workSheet.Column(22).Width = 20; //Cột V
                 workSheet.Cells[addressTotal].Style.Font.Bold = true;
             }
         }

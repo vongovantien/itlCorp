@@ -121,7 +121,7 @@ namespace eFMS.IdentityServer.DL.Services
                         return -4;
                     }
                     SysUserLevel levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
-                    HandleState hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
+                    // HandleState hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
 
                     userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
                     info = new PermissionInfo

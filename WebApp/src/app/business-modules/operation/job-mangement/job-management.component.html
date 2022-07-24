@@ -113,6 +113,9 @@
                                                     {{ item.replicateJobNo }}
                                                 </td>
                                                 <td>
+                                                    <span>{{ item.mblno }}</span>
+                                                </td>
+                                                <td>
                                                     <span>{{ item.hwbno }}</span>
                                                 </td>
                                                 <td>
@@ -127,7 +130,7 @@
                                                 <td>
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
-                                                </td>                                       
+                                                </td>
                                                 <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
@@ -214,7 +217,7 @@
                         </div>
                     </tab>
                     <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
-                        <ng-container *ngIf = "isSearchLinkFeea">
+                        <ng-container *ngIf="isSearchLinkFeea">
                             <app-job-mangement-link-fee></app-job-mangement-link-fee>
                         </ng-container>
                     </tab>
@@ -250,7 +253,8 @@
 
 <app-dropdown #dropdownMenuLinkOps>
     <a class="dropdown-item pointer" (click)="chargeFromRep()">Charge From Replicate</a>
-    <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'" (click)="chargeFromJobRep()">Option Link Charge From Job List</a>
+    <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'"
+        (click)="chargeFromJobRep()">Option Link Charge From Job List</a>
 </app-dropdown>
 
 <link-charge-from-job-rep></link-charge-from-job-rep>

@@ -25,7 +25,6 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     containers: Container[] = [];
@@ -40,6 +39,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
         protected _cd: ChangeDetectorRef
     ) {
         super();
+        this.requestCancel = this.gotoList;
     }
 
     ngOnInit(): void {
@@ -115,7 +115,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
             || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
             || (!!this.formCreateComponent.polDescription.value && !this.formCreateComponent.pol.value)
             || (!this.formCreateComponent.podDescription.value
-            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
+                || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
         ) {
             valid = false;
         }
@@ -128,7 +128,10 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
             this.containers = this.selectedJob.containers;
         }
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
 
