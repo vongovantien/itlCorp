@@ -1,6 +1,6 @@
 {
     "name": "e-fms-web",
-    "version": "1.2.18",
+    "version": "1.2.20",
     "scripts": {
         "ng": "ng",
         "start": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve ",
