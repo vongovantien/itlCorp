@@ -262,7 +262,7 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (var item in contractPartner)
                         {
                             var agreementPartner = CalculatorAgreement(item);
-                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id, false);
+                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id);
 
                             if (agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
