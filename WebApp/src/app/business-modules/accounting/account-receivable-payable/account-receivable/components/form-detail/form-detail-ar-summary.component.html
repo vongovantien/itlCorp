@@ -70,12 +70,12 @@
                 <div class="row">
                     <div class="col-lg-5">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed" ?
+                            {{accReceivableDetail.agreementType === "Guarantee" ?
                             "Salesman:" :"Effective Date:"}}
                         </h6>
                     </div>
                     <div class="col-lg-7">
-                        <div>{{accReceivableDetail.agreementType === "Guaranteed" ?
+                        <div>{{accReceivableDetail.agreementType === "Guarantee" ?
                             accReceivableDetail.agreementSalesmanName
                             : (accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy')}}
                         </div>
@@ -86,19 +86,19 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed"
+                            {{accReceivableDetail.agreementType === "Guarantee"
                             ? "Credit Limit Rate:" :"Credit Limited:"}}
                         </h6>
                     </div>
                     <div class="col-lg-6">
-                        <div [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-success': null ">
-                            {{ accReceivableDetail.agreementType === "Guaranteed" ?
+                        <div [ngClass]="accReceivableDetail.agreementType === 'Guarantee' ? 'text-success': null ">
+                            {{ accReceivableDetail.agreementType === "Guarantee" ?
                             accReceivableDetail.creditRateLimit :
                             accReceivableDetail.creditLimited | number: '.0-3'}}
                             <span
-                                *ngIf="(accReceivableDetail.creditLimited && accReceivableDetail.agreementType !== 'Guaranteed' )||
-                                    (accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType === 'Guaranteed')">
-                                {{ accReceivableDetail.agreementType === "Guaranteed" ? "%"
+                                *ngIf="(accReceivableDetail.creditLimited && accReceivableDetail.agreementType !== 'Guarantee' )||
+                                    (accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType === 'Guarantee')">
+                                {{ accReceivableDetail.agreementType === "Guarantee" ? "%"
                                 : accReceivableDetail.agreementCurrency }}
                             </span>
                             <span *ngIf="!!accReceivableDetail.isOverLimit" title="Contract is over credit limit">
@@ -131,17 +131,17 @@
                 <div class="row">
                     <div class="col-lg-5">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed"
+                            {{accReceivableDetail.agreementType === "Guarantee"
                             ? "Sales Credit Limited:" :"Expired Date:"}}
                         </h6>
                     </div>
                     <div class="col-lg-7">
                         <div>
-                            {{accReceivableDetail.agreementType === "Guaranteed" ?
+                            {{accReceivableDetail.agreementType === "Guarantee" ?
                             (accReceivableDetail.saleCreditLimited | number: '.0-3')
                             : (accReceivableDetail.expriedDate | date: 'dd/MM/yyyy')}}
                             <span
-                                *ngIf="(accReceivableDetail.agreementType === 'Guaranteed' && accReceivableDetail.saleCreditLimited)">
+                                *ngIf="(accReceivableDetail.agreementType === 'Guarantee' && accReceivableDetail.saleCreditLimited)">
                                 {{accReceivableDetail.agreementCurrency}}
                             </span>
                             <span *ngIf="accReceivableDetail.isExpired">
@@ -155,19 +155,19 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed"
+                            {{accReceivableDetail.agreementType === "Guarantee"
                             ? "Sales Debit Amount:" :"Credit Term (Days):"}}
                         </h6>
                     </div>
                     <div class="col-lg-6">
                         <div>
-                            {{ accReceivableDetail.agreementType === "Guaranteed" ?
+                            {{ accReceivableDetail.agreementType === "Guarantee" ?
                             (accReceivableDetail.saleDebitAmount | number: '.0-3')
                             : accReceivableDetail.creditTerm }}
                             <span
-                                *ngIf="(accReceivableDetail.creditTerm && accReceivableDetail.agreementType !== 'Guaranteed' )||
-                                    (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guaranteed') ">
-                                {{accReceivableDetail.agreementType === "Guaranteed" ?
+                                *ngIf="(accReceivableDetail.creditTerm && accReceivableDetail.agreementType !== 'Guarantee' )||
+                                    (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guarantee') ">
+                                {{accReceivableDetail.agreementType === "Guarantee" ?
                                 accReceivableDetail.agreementCurrency : "days"}}
                             </span>
 
@@ -193,18 +193,17 @@
                 <div class="row">
                     <div class="col-lg-5">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed"
+                            {{accReceivableDetail.agreementType === "Guarantee"
                             ? "Credit Term (Days):" :"Expired Days:"}}
                         </h6>
                     </div>
                     <div class="col-lg-7">
-                        <div [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? null : 'text-danger'">
-                            {{ accReceivableDetail.agreementType === "Guaranteed" ?
+                        <div [ngClass]="accReceivableDetail.agreementType === 'Guarantee' ? null : 'text-danger'">
+                            {{ accReceivableDetail.agreementType === "Guarantee" ?
                             accReceivableDetail.creditTerm
                             : accReceivableDetail.expriedDay }}
-                            <span
-                                *ngIf="(accReceivableDetail.expriedDay && accReceivableDetail.agreementType !== 'Guaranteed') ||
-                                (accReceivableDetail.creditTerm && accReceivableDetail.agreementType === 'Guaranteed')">
+                            <span *ngIf="(accReceivableDetail.expriedDay && accReceivableDetail.agreementType !== 'Guarantee') ||
+                                (accReceivableDetail.creditTerm && accReceivableDetail.agreementType === 'Guarantee')">
                                 days</span>
                         </div>
                     </div>
@@ -214,19 +213,19 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <h6 class="font-weight-bold">
-                            {{accReceivableDetail.agreementType === "Guaranteed"
+                            {{accReceivableDetail.agreementType === "Guarantee"
                             ? "Sales Debit Rate:" :"Credit Rate Limit:"}}
                         </h6>
                     </div>
                     <div class="col-lg-6">
                         <div
-                            [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-danger' : 'text-success' ">
-                            {{ accReceivableDetail.agreementType === "Guaranteed" ?
+                            [ngClass]="accReceivableDetail.agreementType === 'Guarantee' ? 'text-danger' : 'text-success' ">
+                            {{ accReceivableDetail.agreementType === "Guarantee" ?
                             (accReceivableDetail.saleDebitRate | number: '.0-3')
                             : (accReceivableDetail.creditRateLimit | number: '.0-3') }}
                             <span
-                                *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guaranteed') ||
-                                    (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guaranteed')">
+                                *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guarantee') ||
+                                    (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guarantee')">
                                 %
                             </span>
                         </div>
@@ -422,15 +421,34 @@
                         <h6 class="font-weight-bold">Over Amount:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div
-                            *ngIf="accReceivableDetail.debitAmount -  accReceivableDetail.creditLimited > 0; else none">
-                            <span class="text-danger">{{(accReceivableDetail.debitAmount -
-                                accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
-                            <span *ngIf="accReceivableDetail.debitAmount -
-                            accReceivableDetail.creditLimited">
-                                {{ accReceivableDetail.arCurrency }}
-                            </span>
-                        </div>
+                        <ng-container [ngSwitch]="accReceivableDetail.agreementType">
+                            <ng-container *ngSwitchCase="'Guarantee'">
+                                <div
+                                    *ngIf="accReceivableDetail.saleDebitAmount - accReceivableDetail.saleCreditLimited > 0; else none">
+                                    <span class="text-danger">
+                                        {{
+                                        (accReceivableDetail.saleDebitAmount -
+                                        accReceivableDetail.saleCreditLimited)| number: '.0-3'
+                                        }}
+                                    </span>
+                                    {{ accReceivableDetail.arCurrency }}
+
+                                </div>
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>
+                                <div
+                                    *ngIf="accReceivableDetail.debitAmount -  accReceivableDetail.creditLimited > 0; else none">
+                                    <span class="text-danger">
+                                        {{
+                                        (accReceivableDetail.debitAmount -
+                                        accReceivableDetail.creditLimited)| number: '.0-3'
+                                        }}
+                                    </span>
+                                    {{ accReceivableDetail.arCurrency }}
+                                </div>
+                            </ng-container>
+                        </ng-container>
+
                         <ng-template #none>
                             <span class="text-success">0</span>
                         </ng-template>

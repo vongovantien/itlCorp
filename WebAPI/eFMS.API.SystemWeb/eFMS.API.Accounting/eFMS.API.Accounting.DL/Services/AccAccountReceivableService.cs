@@ -266,7 +266,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             if (agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
-                                IQueryable<CatContract> relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
+                                var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
                                     && x.SaleManId == agreementPartner.SaleManId
                                     && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
 
@@ -287,13 +287,16 @@ namespace eFMS.API.Accounting.DL.Services
                                             contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
                                         }
                                     }
-
-                                    foreach (var contract in relateGuaranteeContracts)
+                                    else
                                     {
-                                        contract.CreditRate = _creditRate;
-                                        contract.IsOverLimit = false;
-                                        contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
+                                        foreach (var i in relateGuaranteeContracts)
+                                        {
+                                            i.CreditRate = _creditRate;
+                                            i.IsOverLimit = false;
+                                            contractPartnerRepo.Update(item, x => x.Id == i.Id, false);
+                                        }
                                     }
+                                    
                                     salesman.CreditRate = _creditRate;
                                     var hsUpdateUser = await userRepo.UpdateAsync(salesman, x => x.Id == salesman.Id, false);
                                 }
