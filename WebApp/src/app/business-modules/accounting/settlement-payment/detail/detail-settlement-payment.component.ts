@@ -238,7 +238,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
             return false;
         }
-        if(!this.formCreateSurcharge.dueDate.value || (['New','Denied'].indexOf(this.formCreateSurcharge.statusApproval.value) !== -1 && !this.formCreateSurcharge.form.valid)){
+        if((!!this.formCreateSurcharge.dueDate.value && !this.formCreateSurcharge.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateSurcharge.statusApproval.value) && !this.formCreateSurcharge.form.valid)){
             return false;
         }
         return true;
