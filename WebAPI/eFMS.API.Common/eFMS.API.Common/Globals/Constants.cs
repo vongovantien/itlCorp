@@ -15,6 +15,6 @@ namespace eFMS.API.Common.Globals
         public const string PERMISSION_RANGE_NONE = "None";
         public const decimal DecimalNumber = (decimal)0.00000000001;
         public const decimal DecimalMinNumber = (decimal)0.000000001;
-
+        public static readonly string[] spaceCharacter = { "\\s", "\t", "\n" };
     }
 }

@@ -1880,6 +1880,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.DepartmentId = currentUser.DepartmentId;
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
+                entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -2031,6 +2032,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.ReasonReject = settlementCurrent.ReasonReject;
                 settlement.LockedLog = settlementCurrent.LockedLog;
                 settlement.SettlementType = settlementCurrent.SettlementType;
+                settlement.BankAccountNo = StringHelper.RemoveSpecialChars(settlement.BankAccountNo, Constants.spaceCharacter);
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
