@@ -92,7 +92,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             statusApproval: this.settlementPayment.settlement.statusApproval,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             payee: this.formCreateSurcharge.payee.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankCode: this.formCreateSurcharge.bankCode.value,
@@ -118,8 +118,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         //     return;
         // }
 
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -227,14 +227,29 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             );
     }
 
+    checkValidSettle() {
+        if (this.formCreateSurcharge.checkStaffPartner()) {
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return false;
+        }
+
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if((!!this.formCreateSurcharge.dueDate.value && !this.formCreateSurcharge.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateSurcharge.statusApproval.value) && !this.formCreateSurcharge.form.valid)){
+            return false;
+        }
+        return true;
+    }
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        if(!this.checkValidSettle()){
             return;
         }
 

@@ -27,5 +27,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string AccountNo { get; set; }
         public DateTime? ETA { get; set; }
         public DateTime? ETD { get; set; }
+        public string SoaNo { get; set; }
     }
 }

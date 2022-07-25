@@ -233,5 +233,9 @@
 
         public const string OFFICE_HM = "ITLHM";
         public const string OFFICE_BH = "ITLHBH";
+
+        public const string LINK_TYPE_AUTO_RATE = "AUTO_RATE";
+        public const string TYPE_LINK_SOURCE_SHIPMENT = "Replicate";
+        public const string OFFICE_TYPE_OUTSOURCE = "OutSource";
     }
 }

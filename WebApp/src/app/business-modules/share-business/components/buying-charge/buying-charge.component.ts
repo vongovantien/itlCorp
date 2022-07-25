@@ -860,6 +860,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         }
 
+        // Error if total > 100,000usd
+        if (valid && this.charges.some((chargeItem: CsShipmentSurcharge) => chargeItem.currencyId === 'USD' && chargeItem.total > 100000)) {
+            valid = false;
+            this._toastService.error('Amount is too large, please check again.');
+        }
+
         return valid;
     }
 

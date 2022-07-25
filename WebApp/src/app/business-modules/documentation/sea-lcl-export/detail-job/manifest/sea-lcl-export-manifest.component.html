@@ -15,21 +15,19 @@
                 </button>
             </ng-container>
 
-            <ng-container *ngIf="(isLocked | async) === false">
-                <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-                    <button type="button" (click)="showRefreshPopup()"
-                        class="btn btn-default  m-btn--icon m-btn--uppercase">
+            <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
+                <button type="button" (click)="showRefreshPopup()"
+                    class="btn btn-default  m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-refresh"></i>
                         <span>
-                            <i class="la la-refresh"></i>
-                            <span>
-                                Refresh
-                            </span>
+                            Refresh
                         </span>
-                    </button>
-                    <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
-                        [dataTarget]="saveButtonSetting.dataTarget">
-                    </app-default-button>
-                </ng-container>
+                    </span>
+                </button>
+                <app-default-button (click)="addOrUpdateManifest()" [buttonSetting]="saveButtonSetting"
+                    [dataTarget]="saveButtonSetting.dataTarget">
+                </app-default-button>
             </ng-container>
 
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>

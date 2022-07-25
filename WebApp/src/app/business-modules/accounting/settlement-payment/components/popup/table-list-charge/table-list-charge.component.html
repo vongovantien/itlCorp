@@ -203,7 +203,13 @@
                                                     </ng-template>
                                                 </div>
                                             </td>
-                                            <td class="text-right">{{charge.total| number:'1.0-3'}}</td>
+                                            <td>
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
+                                                    <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
+                                                        currencyMask placeholder="Total">
+                                                </div>
+                                            </td>
                                             <td>
                                                 <ng-container *ngIf="!charge.syncedFromBy;else obhPartnerTpl ">
                                                     <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown

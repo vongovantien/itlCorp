@@ -212,8 +212,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-
-                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) === -1 && chargeIds.indexOf(x.jobId) === -1 && !x.isFromShipment && x.hasNotSynce);
+                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 || chargeIds.indexOf(x.id) === -1)  && !x.isFromShipment && x.hasNotSynce);
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
@@ -251,10 +250,15 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this._toastService.warning('Charge already linked charge');
                 return;
             }
-            if(!surcharge.hasNotSynce){
+            if (!surcharge.hasNotSynce) {
                 this._toastService.warning('Charge already synced');
                 return;
             }
+            if(!surcharge.isFromShipment && surcharge.hadIssued){
+                this._toastService.warning('Charge had issued Soa/CdNote');
+                return;
+            }
+
             this.selectedSurcharge = surcharge;
             this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
 
@@ -313,13 +317,13 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
             for (const groupShipment of this.groupShipments) {
                 const chargeIssue = groupShipment.chargeSettlements.filter((chg: Surcharge) => chg.isSelected && chg.hadIssued && !chg.isFromShipment);
-                if(!!chargeIssue.length){
+                if (!!chargeIssue.length) {
                     this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
                     return;
                 }
 
-                let checks : any[] = groupShipment.chargeSettlements.filter((x:any)=>x.isSelected && x.linkChargeId);
-                if(!!checks.length){
+                let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId);
+                if (!!checks.length) {
                     this._toastService.warning('Charge already linked charge');
                     return;
                 }
@@ -336,11 +340,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         } else {
             const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
             const chargeIssue = surchargeSelected.filter((chg: Surcharge) => chg.hadIssued && !chg.isFromShipment);
-            if(!!chargeIssue.length){
+            if (!!chargeIssue.length) {
                 this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
                 return;
             }
-            
+
             let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.linkChargeId);
             if (!!checkChargeLinks.length) {
                 this._toastService.warning('Charge already linked charge');
@@ -376,7 +380,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 if (charge.isFromShipment) {
                     charge.isSelected = true;
                 }
-                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce) {
+                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued) {
                     charge.isSelected = true;
                 }
             } else {
@@ -440,17 +444,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     .subscribe(
                         (data: any) => {
                             this.groupShipments = data || [];
-
                             this.selectedIndexSurcharge = null;
-                            if (this.isExistingSettlement === true) {
-                                this.groupShipments.forEach((groupItem: any) => {
-                                    groupItem.chargeSettlements.map((charge: Surcharge) => {
-                                        const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
-                                        charge.amountVnd = chargeInList.amountVnd;
-                                        charge.vatAmountVnd = chargeInList.vatAmountVnd;
-                                    })
-                                })
-                            }
+                            // if (this.isExistingSettlement === true) {
+                            this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
+                                const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
+                                    return x.hblid == groupItem.hblId
+                                        && x.advanceNo == groupItem.advanceNo
+                                        && x.settlementCode === groupItem.settlementNo
+                                        && x.clearanceNo == groupItem.customNo
+                                });
+                                groupItem.chargeSettlements = groupItemSurcharges || [];
+                            });
+                            // }
                         });
             }
         }
@@ -477,7 +482,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this._toastService.warning('Charge already linked charge');
             return;
         }
-        if(!charge.hasNotSynce){
+        if (!charge.hasNotSynce) {
             this._toastService.warning('Charge already synced');
             return;
         }
@@ -495,13 +500,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.settlementCode = this.settlementCode || null;
             this.existingChargePopup.show();
         } else {
+            if(charge.hadIssued){
+                this._toastService.warning('Charge had issued Soa/CdNote');
+                return;
+            }
+
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {
                 this.tableListChargePopup.selectedShipment = shipment;
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 

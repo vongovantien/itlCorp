@@ -86,7 +86,7 @@
                     </td>
                 </tr>
             </ng-container>
-            <tr *ngIf="!data || !data.chargeSettlements.length" app-table-none-record [colspan]="headers.length + 2">
+            <tr *ngIf="!data || !data?.chargeSettlements?.length" app-table-none-record [colspan]="headers.length + 2">
             </tr>
         </tbody>
     </table>

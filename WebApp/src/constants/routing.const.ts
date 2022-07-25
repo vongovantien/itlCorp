@@ -82,6 +82,7 @@ export class RoutingConstants {
         SUPPLIER: `${RoutingConstants.ROOT_TOOL}/supplier`,
         LOG_VIEWER: `${RoutingConstants.ROOT_TOOL}/log-viewer`,
         UNLOCK: `${RoutingConstants.ROOT_TOOL}/unlock`,
+        FILE_MANAGMENT: `${RoutingConstants.ROOT_TOOL}/file-management`,
     };
 
     public static readonly REPORT = {
@@ -94,6 +95,20 @@ export class RoutingConstants {
         FORM: `${RoutingConstants.ROOT_DESIGNS_ZONE}/form`,
         TABLE: `${RoutingConstants.ROOT_DESIGNS_ZONE}/table`,
     };
+
+    public static mappingRouteDocumentWithTransactionType(transactionType: string) {
+        return new Map([
+            ['AI', this.DOCUMENTATION.AIR_EXPORT],
+            ['AE', this.DOCUMENTATION.AIR_IMPORT],
+            ['SCE', this.DOCUMENTATION.SEA_CONSOL_EXPORT],
+            ['SCI', this.DOCUMENTATION.SEA_CONSOL_IMPORT],
+            ['SFE', this.DOCUMENTATION.SEA_FCL_EXPORT],
+            ['SFI', this.DOCUMENTATION.SEA_FCL_IMPORT],
+            ['SLE', this.DOCUMENTATION.SEA_LCL_EXPORT],
+            ['SLI', this.DOCUMENTATION.SEA_LCL_IMPORT],
+            ['CL', this.LOGISTICS.JOB_MANAGEMENT],
+        ]).get(transactionType);
+    }
 
 }
 

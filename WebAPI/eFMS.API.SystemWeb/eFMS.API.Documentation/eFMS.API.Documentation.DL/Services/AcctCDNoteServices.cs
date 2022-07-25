@@ -2789,13 +2789,14 @@ namespace eFMS.API.Documentation.DL.Services
                               DatetimeModified = soa.DatetimeModified,
                               VoucherIddate = chg.VoucherIddate,
                               PaymentStatus = acc == null ? string.Empty : acc.PaymentStatus,
-                              CodeNo = soa.Soano,
+                              CodeNo = soa.Type=="Debit"?chg.DebitNo: chg.CreditNo,
                               CodeType = soa.Type,
                               ChargeId = chg.Id,
                               ChargeType = chg.Type,
                               PayerId = chg.PayerId,
                               DepartmentId = soa.DepartmentId,
-                              AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
+                              AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
+                              SoaNo = soa.Soano
                           };
             var paySoaData = from soa in soaQuery
                              join chg in chargePSoa on soa.Soano equals chg.PaySoano
@@ -2831,13 +2832,14 @@ namespace eFMS.API.Documentation.DL.Services
                                  DatetimeModified = soa.DatetimeModified,
                                  VoucherIddate = chg.VoucherIddate,
                                  PaymentStatus = acc == null ? string.Empty : acc.PaymentStatus,
-                                 CodeNo = soa.Soano,
+                                 CodeNo = soa.Type == "Debit" ? chg.DebitNo : chg.CreditNo,
                                  CodeType = soa.Type,
                                  ChargeId = chg.Id,
                                  ChargeType = chg.Type,
                                  PayerId = chg.PayerId,
                                  DepartmentId = soa.DepartmentId,
-                                 AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
+                                 AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
+                                 SoaNo = soa.Soano
                              };
             var data = soaData.AsEnumerable();
             if (data == null || data.Count() == 0)
@@ -2883,7 +2885,8 @@ namespace eFMS.API.Documentation.DL.Services
                 ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
                 PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
-                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct())
+                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
+                SoaNo = se.FirstOrDefault().SoaNo,
             }).AsQueryable();
             return result;
         }
@@ -2988,6 +2991,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  PayerId = chg.PayerId,
                                  DepartmentId = cdNote.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
+                                 SoaNo=chg.Soano
                              };
             var debitData = from cdNote in cdNoteData
                             join chg in charges on cdNote.Code equals chg.DebitNo
@@ -3027,7 +3031,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeType = chg.Type,
                                 PayerId = chg.PayerId,
                                 DepartmentId = cdNote.DepartmentId,
-                                AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
+                                AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
+                                SoaNo = chg.Soano
                             };
             IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
             if (creditData == null || creditData.Count() == 0)
@@ -3072,7 +3077,8 @@ namespace eFMS.API.Documentation.DL.Services
                 ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
                 PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
-                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct())
+                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
+                SoaNo=se.FirstOrDefault().SoaNo,
             }).AsQueryable();
             return result;
         }
@@ -3666,7 +3672,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else if (soaData?.Count() > 0)
             {
-                queryData = queryData.Union(soaData);
+                queryData = queryData.Union(soaData);           
             }
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
                 queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
@@ -3714,10 +3720,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 IssueDate = cd.IssuedDate,
                                 AccountNo = cd.AccountNo,
                                 ETA = trans != null ? trans.Eta : null,
-                                ETD = trans != null ? trans.Etd : null                               
+                                ETD = trans != null ? trans.Etd : null,
+                                SoaNo = cd.SoaNo
                             };
 
-            var res = dataTrans.OrderByDescending(o => o.CdNoteNo).ToList<AccAccountingManagementResult>();
+            var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
             return res;
         }
 

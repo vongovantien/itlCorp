@@ -8,25 +8,32 @@
                 </button>
             </div>
             <div class="modal-body">
-
-                <div class="row">
-                    <div class="col-lg-6"></div>
-                    <div class="col-lg-6 m--align-right">
-                        <div class="m--margin-bottom-10">
-                            <input style="display:none" type="file" #file (change)="chooseFile($event)">
-                            <button (click)="file.click()" type="button"
-                                class=" btn btn-success  m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-plus"></i>
-                                    <span>
-                                        Upload Files
-                                    </span>
-                                </span>
-                            </button>
+                <div class="files-attach-wp m-animate-fade-in">
+                    <ng-container>
+                        <div class="m-portlet">
+                            <div class="m-portlet__body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="text-center">
+                                            <div class="dropzone">
+                                                <div class="dropzone__message">
+                                                    <h3 class="dropzone__title">
+                                                        Click to upload
+                                                        <span>
+                                                            <i class="fa fa-upload" aria-hidden="true"></i>
+                                                        </span>
+                                                    </h3>
+                                                </div>
+                                                <input type="file" multiple (change)="chooseFile($event)"
+                                                    title="Upload files" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </ng-container>
                 </div>
-
                 <div class="table-wrapper table-scrollable" id="">
                     <table class="table table-hover table-brand dataTable">
                         <thead app-table-header [headers]="headers"
@@ -51,7 +58,7 @@
                                             </label>
                                         </div>
                                     </td>
-                                    <td> 
+                                    <td>
                                         <a [href]="file.url" target="_blank" [title]="file.name"
                                             download>{{file.name}}</a>
                                     </td>

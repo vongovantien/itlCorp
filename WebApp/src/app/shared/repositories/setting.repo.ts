@@ -142,11 +142,11 @@ export class SettingRepo {
             );
     }
 
-    generatePaymentId(paymentNo: string, type: number){
-        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`,{paymentNo:paymentNo,type:type})
-        .pipe(
-            map((data: any) => data)
-        );
+    generatePaymentId(paymentNo: string, type: number) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`, { paymentNo: paymentNo, type: type })
+            .pipe(
+                map((data: any) => data)
+            );
     }
 
     getRule(page?: number, size?: number, body: any = {}) {
@@ -197,6 +197,22 @@ export class SettingRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    getListFolderName(body: any = {}, page?: number, size?: number) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetFileManagement`, body, {
+            page: '' + page,
+            size: '' + size,
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getDetailFileManagement(folderName: string, objectId: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetDetailFileManagement`, { folderName, objectId }).pipe(
+            map((data: any) => data)
+        );;
     }
 }
 

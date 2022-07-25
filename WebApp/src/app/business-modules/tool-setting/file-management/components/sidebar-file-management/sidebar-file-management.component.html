@@ -1,0 +1,81 @@
+<div class="pl-2">
+    <div class="border border-file-management border-right-0 border-left-0 py-3 font-breadcrumb-files-management">
+        <span class="m-menu__link-text" (click)="onBreadcrumbActive(title)">
+            <a *ngIf="listBreadcrumb.length > 0" href="javascript:;"
+                class="pe-auto m-nav__link-text active-route">{{title}}</a>
+
+            <ng-container *ngIf="listBreadcrumb.length <= 0" class="pe-auto m-nav__link-text active-route">
+                {{title}}
+            </ng-container>
+        </span>
+        <ng-container *ngFor="let item of listBreadcrumb; let i = index">
+            <span class="m-menu__link-text"
+                (click)="i===listBreadcrumb.length-1 ? $event.stopPropagation(): onBreadcrumbActive(item)"> >
+
+                <ng-container *ngIf="i===listBreadcrumb.length-1">
+                    {{item}}
+                </ng-container>
+
+                <a *ngIf="i!==listBreadcrumb.length-1" href="javascript:;"
+                    class="pe-auto m-nav__link-text active-route">
+                    {{item}}</a>
+            </span>
+        </ng-container>
+    </div>
+    <ul class="m-menu__nav navbar-nav pt-3 menu-sidebar-file-management">
+
+        <li class="m-menu__link p-3" [ngClass]="{'active-side-file' : this.title === 'Accounting'}">
+            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center"
+                (click)="navigateFileMngt('accounting')">
+                <i class="icon-calculator m__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Accounting
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item p-3" [ngClass]="{'active-side-file' : this.title === 'Document'}">
+            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center "
+                (click)="navigateFileMngt('document')">
+                <i class="icon-file-text2 m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Document
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item p-3">
+            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-books m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    Catalogue
+                </span>
+            </a>
+        </li>
+        <li class="m-menu__item p-3">
+            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
+                <i class="icon-database m-menu__link-icon"></i>
+                <span class="m-menu__link-text ml-3">
+                    System
+                </span>
+            </a>
+        </li>
+    </ul>
+    <div *ngIf="isActiveSearch === true" class="ml-2 mt-3">
+        <form class="row" [formGroup]="formSearch">
+            <div class="col-lg-11">
+                <div class="form-group">
+                    <textarea name="" id="" cols="40" rows="10" class="form-control" formControlName="listKeyWord"
+                        placeholder="Input text to search...">
+                    </textarea>
+                </div>
+                <div class="text-center mt-2">
+                    <button (click)="onSubmitSearch()" type="submit"
+                        class="btn btn-brand m-btn--icon m-btn--uppercase"><span><i class="la la-search"></i><span>
+                                Search </span></span></button>
+                    <button (click)="reset()" type="reset"
+                        class="ml-2 btn btn-default m-btn--icon m-btn--uppercase"><span><i
+                                class="la la-refresh"></i><span> Reset </span></span></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -162,7 +162,13 @@ export class AdvancePaymentDetailComponent
                         bankName: this.advancePayment.bankName,
                         payee: this.advancePayment.payee,
                         bankCode: this.advancePayment.bankCode,
-                        advanceFor: this.advancePayment.advanceFor
+                        advanceFor: this.advancePayment.advanceFor,
+                        dueDate: {
+                            startDate: new Date(
+                                this.advancePayment.dueDate
+                            ),
+                            endDate: new Date(this.advancePayment.dueDate),
+                        }
                     });
                     this.statusApproval = this.advancePayment.statusApproval;
                     if (!this.isAdvCarrier) {
@@ -235,9 +241,10 @@ export class AdvancePaymentDetailComponent
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: !this.formCreateComponent.bankName.value ? this.formCreateComponent.bankName.value : this.formCreateComponent.bankName.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
+                dueDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en') : null
             };
         }
         else {
@@ -270,16 +277,17 @@ export class AdvancePaymentDetailComponent
                 paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
                 bankAccountNo: this.formCreateComponent.bankAccountNo.value,
                 bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value,
+                bankName: !this.formCreateComponent.bankName.value ? this.formCreateComponent.bankName.value : this.formCreateComponent.bankName.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 payee: this.formCreateComponent.payee.value,
                 bankCode: this.formCreateComponent.bankCode.value,
-                advanceFor: this.formCreateComponent.advanceFor.value
+                advanceFor: this.formCreateComponent.advanceFor.value,
+                dueDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.dueDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en') : null
             };
         }
     }
 
     updateAdvPayment() {
-        if (this.checkValidListAdvanceRequest()) {
+        if (this.checkInvalidListAdvanceRequest()) {
             return;
         } else {
             const body = this.getAndModifiedBodyAdvance();
@@ -330,7 +338,11 @@ export class AdvancePaymentDetailComponent
             });
     }
 
-    checkValidListAdvanceRequest() {
+    checkInvalidListAdvanceRequest() {
+        this.formCreateComponent.isSubmitted = true;
+        if((!!this.formCreateComponent.dueDate.value && !this.formCreateComponent.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateComponent.statusApproval.value) && !this.formCreateComponent.formCreate.valid)){
+            return true;
+        }
         if (!this.isAdvCarrier) {
             if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
                 this._toastService.warning(
@@ -349,7 +361,6 @@ export class AdvancePaymentDetailComponent
 
         } else {
             this.listAdvancePaymentCarrierComponent.isSubmitted = true;
-            this.formCreateComponent.isSubmitted = true;
             if (!this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.length) {
                 this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, "");
                 return true;
@@ -365,6 +376,11 @@ export class AdvancePaymentDetailComponent
                 this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, "");
                 return true;
             }
+            // Error if total > 100,000usd
+            if (this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.some(item => item.currencyId === 'USD' && item.total > 100000)) {
+                this._toastService.error('Amount is too large, please check again.');
+                return true;
+            }
             this.formCreateComponent.isSubmitted = false;
             this.listAdvancePaymentCarrierComponent.isSubmitted = false;
         }
@@ -372,7 +388,7 @@ export class AdvancePaymentDetailComponent
     }
 
     sendRequest() {
-        if (this.checkValidListAdvanceRequest()) {
+        if (this.checkInvalidListAdvanceRequest()) {
             return;
         }
         const body = this.getAndModifiedBodyAdvance();

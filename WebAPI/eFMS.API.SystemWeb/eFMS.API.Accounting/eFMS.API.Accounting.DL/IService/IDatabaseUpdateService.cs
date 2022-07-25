@@ -13,5 +13,6 @@ namespace eFMS.API.Accounting.DL.IService
         sp_InsertRowToDataBase InsertDataToDB(object obj);
         void UpdateSurchargeSettleDataToDB(List<CsShipmentSurcharge> surcharges, string settleCode, decimal kickBackExcRate, string action);
         void UpdateSurchargeAfterSynced(string type, string code);
+        void LogAddEntity(object entity);
     }
 }

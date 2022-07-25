@@ -10,7 +10,6 @@ export class ApiService {
     constructor(protected _http: HttpClient,
     ) {
     }
-
     setHeaders(headers: any = {}) {
         this._headers = Object.assign({}, this._headers, headers);
         return this;

@@ -15,7 +15,7 @@ import { switchMap, map, tap, skip, takeUntil, catchError, finalize, concatMap }
 
 import * as fromShareBussiness from './../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,13 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild("deleteConfirmTemplate") confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
-    @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
@@ -64,8 +57,8 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     ) {
         super(_router, _documenRepo, _toastService);
         this._progressRef = this._ngProgressService.ref();
+        this.requestCancel = this.handleCancelForm;
     }
-
 
     ngOnInit() { }
 
@@ -134,7 +127,10 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -147,6 +143,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+        modelAdd.isLocked = this.shipmentDetail.isLocked;
 
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelAdd);
@@ -239,14 +236,22 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             )
             .subscribe((value: number) => {
                 if (value === 403) {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
                     return;
                 }
                 if (value === 200) {
-                    this.confirmDeletePopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You you sure you want to delete this Job?',
+                        title: 'Alert',
+                        labelConfirm: 'Yes',
+                    }, () => {
+                        this.onDeleteJob();
+                    })
                     return;
                 } else {
-                    this.canNotDeleteJobPopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You are not allowed to delete this job'
+                    });
                 }
             });
     }
@@ -258,7 +263,6 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.confirmDeletePopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -278,7 +282,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -287,24 +291,54 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     }
 
     showDuplicateConfirm() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Duplicate job detail',
+            body: 'The system will open the Job Create Screen. Are you sure you want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.duplicateConfirm();
+        })
     }
 
     duplicateConfirm() {
-        this.action = { action: 'copy' };
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
-        });
-        this.confirmDuplicatePopup.hide();
+        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'SLE')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            data: partnerIds,
+                            transactionType: 'DOC',
+                            type: 5,
+                            settlementCode: null,
+                        };
+                        return this._documenRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.action = { action: 'copy' };
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], {
+                            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+                        });
+                    }
+                }
+            )
+
     }
 
     lockShipment() {
-        this.confirmLockPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to lock this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onLockShipment();
+        })
     }
 
     onLockShipment() {
-        this.confirmLockPopup.hide();
-
         this._progressRef.start();
         this._documenRepo.LockCsTransaction(this.jobId)
             .pipe(
@@ -325,10 +359,23 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             );
     }
 
+    showSyncHBL() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Sync HAWB',
+            body: this.confirmSyncHBLText,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onSyncHBL();
+        })
+    }
+
     onSyncHBL() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
@@ -370,7 +417,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -381,7 +428,12 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
         if (isEdited) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            })
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -389,7 +441,6 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     }
 
     confirmCancel() {
-        this.confirmCancelPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -407,7 +458,12 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
 
         if (isEdited && !this.isCancelFormPopupSuccess) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            })
             return;
         }
         return of(!isEdited);
@@ -415,8 +471,22 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 
 }

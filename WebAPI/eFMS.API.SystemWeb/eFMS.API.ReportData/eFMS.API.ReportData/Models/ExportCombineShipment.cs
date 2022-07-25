@@ -1,4 +1,6 @@
-﻿namespace eFMS.API.ReportData.Models
+﻿using System;
+
+namespace eFMS.API.ReportData.Models
 {
     public class ExportCombineShipment
     {
@@ -22,5 +24,6 @@
         public string OBHInvoice { get; set; }
         public string InvoiceNo { get; set; }
         public string TransactionType { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }

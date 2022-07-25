@@ -224,14 +224,11 @@ namespace eFMS.API.Documentation.Controllers
             var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE)).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
-                for (int i = 0; i < partnersNeedValidate.Count; i++)
+                string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
+                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[0].PaymentObjectId, partnersNeedValidate[0].Hblid, transactionTypeToCheckPoint, CHECK_POINT_TYPE.SURCHARGE, null);
+                if (!hsCheckpoint.Success)
                 {
-                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[i].PaymentObjectId, 
-                        partnersNeedValidate[i].Hblid, "DOC", CHECK_POINT_TYPE.SURCHARGE, null);
-                    if (!hsCheckpoint.Success)
-                    {
-                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
-                    }
+                    return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
                 }
             }
             currentUser.Action = "AddAndUpdate";
@@ -770,6 +767,27 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost("ValidateCheckPointMultiplePartner")]
+        [Authorize]
+        public IActionResult ValidateCheckPointMultiplePartner(CheckPointCriteria criteria)
+        {           
+            HandleState hs = checkPointService.ValidateCheckPointMultiplePartnerSurcharge(criteria);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("GetPartnerForCheckPointInShipment")]
+        public IActionResult GetPartnerForCheckPointInShipment(Guid Id, string transactionType)
+        {
+            var result = checkPointService.GetPartnerForCheckPointInShipment(Id, transactionType);
             return Ok(result);
         }
     }

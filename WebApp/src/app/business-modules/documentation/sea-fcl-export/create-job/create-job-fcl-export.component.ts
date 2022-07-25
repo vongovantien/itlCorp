@@ -28,7 +28,6 @@ import _merge from 'lodash/merge';
 export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
@@ -44,6 +43,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         protected _cdr: ChangeDetectorRef,
     ) {
         super();
+        this.requestCancel = this.gotoList;
     }
 
     ngOnInit() {
@@ -107,7 +107,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
             || (!!this.formCreateComponent.podDescription.value && !this.formCreateComponent.pod.value)
             || (!this.formCreateComponent.polDescription.value
-            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
+                || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
         ) {
             valid = false;
         }
@@ -120,7 +120,10 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             this.containers = this.selectedJob.containers;
         }
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
