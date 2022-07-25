@@ -914,7 +914,8 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.DepartmentId = currentUser.DepartmentId;
                 advance.OfficeId = currentUser.OfficeID;
                 advance.CompanyId = currentUser.CompanyID;
-                
+                advance.BankAccountNo = StringHelper.RemoveSpecialChars(advance.BankAccountNo, Constants.spaceCharacter);
+
                 //Quy đổi tỉ giá USD to Local dựa vào ngày Request - Andy - 23/04/2021
                 var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, advance.RequestDate, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
                 advance.ExcRateUsdToLocal = _excRateUsdToLocal;
@@ -1363,6 +1364,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.ReasonReject = advanceCurrent.ReasonReject;
                 advance.LockedLog = advanceCurrent.LockedLog;
                 advance.ExcRateUsdToLocal = advanceCurrent.ExcRateUsdToLocal;
+                advance.BankAccountNo = StringHelper.RemoveSpecialChars(advance.BankAccountNo, Constants.spaceCharacter);
 
                 //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
                 if (model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED) && advanceCurrent.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))

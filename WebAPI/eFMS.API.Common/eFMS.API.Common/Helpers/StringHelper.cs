@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Common.Helpers
 {
@@ -54,5 +55,19 @@ namespace eFMS.API.Common.Helpers
 
             "ÝỲỴỶỸ"
         };
+
+        public static string RemoveSpecialChars(string str, string[] charRemove)
+        {
+            foreach(var item in charRemove)
+            {
+                var regex = new Regex(item);
+                if (regex.IsMatch(str))
+                {
+                    str = regex.Replace(str, item);
+                    str = str.Replace(item, "");
+                }
+            }
+            return str;
+        }
     }
 }
