@@ -50,49 +50,6 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(accountReceivableService.Get());
         }
 
-        /// <summary>
-        /// Calculator Receivable
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("CalculatorReceivable")]
-        [Authorize]
-        public IActionResult CalculatorReceivable(CalculatorReceivableModel model)
-        {
-            var calculatorReceivable = accountReceivableService.CalculatorReceivable(model);
-            return Ok(calculatorReceivable);
-        }
-
-        /// <summary>
-        /// Calculator Receivable Not Authorize
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("CalculatorReceivableNotAuthorize")]
-        public IActionResult CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
-        {
-            var calculatorReceivable = accountReceivableService.CalculatorReceivableNotAuthorize(model);
-            return Ok(calculatorReceivable);
-        }
-
-        /// <summary>
-        /// Insert Or Update Receivable
-        /// </summary>
-        /// <param name="models"></param>
-        /// <returns></returns>
-        [HttpPost("InsertOrUpdateReceivable")]
-        [Authorize]
-        public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
-        {
-            HandleState insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
-            var message = HandleError.GetMessage(insertOrUpdateReceivable, Crud.Update);
-            if (insertOrUpdateReceivable.Success)
-            {
-                ResultHandle result = new ResultHandle { Status = insertOrUpdateReceivable.Success, Message = stringLocalizer[message].Value };
-                return Ok(result);
-            }
-            return BadRequest(message);
-        }
 
         /// <summary>
         /// Get AR detail has argeement by argeement id

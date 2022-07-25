@@ -636,7 +636,7 @@ export class AccountingRepo {
         );
     }
 
-    // Tính công nợ theo {surchargeId, partnerId, office, service}
+    // ! Deprecated
     calculatorReceivable(body: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body, null, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)

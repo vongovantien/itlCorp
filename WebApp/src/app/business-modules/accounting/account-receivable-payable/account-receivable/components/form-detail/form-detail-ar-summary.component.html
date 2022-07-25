@@ -422,13 +422,18 @@
                         <h6 class="font-weight-bold">Over Amount:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div><span class="text-danger">{{(accReceivableDetail.debitAmount -
+                        <div
+                            *ngIf="accReceivableDetail.debitAmount -  accReceivableDetail.creditLimited > 0; else none">
+                            <span class="text-danger">{{(accReceivableDetail.debitAmount -
                                 accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
                             <span *ngIf="accReceivableDetail.debitAmount -
                             accReceivableDetail.creditLimited">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>
                         </div>
+                        <ng-template #none>
+                            <span class="text-success">0</span>
+                        </ng-template>
                     </div>
                 </div>
             </div>
