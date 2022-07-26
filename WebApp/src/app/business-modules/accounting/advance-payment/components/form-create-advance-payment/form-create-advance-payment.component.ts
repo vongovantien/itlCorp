@@ -120,9 +120,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             note: [],
             currency: [],
             paymentTerm: [9],
-            bankAccountNo: [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
-            ])],
+            bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],

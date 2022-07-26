@@ -95,9 +95,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'statusApproval': ['New'],
             'payee': [],
             'beneficiaryName': [],
-            'bankAccountNo': [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
-            ])],
+            'bankAccountNo': [],
             'bankName': [],
             'bankNameDescription': [],
             'advanceAmount': [],
