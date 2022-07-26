@@ -58,6 +58,10 @@ namespace eFMS.API.Common.Helpers
 
         public static string RemoveSpecialChars(string str, string[] charRemove)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
             foreach(var item in charRemove)
             {
                 var regex = new Regex(item);
