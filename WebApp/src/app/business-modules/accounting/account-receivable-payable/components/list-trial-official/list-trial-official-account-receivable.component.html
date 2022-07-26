@@ -153,8 +153,16 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
-                                            <td class="text-right text-primary"> {{item.debitAmount |
-                                                negativeNumber:'.0-3'}}</td>
+                                            <td class="text-right text-primary">
+                                                <ng-container [ngSwitch]="item.agreementType">
+                                                    <ng-container *ngSwitchCase="'Guarantee'">
+                                                        {{item.saleDebitAmount | negativeNumber:'.0-3'}}
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchDefault>
+                                                        {{item.debitAmount | negativeNumber:'.0-3'}}
+                                                    </ng-container>
+                                                </ng-container>
+                                            </td>
                                             <td class="text-right text-success">
                                                 <ng-container [ngSwitch]="item.agreementType">
                                                     <ng-container *ngSwitchCase="'Guarantee'">

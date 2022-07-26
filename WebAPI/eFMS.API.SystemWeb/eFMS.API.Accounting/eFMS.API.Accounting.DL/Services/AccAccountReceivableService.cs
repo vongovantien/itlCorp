@@ -1060,10 +1060,19 @@ namespace eFMS.API.Accounting.DL.Services
             if (argeementId == null || argeementId == Guid.Empty) return null;
             var argeement = contractPartnerRepo.Get(x => x.Id == argeementId).FirstOrDefault();
             if (argeement == null) return null;
+            var acctReceivables = Enumerable.Empty<AccAccountReceivable>().AsQueryable();
+            if (argeement.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
+            {
+                var guarantees = contractPartnerRepo.Get(x => x.SaleManId == argeement.SaleManId
+                && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE && x.Active == true).Select(x => x.Id.ToString()).ToList();
 
-            var acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == argeementId);
+                acctReceivables = DataContext.Get(x => x.Office != null && guarantees.Contains(x.ContractId.ToString()));
+            } else
+            {
+                acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == argeementId);
+            }
             var partners = partnerRepo.Get();
-            var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == argeement.ContractType);
+            var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == argeement.ContractType && x.SaleManId == argeement.SaleManId);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
 
             var detail = new AccountReceivableDetailResult();
