@@ -39,5 +39,6 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ChargeFromReplicate(string arrJob, out List<Guid> Ids);
         ResultHandle AutoRateReplicate();
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
+        List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria);
     }
 }

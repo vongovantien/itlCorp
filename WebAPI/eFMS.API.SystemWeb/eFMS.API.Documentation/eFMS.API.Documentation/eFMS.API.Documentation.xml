@@ -546,7 +546,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Delete(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Delete(eFMS.API.Documentation.DL.Models.DeleteSurchargeDeleteModel)">
             <summary>
             delete an existed surcharge
             </summary>
@@ -1044,6 +1044,13 @@
             </summary>
             <param name="jobId"></param>
             <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.GetOutsourcingRegcognising(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">
+            <summary>
+            get the list of countries by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.ReportLogController">

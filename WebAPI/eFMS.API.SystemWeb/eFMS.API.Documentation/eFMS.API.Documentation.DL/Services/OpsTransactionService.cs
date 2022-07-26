@@ -70,6 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly IContextBase<SysGroup> groupRepository;
+        private readonly IContextBase<CsShipmentSurcharge> surChargeRepository;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
         private readonly ICsTransactionService csTransactionServe;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -110,6 +111,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
+            IContextBase<CsShipmentSurcharge> surChargeRepo,
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable
@@ -152,6 +154,7 @@ namespace eFMS.API.Documentation.DL.Services
             groupRepository = groupRepo;
             databaseUpdateService = _databaseUpdateService;
             accAccountReceivableService = accAccountReceivable;
+            surChargeRepository= surChargeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1606,7 +1609,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
 
-            return result; 
+            return result;
         }
         public HandleState Update(OpsTransactionModel model)
         {
@@ -1670,7 +1673,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     // update saleman cdnote type debit/invoice
                     var cdnote = acctCdNoteRepository.Get(x => x.JobId == model.Id && x.Type != "CREDIT").FirstOrDefault();
-                    if(cdnote != null && cdnote?.SalemanId != model.SalemanId)
+                    if (cdnote != null && cdnote?.SalemanId != model.SalemanId)
                     {
                         cdnote.SalemanId = model.SalemanId;
                         acctCdNoteRepository.Update(cdnote, x => x.Id == cdnote.Id);
@@ -2251,7 +2254,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID), arrJob);
-           
+
             using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
@@ -2363,7 +2366,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         HandleState hsSurchargeAdd = surchargeRepository.SubmitChanges();
-                        if(hsSurchargeAdd.Success)
+                        if (hsSurchargeAdd.Success)
                         {
                             Ids.AddRange(surchargeAdds.Select(x => x.Id));
                         }
@@ -2730,6 +2733,110 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeAutoRateReplicate>();
             return listSurcharges;
+        }
+
+        public List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria)
+        {
+            criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            var data = Query(criteria);
+
+            data = data.OrderByDescending(x => x.DatetimeModified);
+
+            List<ExportOutsourcingRegcognisingModel> results = new List<ExportOutsourcingRegcognisingModel>();
+            IQueryable<CatPartner> partners = partnerRepository.Get();
+            IQueryable<CsShipmentSurcharge> sur = surchargeRepository.Get();
+            IQueryable<CatCharge> charges = catChargeRepository.Get();
+
+            foreach (var x in data)
+            {
+                if (x.LinkSource == "Replicate")
+                {
+                    continue;
+                }
+                ExportOutsourcingRegcognisingModel result = new ExportOutsourcingRegcognisingModel();
+                var listChagreRep = surchargeRepository.Get(y => y.JobNo == "R" + x.JobNo && y.LinkChargeId!=null).ToList();
+                var dataChargeRep = (
+                                     from surc in listChagreRep
+                                     join pa in partners on surc.PaymentObjectId equals pa.Id
+                                     join cr in charges on surc.ChargeId equals cr.Id
+                                     select new ChargeOutsourcingRegcognisingModelDetail
+                                     {
+                                         ChargeId = surc.Id,
+                                         PartnerName = pa.ShortName,
+                                         PartnerCode = pa.AccountNo,
+                                         ChargeCode = cr.Code,
+                                         ChargeName = cr.ChargeNameEn,
+                                         DebitNo = surc.DebitNo,
+                                         SOA = surc.Soano,
+                                         NETAmount = surc.NetAmount,
+                                         VATAmount = surc.VatAmountVnd,
+                                         LinkChargeId = surc.LinkChargeId
+                                     }).ToList();
+                var listLinkChargeRep = dataChargeRep.Select(g => g.LinkChargeId).ToList();
+
+                var JobRep = new JobOutsourcingRegcognisingModelGeneralModel
+                {
+                    Creator = userRepository.Get(u => u.Id == x.UserCreated).FirstOrDefault()?.Username,
+                    CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).FirstOrDefault()?.ClearanceNo,
+                    Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName,
+                    DateService = x.ServiceDate,
+                    HBL = x.Hwbno,
+                    JobId = x.JobNo,
+                    ProductService = x.ProductService,
+                    Charges = dataChargeRep,
+                };
+
+                result.ReplicateJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
+
+                result.ReplicateJob.Add(JobRep);
+                var listChagreOrn = surchargeRepository.Get(y => y.JobNo == x.JobNo && listLinkChargeRep.Contains(y.Id.ToString().ToLower())).ToList();
+                List<ChargeOutsourcingRegcognisingModelDetail> chargeOrn = new List<ChargeOutsourcingRegcognisingModelDetail>();
+
+                var dataChargeOrn = (
+                                     from surc in listChagreOrn
+                                     join pa in partners on surc.PaymentObjectId equals pa.Id
+                                     join cr in charges on surc.ChargeId equals cr.Id
+                                     select new ChargeOutsourcingRegcognisingModelDetail
+                                     {
+                                         ChargeId = surc.Id,
+                                         PartnerName = pa.ShortName,
+                                         PartnerCode = pa.AccountNo,
+                                         ChargeCode = cr.Code,
+                                         ChargeName = cr.ChargeNameEn,
+                                         DebitNo = surc.DebitNo,
+                                         SOA = surc.Soano,
+                                         NETAmount = surc.NetAmount,
+                                         VATAmount = surc.VatAmountVnd,
+                                         LinkChargeId = surc.LinkChargeId
+                                     }).ToList();
+                dataChargeOrn= SortChargeOrn(dataChargeRep,dataChargeOrn);
+                var JobOrn = new JobOutsourcingRegcognisingModelGeneralModel
+                {
+                    Creator = userRepository.Get(u => u.Id == x.UserCreated).FirstOrDefault()?.Username,
+                    CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).FirstOrDefault()?.ClearanceNo,
+                    Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName,
+                    DateService = x.ServiceDate,
+                    HBL = x.Hwbno,
+                    JobId = x.JobNo,
+                    ProductService = x.ProductService,
+                    Charges = dataChargeOrn,
+                };
+                result.OriginalJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
+                result.OriginalJob.Add(JobOrn);
+                results.Add(result);
+            }
+            
+            return results;
+        }
+
+        private List<ChargeOutsourcingRegcognisingModelDetail> SortChargeOrn(List<ChargeOutsourcingRegcognisingModelDetail> chargeReps,List<ChargeOutsourcingRegcognisingModelDetail> chargeOrns)
+        {
+            List<ChargeOutsourcingRegcognisingModelDetail> chargeOrnsChanged = new List<ChargeOutsourcingRegcognisingModelDetail>();
+            for(int i = 0; i < chargeReps.Count(); i++)
+            {
+                chargeOrnsChanged.Add(chargeOrns.Where(x => x.ChargeId.ToString().ToLower() == chargeReps[i].LinkChargeId).FirstOrDefault());
+            }
+            return chargeOrnsChanged;
         }
     }
 }

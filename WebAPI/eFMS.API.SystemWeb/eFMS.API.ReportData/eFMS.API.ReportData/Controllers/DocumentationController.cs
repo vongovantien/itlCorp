@@ -805,7 +805,31 @@ namespace eFMS.API.ReportData.Controllers
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             return Ok(result);
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportOutsourcingRegcognising")]
+        [HttpPost]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportOutsourcingRegcognising(OpsTransactionCriteria critera)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            critera.RangeSearch = Common.Globals.PermissionRange.All;
+            var responseFromApi = await HttpServiceExtension.PostAPI(critera, aPis.HostStaging + Urls.Documentation.GetOutsourcingRegcognisingUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportOutsourcingRegcognisingModel>>();
+
+            var stream = new DocumentationHelper().GenerateExportOutsourcingRegcognising(dataObjects.Result);
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            string fileName = "Outsourcing Recognising Template";
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream,fileName);
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
         private void HeaderResponse(string fileName)
         {
             Response.Headers.Add("efms-file-name", fileName);

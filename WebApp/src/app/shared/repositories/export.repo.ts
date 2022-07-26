@@ -506,5 +506,12 @@ export class ExportRepo {
     exportDebitAmountDetailByContract(selectedTrialOfficial: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitAmountDetailByContract`, selectedTrialOfficial, null, null, 'response');
     }
+
+    exportOutsourcingRegcognising(criteria: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportOutsourcingRegcognising`, criteria, null, null, 'response').pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

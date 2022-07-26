@@ -4263,5 +4263,96 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
+
+        public Stream GenerateExportOutsourcingRegcognising(List<ExportOutsourcingRegcognisingModel> result)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.OutsourcingRecognisingTemplate));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                int startRow = 4;
+                excel.StartDetailTable = startRow;
+                excel.NumberOfGroup = 1;
+                foreach (var outRe in result)
+                {
+                    excel.IndexOfGroup = 1;
+                    excel.SetGroupsTable();
+                    var listGroupHead = new Dictionary<string, object>()
+                    {
+                        { "RJobID", outRe.ReplicateJob.FirstOrDefault().JobId },
+                        { "RCustomNo", outRe.ReplicateJob.FirstOrDefault().CustomNo },
+                        { "RHBL", outRe.ReplicateJob.FirstOrDefault().HBL },
+                        { "RCustomer", outRe.ReplicateJob.FirstOrDefault().Customer },
+                        { "RProductService", outRe.ReplicateJob.FirstOrDefault().ProductService },
+                        { "RDateService", outRe.ReplicateJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy") },
+                        { "JobID", outRe.OriginalJob.FirstOrDefault().JobId },
+                        { "CustomNo", outRe.OriginalJob.FirstOrDefault().CustomNo },
+                        { "HBL", outRe.OriginalJob.FirstOrDefault().HBL },
+                        { "Customer", outRe.OriginalJob.FirstOrDefault().Customer },
+                        { "ProductService", outRe.OriginalJob.FirstOrDefault().ProductService },
+                        { "DateService", outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy") },
+                        { "Creator", outRe.OriginalJob.FirstOrDefault().Creator },
+                        { "RCreator", outRe.ReplicateJob.FirstOrDefault().Creator },
+                        { "SumRNetAmount", outRe.ReplicateJob.FirstOrDefault().Charges.Sum(x=>x.NETAmount) },
+                        { "SumRVATAmount", outRe.ReplicateJob.FirstOrDefault().Charges.Sum(x=>x.VATAmount) },
+                        { "SumNetAmount", outRe.OriginalJob.FirstOrDefault().Charges.Sum(x=>x.NETAmount) },
+                        { "SumVATAmount", outRe.OriginalJob.FirstOrDefault().Charges.Sum(x=>x.VATAmount) },
+                        { "SumRTotalSelling", outRe.ReplicateJob.FirstOrDefault().Charges.Sum(x=>x.VATAmount+x.NETAmount) },
+                        { "SumTotalBuying", outRe.OriginalJob.FirstOrDefault().Charges.Sum(x=>x.VATAmount+x.NETAmount) },
+                    };
+                    excel.SetData(listGroupHead);
+                    startRow++;
+                    for (int i = 0; i < outRe.ReplicateJob.FirstOrDefault().Charges.Count(); i++)
+                    {
+                        var listKeyData = new Dictionary<string, object>();
+                        excel.SetDataTable();
+                        listKeyData.Add("RJobID", outRe.ReplicateJob.FirstOrDefault().JobId);
+                        listKeyData.Add("RCustomNo", outRe.ReplicateJob.FirstOrDefault().CustomNo);
+                        listKeyData.Add("RHBL", outRe.ReplicateJob.FirstOrDefault().HBL);
+                        listKeyData.Add("RCustomer", outRe.ReplicateJob.FirstOrDefault().Customer);
+                        listKeyData.Add("RProductService", outRe.ReplicateJob.FirstOrDefault().ProductService);
+                        listKeyData.Add("RDateService", outRe.ReplicateJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("JobID", outRe.OriginalJob.FirstOrDefault().JobId);
+                        listKeyData.Add("CustomNo", outRe.OriginalJob.FirstOrDefault().CustomNo);
+                        listKeyData.Add("HBL", outRe.OriginalJob.FirstOrDefault().HBL);
+                        listKeyData.Add("Customer", outRe.OriginalJob.FirstOrDefault().Customer);
+                        listKeyData.Add("ProductService", outRe.OriginalJob.FirstOrDefault().ProductService);
+                        listKeyData.Add("DateService", outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("RPartnerName", outRe.ReplicateJob.FirstOrDefault().Charges[i].PartnerName);
+                        listKeyData.Add("RPartnerCode", outRe.ReplicateJob.FirstOrDefault().Charges[i].PartnerCode);
+                        listKeyData.Add("RChargeCode", outRe.ReplicateJob.FirstOrDefault().Charges[i].ChargeCode);
+                        listKeyData.Add("RChargeName", outRe.ReplicateJob.FirstOrDefault().Charges[i].ChargeName);
+                        listKeyData.Add("RDebitNo", outRe.ReplicateJob.FirstOrDefault().Charges[i].DebitNo);
+                        listKeyData.Add("RSOA", outRe.ReplicateJob.FirstOrDefault().Charges[i].SOA);
+                        listKeyData.Add("RCreator", outRe.ReplicateJob.FirstOrDefault().Creator);
+                        listKeyData.Add("RNetAmount", outRe.ReplicateJob.FirstOrDefault().Charges[i].NETAmount);
+                        listKeyData.Add("RVATAmount", outRe.ReplicateJob.FirstOrDefault().Charges[i].VATAmount);
+                        listKeyData.Add("PartnerName", outRe.OriginalJob.FirstOrDefault().Charges[i].PartnerName);
+                        listKeyData.Add("PartnerCode", outRe.OriginalJob.FirstOrDefault().Charges[i].PartnerCode);
+                        listKeyData.Add("ChargeCode", outRe.OriginalJob.FirstOrDefault().Charges[i].ChargeCode);
+                        listKeyData.Add("ChargeName", outRe.OriginalJob.FirstOrDefault().Charges[i].ChargeName);
+                        listKeyData.Add("DebitNo", outRe.OriginalJob.FirstOrDefault().Charges[i].DebitNo);
+                        listKeyData.Add("SOA", outRe.OriginalJob.FirstOrDefault().Charges[i].SOA);
+                        listKeyData.Add("Creator", outRe.OriginalJob.FirstOrDefault().Creator);
+                        listKeyData.Add("NetAmount", outRe.OriginalJob.FirstOrDefault().Charges[i].NETAmount);
+                        listKeyData.Add("VATAmount", outRe.OriginalJob.FirstOrDefault().Charges[i].VATAmount);
+                        listKeyData.Add("TotalSelling", outRe.ReplicateJob.FirstOrDefault().Charges[i].VATAmount+ outRe.ReplicateJob.FirstOrDefault().Charges[i].NETAmount);
+                        listKeyData.Add("TotalBuying", outRe.OriginalJob.FirstOrDefault().Charges[i].VATAmount + outRe.OriginalJob.FirstOrDefault().Charges[i].NETAmount);
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
+                }
+                    return excel.ExcelStream();
+                }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

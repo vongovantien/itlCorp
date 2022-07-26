@@ -470,5 +470,18 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// get the list of countries by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost("GetOutsourcingRegcognising")]
+        [AuthorizeEx(Menu.opsJobManagement, UserPermission.AllowAccess)]
+        public IActionResult GetOutsourcingRegcognising(OpsTransactionCriteria criteria)
+        {
+            var results = transactionService.GetOutsourcingRegcognising(criteria);
+            return Ok(results);
+        }
     }
 }

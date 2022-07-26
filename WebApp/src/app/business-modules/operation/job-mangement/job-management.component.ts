@@ -6,13 +6,13 @@ import { Store } from '@ngrx/store';
 
 import { Shipment, CustomDeclaration } from '@models';
 import { SortService } from '@services';
-import { DocumentationRepo, OperationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, OperationRepo } from '@repositories';
 import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { JobConstants, RoutingConstants } from '@constants';
+import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
 import { GetCurrenctUser, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
@@ -49,7 +49,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     };
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
-    isSearchLinkFeea:boolean = false;
+    isSearchLinkFeea: boolean = false;
 
     constructor(
         private sortService: SortService,
@@ -59,6 +59,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _operationRepo: OperationRepo,
         private _router: Router,
         private _store: Store<fromOperationStore.IOperationState>,
+        private _exportRepo: ExportRepo,
         private _spinner: NgxSpinnerService
     ) {
         super();
@@ -303,7 +304,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
-    onSelectTab(tabName:any){
+    onSelectTab(tabName: any) {
         this.isSearchLinkFeea = !this.isSearchLinkFeea;
     }
 
@@ -328,7 +329,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             );
     }
 
-    chargeFromJobRep(){
+    chargeFromJobRep() {
         this.linkChargeFromRep.show();
     }
 
@@ -366,5 +367,14 @@ export class JobManagementComponent extends AppList implements OnInit {
                     )
             }
         });
+    }
+
+    exportOutsourcingRegcognising() {
+        this._exportRepo.exportOutsourcingRegcognising(this.dataSearch)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                }
+            );
     }
 }
