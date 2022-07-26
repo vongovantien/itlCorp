@@ -293,7 +293,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         {
                                             i.CreditRate = _creditRate;
                                             i.IsOverLimit = false;
-                                            contractPartnerRepo.Update(item, x => x.Id == i.Id, false);
+                                            contractPartnerRepo.Update(i, x => x.Id == i.Id, false);
                                         }
                                     }
                                     
