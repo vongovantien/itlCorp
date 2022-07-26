@@ -277,7 +277,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                     var salesman = userRepo.Get(x => x.Id == agreementPartner.SaleManId)?.FirstOrDefault();
 
-                                    var _creditRate = ((_totalDebitAmount - _totalAdv) / salesman.CreditLimit ?? 1) * 100;
+                                    var _creditRate = ((_totalDebitAmount - _totalAdv) / (salesman.CreditLimit ?? 1)) * 100;
                                     if (_creditRate >= AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
                                     {
                                         foreach (var contract in relateGuaranteeContracts)
