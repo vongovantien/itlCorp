@@ -176,76 +176,6 @@ namespace eFMS.API.Accounting.DL.Services
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds)
-        {
-            var hs = new HandleState();
-            foreach (var partnerId in partnerIds)
-            {
-                var partner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault();
-                if (partner != null)
-                {
-                    //Agreement của partner
-                    var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partner.ParentId
-                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
-                  
-                    if (contractPartner != null)
-                    {
-                        var agreementPartner = CalculatorAgreement(contractPartner);
-                        hs = contractPartnerRepo.Update(agreementPartner, x => x.Id == agreementPartner.Id, false);
-
-                        if (agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
-                        {
-                            IQueryable<CatContract> relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
-                                && x.SaleManId == agreementPartner.SaleManId);
-                          
-                            if (relateGuaranteeContracts.Count() > 0)
-                            {
-                                var _totalDebitAmount = relateGuaranteeContracts.Sum(x => x.DebitAmount);
-                                var _totalAdv = relateGuaranteeContracts.Sum(x => x.CustomerAdvanceAmountVnd);
-
-                                var salesman = userRepo.Get(x => x.Id == contractPartner.SaleManId)?.FirstOrDefault();
-
-                                var _creditRate = ((_totalDebitAmount - _totalAdv) / salesman.CreditLimit ?? 1) * 100;
-                                if (_creditRate >= AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
-                                {
-                                    foreach (var contract in relateGuaranteeContracts)
-                                    {
-                                        contract.CreditRate = _creditRate;
-                                        contract.IsOverLimit = true;
-                                        contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
-                                    }
-                                }
-
-                                foreach (var contract in relateGuaranteeContracts)
-                                {
-                                    contract.CreditRate = _creditRate;
-                                    contract.IsOverLimit = false;
-                                    contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
-                                }
-                            }
-                        }
-
-                        hs = contractPartnerRepo.SubmitChanges();
-                    }
-                    else
-                    {
-                        //Agreement của AcRef của partner
-                        var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId
-                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
-                        if (contractParent != null)
-                        {
-                            var agreementParent = CalculatorAgreement(contractParent);
-
-                            hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
-                        }
-                    }
-                }
-            }
-            return hs;
-        }
-
         private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
@@ -1885,25 +1815,41 @@ namespace eFMS.API.Accounting.DL.Services
                         if (flag == "overdue")
                         {
                             contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
-                            if(contract.IsOverDue == true && contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
+                            if(contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
-                                contractOverDueGuarantee.Add(contract);
+                                var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
+                                    && x.SaleManId == contract.SaleManId
+                                    && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
+
+                                if (contract.IsOverDue == true)
+                                {
+                                    if (relateGuaranteeContracts.Count() > 0)
+                                    {
+                                        foreach (var contractRalativeOverDue in relateGuaranteeContracts)
+                                        {
+                                            contractRalativeOverDue.IsOverDue = true;
+                                            hs = await contractPartnerRepo.UpdateAsync(contractRalativeOverDue, x => x.Id == contractRalativeOverDue.Id, false);
+
+                                        }
+                                    }
+                                } else
+                                {
+                                    if (relateGuaranteeContracts.Count() > 0)
+                                    {
+                                        foreach (var contractRalativeNotOverDue in relateGuaranteeContracts)
+                                        {
+                                            contractRalativeNotOverDue.IsOverDue = false;
+                                            hs = await contractPartnerRepo.UpdateAsync(contractRalativeNotOverDue, x => x.Id == contractRalativeNotOverDue.Id, false);
+
+                                        }
+                                    }
+                                }
                             }
                         }
 
                         hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == Id, false);
                     }
                 }
-
-                if(contractOverDueGuarantee.Count > 0)
-                {
-                    foreach (var contract in contractOverDueGuarantee)
-                    {
-                        contract.IsOverDue = true;
-                        hs = await contractPartnerRepo.UpdateAsync(contract, x => x.Id == contract.Id, false);
-                    }
-                }
-
                 hs = contractPartnerRepo.SubmitChanges();
             }
             return hs;
