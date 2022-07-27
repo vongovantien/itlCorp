@@ -2749,12 +2749,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             foreach (var x in data)
             {
-                if (x.LinkSource == "Replicate")
+                if (x.LinkSource != "Replicate")
                 {
                     continue;
                 }
                 ExportOutsourcingRegcognisingModel result = new ExportOutsourcingRegcognisingModel();
-                var listChagreRep = surchargeRepository.Get(y => y.JobNo == "R" + x.JobNo && y.LinkChargeId!=null).ToList();
+                var listChagreRep = surchargeRepository.Get(y => y.JobNo == x.JobNo && y.LinkChargeId!=null).ToList();
                 var dataChargeRep = (
                                      from surc in listChagreRep
                                      join pa in partners on surc.PaymentObjectId equals pa.Id
@@ -2768,8 +2768,8 @@ namespace eFMS.API.Documentation.DL.Services
                                          ChargeName = cr.ChargeNameEn,
                                          DebitNo = surc.DebitNo,
                                          SOA = surc.Soano,
-                                         NETAmount = surc.NetAmount,
-                                         VATAmount = surc.VatAmountVnd,
+                                         NETAmount = surc.NetAmount== null?0: surc.NetAmount,
+                                         VATAmount = surc.VatAmountVnd == null ? 0 :surc.VatAmountVnd,
                                          LinkChargeId = surc.LinkChargeId
                                      }).ToList();
                 var listLinkChargeRep = dataChargeRep.Select(g => g.LinkChargeId).ToList();
@@ -2789,7 +2789,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result.ReplicateJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
 
                 result.ReplicateJob.Add(JobRep);
-                var listChagreOrn = surchargeRepository.Get(y => y.JobNo == x.JobNo && listLinkChargeRep.Contains(y.Id.ToString().ToLower())).ToList();
+                var listChagreOrn = surchargeRepository.Get(y => listLinkChargeRep.Contains(y.Id.ToString())).ToList();
                 List<ChargeOutsourcingRegcognisingModelDetail> chargeOrn = new List<ChargeOutsourcingRegcognisingModelDetail>();
 
                 var dataChargeOrn = (
@@ -2805,20 +2805,23 @@ namespace eFMS.API.Documentation.DL.Services
                                          ChargeName = cr.ChargeNameEn,
                                          DebitNo = surc.DebitNo,
                                          SOA = surc.Soano,
-                                         NETAmount = surc.NetAmount,
-                                         VATAmount = surc.VatAmountVnd,
+                                         NETAmount = surc.NetAmount == null ? 0 :surc.NetAmount,
+                                         VATAmount = surc.VatAmountVnd == null ? 0 :surc.VatAmountVnd,
                                          LinkChargeId = surc.LinkChargeId
                                      }).ToList();
                 dataChargeOrn= SortChargeOrn(dataChargeRep,dataChargeOrn);
+
+                var detailJobOrn = DataContext.Get(g => g.JobNo == x.JobNo.Remove(0, 1)).FirstOrDefault();
+
                 var JobOrn = new JobOutsourcingRegcognisingModelGeneralModel
                 {
-                    Creator = userRepository.Get(u => u.Id == x.UserCreated).FirstOrDefault()?.Username,
-                    CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).FirstOrDefault()?.ClearanceNo,
-                    Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName,
-                    DateService = x.ServiceDate,
-                    HBL = x.Hwbno,
-                    JobId = x.JobNo,
-                    ProductService = x.ProductService,
+                    Creator = userRepository.Get(u => u.Id == detailJobOrn.UserCreated).FirstOrDefault()?.Username,
+                    CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == detailJobOrn.JobNo).FirstOrDefault()?.ClearanceNo,
+                    Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == detailJobOrn.CustomerId)?.ShortName,
+                    DateService = detailJobOrn.ServiceDate,
+                    HBL = detailJobOrn.Hwbno,
+                    JobId = detailJobOrn.JobNo,
+                    ProductService = detailJobOrn.ProductService,
                     Charges = dataChargeOrn,
                 };
                 result.OriginalJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
