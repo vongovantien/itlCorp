@@ -10,15 +10,19 @@ namespace eFMS.API.Accounting.DL.Models
         public string MBL { get; set; }
         public string HBL { get; set; }
         public string DebitNote { get; set; }
-        public decimal TotalAmount { get; set; }
-        public decimal TotalAmountVND { get; set; }
-        public decimal TotalAmountUSD { get; set; }
-        public decimal PaidAmount { get; set; }
-        public decimal PaidAmountVND { get; set; }
-        public decimal PaidAmountUSD { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public decimal? TotalAmountVND { get; set; }
+        public decimal? TotalAmountUSD { get; set; }
+        public decimal? PaidAmount { get; set; }
+        public decimal? PaidAmountVND { get; set; }
+        public decimal? PaidAmountUSD { get; set; }
         public string Currency { get; set; }
         public string SalesmanName { get; set; }
         public string Status { get; set; }
+        public string SyncStatus { get; set; }
+        public DateTime? LastSyncDate { get; set; }
+        public string Notes { get; set; }
+        public string PartnerName { get; set; }
     }
 
     public class AccountingPrePaidPaymentCriteria

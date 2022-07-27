@@ -320,7 +320,9 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                && x.SaleService.Contains(_transactionType)).FirstOrDefault();
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     model.CurrencyId = _contractAcRef.CurrencyId;
@@ -328,6 +330,11 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                }
+
+                if(_contractAcRef.ContractType == "Prepaid")
+                {
+                    model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                 }
                 #endregion  --- Set Currency For CD Note ---
 

@@ -1,9 +1,11 @@
-﻿using eFMS.API.Accounting.DL.Common;
+﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,30 +17,38 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AccountingPrePaidPaymentService : IAccountingPrePaidPaymentService
+    public class AccountingPrePaidPaymentService : RepositoryBase<AcctCdnote, AcctCdNoteModel>,  IAccountingPrePaidPaymentService
     {
         private readonly ICurrentUser currentUser;
-        private eFMSDataContextDefault DC => (eFMSDataContextDefault)cdNoteRepository.DC;
-        private readonly IContextBase<AcctCdnote> cdNoteRepository;
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)DataContext.DC;
 
-        public AccountingPrePaidPaymentService(ICurrentUser currentUser)
+        public AccountingPrePaidPaymentService(ICurrentUser currentUser, 
+            IContextBase<AcctCdnote> repository,
+            IMapper mapper,
+            IContextBase<CatPartner> catPartnerRepository): base(repository, mapper)
         {
             this.currentUser = currentUser;
         }
 
         public IQueryable<AccPrePaidPaymentResult> Paging(AccountingPrePaidPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            IQueryable<AccPrePaidPaymentResult> data = GetQuery(criteria);
-            rowsCount = data.CountAsync().Result;
-
-            var resultPaging = data.Skip((page - 1) * size).Take(size);
-
-            return resultPaging;
+            IQueryable<AcctCdnote> cdNotes = GetQuery(criteria);
+            rowsCount = cdNotes.CountAsync().Result;
+            if(rowsCount == 0)
+            {
+                return Enumerable.Empty<AccPrePaidPaymentResult>().AsQueryable();
+            }
+            var resultPaging = cdNotes.Skip((page - 1) * size).Take(size);
+            IQueryable<AccPrePaidPaymentResult> result = FormatCdNotes(resultPaging);
+            return result;
         }
 
-        private IQueryable<AccPrePaidPaymentResult> GetQuery(AccountingPrePaidPaymentCriteria criteria)
+        private IQueryable<AcctCdnote> GetQuery(AccountingPrePaidPaymentCriteria criteria)
         {
-            Expression<Func<AcctCdnote, bool>> query = x => x.CurrencyId == criteria.Currency && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            Expression<Func<AcctCdnote, bool>> query = x => x.CurrencyId == criteria.Currency
+            && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID
+            && string.IsNullOrEmpty(x.SyncStatus);
+
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
                 query = query.And(x => x.PartnerId == criteria.PartnerId);
@@ -55,7 +65,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SalemanId == criteria.SalesmanId);
             }
-            if (criteria.Keywords.Count > 0)
+            if (criteria.Keywords != null && criteria.Keywords.Count > 0)
             {
                 switch (criteria.SearchType)
                 {
@@ -73,16 +83,37 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
-            var cdNotes = DC.AcctCdnote.Select(query);
-            if(cdNotes.Count() > 0)
-            {
-                var d = cdNotes.Select(x => new AccPrePaidPaymentResult {
-                    Id = x.,
-                    Currency = x.cur
+            var cdNotes = DC.AcctCdnote.Where(query);
+           
+            return cdNotes;
+        }
 
-                });
-            }
-            return null;
+        private IQueryable<AccPrePaidPaymentResult> FormatCdNotes(IQueryable<AcctCdnote> cdNotes)
+        {
+            var result = from cd in cdNotes
+                           join p in DC.CatPartner on cd.PartnerId equals p.Id
+                           join sur in DC.CsShipmentSurcharge on cd.Code equals sur.DebitNo
+                           //join u in DC.SysUser on cd.SalemanId equals u.Id
+                           select new AccPrePaidPaymentResult
+                           {
+                               Id = cd.Id,
+                               Currency = cd.CurrencyId,
+                               DebitNote = cd.Code,
+                               SyncStatus = cd.SyncStatus,
+                               LastSyncDate = cd.LastSyncDate,
+                               Notes = cd.Note,
+                               HBL = sur.Hblno,
+                               MBL = sur.Mblno,
+                               JobNo = sur.JobNo,
+                               Status = cd.Status,
+                               TotalAmount = cd.Total,
+                               // SalesmanName = u.Username,
+                               TotalAmountVND = sur.Total,
+                               PartnerName = p.ShortName
+                           };
+
+           return result;
+
         }
     }
 }
