@@ -39,6 +39,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepo;
         private readonly IContextBase<CatDepartment> catDepartmentRepo;
         private readonly IContextBase<CatIncoterm> catIncotermRepo;
+        private readonly IContextBase<CsShipmentSurcharge> suchargeRepo;
+        private readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
@@ -56,6 +58,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysEmailTemplate> sysEmailTemplate,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<CatIncoterm> catIncoterm,
+            IContextBase<CsShipmentSurcharge> sucharge,
+            IContextBase<AcctCdnote> acctCdnote,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -72,6 +76,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysEmailTemplateRepo = sysEmailTemplate;
             catDepartmentRepo = catDepartment;
             catIncotermRepo = catIncoterm;
+            suchargeRepo = sucharge;
+            acctCdnoteRepo = acctCdnote;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -142,36 +148,74 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            string _subject = string.Format(@"INDO TRANS LOGISTICS: ARRIVAL NOTICE // {0} // {1} // {2} (From: {3})",
-                _housebill.Mawb,
-                _housebill.Hwbno,
-                _consignee?.PartnerNameEn,
-                currentUser.UserName);
-            string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mail to: {8}</p>",
-                _housebill.Mawb,
-                _housebill.Hwbno,
-                _housebill.PackageQty,
-                _housebill.GrossWeight,
-                _housebill.FlightNo,
-                (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty,
-                _housebill.Route,
-                _warehouseName,
-                _empCurrentUser?.Email);
+            #region delete Old
+            //string _subject = string.Format(@"INDO TRANS LOGISTICS: ARRIVAL NOTICE // {0} // {1} // {2} (From: {3})",
+            //    _housebill.Mawb,
+            //    _housebill.Hwbno,
+            //    _consignee?.PartnerNameEn,
+            //    currentUser.UserName);
+            //string _body = string.Format(@"<div><b>Dear Valued Customer,</b></div><div>We would like to send <b>Arrival Notice and docs in attached file</b> for your air import shipment with details as below:</div><div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MAWB#: {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HAWB#: {1}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Quantity: {2} CTNS / G.W: {3}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Flight # / ETA: {4} / {5}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Routing: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Warehouse: <b>{7}</b></div></div><p>Please check docs and confirm by return with thanks.</p><p>This is system auto email please do not reply it directly. Please confirm the attached files or inform us about any amendment by mail to: {8}</p>",
+            //    _housebill.Mawb,
+            //    _housebill.Hwbno,
+            //    _housebill.PackageQty,
+            //    _housebill.GrossWeight,
+            //    _housebill.FlightNo,
+            //    (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty,
+            //    _housebill.Route,
+            //    _warehouseName,
+            //    _empCurrentUser?.Email);
+            #endregion
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AI-ARRIVAL-NOTICE").FirstOrDefault();
+            string _subject = templateEmail.Subject;
+            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
+
+            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x=>x.DebitNo).FirstOrDefault();
+            decimal? exchangeRate = null;
+            if(!string.IsNullOrEmpty(debitNo))
+            {
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExcRateUsdToLocal;
+            }
+            string _body = templateEmail.Body;
+            _body = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _body = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _body = _subject.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
+            _body = _subject.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
+            _body = _subject.Replace("{{FlightNo}}", _housebill.FlightNo);
+            _body = _subject.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _subject.Replace("{{Routing}}", _housebill.Route);
+            _body = _subject.Replace("{{WareHouse}}", _warehouseName);
+            _body = _subject.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _subject.Replace("{{pic}}", picEmail);
 
             var emailContent = new EmailContentModel();
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            }
+
             var department = catDepartmentRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
             var mailFrom = "Info FMS";
-            if (department != null)
+            if (!string.IsNullOrEmpty(picEmail))
             {
-                mailFrom = department.Email;
+                mailFrom = picEmail;
             }
             else
             {
                 mailFrom = @"air@itlvn.com";
             }
-            emailContent.From = mailFrom;
-            emailContent.To = _airlineMail; //Email của Airlines
-            emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + department?.Email; // fin-inv.fm@itlvn.com và Group Mail của Department trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
