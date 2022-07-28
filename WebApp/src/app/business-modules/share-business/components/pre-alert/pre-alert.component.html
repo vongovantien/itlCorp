@@ -124,8 +124,7 @@
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedArrivalNotice"
-                                        (change)="onChangeCheckBox()">
+                                    <input type="checkbox" [(ngModel)]="isCheckedArrivalNotice" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
                                 <span>
@@ -133,15 +132,46 @@
                                 </span>
                             </ng-container>
                             <ng-template #NotArrivalNotice>
-                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
-                                    style="display: initial; margin-right: 40px;">
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled" style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
                                     Arrival Notice
                                     <span></span>
                                 </label>
                             </ng-template>
+                        
+                            <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedDebitNote" (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span>
+                                    <a class="pointer" (click)="previewDebitNote()">Debit Note</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotDebitNote>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled" style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    Debit Note
+                                    <span></span>
+                                </label>
+                            </ng-template>
+                            <ng-container *ngIf="isExitsDO else NotDO">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedDO" (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span>
+                                    <a class="pointer" (click)="previewDO()">Delivery Order</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotDO>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled" style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    Delivery Order
+                                    <span></span>
+                                </label>
+                            </ng-template>
                         </div>
-
                     </div>
                     <div class="form-group m-form__group"
                         *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
@@ -164,12 +194,17 @@
                                 </label>
                             </ng-template>
 
-                            <ng-container *ngIf="isExitsHawb else NotHawb">
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedHawb" (change)="onChangeCheckBox()">
-                                    <span></span>
-                                </label>
-                                <span><a class="pointer" (click)="previewHawb()">{{hblRptName}}</a></span>
+                            <ng-container *ngIf="isExitsHawb else NotHawb" >
+                                <ng-container *ngFor="let hbl of hawbDetails">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                        <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb" (change)="onChangeCheckBox()">
+                                        <span></span>
+                                    </label>
+                                    <span style='margin-right: 20px;'>
+                                        <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
+                                    </span>
+                                </ng-container>
+                                <!-- {{hblRptName}} -->
                             </ng-container>
                             <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
@@ -299,6 +334,8 @@
 <iframe style="display: none;" #framePDF id="framePDF" name="framePDF" src="" type="application/pdf" height="1080px"
     width="100%" allowfullscreen frameborder="0"></iframe>
 
-<ng-container *ngIf="dataReport">
+<!-- <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+</ng-container> -->
+
+<ng-template inject></ng-template>

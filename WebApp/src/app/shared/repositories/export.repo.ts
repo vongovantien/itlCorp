@@ -22,7 +22,9 @@ export class ExportRepo {
     }
 
     exportCrystalReportPDF(data: any) {
-        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, `crystal=${JSON.stringify(data)}`);
+        var formData: any = new FormData();
+        formData.append('crystal', JSON.stringify(data));
+        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, formData);
     }
 
     exportCustomClearance(searchObject: any = {}) {

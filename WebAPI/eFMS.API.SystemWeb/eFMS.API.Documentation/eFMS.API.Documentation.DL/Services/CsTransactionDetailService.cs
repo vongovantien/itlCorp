@@ -1446,6 +1446,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImpProofofDelivery" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listProof);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -1740,7 +1748,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2479,6 +2487,22 @@ namespace eFMS.API.Documentation.DL.Services
                 var hsSm = sendEmailHistoryRepository.SubmitChanges();
                 #endregion
             }
+        }
+
+        /// <summary>
+        /// Get HAWB List Of Shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId)
+        {
+            var shipment = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
+            if(shipment == null)
+            {
+                return null;
+            }
+            var transDetails = DataContext.Get(x => x.JobId == shipment.Id);
+            return transDetails;
         }
     }
 }

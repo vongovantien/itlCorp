@@ -66,5 +66,6 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
 
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
+        IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId);
     }
 }
