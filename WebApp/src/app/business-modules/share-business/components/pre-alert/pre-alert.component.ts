@@ -328,7 +328,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         const streamUploadReport = [];
         switch (service) {
             case ChargeConstants.AI_CODE:
-                
                 if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
                     streamUploadReport.push(this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' }));
                 }
@@ -393,7 +392,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     sendMailSubmit() {
         this.isSubmited = true;
-        if (!this.formMail.valid) {
+        if (!this.formMail.valid && this.from.value !== "Info FMS") {
             return;
         }
         const streamUploadFile = this.getStreamUploadFile(this.serviceId);
@@ -891,12 +890,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res: any) => {
                     if (res != null) {
-                        this.dataReport = res;
-                        if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
