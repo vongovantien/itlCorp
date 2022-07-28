@@ -31,7 +31,7 @@
                             </div>
                             <div class="col-md-11">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': from === 'Info FMS' && ((from.dirty && !from.valid) || (isSubmited && !from.valid))}">
+                                    [ngClass]="{'m-form__group has-danger': (from.dirty && !from.valid) || (isSubmited && !from.valid)}">
                                     <input class="form-control" [attr.disabled]="null" formControlName="from" oninput="this.value=this.value.replace(/(<|>|'|,)/g,'')"/>
                                 </div>
                             </div>

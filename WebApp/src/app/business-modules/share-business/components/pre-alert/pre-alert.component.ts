@@ -392,7 +392,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     sendMailSubmit() {
         this.isSubmited = true;
-        if (!this.formMail.valid && this.from.value !== "Info FMS") {
+        if (!this.formMail.valid) {
             return;
         }
         const streamUploadFile = this.getStreamUploadFile(this.serviceId);
@@ -402,7 +402,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             this.numOfFileExp = streamUploadFile.length;
             this.uploadFileStream(streamUploadFile);
         } else {
-            this.sendMail()
+            this.sendMail();
         }
     }
 

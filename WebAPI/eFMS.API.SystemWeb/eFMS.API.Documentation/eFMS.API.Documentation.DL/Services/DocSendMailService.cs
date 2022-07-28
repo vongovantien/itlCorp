@@ -41,6 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatIncoterm> catIncotermRepo;
         private readonly IContextBase<CsShipmentSurcharge> suchargeRepo;
         private readonly IContextBase<AcctCdnote> acctCdnoteRepo;
+        private readonly IContextBase<SysGroup> sysGroupRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         public DocSendMailService(IContextBase<CsTransaction> repository,
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatIncoterm> catIncoterm,
             IContextBase<CsShipmentSurcharge> sucharge,
             IContextBase<AcctCdnote> acctCdnote,
+            IContextBase<SysGroup> sysGroup,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -78,6 +80,7 @@ namespace eFMS.API.Documentation.DL.Services
             catIncotermRepo = catIncoterm;
             suchargeRepo = sucharge;
             acctCdnoteRepo = acctCdnote;
+            sysGroupRepo = sysGroup;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -203,7 +206,7 @@ namespace eFMS.API.Documentation.DL.Services
                 partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
             }
 
-            var department = catDepartmentRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+            var groupUser = sysGroupRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
             {
@@ -215,7 +218,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
-            emailContent.Cc = "fin-inv.fm@itlvn.com;" + department?.Email; // fin-inv.fm@itlvn.com và Group Mail của Department trên Lô hàng
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group Mail của Department trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
@@ -499,9 +502,32 @@ namespace eFMS.API.Documentation.DL.Services
                 _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
 
             var emailContent = new EmailContentModel();
-            emailContent.From = "Info FMS";
-            emailContent.To = _shippinglineMail;
-            emailContent.Cc = _empCurrentUser?.Email; //Email của Current User
+            // Email PIC
+            var _shipment = DataContext.First(x => x.Id == _housebill.JobId);
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            }
+
+            var groupUser = sysGroupRepo.Get(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = groupUser?.Email; // fin-inv.fm@itlvn.com và Group Mail của Department trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
