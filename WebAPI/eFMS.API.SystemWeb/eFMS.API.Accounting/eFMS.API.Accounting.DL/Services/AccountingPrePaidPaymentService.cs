@@ -45,8 +45,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctCdnote> GetQuery(AccountingPrePaidPaymentCriteria criteria)
         {
-            Expression<Func<AcctCdnote, bool>> query = x => x.CurrencyId == criteria.Currency
-            && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID
+            Expression<Func<AcctCdnote, bool>> query = x => x.Status != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
             && string.IsNullOrEmpty(x.SyncStatus);
 
             if (!string.IsNullOrEmpty(criteria.PartnerId))
@@ -70,16 +69,30 @@ namespace eFMS.API.Accounting.DL.Services
                 switch (criteria.SearchType)
                 {
                     case "JobID":
-                        var jobs = DC.CsTransaction.Where(x => criteria.Keywords.Contains(x.JobNo)).Select(x => x.Id);
-                        if (jobs.Count() > 0)
+                        var keywordsOps = criteria.Keywords.Where(s => s.Contains("LOG")).ToList();
+                        var keywordsCs = criteria.Keywords.Where(s => !s.Contains("LOG")).ToList();
+                        var jobsOps = DC.OpsTransaction.Where(x => keywordsOps.Contains(x.JobNo)).Select(x => x.Id).ToList();
+                        var jobsCs = DC.CsTransaction.Where(x => keywordsCs.Contains(x.JobNo)).Select(x => x.Id).ToList();
+
+                        List<Guid> jobUnion = new List<Guid>();
+                        if(jobsOps.Count > 0)
                         {
-                            query = query.And(x => jobs.Contains(x.JobId));
+                            jobUnion.AddRange(jobsOps);
+                        }
+                        if (jobsCs.Count > 0)
+                        {
+                            jobUnion.AddRange(jobsCs);
+                        }
+                        if (jobUnion.Count() > 0)
+                        {
+                            query = query.And(x => jobUnion.Contains(x.JobId));
                         }
                         break;
-                    case "DebitNote":
+                    case "DebitNo":
                         query = query.And(x => criteria.Keywords.Contains(x.Code));
                         break;
                     default:
+                        query = query.And(x => criteria.Keywords.Contains(x.Code));
                         break;
                 }
             }
@@ -93,7 +106,8 @@ namespace eFMS.API.Accounting.DL.Services
             var result = from cd in cdNotes
                            join p in DC.CatPartner on cd.PartnerId equals p.Id
                            join sur in DC.CsShipmentSurcharge on cd.Code equals sur.DebitNo
-                           //join u in DC.SysUser on cd.SalemanId equals u.Id
+                           join u in DC.SysUser on cd.SalemanId equals u.Id into grps
+                           from grp in grps.DefaultIfEmpty()
                            select new AccPrePaidPaymentResult
                            {
                                Id = cd.Id,
@@ -107,13 +121,36 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = sur.JobNo,
                                Status = cd.Status,
                                TotalAmount = cd.Total,
-                               // SalesmanName = u.Username,
+                               SalesmanName = grp.Username,
                                TotalAmountVND = sur.Total,
                                PartnerName = p.ShortName
                            };
 
            return result;
 
+        }
+
+        public async Task<HandleState> UpdatePrePaidPayment(List<AccountingPrePaidPaymentUpdateModel> model)
+        {
+            HandleState result = new HandleState();
+            if(model.Count > 0)
+            {
+                foreach (var item in model)
+                {
+                    var cd = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
+                    if(cd == null || cd.Status == "New")
+                    {
+                        continue;
+                    }
+                    cd.Status = item.Status;
+                    cd.DatetimeModified = DateTime.Now;
+                    cd.UserModified = currentUser.UserID;
+
+                    var d = await DataContext.UpdateAsync(cd, x => x.Id == cd.Id, false);
+                }
+                result = DataContext.SubmitChanges();
+            }
+            return result;
         }
     }
 }

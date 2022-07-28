@@ -34,6 +34,11 @@ namespace eFMS.API.Accounting.DL.Models
         public string Currency { get; set; }
         public string Status { get; set; }
         public string AgreementType { get; set; }
+    }
 
+    public class AccountingPrePaidPaymentUpdateModel
+    {
+        public Guid Id { get; set; }
+        public string Status { get; set; }
     }
 }

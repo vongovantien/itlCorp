@@ -26,23 +26,85 @@
                     </ng-template>
                 </tab>
                 <tab heading="PrePaid" [active]="true">
-                    <form-search-prepaid-payment></form-search-prepaid-payment>
+                    <form-search-prepaid-payment (onSearch)="onSearchData($event)"></form-search-prepaid-payment>
                     <div class="m-portlet">
                         <div class="m-portlet__body">
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-12 table-wrapper table-scrollabler">
                                     <table class="table table-hover table-brand dataTable table-hover">
                                         <thead app-table-header [headers]="headers"
                                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                             <th class="first table-actions-col" style="min-width:40px">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="" [checked]="isCheckAll"
+                                                        (change)="isCheckAll=!isCheckAll; checkAllCd()">
+                                                    <span></span>
+                                                </label>
                                             </th>
                                         </thead>
                                         <tbody>
-                                            <tr class="loading-wrapper" *ngIf="(isLoading | async) "
-                                                app-table-row-loading>
+                                            <ng-container *ngIf="!!debitNotes.length">
+                                                <tr *ngFor="let cd of debitNotes; let i = index; trackby: trackByFn">
+                                                    <td>
+                                                        <div class="m-checkbox-list d-flex align-items-center">
+                                                            <ng-template #dblock>
+                                                                <span class="d-block" style="width:30px"></span>
+                                                            </ng-template>
+                                                            <label class="m-checkbox"
+                                                                *ngIf="cd.status !== 'Paid';else dblock">
+                                                                <input type="checkbox" [(ngModel)]="cd.isSelected"
+                                                                    (change)="onChangeSelectedCd(cd);">
+                                                                <span></span>
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-primary">
+                                                        {{ cd.jobNo }}
+                                                    </td>
+                                                    <td class="text-primary">
+                                                        {{ cd.mbl }} - {{ cd.hbl }}
+                                                    </td>
+                                                    <td class="text-success">
+                                                        {{ cd.partnerName }}
+                                                    </td>
+                                                    <td>
+                                                        {{ cd.debitNote }}
+                                                        <ng-container [ngSwitch]="cd.syncStatus">
+                                                            <span *ngSwitchCase="'Synced'"
+                                                                class="badge badge-success m--margin-left-10">
+                                                                {{cps.syncStatus}}</span>
+                                                            <span *ngSwitchCase="'Rejected'"
+                                                                class="badge badge-danger m--margin-left-10">
+                                                                {{cps.syncStatus}}</span>
+                                                        </ng-container>
+                                                    </td>
+                                                    <td>
+                                                        {{ cd.totalAmount }} {{ cd.currency }}
+                                                    </td>
+                                                    <td>
+                                                        <ng-container *ngIf="cd.paidAmount !== null">
+                                                            {{ cd.paidAmount }} {{ cd.currency }}
+                                                        </ng-container>
+                                                    </td>
+                                                    <td class="text-success">
+                                                        {{ cd.salesmanName }}
+                                                    </td>
+                                                    <td>
+                                                        <ng-container [ngSwitch]="cd.status">
+                                                            <span *ngSwitchCase="'Paid'"
+                                                                class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10">
+                                                                <i class="la la-check"></i>
+                                                            </span>
+                                                            <span *ngSwitchDefault>
+                                                            </span>
+                                                        </ng-container>
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+
+                                            <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
                                             </tr>
-                                            <tr *ngIf="!(isLoading | async)  && !debitNotes.length"
-                                                app-table-none-record>
+                                            <tr *ngIf="!isLoading && !debitNotes.length" app-table-none-record>
                                             </tr>
                                         </tbody>
                                     </table>
