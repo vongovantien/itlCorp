@@ -12,7 +12,7 @@ export class JobConstants {
     public static COMMON_DATA = {
         FREIGHTTERMS: <string[]>['Collect', 'Prepaid'],
 
-        SHIPMENTTYPES: <string[]>['Freehand', 'Nominated'],
+        SHIPMENTTYPES: <string[]>['Freehand', 'Nominated', 'Freehand & Nominated'],
 
         BILLOFLADINGS: <string[]>['Copy', 'Original', 'Sea Waybill', 'Surrendered'],
 
@@ -38,7 +38,7 @@ export class JobConstants {
 
         ROUTES: <string[]>['Red', 'Green', 'Yellow'],
 
-        LINKFEESEARCHS: <string[]>['All','Have Linked', 'Not Link'],
+        LINKFEESEARCHS: <string[]>['All', 'Have Linked', 'Not Link'],
 
         AIRLIGHTCODEMAPPING: <CommonInterface.INg2Select[]>[
             { id: '235', text: 'TURKISH CARGO' },

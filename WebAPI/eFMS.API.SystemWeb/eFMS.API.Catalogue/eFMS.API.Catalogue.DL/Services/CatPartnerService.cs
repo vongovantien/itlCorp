@@ -161,6 +161,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.ContractService = GetContractServicesName(item.SaleService);
                                         entity.ContractNo = item.ContractNo;
                                         entity.OfficeIdContract = item.OfficeId;
+                                        entity.ContractShipmentType = item.ShipmentType;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
@@ -512,6 +513,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body.Replace("{{taxCode}}", partner.TaxCode);
             body.Replace("{{contractService}}", partner.ContractService);
             body.Replace("{{contractType}}", partner.ContractType);
+            body.Replace("{{shipmentType}}", partner.ContractShipmentType);
             body.Replace("{{contractNo}}", partner.ContractNo);
             body.Replace("{{address}}", address);
             body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");

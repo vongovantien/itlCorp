@@ -244,6 +244,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 contract.CreditLimit = 20000000;
                 contract.CreditLimitRate = 120;
             }
+            if(contract.ContractType == "Cash")
+            {
+                contract.ShipmentType = "Nominated";
+            } else
+            {
+                contract.ShipmentType = "Freehand & Nominated";
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
@@ -425,6 +432,14 @@ namespace eFMS.API.Catalogue.DL.Services
             isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if (entity.ContractType == "Cash")
+            {
+                entity.ShipmentType = "Nominated";
+            } else
+            {
+                entity.ShipmentType = "Freehand & Nominated";
+
+            }
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -440,6 +455,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.SalesmanId = entity.SaleManId;
                     modelPartner.UserCreatedContract = entity.UserCreated;
                     modelPartner.OfficeIdContract = entity.OfficeId;
+                    modelPartner.ContractShipmentType = entity.ShipmentType;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -659,6 +675,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.SalesmanId = objUpdate.SaleManId;
                     model.UserCreatedContract = objUpdate.UserCreated;
                     model.OfficeIdContract = objUpdate.OfficeId;
+                    model.ContractShipmentType = objUpdate.ShipmentType;
                     SendMailActiveSuccess(model, "active");
                 }
             }
@@ -1357,6 +1374,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{taxCode}}", partner.TaxCode);
                 body.Replace("{{contractService}}", partner.ContractService);
                 body.Replace("{{contractType}}", partner.ContractType);
+                body.Replace("{{shipmentType}}", partner.ContractShipmentType);
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
@@ -1415,6 +1433,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{taxCode}}", partner.TaxCode);
                 body.Replace("{{contractService}}", partner.ContractService);
                 body.Replace("{{contractType}}", partner.ContractType);
+                body.Replace("{{shipmentType}}", partner.ContractShipmentType);
                 body.Replace("{{contractNo}}", partner.ContractNo);
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
@@ -1531,6 +1550,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body = body.Replace("{{ContractNo}}", contract.ContractNo);
             body = body.Replace("{{SaleService}}", contract.SaleService);
             body = body.Replace("{{ContractType}}", contract.ContractType);
+            body = body.Replace("{{ShipmentType}}", contract.ShipmentType);
             body = body.Replace("{{Comment}}", comment);
             body = body.Replace("{{Address}}", address);
             body = body.Replace("{{LogoEFMS}}", logoUrl);

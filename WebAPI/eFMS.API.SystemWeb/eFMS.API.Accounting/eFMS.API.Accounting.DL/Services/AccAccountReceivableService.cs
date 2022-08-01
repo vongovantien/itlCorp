@@ -340,6 +340,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TaxCode = string.Empty, //Get data bên dưới
                     PartnerStatus = string.Empty, //Get data bên dưới
                     AgreementNo = s.First().contract.ContractNo,
+                    ShipmentType = s.First().contract.ShipmentType,
                     AgreementType = s.First().contract.ContractType,
                     AgreementStatus = s.First().contract.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                     AgreementSalesmanId = s.First().contract.SaleManId,
@@ -410,6 +411,7 @@ namespace eFMS.API.Accounting.DL.Services
                            TaxCode = partner.TaxCode,
                            PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                            AgreementNo = contract.AgreementNo,
+                           ShipmentType = contract.ShipmentType,
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
@@ -863,6 +865,7 @@ namespace eFMS.API.Accounting.DL.Services
                         TaxCode = s.First().TaxCode,
                         PartnerStatus = s.First().PartnerStatus,
                         AgreementNo = s.First().AgreementNo,
+                        ShipmentType = s.First().ShipmentType,
                         AgreementType = s.First().AgreementType,
                         AgreementStatus = s.First().AgreementStatus,
                         AgreementSalesmanId = s.First().AgreementSalesmanId,
