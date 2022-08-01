@@ -8,6 +8,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace eFMS.API.Accounting.DL.Services
     public class AccountingPrePaidPaymentService : RepositoryBase<AcctCdnote, AcctCdNoteModel>,  IAccountingPrePaidPaymentService
     {
         private readonly ICurrentUser currentUser;
+
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)DataContext.DC;
 
         public AccountingPrePaidPaymentService(ICurrentUser currentUser, 

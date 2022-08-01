@@ -26,7 +26,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
 
         public AccountingPrePaidPaymentController(IAccountingPrePaidPaymentService prepaidService,
-            StringLocalizer<LanguageSub> localizer)
+            IStringLocalizer<LanguageSub> localizer)
         {
             this.prepaidService = prepaidService;
             this.stringLocalizer = localizer;
@@ -50,7 +50,7 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!hs.Success)
             {
-               ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = Id };
+               ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                return BadRequest(_result);
             }
 
