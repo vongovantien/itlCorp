@@ -1906,7 +1906,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 

@@ -32,7 +32,7 @@
                             <div class="col-md-11">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': (from.dirty && !from.valid) || (isSubmited && !from.valid)}">
-                                    <input class="form-control" [attr.disabled]="null" formControlName="from" oninput="this.value=this.value.replace(/(<|>|'|,)/g,'')"/>
+                                    <input class="form-control" disabled="true" formControlName="from" oninput="this.value=this.value.replace(/(<|>|'|,)/g,'')"/>
                                 </div>
                             </div>
                         </div>
@@ -138,18 +138,21 @@
                                     <span></span>
                                 </label>
                             </ng-template>
-                        
-                            <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedDebitNote" (change)="onChangeCheckBox()">
-                                    <span></span>
-                                </label>
-                                <span>
-                                    <a class="pointer" (click)="previewDebitNote()">Debit Note</a>
-                                </span>
+
+                            <ng-container *ngIf="isExitsDebitNote else NotDebitNote" >
+                                <ng-container *ngFor="let debitNo of debitNos">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                        <input type="checkbox" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
+                                        <span></span>
+                                    </label>
+                                    <span style='margin: 20px;'>
+                                        <a class="pointer" (click)="previewDebitNote(debitNo.code)">{{debitNo.code}}</a>
+                                    </span>
+                                </ng-container>
                             </ng-container>
                             <ng-template #NotDebitNote>
-                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled" style="display: initial; margin-right: 40px;">
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
                                     Debit Note
                                     <span></span>
