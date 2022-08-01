@@ -520,7 +520,6 @@
                             <span> Save </span>
                         </span>
                     </button>
-                    {{!selectedContract.active && !isCreateNewCommercial}}
                     <button (click)="onSubmit(true)"
                         *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active && !isCreateNewCommercial) )  "
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
