@@ -445,7 +445,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         //         this.attachedFile.push(element);
         //     }
         // });
-        const shipmentFileUrls: string[] = (this.files || []).map(x => x.url);
+        var shipmentFileUrls: string[] = (this.files || []).map(x => x.url);
+        shipmentFileUrls = shipmentFileUrls.filter(element => this.attachmentPopup.getFileShipmentUrls().map(element => element.url).includes(element));
         this.attachedFile = [...this.attachedFile, ...shipmentFileUrls];
     }
 
