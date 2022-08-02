@@ -16,7 +16,7 @@ export const environment = {
         EXPORT: "efms-uat-api.sotrans.com.vn/Export",
         SETTING: "efms-uat-api.sotrans.com.vn/Setting",
         INDENTITY_SERVER_URL: "https://efms-uat-api.sotrans.com.vn/identityserver",
-        EXPORT_CRYSTAL: "https://efms-uat-api.sotrans.com.vn/ReportPreview/ExportCrystal.aspx",
+        EXPORT_CRYSTAL: "efms-uat-api.sotrans.com.vn/ReportPreview/ExportCrystal.aspx",
         PARTNER_API: "efms-uat-api.sotrans.com.vn/partner",
         FILE_SYSTEM: "efms-uat-api.sotrans.com.vn/File",
         REPORT_MANAGEMENT: "efms-uat-api.sotrans.com.vn/Report"
