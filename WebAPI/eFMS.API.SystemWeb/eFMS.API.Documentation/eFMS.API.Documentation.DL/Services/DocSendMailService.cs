@@ -462,7 +462,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
 
             var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
-            var pod = catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault()?.NameEn;
+            var pod = _housebill.FinalDestinationPlace; // catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault()?.NameEn; => Final destination
             string _subject = string.Empty;
             switch (serviceId)
             {
@@ -512,12 +512,16 @@ namespace eFMS.API.Documentation.DL.Services
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
-            // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
+            // Email to: agent/customer + consignee
+            var mailTo = string.Empty;
+            var partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerEmail))
             {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+                partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
             }
+            mailTo += partnerEmail;
+            var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
+            mailTo += ";" + emailConsignee;
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
@@ -528,11 +532,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                mailFrom = @"air@itlvn.com";
+                mailFrom = @"sea@itlvn.com";
             }
 
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
