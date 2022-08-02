@@ -135,6 +135,19 @@ namespace eFMS.API.Documentation.Controllers
             return cdNoteServices.GroupCDNoteByPartner(Id, IsShipmentOperation);
         }
 
+        /// <summary>
+        /// Get CDNote With Hbl Id
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetCDNoteWithHbl")]
+        [Authorize]
+        public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid hblId)
+        {
+            return cdNoteServices.GetCDNoteWithHbl(hblId);
+        }
+
         [HttpGet]
         [Route("GetDetails")]
         public AcctCDNoteDetailsModel Get(Guid jobId, string cdNo)
