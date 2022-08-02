@@ -25,6 +25,13 @@
             <param name="cdNoteId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetCDNoteWithHbl(System.Guid)">
+            <summary>
+            Get CDNote With Hbl Id
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNote(eFMS.API.Documentation.DL.Models.AcctCDNoteDetailsModel,System.Boolean)">
             <summary>
             Preview CD Note (OPS)
@@ -863,6 +870,13 @@
             <param name="issuedDate">Issued Date of housebill</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.GetHAWBListOfShipment(System.Guid)">
+            <summary>
+            Get HAWB List Of Shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
             <summary>
             
@@ -901,18 +915,21 @@
             <param name="hblId">Housebill ID</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Nullable{System.Guid},System.Nullable{System.Guid})">
             <summary>
             Get info mail housebill of Air Export
             </summary>
             <param name="hblId">Housebill ID</param>
+            <param name="jobId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Guid,System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Nullable{System.Guid},System.Nullable{System.Guid},System.String)">
             <summary>
             Get info mail housebill of Air Export
             </summary>
             <param name="hblId">Housebill ID</param>
+            <param name="jobId"></param>
+            <param name="serviceId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailSISeaExport(System.Guid)">
@@ -1044,6 +1061,14 @@
             </summary>
             <param name="jobId"></param>
             <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.AutoRateReplicate(System.String,System.String)">
+            <summary>
+            Calling AutoRateReplicate
+            </summary>
+            <param name="settleNo">Settlement Code</param>
+            <param name="jobNo">Job No</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.ReportLogController">
