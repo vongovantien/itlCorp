@@ -173,9 +173,11 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     requestSearchSOA() {
-        if (!!this.dataSearch.isSearching) {
-            this._store.dispatch(LoadListSOA({ page: 1, size: this.pageSize, dataSearch: this.dataSearch }));
-        } else { this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch })); }
+        // if (!!this.dataSearch.isSearching) {
+        //     this._store.dispatch(LoadListSOA({ page: 1, size: this.pageSize, dataSearch: this.dataSearch }));
+        // } else { this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch })); }
+
+        this._store.dispatch(LoadListSOA({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     sortLocal(sort: string): void {

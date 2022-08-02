@@ -85,21 +85,21 @@ export class StatementOfAccountSearchComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     if (!!data) {
+                        console.log(data);
+
                         if (data.dataSearch !== undefined) {
                             if (!!data.dataSearch.soaFromDateCreate && !!data.dataSearch.soaToDateCreate) {
                                 this.selectedRange = {};
                                 this.selectedRange.startDate = new Date(data.dataSearch?.soaFromDateCreate);
                                 this.selectedRange.endDate = new Date(data.dataSearch?.soaToDateCreate);
                             }
+                            this.selectedPartner = Object.assign({}, !!!data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : { field: 'id', value: data.dataSearch.customerID });
                             //this.selectedStatus = { title: data.dataSearch?.soaStatus, name: data.dataSearch?.soaStatus };
                             this.reference = !!data.dataSearch.strCodes ? data.dataSearch.strCodes : "";
-                            this.selectedPartner = Object.assign({}, !!!data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : null);
+
                             this.selectedStatus = !!data.dataSearch.soaStatus ? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0] : null;
                             this.selectedCurrency = !!data.dataSearch.soaCurrency ? this.currencyList.filter((cur) => cur.id === data.dataSearch.soaCurrency)[0] : null;
-
-                            if (data.dataSearch.soaUserCreate !== null) {
-                                this.currentUser = Object.assign({}, data.dataSearch.soaUserCreate !== null ? { field: 'id', value: data.dataSearch.soaUserCreate } : { field: 'id', value: null });
-                            }
+                            this.currentUser = Object.assign({}, data.dataSearch.soaUserCreate !== null ? { field: 'id', value: data.dataSearch.soaUserCreate } : null);
                         }
                     }
                 }
@@ -204,9 +204,10 @@ export class StatementOfAccountSearchComponent extends AppForm {
             soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.value : null,
             soaUserCreate: !!this.currentUser ? this.currentUser.value : null,
             CurrencyLocal: "VND",
-            isSearching: true
+            //isSearching: true
         };
         this._store.dispatch(SearchListSOA({ dataSearch: body }));
+        console.log(body);
 
         // this.onSearch.emit(body);
     }
