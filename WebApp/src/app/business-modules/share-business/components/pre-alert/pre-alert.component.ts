@@ -328,7 +328,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     streamUploadReport.push(this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' }));
                 }
                 if (this.isExitsDO && this.isCheckedDO) {
-                    streamUploadReport.push(this._documentRepo.previewAirProofofDelivery(this.hblId));
+                    streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
                 }
                 this.debitNos.forEach(element => {
                     if (element.isCheckedDebitNote) {

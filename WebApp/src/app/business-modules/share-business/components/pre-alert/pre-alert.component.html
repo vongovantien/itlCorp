@@ -141,11 +141,11 @@
 
                             <ng-container *ngIf="isExitsDebitNote else NotDebitNote" >
                                 <ng-container *ngFor="let debitNo of debitNos">
-                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px">
                                         <input type="checkbox" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
                                         <span></span>
                                     </label>
-                                    <span style='margin: 20px;'>
+                                    <span>
                                         <a class="pointer" (click)="previewDebitNote(debitNo.code)">{{debitNo.code}}</a>
                                     </span>
                                 </ng-container>
@@ -158,8 +158,9 @@
                                     <span></span>
                                 </label>
                             </ng-template>
+
                             <ng-container *ngIf="isExitsDO else NotDO">
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
                                     <input type="checkbox" [(ngModel)]="isCheckedDO" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
@@ -199,11 +200,11 @@
 
                             <ng-container *ngIf="isExitsHawb else NotHawb" >
                                 <ng-container *ngFor="let hbl of hawbDetails">
-                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
                                         <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb" (change)="onChangeCheckBox()">
                                         <span></span>
                                     </label>
-                                    <span style='margin-right: 20px;'>
+                                    <span>
                                         <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
                                     </span>
                                 </ng-container>
@@ -243,11 +244,11 @@
                             </ng-template>
 
                             <ng-container *ngIf="isExitsSI else NotSI">
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
                                     <input type="checkbox" [(ngModel)]="isCheckedSI" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span style='margin-right: 20px;'>
+                                <span>
                                     <a class="pointer" (click)="previewSI()">SI HBL Detail</a>
                                 </span>
                             </ng-container>
@@ -261,12 +262,12 @@
                             </ng-template>
 
                             <ng-container *ngIf="isExitsSIDetailCont else NotSIDetailCont">
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
                                     <input type="checkbox" [(ngModel)]="isCheckedSIDetailCont"
                                         (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span style='margin-right: 20px;'>
+                                <span>
                                     <a class="pointer" (click)="previewSIDetailCont(serviceId)">SI Detail (Cont)</a>
                                 </span>
                             </ng-container>

@@ -184,7 +184,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? exchangeRate = null;
             if(!string.IsNullOrEmpty(debitNo))
             {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExcRateUsdToLocal;
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
             }
             string _body = templateEmail.Body;
             _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
@@ -193,7 +193,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
             _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
-            _body = _body.Replace("{{Routing}}", _housebill.Route);
+            _body = _body.Replace("{{Routing}}", _shipment.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
@@ -608,7 +608,7 @@ namespace eFMS.API.Documentation.DL.Services
                     #endregion
                     containerDetail = subTemplate.Body;
                     containerDetail = containerDetail.Replace("{{Qty}}", string.Format("{0}x{1}", con.Quantity, conType));
-                    containerDetail = containerDetail.Replace("{{SealNo}}", string.Format("CTNR/SEAL NO.: {0}/{1}/{2}, {3} {4}", con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType));
+                    containerDetail = containerDetail.Replace("{{SealNo}}", string.Format(", CTNR/SEAL NO.: {0}/{1}/{2}, {3} {4}", con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType));
                     containerDetail = containerDetail.Replace("{{GW}}", String.Format("{0:#.###}", con.Gw));
                     containerDetail = containerDetail.Replace("{{CBM}}", String.Format("{0:#.###}", con.Cbm));
                 }
@@ -652,7 +652,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _content = _content.Replace("{{Total}}", _housebill.PackageContainer + ", " + packageTotal);
                 _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
                 _content = _content.Replace("{{CBM}}", String.Format("{0:#.####}", _housebill.Cbm));
-                _content = _content.Replace("{{HBL}}", string.Format("{0} ({1}, {2}", _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment));
+                _content = _content.Replace("{{HBL}}", string.Format("{0} ({1}, {2})", _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment));
                 _content = _content.Replace("{{Shipper}}", _shipper.PartnerNameEn);
                 _content = _content.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
                 _content = _content.Replace("{{Notify}}", _housebill.NotifyPartyDescription);
@@ -666,12 +666,20 @@ namespace eFMS.API.Documentation.DL.Services
                 string etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM").ToUpper();
                 //_subject = string.Format(@"PRE ALERT –{0} – {1} // HBL: {2} // MBL: {3}// {4} {5}// {6} // {7} // ETD: {8}",
                 //_pol?.NameEn, _pod?.NameEn, _housebill.Hwbno, _housebill.Mawb, _housebill.PackageQty, packageType, _shipper?.PartnerNameEn, _consignee?.PartnerNameEn, etd);
+                _subject = _subject.Replace("{{Pol}}", _pol?.NameEn);
+                _subject = _subject.Replace("{{Pod}}", _pod?.NameEn);
+                _subject = _subject.Replace("{{HBL}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{MBL}}", _housebill.Mawb);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
+                _subject = _subject.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
+                _subject = _subject.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
+                _subject = _subject.Replace("{{ETD}}", etd);
 
                 // Body
                 string packageDetail = string.Empty;
                 foreach (var con in csMawbcontainers)
                 {
-                    string conType = GetUnitNameById(con.ContainerTypeId);
+                    string conType = GetUnitNameById(con.PackageTypeId);
                     #region Remove Old
                     //string packType = GetUnitNameById(con.PackageTypeId);
                     //packageDetail += string.Format("<div>{0} {1}, G.W: {2}, CBM: {3}</div>", con.PackageQuantity, packType, String.Format("{0:#.###}", con.Gw), String.Format("{0:#.###}", con.Cbm));
@@ -699,14 +707,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //                        packageTotal, String.Format("{0:#.####}", _housebill.GrossWeight), String.Format("{0:#.####}", _housebill.Cbm),
                 //                        _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
                 #endregion
-                _subject = _subject.Replace("{{Pol}}", _pol?.NameEn);
-                _subject = _subject.Replace("{{Pod}}", _pod?.NameEn);
-                _subject = _subject.Replace("{{HBL}}", _housebill.Hwbno);
-                _subject = _subject.Replace("{{MBL}}", _housebill.Mawb);
-                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
-                _subject = _subject.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
-                _subject = _subject.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
-                _subject = _subject.Replace("{{ETD}}", etd);
+                
 
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
@@ -721,7 +722,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _content = _content.Replace("{{Total}}", packageTotal);
                 _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
                 _content = _content.Replace("{{CBM}}", String.Format("{0:#.####}", _housebill.Cbm));
-                _content = _content.Replace("{{HBL}}", string.Format("{0} ({1}, {2}", _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment));
+                _content = _content.Replace("{{HBL}}", string.Format("{0} ({1}, {2})", _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment));
                 _content = _content.Replace("{{Shipper}}", _shipper.PartnerNameEn);
                 _content = _content.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
                 _content = _content.Replace("{{Notify}}", _housebill.NotifyPartyDescription);
@@ -807,7 +808,7 @@ namespace eFMS.API.Documentation.DL.Services
                         string packType = GetUnitNameById(con.PackageTypeId);
                         containerDetail = subTemplate.Body;
                         containerDetail = containerDetail.Replace("{{Qty}}", string.Format("{0}x{1}", con.Quantity, conType));
-                        containerDetail = containerDetail.Replace("{{SealNo}}", string.Format("CTNR/SEAL NO.: {0}/{1}/{2}, {3} {4}", con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType));
+                        containerDetail = containerDetail.Replace("{{SealNo}}", string.Format(", CTNR/SEAL NO.: {0}/{1}/{2}, {3} {4}", con.ContainerNo, conType, con.SealNo, con.PackageQuantity, packType));
                         containerDetail = containerDetail.Replace("{{GW}}", String.Format("{0:#.###}", con.Gw));
                         containerDetail = containerDetail.Replace("{{CBM}}", String.Format("{0:#.###}", con.Cbm));
                     }
@@ -859,7 +860,6 @@ namespace eFMS.API.Documentation.DL.Services
                 var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).Distinct());
 
                 // Subject
-                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 _subject = _subject.Replace("{{Pol}}", _pol?.NameEn);
                 _subject = _subject.Replace("{{Pod}}", _pod?.NameEn);
                 _subject = _subject.Replace("{{HBL}}", hwbNos);
@@ -869,6 +869,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Cnee}}", string.Empty);
                 _subject = _subject.Replace("{{ETD}}", etd);
                 // Body
+                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
                 _body = _body.Replace("{{VSL}}", _shipment.FlightVesselName);
@@ -882,7 +883,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == _housebill.Id);
                     foreach (var con in csMawbcontainers)
                     {
-                        string conType = GetUnitNameById(con.ContainerTypeId);
+                        string conType = GetUnitNameById(con.PackageTypeId);
                         packageDetail = subTemplate.Body;
                         packageDetail = packageDetail.Replace("{{Qty}}", string.Format("{0} {1}", con.Quantity, conType));
                         packageDetail = packageDetail.Replace("{{SealNo}}", string.Empty);
