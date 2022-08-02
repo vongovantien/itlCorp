@@ -773,6 +773,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.salesDepartment = this.selectedSalesmanData?.userDeparmentId;
         this.selectedContract.salesOfficeId = this.selectedSalesmanData?.userOfficeId;
         this.selectedContract.salesCompanyId = this.selectedSalesmanData?.userCompanyId;
+        this.selectedContract.shipmentType = this.formGroup.controls['shipmentType'].value;
     }
 
     onSubmitActiveContract() {
