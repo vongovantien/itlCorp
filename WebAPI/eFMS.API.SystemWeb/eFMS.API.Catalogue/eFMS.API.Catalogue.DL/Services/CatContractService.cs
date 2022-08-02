@@ -269,6 +269,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.UserCreatedContract = contract.UserCreated;
                     model.UserCreated = entity.UserCreated;
                     model.OfficeIdContract = entity.OfficeId;
+                    model.ContractShipmentType = contract.ShipmentType;
                     SendMailActiveSuccess(model, string.Empty);
                     ClearCache();
                     Get();
@@ -1702,6 +1703,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{saleService}}", saleService);
             body.Replace("{{contractType}}", contract.ContractType);
+            body.Replace("{{shipmentType}}", contract.ShipmentType);
             body.Replace("{{contractNo}}", contract.ContractNo);
             body.Replace("{{address}}", address);
             body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
