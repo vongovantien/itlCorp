@@ -774,7 +774,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var adv in advanceModel.AdvanceRequests)
                 {
-                    var charges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Hblid == adv.Hblid && x.ClearanceNo == adv.CustomNo && x.AdvanceNoFor == advance.AdvanceNo).ToList();
+                    var charges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Hblid == adv.Hblid && (!string.IsNullOrEmpty(x.ClearanceNo) ? (x.ClearanceNo == adv.CustomNo) : string.IsNullOrEmpty(adv.CustomNo))
+                    && x.AdvanceNoFor == advance.AdvanceNo).ToList();
                     if (charges.Count > 0)
                     {
                         var surcharge = new List<ShipmentChargeAdvance>();
@@ -1271,7 +1272,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Hblid = (Guid)item.Hblid;
                     charge.Mblno = item.Mbl;
                     charge.Hblno = item.Hbl;
-                    charge.ClearanceNo = item.CustomNo;
+                    charge.ClearanceNo = string.IsNullOrEmpty(item.CustomNo) ? null : item.CustomNo;
                     charge.AdvanceNoFor = model.AdvanceNo;
                     charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
                     charge.PaymentObjectId = model.Payee;
@@ -2339,7 +2340,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var advanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo);
                     foreach(var adv in advanceRequest)
                     {
-                        var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Mblno == adv.Mbl && x.Hblid == adv.Hblid && x.ClearanceNo == adv.CustomNo && x.AdvanceNoFor == adv.AdvanceNo);
+                        var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Mblno == adv.Mbl && x.Hblid == adv.Hblid
+                        && (!string.IsNullOrEmpty(x.ClearanceNo) ? (x.ClearanceNo == adv.CustomNo) : string.IsNullOrEmpty(adv.CustomNo)) && x.AdvanceNoFor == adv.AdvanceNo);
                         decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
                         foreach (var charge in surcharges)
                         {
@@ -2850,7 +2852,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var list = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo)
-                   .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo })
+                   .GroupBy(g => new { g.JobId, g.Hbl, CustomNo = (string.IsNullOrEmpty(g.CustomNo) ? null : g.CustomNo) })
                    .Select(se => new AcctAdvanceRequest
                    {
                        JobId = se.First().JobId,
@@ -4441,7 +4443,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (model.AdvanceFor == "HBL")
             {
-                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo }).ToList();
+                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }).ToList();
                 foreach (var sm in shipmentTypeGrp)
                 {
                     if (sm.GroupBy(x => x.AdvanceType).Count() > 1)
@@ -4450,7 +4452,7 @@ namespace eFMS.API.Accounting.DL.Services
                         return dataDuplicate;
                     }
                 }
-                var duplicateCharges = surcharges.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.ClearanceNo, x.ChargeId, x.ChargeCode }).ToList();
+                var duplicateCharges = surcharges.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo), x.ChargeId, x.ChargeCode }).ToList();
                 foreach (var charge in duplicateCharges)
                 {
                     if (charge.Count() > 1)
