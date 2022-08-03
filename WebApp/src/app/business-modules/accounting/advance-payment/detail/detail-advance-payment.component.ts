@@ -401,9 +401,8 @@ export class AdvancePaymentDetailComponent
                         });
                     }
                     else {
-                        this._accoutingRepo
+                        return this._accoutingRepo
                             .sendRequestAdvPayment(body)
-                        return EMPTY;
                     }
                 }))
             .subscribe((res: CommonInterface.IResult) => {
