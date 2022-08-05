@@ -144,6 +144,14 @@ namespace eFMS.API.Catalogue.DL.Services
                                 x.PartnerId = partner.Id;
                                 x.DatetimeCreated = DateTime.Now;
                                 x.UserCreated = x.UserModified = currentUser.UserID;
+                                if (x.ContractType == "Cash")
+                                {
+                                    x.ShipmentType = "Nominated";
+                                }
+                                else
+                                {
+                                    x.ShipmentType = "Freehand & Nominated";
+                                }
                             });
                             partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
 
