@@ -217,6 +217,26 @@
                                     <span></span>
                                 </label>
                             </ng-template>
+
+                            <ng-container *ngIf="isExitsDebitNote else NotDebitNote" >
+                                <ng-container *ngFor="let debitNo of debitNos">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px">
+                                        <input type="checkbox" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
+                                        <span></span>
+                                    </label>
+                                    <span>
+                                        <a class="pointer" (click)="previewCDNoteExport(debitNo.code)">{{debitNo.code}}</a>
+                                    </span>
+                                </ng-container>
+                            </ng-container>
+                            <ng-template #NotDebitNote>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    CD Note
+                                    <span></span>
+                                </label>
+                            </ng-template>
                         </div>
                     </div>
 

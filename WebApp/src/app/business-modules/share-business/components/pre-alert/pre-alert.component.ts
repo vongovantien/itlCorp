@@ -186,7 +186,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.isCheckedArrivalNotice = true;
                 
                 this.isExitsDO = true;
-                this.checkExistDebitNote();
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 this.checkExistManifestExport();
@@ -196,7 +195,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.isExitsArrivalNotice = true;
                 this.isCheckedArrivalNotice = true;
                 this.isExitsDO = true;
-                this.checkExistDebitNote();
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -209,6 +207,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             default:
                 break;
         }
+        this.checkExistDebitNote();
     }
 
     checkExistSIExport() {
@@ -265,21 +264,27 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 });
     }
 
-    checkExistDebitNote(){
-        this._documentRepo.getListCDNoteWithHbl(this.hblId)
-        .pipe(
-            catchError(this.catchError),
-            finalize(() => { })
-        )
-        .subscribe(
-            (res: any) => {                
-                if (res) {
-                    this.debitNos = res.filter(x=> lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
-                    this.isExitsDebitNote = true;
-                } else {
-                    this.isExitsDebitNote = false;
-                }
-            });
+    checkExistDebitNote() {
+        this._documentRepo.getListCDNoteWithHbl(this.hblId, this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res) {
+                        if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE') {
+                            this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: false }));
+                        } else {
+                            this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
+                        }
+                        if (this.debitNos.length > 0) {
+                            this.isExitsDebitNote = true;
+                        }
+                    } else {
+                        this.isExitsDebitNote = false;
+                    }
+                });
     }
 
     onAddFile(files: any) {
@@ -346,6 +351,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isCheckedManifest) {
                     streamUploadReport.push(this._documentRepo.previewAirExportManifestByJobId(this.jobId));
                 }
+                this.debitNos.forEach(element => {
+                    if (element.isCheckedDebitNote) {
+                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }))
+                    }
+                });
                 break;
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
@@ -370,6 +380,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.hawbDetails.forEach(ele => {
                         if (ele.isCheckedHawb) {
                             streamUploadReport.push(this._documentRepo.previewSeaHBLOfLanding(ele.id, 'ITL_FRAME'));
+                        }
+                    });
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }))
                         }
                     });
                 } else {
@@ -869,6 +884,40 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res: any) => {
                     if (res != null) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        }
+    }
+
+    previewCDNoteExport(code: string){
+        if(this.serviceId === 'AE'){
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        }else{
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
                             this.renderAndShowReport();

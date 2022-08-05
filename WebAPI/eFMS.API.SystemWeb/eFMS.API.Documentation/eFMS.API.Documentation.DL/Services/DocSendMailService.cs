@@ -172,6 +172,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Email PIC
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            // Group email của PIC
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
 
             var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AI-ARRIVAL-NOTICE").FirstOrDefault();
             string _subject = templateEmail.Subject;
@@ -197,17 +199,17 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
+            _body = _body.Replace("{{emailGroup}}", groupUser?.Email);
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(partnerInfo))
             {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
             }
 
-            // Group email của PIC
-            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+            
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
             {
@@ -293,16 +295,17 @@ namespace eFMS.API.Documentation.DL.Services
 
             var _body = template.Body;
             _body = _body.Replace("{{PolPod}}", polPod);
+            _body = _body.Replace("{{Mawb}}", _housebill.Mawb);
+            _body = _body.Replace("{{Flight}}", _housebill.FlightNo);
+            _body = _body.Replace("{{ETD}}", (_housebill.Etd != null) ? _housebill.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
+
             var _content = template.Content;
             _content = _content.Replace("{{NumOrder}}", string.Empty);
-            _content = _content.Replace("{{Mawb}}", _housebill.Mawb);
-            _content = _content.Replace("{{Flight}}", _housebill.FlightNo);
-            _content = _content.Replace("{{ETD}}", (_housebill.Etd != null) ? _housebill.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
             _content = _content.Replace("{{Hwbno}}", _housebill.Hwbno);
             _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
             _content = _content.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
             _content = _content.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
-            _content = _content.Replace("{{Qty}}", _housebill.PackageQty?.ToString() + _housebill.KgIb);
+            _content = _content.Replace("{{Qty}}", _housebill.PackageQty?.ToString() + "(PCS)");
             _content = _content.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight) + "(KGS)");
             _content = _content.Replace("{{CW}}", string.Format("{0:n2}", _housebill.ChargeWeight) + "(KGS)");
             _content = _content.Replace("{{Incoterm}}", incoterm);
@@ -316,10 +319,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(partnerInfo))
             {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+                partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email;
             }
 
             var emailContent = new EmailContentModel();
@@ -363,6 +366,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             var _body = template.Body;
             _body = _body.Replace("{{PolPod}}", polPod);
+            _body = _body.Replace("{{Mawb}}", shipmentInfo.Mawb);
+            _body = _body.Replace("{{Flight}}", shipmentInfo.FlightVesselName);
+            _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
 
             var numOrder = 1;
             var contenEmail = string.Empty;
@@ -373,14 +379,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
                 var _incoterm = catIncotermRepo.Get(x => x.Id == _hbl.IncotermId).FirstOrDefault()?.Code;
                 _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                _content = _content.Replace("{{Mawb}}", _hbl.Mawb);
-                _content = _content.Replace("{{Flight}}", _hbl.FlightNo);
-                _content = _content.Replace("{{ETD}}", (_hbl.Etd != null) ? _hbl.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
                 _content = _content.Replace("{{Hwbno}}", _hbl.Hwbno);
                 _content = _content.Replace("{{FreightPayment}}", _hbl.FreightPayment);
                 _content = _content.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
                 _content = _content.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
-                _content = _content.Replace("{{Qty}}", _hbl.PackageQty?.ToString() +_hbl.KgIb);
+                _content = _content.Replace("{{Qty}}", _hbl.PackageQty?.ToString() + "(PCS)");
                 _content = _content.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight) + "(KGS)");
                 _content = _content.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight) + "(KGS)");
                 _content = _content.Replace("{{Incoterm}}", _incoterm);
@@ -405,9 +408,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var _content = template.Content;
                 _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                _content = _content.Replace("{{Mawb}}", string.Empty);
-                _content = _content.Replace("{{Flight}}", string.Empty);
-                _content = _content.Replace("{{ETD}}", string.Empty);
                 _content = _content.Replace("{{Hwbno}}", string.Empty);
                 _content = _content.Replace("{{FreightPayment}}", string.Empty);
                 _content = _content.Replace("{{Shipper}}", string.Empty);
@@ -514,10 +514,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             // Email to: agent/customer + consignee
             var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(partnerEmail))
             {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
             }
             mailTo += partnerEmail;
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
@@ -619,7 +619,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                 string packageTotal = string.Join(", ", csMawbcontainers.GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key)));
                 //string packTypeTotal = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
-                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 #region Remove Old
                 //_body = string.Format(@"<div><b>Dear Sir/Madam,</b></div></br><div>Please find pre-alert docs in the attachment and confirm receipt.</div><br/>" +
                 //                        "<div>POL : {0}</div><div>POD : {1}</div><br/>" +
@@ -641,15 +640,19 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _housebill.PackageContainer);
                 _subject = _subject.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
                 _subject = _subject.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
-                _subject = _subject.Replace("{{ETD}}", etd);
+                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd?.ToString("dd MMM").ToUpper());
 
+                //etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
+                string atd = _shipment.Atd?.ToString("dd MMM, yyyy").ToUpper();
+                string eta = _shipment.Eta?.ToString("dd MMM, yyyy").ToUpper();
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
                 _body = _body.Replace("{{VSL}}", _housebill.OceanVoyNo);
-                _body = _body.Replace("{{ETD}}", etd);
+                _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
+                _body = _body.Replace("{{ETA}}", eta);
+                _body = _body.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
 
                 _content = _content.Replace("{{NumOrder}}", string.Empty);
-                _content = _content.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
                 _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
                 _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
                 _content = _content.Replace("{{ContainerDetail}}", containerDetail);
@@ -677,7 +680,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
                 _subject = _subject.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
                 _subject = _subject.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
-                _subject = _subject.Replace("{{ETD}}", etd);
+                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd?.ToString("dd MMM").ToUpper());
 
                 // Body
                 string packageDetail = string.Empty;
@@ -711,17 +714,19 @@ namespace eFMS.API.Documentation.DL.Services
                 //                        packageTotal, String.Format("{0:#.####}", _housebill.GrossWeight), String.Format("{0:#.####}", _housebill.Cbm),
                 //                        _housebill.Hwbno, _housebill.Hbltype, _housebill.FreightPayment, _shipper.PartnerNameEn, _consignee?.PartnerNameEn, _housebill.NotifyPartyDescription);
                 #endregion
-                
 
+                string atd = _shipment.Atd?.ToString("dd MMM, yyyy").ToUpper();
+                string eta = _shipment.Eta?.ToString("dd MMM, yyyy").ToUpper();
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
                 _body = _body.Replace("{{VSL}}", _housebill.OceanVoyNo);
-                _body = _body.Replace("{{ETD}}", etd);
-
-                _content = _content.Replace("{{NumOrder}}", string.Empty);
-                _content = _content.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
+                _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
+                _body = _body.Replace("{{ETA}}", eta);
+                _body = _body.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
                 _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
                 _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
+
+                _content = _content.Replace("{{NumOrder}}", string.Empty);
                 _content = _content.Replace("{{ContainerDetail}}", packageDetail);
                 _content = _content.Replace("{{Total}}", packageTotal);
                 _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
@@ -750,10 +755,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email; //Email to
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(partnerInfo))
             {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
             }
 
             var emailContent = new EmailContentModel();

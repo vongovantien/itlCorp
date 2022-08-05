@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateCDNote(AcctCdnoteModel model);
         HandleState DeleteCDNote(Guid idCDNote);
         List<object> GroupCDNoteByPartner(Guid Id, bool IsShipmentOperation);
-        List<AcctCdnoteModel> GetCDNoteWithHbl(Guid hblId);
+        List<AcctCdnoteModel> GetCDNoteWithHbl(Guid? hblId, Guid? jobId);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo, List<AcctCdnoteModel> acctCdNoteList = null);
         Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin);
         AcctCDNoteExportResult GetDataExportOpsCDNote(AcctCDNoteDetailsModel model, Guid officeId);
