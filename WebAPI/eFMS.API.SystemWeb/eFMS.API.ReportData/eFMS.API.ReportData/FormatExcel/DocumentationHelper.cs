@@ -4280,54 +4280,25 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.NumberOfGroup = 1;
                 foreach (var outRe in result)
                 {
+
                     excel.IndexOfGroup = 1;
                     excel.SetGroupsTable();
-                    if(outRe.ReplicateJob.Count() == 0)
-                    {
                         var listGroupHead = new Dictionary<string, object>()
                         {
-                            { "RJobID", null },
-                            { "RCustomNo", null },
-                            { "RHBL", null },
-                            { "RCustomer", null },
-                            { "RProductService", null },
-                            { "RDateService", null },
-                            { "JobID", null },
-                            { "CustomNo", null },
-                            { "HBL", null },
-                            { "Customer", null },
-                            { "ProductService", null },
-                            { "DateService", null },
-                            { "Creator", null },
-                            { "RCreator", null },
-                            { "SumRNetAmount", null },
-                            { "SumRVATAmount", null },
-                            { "SumNetAmount", null },
-                            { "SumVATAmount", null },
-                            { "SumRTotalSelling", null },
-                            { "SumTotalBuying", null },
-                            { "Balance", null },
-                        };
-                        excel.SetData(listGroupHead);
-                    }
-                    else
-                    {
-                        var listGroupHead = new Dictionary<string, object>()
-                        {
-                            { "RJobID", outRe.ReplicateJob.FirstOrDefault().JobId },
-                            { "RCustomNo", outRe.ReplicateJob.FirstOrDefault().CustomNo },
-                            { "RHBL", outRe.ReplicateJob.FirstOrDefault().HBL },
-                            { "RCustomer", outRe.ReplicateJob.FirstOrDefault().Customer },
-                            { "RProductService", outRe.ReplicateJob.FirstOrDefault().ProductService },
-                            { "RDateService", outRe.ReplicateJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy") },
-                            { "JobID", outRe.OriginalJob.FirstOrDefault().JobId },
-                            { "CustomNo", outRe.OriginalJob.FirstOrDefault().CustomNo },
-                            { "HBL", outRe.OriginalJob.FirstOrDefault().HBL },
-                            { "Customer", outRe.OriginalJob.FirstOrDefault().Customer },
-                            { "ProductService", outRe.OriginalJob.FirstOrDefault().ProductService },
-                            { "DateService", outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy") },
-                            { "Creator", outRe.OriginalJob.FirstOrDefault().Creator },
-                            { "RCreator", outRe.ReplicateJob.FirstOrDefault().Creator },
+                            { "RJobID", outRe.ReplicateJob.FirstOrDefault(x=>x.JobId!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.JobId!=null).JobId:null },
+                            { "RCustomNo", outRe.ReplicateJob.FirstOrDefault(x=>x.CustomNo!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.CustomNo!=null).CustomNo:null },
+                            { "RHBL", outRe.ReplicateJob.FirstOrDefault(x=>x.HBL!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.HBL!=null).HBL:null },
+                            { "RCustomer", outRe.ReplicateJob.FirstOrDefault(x=>x.Customer!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.Customer!=null).Customer:null },
+                            { "RProductService", outRe.ReplicateJob.FirstOrDefault(x=>x.ProductService!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.ProductService!=null).ProductService:null },
+                            { "RDateService", outRe.ReplicateJob.FirstOrDefault(x=>x.DateService!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.DateService!=null).DateService.ToString("dd/MM/yyyy"):null },
+                            { "JobID", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().JobId:null },
+                            { "CustomNo", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().CustomNo:null },
+                            { "HBL", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().HBL:null },
+                            { "Customer", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().Customer:null },
+                            { "ProductService", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().ProductService:null },
+                            { "DateService", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy"):null },
+                            { "Creator", outRe.OriginalJob.FirstOrDefault()!=null? outRe.OriginalJob.FirstOrDefault().Creator:null },
+                            { "RCreator", outRe.ReplicateJob.FirstOrDefault(x=>x.Creator!=null)!=null?outRe.ReplicateJob.FirstOrDefault(x=>x.Creator!=null).Creator:null },
                             { "SumRNetAmount", outRe.ReplicateJob.Sum(x=>x?.NETAmount) },
                             { "SumRVATAmount", outRe.ReplicateJob.Sum(x=>x?.VATAmount) },
                             { "SumNetAmount", outRe.OriginalJob.Sum(x=>x?.NETAmount) },
@@ -4336,100 +4307,54 @@ namespace eFMS.API.ReportData.FormatExcel
                             { "SumTotalBuying", outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
                             { "Balance", outRe.ReplicateJob.Sum(x=>x?.VATAmount+x?.NETAmount)-outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
                         };
-                        excel.SetData(listGroupHead);
-                    }
                     startRow++;
-                    if (outRe.ReplicateJob.Count() == 0)
-                    {
-                        var listKeyData = new Dictionary<string, object>();
-                        excel.SetDataTable();
-                        listKeyData.Add("RJobID", null);
-                        listKeyData.Add("RCustomNo", null);
-                        listKeyData.Add("RHBL", null);
-                        listKeyData.Add("RCustomer", null);
-                        listKeyData.Add("RProductService", null);
-                        listKeyData.Add("RDateService", null);
-                        listKeyData.Add("JobID", null);
-                        listKeyData.Add("CustomNo", null);
-                        listKeyData.Add("HBL", null);
-                        listKeyData.Add("Customer", null);
-                        listKeyData.Add("ProductService", null);
-                        listKeyData.Add("DateService", null);
-                        listKeyData.Add("RPartnerName", null);
-                        listKeyData.Add("RPartnerCode", null);
-                        listKeyData.Add("RChargeCode", null);
-                        listKeyData.Add("RChargeName", null);
-                        listKeyData.Add("RDebitNo", null);
-                        listKeyData.Add("RSOA", null);
-                        listKeyData.Add("RCreator", null);
-                        listKeyData.Add("RNetAmount", null);
-                        listKeyData.Add("RVATAmount", null);
-                        listKeyData.Add("PartnerName", null);
-                        listKeyData.Add("PartnerCode", null);
-                        listKeyData.Add("ChargeCode", null);
-                        listKeyData.Add("ChargeName", null);
-                        listKeyData.Add("DebitNo", null);
-                        listKeyData.Add("SOA", null);
-                        listKeyData.Add("Creator", null);
-                        listKeyData.Add("NetAmount", null);
-                        listKeyData.Add("VATAmount", null);
-                        listKeyData.Add("TotalSelling", null);
-                        listKeyData.Add("TotalBuying", null);
-                        excel.SetData(listKeyData);
-                        startRow++;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < outRe.ReplicateJob.Count(); i++)
+                    excel.SetData(listGroupHead);
+                    for (int i = 0; i < outRe.ReplicateJob.Count(); i++)
                         {
                             var listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
-                            listKeyData.Add("RJobID", outRe.ReplicateJob.FirstOrDefault().JobId);
-                            listKeyData.Add("RCustomNo", outRe.ReplicateJob.FirstOrDefault().CustomNo);
-                            listKeyData.Add("RHBL", outRe.ReplicateJob.FirstOrDefault().HBL);
-                            listKeyData.Add("RCustomer", outRe.ReplicateJob.FirstOrDefault().Customer);
-                            listKeyData.Add("RProductService", outRe.ReplicateJob.FirstOrDefault().ProductService);
-                            listKeyData.Add("RDateService", outRe.ReplicateJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy"));
-                            listKeyData.Add("JobID", outRe.OriginalJob.FirstOrDefault().JobId);
-                            listKeyData.Add("CustomNo", outRe.OriginalJob.FirstOrDefault().CustomNo);
-                            listKeyData.Add("HBL", outRe.OriginalJob.FirstOrDefault().HBL);
-                            listKeyData.Add("Customer", outRe.OriginalJob.FirstOrDefault().Customer);
-                            listKeyData.Add("ProductService", outRe.OriginalJob.FirstOrDefault().ProductService);
-                            listKeyData.Add("DateService", outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy"));
-                            listKeyData.Add("RPartnerName", outRe.ReplicateJob[i].PartnerName);
-                            listKeyData.Add("RPartnerCode", outRe.ReplicateJob[i].PartnerCode);
-                            listKeyData.Add("RChargeCode", outRe.ReplicateJob[i].ChargeCode);
-                            listKeyData.Add("RChargeName", outRe.ReplicateJob[i].ChargeName);
-                            listKeyData.Add("RDebitNo", outRe.ReplicateJob[i].DebitNo);
-                            listKeyData.Add("RSOA", outRe.ReplicateJob[i].SOA);
-                            listKeyData.Add("RCreator", outRe.ReplicateJob.FirstOrDefault().Creator);
-                            listKeyData.Add("RNetAmount", outRe.ReplicateJob[i].NETAmount);
-                            listKeyData.Add("RVATAmount", outRe.ReplicateJob[i].VATAmount);
-                            listKeyData.Add("PartnerName", outRe.OriginalJob[i].PartnerName);
-                            listKeyData.Add("PartnerCode", outRe.OriginalJob[i].PartnerCode);
-                            listKeyData.Add("ChargeCode", outRe.OriginalJob[i].ChargeCode);
-                            listKeyData.Add("ChargeName", outRe.OriginalJob[i].ChargeName);
-                            listKeyData.Add("DebitNo", outRe.OriginalJob[i].DebitNo);
-                            listKeyData.Add("SOA", outRe.OriginalJob[i].SOA);
-                            listKeyData.Add("Creator", outRe.OriginalJob.FirstOrDefault().Creator);
-                            listKeyData.Add("NetAmount", outRe.OriginalJob[i].NETAmount);
-                            listKeyData.Add("VATAmount", outRe.OriginalJob[i].VATAmount);
-                            listKeyData.Add("TotalSelling", outRe.ReplicateJob[i].VATAmount + outRe.ReplicateJob[i].NETAmount);
-                            listKeyData.Add("TotalBuying", outRe.OriginalJob[i].VATAmount + outRe.OriginalJob[i].NETAmount);
+                                listKeyData.Add("RJobID", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].JobId : null);
+                                listKeyData.Add("RCustomNo", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].CustomNo : null);
+                                listKeyData.Add("RHBL", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].HBL : null);
+                                listKeyData.Add("RCustomer", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].Customer : null);
+                                listKeyData.Add("RProductService", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].ProductService : null);
+                                listKeyData.Add("RDateService", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].DateService.ToString("dd/MM/yyyy") : null);
+                                listKeyData.Add("JobID", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().JobId : null);
+                                listKeyData.Add("CustomNo", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().CustomNo : null);
+                                listKeyData.Add("HBL", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().HBL : null);
+                                listKeyData.Add("Customer", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().Customer : null);
+                                listKeyData.Add("ProductService", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().ProductService : null);
+                                listKeyData.Add("DateService", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().DateService.ToString("dd/MM/yyyy") : null);
+                                listKeyData.Add("RPartnerName", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].PartnerName : null);
+                                listKeyData.Add("RPartnerCode", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].PartnerCode : null);
+                                listKeyData.Add("RChargeCode", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].ChargeCode : null);
+                                listKeyData.Add("RChargeName", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].ChargeName : null);
+                                listKeyData.Add("RDebitNo", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].DebitNo : null);
+                                listKeyData.Add("RSOA", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].SOA : null);
+                                listKeyData.Add("RCreator", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].Creator : null);
+                                listKeyData.Add("RNetAmount", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].NETAmount : 0);
+                                listKeyData.Add("RVATAmount", outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].VATAmount : 0);
+                                listKeyData.Add("PartnerName", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].PartnerName : null);
+                                listKeyData.Add("PartnerCode", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].PartnerCode : null);
+                                listKeyData.Add("ChargeCode", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].ChargeCode : null);
+                                listKeyData.Add("ChargeName", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].ChargeName : null);
+                                listKeyData.Add("DebitNo", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].DebitNo : null);
+                                listKeyData.Add("SOA", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].SOA : null);
+                                listKeyData.Add("Creator", outRe.OriginalJob.FirstOrDefault() != null ? outRe.OriginalJob.FirstOrDefault().Creator : null);
+                                listKeyData.Add("NetAmount", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].NETAmount : 0);
+                                listKeyData.Add("VATAmount", outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].VATAmount : 0);
+                                listKeyData.Add("TotalSelling", (outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].VATAmount : 0) + (outRe.ReplicateJob[i] != null ? outRe.ReplicateJob[i].NETAmount : 0));
+                                listKeyData.Add("TotalBuying", (outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].VATAmount : 0) + (outRe.OriginalJob[i] != null ? outRe.OriginalJob[i].NETAmount : 0));
                             excel.SetData(listKeyData);
                             startRow++;
                         }
-                    }
-
-                    if(outRe.ReplicateJob.Sum(x => x.VATAmount + x.NETAmount) - outRe.OriginalJob.Sum(x => x.VATAmount + x.NETAmount) != 0)
+                    if (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) > 0)
                     {
-                        Color colTitleFromHex = System.Drawing.ColorTranslator.FromHtml("#ad150a");
-                        excel.Worksheet.Cells[4, 33, 4 + outRe.ReplicateJob.Count(), 33].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
+                        excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
                     }
                     else
                     {
-                        Color colTitleFromHex = System.Drawing.ColorTranslator.FromHtml("#4bd650");
-                        excel.Worksheet.Cells[4, 33, 4+ outRe.ReplicateJob.Count(), 33].Style.Fill.BackgroundColor.SetColor(colTitleFromHex);
+                        excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
                     }
                 }
                     return excel.ExcelStream();

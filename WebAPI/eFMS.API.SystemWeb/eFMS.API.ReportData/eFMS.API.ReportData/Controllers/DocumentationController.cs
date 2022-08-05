@@ -819,7 +819,6 @@ namespace eFMS.API.ReportData.Controllers
             var accessToken = Request.Headers["Authorization"].ToString();
             critera.RangeSearch = Common.Globals.PermissionRange.All;
             var responseFromApi = await HttpServiceExtension.PostAPI(critera, aPis.HostStaging + Urls.Documentation.GetOutsourcingRegcognisingUrl, accessToken);
-            //var responseFromApi = await HttpServiceExtension.PostAPI(critera, "https://localhost:44324/api/v1/vi/OpsTransaction/GetOutsourcingRegcognising", accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportOutsourcingRegcognisingModel>>();
 
             var stream = new DocumentationHelper().GenerateExportOutsourcingRegcognising(dataObjects.Result);

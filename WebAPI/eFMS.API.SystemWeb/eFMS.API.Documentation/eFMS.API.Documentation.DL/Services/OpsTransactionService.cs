@@ -2741,14 +2741,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = Query(criteria);
 
             data = data.OrderByDescending(x => x.DatetimeModified);
-
-            //List<JobOutsourcingRegcognisingModelGeneralModel> chargeOrn = new List<JobOutsourcingRegcognisingModelGeneralModel>();
-            //List<JobOutsourcingRegcognisingModelGeneralModel> chargeRep = new List<JobOutsourcingRegcognisingModelGeneralModel>();
-            //IQueryable<CatPartner> partners = partnerRepository.Get();
-            //IQueryable<CsShipmentSurcharge> sur = surchargeRepository.Get();
-            //IQueryable<CatCharge> charges = catChargeRepository.Get();
             string JobNos = "";
-            //List<sp_GetOutsourcingRegcognising> outRe = new List<sp_GetOutsourcingRegcognising>();
             List<string> lstJobNo = new List<string>();
             foreach(var item in data)
             {
@@ -2756,90 +2749,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     JobNos += item.JobNo+";";
                     lstJobNo.Add(item.JobNo);
-                    //outRe.AddRange(GetOutsourcingRegcognising(item.JobNo));
                 }
             }
-            //foreach (var x in data)
-            //{
-            //    if (x.LinkSource != "Replicate")
-            //    {
-            //        continue;
-            //    }
-            //ExportOutsourcingRegcognisingModel result = new ExportOutsourcingRegcognisingModel();
-            //    var listChagreRep = surchargeRepository.Get(y => y.JobNo == x.JobNo && y.LinkChargeId!=null).ToList();
-            //    var dataChargeRep = (
-            //                         from surc in listChagreRep
-            //                         join pa in partners on surc.PaymentObjectId equals pa.Id
-            //                         join cr in charges on surc.ChargeId equals cr.Id
-            //                         select new ChargeOutsourcingRegcognisingModelDetail
-            //                         {
-            //                             ChargeId = surc.Id,
-            //                             PartnerName = pa.ShortName,
-            //                             PartnerCode = pa.AccountNo,
-            //                             ChargeCode = cr.Code,
-            //                             ChargeName = cr.ChargeNameEn,
-            //                             DebitNo = surc.DebitNo,
-            //                             SOA = surc.Soano,
-            //                             NETAmount = surc.NetAmount== null?0: surc.NetAmount,
-            //                             VATAmount = surc.VatAmountVnd == null ? 0 :surc.VatAmountVnd,
-            //                             LinkChargeId = surc.LinkChargeId
-            //                         }).ToList();
-            //    var listLinkChargeRep = dataChargeRep.Select(g => g.LinkChargeId).ToList();
-
-            //    var JobRep = new JobOutsourcingRegcognisingModelGeneralModel
-            //    {
-            //        Creator = userRepository.Get(u => u.Id == x.UserCreated).FirstOrDefault()?.Username,
-            //        CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).FirstOrDefault()?.ClearanceNo,
-            //        Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName,
-            //        DateService = x.ServiceDate,
-            //        HBL = x.Hwbno,
-            //        JobId = x.JobNo,
-            //        ProductService = x.ProductService,
-            //        Charges = dataChargeRep,
-            //    };
-
-            //    result.ReplicateJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
-
-            //    result.ReplicateJob.Add(JobRep);
-            //    var listChagreOrn = surchargeRepository.Get(y => listLinkChargeRep.Contains(y.Id.ToString())).ToList();
-            //    List<ChargeOutsourcingRegcognisingModelDetail> chargeOrn = new List<ChargeOutsourcingRegcognisingModelDetail>();
-
-            //    var dataChargeOrn = (
-            //                         from surc in listChagreOrn
-            //                         join pa in partners on surc.PaymentObjectId equals pa.Id
-            //                         join cr in charges on surc.ChargeId equals cr.Id
-            //                         select new ChargeOutsourcingRegcognisingModelDetail
-            //                         {
-            //                             ChargeId = surc.Id,
-            //                             PartnerName = pa.ShortName,
-            //                             PartnerCode = pa.AccountNo,
-            //                             ChargeCode = cr.Code,
-            //                             ChargeName = cr.ChargeNameEn,
-            //                             DebitNo = surc.DebitNo,
-            //                             SOA = surc.Soano,
-            //                             NETAmount = surc.NetAmount == null ? 0 :surc.NetAmount,
-            //                             VATAmount = surc.VatAmountVnd == null ? 0 :surc.VatAmountVnd,
-            //                             LinkChargeId = surc.LinkChargeId
-            //                         }).ToList();
-            //    dataChargeOrn= SortChargeOrn(dataChargeRep,dataChargeOrn);
-
-            //    var detailJobOrn = DataContext.Get(g => g.JobNo == x.JobNo.Remove(0, 1)).FirstOrDefault();
-
-            //    var JobOrn = new JobOutsourcingRegcognisingModelGeneralModel
-            //    {
-            //        Creator = userRepository.Get(u => u.Id == detailJobOrn.UserCreated).FirstOrDefault()?.Username,
-            //        CustomNo = customDeclarationRepository.Get(cus => cus.JobNo == detailJobOrn.JobNo).FirstOrDefault()?.ClearanceNo,
-            //        Customer = partners.Where(z => z.PartnerGroup.Contains("CUSTOMER")).FirstOrDefault(cus => cus.Id == detailJobOrn.CustomerId)?.ShortName,
-            //        DateService = detailJobOrn.ServiceDate,
-            //        HBL = detailJobOrn.Hwbno,
-            //        JobId = detailJobOrn.JobNo,
-            //        ProductService = detailJobOrn.ProductService,
-            //        Charges = dataChargeOrn,
-            //    };
-            //    result.OriginalJob = new List<JobOutsourcingRegcognisingModelGeneralModel>();
-            //    result.OriginalJob.Add(JobOrn);
-            //    results.Add(result);
-            //}
 
             var outRe = GetOutsourcingRegcognising(JobNos);
 
@@ -2849,74 +2760,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var jobrep = outRe.Where(x => x.JobId == lstJobNo[i] && x.ChargeType == "JobRep").ToList();
                 var joborn = outRe.Where(x => x.JobId == lstJobNo[i].Substring(1) && x.ChargeType == "JobOrn").ToList();
-                //if (jobrep.Count() == 0)
-                //{
-                //    lstJobNo.RemoveAt(i);
-                //    i--;
-                //    continue;
-                //}
                 result[i] = new ExportOutsourcingRegcognisingModel();
                 result[i].ReplicateJob = new List<sp_GetOutsourcingRegcognising>();
                 result[i].OriginalJob = new List<sp_GetOutsourcingRegcognising>();
                 result[i].ReplicateJob.AddRange(jobrep);
                 result[i].OriginalJob.AddRange(SortChargeOrn(jobrep,joborn));
             }
-
-            //outRe.ForEach(x =>
-            //{
-            //    if (x.ChargeType == "JobOrn")
-            //    {
-            //        chargeOrn.Add(new JobOutsourcingRegcognisingModelGeneralModel
-            //        {
-            //            ChargeCode = x.ChargeCode,
-            //            ChargeId = x.ChargeId,
-            //            ChargeName = x.ChargeName,
-            //            Creator = x.Creator,
-            //            Customer = x.Customer,
-            //            CustomNo = x.CustomNo,
-            //            DateService = x.DateService,
-            //            DebitNo = x.DebitNo,
-            //            HBL = x.HBL,
-            //            JobId = x.JobId,
-            //            LinkChargeId = x.LinkChargeId,
-            //            NETAmount = x.NETAmount,
-            //            PartnerCode = x.PartnerCode,
-            //            PartnerName = x.PartnerName,
-            //            ProductService = x.ProductService,
-            //            SOA = x.SOA,
-            //            VATAmount = x.VATAmount
-            //        });
-            //    }
-            //    else
-            //    {
-            //        chargeRep.Add(new JobOutsourcingRegcognisingModelGeneralModel
-            //        {
-            //            ChargeCode = x.ChargeCode,
-            //            ChargeId = x.ChargeId,
-            //            ChargeName = x.ChargeName,
-            //            Creator = x.Creator,
-            //            Customer = x.Customer,
-            //            CustomNo = x.CustomNo,
-            //            DateService = x.DateService,
-            //            DebitNo = x.DebitNo,
-            //            HBL = x.HBL,
-            //            JobId = x.JobId,
-            //            LinkChargeId = x.LinkChargeId,
-            //            NETAmount = x.NETAmount,
-            //            PartnerCode = x.PartnerCode,
-            //            PartnerName = x.PartnerName,
-            //            ProductService = x.ProductService,
-            //            SOA = x.SOA,
-            //            VATAmount = x.VATAmount
-            //        });
-            //    }
-            //});
-
-            //for (int i = 0; i < chargeRep.Count()-1; i++)
-            //{
-            //    results[i].ReplicateJob.Add(chargeRep[i]);
-            //    results[i].OriginalJob.Add(chargeOrn[i]);
-            //}
 
             return result.Where(x=>x.ReplicateJob.Count()>0).ToList();
         }
