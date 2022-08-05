@@ -471,6 +471,14 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
+            if (contract.ContractType == "Cash")
+            {
+                contract.ShipmentType = "Nominated";
+            }
+            else
+            {
+                contract.ShipmentType = "Freehand & Nominated";
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             var hsPartner = new HandleState();
@@ -494,6 +502,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.UserCreatedContract = contract.UserCreated;
                     modelPartner.ContractType = contract.ContractType;
                     modelPartner.OfficeIdContract = contract.OfficeId;
+                    modelPartner.ContractShipmentType = contract.ShipmentType;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
