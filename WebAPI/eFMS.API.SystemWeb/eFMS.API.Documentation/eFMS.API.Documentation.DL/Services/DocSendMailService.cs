@@ -309,7 +309,18 @@ namespace eFMS.API.Documentation.DL.Services
             _content = _content.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight) + "(KGS)");
             _content = _content.Replace("{{CW}}", string.Format("{0:n2}", _housebill.ChargeWeight) + "(KGS)");
             _content = _content.Replace("{{Incoterm}}", incoterm);
-            _content = _content.Replace("{{NQGoods}}", _housebill.DesOfGoods);
+            var _desOfGoodArrs = string.IsNullOrEmpty(_housebill.DesOfGoods) ? null : _housebill.DesOfGoods.Split("\n").Where(x => !string.IsNullOrEmpty(x));
+            var _desOfGood = string.Empty;
+            if (_desOfGoodArrs != null && _desOfGoodArrs.Count() > 0)
+            {
+                _desOfGood += _desOfGoodArrs.First();
+                _desOfGoodArrs = _desOfGoodArrs.Skip(1);
+                foreach (var item in _desOfGoodArrs)
+                {
+                    _desOfGood += string.Format("<div style=\"margin-left: 10px;\">{0}</div>", item);
+                }
+            }
+            _content = _content.Replace("{{NQGoods}}", _desOfGood);
 
             _body = _body.Replace("{{Content}}", _content);
             _body = _body.Replace("{{PO}}", string.Empty);
@@ -651,10 +662,10 @@ namespace eFMS.API.Documentation.DL.Services
                 _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
                 _body = _body.Replace("{{ETA}}", eta);
                 _body = _body.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
+                _body = _body.Replace("{{Mbltype}}", _shipment?.Mbltype);
+                _body = _body.Replace("{{FreightPayment}}", _housebill.FreightPayment);
 
                 _content = _content.Replace("{{NumOrder}}", string.Empty);
-                _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
-                _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
                 _content = _content.Replace("{{ContainerDetail}}", containerDetail);
                 _content = _content.Replace("{{Total}}", _housebill.PackageContainer + ", " + packageTotal);
                 _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
@@ -723,8 +734,8 @@ namespace eFMS.API.Documentation.DL.Services
                 _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
                 _body = _body.Replace("{{ETA}}", eta);
                 _body = _body.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
-                _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
-                _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
+                _body = _body.Replace("{{Mbltype}}", _shipment?.Mbltype);
+                _body = _body.Replace("{{FreightPayment}}", _housebill.FreightPayment);
 
                 _content = _content.Replace("{{NumOrder}}", string.Empty);
                 _content = _content.Replace("{{ContainerDetail}}", packageDetail);
@@ -797,13 +808,19 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _shipment.PackageContainer);
                 _subject = _subject.Replace("{{Shipper}}", string.Empty);
                 _subject = _subject.Replace("{{Cnee}}", string.Empty);
-                _subject = _subject.Replace("{{ETD}}", etd);
+                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd.ToString("dd MMM").ToUpper());
                 // Body
-                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
+                //etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
+                string atd = _shipment.Atd?.ToString("dd MMM, yyyy").ToUpper();
+                string eta = _shipment.Eta?.ToString("dd MMM, yyyy").ToUpper();
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
-                _body = _body.Replace("{{VSL}}", _shipment.FlightVesselName);
-                _body = _body.Replace("{{ETD}}", etd);
+                _body = _body.Replace("{{VSL}}", _shipment.FlightVesselName + " " + _shipment.VoyNo);
+                _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
+                _body = _body.Replace("{{ETA}}", eta);
+                _body = _body.Replace("{{MBL}}", _shipment.Mawb);
+                _body = _body.Replace("{{Mbltype}}", _shipment?.Mbltype);
+                _body = _body.Replace("{{FreightPayment}}", _housebills.FirstOrDefault()?.FreightPayment);
 
                 var contentEmail = string.Empty;
                 var numOrder = 1;
@@ -827,9 +844,6 @@ namespace eFMS.API.Documentation.DL.Services
                     var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
                     var _content = emailTemplate.Content;
                     _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
-                    _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
-                    _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
                     _content = _content.Replace("{{ContainerDetail}}", containerDetail);
                     _content = _content.Replace("{{Total}}", _housebill.PackageContainer + ", " + packageTotal);
                     _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
@@ -838,7 +852,6 @@ namespace eFMS.API.Documentation.DL.Services
                     _content = _content.Replace("{{Shipper}}", _shipper.PartnerNameEn);
                     _content = _content.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
                     _content = _content.Replace("{{Notify}}", _housebill.NotifyPartyDescription);
-                    _content += "<div></div>";
                     contentEmail += _content;
                     numOrder += 1;
                 }
@@ -847,9 +860,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _content = emailTemplate.Content;
                     _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{MBL}}", string.Empty);
-                    _content = _content.Replace("{{Mbltype}}", string.Empty);
-                    _content = _content.Replace("{{FreightPayment}}", string.Empty);
                     _content = _content.Replace("{{ContainerDetail}}", string.Empty);
                     _content = _content.Replace("{{Total}}", string.Empty);
                     _content = _content.Replace("{{GW}}", string.Empty);
@@ -876,13 +886,19 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _shipment.PackageQty + " " + _shipment.PackageType);
                 _subject = _subject.Replace("{{Shipper}}", string.Empty);
                 _subject = _subject.Replace("{{Cnee}}", string.Empty);
-                _subject = _subject.Replace("{{ETD}}", etd);
+                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd?.ToString("dd MMM").ToUpper());
                 // Body
-                etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
+                //etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
+                string atd = _shipment.Atd?.ToString("dd MMM, yyyy").ToUpper();
+                string eta = _shipment.Eta?.ToString("dd MMM, yyyy").ToUpper();
                 _body = _body.Replace("{{Pol}}", _pol?.NameEn);
                 _body = _body.Replace("{{Pod}}", _pod?.NameEn);
-                _body = _body.Replace("{{VSL}}", _shipment.FlightVesselName);
-                _body = _body.Replace("{{ETD}}", etd);
+                _body = _body.Replace("{{VSL}}", _shipment.FlightVesselName + " " + _shipment.VoyNo);
+                _body = _body.Replace("{{ATD}}", !string.IsNullOrEmpty(atd) ? atd : etdDate?.ToString("dd MMM, yyyy").ToUpper());
+                _body = _body.Replace("{{ETA}}", eta);
+                _body = _body.Replace("{{MBL}}", _shipment.Mawb);
+                _body = _body.Replace("{{Mbltype}}", _shipment?.Mbltype);
+                _body = _body.Replace("{{FreightPayment}}", _housebills.FirstOrDefault()?.FreightPayment);
 
                 var contentEmail = string.Empty;
                 var numOrder = 1;
@@ -905,9 +921,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                     var _content = emailTemplate.Content;
                     _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{MBL}}", _housebill.Mawb == null ? _shipment.Mawb : _housebill.Mawb);
-                    _content = _content.Replace("{{Mbltype}}", _shipment?.Mbltype);
-                    _content = _content.Replace("{{FreightPayment}}", _housebill.FreightPayment);
                     _content = _content.Replace("{{ContainerDetail}}", packageDetail);
                     _content = _content.Replace("{{Total}}", packageTotal);
                     _content = _content.Replace("{{GW}}", String.Format("{0:#.####}", _housebill.GrossWeight));
@@ -917,7 +930,6 @@ namespace eFMS.API.Documentation.DL.Services
                     _content = _content.Replace("{{Shipper}}", _shipper.PartnerNameEn);
                     _content = _content.Replace("{{Cnee}}", _consignee?.PartnerNameEn);
                     _content = _content.Replace("{{Notify}}", _housebill.NotifyPartyDescription);
-                    _content += "<div></div>";
                     contentEmail += _content;
                     numOrder += 1;
                 }
@@ -925,9 +937,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _content = emailTemplate.Content;
                     _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{MBL}}", string.Empty);
-                    _content = _content.Replace("{{Mbltype}}", string.Empty);
-                    _content = _content.Replace("{{FreightPayment}}", string.Empty);
                     _content = _content.Replace("{{ContainerDetail}}", string.Empty);
                     _content = _content.Replace("{{Total}}", string.Empty);
                     _content = _content.Replace("{{GW}}", string.Empty);
