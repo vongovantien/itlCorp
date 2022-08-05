@@ -335,25 +335,43 @@ namespace eFMS.API.Accounting.DL.Services
         {
             IQueryable<AcctAdvanceRequest> totalAdvanceRequests = acctAdvanceRequestRepo.Get();
             IQueryable<AcctAdvanceRequest> advanceRequests = null;
+            IQueryable<AcctAdvanceRequest> lstNotSettled = null;
+            IQueryable<AcctAdvanceRequest> lstPartial = null;
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
                 advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                var advanceRequests1 = new List<AcctAdvanceRequest>();
+                lstNotSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                lstPartial = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 if (criteria.StatusPayment == "Settled")
                 {
-                    
-                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
+                    var result = totalAdvanceRequests.Where(x=>x.StatusPayment== "Settled").GroupBy(x => x.AdvanceNo).ToList();
                     foreach(var item in result)
                     {
-                        if (checkType(item.ToList())== "settled")
+                        if (item.Count() == 1)
                         {
-                            advanceRequests = advanceRequests.Concat(item);
+                            advanceRequests1.AddRange(item.ToList());
                         }
+                        if (checkType(item.ToList()) == "settled" && item.Count() > 1)
+                        {
+                            advanceRequests1.AddRange(item.ToList());
+                        }
+                        //if (checkType(item.ToList()) == "notsettled")
+                        //{
+                        //    lstNotSettled = lstNotSettled.Concat(item);
+                        //}
+                        //if (checkType(item.ToList()) == "partial")
+                        //{
+                        //    lstPartial = lstPartial.Concat(item);
+                        //}
+                        //result = result.Except(lstPartial);
                     }
+                    advanceRequests = advanceRequests1.AsQueryable();
                 }
                 if (criteria.StatusPayment == "NotSettled")
                 {
-                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
+                    var result = totalAdvanceRequests.Where(x => x.StatusPayment == "NotSettled").GroupBy(x => x.AdvanceNo);
                     foreach (var item in result)
                     {
                         if (checkType(item.ToList())== "notsettled")
