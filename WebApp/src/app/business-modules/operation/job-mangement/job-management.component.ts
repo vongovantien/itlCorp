@@ -370,11 +370,24 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     exportOutsourcingRegcognising() {
+        this._spinner.hide();
+        this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
+        this.loadingPopupComponent.show();
         this._exportRepo.exportOutsourcingRegcognising(this.dataSearch)
-            .subscribe(
+            .pipe(
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                )),
+                finalize(() => { this._progressRef.complete(); })
+            ).subscribe(
                 (res: any) => {
+                    this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is Completed</b>";
                     this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
-                }
+                    this.loadingPopupComponent.proccessCompleted();
+                },
             );
     }
+
+
 }
