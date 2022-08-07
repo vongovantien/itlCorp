@@ -143,9 +143,9 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("GetCDNoteWithHbl")]
         [Authorize]
-        public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid hblId)
+        public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid? hblId, Guid? jobId)
         {
-            return cdNoteServices.GetCDNoteWithHbl(hblId);
+            return cdNoteServices.GetCDNoteWithHbl(hblId, jobId);
         }
 
         [HttpGet]

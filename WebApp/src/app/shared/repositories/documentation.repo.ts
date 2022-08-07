@@ -331,8 +331,8 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: jobId, IsShipmentOperation: isShipmentOperation });
     }
 
-    getListCDNoteWithHbl(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId });
+    getListCDNoteWithHbl(hblId: string, jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
     }
 
     checkCdNoteAllowToDelete(id: string) {

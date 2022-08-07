@@ -25,7 +25,7 @@
             <param name="cdNoteId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetCDNoteWithHbl(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetCDNoteWithHbl(System.Nullable{System.Guid},System.Nullable{System.Guid})">
             <summary>
             Get CDNote With Hbl Id
             </summary>

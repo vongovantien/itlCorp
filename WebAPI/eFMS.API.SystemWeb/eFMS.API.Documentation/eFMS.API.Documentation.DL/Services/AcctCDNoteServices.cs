@@ -3842,12 +3842,24 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="hblId"></param>
         /// <returns></returns>
-        public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid hblId)
+        public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid? hblId, Guid? jobId)
         {
-            var surcharges = surchargeRepository.Get(x => x.Hblid == hblId && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)));
-            var cdNoteCodes = surcharges.Select(x => x.DebitNo).ToList();
-            cdNoteCodes.AddRange(surcharges.Select(x => x.CreditNo));
-            cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            var cdNoteCodes = new List<string>();
+            if (hblId != null && hblId != Guid.Empty)
+            {
+                var surcharges = surchargeRepository.Get(x => x.Hblid == hblId && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)));
+                cdNoteCodes = surcharges.Select(x => x.DebitNo).ToList();
+                cdNoteCodes.AddRange(surcharges.Select(x => x.CreditNo));
+                cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            }
+            else
+            {
+                var jobNo = cstransRepository.First(x => x.Id == jobId).JobNo;
+                var surcharges = surchargeRepository.Get(x => x.JobNo == jobNo && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)));
+                cdNoteCodes = surcharges.Select(x => x.DebitNo).ToList();
+                cdNoteCodes.AddRange(surcharges.Select(x => x.CreditNo));
+                cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            }
             var data = DataContext.Get(x => cdNoteCodes.Any(z => z == x.Code)).ToList();
             var results = mapper.Map<List<AcctCdnoteModel>>(data);
             return results;
