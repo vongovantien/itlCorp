@@ -1869,6 +1869,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             CreditCurrency = x.contract.CreditCurrency,
                             CurrencyId = x.contract.CurrencyId,
                             CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
+                            SaleService = x.contract.SaleService
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }
