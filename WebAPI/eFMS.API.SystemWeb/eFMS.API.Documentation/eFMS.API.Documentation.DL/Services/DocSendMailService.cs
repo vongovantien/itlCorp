@@ -808,7 +808,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _shipment.PackageContainer);
                 _subject = _subject.Replace("{{Shipper}}", string.Empty);
                 _subject = _subject.Replace("{{Cnee}}", string.Empty);
-                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd.ToString("dd MMM").ToUpper());
+                _subject = _subject.Replace("{{ETD}}", _shipment.Atd == null ? etd : _shipment.Atd.Value.ToString("dd MMM").ToUpper());
                 // Body
                 //etd = etdDate == null ? string.Empty : etdDate.Value.ToString("dd MMM, yyyy").ToUpper();
                 string atd = _shipment.Atd?.ToString("dd MMM, yyyy").ToUpper();
