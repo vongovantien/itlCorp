@@ -72,6 +72,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? IncotermId { get; set; }
         public DateTime? Ata { get; set; }
         public DateTime? Atd { get; set; }
+        public bool? IsMawb { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }

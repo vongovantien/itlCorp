@@ -54,7 +54,9 @@
                             </div>
                             <div class="row px-3 py-2 font-weight-bold">
                                 <div class="col-lg-5">Credit Rate:</div>
-                                <div class="col-lg-7">{{creditRate.value | number: '.0-3'}} VND</div>
+                                <div class="col-lg-7"
+                                    [ngClass]="creditRate.value >= 120 ? 'text-danger' : 'text-success'">
+                                    {{creditRate.value / 100 | percent }}</div>
                             </div>
                         </div>
                     </div>

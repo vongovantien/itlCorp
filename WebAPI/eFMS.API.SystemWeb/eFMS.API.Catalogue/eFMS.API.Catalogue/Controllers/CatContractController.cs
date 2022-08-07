@@ -201,6 +201,13 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 model.Active = false;
             }
+         
+            string msgCheckUpdateSalesman = CheckUpdateContract(model);
+            if (!string.IsNullOrEmpty(msgCheckUpdateSalesman))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateSalesman, Data = new { errorCode = 403 } });
+            }
+            
             var isChangeAgrmentType = false;
             var hs = catContractService.Update(model, out isChangeAgrmentType);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -587,6 +594,31 @@ namespace eFMS.API.Catalogue.Controllers
                 return Ok(new List<CatAgreementModel>());
             }
             return Ok(result);
+        }
+
+        private string CheckUpdateContract(CatContractModel model)
+        {
+            string errorMsg = string.Empty;
+            var currentContract = catContractService.GetContractById(model.Id);
+            if(currentContract.ContractType == "Guarantee")
+            {
+                if(currentContract.SaleManId != model.SaleManId)
+                {
+                    return "Cannot change salesman from Guarantee contract";
+                }
+
+                if(model.CurrencyId != "VND" || model.CreditCurrency != "VND")
+                {
+                    return "Cannot change currency from Guarantee contract";
+                }
+            }
+            if ((model.ContractType == "Guarantee" && currentContract.ContractType != "Guarantee") 
+                || (currentContract.ContractType == "Guarantee" && model.ContractType != "Guarantee"))
+            {
+                return string.Format("Cannot change contract type");
+            }
+
+            return errorMsg;
         }
     }
 }

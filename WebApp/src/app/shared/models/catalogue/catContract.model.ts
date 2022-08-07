@@ -58,6 +58,7 @@ export class Contract {
     salesDepartment: string = null;
     salesOfficeId: string = null;
     salesCompanyId: string = null;
+    shipmentType: string = null;
 
     constructor(data?: any) {
         const self = this;

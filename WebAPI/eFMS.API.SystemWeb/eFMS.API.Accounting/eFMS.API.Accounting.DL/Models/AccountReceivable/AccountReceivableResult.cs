@@ -59,5 +59,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public string ArSalesmanId { get; set; }
         public List<string> ArOfficeIds { get; set; }
         public List<string> ArServices { get; set; }
+        public string ShipmentType { get; set; }
     }
 }

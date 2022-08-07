@@ -14,9 +14,6 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IAccAccountReceivableService : IRepositoryBase<AccAccountReceivable, AccAccountReceivableModel>
     {
-        HandleState InsertOrUpdateReceivable(List<ObjectReceivableModel> models);
-        HandleState CalculatorReceivable(CalculatorReceivableModel model);
-        HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
         AccountReceivableDetailResult GetDetailAccountReceivableByArgeementId(Guid argeementId);
         AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId);
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);
@@ -25,8 +22,6 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
         List<sp_GetBillingWithSalesman> GetDataDebitDetail(AcctReceivableDebitDetailCriteria creteria);
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
-        Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
-        Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
         HandleState CalculatorReceivableOverDue1To15Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableOverDue15To30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);
         HandleState CalculatorReceivableOverDue30Day(List<string> partnerIds, out List<Guid?> contractIdstoUpdate);

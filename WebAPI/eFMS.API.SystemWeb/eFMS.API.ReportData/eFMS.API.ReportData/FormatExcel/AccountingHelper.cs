@@ -5289,6 +5289,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("ContractType", item.AgreementType);
                     listKeyData.Add("Status", item.AgreementStatus);
                     listKeyData.Add("ContractNo", item.AgreementNo);
+                    listKeyData.Add("ShipmentType", item.ShipmentType);
                     listKeyData.Add("ExpDate", item.ExpriedDate);
                     listKeyData.Add("ExpDay", item.ExpriedDay);
                     listKeyData.Add("ParentPartner", item.ParentNameAbbr);

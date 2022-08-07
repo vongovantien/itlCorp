@@ -19,6 +19,9 @@ using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Extensions;
 using ITL.NetCore.Common;
 using System.Threading.Tasks;
+using System.Net.Http;
+using eFMS.API.Common.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -31,15 +34,18 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctReceiptService acctReceiptService;
         private readonly ICurrentUser currentUser;
+        private readonly IOptions<ApiUrl> apiServiceUrl;
 
 
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
+            IOptions<ApiUrl> _apiServiceUrl,
            IAcctReceiptService acctReceipt)
         {
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
             currentUser = curUser;
+            apiServiceUrl = _apiServiceUrl;
         }
 
         [HttpPost]
@@ -283,7 +289,7 @@ namespace eFMS.API.Accounting.Controllers
                         List<int> deptIds = receiptModel.NotifyDepartment.Split(",").Select(x => Int32.Parse(x)).Distinct().ToList();
                         acctReceiptService.AlertReceiptToDeppartment(deptIds, receiptModel);
                     }
-
+                    await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
             }
             return Ok(result);
@@ -312,14 +318,31 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(receiptId);
-
+                    var receipt = acctReceiptService.First(x => x.Id == receiptId);
+                    if(receipt != null)
+                    {
+                        await CalculateOverDueAsync(new List<string>() { receipt.CustomerId });
+                    }
                 });
             }
-
 
             return Ok(result);
         }
 
+        private async Task<IActionResult> CalculateOverDueAsync(List<string> partnerIds)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.Url);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquestOverDue1To15 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue1To15", partnerIds, accessToken);
+            HttpResponseMessage resquestOverDue15To30 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue15To30", partnerIds, accessToken);
+            HttpResponseMessage resquestOverDueover30 = await HttpClientService.PutAPI(urlAccounting + "Accounting/api/v1/e/AccountReceivable/CalculateOverDue30", partnerIds, accessToken);
+            var responseOverDue1To15 = await resquestOverDue1To15.Content.ReadAsAsync<ResultHandle>();
+            var responseOverDue15To30 = await resquestOverDue15To30.Content.ReadAsAsync<ResultHandle>();
+            var responseOverDueOver30 = await resquestOverDueover30.Content.ReadAsAsync<ResultHandle>();
+
+            return Ok();
+        }
 
         [HttpPost("ProcessInvoice")]
         public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
