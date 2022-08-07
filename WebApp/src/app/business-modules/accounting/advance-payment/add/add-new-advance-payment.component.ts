@@ -9,9 +9,11 @@ import { RoutingConstants } from '@constants';
 
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { combineLatest, EMPTY } from 'rxjs';
+import { catchError, concatMap, map } from 'rxjs/operators';
 import { ListAdvancePaymentCarrierComponent } from '../components/list-advance-payment-carrier/list-advance-payment-carrier.component';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
 @Component({
     selector: 'app-advance-payment-new',
     templateUrl: './add-new-advance-payment.component.html',
@@ -22,6 +24,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     @ViewChild(AdvancePaymentListRequestComponent) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ListAdvancePaymentCarrierComponent) listAdvancePaymentCarrierComponent: ListAdvancePaymentCarrierComponent;
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    
     params: any;
     ACTION: string = '';
     isAdvCarrier: boolean = false;
@@ -123,7 +127,21 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             return;
         } else {
             const body = this.getFormData();
-            this._accoutingRepo.addNewAdvancePayment(body)
+            this._accoutingRepo.checkIfInvalidFeeShipmentAdv(body)
+                .pipe(catchError(this.catchError),
+                    concatMap((res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'Warning',
+                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                class: 'bg-danger'
+                            });
+                            return EMPTY;
+                        } else {
+                            return this._accoutingRepo.addNewAdvancePayment(body)
+
+                        }
+                    }))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -151,25 +169,37 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             return;
         } else {
             const body = this.getFormData();
-            this._accoutingRepo.sendRequestAdvPayment(body)
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !');
-                            if (!this.isAdvCarrier) {
-                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`]);
-                            } else {
-                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`], {
-                                    queryParams: Object.assign({}, { action: "carrier" })
-                                });
-                            }
-                        } else {
-                            this.handleError(null, (data: any) => {
-                                this._toastService.error(data.message, data.title);
-                            });
-                        }
-                    },
-                );
+            this._accoutingRepo.checkIfInvalidFeeShipmentAdv(body)
+                .subscribe((res: any) => {
+                    if (!res.status) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return EMPTY;
+                    } else {
+                        this._accoutingRepo.sendRequestAdvPayment(body)
+                            .subscribe(
+                                (res: CommonInterface.IResult) => {
+                                    if (res.status) {
+                                        this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !');
+                                        if (!this.isAdvCarrier) {
+                                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`]);
+                                        } else {
+                                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`], {
+                                                queryParams: Object.assign({}, { action: "carrier" })
+                                            });
+                                        }
+                                    } else {
+                                        this.handleError(null, (data: any) => {
+                                            this._toastService.error(data.message, data.title);
+                                        });
+                                    }
+                                },
+                            );
+                    }
+                })
         }
     }
 

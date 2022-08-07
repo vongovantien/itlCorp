@@ -6238,6 +6238,40 @@ namespace eFMS.API.Accounting.DL.Services
                 return new ResultHandle();
             }
         }
+        
+        /// Check if payee not staff then not accept input cost > sell
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string CheckValidFeesOnShipment(CreateUpdateSettlementModel model)
+        {
+            var invalidShipment = string.Empty;
+            if (!string.IsNullOrEmpty(model.Settlement.Payee))
+            {
+                if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                {
+                    var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
+                    var listSipment = new List<string>();
+                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    foreach (var job in shipmentGrp)
+                    {
+                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        if (buyAmount > sellAmount)
+                        {
+                            listSipment.Add(job.Key);
+                        }
+                    }
+                    if (listSipment.Count > 0)
+                    {
+                        listSipment = listSipment.Distinct().ToList();
+                        invalidShipment = string.Join("\n", listSipment);
+                    }
+                }
+            }
+            return invalidShipment;
+        }
     }
 }
 
