@@ -682,6 +682,19 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("ImportPQL")]
+        public IActionResult ImportPQL([FromBody] List<string> data)
+        {
+            var hs = csShipmentSurchargeService.ImportPQL(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
         #endregion
 
         /// <summary>
