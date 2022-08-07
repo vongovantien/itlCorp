@@ -79,7 +79,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     checkInvalidListAdvanceRequest(){
         this.formCreateComponent.isSubmitted = true;
-        if((!!this.formCreateComponent.dueDate.value && !this.formCreateComponent.dueDate.value.startDate)){
+        if(!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate){
             return true;
         }
         if(!this.isAdvCarrier){
