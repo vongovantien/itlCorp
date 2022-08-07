@@ -5690,7 +5690,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         mappingKeyValue.Add("CombineNo", item.CombineNo);
                         //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
                         mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
-                        mappingKeyValue.Add("FrieghtOBHInvoice", item.FreInvoice);
+                        mappingKeyValue.Add("FrieghtOBHInvoice", DistinctInvoice(item.FreInvoice));
                         mappingKeyValue.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
                         //CusFeeTotal += item.CusFee;
                         //CusVATTotal += item.CusVAT;
