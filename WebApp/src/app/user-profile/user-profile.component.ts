@@ -26,7 +26,7 @@ import { GetCatalogueBankAction, getCatalogueBankState, UpdateCurrentUser } from
 })
 export class UserProfilePageComponent extends AppForm {
     @ViewChild('image') el: ElementRef;
-
+    @ViewChild('signature') signature: ElementRef;
     currentUserId: string;
 
     formUser: FormGroup;
@@ -46,6 +46,7 @@ export class UserProfilePageComponent extends AppForm {
     personalId: AbstractControl;
 
     photoUrl: string;
+    signatureUrl: string;
     banks: Observable<Bank[]>;
     bankCode: AbstractControl;
 
@@ -76,6 +77,7 @@ export class UserProfilePageComponent extends AppForm {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _zone: NgZone,
+        private _zone2: NgZone,
         private _globalState: GlobalState,
         private _store: Store<any>,
         private _router: Router,
@@ -116,8 +118,55 @@ export class UserProfilePageComponent extends AppForm {
 
     ngAfterViewInit() {
         this.initImageLibary();
+        this.initSignatureImage();
     }
 
+    initSignatureImage() {
+        let selectImg = null;
+        this._zone2.runOutsideAngular(() => {
+            $(this.signature.nativeElement).froalaEditor({
+                requestWithCORS: true,
+                language: 'en',
+                imageEditButtons: ['imageReplace'],
+                imageMaxSize: 2 * 709 * 424,
+                imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+                requestHeaders: {
+                    Authorization: `Bearer ${localStorage.getItem(SystemConstants.ACCESS_TOKEN)}`,
+                    Module: 'User', // thu muc anh chua anh cua user.
+                    ObjectId: `${this.currentUserId}`,
+                },
+                imageUploadURL: `//${environment.HOST.FILE_SYSTEM}/api/v1/en-US/AWSS3/UploadImages/System/User/${this.currentUserId}`,
+                imageUploadMethod: 'PUT',
+                imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
+            }).on('froalaEditor.contentChanged', (e: any) => {
+                this.signatureUrl = e.target.src;
+                console.log(this.signatureUrl);
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Image hasn't been deleted");
+                } else
+                    this._toastService.success("Image has been deleted successfully");
+
+
+            }).on('froalaEditor.image.error', (e, editor, error, response) => {
+                console.log(error);
+                switch (error.code) {
+                    case 5:
+                        this._toastService.error("Size image invalid");
+                        break;
+                    case 6:
+                        this._toastService.error("Image invalid");
+                        break;
+                    default:
+                        this._toastService.error(error.message);
+                        break;
+                }
+            })
+        });
+    }
     initImageLibary() {
         let selectImg = null;
         this._zone.runOutsideAngular(() => {
@@ -232,6 +281,7 @@ export class UserProfilePageComponent extends AppForm {
             bankCode: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankCode : null
         });
         this.photoUrl = body.avatar;
+        this.signatureUrl = body.signatureImage;
     }
     handleUpdateUser() {
         const form = this.formUser.getRawValue();
@@ -250,6 +300,7 @@ export class UserProfilePageComponent extends AppForm {
             avatar: this.photoUrl,
             personalId: form.personalId,
             bankCode: form.bankCode,
+            signatureImage: this.signatureUrl,
         };
         this.onUpdate(body);
     }

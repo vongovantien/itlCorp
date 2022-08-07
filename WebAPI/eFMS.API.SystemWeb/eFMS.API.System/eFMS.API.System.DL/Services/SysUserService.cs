@@ -584,6 +584,7 @@ namespace eFMS.API.System.DL.Services
             result.SysEmployeeModel.BankCode = currEmployee?.BankCode;
             // get avatar through last modified date.
             result.Avatar = currEmployee?.Photo;
+            result.SignatureImage = currEmployee?.SignatureImage;
 
             if (result == null)
             {
@@ -627,6 +628,7 @@ namespace eFMS.API.System.DL.Services
                     if (hs.Success)
                     {
                          currEmployee.Photo = criteria.Avatar;
+                         currEmployee.SignatureImage = criteria.SignatureImage;
                          hs = employeeRepository.Update(currEmployee, y => y.Id == currEmployee.Id);
                     }
 

@@ -16,8 +16,8 @@
 <div class="m-content mb-3">
     <div class="form" [formGroup]="formUser">
         <div class="row">
-            <div class="col-lg-4">
-                <div class="p-3 border-radius-15 bg-white box-shadow">
+            <div class="col-lg-4 border-radius-15 bg-white box-shadow">
+                <div class="p-3 bg-white box">
                     <div class="row">
                         <div class="col-lg-12 text-center py-3">
                             <img #image [src]="photoUrl" onerror="this.src = 'assets/app/media/img/emptydata.png'"
@@ -57,13 +57,21 @@
                                 <div class="col-lg-7">{{creditRate.value | number: '.0-3'}} VND</div>
                             </div>
                         </div>
-
                     </div>
-
+                </div>
+                <div class="py-3">
+                    <div class="bg-white box-shadow">
+                        <div class="row">
+                            <div class="col-lg-12 text-center py-3">
+                                <img #signature [src]="signatureUrl" onerror="this.src = 'assets/app/media/img/emptydata.png'"
+                                    class="" alt="Cinque Terre">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-8 border-radius-15 bg-white box-shadow">
-                <div class="p-3">
+            <div class="col-lg-8">
+                <div class="p-3 border-radius-15 bg-white box-shadow">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
