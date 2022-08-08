@@ -2741,25 +2741,33 @@ namespace eFMS.API.Documentation.DL.Services
             var data = Query(criteria);
 
             data = data.OrderByDescending(x => x.DatetimeModified);
-            string JobNos = "";
             List<string> lstJobNo = new List<string>();
-            foreach(var item in data)
+            foreach (var item in data)
             {
                 if (item.LinkSource == "Replicate")
                 {
-                    JobNos += item.JobNo+";";
                     lstJobNo.Add(item.JobNo);
                 }
+                else if (item.ReplicatedId != null)
+                {
+                    lstJobNo.Add("R"+item.JobNo);
+                }
             }
-
-            var outRe = GetOutsourcingRegcognising(JobNos);
-
-            ExportOutsourcingRegcognisingModel[] result = new ExportOutsourcingRegcognisingModel[lstJobNo.Count()];
-
-            for (int i = 0; i < lstJobNo.Count(); i++)
+            var lstJobNoDistinct = lstJobNo.Distinct().ToList();
+            string jobNos = "";
+            lstJobNoDistinct.ForEach(x =>
             {
-                var jobrep = outRe.Where(x => x.JobId == lstJobNo[i] && x.ChargeType == "JobRep").ToList();
-                var joborn = outRe.Where(x => x.JobId == lstJobNo[i].Substring(1) && x.ChargeType == "JobOrn").ToList();
+                jobNos += x + ";";
+            });
+
+            var outRe = GetOutsourcingRegcognising(jobNos);
+
+            ExportOutsourcingRegcognisingModel[] result = new ExportOutsourcingRegcognisingModel[lstJobNoDistinct.Count()];
+
+            for (int i = 0; i < lstJobNoDistinct.Count(); i++)
+            {
+                var jobrep = outRe.Where(x => x.JobId == lstJobNoDistinct[i] && x.ChargeType == "JobRep").ToList();
+                var joborn = outRe.Where(x => x.JobId == lstJobNoDistinct[i].Substring(1) && x.ChargeType == "JobOrn").ToList();
                 result[i] = new ExportOutsourcingRegcognisingModel();
                 result[i].ReplicateJob = new List<sp_GetOutsourcingRegcognising>();
                 result[i].OriginalJob = new List<sp_GetOutsourcingRegcognising>();
