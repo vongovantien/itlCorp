@@ -700,7 +700,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, x.CustomNo }) /* case đặc biệt
+                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
                                         1. Có tạm ứng - không có tk 
                                         2. Có tạm ứng - Có tờ khai
                                         */
@@ -812,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
             AdvanceInfo result = new AdvanceInfo();
             string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
-            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
+            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) }).ToList();
 
             var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.ClearanceNo == _clearanceNo);
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
@@ -916,7 +916,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
                                      && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
-                                     && sur.ClearanceNo == clearanceNo
+                                     && (!string.IsNullOrEmpty(sur.ClearanceNo) ? (sur.ClearanceNo == clearanceNo) : string.IsNullOrEmpty(clearanceNo))
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -990,7 +990,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
                                     && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
-                                    && sur.ClearanceNo == clearanceNo
+                                    && (!string.IsNullOrEmpty(sur.ClearanceNo) ? (sur.ClearanceNo == clearanceNo) : string.IsNullOrEmpty(clearanceNo))
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1960,7 +1960,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal? _advanceAmount = null;
 
-            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) })
                                     .Select(x => new ShipmentSettlement
                                     {
                                         JobId = x.Key.JobId,
@@ -4661,7 +4661,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(s.ClearanceNo) ? string.Empty : s.ClearanceNo) }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(s.ClearanceNo) ? null : s.ClearanceNo) }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4880,7 +4880,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var data = dataOperation.Union(dataService).ToList();
 
                         decimal? advTotalAmount;
-                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
+                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, CustomNo = (string.IsNullOrEmpty(d.CustomNo) ? null : d.CustomNo) })
                             .Select(s => new SettlementExportGroupDefault
                             {
                                 JobID = s.Key.JobID,
@@ -4945,7 +4945,7 @@ namespace eFMS.API.Accounting.DL.Services
                     d.SettleNo,
                     d.Currency,
                     d.ApproveDate,
-                    d.CustomNo,
+                    CustomNo = (string.IsNullOrEmpty(d.CustomNo) ? null : d.CustomNo),
                     d.RequestDate,
                     d.Requester
                 })
@@ -5677,7 +5677,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal? _advanceAmount = null;
 
-            IEnumerable<ShipmentSettlement> dataGroups = charges.Where(x => !string.IsNullOrEmpty(x.AdvanceNo)).GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+            IEnumerable<ShipmentSettlement> dataGroups = charges.Where(x => !string.IsNullOrEmpty(x.AdvanceNo)).GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) })
                                     .Select(x => new ShipmentSettlement
                                     {
                                         JobId = x.Key.JobId,
@@ -6237,6 +6237,40 @@ namespace eFMS.API.Accounting.DL.Services
                 new LogHelper("EFMS_AutoRateReplicate_Error", "Settle :" + settlement.SettlementNo + " - Total of fees: " + surcharges.Count() + " Error: " + ex.Message);
                 return new ResultHandle();
             }
+        }
+        
+        /// Check if payee not staff then not accept input cost > sell
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string CheckValidFeesOnShipment(CreateUpdateSettlementModel model)
+        {
+            var invalidShipment = string.Empty;
+            if (!string.IsNullOrEmpty(model.Settlement.Payee))
+            {
+                if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                {
+                    var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
+                    var listSipment = new List<string>();
+                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    foreach (var job in shipmentGrp)
+                    {
+                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        if (buyAmount > sellAmount)
+                        {
+                            listSipment.Add(job.Key);
+                        }
+                    }
+                    if (listSipment.Count > 0)
+                    {
+                        listSipment = listSipment.Distinct().ToList();
+                        invalidShipment = string.Join("\n", listSipment);
+                    }
+                }
+            }
+            return invalidShipment;
         }
     }
 }

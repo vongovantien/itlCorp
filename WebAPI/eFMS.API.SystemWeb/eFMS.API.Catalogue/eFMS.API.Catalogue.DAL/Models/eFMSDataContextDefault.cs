@@ -65,7 +65,7 @@ namespace eFMS.API.Catalogue.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
+                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
@@ -550,12 +550,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.IsExpired).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.IsOverDue).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.IsOverLimit).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -586,6 +580,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.SalesOfficeId)
                     .HasColumnName("SalesOfficeID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -821,6 +819,10 @@ namespace eFMS.API.Catalogue.Service.Models
             {
                 entity.ToTable("catPartner");
 
+                entity.HasIndex(e => e.AccountNo)
+                    .HasName("Index_CatPartner")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .HasMaxLength(50)
@@ -877,6 +879,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CreditPayment)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Currency)
+                    .HasMaxLength(3)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated)
@@ -1809,9 +1815,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.ToTable("csTransaction");
 
-                entity.HasIndex(e => e.JobNo)
-                    .HasName("Index_CSTransaction");
-
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -2390,6 +2393,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
             {
+                entity.HasIndex(e => new { e.JobNo, e.ClearanceNo })
+                    .HasName("Index_Clearance");
+
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.AccountNo)
@@ -2569,9 +2575,6 @@ namespace eFMS.API.Catalogue.Service.Models
             modelBuilder.Entity<OpsTransaction>(entity =>
             {
                 entity.ToTable("opsTransaction");
-
-                entity.HasIndex(e => e.JobNo)
-                    .HasName("Index_OpsTransaction");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -2993,6 +2996,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.SaleTarget).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Signature).HasColumnType("image");
+
+                entity.Property(e => e.SignatureImage).HasMaxLength(500);
 
                 entity.Property(e => e.StaffCode)
                     .HasMaxLength(50)

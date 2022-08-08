@@ -517,9 +517,8 @@ namespace eFMS.API.Documentation.DL.Services
                     IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
                     break;
                 case "Trial":
-                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
-                    break;
                 case "Official":
+                case "Guarantee":
                     IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
                     break;
                 default:

@@ -161,6 +161,13 @@ export class AccountingRepo {
             );
     }
 
+    checkIfInvalidFeeShipmentAdv(body: any = {}): Observable<any> {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckIfInvalidFeeShipmentAdv`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     getListAdvancePayment(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/paging`, body, {
             pageNumber: '' + page,
@@ -247,6 +254,13 @@ export class AccountingRepo {
 
     addNewSettlement(body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/Add`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkIfInvalidFeeShipmentSettle(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckIfInvalidFeeShipmentSettle`, body)
             .pipe(
                 map((data: any) => data)
             );
@@ -636,7 +650,7 @@ export class AccountingRepo {
         );
     }
 
-    // Tính công nợ theo {surchargeId, partnerId, office, service}
+    // ! Deprecated
     calculatorReceivable(body: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body, null, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)

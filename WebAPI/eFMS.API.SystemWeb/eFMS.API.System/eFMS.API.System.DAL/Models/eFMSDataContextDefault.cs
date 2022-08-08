@@ -466,6 +466,8 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Signature).HasColumnType("image");
 
+                entity.Property(e => e.SignatureImage).HasMaxLength(500);
+
                 entity.Property(e => e.StaffCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);

@@ -3701,13 +3701,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public async Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId)
         {
-            //Get list payment of Receipt
             var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
-            //Get list Invoice of payments
             var invoiceIds = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
-            //Get list Invoice Temp of payments
-            // var invoiceTempIds = payments.Where(x => x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
-            //Get list Soa Credit of payments
             var soaIds = payments.Where(x => x.Type == "CREDITSOA").Select(s => s.RefId).Distinct().ToList();
             var paySoaNos = new List<string>();
             if (soaIds.Count > 0)
@@ -3734,8 +3729,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (surcharges == null) return hs;
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ cho Partner, Service, Office có trong Receipt
-            hs = await accAccountReceivableService.CalculatorReceivableDebitAmountAsync(objectReceivablesModel);
+            hs = await accAccountReceivableService.CalculatorReceivableDebitAmountAsync(objectReceivablesModel);           
             return hs;
         }
 
