@@ -505,7 +505,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         CustomerCodeTransfer = d.FirstOrDefault().CustomerCodeTransfer,
                                         AdvanceNo = d.Key.AdvanceNo,
                                         HblId = d.Key.HblId,
-                                        ClearanceNo = d.Key.ClearanceNo,
+                                        ClearanceNo = (string.IsNullOrEmpty(d.Key.ClearanceNo) ? null : d.Key.ClearanceNo),
                                         AdvanceCustomerCode = d.FirstOrDefault().AdvanceCustomerCode
                                     }).ToList();
                                 if (querySettlmentReqListHasAdvance.Count > 0)
