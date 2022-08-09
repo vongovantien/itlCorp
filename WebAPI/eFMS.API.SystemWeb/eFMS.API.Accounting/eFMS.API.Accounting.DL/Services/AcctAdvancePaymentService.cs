@@ -334,28 +334,28 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
             IQueryable<AcctAdvanceRequest> totalAdvanceRequests = acctAdvanceRequestRepo.Get();
-            IQueryable<AcctAdvanceRequest> advanceRequests = null;
             IQueryable<AcctAdvanceRequest> lstNotSettled = null;
             IQueryable<AcctAdvanceRequest> lstPartial = null;
+            IQueryable<AcctAdvanceRequest> advanceRequests = null;
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
                 advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
-                var advanceRequests1 = new List<AcctAdvanceRequest>();
+                var lstAdvanceRequests = new List<AcctAdvanceRequest>();
                 lstNotSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 lstPartial = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 if (criteria.StatusPayment == "Settled")
                 {
-                    var result = totalAdvanceRequests.Where(x=>x.StatusPayment== "Settled").GroupBy(x => x.AdvanceNo).ToList();
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo).ToList();
                     foreach(var item in result)
                     {
-                        if (item.Count() == 1)
+                        //if (item.Count() == 1)
+                        //{
+                        //    advanceRequests1.AddRange(item.ToList());
+                        //}
+                        if (checkType(item.ToList()) == "settled")
                         {
-                            advanceRequests1.AddRange(item.ToList());
-                        }
-                        if (checkType(item.ToList()) == "settled" && item.Count() > 1)
-                        {
-                            advanceRequests1.AddRange(item.ToList());
+                            lstAdvanceRequests.AddRange(item.ToList());
                         }
                         //if (checkType(item.ToList()) == "notsettled")
                         //{
@@ -367,30 +367,30 @@ namespace eFMS.API.Accounting.DL.Services
                         //}
                         //result = result.Except(lstPartial);
                     }
-                    advanceRequests = advanceRequests1.AsQueryable();
                 }
                 if (criteria.StatusPayment == "NotSettled")
                 {
-                    var result = totalAdvanceRequests.Where(x => x.StatusPayment == "NotSettled").GroupBy(x => x.AdvanceNo);
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo).ToList();
                     foreach (var item in result)
                     {
                         if (checkType(item.ToList())== "notsettled")
                         {
-                            advanceRequests = advanceRequests.Concat(item);
+                            lstAdvanceRequests.AddRange(item.ToList());
                         }
                     }
                 }
                 if (criteria.StatusPayment == "PartialSettlement")
                 {
-                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo).ToList();
                     foreach (var item in result)
                     {
                         if (checkType(item.ToList()) == "partial")
                         {
-                            advanceRequests = advanceRequests.Concat(item);
+                            lstAdvanceRequests.AddRange(item.ToList());
                         }
                     }
                 }
+                advanceRequests = lstAdvanceRequests.AsQueryable();
             }
 
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
