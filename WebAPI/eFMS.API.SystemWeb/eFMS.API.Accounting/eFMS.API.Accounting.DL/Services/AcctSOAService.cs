@@ -3245,86 +3245,97 @@ namespace eFMS.API.Accounting.DL.Services
             var partner = catPartnerRepo.Get(x => x.Id == soa.Customer).FirstOrDefault();
             var grpInvCdNoteByHbl = chargesOfSOA.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
 
-            var soaCharges = new List<AccountStatementFullReport>();
-            foreach (var charge in chargesOfSOA)
-            {
-                string _mawb = string.Empty;
-                string _hwbNo = string.Empty;
-                string _customNo = string.Empty;
-                string _jobNo = string.Empty;
+            // var soaCharges = new List<AccountStatementFullReport>();
+            //foreach (var charge in chargesOfSOA)
+            //{
+            //    string _mawb = string.Empty;
+            //    string _hwbNo = string.Empty;
+            //    string _customNo = string.Empty;
+            //    string _jobNo = string.Empty;
 
-                #region -- Info MBL, HBL --
-                _mawb = charge.Mblno;
-                _hwbNo = charge.Hblno;
-                _customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
-                _jobNo = charge.JobNo;
-                #endregion -- Info MBL, HBL --
+            //    #region -- Info MBL, HBL --
+            //    _mawb = charge.Mblno;
+            //    _hwbNo = charge.Hblno;
+            //    _customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
+            //    _jobNo = charge.JobNo;
+            //    #endregion -- Info MBL, HBL --
 
-                #region -- Info CD Note --
-                var cdNote = acctCdnoteRepo.Get(x => (soa.Type == "Debit" ? charge.DebitNo : charge.CreditNo) == x.Code).FirstOrDefault();
-                #endregion -- Info CD Note --
+            //    #region -- Info CD Note --
+            //    var cdNote = acctCdnoteRepo.Get(x => (soa.Type == "Debit" ? charge.DebitNo : charge.CreditNo) == x.Code).FirstOrDefault();
+            //    #endregion -- Info CD Note --
 
-                // Exchange Rate from currency charge to current soa
-                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
+            //    // Exchange Rate from currency charge to current soa
+            //    decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, soa.Currency);
 
-                var soaCharge = new AccountStatementFullReport();
-                soaCharge.PartnerID = partner?.Id;
-                soaCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En
-                soaCharge.PersonalContact = partner?.ContactPerson?.ToUpper();
-                soaCharge.Email = string.Empty; //NOT USE
-                soaCharge.Address = partner?.AddressEn?.ToUpper(); //Address En 
-                soaCharge.Workphone = partner?.WorkPhoneEx;
-                soaCharge.Fax = string.Empty; //NOT USE
-                soaCharge.Taxcode = string.Empty; //NOT USE
-                soaCharge.TransID = string.Empty; //NOT USE
-                soaCharge.MAWB = _mawb; //MBLNo
-                soaCharge.HWBNO = _hwbNo; //HBLNo
-                soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
-                soaCharge.Order = string.Empty; //NOT USE
-                soaCharge.InvID = charge.InvoiceNo;
-                soaCharge.Amount = _amount + _decimalNumber; //Cộng thêm phần thập phân
-                soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
-                soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
-                soaCharge.Vessel = string.Empty; //NOT USE
-                soaCharge.Routine = string.Empty; //NOT USE
-                soaCharge.LoadingDate = null; //NOT USE
-                soaCharge.CustomerID = string.Empty; //NOT USE
-                soaCharge.CustomerName = string.Empty; //NOT USE
-                soaCharge.ArrivalDate = null; //NOT USE
-                soaCharge.TpyeofService = string.Empty; //NOT USE
-                soaCharge.SOANO = string.Empty; //NOT USE
-                soaCharge.SOADate = null; //NOT USE
-                soaCharge.FromDate = null; //NOT USE
-                soaCharge.ToDate = null; //NOT USE
-                soaCharge.OAmount = null; //NOT USE
-                soaCharge.SAmount = null; //NOT USE
-                soaCharge.CurrOP = string.Empty; //NOT USE
-                soaCharge.Notes = string.Empty; //NOT USE
-                soaCharge.IssuedBy = string.Empty; //NOT USE
-                soaCharge.Shipper = string.Empty; //NOT USE
-                soaCharge.Consignee = string.Empty; //NOT USE
-                soaCharge.OtherRef = string.Empty; //NOT USE
-                soaCharge.Volumne = string.Empty; //NOT USE
-                soaCharge.POBH = null; //NOT USE
-                soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
-                soaCharge.ROBH = soaCharge.ROBH + _decimalNumber; //Cộng thêm phần thập phân
-                soaCharge.CustomNo = _customNo;
-                soaCharge.JobNo = _jobNo;
-                soaCharge.CdCode = cdNote?.Code;
-                var grpInvCdNote = grpInvCdNoteByHbl.Where(w => (!string.IsNullOrEmpty(w.InvoiceNo) || !string.IsNullOrEmpty(w.CdNote)) && w.Hblid == charge.Hblid).ToList();
-                if (grpInvCdNote.Count > 0)
-                {
-                    soaCharge.Docs = string.Join("\r\n", grpInvCdNote.Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
-                }
+            //    var soaCharge = new AccountStatementFullReport();
+            //    //soaCharge.PartnerID = partner?.Id;
+            //    //soaCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En
+            //    //soaCharge.PersonalContact = partner?.ContactPerson?.ToUpper();
+            //    //soaCharge.Address = partner?.AddressEn?.ToUpper(); //Address En 
+            //    //soaCharge.Workphone = partner?.WorkPhoneEx;
 
-                soaCharges.Add(soaCharge);
-            }
+            //    // soaCharge.Email = string.Empty; //NOT USE
+            //    //soaCharge.Fax = string.Empty; //NOT USE
+            //    //soaCharge.Taxcode = string.Empty; //NOT USE
+            //    //soaCharge.TransID = string.Empty; //NOT USE
+            //    soaCharge.MAWB = _mawb; //MBLNo
+            //    soaCharge.HWBNO = _hwbNo; //HBLNo
+            //    // soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
+            //    // soaCharge.Order = string.Empty; //NOT USE
+            //    soaCharge.InvID = charge.InvoiceNo;
+            //    soaCharge.Amount = _amount + _decimalNumber; //Cộng thêm phần thập phân
+            //    soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
+            //    soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
+            //    //soaCharge.Vessel = string.Empty; //NOT USE
+            //    //soaCharge.Routine = string.Empty; //NOT USE
+            //    //soaCharge.LoadingDate = null; //NOT USE
+            //    //soaCharge.CustomerID = string.Empty; //NOT USE
+            //    //soaCharge.CustomerName = string.Empty; //NOT USE
+            //    //soaCharge.ArrivalDate = null; //NOT USE
+            //    //soaCharge.TpyeofService = string.Empty; //NOT USE
+            //    //soaCharge.SOANO = string.Empty; //NOT USE
+            //    //soaCharge.SOADate = null; //NOT USE
+            //    //soaCharge.FromDate = null; //NOT USE
+            //    //soaCharge.ToDate = null; //NOT USE
+            //    //soaCharge.OAmount = null; //NOT USE
+            //    //soaCharge.SAmount = null; //NOT USE
+            //    //soaCharge.CurrOP = string.Empty; //NOT USE
+            //    //soaCharge.Notes = string.Empty; //NOT USE
+            //    //soaCharge.IssuedBy = string.Empty; //NOT USE
+            //    //soaCharge.Shipper = string.Empty; //NOT USE
+            //    //soaCharge.Consignee = string.Empty; //NOT USE
+            //    //soaCharge.OtherRef = string.Empty; //NOT USE
+            //    //soaCharge.Volumne = string.Empty; //NOT USE
+            //    //soaCharge.POBH = null; //NOT USE
+            //    soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
+            //    soaCharge.ROBH = soaCharge.ROBH + _decimalNumber; //Cộng thêm phần thập phân
+            //    soaCharge.CustomNo = _customNo;
+            //    soaCharge.JobNo = _jobNo;
+            //    // soaCharge.CdCode = cdNote?.Code;
+            //    var grpInvCdNote = grpInvCdNoteByHbl.Where(w => (!string.IsNullOrEmpty(w.InvoiceNo) || !string.IsNullOrEmpty(w.CdNote)) && w.Hblid == charge.Hblid).ToList();
+            //    if (grpInvCdNote.Count > 0)
+            //    {
+            //        soaCharge.Docs = string.Join("\r\n", grpInvCdNote.Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
+            //    }
+
+            //    soaCharges.Add(soaCharge);
+            //}
 
             //Sắp xếp giảm dần theo số Job
             // soaCharges = soaCharges.ToArray().OrderByDescending(o => o.JobNo).ToList();
 
             //Info Company, Office of User Created SOA
             //var company = sysCompanyRepo.Get(x => x.Id == soa.CompanyId).FirstOrDefault();
+            var soaCharges = new List<sp_GetSurchargePreviewSOAFull>();
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@SoaNo", Value = soa.Soano },
+                new SqlParameter(){ ParameterName = "@Type", Value = soa.Type },
+                new SqlParameter(){ ParameterName = "@Currency", Value = soa.Currency }
+            };
+            List<sp_GetSurchargePreviewSOAFull> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargePreviewSOAFull>(parameters);
+
+            soaCharges = listSurcharges;
+
             var office = officeRepo.Get(x => x.Id == soa.OfficeId).FirstOrDefault();
 
             var parameter = new AccountStatementFullReportParams();
