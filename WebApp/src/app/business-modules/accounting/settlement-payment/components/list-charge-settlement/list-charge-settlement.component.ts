@@ -259,6 +259,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 return;
             }
 
+            if(surcharge.chargeAutoRated){
+                this._toastService.warning('Charge had autorate charge');
+                return;
+            }
+
             this.selectedSurcharge = surcharge;
             this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
 
@@ -352,7 +357,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             }
 
             if (!!surchargeSelected.length) {
-                this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
+                this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected && surcharge.chargeAutoRated);
             } else {
                 this._toastService.warning(`Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
                 return;
@@ -367,7 +372,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     returnChargeFromShipment(groupShipment: any) {
-        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected);
+        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected && surcharge.chargeAutoRated);
     }
 
     sortSurcharge(sortData: any) {
@@ -380,7 +385,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 if (charge.isFromShipment) {
                     charge.isSelected = true;
                 }
-                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued) {
+                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued && !charge.chargeAutoRated) {
                     charge.isSelected = true;
                 }
             } else {
@@ -505,13 +510,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 return;
             }
 
+            if(charge.chargeAutoRated){
+                this._toastService.warning('Charge had autorate charge');
+                return;
+            }
+
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {
                 this.tableListChargePopup.selectedShipment = shipment;
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued && !surcharge.chargeAutoRated);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 

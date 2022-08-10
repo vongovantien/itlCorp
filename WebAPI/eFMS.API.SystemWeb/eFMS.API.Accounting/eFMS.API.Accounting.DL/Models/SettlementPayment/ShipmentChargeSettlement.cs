@@ -68,5 +68,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public bool? HadIssued { get; set; }
         public bool? PayeeIssued { get; set; }
         public bool? OBHPartnerIssued { get; set; }
+        public bool? ChargeAutoRated { get; set; }
     }
 }

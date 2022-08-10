@@ -5772,54 +5772,57 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public ResultHandle CheckAllowDenySettle(List<Guid> ids)
         {
-            #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
-            var invalidSettles = new List<Guid>();
-            var invalidCodeSettles = new List<string>();
-
-            var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
-            var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
-            var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
-            foreach (var settlementId in ids)
+            if (false)
             {
-                var detail = settlementData.First(x => x.Id == settlementId);
-                if (detail == null) return null;
+                #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
+                var invalidSettles = new List<Guid>();
+                var invalidCodeSettles = new List<string>();
 
-                #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
-                //if (detail.SettlementType == "DIRECT")
-                //{
-                //    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
-                //    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
-                //    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
-                //    if (isDebit || isSoa)
-                //    {
-                //        invalidSettles.Add(settlementId);
-                //        invalidCodeSettles.Add(detail.SettlementNo);
-                //    }
-                //}
-                //if (invalidSettles.Count > 0)
-                //            {
-                //                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
-                //            }
-                #endregion
-
-                // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
-                var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
-                var chargesLinked = from sur in surchargesSettle
-                                    join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
-                                    join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
-                                    select sell.Id;
-                if (chargesLinked != null && chargesLinked.Count() > 0)
+                var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
+                var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
+                var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
+                var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+                foreach (var settlementId in ids)
                 {
-                    invalidSettles.Add(settlementId);
-                    invalidCodeSettles.Add(detail.SettlementNo);
+                    var detail = settlementData.First(x => x.Id == settlementId);
+                    if (detail == null) return null;
+
+                    #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
+                    //if (detail.SettlementType == "DIRECT")
+                    //{
+                    //    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
+                    //    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
+                    //    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
+                    //    if (isDebit || isSoa)
+                    //    {
+                    //        invalidSettles.Add(settlementId);
+                    //        invalidCodeSettles.Add(detail.SettlementNo);
+                    //    }
+                    //}
+                    //if (invalidSettles.Count > 0)
+                    //            {
+                    //                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                    //            }
+                    #endregion
+
+                    // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
+                    var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
+                    var chargesLinked = from sur in surchargesSettle
+                                        join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
+                                        join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
+                                        select sell.Id;
+                    if (chargesLinked != null && chargesLinked.Count() > 0)
+                    {
+                        invalidSettles.Add(settlementId);
+                        invalidCodeSettles.Add(detail.SettlementNo);
+                    }
                 }
+                if (invalidSettles.Count > 0)
+                {
+                    return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had auto rate fees. You can not deny.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                }
+                #endregion
             }
-            if (invalidSettles.Count > 0)
-            {
-                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had auto rate fees. You can not deny.", invalidCodeSettles.Join(",")), Data = invalidSettles };
-            }
-            #endregion
             return new ResultHandle();
         }
 

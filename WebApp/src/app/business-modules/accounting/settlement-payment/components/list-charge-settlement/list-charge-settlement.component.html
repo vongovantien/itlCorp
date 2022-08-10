@@ -168,7 +168,7 @@
                                                     <label class="m-checkbox"
                                                         *ngIf="!surcharge.isLocked;else lockIconTpl">
                                                         <ng-container
-                                                            *ngIf="surcharge.hasNotSynce && !surcharge.linkChargeId">
+                                                            *ngIf="surcharge.hasNotSynce && !surcharge.linkChargeId && !surcharge.chargeAutoRated">
                                                             <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                                 value="{{surcharge}}"
                                                                 [(ngModel)]="surcharge.isSelected">

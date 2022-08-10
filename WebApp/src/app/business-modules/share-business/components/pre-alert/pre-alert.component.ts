@@ -338,7 +338,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 this.debitNos.forEach(element => {
                     if (element.isCheckedDebitNote) {
-                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }))
+                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }))
                     }
                 });
                 break;
@@ -353,7 +353,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 this.debitNos.forEach(element => {
                     if (element.isCheckedDebitNote) {
-                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }))
+                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }))
                     }
                 });
                 break;
@@ -367,7 +367,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 this.debitNos.forEach(element => {
                     if (element.isCheckedDebitNote) {
-                        streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                     }
                 });
                 break;
@@ -864,7 +864,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     previewDebitNote(code: string) {
         if (this.serviceId === 'AI') {
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
                 .pipe(
                 ).subscribe(
                     (res: any) => {
@@ -879,7 +879,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     },
                 );
         }else{
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -898,7 +898,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     previewCDNoteExport(code: string){
         if(this.serviceId === 'AE'){
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
             .pipe(
             ).subscribe(
                 (res: any) => {
@@ -913,7 +913,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 },
             );
         }else{
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
             .pipe(
             ).subscribe(
                 (res: any) => {

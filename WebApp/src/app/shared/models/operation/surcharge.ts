@@ -80,7 +80,8 @@ export class Surcharge {
     hadIssued: boolean = false; // charge đã issued
     payeeIssued: boolean = false; // đầu payee đã được issued
     obhPartnerIssued: boolean = false; // đầu obh partner đã được issued
-
+    chargeAutoRated: boolean = false; // charge chưa autorate repl
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
