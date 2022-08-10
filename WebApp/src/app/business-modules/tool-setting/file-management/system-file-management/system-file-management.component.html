@@ -1,0 +1,116 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+    </div>
+</div>
+
+<div class="m-content">
+    <tabset class="customer-payment-wrapper m-animate-fade-in tab-container">
+        <tab heading="My Attachments">
+        </tab>
+        <tab heading="e-FMS Docs" class="active">
+            <div class="m-portlet">
+                <div class="m-portlet__body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <sidebar-file-management>
+                            </sidebar-file-management>
+                        </div>
+                        <div class="col-md-10">
+                            <form-search-file-management>
+                            </form-search-file-management>
+                            <br />
+                            <div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <span>Name</span>
+                                            </th>
+                                            <th>
+                                                <span>Dectetive Created</span>
+                                            </th>
+                                            <th>
+                                                <span>User Modifed</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                <i class="la la-folder"></i>
+                                                &nbsp;
+                                                <span>SOA Folder</span>
+                                            </th>
+                                            <th>
+                                                <span>19/03/2022</span>
+                                            </th>
+                                            <th>
+                                                <span>22/03/2022</span>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <i class="la la-folder"></i>
+                                                &nbsp;
+                                                <span>SOA Folder</span>
+                                            </th>
+                                            <th>
+                                                <span>19/03/2022</span>
+                                            </th>
+                                            <th>
+                                                <span>22/03/2022</span>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <i class="la la-folder"></i>
+                                                &nbsp;
+                                                <span>SOA Folder</span>
+                                            </th>
+                                            <th>
+                                                <span>19/03/2022</span>
+                                            </th>
+                                            <th>
+                                                <span>22/03/2022</span>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <i class="la la-folder"></i>
+                                                &nbsp;
+                                                <span>SOA Folder</span>
+                                            </th>
+                                            <th>
+                                                <span>19/03/2022</span>
+                                            </th>
+                                            <th>
+                                                <span>22/03/2022</span>
+                                            </th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tab>
+    </tabset>
+</div>
+<app-context-menu #linkFeeContextMenu>
+    <ng-container>
+        <div class="menu-context__item ">
+            <span><i class="la la-delete"></i><span> Delete</span></span>
+        </div>
+        <div class="menu-context__item">
+            <span><i class="la la-"></i><span> Move</span></span>
+        </div>
+        <div class="menu-context__item">
+            <span><i class="la la-edit"></i><span> Download</span></span>
+        </div>
+    </ng-container>
+</app-context-menu>
+<permission-403-popup></permission-403-popup>

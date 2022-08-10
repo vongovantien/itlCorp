@@ -5,6 +5,8 @@ import { ITransactionState, TransactionReducer } from './transaction.reducer';
 import { IHBLState, HBLReducer } from './hbl.reducer';
 import { IDimensionState, DimensionReducer } from './dimension.reduder';
 import { IOtherChargeState, shipmentOtherChargeReducer } from './shipment-other-charge.reducer';
+import { IShareBussinessCatalogueState } from '@share-bussiness';
+import { CatalogueReducer } from './catalogue.reducer';
 
 
 export * from './surcharge.reducer';
@@ -12,6 +14,7 @@ export * from './container.reducer';
 export * from './transaction.reducer';
 export * from './hbl.reducer';
 export * from './dimension.reduder';
+export * from './catalogue.reducer';
 
 export interface IShareBussinessState {
     surcharge: ISurcharge;
@@ -20,6 +23,7 @@ export interface IShareBussinessState {
     houseBill: IHBLState;
     dimensions: IDimensionState;
     otherCharges: IOtherChargeState;
+    shareCatalogue: IShareBussinessCatalogueState;
 }
 
 export const shareBussinessState = createFeatureSelector<IShareBussinessState>('share-bussiness');
@@ -64,6 +68,9 @@ export const getDimensionVolumesState = createSelector(shareBussinessState, (sta
 // * Other charge
 export const getOtherChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.otherCharges.otherCharges);
 
+// * Catalogue
+export const getPartnerForKeyingChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state?.shareCatalogue?.partners);
+export const getPartnerForKeyingChargeLoadingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state?.shareCatalogue?.isLoading);
 
 export const reducers: ActionReducerMap<IShareBussinessState> = {
     surcharge: SurchargeReducer,
@@ -71,5 +78,6 @@ export const reducers: ActionReducerMap<IShareBussinessState> = {
     transaction: TransactionReducer,
     houseBill: HBLReducer,
     dimensions: DimensionReducer,
-    otherCharges: shipmentOtherChargeReducer
+    otherCharges: shipmentOtherChargeReducer,
+    shareCatalogue: CatalogueReducer
 };

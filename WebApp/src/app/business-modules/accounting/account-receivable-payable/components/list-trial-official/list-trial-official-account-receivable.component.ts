@@ -1,21 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableLoadingListState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, IAccountReceivableState, getAccountReceivableLoadingListState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
-
+import { ContextMenuDirective } from "@directives";
 @Component({
     selector: 'list-trial-official-account-receivable',
     templateUrl: './list-trial-official-account-receivable.component.html',
@@ -23,8 +23,12 @@ import { HttpResponse } from '@angular/common/http';
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
+    @Output() onTotalListTrial: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     trialOfficialList: TrialOfficialOtherModel[] = [];
+    selectedPartner: TrialOfficialOtherModel;
+    selectedTrialOfficial: TrialOfficialOtherModel;
 
     constructor(
         private _sortService: SortService,
@@ -60,24 +64,9 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             { title: 'Expired Days', field: 'expriedDay', sortable: true },
             { title: 'Parent Partner', field: 'partnerNameAbbr', sortable: true },
         ];
-
+        this.pageSize = 50;
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        this._store.select(getAccountReceivableSearchState)
-            .pipe(
-                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
-                takeUntil(this.ngUnsubscribe),
-                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-            )
-            .subscribe(
-                (data) => {
-                    this.dataSearch = data.dataSearch;
-                    this.page = data.page;
-                    this.pageSize = data.pageSize;
-                }
-            );
-
         this.isLoading = this._store.select(getAccountReceivableLoadingListState);
-
     }
 
     sortTrialOfficalList(sortField: string, order: boolean) {
@@ -94,6 +83,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
+                    this.onTotalListTrial.emit(res.totalItems);
                 },
             );
     }
@@ -130,13 +120,17 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         }
     }
 
-    showDebitDetail(agreementId, option) {
-        let officeId = "";
-        let overDueDay = 0;
-        let agreeStr=''+agreementId;
-        if(this.dataSearch && this.dataSearch.officeIds){officeId = this.dataSearch.officeIds.join("|");}
-        if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
-        this._accountingRepo.getDataDebitDetailList(agreementId, option,officeId,'',overDueDay)
+    showDebitDetail(item: TrialOfficialOtherModel, status: string, overDue: string = null) {
+        const body = {
+            partnerId: item.partnerId,
+            type: null,
+            officeId: !!item.arOfficeIds.length ? item.arOfficeIds.join("|") : null,
+            service: !!item.arServices.length ? item.arServices.join("|") : null,
+            paymentStatus: status,
+            salesman: item.agreementSalesmanId,
+            overDue: overDue
+        };
+        this._accountingRepo.getDataDebitDetailList(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -144,11 +138,26 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 (res: any) => {
                     if (res) {
                         this.debitDetailPopupComponent.dataDebitList = res || [];
-                        this.debitDetailPopupComponent.dataSearch= {argeementId:agreeStr, option,officeId,serviceCode:'',overDueDay};
+                        this.debitDetailPopupComponent.dataSearch = body;
+
                         this.debitDetailPopupComponent.calculateTotal();
                         this.debitDetailPopupComponent.show();
                     }
                 },
+            );
+    }
+
+    onSelectPartner(part: TrialOfficialOtherModel) {
+        this.selectedPartner = part;
+        this.clearMenuContext(this.queryListMenuContext);
+    }
+
+    exportDebitAmount() {
+        this._exportRepo.exportDebitAmountDetailByContract(this.selectedPartner)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                }
             );
     }
 }

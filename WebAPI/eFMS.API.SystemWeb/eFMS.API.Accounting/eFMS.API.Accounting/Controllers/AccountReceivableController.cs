@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.AccountReceivable;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
@@ -49,48 +50,17 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(accountReceivableService.Get());
         }
 
-        /// <summary>
-        /// Calculator Receivable
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("CalculatorReceivable")]
-        [Authorize]
-        public IActionResult CalculatorReceivable(CalculatorReceivableModel model)
-        {
-            var calculatorReceivable = accountReceivableService.CalculatorReceivable(model);
-            return Ok(calculatorReceivable);
-        }
 
         /// <summary>
-        /// Calculator Receivable Not Authorize
+        /// Get AR detail has argeement by argeement id
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="criteria"></param>
         /// <returns></returns>
-        [HttpPost("CalculatorReceivableNotAuthorize")]
-        public IActionResult CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        [HttpPost("GetDebitAmountDetailByContract")]
+        public IActionResult GetDebitAmountDetailByContract(AccAccountReceivableCriteria criteria)
         {
-            var calculatorReceivable = accountReceivableService.CalculatorReceivableNotAuthorize(model);
-            return Ok(calculatorReceivable);
-        }
-
-        /// <summary>
-        /// Insert Or Update Receivable
-        /// </summary>
-        /// <param name="models"></param>
-        /// <returns></returns>
-        [HttpPost("InsertOrUpdateReceivable")]
-        [Authorize]
-        public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
-        {
-            HandleState insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
-            var message = HandleError.GetMessage(insertOrUpdateReceivable, Crud.Update);
-            if (insertOrUpdateReceivable.Success)
-            {
-                ResultHandle result = new ResultHandle { Status = insertOrUpdateReceivable.Success, Message = stringLocalizer[message].Value };
-                return Ok(result);
-            }
-            return BadRequest(message);
+            var data = accountReceivableService.GetDebitAmountDetailByContract(criteria);
+            return Ok(data);
         }
 
         /// <summary>
@@ -111,9 +81,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="partnerId"></param>
         /// <returns></returns>
         [HttpGet("GetDetailAccountReceivableByPartnerId")]
-        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId)
+        public IActionResult GetDetailAccountReceivableByPartnerId(string partnerId,string saleManId)
         {
-            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId);
+            var data = accountReceivableService.GetDetailAccountReceivableByPartnerId(partnerId, saleManId);
             return Ok(data);
         }
 
@@ -156,13 +126,20 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        [HttpGet("GetDebitDetail")]
-        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode ,int overDueDay = 0)
+        [HttpPost("GetDebitDetail")]
+        public IActionResult GetDebitDetail(AcctReceivableDebitDetailCriteria criteria)
         {
-            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode, overDueDay);
+            var data = accountReceivableService.GetDataDebitDetail(criteria);
             return Ok(data);
         }
 
+        [HttpPost("GetDebitDetailByPartnerId")]
+        [Authorize]
+        public IActionResult GetDebitDetailByPartnerId([FromBody]ArDebitDetailCriteria model)
+        {
+            var data = accountReceivableService.GetDebitDetailByPartnerId(model);
+            return Ok(data);
+        }
         /// <summary>
         /// Update due date invoice và công nợ quá hạn sau khi update HĐ
         /// </summary>
@@ -170,9 +147,17 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost("UpdateDueDateAndOverDaysAfterChangePaymentTerm")]
         [Authorize]
-        public IActionResult UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
+        public async Task<IActionResult> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
         {
-            var result = accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            var result = await accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            List<string> partnerIds = new List<string> { contractModel.PartnerId };
+          
+            Response.OnCompleted(async () =>
+            {
+                CalculateOverDue1To15(partnerIds);
+                CalculateOverDue15To30(partnerIds);
+                CalculateOverDue30(partnerIds);
+            });
             return Ok(result);
         }
 
@@ -234,9 +219,24 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPut("CalculateDebitAmount")]
-        public IActionResult CalculateDebitAmount([FromBody] List<string> partnerIds)
+        public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
-            var hs = accountReceivableService.CalculatorReceivableDebitAmount(partnerIds);
+            var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
+
+        [HttpPut("MoveSalesmanReceivableData")]
+        [Authorize]
+        public async Task<IActionResult> MoveSalesmanReceivableData(AccountReceivableMoveDataSalesman model)
+        {
+            var hs = await accountReceivableService.MoveReceivableData(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             if (hs.Success)

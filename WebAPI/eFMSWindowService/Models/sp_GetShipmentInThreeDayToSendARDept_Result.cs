@@ -39,6 +39,7 @@ namespace eFMSWindowService.Models
         public decimal Over16To30Day { get; set; }
         public decimal Over30Day { get; set; }
         public string TaxCode { get; set; }
+        public string AREmail { get; set; }
     }
 
 
@@ -53,6 +54,7 @@ namespace eFMSWindowService.Models
         public decimal CreditRate { get; set; }
         public decimal? CreditLimit { get; set; }
         public decimal DebitAmount { get; set; }
+        public string AREmail { get; set; }
     }
     
     public partial class sp_GetExpiredContract_Result

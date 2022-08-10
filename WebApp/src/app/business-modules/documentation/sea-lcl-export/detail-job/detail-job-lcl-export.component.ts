@@ -9,7 +9,7 @@ import { CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -31,14 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
-    @ViewChild("confirmCancelPopup") confirmCancelPopup: ConfirmPopupComponent;
-
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -67,6 +59,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     ) {
         super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
         this._progressRef = this._ngProgressService.ref();
+        this.requestCancel = this.handleCancelForm;
 
     }
 
@@ -94,7 +87,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    if (this.selectedTab === this.tabList[0]) {
+                        this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    }
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
 
                     this.getDetailSeaLCLExport();
@@ -132,7 +127,10 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         [this.formCreateComponent.isSubmitted, this.shipmentGoodSummaryComponent.isSubmitted] = [true, true];
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
 
@@ -145,6 +143,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+        modelAdd.isLocked = this.shipmentDetail.isLocked;
 
 
         if (this.ACTION === 'COPY') {
@@ -235,7 +234,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -266,33 +265,24 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             )
             .subscribe((value: number) => {
                 if (value === 403) {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
                     return;
                 }
                 if (value === 200) {
-                    this.confirmDeleteJobPopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You you sure you want to delete this Job?',
+                        title: 'Alert',
+                        labelConfirm: 'Yes',
+                    }, () => {
+                        this.onDeleteJob();
+                    });
                     return;
                 } else {
-                    this.canNotDeleteJobPopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'You are not allowed to delete this job?',
+                    });
                 }
             });
-    }
-
-    deleteJob() {
-        this._progressRef.start();
-        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmDeleteJobPopup.show();
-                    } else {
-                        this.canNotDeleteJobPopup.show();
-                    }
-                },
-            );
     }
 
     onDeleteJob() {
@@ -302,7 +292,6 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.confirmDeleteJobPopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -317,23 +306,54 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     showDuplicateConfirm() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Duplicate job detail',
+            body: 'The system will open the Job Create Screen. Are you sure you want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.duplicateConfirm();
+        });
     }
 
     duplicateConfirm() {
-        this.action = { action: 'copy' };
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
-        });
-        this.confirmDuplicatePopup.hide();
+        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'SLE')
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((partnerIds: string[]) => {
+                    if (!!partnerIds.length) {
+                        const criteria: DocumentationInterface.ICheckPointCriteria = {
+                            data: partnerIds,
+                            transactionType: 'DOC',
+                            type: 5,
+                            settlementCode: null,
+                        };
+                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                    }
+                    return of({ data: null, message: null, status: true });
+                })
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.action = { action: 'copy' };
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], {
+                            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+                        });
+                    }
+                }
+            )
+
     }
 
     lockShipment() {
-        this.confirmLockPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to lock this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onLockShipment();
+        });
     }
 
     onLockShipment() {
-        this.confirmLockPopup.hide();
 
         this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
@@ -355,10 +375,23 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             );
     }
 
+    showSyncHBL() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Sync HAWB',
+            body: this.confirmSyncHBLText,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onSyncHBL();
+        })
+    }
+
     onSyncHBL() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Update Job',
+                body: this.invalidFormText
+            });
             return;
         }
         const modelAdd = this.onSubmitData();
@@ -400,7 +433,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -411,7 +444,12 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
         if (isEdited) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            });
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -419,7 +457,6 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     confirmCancel() {
-        this.confirmCancelPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -437,7 +474,12 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
 
         if (isEdited && !this.isCancelFormPopupSuccess) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            });
             return;
         }
         return of(!isEdited);
@@ -445,7 +487,21 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 }

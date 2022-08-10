@@ -36,7 +36,6 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal PreviewAccountStatementFull(string soaNo);
         List<Guid> GetSurchargeIdBySoaId(string soaId);
         HandleState RejectSoaCredit(RejectSoaModel model);
-        List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo);
         AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results);
         HandleState ValidateCheckPointPartnerSOA(AcctSoa soa);
         AdjustModel GetAdjustDebitValue(AdjustModel model);

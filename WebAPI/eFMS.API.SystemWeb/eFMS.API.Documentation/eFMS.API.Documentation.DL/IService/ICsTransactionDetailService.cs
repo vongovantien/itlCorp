@@ -4,6 +4,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -20,7 +21,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
         HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
         string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum);
-        HandleState DeleteTransactionDetail(Guid hbId);
+        HandleState DeleteTransactionDetail(Guid hbId, out List<ObjectReceivableModel> receivables);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
         
@@ -65,5 +66,6 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
 
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
+        IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId);
     }
 }

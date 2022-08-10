@@ -18,6 +18,9 @@ namespace eFMS.API.Accounting.DL.Common
                     break;
                 case ARTypeEnum.Other:
                     result = TermData.AR_Other;
+                    break;           
+                case ARTypeEnum.NoAgreement:
+                    result = TermData.AR_NoAgreement;
                     break;
             }
             return result;

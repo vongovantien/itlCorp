@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
+using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
@@ -4948,39 +4949,40 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Width = 14; //Cột E
             workSheet.Column(6).Width = 14; //Cột F
             workSheet.Column(7).Width = 14; //Cột G
-            workSheet.Column(8).Width = 18; //Cột H
-            workSheet.Column(9).Width = 19; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
-            workSheet.Column(11).Width = 12; //Cột K
-            workSheet.Column(12).Width = 20; //Cột L
-            workSheet.Column(13).Width = 10; //Cột M
-            workSheet.Column(14).Width = 16; //Cột N
-            workSheet.Column(15).Width = 15; //Cột O
-            workSheet.Column(16).Width = 15; //Cột P
-            workSheet.Column(17).Width = 20; //Cột Q
-            workSheet.Column(18).Width = 20; //Cột R
-            workSheet.Column(19).Width = 20; //Cột S
-            workSheet.Column(20).Width = 20; //Cột T
-            workSheet.Column(21).Width = 15; //Cột U
-            workSheet.Column(22).Width = 30; //Cột V
-            workSheet.Column(23).Width = 16; //Cột W
-            workSheet.Column(24).Width = 14; //Cột X
-            workSheet.Column(25).Width = 18; //Cột Y
-            workSheet.Column(26).Width = 10; //Cột Z
-            workSheet.Column(27).Width = 12; //Cột AA
-            workSheet.Column(28).Width = 8; //Cột AB
-            workSheet.Column(29).Width = 10; //Cột AC
-            workSheet.Column(30).Width = 14; //Cột AD
-            workSheet.Column(31).Width = 10; //Cột AE
-            workSheet.Column(32).Width = 15; //Cột AF
-            workSheet.Column(33).Width = 12; //Cột AG
-            workSheet.Column(34).Width = 10; //Cột AH
-            workSheet.Column(35).Width = 10; //Cột AI
-            workSheet.Column(36).Width = 30; //Cột AJ
-            workSheet.Column(37).Width = 15; //Cột AK
-            workSheet.Column(38).Width = 18; //Cột AL
-            workSheet.Column(39).Width = 20; //Cột AM
-            workSheet.Column(40).Width = 25; //Cột AN
+            workSheet.Column(8).Width = 14; //Cột H
+            workSheet.Column(1 + 8).Width = 18; //Cột 1+H
+            workSheet.Column(1 + 9).Width = 19; //Cột 1+I
+            workSheet.Column(1 + 10).Width = 15; //Cột 1+J
+            workSheet.Column(1 + 11).Width = 12; //Cột 1+K
+            workSheet.Column(1 + 12).Width = 20; //Cột 1+L
+            workSheet.Column(1 + 13).Width = 10; //Cột 1+M
+            workSheet.Column(1 + 14).Width = 16; //Cột 1+N
+            workSheet.Column(1 + 15).Width = 15; //Cột 1+O
+            workSheet.Column(1 + 16).Width = 15; //Cột 1+P
+            workSheet.Column(1 + 17).Width = 20; //Cột 1+Q
+            workSheet.Column(1 + 18).Width = 20; //Cột 1+R
+            workSheet.Column(1 + 19).Width = 20; //Cột 1+S
+            workSheet.Column(1 + 20).Width = 20; //Cột 1+T
+            workSheet.Column(1 + 21).Width = 15; //Cột 1+U
+            workSheet.Column(1 + 22).Width = 30; //Cột 1+V
+            workSheet.Column(1 + 23).Width = 16; //Cột 1+W
+            workSheet.Column(1 + 24).Width = 14; //Cột 1+X
+            workSheet.Column(1 + 25).Width = 18; //Cột 1+Y
+            workSheet.Column(1 + 26).Width = 10; //Cột 1+Z
+            workSheet.Column(1 + 27).Width = 12; //Cột 1+AA
+            workSheet.Column(1 + 28).Width = 8; //Cột 1+AB
+            workSheet.Column(1 + 29).Width = 10; //Cột 1+AC
+            workSheet.Column(1 + 30).Width = 14; //Cột 1+AD
+            workSheet.Column(1 + 31).Width = 10; //Cột 1+AE
+            workSheet.Column(1 + 32).Width = 15; //Cột 1+AF
+            workSheet.Column(1 + 33).Width = 12; //Cột 1+AG
+            workSheet.Column(1 + 34).Width = 10; //Cột 1+AH
+            workSheet.Column(1 + 35).Width = 10; //Cột 1+AI
+            workSheet.Column(1 + 36).Width = 30; //Cột 1+AJ
+            workSheet.Column(1 + 37).Width = 15; //Cột 1+AK
+            workSheet.Column(1 + 38).Width = 18; //Cột 1+AL
+            workSheet.Column(1 + 39).Width = 20; //Cột 1+AM
+            workSheet.Column(1 + 40).Width = 25; //Cột 1+AN
         }
 
         private void BindingDataAccoutingManagementExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
@@ -5113,8 +5115,9 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
             workSheet.Column(6).Width = 20; //Cột F
-            workSheet.Column(7).Width = 20; //Cột F
-            workSheet.Column(13).Width = 20; //Cột M
+            workSheet.Column(7).Width = 20; //Cột G
+            workSheet.Column(8).Width = 20; //Cột H
+            workSheet.Column(14).Width = 20; //Cột M
             List<string> headers = new List<string>
             {
                 "JobNo",//0
@@ -5123,21 +5126,22 @@ namespace eFMS.API.ReportData.FormatExcel
                 "HBLNo",//3
                 "VoucherID",//4
                 "Accounting Date",//5
-                "Reference No",//6
-                "Code_Type",//7
-                "ChargeType",//8
-                "PayerID",//9
-                "Payer_Name",//10
-                "PartnerType",//11
-                "Curr",//12
-                "Amount",//13
-                "Issued_by",//14
-                "BU",//15
-                "Service Date",//16
-                "Issue Date",//17
-                "Account No",//18
-                "ETD",//19
-                "ETA"//20
+                "CD Note",//6
+                "SOA",//7
+                "Code_Type",//1+7
+                "ChargeType",//1+8
+                "PayerID",//1+9
+                "Payer_Name",//1+10
+                "PartnerType",//1+11
+                "Curr",//1+12
+                "Amount",//1+13
+                "Issued_by",//1+14
+                "BU",//1+15
+                "Service Date",//1+16
+                "Issue Date",//1+17
+                "Account No",//1+18
+                "ETD",//1+19
+                "ETA"//1+20
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -5161,63 +5165,47 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
                 workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 8].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 9].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 10].Value = item.PayerId;
-                workSheet.Cells[rowStart, 11].Value = item.PayerName;
-                workSheet.Cells[rowStart, 12].Value = item.PayerType;
-                workSheet.Cells[rowStart, 13].Value = item.Currency;
+                workSheet.Cells[rowStart, 8].Value = item.SoaNo;
+                workSheet.Cells[rowStart, 1 + 8].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 1 + 9].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 1 + 10].Value = item.PayerId;
+                workSheet.Cells[rowStart, 1 + 11].Value = item.PayerName;
+                workSheet.Cells[rowStart, 1 + 12].Value = item.PayerType;
+                workSheet.Cells[rowStart, 1 + 13].Value = item.Currency;
 
-                workSheet.Cells[rowStart, 14].Value = item.Amount;
-                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
+                workSheet.Cells[rowStart, 1 + 14].Value = item.Amount;
+                workSheet.Cells[rowStart, 1 + 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
 
-                workSheet.Cells[rowStart, 15].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 16].Value = item.Bu;
-                workSheet.Cells[rowStart, 17].Value = item.ServiceDate;
-                workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 18].Value = item.IssueDate;
-                workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 15].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 1 + 16].Value = item.Bu;
+                workSheet.Cells[rowStart, 1 + 17].Value = item.ServiceDate;
+                workSheet.Cells[rowStart, 1 + 17].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 18].Value = item.IssueDate;
+                workSheet.Cells[rowStart, 1 + 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
-                workSheet.Cells[rowStart, 19].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 20].Value = item.ETD;
-                workSheet.Cells[rowStart, 20].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 21].Value = item.ETA;
-                workSheet.Cells[rowStart, 21].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 19].Value = item.AccountNo;
+                workSheet.Cells[rowStart, 1 + 20].Value = item.ETD;
+                workSheet.Cells[rowStart, 1 + 20].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 1 + 21].Value = item.ETA;
+                workSheet.Cells[rowStart, 1 + 21].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
-        //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
-        //{
-        //    try
-        //    {
-        //        using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
-        //        {
-        //            excelPackage.Workbook.Worksheets.Add("Sheet1");
-        //            var workSheet = excelPackage.Workbook.Worksheets.First();
-        //            if (arType == ARTypeEnum.TrialOrOffical)
-        //            {
-        //                BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
-        //            }else if (arType == ARTypeEnum.Other)
-        //            {
-        //                BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
-        //            }
-        //            excelPackage.Save();
-        //            return excelPackage.Stream;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-        //    return null;
-        //}
+        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
+        {
+            if (arType == ARTypeEnum.TrialOrOffical)
+                return GenerateAccountingReceivableArSumary(acctMngts);
+            else if (arType == ARTypeEnum.NoAgreement)
+                return GenerateAccountingReceivableArSumaryNoAgrement(acctMngts);
+            return null;
+        }
 
         public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result)
         {
@@ -5301,6 +5289,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("ContractType", item.AgreementType);
                     listKeyData.Add("Status", item.AgreementStatus);
                     listKeyData.Add("ContractNo", item.AgreementNo);
+                    listKeyData.Add("ShipmentType", item.ShipmentType);
                     listKeyData.Add("ExpDate", item.ExpriedDate);
                     listKeyData.Add("ExpDay", item.ExpriedDay);
                     listKeyData.Add("ParentPartner", item.ParentNameAbbr);
@@ -5335,7 +5324,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
                 var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
                 //Set Title
-                excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                if(!string.IsNullOrEmpty(debitType))
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail - " + debitType.ToUpper();
+                } else
+                {
+                    excel.Worksheet.Cells[1, 5].Value = "Debit Detail";
+                }
                 var rowStart = 4;
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5353,6 +5348,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("PaidUSD", item.PaidAmountUSD);
                     listKeyData.Add("UnpaidVND", item.UnpaidAmountVND);
                     listKeyData.Add("UnpaidUSD", item.UnpaidAmountUSD);
+                    listKeyData.Add("Services", item.Service);
+                    listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("OverdueDays", item.OverdueDays);
                     listKeyData.Add("DueDate", item.PaymentDueDate);
                     listKeyData.Add("Office", item.Code);
@@ -5614,6 +5611,173 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        //private string FormatNumberByCurrency(decimal? numberIn,string currency) 
+        //{
+        //    if (currency == "VND")
+        //    {
+        //        return numberIn > 0 ? String.Format("{0:n0}", numberIn) : "(" + String.Format("{0:n0}", numberIn*-1) + ")";
+        //    }
+        //    return numberIn > 0 ? String.Format("{0:n}", numberIn) : "(" + String.Format("{0:n}", numberIn*-1) + ")";
+        //}
+
+        private string DistinctInvoice(string invoiceNos)
+        {
+            if (string.IsNullOrEmpty(invoiceNos)){
+                return null;
+            }
+            var itemINV = invoiceNos.Split(';').Distinct();
+            string result = "";
+            foreach(var item in itemINV.ToList())
+            {
+                result += item + ';';
+            }
+            return result.Remove(result.Length-1);
+        }
+        public Stream GenerateCombineShipmentExcel(CombineShipmentModel combineshipment, AcctCombineBillingCriteria criteria)
+        {
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, criteria.Currency=="VND"? ResourceConsts.CombineBillingByShipmentVND:ResourceConsts.CombineBillingByShipmentUSD));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 5;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("Date", "Từ Ngày: " + combineshipment.FromDate?.ToString("dd/MM/yyyy") + " đến:  " + combineshipment.ToDate?.ToString("dd/MM/yyyy"));
+                startRow++;
+                listKeyData.Add("SOANo", combineshipment.No);
+                startRow++;
+                listKeyData.Add("CompanyName", combineshipment.PartnerNameVN);
+                startRow++;
+                listKeyData.Add("CompanyAddress", combineshipment.BillingAddressVN);
+                excel.SetData(listKeyData);
+
+                startRow = 11;
+                excel.StartDetailTable = startRow;
+                decimal? PTSumTotal=0, CusFeeTotal = 0, CusVATTotal = 0, CusSumTotal = 0, AuthFeeTotal = 0, AuthVATTotal = 0, AuthSumTotal = 0, CusAuthSumTotal = 0, FreFeeTotal = 0, FreVATTotal = 0, FreSumTotal = 0;
+
+                if (combineshipment.exportShipment != null && combineshipment.exportShipment.Count>0)
+                {
+                    for (int i = 0; i < combineshipment.exportShipment.Count; i++)
+                    {
+                        var item = combineshipment.exportShipment[i];
+                        Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                        excel.SetGroupsTable();
+                        mappingKeyValue.Add("STT", i + 1);
+                        mappingKeyValue.Add("Commodity", item.CommodityName);
+                        mappingKeyValue.Add("JobNo", item.JobNo);
+                        mappingKeyValue.Add("CustomsDeclarationNo", item.CustomDeclarationNo);
+                        mappingKeyValue.Add("HBLNo", item.HwbNo);
+                        mappingKeyValue.Add("InvoiceNo", item.TransactionType=="CL"? (!string.IsNullOrEmpty(item.InvoiceNo) ? DistinctInvoice(item.InvoiceNo) +  (!string.IsNullOrEmpty(item.OBHInvoice) ? ";" + DistinctInvoice(item.OBHInvoice):"") : (!string.IsNullOrEmpty(item.OBHInvoice) ? DistinctInvoice(item.OBHInvoice) : "")) : (!string.IsNullOrEmpty(item.OBHInvoice) ?"OBH: " + DistinctInvoice(item.OBHInvoice):""));
+                        mappingKeyValue.Add("KGS", item.KGS);
+                        mappingKeyValue.Add("CBM", item.CBM);
+                        mappingKeyValue.Add("Container", item.PackageContainer);
+                        mappingKeyValue.Add("CusFee", item.CusFee );
+                        mappingKeyValue.Add("CusVAT", item.CusVAT);
+                        mappingKeyValue.Add("CusTotal", item.CusVAT+ item.CusFee);
+                        mappingKeyValue.Add("AuthFee", item.AuthFee);
+                        mappingKeyValue.Add("AuthVAT", item.AuthVAT);
+                        mappingKeyValue.Add("AuthTotal", item.AuthVAT+ item.AuthFee);
+                        mappingKeyValue.Add("CusAuthTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                        //mappingKeyValue.Add("FrieghtInvoice", item.FreInvoice);
+                        mappingKeyValue.Add("FreightFee", item.FreFee);
+                        mappingKeyValue.Add("FreightVAT", item.FreVAT);
+                        mappingKeyValue.Add("FreightTotal", item.FreVAT + item.FreFee);
+                        mappingKeyValue.Add("BillingNo", item.BillingNo);
+                        mappingKeyValue.Add("CombineNo", item.CombineNo);
+                        //mappingKeyValue.Add("OBHInvoice", item.OBHInvoice);
+                        mappingKeyValue.Add("PTTotal", item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                        mappingKeyValue.Add("FrieghtOBHInvoice", DistinctInvoice(item.FreInvoice));
+                        mappingKeyValue.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                        //CusFeeTotal += item.CusFee;
+                        //CusVATTotal += item.CusVAT;
+                        //CusSumTotal += (item.CusVAT != null ? item.CusVAT : 0) + (item.CusFee != null ? item.CusFee : 0);
+                        //AuthFeeTotal += item.AuthFee;
+                        //AuthVATTotal += item.AuthVAT;
+                        //AuthSumTotal += (item.AuthVAT + item.AuthFee);
+                        //CusAuthSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee);
+                        //FreFeeTotal += item.FreFee;
+                        //FreVATTotal += item.FreVAT;
+                        //FreSumTotal += (item.FreVAT + item.FreFee);
+                        //PTSumTotal += (item.AuthVAT + item.AuthFee + item.CusVAT + item.CusFee + item.FreFee + item.FreVAT);
+                        excel.SetData(mappingKeyValue);
+                        startRow++;
+                    }
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", CusFeeTotal);
+                    //mappingTotalValue.Add("CusVATTotal", CusVATTotal);
+                    //mappingTotalValue.Add("CusSumTotal", CusSumTotal);
+                    //mappingTotalValue.Add("AuthFeeTotal", AuthFeeTotal);
+                    //mappingTotalValue.Add("AuthVATTotal", AuthVATTotal);
+                    //mappingTotalValue.Add("AuthSumTotal", AuthSumTotal);
+                    //mappingTotalValue.Add("CusAuthSumTotal", CusAuthSumTotal);
+                    //mappingTotalValue.Add("FreFeeTotal", FreFeeTotal);
+                    //mappingTotalValue.Add("FreVATTotal", FreVATTotal);
+                    //mappingTotalValue.Add("FreSumTotal", FreSumTotal);
+                    //mappingTotalValue.Add("PTSumTotal", PTSumTotal);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total ("+criteria.Currency+")");
+                    //excel.SetData(mappingTotalValue);
+                }
+                else
+                {
+                    Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    mappingKeyValue.Add("STT", null);
+                    mappingKeyValue.Add("Commodity", null);
+                    mappingKeyValue.Add("JobNo", null);
+                    mappingKeyValue.Add("CustomsDeclarationNo", null);
+                    mappingKeyValue.Add("HBLNo", null);
+                    mappingKeyValue.Add("InvoiceNo", null);
+                    mappingKeyValue.Add("KGS", null);
+                    mappingKeyValue.Add("CBM", null);
+                    mappingKeyValue.Add("Container", null);
+                    mappingKeyValue.Add("CusFee", null);
+                    mappingKeyValue.Add("CusVAT", null);
+                    mappingKeyValue.Add("CusTotal", null);
+                    mappingKeyValue.Add("AuthFee", null);
+                    mappingKeyValue.Add("AuthVAT", null);
+                    mappingKeyValue.Add("AuthTotal", null);
+                    mappingKeyValue.Add("CusAuthTotal", null);
+                    mappingKeyValue.Add("FrieghtInvoice", null);
+                    mappingKeyValue.Add("FreightFee", null);
+                    mappingKeyValue.Add("FreightVAT", null);
+                    mappingKeyValue.Add("FreightTotal", null);
+                    mappingKeyValue.Add("BillingNo", null);
+                    mappingKeyValue.Add("CombineNo", null);
+                    mappingKeyValue.Add("OBHInvoiceNo", null);
+                    mappingKeyValue.Add("PTTotal", "-");
+                    mappingKeyValue.Add("FrieghtOBHInvoice", null);
+                    mappingKeyValue.Add("ServiceDate", null);
+                    //Dictionary<string, object> mappingTotalValue = new Dictionary<string, object>();
+                    //mappingTotalValue.Add("CusFeeTotal", null);
+                    //mappingTotalValue.Add("CusVATTotal", null);
+                    //mappingTotalValue.Add("CusSumTotal", null);
+                    //mappingTotalValue.Add("AuthFeeTotal", null);
+                    //mappingTotalValue.Add("AuthVATTotal", null);
+                    //mappingTotalValue.Add("AuthSumTotal", null);
+                    //mappingTotalValue.Add("CusAuthSumTotal", null);
+                    //mappingTotalValue.Add("FreFeeTotal", null);
+                    //mappingTotalValue.Add("FreVATTotal", null);
+                    //mappingTotalValue.Add("FreSumTotal", null);
+                    //mappingTotalValue.Add("PTSumTotal", null);
+                    //mappingTotalValue.Add("LabelTotal", "Tổng cộng/Total (" + criteria.Currency + ")");
+                    //excel.SetData(mappingTotalValue);
+                    excel.SetData(mappingKeyValue);
+                }
+                
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
         public Stream GenerateCombineOPSExcel(CombineOPSModel result, AcctCombineBillingCriteria criteria, Stream stream = null)
         {
             try
@@ -5670,7 +5834,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "SOA/CD Note", // 12
                "Số HĐ/Invoice No", // 13
                "Ngày HĐ/Invoice Date", // 14
-               "Reference No/Số tham chiếu" // 15
+               "Reference No/Số tham chiếu" ,// 15
+               "Service Date/Ngày dịch vụ"//16
             };
 
             List<string> subheaderTable = new List<string>()
@@ -5745,6 +5910,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["S9:S10"].Merge = true;
             workSheet.Cells["T9:T10"].Merge = true;
             workSheet.Cells["U9:U10"].Merge = true;
+            workSheet.Cells["V9:V10"].Merge = true;
 
             // Tạo header
             int colNum = 1;
@@ -5787,10 +5953,10 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["O10"].Value = subheaderTable[4];
             workSheet.Cells["P10"].Value = subheaderTable[5];
 
-            workSheet.Cells[9, 1, 10, 21].Style.Font.Bold = true;
-            workSheet.Cells[9, 1, 10, 21].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[9, 1, 10, 21].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[9, 1, 10, 21].Style.WrapText = true;
+            workSheet.Cells[9, 1, 10, 22].Style.Font.Bold = true;
+            workSheet.Cells[9, 1, 10, 22].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 22].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[9, 1, 10, 22].Style.WrapText = true;
 
             int addressStartContent = 11;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
@@ -5809,8 +5975,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 for (int i = 0; i < lstSoa.exportOPS.Count; i++)
                 {
                     var item = lstSoa.exportOPS[i];
-                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 21].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 21].Style.Fill.BackgroundColor.SetColor(colFromHex);
+                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 22].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    workSheet.Cells[i + addressStartContent, 1, i + addressStartContent, 22].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
                     workSheet.Cells[i + addressStartContent, 2].Value = item.CommodityName;
                     workSheet.Cells[i + addressStartContent, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -5848,9 +6014,10 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = formatNumberStr;
 
                     workSheet.Cells[i + addressStartContent, 18].Value = item.Charges.Select(t => t.CombineBillingType).FirstOrDefault() == "SOA" ? item.Charges.Select(t => t.SOANo).FirstOrDefault() : item.Charges.Select(t => t.CDNote).FirstOrDefault();
-                    workSheet.Cells[i + addressStartContent, 19].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
+                    workSheet.Cells[i + addressStartContent, 19].Value = DistinctInvoice(string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)));
                     workSheet.Cells[i + addressStartContent, 20].Value = "";
                     workSheet.Cells[i + addressStartContent, 21].Value = item.Charges.Select(t => t.CombineNo).FirstOrDefault();
+                    workSheet.Cells[i + addressStartContent, 22].Value = item.Charges.Select(t => t.ServiceDate?.ToString("dd/MM/yyyy")).FirstOrDefault();
 
                     for (int j = 0; j < item.Charges.Count; j++)
                     {
@@ -5908,9 +6075,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 addressStartContent = addressStartContent + lstSoa.exportOPS.Count;
 
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[9, 1, addressStartContent, 21].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[9, 1, addressStartContent, 22].Style.Border.Top.Style = ExcelBorderStyle.Thin;
 
 
                 workSheet.Cells[addressStartContent, 1].Value = headers[3]; //Total
@@ -6007,6 +6174,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Column(19).Width = 20; //Cột S
                 workSheet.Column(20).Width = 20; //Cột T
                 workSheet.Column(21).Width = 16; //Cột U
+                workSheet.Column(22).Width = 20; //Cột V
                 workSheet.Cells[addressTotal].Style.Font.Bold = true;
             }
         }
@@ -6140,6 +6308,186 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumPaidVndGrp", sumPaidVnd);
                 listKeyTotal.Add("SumRemainVndGrp", sumRemainVnd);
                 excel.SetData(listKeyTotal);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+
+        private string convertServiceType(string serviceCode)
+        {
+            switch (serviceCode)
+            {
+                case "AE":
+                    return "Air Export";
+                case "AI":
+                    return "Air Import";
+                case "CL":
+                    return "Custom Logistic";
+                case "SCE":
+                    return "Sea Consol Export";
+                case "SCI":
+                    return "Sea Consol Import";
+                case "SFE":
+                    return "Sea FCL Export";
+                case "SFI":
+                    return "Sea FCL Import";
+                case "SLE":
+                    return "Sea LCL Export";
+                case "SLI":
+                    return "Sea LCL Import";
+                default: return null;
+            }
+
+        }
+
+        //private bool compareDebitAmountDetailByContract(DebitAmountDetailByContractModel obj1, DebitAmountDetailByContractModel obj2)
+        //{
+        //    return obj1.JobNo == obj2.JobNo && obj1.HBLNo == obj2.HBLNo && obj2.MBLNo == obj1.MBLNo && obj1.DebitNo == obj2.DebitNo && obj1.OfficeName == obj2.OfficeName && obj1.TransactionType == obj2.TransactionType
+        //        && obj1.PaymentStatus == obj2.PaymentStatus && obj1.Type == obj2.Type&&obj1.InvoiceNo==obj2.InvoiceNo;
+        //}
+
+        //private List<DebitAmountDetailByContractModel> groupDebitAmountDetails(List<DebitAmountDetailByContractModel> debitAmountDetailByContractModels)
+        //{
+        //    for (int i = 0; i < debitAmountDetailByContractModels.Count-2; i++)
+        //    {
+        //        for(int j = i + 1; j < debitAmountDetailByContractModels.Count - 1; j++){
+        //            if (compareDebitAmountDetailByContract(debitAmountDetailByContractModels[i], debitAmountDetailByContractModels[j]))
+        //            {
+        //                debitAmountDetailByContractModels[i].TotalUSD += debitAmountDetailByContractModels[j].TotalUSD;
+        //                debitAmountDetailByContractModels[i].TotalVND += debitAmountDetailByContractModels[j].TotalVND;
+        //                debitAmountDetailByContractModels.RemoveAt(j);
+        //                j--;
+        //            }
+        //        }
+        //    }
+        //    return debitAmountDetailByContractModels;
+        //}
+
+        /// <summary>
+        /// Generate Export Generate Export Debit Amount Detail Report
+        /// </summary>
+        /// <param name="agreementId"></param>
+        /// <returns></returns>
+        public Stream GenerateExportDebitAmountDetail(DebitAmountDetail debitAmountDetail)
+        {
+
+            var folderOfFile = GetFolderInTemplateExport("AR");
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.DebitAmountDetailByContract));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
+            try
+            {
+                int startRow = 3;
+                var listKeyData = new Dictionary<string, object>();
+                Double SumTotalVND = 0, SumTotalUSD = 0, PaidAmountVND = 0, PaidAmountUSD = 0, DebitAmountVND = 0, DebitAmountUSD = 0;
+                //listKeyData.Add("PartnerCode", string.Format("From date: {0} To date: {0}", DateTime.Parse(criteria.FromPaymentDate).ToString("dd/MM/yyyy"), DateTime.Parse(criteria.ToPaymentDate).ToString("dd/MM/yyyy")));
+                listKeyData.Add("PartnerCode", debitAmountDetail.DebitAmountGeneralInfo.PartnerCode);
+                listKeyData.Add("ContractNo", debitAmountDetail.DebitAmountGeneralInfo.ContractNo);
+                startRow++;
+                listKeyData.Add("PartnerName", debitAmountDetail.DebitAmountGeneralInfo.PartnerName);
+                listKeyData.Add("EffectiveDate", debitAmountDetail.DebitAmountGeneralInfo.EffectiveDate?.ToString("dd/MM/yyyy"));
+                startRow++;
+                listKeyData.Add("ContractType", debitAmountDetail.DebitAmountGeneralInfo.ContracType);
+                listKeyData.Add("ExpiredDate", debitAmountDetail.DebitAmountGeneralInfo.ExpiredDate?.ToString("dd/MM/yyyy"));
+                excel.SetData(listKeyData);
+
+                startRow = 8;
+                excel.StartDetailTable = startRow;
+
+                if (debitAmountDetail.DebitAmountDetails.Count == 0)
+                {
+                    listKeyData = new Dictionary<string, object>();
+
+                    excel.SetGroupsTable();
+                    listKeyData.Add("No", 0);
+                    listKeyData.Add("JobNo", "");
+                    listKeyData.Add("HblNo", "");
+                    listKeyData.Add("MblNo", "");
+                    listKeyData.Add("BillingNo", "");
+                    listKeyData.Add("Type", "");
+                    listKeyData.Add("InvoiceNo", "");
+                    listKeyData.Add("TotalVND", 0);
+                    listKeyData.Add("TotalUSD", 0);
+                    listKeyData.Add("Office", "");
+                    listKeyData.Add("SalesMan", "");
+                    listKeyData.Add("ServiceDate", "");
+                    listKeyData.Add("ETD", "");
+                    listKeyData.Add("ETA", "");
+                    listKeyData.Add("Service","");
+                    listKeyData.Add("InvoicePaymentStatus", "");
+                }
+                else
+                {
+                    //debitAmountDetail.DebitAmountDetails = groupDebitAmountDetails(debitAmountDetail.DebitAmountDetails);
+                    for (int i = 0; i < debitAmountDetail.DebitAmountDetails.Count; i++)
+                    {
+                        var item = debitAmountDetail.DebitAmountDetails[i];
+                        listKeyData = new Dictionary<string, object>();
+                        excel.SetGroupsTable();
+                        listKeyData.Add("No", i + 1);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("HblNo", item.HBLNo);
+                        listKeyData.Add("MblNo", item.MBLNo);
+                        listKeyData.Add("BillingNo", item.DebitNo);
+                        listKeyData.Add("Type", item.Type == "SELL" ? "DEBIT" : "OBH");
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                        listKeyData.Add("TotalVND", item.TotalVND);
+                        listKeyData.Add("TotalUSD", item.TotalUSD);
+                        listKeyData.Add("Office", item.OfficeName);
+                        listKeyData.Add("SalesMan", item.UserName);
+                        listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETD", item.ETD?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETA", item.ETA?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("Service", convertServiceType(item.TransactionType));
+                        listKeyData.Add("InvoicePaymentStatus", item.PaymentStatus);
+                        SumTotalUSD += item.TotalUSD;
+                        SumTotalVND += item.TotalVND;
+                        //PaidAmountUSD += item.PaidAmountUSD != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountVND += item.PaidAmountVND != debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountVND ? debitAmountDetail.DebitAmountDetails[i < debitAmountDetail.DebitAmountDetails.Count - 1 ? i + 1 : i].PaidAmountUSD : 0;
+                        //PaidAmountUSD += item.PaidAmountUSD;
+                        //PaidAmountVND += item.PaidAmountVND;
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
+                }
+                PaidAmountUSD = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountUSD);
+                PaidAmountVND = debitAmountDetail.DebitAmountDetails.Where(x => x.PaymentStatus == "Paid A Part").GroupBy(x => new { x.InvoiceNo, x.OfficeName }).Sum(x => x.FirstOrDefault().PaidAmountVND);
+                DebitAmountUSD = SumTotalUSD - PaidAmountUSD;
+                DebitAmountVND = SumTotalVND - PaidAmountVND;
+                startRow++;
+                listKeyData.Add("SumTotalVND", SumTotalVND);
+                listKeyData.Add("SumTotalUSD", SumTotalUSD);
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("PaidAmountVND", PaidAmountVND);
+                    listKeyData.Add("PaidAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("PaidAmountVND", null);
+                    listKeyData.Add("PaidAmountUSD", PaidAmountUSD);
+                }
+                startRow++;
+                if (debitAmountDetail.DebitAmountGeneralInfo.Currency == "VND")
+                {
+                    listKeyData.Add("DebitAmountVND", DebitAmountVND);
+                    listKeyData.Add("DebitAmountUSD", null);
+                }
+                else
+                {
+                    listKeyData.Add("DebitAmountVND", null);
+                    listKeyData.Add("DebitAmountUSD", DebitAmountUSD);
+                }
+                excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -6291,6 +6639,84 @@ namespace eFMS.API.ReportData.FormatExcel
             catch (Exception ex)
             {
                 excel.PackageExcel.Dispose();
+                return null;
+            }
+        }
+        public Stream GenerateAccountingReceivableArSumaryNoAgrement(List<AccountReceivableResultExport> result)
+        {
+            try
+            {
+                var folderOfFile = GetFolderInTemplateExport("AR");
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, ResourceConsts.AR_SUMMARY_TEMPLATE_NO_ARGEEMENT));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 3;
+
+                excel.StartDetailTable = 3;
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                 
+                var rowStart = 3;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", i + 1);
+                    listKeyData.Add("PartnerId", item.PartnerCode);
+                    listKeyData.Add("PartnerName", item.PartnerNameEn);
+
+                    if (item.ArCurrency == "VND")
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountVND;
+                    }
+                    else
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 11].Style.Numberformat.Format = formatAmountUSD;
+                    }
+
+                    listKeyData.Add("Curr", item.ArCurrency);
+                    listKeyData.Add("ServiceName", item.ArServiceName);
+                    listKeyData.Add("ArSalesmanName", item.ArSalesmanName);
+                    excel.SetData(listKeyData);
+                    excel.Worksheet.Cells.AutoFitColumns();
+                    rowStart++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }

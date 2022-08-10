@@ -134,6 +134,63 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        private ResultHandle CheckValidAdvancePayment(AcctAdvancePaymentModel model)
+        {
+            if (model.AdvanceRequests.Count > 0)
+            {
+                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+                if (currentUser.Action == "AddAcctAdvancePayment")
+                {
+                    if (model.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+                    {
+                        var totalAmount = model.AdvanceRequests.Sum(z => z.Surcharge.Sum(x => x.Total));
+                        if (totalAmount > 100000000)
+                        {
+                            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+                            return _result;
+                        }
+                    }
+                }
+                else
+                {
+                    if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+                    {
+                        var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                        if (totalAmount > 100000000)
+                        {
+                            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+                            return _result;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(model.AdvanceFor))
+                {
+                    //Check Duplicate phí
+                    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+                    if (!string.IsNullOrEmpty(messDuplicateCharge))
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+                        return _result;
+                    }
+                }
+            }
+            return new ResultHandle();
+        }
+
+        [HttpPost]
+        [Route("CheckIfInvalidFeeShipmentAdv")]
+        public IActionResult CheckIfInvalidFeeShipmentAdv(AcctAdvancePaymentModel model)
+        {
+            // Check if Cost > Sell
+            var messInvalidShipment = acctAdvancePaymentService.CheckValidFeesOnShipment(model);
+            var _result = new ResultHandle() { Status = true };
+            if (!string.IsNullOrEmpty(messInvalidShipment))
+            {
+                _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
+            }
+            return Ok(_result);
+        }
+
         /// <summary>
         /// add new advance payment (include advance request)
         /// </summary>
@@ -146,30 +203,37 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             currentUser.Action = "AddAcctAdvancePayment";
-            if (model.AdvanceRequests.Count > 0)
+            ResultHandle _result = CheckValidAdvancePayment(model);
+            if (!string.IsNullOrEmpty(_result.Message))
             {
-                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
-                {
-                    var totalAmount = model.AdvanceRequests.Sum(z=>z.Surcharge.Sum(x => x.Total));
-                    if (totalAmount > 100000000)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
-                        return BadRequest(_result);
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(model.AdvanceFor))
-                {
-                    //Check Duplicate phí
-                    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
-                    if (!string.IsNullOrEmpty(messDuplicateCharge))
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
-                        return BadRequest(_result);
-                    }
-                }
+                return BadRequest(_result);
             }
+            #region
+            //if (model.AdvanceRequests.Count > 0)
+            //{
+            //    //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+            //    if (model.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+            //    {
+            //        var totalAmount = model.AdvanceRequests.Sum(z=>z.Surcharge.Sum(x => x.Total));
+            //        if (totalAmount > 100000000)
+            //        {
+            //            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+            //            return BadRequest(_result);
+            //        }
+            //    }
+
+            //    if (!string.IsNullOrEmpty(model.AdvanceFor))
+            //    {
+            //        //Check Duplicate phí
+            //        var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+            //        if (!string.IsNullOrEmpty(messDuplicateCharge))
+            //        {
+            //            ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+            //            return BadRequest(_result);
+            //        }
+            //    }
+            //}
+            #endregion
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
             if (hs.Code == 403)
             {
@@ -182,15 +246,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
-            }
+           
             return Ok(result);
         }
 
@@ -265,15 +321,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
-            }
+            
             return Ok(result);
         }
 
@@ -350,28 +398,35 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (model.AdvanceRequests.Count > 0)
+            ResultHandle _result = CheckValidAdvancePayment(model);
+            if (!string.IsNullOrEmpty(_result.Message))
             {
-                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
-                {
-                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
-                    if (totalAmount > 100000000)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
-                        return BadRequest(_result);
-                    }
-                }
+                return BadRequest(_result);
             }
-            if (!string.IsNullOrEmpty(model.AdvanceFor))
-            {
-                //Check Duplicate phí
-                var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
-                if (!string.IsNullOrEmpty(messDuplicateCharge))
-                {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
-                    return BadRequest(_result);
-                }
-            }
+            #region
+            //if (model.AdvanceRequests.Count > 0)
+            //{
+            //    if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+            //    {
+            //        var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+            //        if (totalAmount > 100000000)
+            //        {
+            //            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+            //            return BadRequest(_result);
+            //        }
+            //    }
+            //}
+            //if (!string.IsNullOrEmpty(model.AdvanceFor))
+            //{
+            //    //Check Duplicate phí
+            //    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+            //    if (!string.IsNullOrEmpty(messDuplicateCharge))
+            //    {
+            //        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+            //        return BadRequest(_result);
+            //    }
+            //}
+            #endregion
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             if (hs.Code == 403)
@@ -384,15 +439,6 @@ namespace eFMS.API.Accounting.Controllers
             if (!hs.Success)
             {
                 return BadRequest(result);
-            }
-            else
-            {
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-                   
-                });
             }
             return Ok(result);
         }
@@ -425,29 +471,36 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            if (model.AdvanceRequests.Count > 0)
+            ResultHandle resultCheckValid = CheckValidAdvancePayment(model);
+            if (!string.IsNullOrEmpty(resultCheckValid.Message))
             {
-                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
-                {
-                    var totalAmount = model.AdvanceRequests.Select(s => s.Amount).Sum();
-                    if (totalAmount > 100000000)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
-                        return BadRequest(_result);
-                    }
-                }
-                if (!string.IsNullOrEmpty(model.AdvanceFor))
-                {
-                    //Check Duplicate phí
-                    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
-                    if (!string.IsNullOrEmpty(messDuplicateCharge))
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
-                        return BadRequest(_result);
-                    }
-                }
+                return BadRequest(resultCheckValid);
             }
+            #region
+            //if (model.AdvanceRequests.Count > 0)
+            //{
+            //    //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+            //    if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+            //    {
+            //        var totalAmount = model.AdvanceRequests.Select(s => s.Amount).Sum();
+            //        if (totalAmount > 100000000)
+            //        {
+            //            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+            //            return BadRequest(_result);
+            //        }
+            //    }
+            //    if (!string.IsNullOrEmpty(model.AdvanceFor))
+            //    {
+            //        //Check Duplicate phí
+            //        var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+            //        if (!string.IsNullOrEmpty(messDuplicateCharge))
+            //        {
+            //            ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+            //            return BadRequest(_result);
+            //        }
+            //    }
+            //}
+            #endregion
 
             #region -- Check Validate Email Requester --
             var isValidEmail = acctAdvancePaymentService.CheckValidateMailByUserId(model.Requester);
@@ -555,13 +608,6 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
-
-                Response.OnCompleted(async () =>
-                {
-                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
-                });
 
                 return Ok(result);
             }
@@ -947,6 +993,5 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
-
     }
 }

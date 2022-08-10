@@ -32,7 +32,8 @@
                         </label>
                         <input type="text" class="form-control m-input m-input--square" formControlName="partnerNameEn"
                             autofocus placeholder="Please enter English Name" name="partnerNameEn" autocomplete="nope"
-                            minlength="3" maxlength="100" [attr.disabled]="this.active.value === true ? 'disabled' : null"
+                            minlength="3" maxlength="100"
+                            [attr.disabled]="this.active.value === true ? 'disabled' : null"
                             [ngClass]="{ 'm-input--square': isSubmitted && partnerNameEn.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerNameEn.invalid">
                             English Name is required
@@ -78,14 +79,14 @@
                         [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                         <label required class="form-control-label"> Partner Location </label>
                         <ng-select [items]="partnerLocations" name="partnerLocation" formControlName="partnerLocation"
-                            class="custom" placeholder="Select partner location" 
+                            class="custom" placeholder="Select partner location"
                             [readonly]="this.active.value === true ? true : false">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && taxCode.invalid }">
+                        [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && (taxCode.invalid|| (taxCode.errors | equalError:'maxlength' || taxCode.errors | equalError:'minlength')) }">
                         <label class="form-control-label" for="">
                             Tax Code <span class="m--font-danger">(*)</span>
                         </label>
@@ -93,9 +94,10 @@
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
-                        <div class="form-control-feedback" *ngIf="isSubmitted && 
-                            ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
-                            Tax Code include 7 - 14 characters!
+                        <div class="form-control-feedback"
+                            *ngIf="(isSubmitted &&
+                            ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
+                            Tax Code include 8 - 14 characters!
                         </div>
                         <div class="form-control-feedback"
                             *ngIf="isSubmitted && taxCode.errors  | equalError:'pattern'">
@@ -139,8 +141,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label"> Internal Code </label>
-                        <input [attr.disabled]="isDisabledInternalCode||this.active.value === true ? 'disabled' : null" type="text"
-                            name="internalCode" class="form-control" formControlName="internalCode" />
+                        <input [attr.disabled]="isDisabledInternalCode||this.active.value === true ? 'disabled' : null"
+                            type="text" name="internalCode" class="form-control" formControlName="internalCode" />
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -166,9 +168,9 @@
                             Category <span class="m--font-danger">(*)</span>
                         </label>
                         <ng-select [multiple]="true" [items]="partnerGroups" placeholder="Select partner group"
-                            [readonly]="this.active.value === true ? true : false"
-                            bindLabel="text" class="custom" formControlName="partnerGroup"
-                            (change)="onChange($event, 'category')" (remove)="removed($event, 'category')">
+                            [readonly]="this.active.value === true ? true : false" bindLabel="text" class="custom"
+                            formControlName="partnerGroup" (change)="onChange($event, 'category')"
+                            (remove)="removed($event, 'category')">
                         </ng-select>
                         <div class="form-control-feedback" *ngIf="isSubmitted && partnerGroup.invalid">
                             Category is required
@@ -180,7 +182,8 @@
                         <label class="form-control-label" for="">
                             Airline Code/Co-Loader Code
                         </label>
-                        <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode" [attr.disabled]="this.active.value === true ? 'disabled' : null" />
+                        <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode"
+                            [attr.disabled]="this.active.value === true ? 'disabled' : null" />
                     </div>
                     <div classs="form-group" *ngIf="isUpdate">
                         <div class="text-left text-underline m--margin-top-10">
@@ -195,8 +198,7 @@
                             <div class="form-group">
                                 <label class="form-control-label"> Credit Payment </label>
                                 <ng-select [items]="creditPayments" name="creditPayment" formControlName="creditPayment"
-                                    class="custom"
-                                    [readonly]="this.active.value === true ? true : false"
+                                    class="custom" [readonly]="this.active.value === true ? true : false"
                                     [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
                                     placeholder="Select credit payment">
                                 </ng-select>
@@ -437,7 +439,8 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <!--Bank account no-->
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
                                         <label class="form-control-label" for="">
                                             Bank Account No
                                         </label>
@@ -510,9 +513,11 @@
                                                 </label>
                                                 <app-combo-grid-virtual-scroll
                                                     (itemSelected)="onSelectDataFormInfo($event, 'bank')"
-                                                    [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                                                    [displayFields]="displayFieldBank" (remove)="resetFormControl(bankCode)"
-                                                    placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
+                                                    [selectedDisplayFields]="['bankNameEn']"
+                                                    [dataSources]="banks | async" [displayFields]="displayFieldBank"
+                                                    (remove)="resetFormControl(bankCode)"
+                                                    placeholder="Please Select Bank Name" allowFreeText
+                                                    formControlName="bankName">
                                                 </app-combo-grid-virtual-scroll>
                                             </div>
                                         </div>

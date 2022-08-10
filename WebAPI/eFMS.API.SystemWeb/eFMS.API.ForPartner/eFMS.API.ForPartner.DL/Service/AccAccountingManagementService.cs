@@ -196,7 +196,8 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 var debitCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_DEBIT).ToList();
                 var obhCharges = model.Charges.Where(x => x.ChargeType?.ToUpper() == ForPartnerConstants.TYPE_CHARGE_OBH).ToList();
-                var surchargesLookupId = surchargeRepo.Get().ToLookup(x => x.Id);
+                var idsInCharges = model.Charges.Select(x => x.ChargeId);
+                var surchargesLookupId = surchargeRepo.Get(x => idsInCharges.Any(z => z == x.Id)).ToLookup(x => x.Id);
 
                 /*var chargeNotExistsInSurcharge = GetChargeNotExistsInSurcharge(model.Charges, surchargesLookupId);
                 if (!string.IsNullOrEmpty(chargeNotExistsInSurcharge))
@@ -298,9 +299,16 @@ namespace eFMS.API.ForPartner.DL.Service
                     invoiceDebit.TotalAmountVnd = invoiceDebit.UnpaidAmountVnd = _totalAmountVndInvoiceDebit;
                     invoiceDebit.TotalAmountUsd = invoiceDebit.UnpaidAmountUsd = _totalAmountUsdInvoiceDebit;
 
-                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                    invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    // var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                    // invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType)
+                   .GroupBy(x => x)
+                   .Select(x => new { service = x.Key, counts = x.Count() })
+                   .OrderByDescending(x => x.counts)
+                   .Select(x => x.service)
+                   .ToList();
 
+                    invoiceDebit.ServiceType = _transactionTypes.FirstOrDefault();
                     //Task: 15631 - Andy - 14/04/2021
                     invoiceDebit.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceDebit.PartnerId, invoiceDebit.PaymentTerm, _transactionTypes, invoiceDebit.Date, invoiceDebit.ConfirmBillingDate);
                 }
@@ -363,9 +371,16 @@ namespace eFMS.API.ForPartner.DL.Service
                         invoiceObh.TotalAmountVnd = invoiceObh.UnpaidAmountVnd = _totalAmountVndInvoiceObh;
                         invoiceObh.TotalAmountUsd = invoiceObh.UnpaidAmountUsd = _totalAmountUsdInvoiceObh;
 
-                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
-                        invoiceObh.ServiceType = string.Join(";", _transactionTypes);
+                        //var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+                        //invoiceObh.ServiceType = string.Join(";", _transactionTypes);
 
+                        var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType)
+                          .GroupBy(x => x)
+                          .Select(x => new { service = x.Key, counts = x.Count() })
+                          .OrderByDescending(x => x.counts)
+                          .Select(x => x.service)
+                          .ToList();
+                        invoiceObh.ServiceType = _transactionTypes.FirstOrDefault();
                         //Task: 15631 - Andy - 14/04/2021
                         invoiceObh.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceObh.PartnerId, invoiceObh.PaymentTerm, _transactionTypes, invoiceObh.Date, invoiceObh.ConfirmBillingDate);
                     }
@@ -563,6 +578,19 @@ namespace eFMS.API.ForPartner.DL.Service
             invoice.Description = model.Description;
             invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
 
+            // Get saleman nếu có chứng từ
+            if (firstCharge != null && partner != null)
+            {
+                if (!string.IsNullOrEmpty(firstCharge.Soano))
+                {
+                    invoice.SalesmanId = acctSOARepository.Get(x => x.Soano == firstCharge.Soano && x.Customer == partner.Id).FirstOrDefault()?.SalemanId;
+                }
+                if(string.IsNullOrEmpty(invoice.SalesmanId))
+                {
+                    invoice.SalesmanId = acctCdNoteRepo.Get(x => x.Code == firstCharge.DebitNo && x.PartnerId == partner.Id).FirstOrDefault()?.SalemanId;
+                }
+            }
+
             return invoice;
         }
 
@@ -611,6 +639,19 @@ namespace eFMS.API.ForPartner.DL.Service
                 invoice.Description = model.Description;
                 invoice.ServiceType = string.Empty; //TÍNH TOÁN BÊN NGOÀI
 
+                // Get saleman nếu có chứng từ
+                if (firstCharge != null && partner != null)
+                {
+                    if (!string.IsNullOrEmpty(firstCharge.Soano))
+                    {
+                        invoice.SalesmanId = acctSOARepository.Get(x => x.Soano == firstCharge.Soano && x.Customer == partner.Id).FirstOrDefault()?.SalemanId;
+                    }
+                    if (string.IsNullOrEmpty(invoice.SalesmanId))
+                    {
+                        invoice.SalesmanId = acctCdNoteRepo.Get(x => x.Code == firstCharge.DebitNo && x.PartnerId == partner.Id).FirstOrDefault()?.SalemanId;
+                    }
+                }
+
                 invoices.Add(invoice);
             }
             return invoices;
@@ -639,7 +680,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser, out AccAccountingManagement data)
         {
             string invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE;
-            List<Guid?> IdsInvoiceTemps = new List<Guid?>();
+            List<Guid> IdsInvoiceTemps = new List<Guid>();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -674,8 +715,11 @@ namespace eFMS.API.ForPartner.DL.Service
 
                         if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
                         {
-                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId).Distinct().ToList();
-
+                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId ?? Guid.Empty).Distinct().ToList();
+                            if (accPaymentService.CheckInvoicePayment(IdsInvoiceTemps))
+                            {
+                                return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR)", model.ReferenceNo));
+                            }
                             foreach (var Id in IdsInvoiceTemps)
                             {
                                 DataContext.Delete(x => x.Id == Id, false);
@@ -694,7 +738,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             return new HandleState((object)"Không tìm thấy hóa đơn");
                         }
 
-                        if(accPaymentService.CheckInvoicePayment(invoiceToDelete.Id))
+                        if(accPaymentService.CheckInvoicePayment(new List<Guid> { invoiceToDelete.Id }))
                         {
                             return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
                         }
@@ -712,7 +756,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         else
                         {
-                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId ?? Guid.Empty) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
                         }
 
                         if (charges != null)
@@ -721,11 +765,14 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 charge.AcctManagementId = null;
                                 charge.ReferenceNo = null;
-                                charge.InvoiceNo = null;
-                                charge.InvoiceDate = null;
+                                if(charge.Type == ForPartnerConstants.TYPE_CHARGE_SELL)
+                                {
+                                    charge.InvoiceNo = null;
+                                    charge.SeriesNo = null;
+                                    charge.InvoiceDate = null;
+                                }
                                 charge.VoucherId = null;
                                 charge.VoucherIddate = null;
-                                charge.SeriesNo = null;
                                 //charge.FinalExchangeRate = null;
                                 //charge.AmountVnd = charge.VatAmountVnd = null;
                                 charge.DatetimeModified = DateTime.Now;
@@ -2062,7 +2109,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 charge.VoucherIddate = null;
                                 charge.SyncedFrom = null;
                             }
-                            charge.ReferenceNo = null;
+                            // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                            //charge.ReferenceNo = null;
                             surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
 
@@ -2149,36 +2197,6 @@ namespace eFMS.API.ForPartner.DL.Service
 
         #endregion --- REJECT & REMOVE DATA ---
 
-        private List<ObjectReceivableModel> GetListObjectReceivableBySurchargeIds(List<Guid> surchargeIds)
-        {
-            var surcharges = surchargeRepo.Get(x => surchargeIds.Any(a => a == x.Id));
-            var objPO = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objPR = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PayerId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objMerge = objPO.Union(objPR).ToList();
-            var objectReceivables = objMerge.GroupBy(g => new { Service = g.Service, PartnerId = g.PartnerId, Office = g.Office })
-                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
-            return objectReceivables.ToList();
-        }
-
-        public CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action)
-        {
-            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
-            CalculatorReceivableNotAuthorizeModel modelReceivable = new CalculatorReceivableNotAuthorizeModel
-            {
-                UserID = _currentUser.UserID,
-                GroupId = _currentUser.GroupId,
-                DepartmentId = _currentUser.DepartmentId,
-                OfficeID = _currentUser.OfficeID,
-                CompanyID = _currentUser.CompanyID,
-                Action = action,
-                ObjectReceivable = GetListObjectReceivableBySurchargeIds(surchargeIds)
-            };
-            return modelReceivable;
-        }
 
         public List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo)
         {
@@ -2354,6 +2372,22 @@ namespace eFMS.API.ForPartner.DL.Service
                         _totalAmountUsd = item.surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd);
                     }
 
+                    // Get saleman nếu có chứng từ
+                    var soaNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.Soano)).Select(x=>x.Soano).Distinct().ToList();
+                    var salesManId = string.Empty;
+                    if (soaNoList.Count > 0)
+                    {
+                        salesManId = acctSOARepository.Get(x => soaNoList.Any(z => z == x.Soano) && x.Customer == customer.Id).FirstOrDefault()?.SalemanId;
+                    }
+                    if(string.IsNullOrEmpty(salesManId))
+                    {
+                        var debitNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).Distinct().ToList();
+                        if(debitNoList.Count > 0)
+                        {
+                            salesManId = acctCdNoteRepo.Get(x => debitNoList.Any(z=>z== x.Code) && x.PartnerId == customer.Id).FirstOrDefault()?.SalemanId;
+                        }                        
+                    }
+
                     AccAccountingManagement voucher = new AccAccountingManagement
                     {
                         Id = Guid.NewGuid(),
@@ -2396,6 +2430,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         LastSyncDate = DateTime.Now,
                         ServiceType = null, // Invoice mới cần Service type
                         SourceCreated = "Bravo",
+                        SalesmanId = salesManId
                     };
 
                     vouchers.Add(voucher);
@@ -2441,21 +2476,22 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.SeriesNo = surChargeBravo.SerieNo;
                                                 surcharge.DatetimeModified = voucher.DatetimeCreated;
                                                 surcharge.UserModified = currentUser.UserID;
-                                                surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
+                                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                                //surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
                                                                                                
                                                 if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
 
-                                                    //surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
-                                                    //surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
-                                                    //surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
-                                                    //surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
+                                                    // surcharge.VatAmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.VatAmountVnd : surcharge.VatAmountVnd;
+                                                    // surcharge.AmountVnd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_LOCAL ? surChargeBravo.AmountVnd : surcharge.AmountVnd;
+                                                    surcharge.VatAmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.VatAmountUsd : surcharge.VatAmountUsd;
+                                                    surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
 
                                                     // CR: 17688
                                                     surcharge.VatAmountVnd =  surChargeBravo.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.AmountVnd;
-                                                    surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
-                                                    surcharge.AmountUsd = surChargeBravo.AmountUsd;
+                                                    // surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
+                                                    // surcharge.AmountUsd = surChargeBravo.AmountUsd;
 
                                                     surcharge.FinalExchangeRate = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.ExchangeRate : surcharge.FinalExchangeRate;
                                                     AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
@@ -2676,7 +2712,8 @@ namespace eFMS.API.ForPartner.DL.Service
                             var surcharge = surcharges.Where(x => x.Id == item.ChargeID)?.FirstOrDefault();
                             if (surcharge != null)
                             {
-                                surcharge.ReferenceNo = item.BravoRefNo;
+                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                //surcharge.ReferenceNo = item.BravoRefNo;
                                 surcharge.UserModified = currentUser.UserID;
                                 surcharge.DatetimeModified = DateTime.Now;
 
@@ -2783,7 +2820,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 */
 
                                 surcharge.UserModified = currentUser.UserID;
-                                surcharge.ReferenceNo = null; //remove số ref của bravo sync trước đó
+                                // [CR:20062022 => refNo dành để lưu khi issue HĐ]
+                                //surcharge.ReferenceNo = null; //remove số ref của bravo sync trước đó
                                 surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
 
                             }

@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AppPage } from '@app';
 import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { ReportPreviewComponent } from '@common';
+import { InfoPopupComponent, ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
@@ -23,7 +23,7 @@ import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operator
 import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
 import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment, LoadDetailSettlePaymentFail } from '../components/store';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { getCurrentUserState } from '@store';
 @Component({
     selector: 'app-settlement-payment-detail',
@@ -36,7 +36,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-
+    
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
@@ -92,7 +92,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             statusApproval: this.settlementPayment.settlement.statusApproval,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             payee: this.formCreateSurcharge.payee.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankCode: this.formCreateSurcharge.bankCode.value,
@@ -118,8 +118,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         //     return;
         // }
 
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -128,8 +128,20 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
-
-        this._accoutingRepo.updateSettlementPayment(body)
+        this._accoutingRepo.checkIfInvalidFeeShipmentSettle(body)
+            .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return EMPTY;
+                    } else {
+                        return this._accoutingRepo.updateSettlementPayment(body);
+                    }
+                }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -227,14 +239,29 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             );
     }
 
+    checkValidSettle() {
+        if (this.formCreateSurcharge.checkStaffPartner()) {
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return false;
+        }
+
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if((!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateSurcharge.statusApproval.value) && !this.formCreateSurcharge.form.valid)){
+            return false;
+        }
+        return true;
+    }
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -247,31 +274,46 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         let settlementResult: any = {};
         this._accoutingRepo.checkValidToSendRequestSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
-            concatMap((res: CommonInterface.IResult) => {
+                concatMap((res: CommonInterface.IResult) => {
                     if (!res.status && !!res.message) {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                         return;
                     }
-                    else{
-                        return this._accoutingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
+                    else {
+                        return this._accoutingRepo.checkIfInvalidFeeShipmentSettle(body).pipe(
                             catchError(this.catchError),
                             concatMap((res: CommonInterface.IResult) => {
                                 if (!res.status) {
-                                    this._toastService.warning(res.message, '', { enableHtml: true });
+                                    this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
+                                        title: 'Warning',
+                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                        class: 'bg-danger'
+                                    });
+                                    return EMPTY;
                                 } else {
-                                    settlementResult = res.data.settlement;
-                                    let approve : any ={
-                                        settlementNo: settlementResult.settlementNo,
-                                        requester: settlementResult.requester,
-                                        requesterAprDate: new Date()
-                                    }
-                                    return this._accoutingRepo.updateAndSendMailApprovalSettlement(approve);
+                                    return this._accoutingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
+                                        catchError(this.catchError),
+                                        concatMap((res: CommonInterface.IResult) => {
+                                            if (!res.status) {
+                                                this._toastService.warning(res.message, '', { enableHtml: true });
+                                                this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                                            } else {
+                                                settlementResult = res.data.settlement;
+                                                let approve: any = {
+                                                    settlementNo: settlementResult.settlementNo,
+                                                    requester: settlementResult.requester,
+                                                    requesterAprDate: new Date()
+                                                }
+                                                return this._accoutingRepo.updateAndSendMailApprovalSettlement(approve);
+                                            }
+                                        })
+                                    );
                                 }
                             })
                         );
                     }
                 }
-            ))
+                ))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!res.status) {
@@ -388,7 +430,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @delayTime(1000)
     showReport(): void {
         this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
+        this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
 }
 

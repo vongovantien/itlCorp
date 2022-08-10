@@ -47,5 +47,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? IsExpired { get; set; }
         public bool? IsOverLimit { get; set; }
         public bool? IsOverDue { get; set; }
+        public short? SalesGroup { get; set; }
+        public int? SalesDepartment { get; set; }
+        public string SalesOfficeId { get; set; }
+        public string SalesCompanyId { get; set; }
+        public bool? NoDue { get; set; }
+        public string ShipmentType { get; set; }
     }
 }

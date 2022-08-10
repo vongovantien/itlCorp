@@ -650,21 +650,6 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        private void CalculatorReceivableAcctPayment(List<Guid> surchargeIds)
-        {
-            if (surchargeIds != null && surchargeIds.Count > 0)
-            {
-                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
-                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
-                foreach (var surchargeId in surchargeIds)
-                {
-                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
-                    objectReceivable.SurchargeId = surchargeId;
-                    receivableModels.Add(objectReceivable);
-                }
-                calculatorReceivable.ObjectReceivable = receivableModels;
-                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
-            }
-        }
+        
     }
 }

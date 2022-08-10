@@ -117,7 +117,7 @@ namespace eFMS.API.Accounting.DL.Services
             var billingNos = DataContext.Get(x => x.CombineBillingNo.Contains("CB")).Select(x => x.CombineBillingNo);
             var numOfOrder = new List<int>();
             var num = string.Empty;
-            if(billingNos != null && billingNos.Count() > 0)
+            if (billingNos != null && billingNos.Count() > 0)
             {
                 foreach (var code in billingNos)
                 {
@@ -337,7 +337,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             // Remove from surcharges
                             var surcharges = surchargeRepo.Get(x => x.CombineBillingNo == combineData.CombineBillingNo || x.ObhcombineBillingNo == combineData.CombineBillingNo).ToList();
-                            foreach(var item in surcharges)
+                            foreach (var item in surcharges)
                             {
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
@@ -355,7 +355,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // Remove from soa
                             var acctSoa = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && x.CombineBillingNo.Contains(combineData.CombineBillingNo)).ToList();
-                            foreach(var item in acctSoa)
+                            foreach (var item in acctSoa)
                             {
                                 item.CombineBillingNo = item.CombineBillingNo.Replace(combineData.CombineBillingNo, "");
                                 item.CombineBillingNo = string.IsNullOrEmpty(item.CombineBillingNo) ? null : string.Join(";", item.CombineBillingNo.Split(';').Where(x => !string.IsNullOrEmpty(x)));
@@ -479,19 +479,40 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctCombineBillingResult> GetData(AcctCombineBillingCriteria criteria)
         {
             var query = ExpressionQuery(criteria);
-            var partners = partnerRepo.Get();
-            var users = userRepo.Get();
-            var employee = employeeRepo.Get();
             var dataCombineBilling = GetCombinePermission().Where(query);
-            var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+            var userId = dataCombineBilling.Select(x => x.UserCreated);
+            var users = userRepo.Get(x => userId.Any(z => z == x.Id));
+            var partnerId = dataCombineBilling.Select(x => x.PartnerId);
+            var partners = partnerRepo.Get(x => partnerId.Any(z => z == x.Id));
+
+            if (criteria.ReferenceNo != null && criteria.ReferenceNo.Count > 0)
+            {
+                criteria.ReferenceNo = criteria.ReferenceNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                var combineNos = new List<string>();
+                var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
+                var chargesFilter = surcharges.Where(x => criteria.ReferenceNo.Any(z => z == x.JobNo || z == x.Soano || z == x.PaySoano || z == x.CreditNo || z == x.DebitNo));
+                combineNos.AddRange(chargesFilter.Select(x => x.CombineBillingNo));
+                combineNos.AddRange(chargesFilter.Select(x => x.ObhcombineBillingNo));
+                combineNos.AddRange(dataCombineBilling.Where(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo)).Select(x => x.CombineBillingNo));
+                combineNos = combineNos.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                if (combineNos.Count() > 0)
+                {
+                    dataCombineBilling = dataCombineBilling.Where(x => combineNos.Any(z => z == x.CombineBillingNo));
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
             var result = from data in dataCombineBilling
                          join part in partners on data.PartnerId equals part.Id
-                         join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
-                         from surcharge in grpCombine.DefaultIfEmpty()
-                         join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.CombineBillingNo into grpCombineObh
-                         from surcharge2 in grpCombineObh.DefaultIfEmpty()
+                         //join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
+                         //from surcharge in grpCombine.DefaultIfEmpty()
+                         //join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.ObhcombineBillingNo into grpCombineObh
+                         //from surcharge2 in grpCombineObh.DefaultIfEmpty()
                          join us in users on data.UserCreated equals us.Id
-                         join emp in employee on us.EmployeeId equals emp.Id
+                         join emp in employeeRepo.Get() on us.EmployeeId equals emp.Id
                          select new AcctCombineBillingResult
                          {
                              Id = data.Id,
@@ -500,41 +521,24 @@ namespace eFMS.API.Accounting.DL.Services
                              UserCreated = data.UserCreated,
                              TotalAmountVnd = data.TotalAmountVnd,
                              TotalAmountUsd = data.TotalAmountUsd,
-                             JobNo = surcharge != null ? surcharge.JobNo : surcharge2.JobNo,
-                             Soano = surcharge != null ? surcharge.Soano : surcharge2.Soano,
-                             PaySoano = surcharge != null ? surcharge.PaySoano : surcharge2.PaySoano,
-                             CreditNo = surcharge != null ? surcharge.CreditNo : surcharge2.CreditNo,
-                             DebitNo = surcharge != null ? surcharge.DebitNo : surcharge2.DebitNo,
+                             //JobNo = surcharge != null ? surcharge.JobNo : surcharge2.JobNo,
+                             //Soano = surcharge != null ? surcharge.Soano : surcharge2.Soano,
+                             //PaySoano = surcharge != null ? surcharge.PaySoano : surcharge2.PaySoano,
+                             //CreditNo = surcharge != null ? surcharge.CreditNo : surcharge2.CreditNo,
+                             //DebitNo = surcharge != null ? surcharge.DebitNo : surcharge2.DebitNo,
                              UserCreatedName = emp == null ? string.Empty : emp.EmployeeNameEn,
                              DatetimeCreated = data.DatetimeCreated
                          };
-            if (criteria.ReferenceNo != null && criteria.ReferenceNo.Count > 0)
-            {
-                result = result.Where(x => criteria.ReferenceNo.Any(z => z.Trim() == x.CombineBillingNo) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.JobNo) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.Soano) || criteria.ReferenceNo.Any(z => z.Trim() == x.PaySoano) ||
-                                                            criteria.ReferenceNo.Any(z => z.Trim() == x.CreditNo) || criteria.ReferenceNo.Any(z => z.Trim() == x.DebitNo));
-            }
-            var dataResult = new List<AcctCombineBillingResult>();
+            IQueryable<AcctCombineBillingResult> dataResult = null;
             if (result != null && result.Count() > 0)
             {
-                var dataGrp = result.Where(x => x.Id != null).GroupBy(x => new { x.Id, x.CombineBillingNo });
-                foreach (var item in dataGrp)
-                {
-                    var billing = new AcctCombineBillingResult();
-                    var firstData = item.FirstOrDefault();
-                    billing.Id = item.Key.Id;
-                    billing.CombineBillingNo = item.Key.CombineBillingNo;
-                    billing.TotalAmountVnd = firstData?.TotalAmountVnd ?? 0;
-                    billing.TotalAmountUsd = firstData?.TotalAmountUsd ?? 0;
-                    billing.PartnerName = firstData?.PartnerName;
-                    billing.UserCreatedName = firstData?.UserCreatedName;
-                    billing.DatetimeCreated = firstData?.DatetimeCreated;
-                    billing.UserCreated = firstData?.UserCreated;
-                    dataResult.Add(billing);
-                }
+                dataResult = result.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
             }
-            return dataResult?.OrderByDescending(x => x.DatetimeCreated).AsQueryable();
+            else
+            {
+                return null;
+            }
+            return dataResult;
         }
 
         /// <summary>
@@ -583,18 +587,22 @@ namespace eFMS.API.Accounting.DL.Services
                         var existCDNotes = cdNoteRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Code) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Code).ToList();
                         foreach (var item in existCDNotes)
                         {
-                            var credit = surchargeRepo.Get(x => item.Trim() == x.CreditNo).Select(x => x.Hblid);
-                            var existingCredit = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
-                            if (credit.Count() == existingCredit.Count() && existingCredit.Count() > 0)
+                            //var existingCredit = surchargeRepo.Get(x => (string.IsNullOrEmpty(x.CombineBillingNo) && string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo);
+                            // Type Credit
+                            var combineNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo).Select(x => x.CombineBillingNo).ToList();
+                            combineNo.AddRange(surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.CreditNo).Select(x => x.ObhcombineBillingNo).ToList());
+                            combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                            if (combineNo.Count > 0 && !combineNo.Any(z => z == criteria.CombineNo))
                             {
-                                existCombineNo = item + " has been existed in CB: " + (existingCredit.FirstOrDefault().Type != "OBH" ? existingCredit.FirstOrDefault().CombineBillingNo : existingCredit.FirstOrDefault().ObhcombineBillingNo);
+                                existCombineNo = item + " has been existed in CB: " + string.Join(";", combineNo);
                                 return existCombineNo;
                             }
-                            var debit = surchargeRepo.Get(x => item.Trim() == x.DebitNo).Select(x => x.Hblid).ToList();
-                            var existingDebit = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).ToList();
-                            if (debit.Count == existingDebit.Count && existingDebit.Count > 0)
+
+                            // Type debit
+                            combineNo = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.DebitNo).Select(x => x.CombineBillingNo).Distinct().ToList();
+                            if (combineNo.Count > 0 && !combineNo.Any(z => z == criteria.CombineNo))
                             {
-                                existCombineNo = item + " has been existed in CB: " + existingDebit[0].CombineBillingNo;
+                                existCombineNo = item + " has been existed in CB: " + string.Join(";", combineNo);
                                 return existCombineNo;
                             }
                         }
@@ -603,18 +611,23 @@ namespace eFMS.API.Accounting.DL.Services
                         var existSoa = soaRepo.Get(x => criteria.DocumentNo.Any(z => z == x.Soano) && !string.IsNullOrEmpty(x.CombineBillingNo)).Select(x => x.Soano).ToList();
                         foreach (var item in existSoa)
                         {
-                            var soa = surchargeRepo.Get(x => item.Trim() == x.Soano);
-                            var existingSoa = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
-                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
+                            // Type Debit
+                            //var existingSoa = surchargeRepo.Get(x => string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano);
+                            var combineNo = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && item.Trim() == x.Soano).Select(x => x.CombineBillingNo).Distinct().ToList();
+                            if (combineNo.Count > 0 && !combineNo.Any(z => z == criteria.CombineNo))
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + existingSoa.FirstOrDefault().CombineBillingNo;
+                                existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                 return existCombineNo;
                             }
-                            soa = surchargeRepo.Get(x => item.Trim() == x.PaySoano);
-                            existingSoa = surchargeRepo.Get(x => (x.Type != "OBH" ? !string.IsNullOrEmpty(x.CombineBillingNo) : !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
-                            if (soa.Count() == existingSoa.Count() && existingSoa.Count() > 0)
+
+                            // Type Credit
+                            //existingSoa = surchargeRepo.Get(x => (string.IsNullOrEmpty(x.CombineBillingNo) && string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano);
+                            combineNo = surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano).Select(x => x.CombineBillingNo).ToList();
+                            combineNo.AddRange(surchargeRepo.Get(x => (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && item.Trim() == x.PaySoano).Select(x => x.ObhcombineBillingNo).ToList());
+                            combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                            if (combineNo.Count > 0 && !combineNo.Any(z => z == criteria.CombineNo))
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingSoa.FirstOrDefault().Type != "OBH" ? existingSoa.FirstOrDefault().CombineBillingNo : existingSoa.FirstOrDefault().ObhcombineBillingNo);
+                                existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
                                 return existCombineNo;
                             }
                         }
@@ -622,45 +635,90 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Job No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var jobNoInfo = surchargeInfo.Where(x => item.Trim() == x.JobNo);
-                            var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo);
-
-                            var existingJobNo = jobNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingJobNoObh = jobNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (jobNoInfo.Count() == existingJobNo.Count() && jobNoObhInfo.Count() == existingJobNoObh.Count() && (existingJobNo.Count() > 0 || existingJobNoObh.Count() > 0))
+                            var jobNoInfo = surchargeInfo.Where(x => item.Trim() == x.JobNo && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            var jobNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.JobNo && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            if (jobNoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingJobNo.Count() > 0 ? existingJobNo.FirstOrDefault().CombineBillingNo : existingJobNoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = jobNoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
+                            }
+                            if (jobNoObhInfo.Count() > 0)
+                            {
+                                var combineNo = jobNoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
                     case "HBL No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var hblnoInfo = surchargeInfo.Where(x => item.Trim() == x.Hblno);
-                            var hblnoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.Hblno);
+                            var hblnoInfo = surchargeInfo.Where(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (criteria.Services.Count == 0 || criteria.Services.Any(z => z == x.TransactionType)));
+                            var hblnoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.Hblno && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (criteria.Services.Count == 0 || criteria.Services.Any(z => z == x.TransactionType)));
 
-                            var existingHblno = hblnoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingHblnoObh = hblnoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (hblnoInfo.Count() == existingHblno.Count() && hblnoObhInfo.Count() == existingHblnoObh.Count() && (existingHblno.Count() > 0 || existingHblnoObh.Count() > 0))
+                            if (hblnoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingHblno.Count() > 0 ? existingHblno.FirstOrDefault().CombineBillingNo : existingHblnoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = hblnoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(hblnoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
+                            }
+
+                            if (hblnoObhInfo.Count() > 0)
+                            {
+                                var combineNo = hblnoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(hblnoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
                     case "Custom No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var cusNoInfo = surchargeInfo.Where(x => item.Trim() == x.ClearanceNo);
-                            var cusNoObhInfo = surchargeOBHInfo.Where(x => item.Trim() == x.ClearanceNo);
-
-                            var existingCusNo = cusNoInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            var existingCusNoObh = cusNoObhInfo.Where(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
-                            if (cusNoInfo.Count() == existingCusNo.Count() && cusNoObhInfo.Count() == existingCusNoObh.Count() && (existingCusNo.Count() > 0 || existingCusNoObh.Count() > 0))
+                            var jobNo = customsDeclarationRepo.Get(x => x.ClearanceNo == item.Trim() && !string.IsNullOrEmpty(x.JobNo)).Select(x => x.JobNo);
+                            var jobNoInfo = surchargeInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            var jobNoObhInfo = surchargeOBHInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
+                            if (jobNoInfo.Count() > 0)
                             {
-                                existCombineNo = item.Trim() + " has been existed in CB: " + (existingCusNo.Count() > 0 ? existingCusNo.FirstOrDefault().CombineBillingNo : existingCusNoObh.FirstOrDefault().CombineBillingNo);
-                                return existCombineNo;
+                                var combineNo = jobNoInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
+                            }
+                            if (jobNoObhInfo.Count() > 0)
+                            {
+                                var combineNo = jobNoObhInfo.Select(x => x.CombineBillingNo).ToList();
+                                combineNo.AddRange(jobNoObhInfo.Select(x => x.ObhcombineBillingNo).ToList());
+                                combineNo = combineNo.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                                if (combineNo.Count > 0)
+                                {
+                                    existCombineNo = item.Trim() + " has been existed in CB: " + string.Join(";", combineNo);
+                                    return existCombineNo;
+                                }
                             }
                         }
                         break;
@@ -874,7 +932,7 @@ namespace eFMS.API.Accounting.DL.Services
             model.PodName = pod?.NameEn;
 
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
-            var catChargeSearch = catChargeRepo.Get().ToLookup(x=>x.Id);
+            var catChargeSearch = catChargeRepo.Get().ToLookup(x => x.Id);
             foreach (var shipment in combineDetail.Shipments)
             {
                 var charges = surchargeRepo.Get(x => x.JobNo == shipment.JobNo && x.Hblid == shipment.Hblid && (x.CombineBillingNo == combineDetail.CombineBillingNo || x.ObhcombineBillingNo == combineDetail.CombineBillingNo) && (x.Soano == shipment.Refno || x.PaySoano == shipment.Refno || x.CreditNo == shipment.Refno || x.DebitNo == shipment.Refno)).ToList();
@@ -1078,7 +1136,7 @@ namespace eFMS.API.Accounting.DL.Services
         public CombineOPSModel GetDataExportCombineOps(string combineBillingNo)
         {
             CombineOPSModel ops = new CombineOPSModel();
-            var combine = DataContext.Get(x => x.CombineBillingNo == combineBillingNo ).FirstOrDefault();
+            var combine = DataContext.Get(x => x.CombineBillingNo == combineBillingNo).FirstOrDefault();
             if (combine == null) { return ops; }
 
             var charges = GetChargeByCombineNo(combineBillingNo);
@@ -1168,7 +1226,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return ops;
         }
-            
+
         private IQueryable<ChargeCombineResult> GetChargeByCombineNo(string combineBillingNo)
         {
             var surCharges = surchargeRepo.Get(x => x.CombineBillingNo == combineBillingNo || x.ObhcombineBillingNo == combineBillingNo);
@@ -1202,7 +1260,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _grossWeight = opst?.SumGrossWeight;
                     _chargeWeight = opst?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
-                    _customNo = cus!=null?cus.ClearanceNo:string.Empty;
+                    _customNo = cus != null ? cus.ClearanceNo : string.Empty;
                 }
                 else
                 {
@@ -1228,7 +1286,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 bool _isSynced = false;
-                if ( sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
                 {
                     _isSynced = !string.IsNullOrEmpty(sur.PaySyncedFrom) && (sur.PaySyncedFrom.Equals("SOA") || sur.PaySyncedFrom.Equals("CDNOTE") || sur.PaySyncedFrom.Equals("VOUCHER") || sur.PaySyncedFrom.Equals("SETTLEMENT"));
                 }
@@ -1310,6 +1368,101 @@ namespace eFMS.API.Accounting.DL.Services
             return result.OrderBy(x => x.Service).AsQueryable();
         }
 
+        private IQueryable<ChargeCombineResult> GetChargeSellByCombineNo(string combineBillingNo)
+        {
+            var surCharges = surchargeRepo.Get(x => (x.CombineBillingNo == combineBillingNo || x.ObhcombineBillingNo == combineBillingNo) && x.Type != "BUY");
+
+            var result = new List<ChargeCombineResult>();
+
+            foreach (var sur in surCharges)
+            {
+                var charge = catChargeRepo.Get().Where(x => x.Id == sur.ChargeId).FirstOrDefault();
+                var unit = catUnitRepo.Get().Where(x => x.Id == sur.UnitId).FirstOrDefault();
+                var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == sur.JobNo).FirstOrDefault();
+                string _commodity, _packageContainer, _customNo, _billingNo = "";
+                decimal? _chargeWeight, _cbm;
+                if (sur.TransactionType == "CL")
+                {
+                    var opst = opsTransactionRepo.Get().Where(x => x.Hblid == sur.Hblid).FirstOrDefault();
+                    _commodity = opst.Note;
+                    _packageContainer = string.Empty;
+                    _chargeWeight = opst?.SumChargeWeight;
+                    _cbm = opst?.SumCbm;
+                    _customNo = cus != null ? cus.ClearanceNo : string.Empty;
+                }
+                else
+                {
+                    var csTransDe = csTransactionDetailRepo.Get(x => x.Id == sur.Hblid).FirstOrDefault();
+                    var csTrans = csTransDe == null ? new CsTransaction() : csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && x.Id == csTransDe.JobId).FirstOrDefault();
+                    _commodity = csTrans?.Commodity;
+                    _chargeWeight = csTransDe?.ChargeWeight;
+                    _cbm = csTransDe?.Cbm;
+                    _packageContainer = csTransDe?.PackageContainer;
+                    _customNo = cus != null ? cus.ClearanceNo : string.Empty;
+                }
+
+                if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    switch (sur.PaySyncedFrom)
+                    {
+                        case "SOA": _billingNo = sur.PaySoano;
+                            break;
+                        case "CDNOTE": _billingNo = sur.DebitNo;
+                            break;
+                        case "VOUCHER":
+                            _billingNo = sur.VoucherId;
+                            break;
+                        case "SETTLEMENT":
+                            _billingNo = sur.SettlementCode;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (sur.SyncedFrom)
+                    {
+                        case "SOA":
+                            _billingNo = sur.Soano;
+                            break;
+                        case "CDNOTE":
+                            _billingNo = sur.DebitNo;
+                            break;
+                        case "VOUCHER":
+                            _billingNo = sur.VoucherId;
+                            break;
+                        case "SETTLEMENT":
+                            _billingNo = sur.SettlementCode;
+                            break;
+                    }
+                }
+
+                var chg = new ChargeCombineResult()
+                {
+                    JobId = sur.JobNo,
+                    HBL = sur.Hblno,
+                    CustomNo = _customNo,
+                    InvoiceNo = sur.InvoiceNo,
+                    Commodity = _commodity,
+                    UnitId = sur.UnitId,
+                    ChargeWeight = _chargeWeight,
+                    CBM = _cbm,
+                    PackageContainer = _packageContainer,
+                    NetAmount = sur.NetAmount,
+                    AmountVND = sur.AmountVnd,
+                    AmountUSD = sur.AmountUsd,
+                    VATAmountLocal = sur.VatAmountVnd,
+                    VATAmountUSD = sur.VatAmountUsd,
+                    CombineNo = combineBillingNo,
+                    TypeCharge = sur.Type,
+                    BillingNo = _billingNo,
+                    TransactionType = sur.TransactionType,
+                    ExchangeDate = sur.ExchangeDate,
+                };
+                result.Add(chg);
+            }
+            return result.OrderBy(x => x.Service).AsQueryable();
+        }
+
         public Crystal PreviewConfirmBilling(string combineBillingNo)
         {
             Crystal result = null;
@@ -1338,7 +1491,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _hwbNo = charge.HBL;
                 //_customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
                 var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == charge.JobId).FirstOrDefault();
-                _customNo = cus != null ? cus.ClearanceNo :string.Empty;
+                _customNo = cus != null ? cus.ClearanceNo : string.Empty;
                 _jobNo = charge.JobId;
                 #endregion -- Info MBL, HBL --
 
@@ -1410,7 +1563,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Sắp xếp giảm dần theo số Job
             combineCharges = combineCharges.ToArray().OrderByDescending(o => o.JobNo).ToList();
             var parameter = new CombineReportGeneralReportParams();
-            var p = partnerRepo.Get(x=>x.Id == combineBilling.PartnerId).FirstOrDefault();
+            var p = partnerRepo.Get(x => x.Id == combineBilling.PartnerId).FirstOrDefault();
             var office = sysOfficeRepo.Get(x => x.Id == p.OfficeId).FirstOrDefault();
 
             if (combineBilling.ServiceDateFrom != null)
@@ -1419,8 +1572,8 @@ namespace eFMS.API.Accounting.DL.Services
                 parameter.UptoDate = string.Format("{0} - {1}", combineBilling.IssuedDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.IssuedDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
             else
             {
-                var chagerOrder = charges.OrderByDescending(x=>x.ExchangeDate);
-                var lastdate  = chagerOrder.FirstOrDefault();
+                var chagerOrder = charges.OrderByDescending(x => x.ExchangeDate);
+                var lastdate = chagerOrder.FirstOrDefault();
                 var firstdate = chagerOrder.LastOrDefault();
                 parameter.UptoDate = string.Format("{0} - {1}", firstdate.ExchangeDate?.ToString("dd/MM/yyyy") ?? string.Empty, lastdate.ExchangeDate?.ToString("dd/MM/yyyy") ?? string.Empty); //
             }
@@ -1467,10 +1620,20 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public CombineOPSModel GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria)
         {
+            var combineDatas = GetData(criteria);
+            if (criteria.ReferenceNo == null)
+            {
+                criteria.ReferenceNo = combineDatas == null ? new List<string>() : AppendCombineNo(combineDatas);
+            }
+            List<string> combineNos = new List<string>();
+            foreach(var item in combineDatas)
+            {
+                combineNos.Add(item.CombineBillingNo);
+            }
             var opsModel = new CombineOPSModel();
-            var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
+            //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
             if (combineDatas == null || combineDatas.Count() == 0) { return opsModel; }
-            var surcharges = surchargeRepo.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo || z == x.ObhcombineBillingNo));
+            var surcharges = surchargeRepo.Get(x => combineNos.Contains(x.CombineBillingNo) || combineNos.Contains(x.ObhcombineBillingNo)); 
             var chargeDatas = catChargeRepo.Get();
             var unitDatas = catUnitRepo.Get();
             var clearanceDatas = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
@@ -1529,7 +1692,7 @@ namespace eFMS.API.Accounting.DL.Services
                               GrossWeight = opst.SumGrossWeight,
                               ChargeWeight = opst.SumChargeWeight,
                               CBM = opst.SumCbm,
-                              PackageContainer = string.Empty,
+                              PackageContainer = opst.ContainerDescription,
                               CreditNo = sur.CreditNo,
                               DebitNo = sur.DebitNo,
                               DatetimeModified = sur.DatetimeModified,
@@ -1545,7 +1708,7 @@ namespace eFMS.API.Accounting.DL.Services
                               SeriesNo = sur.SeriesNo,
                               InvoiceDate = sur.InvoiceDate,
                               TaxCodeOBH = string.Empty,
-                              CombineNo = criteria.ReferenceNo.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault(),
+                              CombineNo = combineNos.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault(),
                           };
             var dataDoc = from sur in surcharges
                           join charge in chargeDatas on sur.ChargeId equals charge.Id
@@ -1615,7 +1778,7 @@ namespace eFMS.API.Accounting.DL.Services
                               SeriesNo = sur.SeriesNo,
                               InvoiceDate = sur.InvoiceDate,
                               TaxCodeOBH = string.Empty,
-                              CombineNo = criteria.ReferenceNo.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault()
+                              CombineNo = combineNos.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault()
                           };
             #endregion
             var dataCharges = new List<ChargeCombineResult>();
@@ -1705,6 +1868,308 @@ namespace eFMS.API.Accounting.DL.Services
                 opsModel.ToDate = criteria.CreatedDateTo;
             }
             return opsModel;
+        }
+
+        private string GetBillingNo(CsShipmentSurcharge sur)
+        {
+            //if(sur.Type== AccountingConstants.TYPE_CHARGE_SELL)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.Soano;
+            //        case "CDNOTE":
+            //            return sur.DebitNo;
+            //        default: return "";
+            //    }
+            //}
+            //else if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.PaySoano;
+            //        case "CDNOTE":
+            //            return sur.DebitNo;
+            //        default: return "";
+            //    }
+            //}
+            //else if(sur.Type== AccountingConstants.TYPE_CHARGE_OBH_BUY)
+            //{
+            //    switch (sur.SyncedFrom)
+            //    {
+            //        case "SOA":
+            //            return sur.PaySoano;
+            //        case "CDNOTE":
+            //            return sur.CreditNo;
+            //        default: return "";
+            //    }
+            //}
+            var soaData = soaRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && (x.CombineBillingNo.Contains(sur.CombineBillingNo)||x.CombineBillingNo.Contains(sur.ObhcombineBillingNo)) && (x.Soano == sur.Soano || x.Soano == sur.PaySoano)).FirstOrDefault();
+            if (soaData != null)
+            {
+                return soaData.Soano;
+            }
+            else
+            {
+                var cdNote = cdNoteRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) && (x.CombineBillingNo.Contains(sur.CombineBillingNo) || x.CombineBillingNo.Contains(sur.ObhcombineBillingNo)) && (x.Code == sur.CreditNo || x.Code == sur.DebitNo)).FirstOrDefault();
+                return cdNote.Code;
+            }
+            return null;
+        }
+
+        private string getCommonditiJobService(string code)
+        {
+            switch (code)
+            {
+                case "AI":
+                    return "Air Import";
+                case "AE":
+                    return "Air Export";
+                case "SFE": 
+                    return "Sea FCL Export";
+                case "SLE": 
+                    return "Sea LCL Export";
+                case "SFI": 
+                    return "Sea FCL Import";
+                case "SLI": 
+                    return "Sea LCL Import";
+                case "SCE": 
+                    return "Sea Consol Export";
+                case "SCI": 
+                    return "Sea Consol Import";
+                case "IT": 
+                    return "Inland Trucking";
+                default:return null;
+
+            }
+        }
+
+
+        private List<string> AppendCombineNo(IQueryable<AcctCombineBillingResult> combineDatas)
+        {
+            List<string> combineList = new List<string>();
+            combineDatas.ToList().ForEach(x =>
+            combineList.Add(x.CombineBillingNo)
+            );
+            return combineList;
+        }
+
+        /// <summary>
+        /// Get Combine OPS data with partner and currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public CombineShipmentModel GetDataExportCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
+        {
+            var combineDatas = GetData(criteria);
+            if(criteria.ReferenceNo == null)
+            {
+                criteria.ReferenceNo = combineDatas == null ? new List<string>() : AppendCombineNo(combineDatas);
+            }
+            List<string> combineNos = new List<string>();
+            foreach (var item in combineDatas)
+            {
+                combineNos.Add(item.CombineBillingNo);
+            }
+            var shipmentModel = new CombineShipmentModel();
+            //var combineDatas = DataContext.Get(x => criteria.ReferenceNo.Any(z => z == x.CombineBillingNo));
+            if (combineDatas == null || combineDatas.Count() == 0) { return shipmentModel; }
+            var surcharges = surchargeRepo.Get(x => combineNos.Contains(x.CombineBillingNo) || combineNos.Contains(x.ObhcombineBillingNo));
+            var chargeDatas = catChargeRepo.Get();
+            var unitDatas = catUnitRepo.Get();
+            // var clearanceDatas = customsDeclarationRepo.Get();
+            // var jobList = surcharges.Select(x => x.JobNo).ToList();
+            var opsData = opsTransactionRepo.Get().Where(x => x.CurrentStatus != TermData.Canceled);
+            var csTransData = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
+            #region Get surcharges
+
+            var dataOps = from sur in surcharges
+                          join charge in chargeDatas on sur.ChargeId equals charge.Id
+                          join unit in unitDatas on sur.UnitId equals unit.Id
+                          join opst in opsData on sur.Hblid equals opst.Hblid
+                          //join clear in clearanceDatas on sur.JobNo equals clear.JobNo
+                          select new ChargeCombineResult()
+                          {
+                              JobId = sur.JobNo,
+                              HBL = sur.Hblno,
+                              CustomNo = sur.ClearanceNo,
+                              InvoiceNo = sur.InvoiceNo,
+                              Commodity = opst.Note,
+                              UnitId = sur.UnitId,
+                              ChargeWeight = opst.SumGrossWeight,
+                              CBM = opst.SumCbm,
+                              PackageContainer = opst.ContainerDescription,
+                              AmountVND = sur.AmountVnd,
+                              AmountUSD = sur.AmountUsd,
+                              VATAmountLocal = sur.VatAmountVnd,
+                              VATAmountUSD = sur.VatAmountUsd,
+                              CombineNo = combineNos.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault(),
+                              TypeCharge = sur.Type,
+                              BillingNo = GetBillingNo(sur),
+                              TransactionType = sur.TransactionType,
+                              ExchangeDate = sur.ExchangeDate,
+                              CreditNo=sur.CreditNo,
+                              DebitNo=sur.DebitNo,
+                              ServiceDate=opst.ServiceDate,
+                          };
+            var dataDoc = from sur in surcharges
+                          join charge in chargeDatas on sur.ChargeId equals charge.Id
+                          join unit in unitDatas on sur.UnitId equals unit.Id
+                          join csTransDe in csTransactionDetailRepo.Get() on sur.Hblid equals csTransDe.Id
+                          join csTran in csTransData on csTransDe.JobId equals csTran.Id
+                          // join clear in clearanceDatas on sur.JobNo equals clear.JobNo
+                          select new ChargeCombineResult()
+                          {
+                              JobId = sur.JobNo,
+                              HBL = sur.Hblno,
+                              CustomNo = sur.ClearanceNo,
+                              InvoiceNo = sur.InvoiceNo,
+                              Commodity = getCommonditiJobService(csTran.TransactionType),
+                              UnitId = sur.UnitId,
+                              ChargeWeight = csTran.GrossWeight,
+                              CBM = csTransDe.Cbm,
+                              PackageContainer = csTransDe.PackageContainer,
+                              AmountVND = sur.AmountVnd,
+                              AmountUSD = sur.AmountUsd,
+                              VATAmountLocal = sur.VatAmountVnd,
+                              VATAmountUSD = sur.VatAmountUsd,
+                              CombineNo = combineNos.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault(),
+                              TypeCharge = sur.Type,
+                              BillingNo = GetBillingNo(sur),
+                              TransactionType = sur.TransactionType,
+                              ExchangeDate = sur.ExchangeDate,
+                              CreditNo = sur.CreditNo,
+                              DebitNo = sur.DebitNo,
+                              ServiceDate=csTran.ServiceDate,
+                          };
+            #endregion
+            var dataCharges = Enumerable.Empty<ChargeCombineResult>().AsQueryable();
+            //dataCharges.AddRange(dataOps);
+            //if (dataDoc.Count() > 0)
+            //{
+            //    dataCharges.AddRange(dataDoc);
+            //}
+            dataCharges = dataOps.Union(dataDoc);
+
+            List<ExportCombineShipment> lstShipment = new List<ExportCombineShipment>();
+
+            var res = dataCharges.OrderBy(x => x.CombineNo).GroupBy(x => new { x.CombineNo, x.JobId, x.HBL, x.BillingNo }).ToList();
+            foreach (var grp in res)
+            {
+                var grpData = grp.FirstOrDefault();
+                ExportCombineShipment exportCombineShipment = new ExportCombineShipment();
+                exportCombineShipment.CommodityName = grpData.Commodity;
+                exportCombineShipment.JobNo = grpData.JobId;
+                exportCombineShipment.CustomDeclarationNo = grpData.CustomNo;
+                exportCombineShipment.InvoiceNo = String.Join(";", grp.Where(t => t.TransactionType == "CL" && t.TypeCharge != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.OBHInvoice = String.Join(";", grp.Where(t => t.TypeCharge == "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.FreInvoice = String.Join(";", grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.KGS = grpData.ChargeWeight;
+                exportCombineShipment.CBM = grpData.CBM;
+                exportCombineShipment.CombineNo = grpData.CombineNo;
+                exportCombineShipment.BillingNo = grpData.BillingNo;
+                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.AmountVND * -1 : t.AmountVND) : (t.TypeCharge == "BUY" ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH" && t.TransactionType == "CL").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.VATAmountLocal*-1:t.VATAmountLocal) : (t.TypeCharge == "BUY" ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
+                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? (t.CreditNo!=null && t.DebitNo==null? t.AmountVND*-1:t.AmountVND) : ((t.CreditNo != null && t.DebitNo == null) ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => criteria.Currency == "VND" ? (t.CreditNo != null && t.DebitNo == null ? t.VATAmountLocal*-1: t.VATAmountLocal): ((t.CreditNo != null && t.DebitNo == null) ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
+                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.AmountVND * -1 : t.AmountVND) : (t.TypeCharge == "BUY" ? t.AmountUSD * -1 : t.AmountUSD)).Sum();
+                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => criteria.Currency == "VND" ? (t.TypeCharge == "BUY" ? t.VATAmountLocal*-1: t.VATAmountLocal) : (t.TypeCharge == "BUY" ? t.VATAmountUSD*-1:t.VATAmountUSD)).Sum();
+                exportCombineShipment.HwbNo = grpData.HBL;
+                exportCombineShipment.PackageContainer = grpData.PackageContainer;
+                exportCombineShipment.TransactionType = grpData.TransactionType;
+                exportCombineShipment.ServiceDate = grpData.ServiceDate;
+                lstShipment.Add(exportCombineShipment);
+            }
+
+            shipmentModel.exportShipment = lstShipment;
+            var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+            shipmentModel.BillingAddressVN = partner?.AddressVn;
+            shipmentModel.PartnerNameVN = partner?.PartnerNameVn;
+            if (criteria.CreatedDateFrom != null)
+            {
+                shipmentModel.FromDate = criteria.CreatedDateFrom;
+                shipmentModel.ToDate = criteria.CreatedDateTo;
+            }
+            return shipmentModel;
+        }
+
+        public CombineShipmentModel GetDataExportCombineShipment(string combineBillingNo)
+        {
+            CombineShipmentModel shipment = new CombineShipmentModel();
+            var combine = DataContext.Get(x => x.CombineBillingNo == combineBillingNo).FirstOrDefault();
+            if (combine == null) { return shipment; }
+
+            var charges = GetChargeSellByCombineNo(combineBillingNo);
+
+            List<ExportCombineShipment> lstShipment = new List<ExportCombineShipment>();
+            var res = charges.GroupBy(x => new { x.JobId, x.HBL }).AsQueryable();
+            foreach (var grp in res)
+            {
+                ExportCombineShipment exportCombineShipment = new ExportCombineShipment();
+                exportCombineShipment.CommodityName = grp.Select(t => t.Commodity).FirstOrDefault();
+                exportCombineShipment.JobNo = grp.Select(t => t.JobId).FirstOrDefault();
+                exportCombineShipment.CustomDeclarationNo = grp.Select(t => t.CustomNo).FirstOrDefault();
+                exportCombineShipment.InvoiceNo = String.Join(";", grp.Where(t => t.TransactionType != "OBH"&&!string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.FreInvoice = String.Join(";", grp.Where(t => t.TransactionType == "OBH" && !string.IsNullOrEmpty(t.InvoiceNo)).Select(t => t.InvoiceNo));
+                exportCombineShipment.KGS = grp.Select(t => t.ChargeWeight).FirstOrDefault();
+                exportCombineShipment.CBM = grp.Select(t => t.CBM).FirstOrDefault();
+                exportCombineShipment.CombineNo = combineBillingNo;
+                exportCombineShipment.BillingNo = grp.Select(t => t.BillingNo).FirstOrDefault();
+                exportCombineShipment.CusFee = grp.Where(t => t.TypeCharge != "OBH"&&t.TransactionType=="CL").Select(t => t.AmountVND).Sum();
+                exportCombineShipment.CusVAT = grp.Where(t => t.TypeCharge != "OBH"&&t.TransactionType=="CL").Select(t => t.VATAmount).Sum();
+                exportCombineShipment.AuthFee = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.AmountVND).Sum();
+                exportCombineShipment.AuthVAT = grp.Where(t => t.TypeCharge == "OBH").Select(t => t.VATAmount).Sum();
+                exportCombineShipment.FreFee = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => t.AmountVND).Sum();
+                exportCombineShipment.FreVAT = grp.Where(t => t.TransactionType != "CL" && t.TypeCharge != "OBH").Select(t => t.VATAmount).Sum();
+                exportCombineShipment.HwbNo = grp.Select(t => t.HBL).FirstOrDefault();
+                //exportSOAOPS.CBM = grp.Select(t => t.CBM).FirstOrDefault();
+                //exportSOAOPS.GW = grp.Select(t => t.GrossWeight).FirstOrDefault();
+                //exportSOAOPS.PackageContainer = grp.Select(t => t.PackageContainer).FirstOrDefault();
+                //exportSOAOPS.Charges.AddRange(grp.Select(t => t).ToList());
+                lstShipment.Add(exportCombineShipment);
+            }
+            shipment.exportShipment = lstShipment;
+            var partner = partnerRepo.Get(x => x.Id == combine.PartnerId).FirstOrDefault();
+            shipment.BillingAddressVN = partner?.AddressVn;
+            shipment.PartnerNameVN = partner?.PartnerNameVn;
+            //opssoa.FromDate = soa.SoaformDate;
+            shipment.No = combineBillingNo;
+
+            //foreach (var item in ops.exportOPS)
+            //{
+            //    foreach (var it in item.Charges)
+            //    {
+            //        it.VATAmount = it.VATAmountLocal;
+            //        it.NetAmount = it.AmountVND;
+            //        if (it.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+            //        {
+            //            it.VATAmount *= (-1);
+            //            it.NetAmount *= (-1);
+            //        }
+            //    }
+            //}
+
+            if (combine.ServiceDateFrom != null)
+            {
+                shipment.FromDate = combine.ServiceDateFrom;
+                shipment.ToDate = combine.ServiceDateTo;
+            }
+            else if (combine.IssuedDateFrom != null)
+            {
+                shipment.FromDate = combine.IssuedDateFrom;
+                shipment.ToDate = combine.IssuedDateTo;
+            }
+            else
+            {
+                var chagerOrder = charges.OrderByDescending(x => x.ExchangeDate);
+                var lastdate = chagerOrder.FirstOrDefault();
+                var firstdate = chagerOrder.LastOrDefault();
+                shipment.FromDate = firstdate != null ? firstdate.ExchangeDate : null;
+                shipment.ToDate = lastdate != null ? lastdate.ExchangeDate : null;
+            }
+
+            return shipment;
         }
 
     }

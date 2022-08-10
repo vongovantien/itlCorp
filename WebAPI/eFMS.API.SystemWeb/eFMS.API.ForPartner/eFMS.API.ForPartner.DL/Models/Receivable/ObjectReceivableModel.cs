@@ -6,7 +6,6 @@ namespace eFMS.API.ForPartner.DL.Models.Receivable
 {
     public class ObjectReceivableModel
     {
-        public Guid? SurchargeId { get; set; }
         public string PartnerId { get; set; }
         public Guid? Office { get; set; }
         public string Service { get; set; }

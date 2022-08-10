@@ -17,5 +17,7 @@ namespace eFMS.API.ReportData.Models
         public string Code { get; set; }
         public DateTime PaymentDueDate { get; set; }
         public string PaymentStatus { get; set; }
+        public string Service { get; set; }
+        public string Salesman { get; set; }
     }
 }

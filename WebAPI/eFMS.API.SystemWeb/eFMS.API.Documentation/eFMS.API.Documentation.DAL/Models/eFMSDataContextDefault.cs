@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CsLinkCharge> CsLinkCharge { get; set; }
         public virtual DbSet<CsManifest> CsManifest { get; set; }
         public virtual DbSet<CsMawbcontainer> CsMawbcontainer { get; set; }
+        public virtual DbSet<CsRuleLinkFee> CsRuleLinkFee { get; set; }
         public virtual DbSet<CsShipmentOtherCharge> CsShipmentOtherCharge { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<CsShippingInstruction> CsShippingInstruction { get; set; }
@@ -76,13 +77,13 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
+                optionsBuilder.UseSqlServer("Server=efms-db.itlvn.com; Database=eFMS; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -383,6 +384,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.AdvanceFor)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.AdvanceNo)
                     .HasMaxLength(11)
@@ -959,6 +964,9 @@ namespace eFMS.API.Documentation.Service.Models
             {
                 entity.ToTable("acctSOA");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSOA");
+
                 entity.HasIndex(e => e.Soano)
                     .HasName("AcctSOA")
                     .IsUnique();
@@ -1309,12 +1317,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.IsExpired).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.IsOverDue).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.IsOverLimit).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -1569,6 +1571,10 @@ namespace eFMS.API.Documentation.Service.Models
             modelBuilder.Entity<CatPartner>(entity =>
             {
                 entity.ToTable("catPartner");
+
+                entity.HasIndex(e => e.AccountNo)
+                    .HasName("Index_CatPartner")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -2494,6 +2500,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerNameOrg)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PartnerOrgId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2622,6 +2632,59 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.SealNo).HasMaxLength(100);
 
                 entity.Property(e => e.UnitOfMeasureId).HasColumnName("UnitOfMeasureID");
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CsRuleLinkFee>(entity =>
+            {
+                entity.ToTable("csRuleLinkFee");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeBuying)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ChargeSelling)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerBuying)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerSelling)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RuleName)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceBuying)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceSelling)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
@@ -3002,9 +3065,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .ForSqlServerIsClustered(false);
 
                 entity.ToTable("csTransaction");
-
-                entity.HasIndex(e => e.JobNo)
-                    .HasName("Index_CSTransaction");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -3584,6 +3644,9 @@ namespace eFMS.API.Documentation.Service.Models
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
             {
+                entity.HasIndex(e => new { e.JobNo, e.ClearanceNo })
+                    .HasName("Index_Clearance");
+
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.AccountNo)
@@ -3763,9 +3826,6 @@ namespace eFMS.API.Documentation.Service.Models
             modelBuilder.Entity<OpsTransaction>(entity =>
             {
                 entity.ToTable("opsTransaction");
-
-                entity.HasIndex(e => e.JobNo)
-                    .HasName("Index_OpsTransaction");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")

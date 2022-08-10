@@ -169,7 +169,7 @@
 
         public static readonly string ARGEEMENT_TYPE_TRIAL = "Trial";
         public static readonly string ARGEEMENT_TYPE_OFFICIAL = "Official";
-        public static readonly string ARGEEMENT_TYPE_GUARANTEED = "Guaranteed";
+        public static readonly string ARGEEMENT_TYPE_GUARANTEE = "Guarantee";
         public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
         public static readonly string ARGEEMENT_TYPE_PARENT= "Parent Contract";
 
@@ -230,5 +230,12 @@
         public static readonly string TRANSACTION_TYPE_PAYABLE_ADV = "ADV";
         public static readonly string TRANSACTION_TYPE_PAYABLE_COMBINE = "COMBINE";
         #endregion
+
+        public const string OFFICE_HM = "ITLHM";
+        public const string OFFICE_BH = "ITLHBH";
+
+        public const string LINK_TYPE_AUTO_RATE = "AUTO_RATE";
+        public const string TYPE_LINK_SOURCE_SHIPMENT = "Replicate";
+        public const string OFFICE_TYPE_OUTSOURCE = "OutSource";
     }
 }

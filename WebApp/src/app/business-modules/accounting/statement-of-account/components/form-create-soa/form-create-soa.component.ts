@@ -88,6 +88,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     staffTypes: any = [];
     selectedStaffType: any = null;
+    agreementsInfo: any[] = [];
 
     constructor(
         private _toastService: ToastrService,
@@ -377,6 +378,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
                     this.updateDataSearch('serviceTypeId', this.selectedService.toString().replace(/(?:,)/g, ';'));
                     this.updateDataSearch('strServices', this.selectedService.toString());
+
+                    if(this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id).length > 1){
+                        this.getSelectedCurrencyForm();
+                    }
                 }
 
                 break;
@@ -400,6 +405,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.selectedSaleman = {};
                 if(!!data){
                     this.selectedSaleman = cloneDeep({ id: data.id, value: data.value });
+                    this.getSelectedCurrencyForm();
                     this.salemanDisplay = this.selectedSaleman.value;
                     this.updateDataSearch('salemanId', this.selectedSaleman.id);
                 } else{
@@ -570,6 +576,28 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         return _shipment;
     }
 
+    // Case thay đổi sale hoặc service thì update currency của soa debit
+    getSelectedCurrencyForm() {
+        const agreementLst = this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id);
+        let currency = this.currencyList.filter((curr) => agreementLst.map(x => x.creditCurrency).includes(curr.id));
+        if (!currency) {
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+        } else if (currency.length > 1) {
+            if (this.selectedService[0] !== 'All') {
+                this.selectedService.forEach((item: any) => {
+                    currency = this.currencyList.filter((curr) => agreementLst.filter(x => x.saleService.includes(item)).map(x => x.creditCurrency).includes(curr.id));
+                    if (!!currency) {
+                        return;
+                    }
+                })
+            }
+        }
+        this.selectedCurrency = currency[0];
+        if (!this.selectedCurrency) {
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+        }
+    }
+
     getInfoAgreement(){
         if(this.selectedType.value === this.types[0].value && !!this.selectedPartner.value){
             this.saleMans = [];
@@ -579,7 +607,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }).subscribe(
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
-                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].creditCurrency)[0];
+                            this.agreementsInfo = agreements;
                             this.saleMans = [...agreements.map(x => ({id: x.saleManId, value: x.saleManName})), ...this.itlBOD];
                             this.saleMans = _uniqBy(this.saleMans, 'id');
                         }else{

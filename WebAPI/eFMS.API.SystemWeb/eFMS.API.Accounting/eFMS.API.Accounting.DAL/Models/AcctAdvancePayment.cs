@@ -37,5 +37,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? ExcRateUsdToLocal { get; set; }
         public string BankCode { get; set; }
         public string AdvanceFor { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

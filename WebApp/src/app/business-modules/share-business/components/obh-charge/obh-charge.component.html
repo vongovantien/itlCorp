@@ -37,7 +37,7 @@
                 </ng-container>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
+        <div class="table-wrapper table-editable m--margin-top-20 table-horizontal" [class.h]="!!charges.length">
             <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -48,7 +48,8 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['receiverName','payerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''" [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
+                            [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
@@ -254,7 +255,7 @@
                                                 [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                [dataSources]="listCharges"
+                                                [dataSources]="listCharges$ | async"
                                                 [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                                 placeholder="Select charge" (remove)="charge.chargeId = null">
                                             </app-combo-grid-virtual-scroll>
@@ -413,7 +414,8 @@
                                 </div>
                             </td>
                             <td class="disabled">
-                                <div class="form-group ">
+                                <div class="form-group "
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
                                         currencyMask placeholder="Total">
                                 </div>
@@ -601,6 +603,25 @@
                                         disabled currencyMask placeholder="Net Amount">
                                 </div>
                             </td>
+                            <td class="disabled">
+                                <ng-container [ngSwitch]="charge.paymentStatus">
+                                    <span class="text-danger" *ngSwitchCase="'Unpaid'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-success" *ngSwitchDefault>
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                </ng-container>
+                            </td>
+                            <td class="disabled">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" disabled
+                                        [value]="charge.paidDate | date: 'dd/MM/yyyy'">
+                                </div>
+                            </td>
                         </tr>
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
@@ -624,12 +645,13 @@
 <confirm-popup [body]="'Are you sure want to delete this Charge'" (onSubmit)="onDeleteShipmentSurcharge('OBH')">
 </confirm-popup>
 
-<confirm-popup #confirmCancelPopup [body]="'Are you sure want to cancel link charge'" (onSubmit)="onCancelLinkCharge('OBH')">
+<confirm-popup #confirmCancelPopup [body]="'Are you sure want to cancel link charge'"
+    (onSubmit)="onCancelLinkCharge('OBH')">
 </confirm-popup>
 
-<app-context-menu #linkFeeContextMenu >
+<app-context-menu #linkFeeContextMenu>
     <ng-container *ngIf="selectedCs&&selectedCs.linkChargeId&&shipment.replicatedId">
-        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)" >
+        <div class="menu-context__item " (click)="cancelLinkCharge(selectedCs)">
             <span><i class="la la-ban"></i><span>Cancel Link Charge</span></span>
         </div>
     </ng-container>

@@ -314,7 +314,7 @@ export class DocumentationRepo {
     }
 
     getPartners(id: any, isHouseBillID: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`, { Id: id, IsHouseBillID: isHouseBillID }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`, { Id: id, IsHouseBillID: isHouseBillID }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -329,6 +329,10 @@ export class DocumentationRepo {
 
     getListCDNote(jobId: string, isShipmentOperation: boolean) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: jobId, IsShipmentOperation: isShipmentOperation });
+    }
+
+    getListCDNoteWithHbl(hblId: string, jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
     }
 
     checkCdNoteAllowToDelete(id: string) {
@@ -428,27 +432,27 @@ export class DocumentationRepo {
         return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadGoodsFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
     }
 
-    deleteShipmentSurcharge(chargId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Delete`, { chargId: chargId }).pipe(
+    deleteShipmentSurcharge(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Delete`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
-    cancelLinkCharge(chargId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, { chargId: chargId }).pipe(
+    cancelLinkCharge(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/CancelLinkCharge`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
-    getShipmentTotalProfit(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }).pipe(
+    GetShipmentTotalProfit(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetShipmentTotalProfit`, { jobId: jobId }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     getHBLTotalProfit(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -911,6 +915,12 @@ export class DocumentationRepo {
         );
     }
 
+    getHAWBListOfShipment(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getInfoMailHBLAirImport(hblId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirImport`, { hblId: hblId }).pipe(
             map((data: any) => data)
@@ -923,14 +933,14 @@ export class DocumentationRepo {
         );
     }
 
-    getInfoMailHBLAirExport(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId }).pipe(
+    getInfoMailHBLAirExport(hblId: any, jobId: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId, jobId: jobId }).pipe(
             map((data: any) => data)
         );
     }
 
-    getInfoMailHBLPreAlertSeaExport(hblId: string, serviceId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, serviceId: serviceId }).pipe(
+    getInfoMailHBLPreAlertSeaExport(hblId: string, jobId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, jobId: jobId, serviceId: serviceId }).pipe(
             map((data: any) => data)
         );
     }
@@ -1225,5 +1235,14 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/DetailByChargeOrgId?id=${id}`).pipe(
             map((data: any) => data)
         );
+    }
+
+    validateCheckPointMultiplePartner(body: DocumentationInterface.ICheckPointCriteria) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointMultiplePartner`, body);
+    }
+
+    getPartnerForCheckPointInShipment(id: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartnerForCheckPointInShipment`, { id, transactionType });
+
     }
 }

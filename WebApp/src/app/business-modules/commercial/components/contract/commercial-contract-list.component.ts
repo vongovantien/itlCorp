@@ -100,6 +100,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             description: null,
             vas: null,
             saleService: null,
+            shipmentType: null
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;
@@ -112,7 +113,12 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         }
         this.formContractPopup.selectedContract = new Contract();
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
-        this.formContractPopup.salesmanId.setValue(userLogged.id);
+        this.formContractPopup.selectedSalesman = { field: 'id', value: userLogged.id + '-' + userLogged.groupId + '-' + userLogged.departmentId };
+        this.formContractPopup.selectedSalesmanData = {
+            userId: userLogged.id, userGroupId: userLogged.groupId,
+            userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
+            userCompanyId: userLogged.companyId
+        };
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
 

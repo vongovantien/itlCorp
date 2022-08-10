@@ -23,46 +23,22 @@ namespace eFMSWindowService
             _scheduleTime = DateTime.Today.AddDays(1).AddHours(3);
 
         }
-
-        protected override void OnStart(string[] args)
-        {
-            if (ConfigurationManager.AppSettings["LogUpdateOverDueService"] == "1")
-                this.Start();
-        }
-
         public void Start()
         {
-            FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDueService] [START]:" + DateTime.Now);
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
-            // Execute mỗi ngày vào lúc 3h sáng
+            // Execute mỗi ngày vào lúc 1h sáng
             _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
-            //_timer.Interval = 7000; 
+            // _timer.Interval = 30000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer
             _timer.Enabled = true;
         }
-
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                //using (eFMSTestEntities db = new eFMSTestEntities())
-                //{
-                //    List<sp_GetOverDuePayment> over_15 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15DaysOverDueReceivable]").ToList();
-                //    List<sp_GetOverDuePayment> over_15_30 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15To30DaysOverDueReceivable]").ToList();
-                //    List<sp_GetOverDuePayment> over_30 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice30DaysOverDueReceivable]").ToList();
-
-                //    string log_15 = JsonConvert.SerializeObject(over_15);
-                //    string log_15_30 = JsonConvert.SerializeObject(over_15_30);
-                //    string log_30 = JsonConvert.SerializeObject(over_30);
-
-                //    FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDue15Service] [Updated]:" + DateTime.Now + "\n" + "=======" + "\n" + log_15 + "\n" + "======= ");
-                //    FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDue15_30Service] [Updated]:" + DateTime.Now + "\n" + "=======" + "\n" + log_15_30 + "\n" + "======= ");
-                //    FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDue30Service] [Updated]:" + DateTime.Now + "\n" + "=======" + "\n" + log_30 + "\n" + "======= ");
-
-
                 FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDueService] [CALL]:" + DateTime.Now);
 
                 HttpClient client = new HttpClient();
@@ -91,6 +67,11 @@ namespace eFMSWindowService
                 FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDueService] [ERROR]:" + DateTime.Now + "\n " + ex.ToString());
                 throw;
             }
+        }
+        protected override void OnStart(string[] args)
+        {
+            FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDueService] [START]:" + DateTime.Now);
+            this.Start();
         }
 
         protected override void OnStop()

@@ -45,15 +45,14 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !salesmanId.value}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedSalesmanData}">
                                 <label required>Salesman</label>
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectedDataFormInfo($event,'salesman')"
-                                    [currentActiveItemId]="{ field: 'id', value: salesmanId.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="users"
-                                    [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
-                                    placeholder="Select Salesman" [height]="200" size="15"
-                                    (remove)="resetFormControl('salesmanId')">
+                                    [currentActiveItemId]="selectedSalesman"
+                                    [selectedDisplayFields]="selectedDisplaySalesman" [dataSources]="users"
+                                    [displayFields]="displayFieldSalesman" placeholder="Select Salesman" [height]="200"
+                                    size="15" (remove)="resetFormControl('salesmanId')" [clearable]="false">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -67,7 +66,7 @@
                                     [selectedDisplayFields]="['bunameAbbr']" [dataSources]="companies"
                                     (remove)="resetFormControl('company')"
                                     [displayFields]="[{field: 'bunameAbbr', label: 'Abbr Name'}, { field: 'bunameEn', label: 'Name EN' }]"
-                                    [height]="200" placeholder="Select Company">
+                                    [height]="200" placeholder="Select Company" [clearable]="false">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -78,7 +77,8 @@
                                 <div class="pos-rel">
                                     <ng-select [items]="offices" [clearable]="true" class="custom"
                                         formControlName="officeId" [multiple]="true" bindLabel="text"
-                                        (change)="selectedOffice($event)" placeholder="Please select">
+                                        (change)="selectedOffice($event)" placeholder="Please select"
+                                        [clearable]="false">
                                     </ng-select>
                                 </div>
                             </div>
@@ -97,25 +97,50 @@
 
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !effectiveDate.value.startDate }">
-                                <label required for="">Effective Date</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
-                                        class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !effectiveDate.value.startDate }">
+                                        <label required for="">Effective Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
+                                                class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                formControlName="effectiveDate" readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!expiredDate.value.startDate && contractType.value !=='Cash') }">
+                                        <label *ngIf="contractType.value !=='Cash'" required for="">Expired Date</label>
+                                        <label *ngIf="contractType.value === 'Cash'" for="">Expired Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                formControlName="expiredDate" readonly [minDate]="minDateExpired" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="row">
-                                <div class="col-lg-7">
+                                <!-- <div class="col-lg-7">
                                     <div class="form-group">
                                         <label>Expired Date</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -131,13 +156,27 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-5">
+                                </div> -->
+                                <div class="col-lg-8">
                                     <div class="form-group">
                                         <label>Auto Extend (Year)
                                         </label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
-                                            class="form-control" formControlName="autoExtendDays">
+                                        <input currencyMask type="text" class="form-control"
+                                            (change)="formatAutoExtendDays()" formControlName="autoExtendDays">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            No Due
+                                        </label>
+                                        <div>
+                                            <label class="m-checkbox m-checkbox--state-success mb-0">
+                                                <input type="checkbox" formControlName="noDue"
+                                                    (onclick)="onSelectedDataFormInfo($event,'noDue')">
+                                                <span></span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -145,13 +184,26 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
-                                <label required>Agreement Type</label>
-                                <ng-select [items]="contractTypes" (change)="selectedAgreementType($event)"
-                                    class="custom" formControlName="contractType" placeholder="Please select">
-                                </ng-select>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
+                                        <label required>Agreement Type</label>
+                                        <ng-select [items]="contractTypes" (change)="selectedAgreementType($event)"
+                                            class="custom" formControlName="contractType" placeholder="Please select"
+                                            [clearable]="false">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Shipment Type</label>
+                                        <input type="text" class="form-control" formControlName="shipmentType"
+                                            placeholder="Nominated/Freehand" readonly>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
@@ -177,19 +229,22 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
                                 <label required>Invoice Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="currencyId" placeholder="Select Currency">
+                                    class="custom" formControlName="currencyId" placeholder="Select Currency"
+                                    [clearable]="false">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
                                 <label required>AR Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="creditCurrency"
-                                    placeholder="Select Credit Currency">
+                                    class="custom" formControlName="creditCurrency" placeholder="Select Credit Currency"
+                                    [clearable]="false">
                                 </ng-select>
                             </div>
                         </div>
@@ -206,7 +261,8 @@
                         </div>
                     </div>
                     <ng-container>
-                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && (contractType.value ==='Official' || contractType.value ==='Trial'))">
+                        <div class="row"
+                            *ngIf=" isUpdate ||  (!isUpdate && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                             <div class="col-lg-12">
                                 <div class="alert-block__heading font-weight-bold collapse-toggle "
                                     data-toggle="collapse" data-target="#data-form-contact">
@@ -278,7 +334,8 @@
                                     </div>
                                 </div>
                             </ng-container>
-                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
+                            <ng-container
+                                *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Payment Term</label>
@@ -291,7 +348,8 @@
                                     <div class="form-group">
                                         <label>Base On</label>
                                         <ng-select [items]="basesOn" [clearable]="false" class="custom"
-                                            formControlName="baseOn" placeholder="Please select">
+                                            [readonly]="contractType.value === 'Guarantee'" formControlName="baseOn"
+                                            placeholder="Please select">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -390,7 +448,8 @@
                                 </div>
                             </ng-container>
                         </div>
-                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
+                        <div class="row"
+                            *ngIf=" isUpdate || (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                             <div class="col-lg-8">
                                 <div class="form-group">
                                     <label>Description</label>
@@ -421,12 +480,12 @@
                                         <ng-container *ngIf="!isLoading && !!files && isUpdate">
                                             <li *ngFor="let file of files">
                                                 <a [href]="file.url" target="_blank" [title]="file.name"
-                                                download>{{file.name}}</a>
+                                                    download>{{file.name}}</a>
                                                 <span class="pointer text-center">
                                                     <a title="Delete" (click)="deleteFile(file)">
                                                         <i class="la la-times fa-lg text-danger"></i>
                                                     </a>
-                                                </span>    
+                                                </span>
                                             </li>
                                         </ng-container>
                                     </div>

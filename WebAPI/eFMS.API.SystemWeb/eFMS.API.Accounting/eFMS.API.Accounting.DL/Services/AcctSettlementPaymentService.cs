@@ -19,7 +19,6 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
@@ -30,8 +29,8 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -72,6 +71,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -112,6 +112,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IUserBaseService userBase,
             IDatabaseUpdateService _databaseUpdateService,
+            IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -149,6 +150,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailSettingRepository = sysEmailSettingRepo;
             opsStageAssignedRepository = opsStageAssignedRepo;
             databaseUpdateService = _databaseUpdateService;
+            csLinkChargeRepository = csLinkChargeRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -425,6 +427,10 @@ namespace eFMS.API.Accounting.DL.Services
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
             IQueryable<CatDepartment> departments = catDepartmentRepo.Get();
+            var settleNos = settlementPayments.Select(x => x.SettlementNo).ToList();
+            var surchargesIssued = csShipmentSurchargeRepo.Get(x => settleNos.Any(z => z == x.SettlementCode) && x.IsFromShipment == false &&
+                    !(string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.PaySoano) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.VoucherIdre)))
+                    .Select(x=> x.SettlementCode).Distinct().ToList();
 
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
@@ -442,6 +448,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Requester = settlePayment.Requester,
                            RequesterName = user.Username,
                            RequestDate = settlePayment.RequestDate,
+                           DueDate = settlePayment.DueDate,
                            StatusApproval = settlePayment.StatusApproval,
                            PaymentMethod = settlePayment.PaymentMethod,
                            Note = settlePayment.Note,
@@ -456,7 +463,9 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
                            PayeeName = partnerGrp.ShortName,
-                           DepartmentName = deptGrp.DeptNameAbbr
+                           DepartmentName = deptGrp.DeptNameAbbr,
+
+                           IssuedSoa = surchargesIssued.Any(z => z == settlePayment.SettlementNo)
                        };
             return data;
         }
@@ -691,7 +700,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, x.CustomNo }) /* case đặc biệt
+                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
                                         1. Có tạm ứng - không có tk 
                                         2. Có tạm ứng - Có tờ khai
                                         */
@@ -732,7 +741,7 @@ namespace eFMS.API.Accounting.DL.Services
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
                     // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
-                    ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
+                    // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
@@ -803,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
             AdvanceInfo result = new AdvanceInfo();
             string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
-            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
+            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) }).ToList();
 
             var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.ClearanceNo == _clearanceNo);
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
@@ -907,7 +916,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
                                      && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
-                                     && sur.ClearanceNo == clearanceNo
+                                     && (!string.IsNullOrEmpty(sur.ClearanceNo) ? (sur.ClearanceNo == clearanceNo) : string.IsNullOrEmpty(clearanceNo))
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -981,7 +990,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
                                     && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
-                                    && sur.ClearanceNo == clearanceNo
+                                    && (!string.IsNullOrEmpty(sur.ClearanceNo) ? (sur.ClearanceNo == clearanceNo) : string.IsNullOrEmpty(clearanceNo))
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1871,6 +1880,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.DepartmentId = currentUser.DepartmentId;
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
+                entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -1878,6 +1888,7 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState((object)"Fail to create settlment. Please try again.");
                 }
                 var settlement = mapper.Map<AcctSettlementPayment>(DataContext.Get(x => x.Id == entity.Id).FirstOrDefault());
+                databaseUpdateService.LogAddEntity(settlement);
                 model.Settlement.SettlementNo = settlement.SettlementNo;
                 model.Settlement.Requester = settlement.Requester;
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
@@ -1949,7 +1960,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal? _advanceAmount = null;
 
-            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) })
                                     .Select(x => new ShipmentSettlement
                                     {
                                         JobId = x.Key.JobId,
@@ -2021,6 +2032,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.ReasonReject = settlementCurrent.ReasonReject;
                 settlement.LockedLog = settlementCurrent.LockedLog;
                 settlement.SettlementType = settlementCurrent.SettlementType;
+                settlement.BankAccountNo = StringHelper.RemoveSpecialChars(settlement.BankAccountNo, Constants.spaceCharacter);
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
@@ -2663,18 +2675,18 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         var hs = acctApproveSettlementRepo.SubmitChanges();
-                        
+                        var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
                         if (settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                         {
-                            settlementPayment.Amount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).Sum(surcharge => (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0));
+                            settlementPayment.Amount = surcharges.Sum(surcharge => (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0));
                         }
                         else if (settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_USD)
                         {
-                            settlementPayment.Amount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).Sum(surcharge => (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0));
+                            settlementPayment.Amount = surcharges.Sum(surcharge => (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0));
                         }
                         else
                         {
-                            settlementPayment.Amount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).Sum(surcharge => surcharge.Total);
+                            settlementPayment.Amount = surcharges.Sum(surcharge => surcharge.Total);
                         }
                         var hsUpdateAdvancePayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id);
                         trans.Commit();
@@ -4649,7 +4661,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(s.ClearanceNo) ? null : s.ClearanceNo) }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4853,7 +4865,7 @@ namespace eFMS.API.Accounting.DL.Services
                                               JobID = cst.JobNo,
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
-                                              SettlementAmount = sur.Total,
+
                                               CustomNo = string.Empty,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
@@ -4861,13 +4873,14 @@ namespace eFMS.API.Accounting.DL.Services
                                               Requester = requesterName,
                                               RequestDate = currentSettlement.RequestDate,
                                               ApproveDate = approveDate,
-                                              Description = sur.Notes
+                                              Description = sur.Notes,
+                                              SettlementAmount = sur.Total,
                                           };
 
                         var data = dataOperation.Union(dataService).ToList();
 
                         decimal? advTotalAmount;
-                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
+                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, CustomNo = (string.IsNullOrEmpty(d.CustomNo) ? null : d.CustomNo) })
                             .Select(s => new SettlementExportGroupDefault
                             {
                                 JobID = s.Key.JobID,
@@ -4932,7 +4945,7 @@ namespace eFMS.API.Accounting.DL.Services
                     d.SettleNo,
                     d.Currency,
                     d.ApproveDate,
-                    d.CustomNo,
+                    CustomNo = (string.IsNullOrEmpty(d.CustomNo) ? null : d.CustomNo),
                     d.RequestDate,
                     d.Requester
                 })
@@ -5423,11 +5436,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode)
         {
-            //Get list charge by SettlementCode
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode);
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+            if(surcharges.Count() > 0)
+            {
+                return new List<ObjectReceivableModel>();
+            }
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ cho Partner, Service, Office có trong charge của Settlement
-            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Settlement ---
@@ -5663,7 +5677,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal? _advanceAmount = null;
 
-            IEnumerable<ShipmentSettlement> dataGroups = charges.Where(x => !string.IsNullOrEmpty(x.AdvanceNo)).GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+            IEnumerable<ShipmentSettlement> dataGroups = charges.Where(x => !string.IsNullOrEmpty(x.AdvanceNo)).GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, ClearanceNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) })
                                     .Select(x => new ShipmentSettlement
                                     {
                                         JobId = x.Key.JobId,
@@ -5761,26 +5775,49 @@ namespace eFMS.API.Accounting.DL.Services
             #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
             var invalidSettles = new List<Guid>();
             var invalidCodeSettles = new List<string>();
+
+            var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
+            var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
+            var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
             foreach (var settlementId in ids)
             {
-                var detail = DataContext.Get(x => x.Id == settlementId)?.FirstOrDefault();
+                var detail = settlementData.First(x => x.Id == settlementId);
                 if (detail == null) return null;
 
-                if (detail.SettlementType == "DIRECT")
+                #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
+                //if (detail.SettlementType == "DIRECT")
+                //{
+                //    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
+                //    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
+                //    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
+                //    if (isDebit || isSoa)
+                //    {
+                //        invalidSettles.Add(settlementId);
+                //        invalidCodeSettles.Add(detail.SettlementNo);
+                //    }
+                //}
+                //if (invalidSettles.Count > 0)
+                //            {
+                //                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                //            }
+                #endregion
+
+                // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
+                var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
+                var chargesLinked = from sur in surchargesSettle
+                                    join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
+                                    join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
+                                    select sell.Id;
+                if (chargesLinked != null && chargesLinked.Count() > 0)
                 {
-                    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
-                    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
-                    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
-                    if (isDebit || isSoa)
-                    {
-                        invalidSettles.Add(settlementId);
-                        invalidCodeSettles.Add(detail.SettlementNo);
-                    }
+                    invalidSettles.Add(settlementId);
+                    invalidCodeSettles.Add(detail.SettlementNo);
                 }
             }
-            if(invalidSettles.Count > 0)
+            if (invalidSettles.Count > 0)
             {
-                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had auto rate fees. You can not deny.", invalidCodeSettles.Join(",")), Data = invalidSettles };
             }
             #endregion
             return new ResultHandle();
@@ -6160,6 +6197,80 @@ namespace eFMS.API.Accounting.DL.Services
                 // Update/Delete surcharge of settlement
                 databaseUpdateService.UpdateSurchargeSettleDataToDB(surchargeShipment, settleCode, kickBackExcRate, action);
             }
+        }
+
+        /// <summary>
+        /// Call Auto replicate after done settle
+        /// </summary>
+        /// <param name="settleNo"></param>
+        /// <returns></returns>
+        public async Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId)
+        {
+            var settlement = DataContext.Get(x => x.Id == settleId).FirstOrDefault();
+            if(settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE) // Get Auto rate fees when settlement Done
+            {
+                return new ResultHandle();
+            }
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+            try
+            {
+                var jobNos = surcharges.Select(x => x.JobNo).Distinct().ToList();
+                var validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && x.LinkSource == AccountingConstants.TYPE_LINK_SOURCE_SHIPMENT && x.ReplicatedId == null);
+                if (!validAutorate)
+                {
+                    var outSourceOffice = sysOfficeRepo.Get(x => x.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE).Select(x => x.Id).ToList();
+                    validAutorate = opsTransactionRepo.Any(x => jobNos.Any(z => z == x.JobNo) && outSourceOffice.Any(ofi => ofi == x.OfficeId));
+                }
+                var response = new ResultHandle();
+                if (validAutorate)
+                {
+                    Uri urlDocumentation = new Uri(apiUrl.Value.Url);
+                    string urlAutorate = new Uri(urlDocumentation, "Documentation/api/v1/en-US/OpsTransaction/AutoRateReplicate?settleNo=" + settlement.SettlementNo + "&&jobNo=null").ToString();
+                    HttpResponseMessage resquest = await HttpClientService.GetApi(urlAutorate, null);
+                    response = await resquest.Content.ReadAsAsync<ResultHandle>();
+                }
+                new LogHelper("EFMS_AutoRateReplicate_Called", "Settle :" + settlement.SettlementNo + " - Total of fees: " + surcharges.Count() + " Status: " + response?.Status);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("EFMS_AutoRateReplicate_Error", "Settle :" + settlement.SettlementNo + " - Total of fees: " + surcharges.Count() + " Error: " + ex.Message);
+                return new ResultHandle();
+            }
+        }
+        
+        /// Check if payee not staff then not accept input cost > sell
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string CheckValidFeesOnShipment(CreateUpdateSettlementModel model)
+        {
+            var invalidShipment = string.Empty;
+            if (!string.IsNullOrEmpty(model.Settlement.Payee))
+            {
+                if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                {
+                    var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
+                    var listSipment = new List<string>();
+                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    foreach (var job in shipmentGrp)
+                    {
+                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        if (buyAmount > sellAmount)
+                        {
+                            listSipment.Add(job.Key);
+                        }
+                    }
+                    if (listSipment.Count > 0)
+                    {
+                        listSipment = listSipment.Distinct().ToList();
+                        invalidShipment = string.Join("\n", listSipment);
+                    }
+                }
+            }
+            return invalidShipment;
         }
     }
 }

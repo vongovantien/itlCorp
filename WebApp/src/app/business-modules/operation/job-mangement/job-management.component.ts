@@ -49,7 +49,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     };
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
-    isSearchLinkFeea:boolean = false;
+    isSearchLinkFeea: boolean = false;
 
     constructor(
         private sortService: SortService,
@@ -74,18 +74,19 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Replicate Job', field: 'replicateJobNo', sortable: true },
+            { title: 'MBL', field: 'mblno', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Product Service', field: 'productService', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
-            { title: 'Department', field: 'departmentName', sortable: true },
-            { title: 'Group', field: 'groupName', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
             { title: 'CBM', field: 'sumCbm', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
+            { title: 'Department', field: 'departmentName', sortable: true },
+            { title: 'Group', field: 'groupName', sortable: true },
             { title: 'Modified Date', field: 'modifiedDate', sortable: true },
         ];
 
@@ -303,7 +304,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
-    onSelectTab(tabName:any){
+    onSelectTab(tabName: any) {
         this.isSearchLinkFeea = !this.isSearchLinkFeea;
     }
 
@@ -328,7 +329,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             );
     }
 
-    chargeFromJobRep(){
+    chargeFromJobRep() {
         this.linkChargeFromRep.show();
     }
 

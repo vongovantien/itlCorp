@@ -3436,7 +3436,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
-            var files = sysFileRepository.Get(x => x.Folder == "Accounting/" + folder && x.ObjectId == objectId).ToList();
+            var files = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId).ToList();
             if(files.Count > 0)
             {
                 files.ForEach(c =>

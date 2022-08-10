@@ -18,7 +18,7 @@ import { RoutingConstants } from '@constants';
 
 export class SeaConsolExportHBLComponent extends AppShareHBLBase implements OnInit {
     constructor(
-        private _router: Router,
+        protected _router: Router,
         protected _store: Store<IShareBussinessState>,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
@@ -28,7 +28,7 @@ export class SeaConsolExportHBLComponent extends AppShareHBLBase implements OnIn
         protected _activedRoute: ActivatedRoute,
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
     }
 
     configHBL() {
@@ -86,11 +86,5 @@ export class SeaConsolExportHBLComponent extends AppShareHBLBase implements OnIn
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
         }
-    }
-
-    duplicateConfirm() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
-        });
     }
 }

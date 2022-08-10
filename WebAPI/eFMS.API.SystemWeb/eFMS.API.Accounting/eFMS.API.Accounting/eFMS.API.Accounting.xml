@@ -309,25 +309,11 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivable(eFMS.API.Accounting.DL.Models.CalculatorReceivableModel)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDebitAmountDetailByContract(eFMS.API.Accounting.DL.Models.Criteria.AccAccountReceivableCriteria)">
             <summary>
-            Calculator Receivable
+            Get AR detail has argeement by argeement id
             </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivableNotAuthorize(eFMS.API.Accounting.DL.Models.CalculatorReceivableNotAuthorizeModel)">
-            <summary>
-            Calculator Receivable Not Authorize
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.ObjectReceivableModel})">
-            <summary>
-            Insert Or Update Receivable
-            </summary>
-            <param name="models"></param>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">
@@ -337,7 +323,7 @@
             <param name="argeementId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String,System.String)">
             <summary>
             Get AR detail no argeement by partner id
             </summary>
@@ -665,6 +651,13 @@
         <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetDataExportCombineOpsByPartner(eFMS.API.Accounting.DL.Models.Criteria.AcctCombineBillingCriteria)">
             <summary>
             Get Combine OPS data with partner and currency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetDataCombineShipmentByPartner(eFMS.API.Accounting.DL.Models.Criteria.AcctCombineBillingCriteria)">
+            <summary>
+            Get Combine Shipment data with partner and currency
             </summary>
             <param name="criteria"></param>
             <returns></returns>

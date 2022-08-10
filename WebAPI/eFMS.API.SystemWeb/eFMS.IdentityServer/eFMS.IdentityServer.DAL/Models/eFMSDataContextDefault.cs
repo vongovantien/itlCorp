@@ -336,6 +336,8 @@ namespace eFMS.IdentityServer.Service.Models
 
                 entity.Property(e => e.Photo).HasMaxLength(500);
 
+                entity.Property(e => e.SignatureImage).HasMaxLength(1000);
+
                 entity.Property(e => e.Position).HasMaxLength(1600);
 
                 entity.Property(e => e.SaleResource)

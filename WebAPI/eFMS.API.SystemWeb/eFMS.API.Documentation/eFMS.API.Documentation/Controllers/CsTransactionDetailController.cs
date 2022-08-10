@@ -2,18 +2,24 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -29,15 +35,28 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionDetailService csTransactionDetailService;
         private readonly ICurrentUser currentUser;
-        ICsMawbcontainerService containerService;
-        ICsTransactionService csTransactionService;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user, ICsMawbcontainerService mawbcontainerService, ICsTransactionService csTransaction)
+        private readonly ICsMawbcontainerService containerService;
+        private readonly ICsTransactionService csTransactionService;
+        private readonly IAccAccountReceivableService AccAccountReceivableService;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
+            ICsTransactionDetailService service, 
+            ICurrentUser user, 
+            ICsMawbcontainerService mawbcontainerService, 
+            ICsTransactionService csTransaction,
+            IAccAccountReceivableService AccAccountReceivable,
+            IOptions<ApiServiceUrl> serviceUrl
+            )
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
             currentUser = user;
             containerService = mawbcontainerService;
             csTransactionService = csTransaction;
+            AccAccountReceivableService = AccAccountReceivable;
+            apiServiceUrl = serviceUrl;
+
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -122,9 +141,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            currentUser.Action = "DeleteCSTransactionDetail";
 
-            var hs = csTransactionDetailService.DeleteTransactionDetail(id);
+            var hs = csTransactionDetailService.DeleteTransactionDetail(id, out List<ObjectReceivableModel> modelReceivableList);
             var message = hs.Success == true ? HandleError.GetMessage(hs, Crud.Delete) : hs.Message?.ToString();
             if (hs.Code == 403)
             {
@@ -135,6 +153,16 @@ namespace eFMS.API.Documentation.Controllers
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
             }
             return Ok(result);
         }
@@ -545,6 +573,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get HAWB List Of Shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetHAWBListOfShipment")]
+        public IActionResult GetHAWBListOfShipment(Guid jobId)
+        {
+            var result = csTransactionDetailService.GetHAWBListOfShipment(jobId);
+            return Ok(result);
+        }
+
         private string CheckHasHBLUpdatePermitted(CsTransactionDetailModel model)
         {
             string errorMsg = string.Empty;
@@ -563,6 +604,16 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             return errorMsg;
+        }
+
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
         }
     }
 }

@@ -62,10 +62,13 @@
         public const string CODE_ITL = "ITL7939";
         public const string NO_HOUSE = "N/H";
         public const string ITL_BOD = "ITL.BOD";
+        public const string OFFICE_HM = "ITLHM";
+        public const string OFFICE_BH = "ITLHBH";
 
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
-
+        public static readonly string SHIPMENT_TYPE_NOMINATED = "Nominated";
+        public static readonly string SHIPMENT_TYPE_FREEHAND = "Freehand";
 
         public const string PERMISSION_RANGE_ALL = "All";
         public const string PERMISSION_RANGE_OWNER = "Owner";

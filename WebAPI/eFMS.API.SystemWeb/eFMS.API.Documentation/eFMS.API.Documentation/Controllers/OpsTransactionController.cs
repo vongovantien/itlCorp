@@ -228,20 +228,22 @@ namespace eFMS.API.Documentation.Controllers
 
                 Response.OnCompleted(async () =>
                 {
-                    //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
                 });
             }
             return Ok(hs);
         }
 
-        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
             Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
@@ -262,12 +264,22 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
-            var hs = transactionService.SoftDeleteJob(id);
+            var hs = transactionService.SoftDeleteJob(id, out List<ObjectReceivableModel> modelReceivableList);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
             }
             return Ok(result);
         }
@@ -383,17 +395,34 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult ChargeFromReplicate([FromBody] ChargeFromReplicateCriteria model)
         {
             currentUser.Action = "ChargeFromReplicate";
-            ResultHandle hs = transactionService.ChargeFromReplicate(model.ArrJobRep);
+            ResultHandle hs = transactionService.ChargeFromReplicate(model.ArrJobRep, out List<Guid> Ids);
             if (!hs.Status)
                 return BadRequest(hs);
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
+            }
             return Ok(hs);
         }
 
+        /// <summary>
+        /// Calling AutoRateReplicate
+        /// </summary>
+        /// <param name="settleNo">Settlement Code</param>
+        /// <param name="jobNo">Job No</param>
+        /// <returns></returns>
         [HttpGet("AutoRateReplicate")]
-        public IActionResult AutoRateReplicate()
+        public IActionResult AutoRateReplicate(string settleNo, string jobNo)
         {
             currentUser.Action = "AutoRateReplicate";
-            ResultHandle hs = transactionService.AutoRateReplicate();
+            ResultHandle hs = transactionService.AutoRateReplicate(settleNo, jobNo);
             if (!hs.Status)
                 return BadRequest(hs);
             return Ok(hs);

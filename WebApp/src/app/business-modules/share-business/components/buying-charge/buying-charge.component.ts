@@ -58,6 +58,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
     listCharges: Charge[];
+    listCharges$: Observable<Charge[]>;
     listUnits: Unit[] = [];
     listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
@@ -285,12 +286,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
-            .subscribe(
-                (charges: Charge[]) => {
-                    this.listCharges = charges;
-                }
-            );
+        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
+        // .subscribe(
+        //     (charges: Charge[]) => {
+        //         this.listCharges = charges;
+        //     }
+        // );
     }
 
     sortSurcharge() {
@@ -431,7 +432,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
             this._progressRef.start();
-            this._documentRepo.deleteShipmentSurcharge(this.selectedSurcharge.id)
+            const body = {
+                Id: this.selectedSurcharge.id,
+                partnerId: this.selectedSurcharge.paymentObjectId,
+                office: (!!this.selectedSurcharge ? this.selectedSurcharge.officeId : this.userLogged.officeId),
+                service: (!!this.selectedSurcharge.transactionType ? this.selectedSurcharge.transactionType : this.serviceTypeId),
+            }
+            this._documentRepo.deleteShipmentSurcharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -440,8 +447,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             if (this.selectedIndexCharge > -1) {
 
                                 // TODO Tính công nợ BE
-                                this.calculatorReceivable([this.selectedSurcharge]);
-
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
 
                             }
@@ -461,9 +466,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                // this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteSellingSurchargeAction(index));
                 break;
             case CommonEnum.SurchargeTypeEnum.OBH:
+                // this.calculatorReceivable([this.selectedSurcharge])
                 this._store.dispatch(new fromStore.DeleteOBHSurchargeAction(index));
                 break;
             default:
@@ -547,9 +554,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
-                        // Tính công nợ
-                        // this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(type);
@@ -854,6 +858,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 valid = false;
                 break;
             }
+        }
+
+        // Error if total > 100,000usd
+        if (valid && this.charges.some((chargeItem: CsShipmentSurcharge) => chargeItem.currencyId === 'USD' && chargeItem.total > 100000)) {
+            valid = false;
+            this._toastService.error('Amount is too large, please check again.');
         }
 
         return valid;
@@ -1444,14 +1454,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     calculatorReceivable(charges: CsShipmentSurcharge[]) {
-        const objReceivable = charges.map((item: any) => ({ surchargeId: item.id, partnerId: item.paymentObjectId, office: (!!item.officeId ? item.officeId : this.userLogged.officeId), service: (!!item.transactionType ? item.transactionType : this.serviceTypeId) }));
-        charges.forEach((element: any) => {
-            if (element.type === 'OBH') {
-                objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
-            }
-        });
+        const objReceivable = charges.map((item: any) => ({
+            surchargeId: item.id,
+            partnerId: item.paymentObjectId,
+            office: (!!item.officeId ? item.officeId : this.userLogged.officeId),
+            service: (!!item.transactionType ? item.transactionType : this.serviceTypeId),
+        }));
 
-        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+        // charges.forEach((element: any) => {
+        //     if (element.type === 'OBH') {
+        //         objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
+        //     }
+        // });
+
+        this._accountingRepo.calculatorDebitAmount({ objectReceivable: objReceivable }).subscribe();
     }
 
     onSelectSurcharge(index, cs: CsShipmentSurcharge) {
@@ -1475,7 +1491,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.confirmCancelPopup.hide();
         if (!!this.selectedCs && this.selectedCs.id !== SystemConstants.EMPTY_GUID) {
             this._progressRef.start();
-            this._documentRepo.cancelLinkCharge(this.selectedCs.id)
+            const body = {
+                Id: this.selectedCs.id,
+                partnerId: this.selectedCs.paymentObjectId,
+                office: (!!this.selectedCs ? this.selectedCs.officeId : this.userLogged.officeId),
+                service: (!!this.selectedCs.transactionType ? this.selectedCs.transactionType : this.serviceTypeId),
+            }
+            this._documentRepo.cancelLinkCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

@@ -224,14 +224,11 @@ namespace eFMS.API.Documentation.Controllers
             var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE)).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
-                for (int i = 0; i < partnersNeedValidate.Count; i++)
+                string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
+                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[0].PaymentObjectId, partnersNeedValidate[0].Hblid, transactionTypeToCheckPoint, CHECK_POINT_TYPE.SURCHARGE, null);
+                if (!hsCheckpoint.Success)
                 {
-                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[i].PaymentObjectId, 
-                        partnersNeedValidate[i].Hblid, "DOC", CHECK_POINT_TYPE.SURCHARGE, null);
-                    if (!hsCheckpoint.Success)
-                    {
-                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
-                    }
+                    return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
                 }
             }
             currentUser.Action = "AddAndUpdate";
@@ -248,20 +245,22 @@ namespace eFMS.API.Documentation.Controllers
                 //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
                 Response.OnCompleted(async () =>
                 {
-                    //Tính công nợ sau khi tạo mới hóa đơn thành công
                     List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
                 });
             }
             return Ok(result);
         }
 
-        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
             Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
@@ -404,18 +403,28 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="chargId"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPut]
         [Route("Delete")]
         [Authorize]
-        public IActionResult Delete(Guid chargId)
+        public IActionResult Delete(DeleteSurchargeDeleteModel model)
         {
             currentUser.Action = "DeleteCsShipmentSurcharge";
-            var hs = csShipmentSurchargeService.DeleteCharge(chargId);
+            var hs = csShipmentSurchargeService.DeleteCharge(model.Id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = new List<ObjectReceivableModel>() {
+                        new ObjectReceivableModel { Office = model.Office, PartnerId = model.PartnerId, Service = model.Service }
+                    };
+                    await CalculatorReceivable(modelReceivableList);
+                });
             }
             return Ok(result);
         }
@@ -654,7 +663,31 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CsShipmentSurchargeImportModel> data)
         {
-            var hs = csShipmentSurchargeService.Import(data);
+            var hs = csShipmentSurchargeService.Import(data, out List<Guid> Ids);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await CalculatorReceivable(modelReceivableList);
+                    }
+                });
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("ImportPQL")]
+        public IActionResult ImportPQL([FromBody] List<string> data)
+        {
+            var hs = csShipmentSurchargeService.ImportPQL(data);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
             if (!hs.Success)
             {
@@ -681,18 +714,36 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
+        [HttpPut("GetAmountSurcharge")]
+        public IActionResult GetAmountSurcharge([FromBody] List<Guid> Ids)
+        {
+            var hs = csShipmentSurchargeService.GetAmountSurchargeResult(Ids);
+            ResultHandle _result = new ResultHandle { Data = hs };
+            return Ok(_result);
+        }
+
+        [HttpPut]
         [Route("CancelLinkCharge")]
         [Authorize]
-        public IActionResult CancelLinkCharge(Guid chargId)
+        public IActionResult CancelLinkCharge(DeleteSurchargeDeleteModel model)
         {
             currentUser.Action = "CancelLinkCharge";
-            var hs = csShipmentSurchargeService.CancelLinkCharge(chargId);
+            var hs = csShipmentSurchargeService.CancelLinkCharge(model.Id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = new List<ObjectReceivableModel>() {
+                        new ObjectReceivableModel { Office = model.Office, PartnerId = model.PartnerId, Service = model.Service }
+                    };
+                    await CalculatorReceivable(modelReceivableList);
+                });
             }
             return Ok(result);
         }
@@ -729,6 +780,27 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost("ValidateCheckPointMultiplePartner")]
+        [Authorize]
+        public IActionResult ValidateCheckPointMultiplePartner(CheckPointCriteria criteria)
+        {           
+            HandleState hs = checkPointService.ValidateCheckPointMultiplePartnerSurcharge(criteria);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("GetPartnerForCheckPointInShipment")]
+        public IActionResult GetPartnerForCheckPointInShipment(Guid Id, string transactionType)
+        {
+            var result = checkPointService.GetPartnerForCheckPointInShipment(Id, transactionType);
             return Ok(result);
         }
     }

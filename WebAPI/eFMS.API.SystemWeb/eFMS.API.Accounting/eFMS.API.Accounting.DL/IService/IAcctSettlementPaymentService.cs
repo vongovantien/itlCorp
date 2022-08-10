@@ -109,5 +109,7 @@ namespace eFMS.API.Accounting.DL.IService
         ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
         ResultHandle CheckAllowDenySettle(List<Guid> ids);
         void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action);
+        Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId);
+        string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
     }
 }

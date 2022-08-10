@@ -48,5 +48,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? ObhBillingAmount { get; set; }
         public decimal? ObhPaidAmount { get; set; }
         public decimal? ObhUnPaidAmount { get; set; }
+        public string ArSalesmanName { get; set; }
+        public string ShipmentType { get; set; }
     }
 }

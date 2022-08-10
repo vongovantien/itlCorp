@@ -35,7 +35,7 @@ namespace eFMS.IdentityServer
 
             string officeId = _contextAccessor.HttpContext.Request.Headers["officeId"];
             string deptId = _contextAccessor.HttpContext.Request.Headers["departmentId"];
-
+            string userType = _contextAccessor.HttpContext.Request.Headers["userType"];
             if (!string.IsNullOrEmpty(officeId))
             {
                 if (string.IsNullOrEmpty(deptId))
@@ -80,7 +80,7 @@ namespace eFMS.IdentityServer
                 return Task.FromResult(new GrantValidationResult(TokenRequestErrors.InvalidGrant, messageError));
             }
 
-            var result = authenUser.Login(context.UserName, password, companyId, out LoginReturnModel modelReturn, userPermissionInfo);
+            var result = authenUser.Login(context.UserName, password, companyId, out LoginReturnModel modelReturn, userType, userPermissionInfo);
 
             switch (result)
             {

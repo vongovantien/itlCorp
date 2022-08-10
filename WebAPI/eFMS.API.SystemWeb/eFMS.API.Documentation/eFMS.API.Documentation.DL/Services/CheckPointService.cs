@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -7,11 +8,14 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
     public class CheckPointService : ICheckPointService
     {
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)csSurchargeRepository.DC;
+
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<AccAccountingManagement> accAccountMngtRepository;
@@ -27,6 +31,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly string salemanBOD = string.Empty;
         readonly IQueryable<CsTransaction> csTransactions;
         readonly IQueryable<OpsTransaction> opsTransactions;
+        readonly Guid? HM = Guid.Empty;
+        readonly Guid? BH = Guid.Empty;
 
         public CheckPointService(ICurrentUser currUser,
             IContextBase<SysUser> sysUserRepository,
@@ -57,6 +63,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             csTransactions = csTransactionRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             opsTransactions = opsTransactionRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+
+            HM = sysOfficeRepository.Get(x => x.Code == DocumentConstants.OFFICE_HM)?.FirstOrDefault()?.Id;
+            BH = sysOfficeRepository.Get(x => x.Code == DocumentConstants.OFFICE_BH)?.FirstOrDefault()?.Id;
         }
 
         public bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType)
@@ -68,18 +77,37 @@ namespace eFMS.API.Documentation.DL.Services
             string salemanCurrent = null;
             if (transactionType == "CL")
             {
-                salemanCurrent = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault()?.SalemanId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SalemanId;
+                if (hbl?.SalemanId == salemanBOD || hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
                 {
                     return valid;
                 }
             }
             else
             {
-                salemanCurrent = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault()?.SaleManId;
-                if (salemanCurrent == salemanBOD)
+                var hbl = csTransactionDetail.Get(x => x.Id == HblId)?.FirstOrDefault();
+                salemanCurrent = hbl?.SaleManId;
+
+                if (hbl?.SaleManId == salemanBOD)
                 {
                     return valid;
+                }
+
+                if (!string.IsNullOrEmpty(hbl?.ShipmentType))
+                {
+                    if (hbl?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
+                    {
+                        return valid;
+                    }
+                }
+                else
+                {
+                    var jobcs = DC.CsTransaction.FirstOrDefault(x => x.Id == hbl.JobId);
+                    if (jobcs?.ShipmentType == DocumentConstants.SHIPMENT_TYPE_NOMINATED)
+                    {
+                        return valid;
+                    }
                 }
             }
 
@@ -262,6 +290,22 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public HandleState ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria criteria)
+        {
+            HandleState result = new HandleState();
+            if (criteria.Data.Count == 0) return result;
+          
+            foreach (var partner in criteria.Data)
+            {
+                var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
+                if (!isValid.Success)
+                {
+                    return isValid;
+                }
+            }
+            return result;
+        }
+
         public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode)
         {
             HandleState result = new HandleState();
@@ -289,15 +333,15 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            if (contract == null)
-            {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
-            }
-
             if (currentSaleman == salemanBOD)
             {
                 isValid = true;
                 return result;
+            }
+
+            if (contract == null)
+            {
+                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
 
             int errorCode = -1;
@@ -319,7 +363,8 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case "Trial":
                 case "Official":
-                    if(checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                case "Guarantee":
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
                     {
                         isValid = true;
                         break;
@@ -329,7 +374,8 @@ namespace eFMS.API.Documentation.DL.Services
                         if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) // hđ quá hạn vẫn cho issue DEBIT.
                         {
                             isValid = true;
-                        } else if(contract.IsOverDue == true)
+                        }
+                        else if (contract.IsOverDue == true)
                         {
                             isValid = false;
                         }
@@ -449,7 +495,8 @@ namespace eFMS.API.Documentation.DL.Services
                 if (contracts.Count() > 1)
                 {
                     contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
-                } else
+                }
+                else
                 {
                     contract = contracts.FirstOrDefault();
                 }
@@ -470,9 +517,8 @@ namespace eFMS.API.Documentation.DL.Services
                     IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
                     break;
                 case "Trial":
-                    IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
-                    break;
                 case "Official":
+                case "Guarantee":
                     IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
                     break;
                 default:
@@ -511,6 +557,51 @@ namespace eFMS.API.Documentation.DL.Services
                 isApply = isApply && setting.ExpiredAgreement == true;
             }
             return isApply;
+        }
+
+        public List<CheckPointPartnerHBLDataGroup> GetPartnerForCheckPointInShipment(Guid Id, string transactionType)
+        {
+            List<CheckPointPartnerHBLDataGroup> partners = new List<CheckPointPartnerHBLDataGroup>();
+            IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+            Expression<Func<CsShipmentSurcharge, bool>> querySurcharge = x => x.OfficeId != HM
+                && x.OfficeId != BH
+                && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var hbls = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
+            if (transactionType == "CL")
+            {
+                querySurcharge = querySurcharge.And(x => x.Hblid == Id);
+            }
+            else
+            {
+                hbls = csTransactionDetail.Get(x => x.JobId == Id);
+                var hblIds = hbls.Select(x => x.Id).ToList();
+                querySurcharge = querySurcharge.And(x => hblIds.Contains(x.Hblid));
+            }
+            surcharges = csSurchargeRepository.Get(querySurcharge);
+
+            if (surcharges.Count() > 0)
+            {
+                partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
+            } else
+            {
+                if(transactionType == "CL")
+                {
+                    var opsJob = opsTransactionRepository.First(x => x.Hblid == Id);
+                    if(opsJob != null)
+                    {
+                        partners.Add(new CheckPointPartnerHBLDataGroup { HblId = opsJob.Hblid, PartnerId = opsJob.CustomerId });
+
+                        return partners;
+                    }
+                }
+                if(hbls.Count() == 0)
+                {
+                    return partners;
+                }
+                partners = hbls.Select(x => new CheckPointPartnerHBLDataGroup { HblId = x.Id, PartnerId = x.CustomerId }).ToList();
+            }
+
+            return partners;
         }
     }
 }

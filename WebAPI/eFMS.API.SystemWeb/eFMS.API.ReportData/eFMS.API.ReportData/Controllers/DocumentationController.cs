@@ -771,7 +771,6 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExporDebCretInvUrl,accessToken);
-
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 

@@ -20,6 +20,8 @@ import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.co
 import { ShareAirExportModule } from './share-air-export.module';
 import { DeactivateGuardService } from 'src/app/core/guards/deactivate.guard';
 import { ShareAirServiceModule } from '../share-air/share-air-service.module';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { ChargeConstants } from '@constants';
 
 const routing: Routes = [
     {
@@ -52,7 +54,10 @@ const routing: Routes = [
                         path: 'mawb', component: AirExportMAWBFormComponent,
                         data: { name: "MAWB Detail", },
                     },
-
+                    {
+                        path: 'prealert', component: ShareBusinessReAlertComponent,
+                        data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.AE_CODE },
+                    }
                 ]
             },
 

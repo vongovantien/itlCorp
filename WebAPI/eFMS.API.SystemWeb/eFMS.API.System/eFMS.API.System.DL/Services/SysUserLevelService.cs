@@ -3,6 +3,7 @@ using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -11,6 +12,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.System.DL.Services
@@ -313,6 +315,42 @@ namespace eFMS.API.System.DL.Services
             }
 
             return hs;
+        }
+
+        /// <summary>
+        /// Ger Data User Info
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<UserInfoViewModel> GetUserActiveInfo()
+        {
+            var users = userRepository.Get(x=>x.Active == true);
+            var employees = employeeRepository.Get();
+            var groups = groupRepository.Get();
+            var offices = officeRepository.Get();
+            var companies = companyRepository.Get();
+            var departments = departmentRepository.Get();
+            var datas = from u in users
+                        join e in employees on u.EmployeeId equals e.Id into em
+                        from e in em.DefaultIfEmpty()
+                        join uLv in DataContext.Get() on u.Id equals uLv.UserId
+                        join grp in groupRepository.Get() on uLv.GroupId equals grp.Id
+                        join dept in departmentRepository.Get() on uLv.DepartmentId equals dept.Id
+                        select new UserInfoViewModel
+                        {
+                            Id = u.Id + "-" + uLv.GroupId + "-" + uLv.DepartmentId,
+                            UserId = u.Id,
+                            UserName = u.Username,
+                            UserGroupId = uLv.GroupId,
+                            UserGroupName = grp.ShortName,
+                            UserDeparmentId = uLv.DepartmentId,
+                            UserDeparmentName = dept.DeptNameAbbr,
+                            UserOfficeId = uLv.OfficeId,
+                            UserCompanyId = uLv.CompanyId,
+                            EmployeeNameEn = e.EmployeeNameEn,
+                            EmployeeNameVn = e.EmployeeNameVn
+                        };
+            datas = datas.OrderBy(x => x.UserName).ThenBy(x => x.UserGroupName);
+            return datas;
         }
     }
 }

@@ -2,11 +2,10 @@
   "MSG_DATA_NOT_FOUND": "Data not found",
   "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
   "MSG_OBJECT_DUPLICATED": "Object is douplicated",
-  "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
+  "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object",
   "MSG_INSERT_SUCCESS": "New data added",
   "MSG_UPDATE_SUCCESS": "Data update success",
   "MSG_DELETE_SUCCESS": "Data delete success",
-
   "MSG_JOBNO_EXISTED": "Job No {0} đã tồn tại",
   "MSG_NAME_EXISTED": "Tên đã tồn tại",
   "MSG_CODE_EXISTED": "Code đã tồn tại",
@@ -20,7 +19,6 @@
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
   "MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE": "Cargo type must have service type",
-
   "MSG_MAWBCONTAINER_CONTAINERTYPE_EMPTY": "Container type name is empty",
   "MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND": "Container type name '{0}' not found",
   "MSG_MAWBCONTAINER_QUANTITY_EMPTY": "Quantity is empty",
@@ -37,16 +35,13 @@
   "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1",
   "MSG_MAWBCONTAINER_PACKAGE_TYPE_EMPTY": "Package type name is empty",
   "MSG_MAWBCONTAINER_PACKAGE_QUANTITY_EMPTY": "Package quantity is empty",
-
   "MSG_SURCHARGE_NOT_FOUND": "Charge not found!",
   "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note / SOA no / Voucher / Vat Invoice!",
-
   "MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND": "Credit debit note not found !",
   "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA": "Cannot delete, this credit debit not is containing at least one charge have SOA no!",
   "MSG_CDNOTE_NOT_NOT_FOUND": "CD Note not found !",
   "MSG_SURCHARGE_ARE_DUPLICATE_INVOICE": "Surcharges have duplicated invoice charge",
   "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED": "Không được phép xóa. CD Note đã được đồng bộ",
-
   "MSG_NOT_FOUND_TRANSACTION_TYPE": "Không tìm thấy Transaction Type",
   "MSG_MBL_REQUIRED": "MBL không được để trống!",
   "MSG_POD_DIFFERENT_POL": "Port of Destination phải khác Port of Loading",
@@ -60,20 +55,18 @@
   "MSG_PODELI_DIFFERENT_POL": "Place of Delivery phải khác Port of Loading",
   "MSG_SERVICE_TYPE_REQUIRED": "Service Type không được để trống!",
   "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!",
-
   "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: {0}!",
-  "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission",
   "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Không thể xóa vì house bill này đã được lên SOA hoặc CD Note! hoặc Link Fee",
   "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
   "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} không tìm thấy, vui lòng kiểm tra lại!",
-
   "MSG_ETD_CANNOT_CHANGE_MONTH": "Ngày ETD Không được đổi sang tháng khác",
   "MSG_ETA_CANNOT_CHANGE_MONTH": "Ngày ETA Không được đổi sang tháng khác",
   "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH": "Ngày Service Không được đổi sang tháng khác",
-
   "MSG_CURRENCY_EMPTY": "Currency không được để trống!",
   "MSG_CURRENCY_NOT_EXIST": "Currency không tồn tại!",
-
-  //"MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
-  //"MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!"
+  "MSG_SERIES_NO_REQUIRED": "SeriesNo không được để trống!",
+  "MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!",
+  "MSG_CDNOTE_ISSUED_COMBINE": "CD Note đã làm combine billing {0}. Vui lòng xóa CD Note khỏi Combine trên để thực hiện thao tác.",
+  "MSG_TOTAL_OVER_LIMIT": "Tổng tiền quá lớn với mã tiền tệ {0}"
 }

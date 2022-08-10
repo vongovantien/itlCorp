@@ -12,11 +12,19 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+    exportCombineShipment(criteria: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportCombineShipment`, criteria, null, null, 'response').pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     constructor(private _api: ApiService) {
     }
 
     exportCrystalReportPDF(data: any) {
-        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, `crystal=${JSON.stringify(data)}`);
+        var formData: any = new FormData();
+        formData.append('crystal', JSON.stringify(data));
+        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, formData);
     }
 
     exportCustomClearance(searchObject: any = {}) {
@@ -30,33 +38,33 @@ export class ExportRepo {
     exportCompany(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportCompany`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
 
     exportDepartment(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportDepartment`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
     exportOffice(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportOffice`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
     exportGroup(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportGroup`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
 
     exportUser(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportUser`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
     exportEManifest(hblId: string) {
@@ -241,7 +249,7 @@ export class ExportRepo {
     }
 
     exportDetailSOA(soaNo: string, currency) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSOA`, null, { soaNo: soaNo, currency: currency },null,'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSOA`, null, { soaNo: soaNo, currency: currency }, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -297,28 +305,28 @@ export class ExportRepo {
     }
 
     exportSCSCAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportSCSCAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportSCSCAirExport?jobId=${jobId}`, null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportTCSAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportTCSAirExport?jobId=${jobId}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportTCSAirExport?jobId=${jobId}`, null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportACSAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportACSAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportACSAirExport?jobId=${jobId}`, null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     exportNCTSALSAirwayBill(jobId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportNCTSALSAirExport?jobId=${jobId}`,null, null, null, 'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportNCTSALSAirExport?jobId=${jobId}`, null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -383,7 +391,7 @@ export class ExportRepo {
     exportAccountingManagementDebCreInvoice(body: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementDebCreInvoice`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
-            map((data:any) => data)
+            map((data: any) => data)
         );
     }
 
@@ -439,8 +447,8 @@ export class ExportRepo {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
 
-    
-    downloadExport(url: string){
+
+    downloadExport(url: string) {
         window.open(`${url}`, '_blank');
     }
 
@@ -495,6 +503,10 @@ export class ExportRepo {
 
     exportAcountingTemplatePayable(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayableAcctTemplateReport`, searchObject, null, {}, 'response');
+    }
+
+    exportDebitAmountDetailByContract(selectedTrialOfficial: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDebitAmountDetailByContract`, selectedTrialOfficial, null, null, 'response');
     }
 }
 

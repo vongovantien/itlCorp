@@ -28,9 +28,10 @@ export class CombineBillingComponent extends AppList implements OnInit {
   @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
   billings: CombineBilling[] = [];
+  billingsNo: string[] = [];
   // Get data with 6 month from current
   dataSearch : any = {
-    createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 3, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
   };
   criteriaExport: any = {};
@@ -113,8 +114,22 @@ export class CombineBillingComponent extends AppList implements OnInit {
                 (res: any) => {
                     this.billings = res.data || [];
                     this.totalItems = res.totalItems || 0;
+                    this.getListCombineBillingNo(res.totalItems);
                 },
             );
+  }
+
+  getListCombineBillingNo(totalItem: number) {
+    this._accountingRepo.getListCombineBilling(1, totalItem, this.dataSearch)
+      .pipe(
+        catchError(this.catchError))
+      .subscribe(
+        (res: any) => {
+          res.data.forEach(combine => {
+            this.billingsNo.push(combine.combineBillingNo)
+          });
+        }
+      )
   }
 
   prepareDeleteCombine(data: any) {
@@ -179,16 +194,54 @@ deleteCombineBilling(id: string) {
   exportCombineOPS(currency: string) {
     this.isExport = true;
     this.criteriaExport = this.dataSearch;
+    //this.getListCombineBillingNo(this.totalItems);
+
     if (this.criteriaExport.partnerId) {
-      let combineNos = [];
-      this.billings.forEach(combine => {
-        combineNos.push(combine.combineBillingNo)
-      });
-      if (combineNos.length) {
+      // let combineNos = [];
+      // this.billings.forEach(combine => {
+      //   combineNos.push(combine.combineBillingNo)
+      // });
+      if (this.billingsNo.length) {
         this._progressRef.start();
-        this.criteriaExport.referenceNo = combineNos;
+        //this.criteriaExport.referenceNo = this.billingsNo;
         this.criteriaExport.currency = currency;
         this._exportRepo.exportCombineOps(this.criteriaExport)
+          .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+          )
+          .subscribe(
+            (response: HttpResponse<any>) => {
+              if (response!=null) {
+                this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+              } else {
+                this._toastService.warning('No data found');
+              }
+            },
+          );
+        this.isExport = false;
+      }else{
+        this._toastService.warning("No data apply. Please re-check again.")
+      }
+    }else{
+      this._toastService.warning("Please apply search with partner.")
+    }
+  }
+
+  exportCombineShipment(currency: string) {
+    this.isExport = true;
+    this.criteriaExport = this.dataSearch;
+    if (this.criteriaExport.partnerId) {
+      //this.getListCombineBillingNo(this.totalItems);
+      // let combineNos = [];
+      // this.billings.forEach(combine => {
+      //   combineNos.push(combine.combineBillingNo)
+      // });
+      if (this.billingsNo.length) {
+        this._progressRef.start();
+        //this.criteriaExport.referenceNo = this.billingsNo;
+        this.criteriaExport.currency = currency;
+        this._exportRepo.exportCombineShipment(this.criteriaExport)
           .pipe(
             catchError(this.catchError),
             finalize(() => this._progressRef.complete())

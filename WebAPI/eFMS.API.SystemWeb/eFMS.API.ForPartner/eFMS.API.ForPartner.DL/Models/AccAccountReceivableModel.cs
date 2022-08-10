@@ -2,7 +2,7 @@
 
 namespace eFMS.API.ForPartner.DL.Models
 {
-    class AccAccountReceivableModel : AccAccountReceivable
+    public class AccAccountReceivableModel : AccAccountReceivable
     {
     }
 }

@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-lg-2">
                         <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': (userRole.dirty && !userRole.valid) || (isSubmited && !userRole.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (userRole.dirty && !userRole.valid) || (isSubmited && !userRole.valid)}">
                             <label class="form-control-label">
                                 User Role <span class="m--font-danger">(*)</span>
                             </label>
@@ -91,8 +91,8 @@
                                 <option *ngFor="let usRole of userRoles" [ngValue]="usRole">{{usRole.title}}</option>
                             </select>
                             <div class="form-control-feedback"
-                            *ngIf="isSubmited && (userRole.errors | equalError: 'required') || (userRole.errors | equalError: 'required') && userRole.dirty">
-                             User Role is required!
+                                *ngIf="isSubmited && (userRole.errors | equalError: 'required') || (userRole.errors | equalError: 'required') && userRole.dirty">
+                                User Role is required!
                             </div>
                         </div>
                     </div>
@@ -173,7 +173,8 @@
                                 Credit Limit
                             </label>
                             <input type="number" min="0" class="form-control m-input m-input--square"
-                                formControlName="creditLimit" placeholder="Please Enter Credit Limit">
+                                formControlName="creditLimit" placeholder="Please Enter Credit Limit"
+                                autoFormatCurrency>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -182,7 +183,7 @@
                                 Credit Rate
                             </label>
                             <input type="number" min="0" class="form-control m-input m-input--square"
-                                formControlName="creditRate" placeholder="Please Enter Credit Rate">
+                                formControlName="creditRate" placeholder="Please Enter Credit Rate" readonly>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -204,6 +205,16 @@
                                         <button (click)="resetPassword(SelectedUser.id)"
                                             class="btn btn-default  m-btn--icon m-btn--uppercase">Reset
                                             Password</button>
+                                    </div>
+                                    <div class="form-group m--align-right"
+                                        *ngIf="(currentUserType == 'Super Admin') && (infoCurrentUserId != SelectedUser.id)">
+                                        <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+                                            (click)="switchUser(SelectedUser)">
+                                            <span>
+                                                <i class="la la-user-plus"></i>
+                                                <span>Log In</span>
+                                            </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

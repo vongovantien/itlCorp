@@ -44,7 +44,8 @@ export class SettlementPayment {
     departmentName: string = null;
     bankCode: string = null;
     dueDate: string = '';
-
+    issuedSoa: boolean = false;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

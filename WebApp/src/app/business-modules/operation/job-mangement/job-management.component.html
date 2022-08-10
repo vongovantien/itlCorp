@@ -113,6 +113,9 @@
                                                     {{ item.replicateJobNo }}
                                                 </td>
                                                 <td>
+                                                    <span>{{ item.mblno }}</span>
+                                                </td>
+                                                <td>
                                                     <span>{{ item.hwbno }}</span>
                                                 </td>
                                                 <td>
@@ -129,12 +132,6 @@
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{ item.departmentName }}</span>
-                                                </td>
-                                                <td>
-                                                    <span>{{ item.groupName }}</span>
-                                                </td>
-                                                <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
                                                 <td>
@@ -148,6 +145,12 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-success">{{ item.userCreatedName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.departmentName }}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{ item.groupName }}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.datetimeModified | date:'dd/MM/yyyy' }}</span>
@@ -214,7 +217,9 @@
                         </div>
                     </tab>
                     <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
+                        <ng-container *ngIf="isSearchLinkFeea">
                             <app-job-mangement-link-fee></app-job-mangement-link-fee>
+                        </ng-container>
                     </tab>
                 </tabset>
             </div>
@@ -248,7 +253,8 @@
 
 <app-dropdown #dropdownMenuLinkOps>
     <a class="dropdown-item pointer" (click)="chargeFromRep()">Charge From Replicate</a>
-    <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'" (click)="chargeFromJobRep()">Option Link Charge From Job List</a>
+    <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'"
+        (click)="chargeFromJobRep()">Option Link Charge From Job List</a>
 </app-dropdown>
 
 <link-charge-from-job-rep></link-charge-from-job-rep>

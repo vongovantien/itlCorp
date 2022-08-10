@@ -10,42 +10,54 @@ namespace eFMSWindowService
 {
     public partial class UpdateExchangeRate : ServiceBase
     {
-        Timer _aTimer;
+        Timer _timer;
         DateTime _scheduleTime;
 
         public UpdateExchangeRate()
         {
             InitializeComponent();
-            _aTimer = new Timer(30000);
-            _scheduleTime = DateTime.Today.AddDays(1);
+            _scheduleTime = DateTime.Today.AddDays(1).AddHours(1);
         }
 
         public void Start()
         {
-            _aTimer.Start();
-            _aTimer.Enabled = true;
-            
-            // Execute mỗi 1 hour
-            var tillNextInterval = int.Parse(ConfigurationManager.AppSettings["intervalExchangeRate"].ToString());
-            _aTimer.Interval = tillNextInterval;
-            _aTimer.Elapsed += _aTimer_Elapsed;
+             // Tạo 1 timer từ libary System.Timers
+            _timer = new Timer();
+            // Execute mỗi ngày vào lúc 1h sáng
+            _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            // _timer.Interval = 30000;
+            // Những gì xảy ra khi timer đó dc tick
+            _timer.Elapsed += Timer_Elapsed;
+            // Enable timer
+            _timer.Enabled = true;
         }
 
         //Custom method to Stop the timer
         public new void Stop()
         {
             FileHelper.WriteToFile("ServiceUpdateExchangeRate", "Service update exchange rate is stopped at " + DateTime.Now);
-            _aTimer.Stop();
-            _aTimer.Dispose();
+            _timer.Stop();
+            _timer.Dispose();
         }
 
-        private void _aTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            FileHelper.WriteToFile("ServiceUpdateExchangeRate", "Service update exchange rate is recall at " + DateTime.Now);
-            using (eFMSTestEntities db = new eFMSTestEntities())
+            try
             {
-                var result = db.Database.SqlQuery<int>("[dbo].[sp_AutoUpdateExchangeRate]").FirstOrDefault();
-                FileHelper.WriteToFile("ServiceUpdateExchangeRate", DateTime.Now + " - Total number of affected rows: " + result);
+                FileHelper.WriteToFile("ServiceUpdateExchangeRate", "Service update exchange rate is recall at " + DateTime.Now);
+                using (eFMSTestEntities db = new eFMSTestEntities())
+                {
+                    var result = db.Database.SqlQuery<int>("[dbo].[sp_AutoUpdateExchangeRate]").FirstOrDefault();
+                    FileHelper.WriteToFile("ServiceUpdateExchangeRate", DateTime.Now + " - Total number of affected rows: " + result);
+                }
+                if (_timer.Interval != 24 * 60 * 60 * 1000)
+                {
+                    _timer.Interval = 24 * 60 * 60 * 1000;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

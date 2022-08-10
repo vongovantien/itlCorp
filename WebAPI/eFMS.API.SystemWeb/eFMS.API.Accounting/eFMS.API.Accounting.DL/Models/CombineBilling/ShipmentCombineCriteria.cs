@@ -15,5 +15,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public List<string> Services { get; set; }
         public string DocumentType { get; set; }
         public List<string> DocumentNo { get; set; }
+        public string CombineNo { get; set; }
     }
 }

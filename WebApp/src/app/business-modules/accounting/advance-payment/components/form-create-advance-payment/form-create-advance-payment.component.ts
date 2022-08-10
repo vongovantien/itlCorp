@@ -9,7 +9,8 @@ import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogu
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
-
+import { SystemConstants } from '@constants';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -21,7 +22,15 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     @Input() mode: string = 'create';
     @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
     @Output() onChangeAdvanceFor: EventEmitter<string> = new EventEmitter<string>();
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
 
+    get readonlyForm(): boolean {
+        return this._readonly;
+    }
+
+    private _readonly: boolean = false;
     methods: CommonInterface.ICommonTitleValue[] = [
         { title: 'Cash', value: 'Cash' },
         { title: 'Bank Transfer', value: 'Bank' },
@@ -49,6 +58,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     paymentTerm: AbstractControl;
     payee: AbstractControl;
     advanceFor: AbstractControl;
+    dueDate: AbstractControl;
 
     selectedPayee: Partner;
     banks: Observable<Bank[]>;
@@ -115,7 +125,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             bankName: [],
             payee: this.isAdvCarrier ? [null,  Validators.required] : [],
             bankCode: [{ value: null, disabled: true }],
-            advanceFor: [this.advanceForDatas[0]]
+            advanceFor: [this.advanceForDatas[0]],
+            dueDate: [null, Validators.required]
         });
 
         this.advanceNo = this.formCreate.controls['advanceNo'];
@@ -133,6 +144,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.payee = this.formCreate.controls['payee'];
         this.bankCode = this.formCreate.controls['bankCode'];
         this.advanceFor = this.formCreate.controls['advanceFor'];
+        this.dueDate = this.formCreate.controls['dueDate'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(
@@ -216,13 +228,17 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.bankAccountNo.setValue(payee.bankAccountNo);
         this.bankAccountName.setValue(payee.bankAccountName);
         this.bankName.setValue(payee.bankName);
-        this.bankCode.setValue(payee.bankCode);
+        this.mapBankCode(payee.bankCode);
     }
 
     onSelectDataBankInfo(data: any) {
         if (data) {
             this.bankName.setValue(data.bankNameEn);
-            this.bankCode.setValue(data.code);
+            this.mapBankCode(data.code);
         }
+    }
+
+    mapBankCode(data: any) {
+        this.bankCode.setValue(data);
     }
 }

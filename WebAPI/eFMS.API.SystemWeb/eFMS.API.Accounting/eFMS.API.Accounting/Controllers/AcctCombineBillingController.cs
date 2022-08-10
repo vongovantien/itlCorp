@@ -257,6 +257,14 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        [HttpGet("GetDataExportCombineShipment")]
+        [Authorize]
+        public IActionResult GetDataExportCombineByShipment(string combineBillingNo)
+        {
+            var data = combineBillingService.GetDataExportCombineShipment(combineBillingNo);
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get Combine OPS data with partner and currency
         /// </summary>
@@ -267,6 +275,19 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria)
         {
             var data = combineBillingService.GetDataExportCombineOpsByPartner(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Combine Shipment data with partner and currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataCombineShipmentByPartner")]
+        [Authorize]
+        public IActionResult GetDataCombineShipmentByPartner(AcctCombineBillingCriteria criteria)
+        {
+            var data = combineBillingService.GetDataExportCombineShipmentByPartner(criteria);
             return Ok(data);
         }
 

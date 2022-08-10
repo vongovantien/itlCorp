@@ -11,6 +11,7 @@ using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
@@ -59,6 +60,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
         private readonly IContextBase<AcctCdnote> acctCdnoteRepository;
         private readonly IContextBase<SysGroup> sysGroupRepository;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -91,6 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<AcctCdnote> acctCdnoteRepo,
             IContextBase<SysGroup> sysGroupRepo,
+            IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             webUrl = wUrl;
@@ -123,6 +127,7 @@ namespace eFMS.API.Documentation.DL.Services
             sendEmailHistoryRepository = sendEmailHistoryRepo;
             acctCdnoteRepository = acctCdnoteRepo;
             sysGroupRepository = sysGroupRepo;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -877,9 +882,12 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
                           Total = detail.Total, 
                           Notify = detail.Notify,
-                          Group=gr.ShortName,
-                          Department=dept.DeptNameAbbr,
-                          WareHouseAnDate= detail.WareHouseAnDate
+                          Group = gr.ShortName,
+                          Department = dept.DeptNameAbbr,
+                          WareHouseAnDate = detail.WareHouseAnDate,
+                          OfficeId = detail.OfficeId,
+                          CompanyId = detail.CompanyId,
+                          TransactionType = tran.TransactionType
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
@@ -1249,9 +1257,12 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState DeleteTransactionDetail(Guid hbId)
+        public HandleState DeleteTransactionDetail(Guid hbId, out List<ObjectReceivableModel> receivables)
         {
+            currentUser.Action = "DeleteCSTransactionDetail";
+
             var hs = new HandleState();
+            receivables = new List<ObjectReceivableModel>();
             try
             {
 
@@ -1269,7 +1280,9 @@ namespace eFMS.API.Documentation.DL.Services
                     int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403, "");
 
-                    var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
+                    var charges = surchareRepository.Get(x => x.Hblid == hbl.Id);
+                    receivables = accAccountReceivableService.GetListObjectReceivableBySurcharges(charges);
+
                     bool isSpecialCase = false;
                     foreach (var item in charges)
                     {
@@ -1370,6 +1383,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaImpProofofDelivery" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listProof);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -1433,6 +1454,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImpProofofDelivery" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listProof);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -1489,6 +1518,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImptDocumentRelease" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listDocument);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -1727,7 +1763,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1885,7 +1921,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1982,6 +2018,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImptAuthorisedLetter" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(authorizeLetters);
             result.SetParameter(parameter);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -2046,6 +2089,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImptAuthorisedLetter_Consign" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(authorizeLetters);
             result.SetParameter(parameter);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -2095,6 +2146,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "BookingNoteAir" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(bookingNotes);
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
@@ -2466,6 +2525,22 @@ namespace eFMS.API.Documentation.DL.Services
                 var hsSm = sendEmailHistoryRepository.SubmitChanges();
                 #endregion
             }
+        }
+
+        /// <summary>
+        /// Get HAWB List Of Shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId)
+        {
+            var shipment = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
+            if(shipment == null)
+            {
+                return null;
+            }
+            var transDetails = DataContext.Get(x => x.JobId == shipment.Id);
+            return transDetails;
         }
     }
 }

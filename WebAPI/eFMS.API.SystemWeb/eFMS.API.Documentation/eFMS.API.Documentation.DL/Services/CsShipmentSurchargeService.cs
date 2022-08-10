@@ -484,7 +484,13 @@ namespace eFMS.API.Documentation.DL.Services
                 HouseBillTotalCharge = new HouseBillTotalCharge()
             };
             //List<spc_GetSurchargeByHouseBill> surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
-            var surcharges = DataContext.Get(x => x.Hblid == hblid).Select(x => new { x.Type, x.AmountVnd, x.AmountUsd });
+            var typeSurcharges = new List<string>()
+            {
+                DocumentConstants.CHARGE_BUY_TYPE,
+                DocumentConstants.CHARGE_SELL_TYPE,
+                DocumentConstants.CHARGE_OBH_TYPE
+            };
+            var surcharges = DataContext.Get(x => x.Hblid == hblid && typeSurcharges.Any(z => z == x.Type)).Select(x => new { x.Type, x.AmountVnd, x.AmountUsd });
             if (surcharges.Count() == 0) return result;
             foreach (var item in surcharges)
             {
@@ -1702,6 +1708,17 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_USD) // Error if total > 100,000usd
+                        {
+                            var _roundDecimal = 2;
+                            var _netAmount = NumberHelper.RoundNumber((item.UnitPrice * item.Quantity) ?? 0, _roundDecimal);
+                            var _vatAmount = NumberHelper.RoundNumber(item.Vatrate < 0 ? Math.Abs(item.Vatrate ?? 0) : ((_netAmount * item.Vatrate) ?? 0) / 100, _roundDecimal);
+                            if ((_netAmount + _vatAmount) > 100000)
+                            {
+                                item.CurrencyError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TOTAL_OVER_LIMIT], item.CurrencyId);
+                                item.IsValid = false;
+                            }
+                        }
                     }
                 }
             });
@@ -1729,8 +1746,9 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        public HandleState Import(List<CsShipmentSurchargeImportModel> list)
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list,  out List<Guid> Ids)
         {
+            Ids = new List<Guid>(); // ds charge dùng để tính công nợ
             var chargeGroup = catChargeGroupRepository.Get();
             var listImport = new List<CsShipmentSurchargeImportModel>();
             foreach (var item in list)
@@ -1779,6 +1797,8 @@ namespace eFMS.API.Documentation.DL.Services
                     //{
                     //    item.Type = "SELL";
                     //}
+
+                    Ids.Add(item.Id);
                 }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(listImport);
@@ -1791,6 +1811,73 @@ namespace eFMS.API.Documentation.DL.Services
                 try
                 {
                     var hs = DataContext.Add(datas);
+                    if (hs.Success)
+                    {
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    Get();
+                    trans.Dispose();
+                }
+            }
+        }
+
+        public HandleState ImportPQL(List<string> list)
+        {
+            var surcharges = new List<CsShipmentSurcharge>();
+
+            foreach (var cd in list)
+            {
+                surcharges.Add(new CsShipmentSurcharge {
+                    Id = Guid.NewGuid(),
+                    Hblid = Guid.Parse("C45EFF8A-9197-4D0C-A723-F416F21E90BC"),
+                    Type = "SELL",
+                    ChargeId = Guid.Parse("19E68F55-1724-4B8B-AB73-E318D3A5D0B0"),
+                    Quantity = 1,
+                    UnitPrice = 350000,
+                    UnitId = 183,
+                    CurrencyId = "VND",
+                    Vatrate = 8,
+                    Total = 378000,
+                    PaymentObjectId = "bc7fe421-e049-4b64-abd7-ab4865db4040",
+                    ExchangeDate = DateTime.Now,
+                    ClearanceNo = cd,
+                    IsFromShipment = true,
+                    UserCreated = "d1bb21ea-249a-455c-a981-dcb554c3b848",
+                    UserModified = "d1bb21ea-249a-455c-a981-dcb554c3b848",
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    FinalExchangeRate = 1,
+                    JobNo = "RLOG2207/01809",
+                    Mblno = "PQL-052022",
+                    Hblno = "PQL-052022",
+                    AmountVnd = 350000,
+                    VatAmountVnd = 28000,
+                    AmountUsd = (decimal)15.02,
+                    VatAmountUsd = (decimal)1.2,
+                    TransactionType = "CL",
+                    OfficeId = Guid.Parse("FC576371-1779-4632-A510-7CA828227F48"),
+                    CompanyId = Guid.Parse("27D26ACB-E247-47B7-961E-AFA7B3D7E111"),
+                    NetAmount = 350000,
+                });
+            }
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Add(surcharges);
                     if (hs.Success)
                     {
                         trans.Commit();
@@ -1995,6 +2082,20 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 return result;
             }
+        }
+
+        public List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids)
+        {
+            List<AmountSurchargeResult> results = new List<AmountSurchargeResult>();
+
+            var surcharges = DataContext.Get(x => Ids.Contains(x.Id));
+            foreach (var item in surcharges)
+            {
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, 20000);
+                results.Add(amountSurcharge);
+            }
+
+            return results; 
         }
     }
 }

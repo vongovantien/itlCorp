@@ -4,6 +4,7 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
+using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -12,6 +13,7 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
@@ -236,6 +238,19 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
+            if (contract.ContractType == "Guarantee") // Default các giá trị khi hđ type Guarantee
+            {
+                contract.PaymentTerm = 1;
+                contract.CreditLimit = 20000000;
+                contract.CreditLimitRate = 120;
+            }
+            if(contract.ContractType == "Cash")
+            {
+                contract.ShipmentType = "Nominated";
+            } else
+            {
+                contract.ShipmentType = "Freehand & Nominated";
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
@@ -254,6 +269,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.UserCreatedContract = contract.UserCreated;
                     model.UserCreated = entity.UserCreated;
                     model.OfficeIdContract = entity.OfficeId;
+                    model.ContractShipmentType = contract.ShipmentType;
                     SendMailActiveSuccess(model, string.Empty);
                     ClearCache();
                     Get();
@@ -417,6 +433,14 @@ namespace eFMS.API.Catalogue.DL.Services
             isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if (entity.ContractType == "Cash")
+            {
+                entity.ShipmentType = "Nominated";
+            } else
+            {
+                entity.ShipmentType = "Freehand & Nominated";
+
+            }
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -432,6 +456,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.SalesmanId = entity.SaleManId;
                     modelPartner.UserCreatedContract = entity.UserCreated;
                     modelPartner.OfficeIdContract = entity.OfficeId;
+                    modelPartner.ContractShipmentType = entity.ShipmentType;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -446,6 +471,14 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
+            if (contract.ContractType == "Cash")
+            {
+                contract.ShipmentType = "Nominated";
+            }
+            else
+            {
+                contract.ShipmentType = "Freehand & Nominated";
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             var hsPartner = new HandleState();
@@ -469,6 +502,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.UserCreatedContract = contract.UserCreated;
                     modelPartner.ContractType = contract.ContractType;
                     modelPartner.OfficeIdContract = contract.OfficeId;
+                    modelPartner.ContractShipmentType = contract.ShipmentType;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -479,6 +513,19 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(Guid id)
         {
+            var contract = DataContext.First(x => x.Id == id);
+            if(contract == null)
+            {
+                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+            }
+            if(contract.Active == true)
+            {
+                return new HandleState((object)string.Format("The Contract is active"));
+            }
+            if (contract.DebitAmount != null && contract.DebitAmount != 0)
+            {
+                return new HandleState((object)string.Format("The contract is recording the receivable"));
+            }
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -591,8 +638,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit, out bool active)
         {
+            active = false;
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             var DataCheckExisted = CheckExistedContractActive(id, partnerId);
@@ -603,12 +651,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
                     item.Active = false;
-                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id);
+                    var isUpdateAgreementActive = DataContext.Update(item, x => x.Id == item.Id, false);
                 }
             }
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
+                active = objUpdate.Active ?? false;
                 if (credit.CreditLimit != null)
                 {
                     objUpdate.CreditLimit = credit.CreditLimit;
@@ -636,6 +685,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.SalesmanId = objUpdate.SaleManId;
                     model.UserCreatedContract = objUpdate.UserCreated;
                     model.OfficeIdContract = objUpdate.OfficeId;
+                    model.ContractShipmentType = objUpdate.ShipmentType;
                     SendMailActiveSuccess(model, "active");
                 }
             }
@@ -645,12 +695,50 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
+            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
+            if (ContractActive.Count() == 0)
+            {
+                return null;
+            }
             var IsExisted = ContractActive
                 .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
             if (IsExisted)
             {
                 return ContractActive;
+            }
+            return null;
+        }
+
+        public CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps)
+        {
+            serviceOfficeGrps = new List<ServiceOfficeGroup>();
+            var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var contractOffices = contract.OfficeId.Split(";").ToList();
+            var contractServices = contract.SaleService.Split(";").ToList();
+
+            var contractInacActive = DataContext.First(x => x.Active == false && x.PartnerId == partnerId && x.Id != id && x.SaleManId == contract.SaleManId);
+
+            if (contractInacActive == null)
+            {
+                return null;
+            }
+
+            var offices = contractInacActive.OfficeId.Split(";").ToList();
+            var services = contractInacActive.SaleService.Split(";").ToList();
+
+            var officeInterset = contractOffices.Intersect(offices);
+            var serviceInterset = contractServices.Intersect(services);
+            var isExisted = (contractInacActive.SaleManId == contract.SaleManId && officeInterset.Any() && serviceInterset.Any());
+            if (isExisted)
+            {
+                foreach (string service in serviceInterset)
+                {
+                    foreach (string office in officeInterset)
+                    {
+                        serviceOfficeGrps.Add(new ServiceOfficeGroup { Office = office, Service = service });
+                    }
+                }
+                return contractInacActive;
             }
             return null;
         }
@@ -1210,6 +1298,9 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
 
+            // var requester = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            // var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
+
             List<string> lstBCc = ListMailCC();
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
             switch (partner.PartnerType)
@@ -1293,13 +1384,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{taxCode}}", partner.TaxCode);
                 body.Replace("{{contractService}}", partner.ContractService);
                 body.Replace("{{contractType}}", partner.ContractType);
+                body.Replace("{{shipmentType}}", partner.ContractShipmentType);
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
                 lstCc = listEmailViewModel.ListAccountant;
 
                 lstTo.Add(objInfoSalesman?.Email);
-                lstTo.Add(objInfoCreatorPartner?.Email);
+                //lstTo.Add(objInfoCreatorPartner?.Email);
                 lstTo.Add(objInfoCreator?.Email);
                 lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
@@ -1343,6 +1435,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
+                body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
@@ -1350,6 +1443,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{taxCode}}", partner.TaxCode);
                 body.Replace("{{contractService}}", partner.ContractService);
                 body.Replace("{{contractType}}", partner.ContractType);
+                body.Replace("{{shipmentType}}", partner.ContractShipmentType);
                 body.Replace("{{contractNo}}", partner.ContractNo);
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
@@ -1371,8 +1465,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                lstCc.Add(objInfoCreatorPartner?.Email);
-                lstCc.Add(objInfoModified?.Email);
+                //lstCc.Add(objInfoCreatorPartner?.Email);
+                //lstCc.Add(objInfoModified?.Email);
                 lstCc.Add(objInfoCreator?.Email);
                 lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
@@ -1407,6 +1501,8 @@ namespace eFMS.API.Catalogue.DL.Services
             string urlToSend = string.Empty;
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, string.Empty);
+
             string subject = string.Empty;
             string linkVn = string.Empty;
             string linkEn = string.Empty;
@@ -1415,64 +1511,106 @@ namespace eFMS.API.Catalogue.DL.Services
             string body = string.Empty;
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
-            if (partnerType == "Customer")
-            {
-                url = "home/commercial/customer/";
-                subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
-                customerName = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
-            }
-            else
-            {
-                url = "home/commercial/agent/";
-                subject = "Reject Agreement Agent - " + partner.PartnerNameVn;
-                customerName = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
-            }
-            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-            linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
-            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
-                        "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
-                        "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
-                        "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                        "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
-                        "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
-                        "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
-                        "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
-                        + linkEn + "</br>" + linkVn + "</br> </br>" +
-                        "<i> Thanks and Regards </i>" + "</br> </br>" +
-                        "<b> eFMS System, </b>" +
-                        "</br>"
-                        + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            #region Change use template
+            //if (partnerType == "Customer")
+            //{
+            //    url = "home/commercial/customer/";
+            //    subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
+            //    customerName = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            //}
+            //else
+            //{
+            //    url = "home/commercial/agent/";
+            //    subject = "Reject Agreement Agent - " + partner.PartnerNameVn;
+            //    customerName = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            //}
+            //linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+            //linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            //body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
+            //            "Your Agreement of " + "<b>" + partner.PartnerNameVn + "</b>" + " is rejected by AR/Accountant as info bellow</br>" +
+            //            "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName +
+            //            "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+            //            "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
+            //            "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
+            //            "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
+            //            "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
+            //            + linkEn + "</br>" + linkVn + "</br> </br>" +
+            //            "<i> Thanks and Regards </i>" + "</br> </br>" +
+            //            "<b> eFMS System, </b>" +
+            //            "</br>"
+            //            + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            #endregion
 
+            string address = webUrl.Value.Url + "/en/#/home/commercial/" + (partnerType == "Customer" ? "customer" : "agent") + "/" + partner.Id;
             urlToSend = UrlClone.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+            //body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+            var logoUrl = urlToSend + "/ReportPreview/Images/logo-eFMS.png";
+
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-REJECT").FirstOrDefault();
+            // Subject
+            subject = emailTemplate.Subject;
+            subject = subject.Replace("{{PartnerType}}", partnerType);
+            subject = subject.Replace("{{PartnerName}}", partner.PartnerNameVn);
+
+            body = emailTemplate.Body;
+            body = body.Replace("{{EmployeeName}}", salesmanObj.EmployeeNameVn);
+            body = body.Replace("{{PartnerName}}", partner.PartnerNameVn);
+            body = body.Replace("{{TaxCode}}", partner.TaxCode);
+            body = body.Replace("{{ContractNo}}", contract.ContractNo);
+            body = body.Replace("{{SaleService}}", contract.SaleService);
+            body = body.Replace("{{ContractType}}", contract.ContractType);
+            body = body.Replace("{{ShipmentType}}", contract.ShipmentType);
+            body = body.Replace("{{Comment}}", comment);
+            body = body.Replace("{{Address}}", address);
+            body = body.Replace("{{LogoEFMS}}", logoUrl);
+
             List<string> lstBCc = ListMailCC();
             List<string> lstTo = new List<string>();
             List<string> lstCC = new List<string>();
 
-
             lstTo.Add(salesmanObj?.Email);
-            lstCC.Add(salesmanObj?.Email);
-            lstCC.Add(userCreatedObj?.Email);
+            //lstCC.Add(salesmanObj?.Email);
+            lstTo.Add(userCreatedObj?.Email);
+            lstCC = GetEmailsArAccDepartmentUser();
             lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             bool result = SendMail.Send(subject, body, lstTo, null, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
-                SentUser = SendMail._emailFrom,
-                Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
-                Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
-                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
-                Subject = subject,
-                Sent = result,
-                SentDateTime = DateTime.Now,
-                Body = body
+               SentUser = SendMail._emailFrom,
+               Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
+               Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
+               Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
+               Subject = subject,
+               Sent = result,
+               SentDateTime = DateTime.Now,
+               Body = body
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
             return result;
 
+        }
+
+        /// <summary>
+        /// Get email of dept type ar or acct current user
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GetEmailsArAccDepartmentUser()
+        {
+            var departmentsUser = userlevelRepository.Get(x => x.UserId == currentUser.UserID).Select(x => x.DepartmentId).ToList();
+            var departments = catDepartmentRepository.Get(x => (x.DeptType == "AR" || x.DeptType == "ACCOUNTANT") && departmentsUser.Any(z => z == x.Id));
+            if(departments.Count() > 1)
+            {
+                var department = departments.Where(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
+                return (department == null ? new List<string>() : department.Email?.Split(";").ToList());
+            }
+            else
+            {
+                return (departments.FirstOrDefault() == null ? new List<string>() : departments.FirstOrDefault().Email?.Split(";").ToList());
+            }
         }
 
         public bool SendMailARConfirmed(string partnerId, string contractId, string partnerType)
@@ -1574,6 +1712,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{saleService}}", saleService);
             body.Replace("{{contractType}}", contract.ContractType);
+            body.Replace("{{shipmentType}}", contract.ShipmentType);
             body.Replace("{{contractNo}}", contract.ContractNo);
             body.Replace("{{address}}", address);
             body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
@@ -1602,12 +1741,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private List<string> ListMailCC()
         {
-            List<string> lstCc = new List<string>
+            var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+            List<string> emailBCCs = new List<string>();
+            if (emailBcc != null)
             {
-                "alex.phuong@itlvn.com",
-                "kenny.thuong@itlvn.com",
-            };
-            return lstCc;
+                emailBCCs = emailBcc.ToString().Split(";").ToList();
+            }
+            return emailBCCs;
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)
@@ -1760,6 +1900,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             CreditCurrency = x.contract.CreditCurrency,
                             CurrencyId = x.contract.CurrencyId,
                             CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
+                            SaleService = x.contract.SaleService
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }
@@ -1767,6 +1908,11 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             return results;
+        }
+
+        public CatContract GetContractById(Guid Id)
+        {
+            return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
         }
     }
 }

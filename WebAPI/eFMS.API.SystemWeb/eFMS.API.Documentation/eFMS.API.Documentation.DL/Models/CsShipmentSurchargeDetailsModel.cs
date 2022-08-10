@@ -24,5 +24,7 @@ namespace eFMS.API.Documentation.DL.Models
         public bool IsSynced { get; set; }
         public string SyncedFromBy { get; set; }
         public string VatPartnerShortName { get; set; }
+        public string PaymentStatus { get; set; }
+        public DateTime? PaidDate { get; set; }
     }
 }

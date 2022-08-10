@@ -101,7 +101,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'advanceAmount': [],
             'balanceAmount': [],
             'bankCode': [],
-            'dueDate': []
+            'dueDate': [null, Validators.required]
         });
 
 
@@ -239,5 +239,9 @@ export class SettlementFormCreateComponent extends AppForm {
             return true;
         }
         return false;
+    }
+
+    onUpdateRequestDate(value: { startDate: any; endDate: any }) {
+        this.minDate = value.startDate;
     }
 }

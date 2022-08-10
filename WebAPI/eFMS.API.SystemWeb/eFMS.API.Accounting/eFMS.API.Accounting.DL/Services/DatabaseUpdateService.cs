@@ -21,6 +21,7 @@ namespace eFMS.API.Accounting.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private IContextBase<sp_InsertRowToDataBase> context;
+        IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         public DatabaseUpdateService(IContextBase<sp_InsertRowToDataBase> repository,
             IMapper mapper,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
@@ -28,6 +29,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             context = repository;
             currentUser = user;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         /// <summary>
@@ -39,38 +41,47 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var sql = "<tag/>";
             var values = new List<object>();
-            var typeInfo = obj.GetType().GetTypeInfo();
-            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
-            foreach (var propertyInfo in typeInfo.GetProperties())
+            try
             {
-                if (propertyInfo.GetValue(obj) != null)
+                var typeInfo = obj.GetType().GetTypeInfo();
+
+                foreach (var propertyInfo in typeInfo.GetProperties())
                 {
-                    if (propertyInfo.PropertyType == typeof(DateTime) || propertyInfo.PropertyType == typeof(DateTime?))
+                    if (propertyInfo.GetValue(obj) != null)
                     {
-                        values.Add("\'" + DateTime.Parse(propertyInfo.GetValue(obj).ToString()).ToString("yyyy-MM-dd HH:mm:ss.fff") + "\'");
-                    }
-                    else if (propertyInfo.PropertyType == typeof(decimal?) || propertyInfo.PropertyType == typeof(int?))
-                    {
-                        values.Add(propertyInfo.GetValue(obj));
+                        if (propertyInfo.PropertyType == typeof(DateTime) || propertyInfo.PropertyType == typeof(DateTime?))
+                        {
+                            values.Add("\'" + DateTime.Parse(propertyInfo.GetValue(obj).ToString()).ToString("yyyy-MM-dd HH:mm:ss.fff") + "\'");
+                        }
+                        else if (propertyInfo.PropertyType == typeof(decimal?) || propertyInfo.PropertyType == typeof(int?))
+                        {
+                            values.Add(propertyInfo.GetValue(obj));
+                        }
+                        else
+                        {
+                            var strValue = propertyInfo.GetValue(obj).ToString().Replace("'", "''");
+                            values.Add("N'" + strValue + "\'");
+                        }
                     }
                     else
                     {
-                        values.Add("N'" + propertyInfo.GetValue(obj) + "\'");
+                        values.Add("NULL");
                     }
                 }
-                else
-                {
-                    values.Add("NULL");
-                }
-            }
-            sql += string.Join("<tag>", values);
-            sql += "<tag/>";
-            var parameters = new[]{
+                sql += string.Join("<tag>", values);
+                sql += "<tag/>";
+                var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@table", Value = obj.GetType().Name.Replace("Model", "") },
                 new SqlParameter(){ ParameterName = "@values", Value = sql }
             };
-            var result = context.DC.ExecuteProcedure<sp_InsertRowToDataBase>(parameters);
-            return result.FirstOrDefault();
+                var result = context.DC.ExecuteProcedure<sp_InsertRowToDataBase>(parameters);
+                return result.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("EFMS_InsertDataToDB", "Error : " + ex.ToString() + "\nAction: " + currentUser.Action + "\nValue: Table " + obj.GetType().Name.Replace("Model", "") + " Value: " + sql);
+                return null;
+            }
         }
 
         /// <summary>
@@ -84,6 +95,16 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
+                IQueryable<CsShipmentSurcharge> surchargesUpd = null;
+                if (action != "Delete")
+                {
+                    var idsUpd = surcharges.Where(x => x.Id != Guid.Empty).Select(x => x.Id).ToList();
+                    surchargesUpd = csShipmentSurchargeRepo.Get(x => idsUpd.Any(z => z == x.Id));
+                }
+                else
+                {
+                    surchargesUpd = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settleCode);
+                }
                 var parameters = new[]{
                 new SqlParameter()
                 {
@@ -101,12 +122,53 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@action", Value = action}
             };
                 var hs = context.DC.ExecuteProcedure<sp_UpdateSurchargeSettlement>(parameters);
-                new LogHelper("eFMS_Log_UpdateSurchargeSettle-" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
+                new LogHelper("eFMS_Log_UpdateSurchargeSettle" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
+                LogSurchargeSettlement(surchargesUpd, settleCode, action);
             }
             catch (Exception ex)
             {
-                new LogHelper("eFMS_Log_UpdateSurchargeSettle-" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\nError " + ex.ToString() + "\n Settle: " + settleCode + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
+                new LogHelper("eFMS_Log_UpdateSurchargeSettle" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\nError " + ex.ToString() + "\n Settle: " + settleCode + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
             }
+        }
+
+        private void LogSurchargeSettlement(IEnumerable<CsShipmentSurcharge> oldSurcharges, string settleCode, string action)
+        {
+            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+            var idsOld = new List<Guid>();
+            if (oldSurcharges != null)
+            {
+                idsOld = oldSurcharges.Select(x => x.Id).ToList();
+                var surchargesUpdNew = csShipmentSurchargeRepo.GetAsync(x => idsOld.Any(z => z == x.Id)).Result;
+                if (surchargesUpdNew?.Count() > 0)
+                {
+                    var editList = ChangeTrackerHelper.GetChangeModifield(oldSurcharges, surchargesUpdNew);
+                    ChangeTrackerHelper.InsertToMongoDb(editList);
+                }
+                else
+                {
+                    var deleteList = ChangeTrackerHelper.GetDeleted(oldSurcharges);
+                    ChangeTrackerHelper.InsertToMongoDb(deleteList);
+                }
+            }
+            {
+                if (action != "Delete") // Log add new surcharges
+                {
+                    var surchargesUpdNew = csShipmentSurchargeRepo.GetAsync(x => x.SettlementCode == settleCode && !idsOld.Any(z => z == x.Id)).Result;
+                    var addList = ChangeTrackerHelper.GetAdded(surchargesUpdNew);
+                    ChangeTrackerHelper.InsertToMongoDb(addList);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Log add object to mongo
+        /// </summary>
+        /// <param name="entity"></param>
+        public void LogAddEntity(object entity)
+        {
+            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+            var addedList = ChangeTrackerHelper.GetAdded((new List<object>() { entity }).AsEnumerable());
+            ChangeTrackerHelper.InsertToMongoDb(addedList);
         }
 
         /// <summary>

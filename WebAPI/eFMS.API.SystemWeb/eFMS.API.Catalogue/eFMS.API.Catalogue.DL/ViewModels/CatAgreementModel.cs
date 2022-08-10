@@ -16,5 +16,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string CurrencyId { get; set; }
         public decimal? CustomerAdvanceAmountVnd { get; set; }
         public decimal? CustomerAdvanceAmountUsd { get; set; }
+        public string SaleService { get; set; }
     }
 }

@@ -433,6 +433,7 @@ export class PartnerDetailComponent extends AppList {
             partnerLocation: !!formBody.partnerLocation ? formBody.partnerLocation.id : null,
             id: this.isAddSubPartner ? null : this.partner.id,
             creditPayment: !!formBody.creditPayment ? formBody.creditPayment.id : null,
+            bankName: !!formBody.bankName ? formBody.bankName.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : null
         };
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
@@ -513,6 +514,7 @@ export class PartnerDetailComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
+                            this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
                             this._toastService.success(res.message);
                         } else {

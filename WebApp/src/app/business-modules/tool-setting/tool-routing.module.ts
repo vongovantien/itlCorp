@@ -27,6 +27,10 @@ const routes: Routes = [
         }
     },
     {
+        path: 'file-management', loadChildren: () => import('./file-management/file-management.module').then(m => m.FilesManagementModule),
+        data: { name: 'Files Management', title: 'eFMS File Management' }
+    },
+    {
         path: 'other', loadChildren: () => import('./other/other.module').then(m => m.OtherModule),
         data: { name: 'Other', title: 'eFMS Other' }
     },

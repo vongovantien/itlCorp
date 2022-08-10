@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -25,7 +26,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ConvertClearanceToJob(CustomsDeclarationModel model);
         //HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState ConvertExistedClearancesToJobs(List<CustomsDeclarationModel> list);
-        HandleState SoftDeleteJob(Guid id);
+        HandleState SoftDeleteJob(Guid id, out List<ObjectReceivableModel> receivables);
         string CheckExist(OpsTransactionModel model, string mblNo, string hblNo);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
@@ -34,9 +35,9 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
-        ResultHandle ChargeFromReplicate(string arrJob);
-        ResultHandle AutoRateReplicate();
         Task<HandleState> ReplicateJobs(ReplicateIds model);
+        ResultHandle ChargeFromReplicate(string arrJob, out List<Guid> Ids);
+        ResultHandle AutoRateReplicate(string settleNo, string jobNo);
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
     }
 }

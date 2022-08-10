@@ -14,6 +14,9 @@ import { SettlementListChargeComponent } from '../components/list-charge-settlem
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 
 import { catchError, concatMap, finalize } from 'rxjs/operators';
+import { InfoPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { EMPTY } from 'rxjs';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -23,7 +26,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
     @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
-
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -62,21 +66,38 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         }
     }
 
+    checkValidSettle() {
+        if (this.formCreateSurcharge.checkStaffPartner()) {
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return false;
+        }
+
+        this.formCreateSurcharge.isSubmitted = true;
+        if (this.requestSurchargeListComponent.surcharges.length === 0) {
+            this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
+            return false;
+        }
+        if(!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate){
+            return false;
+        }
+        return true;
+    }
+
     saveSettlement() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
 
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
-            return;
-        }
         // this.requestSurchargeListComponent.surcharges.forEach(s => {
         //     if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
         //         s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
         //     }
         // });
+
+        if(!this.checkValidSettle()){
+            return;
+        }
 
         this.formatInvoiceDateSurcharge();
 
@@ -85,8 +106,20 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
-        this._accountingRepo.addNewSettlement(body)
-            .pipe(catchError(this.catchError))
+        this._accountingRepo.checkIfInvalidFeeShipmentSettle(body)
+            .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
+            concatMap((res: CommonInterface.IResult) => {
+                if (!res.status) {
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        title: 'Warning',
+                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                        class: 'bg-danger'
+                    });
+                    return EMPTY;
+                } else {
+                    return this._accountingRepo.addNewSettlement(body);
+                }
+            }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -113,9 +146,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-
-        if (this.formCreateSurcharge.checkStaffPartner()) {
-            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+        if(!this.checkValidSettle()){
             return;
         }
 
@@ -134,20 +165,34 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         return;
                     }
                     else {
-                        return this._accountingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
+                        return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body).pipe(
                             catchError(this.catchError),
                             concatMap((res: CommonInterface.IResult) => {
                                 if (!res.status) {
-                                    this._toastService.warning(res.message, '', { enableHtml: true });
-                                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                        title: 'Warning',
+                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                        class: 'bg-danger'
+                                    });
+                                    return EMPTY;
                                 } else {
-                                    settlementResult = res.data.settlement;
-                                    let approve: any = {
-                                        settlementNo: settlementResult.settlementNo,
-                                        requester: settlementResult.requester,
-                                        requesterAprDate: new Date()
-                                    }
-                                    return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
+                                    return this._accountingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
+                                        catchError(this.catchError),
+                                        concatMap((res: CommonInterface.IResult) => {
+                                            if (!res.status) {
+                                                this._toastService.warning(res.message, '', { enableHtml: true });
+                                                this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                                            } else {
+                                                settlementResult = res.data.settlement;
+                                                let approve: any = {
+                                                    settlementNo: settlementResult.settlementNo,
+                                                    requester: settlementResult.requester,
+                                                    requesterAprDate: new Date()
+                                                }
+                                                return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
+                                            }
+                                        })
+                                    );
                                 }
                             })
                         );
@@ -188,7 +233,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
-            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankName: !this.formCreateSurcharge.bankNameDescription.value ? this.formCreateSurcharge.bankNameDescription.value : this.formCreateSurcharge.bankNameDescription.value.normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
             bankCode: this.formCreateSurcharge.bankCode.value,
             dueDate: !!this.formCreateSurcharge.dueDate.value && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };

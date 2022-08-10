@@ -15,14 +15,18 @@
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)"
                                 placeholder="xxx-xxxxxxxx">
-                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb' 
-                            ">
-                                MAWB inputted is not correct format
-                            </div> -->
-                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
                             mawb.errors | equalError:'pattern':''">
                                 MAWB must be xxx-xxxxxxxx
-                            </div> -->
+                            </div>
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb'
+                            ">
+                                MAWB inputted is not correct format
+                            </div>
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidSpecial'
+                            ">
+                                MAWB No must be not have special charater!
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -164,8 +168,9 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="form-group">
-                            <label>Incoterm</label>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
+                            <label>Incoterm <span class="text-danger">(*)</span></label>
                             <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
                                 [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                             </ng-select>
@@ -206,14 +211,15 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!serviceDate.valid || !serviceDate.value.startDate))}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!serviceDate.valid || !serviceDate.value.startDate))}">
                             <label required>Service Date</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select Service Date" readonly
-                                    formControlName="serviceDate" (remove)="resetFormControl(serviceDate)" calendar
-                                    [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate" />
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select Service Date"
+                                    readonly formControlName="serviceDate" (remove)="resetFormControl(serviceDate)"
+                                    calendar [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate" />
                             </div>
                         </div>
                     </div>
@@ -256,8 +262,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric placeholder="Charge weight"
-                                        [decimals]="digitDecimal" autoFormatCurrency [digits]=2>
+                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                        placeholder="Charge weight" [decimals]="digitDecimal" autoFormatCurrency
+                                        [digits]=2>
                                 </div>
                             </div>
                         </div>
@@ -342,12 +349,23 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>No HAWB</label>
-                                    <div>
-                                        <app-switch size="md" formControlName="isHawb"></app-switch>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>No HAWB</label>
+                                            <div>
+                                                <app-switch size="md" formControlName="isHawb"></app-switch>
+                                            </div>
+                                        </div>
                                     </div>
-
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>No MAWB</label>
+                                            <div>
+                                                <app-switch size="md" formControlName="isMawb"></app-switch>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

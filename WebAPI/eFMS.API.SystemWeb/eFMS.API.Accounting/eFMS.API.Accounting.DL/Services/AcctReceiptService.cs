@@ -3701,13 +3701,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public async Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId)
         {
-            //Get list payment of Receipt
             var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
-            //Get list Invoice of payments
-            var invoiceIds = payments.Where(x => x.Type == "DEBIT").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
-            //Get list Invoice Temp of payments
-            var invoiceTempIds = payments.Where(x => x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
-            //Get list Soa Credit of payments
+            var invoiceIds = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
             var soaIds = payments.Where(x => x.Type == "CREDITSOA").Select(s => s.RefId).Distinct().ToList();
             var paySoaNos = new List<string>();
             if (soaIds.Count > 0)
@@ -3715,7 +3710,7 @@ namespace eFMS.API.Accounting.DL.Services
                 paySoaNos = soaRepository.Get(x => soaIds.Any(s => s == x.Id)).Select(s => s.Soano).Distinct().ToList();
             }
             IQueryable<CsShipmentSurcharge> surcharges = null;
-            if (invoiceIds.Count > 0 || invoiceTempIds.Count > 0 || paySoaNos.Count > 0)
+            if (invoiceIds.Count > 0 || paySoaNos.Count > 0)
             {
                 Expression<Func<CsShipmentSurcharge, bool>> query = chg => false;
 
@@ -3723,10 +3718,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     query = query.Or(x => invoiceIds.Any(i => i == x.AcctManagementId));
                 }
-                if (invoiceTempIds.Count > 0)
-                {
-                    query = query.Or(x => invoiceTempIds.Any(t => t == x.PayerAcctManagementId));
-                }
+               
                 if (paySoaNos.Count > 0)
                 {
                     query = query.Or(x => paySoaNos.Any(p => p == x.PaySoano));
@@ -3737,8 +3729,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (surcharges == null) return hs;
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            //Tính công nợ cho Partner, Service, Office có trong Receipt
-            hs = await accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
+            hs = await accAccountReceivableService.CalculatorReceivableDebitAmountAsync(objectReceivablesModel);           
             return hs;
         }
 

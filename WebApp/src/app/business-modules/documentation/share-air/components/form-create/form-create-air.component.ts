@@ -23,7 +23,6 @@ import {
     IShareBussinessState,
 } from '@share-bussiness';
 import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
-
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
@@ -47,7 +46,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
     personalIncharge: AbstractControl;
-
+    isCheckedActive: boolean = false;
     coloaderId: AbstractControl; // * Airline/Coloader
     supplierName: string = null;
 
@@ -245,10 +244,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                // * 15375
-                // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
-                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                // FormValidators.validateMAWB,
+                Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                FormValidators.validateMAWB,
                 FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
@@ -292,7 +289,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             airlineInfo: [],
 
             isHawb: [false],
-            incotermId: [],
+            isMawb: [false],
+            incotermId: [null, Validators.required],
             ata: [],
             atd: []
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
@@ -356,8 +354,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 });
         }
 
+        this.handleValidatorChange();
     }
-
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
@@ -550,5 +548,27 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             hw = Number(hw.toFixed(2));
             this.formGroup.patchValue({ chargeWeight: hw });
         }
+    }
+
+    handleValidatorChange() {
+        this.formGroup.get('isMawb').valueChanges
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(response => {
+                if (response === true) {
+                    this.isCheckedActive = true;
+                    this.formGroup.get('mawb').clearValidators();
+                    this.formGroup.get('mawb').setValidators([FormValidators.required, FormValidators.validateSpecialChar]);
+                }
+                else {
+                    this.isCheckedActive = false;
+                    this.formGroup.get('mawb').setValidators([
+                        Validators.required,
+                        Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                        FormValidators.validateMAWB,
+                        FormValidators.validateSpecialChar
+                    ]);
+                }
+                this.formGroup.get('mawb').updateValueAndValidity();
+            })
     }
 }

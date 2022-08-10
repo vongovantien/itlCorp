@@ -58,7 +58,7 @@
                 </div>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
+        <div class="table-wrapper table-editable m--margin-top-20 table-horizontal" [class.h]="!!charges.length">
             <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -69,14 +69,14 @@
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
                         <tr *ngFor="let charge of charges  | filter: keyword: ['partnerShortName','chargeNameEn','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
-                        class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
-                        [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
-                        [contextMenu]="linkFeeContextMenu" [disableMenuContext]="!charge.linkFee"
-                        (onTouch)="onSelectSurcharge(charge)">
-                        <ng-container *ngIf="(isLocked | async) === false">
-                            <td class="table-actions-col fixed-side "
-                                [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
-                                *ngIf="(permissionShipments | async)?.allowUpdateCharge">
+                            class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
+                            [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
+                            [contextMenu]="linkFeeContextMenu" [disableMenuContext]="!charge.linkFee"
+                            (onTouch)="onSelectSurcharge(charge)">
+                            <ng-container *ngIf="(isLocked | async) === false">
+                                <td class="table-actions-col fixed-side "
+                                    [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
+                                    *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                                     <div class="table-actions" *ngIf="allowSaving">
                                         <ng-container *ngIf="allowLinkFee && !charge.linkFee">
                                             <label class="m-checkbox">
@@ -190,7 +190,7 @@
                                                 [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                [dataSources]="listCharges"
+                                                [dataSources]="listCharges$ | async"
                                                 [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                                 placeholder="Select charge" (remove)="charge.chargeId = null">
                                             </app-combo-grid-virtual-scroll>
@@ -349,7 +349,8 @@
                                 </div>
                             </td>
                             <td class="disabled">
-                                <div class="form-group ">
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
                                     <input currencyMask type="text" class="form-control" [(ngModel)]="charge.total"
                                         placeholder="Total" readonly disabled>
                                 </div>
@@ -485,6 +486,25 @@
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.netAmount" readonly
                                         disabled currencyMask placeholder="Net Amount">
+                                </div>
+                            </td>
+                            <td class="disabled">
+                                <ng-container [ngSwitch]="charge.paymentStatus">
+                                    <span class="text-danger" *ngSwitchCase="'Unpaid'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                    <span class="text-success" *ngSwitchDefault>
+                                        {{ charge.paymentStatus }}
+                                    </span>
+                                </ng-container>
+                            </td>
+                            <td class="disabled">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" disabled
+                                        [value]="charge.paidDate | date: 'dd/MM/yyyy'">
                                 </div>
                             </td>
                         </tr>

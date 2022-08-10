@@ -15,5 +15,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public bool IsShowManager { get; set; }
         public bool IsShowAccountant { get; set; }
         public bool IsShowBuHead { get; set; }
+        public bool IsValidAutoRate { get; set; }
     }
 }

@@ -13,6 +13,7 @@ export class SystemConstants {
     // Security
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
+    public static readonly USER_ACCESS_PERMISSION = 'USER_ACCESS_PERMISSION';
     public static readonly ACCESS_TOKEN = 'access_token';
     public static readonly ID_TOKEN = 'id_token';
     public static readonly ISCHANGE_OFFICE = 'ISCHANGE_OFFICE';
@@ -132,7 +133,8 @@ export class SystemConstants {
         WHITE_SPACE: /^\s*$/,
         TAX_CODE: /^[a-zA-Z0-9_-]*$/,
         GUID: /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/g,
-        UNICODE_ZERO_WIDTH: /[\u200B-\u200D\uFEFF\u200e]/g
+        UNICODE_ZERO_WIDTH: /[\u200B-\u200D\uFEFF\u200e]/g,
+        VIETNAMESE_REGEX: /^((?![^a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).)*$/
     };
 
     public static HTTP_CODE = {

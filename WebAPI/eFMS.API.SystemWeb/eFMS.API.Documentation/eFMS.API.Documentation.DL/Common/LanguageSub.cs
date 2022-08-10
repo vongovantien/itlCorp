@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_ETD_CANNOT_CHANGE_MONTH = "MSG_ETD_CANNOT_CHANGE_MONTH";
         public static readonly string MSG_ETA_CANNOT_CHANGE_MONTH = "MSG_ETA_CANNOT_CHANGE_MONTH";
         public static readonly string MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH = "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH";
-
+        public static readonly string MSG_CDNOTE_ISSUED_COMBINE = "MSG_CDNOTE_ISSUED_COMBINE";
 
         // IMPORT SURCHARE 
         public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";
@@ -108,6 +108,6 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PARTER_CODE_NOT_VALID_TYPE = "MSG_PARTER_CODE_NOT_VALID_TYPE";
         public static readonly string MSG_PARTNER_CODE_DUPLICATE = "MSG_PARTNER_CODE_DUPLICATE";
         public static readonly string MSG_CHARGE_CODE_WRONG_SERVICE = "MSG_CHARGE_CODE_WRONG_SERVICE";
-
+        public static readonly string MSG_TOTAL_OVER_LIMIT = "MSG_TOTAL_OVER_LIMIT";
     }
 }
