@@ -1715,7 +1715,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.BillingRefNoType
             }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.CombineNo, z.Hblid }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, invoicePayment = z.payment?.InvoiceNo, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.payment?.UnpaidPaymentAmountUsd, z.Type }) });
             var results = new List<AccountingCustomerPaymentExport>();
-            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated }).ToLookup(x => x.Soano);
+            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
             var opsLookup = opsTransactionRepository.Get(x => x.CurrentStatus != "Canceled").Select(x => new { x.Id, x.JobNo, x.Hblid, x.SalemanId }).ToLookup(x => x.Id);
             //var userLst = userRepository.Get().Select(x => new { x.Id, x.EmployeeId }).ToLookup(x => x.Id);
@@ -1950,12 +1950,14 @@ namespace eFMS.API.Accounting.DL.Services
                         if (soaDetail != null)
                         {
                             #region saleman of contract
-                            var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
-                            var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
-                            if (string.IsNullOrEmpty(salemanId))
+                            var salemanId = soaDetail?.SalemanId; // Lấy salesman trên soa detail [CR: 30/05/2022 => lấy salesman trên detail soa]
+                            if (string.IsNullOrEmpty(salemanId)) // if salesman null => thì lấy trên hợp đồng
                             {
-                                salemanId = catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
-                                                                                           && x.OfficeId.Contains(invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId;
+                                var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
+                                salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
+
+                                salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId && x.Active == true
+                                                                                           && x.OfficeId.Contains(invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                             }
                             if (!string.IsNullOrEmpty(salemanId))
                             {
@@ -2276,15 +2278,17 @@ namespace eFMS.API.Accounting.DL.Services
                             payment.Salesman = employeeData == null ? string.Empty : employeeData.EmployeeNameEn;
                         }
                     }
-                    if (soaDetail != null) // Billing là soa
+                    if (soaDetail != null) // Billing là soa [CR: 30/05/2022 => lấy salesman trên detail soa]
                     {
                         #region saleman of contract
-                        var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
-                        var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
-                        if (string.IsNullOrEmpty(salemanId))
+                        var salemanId = soaDetail?.SalemanId; // Lấy salesman trên soa detail
+                        if (string.IsNullOrEmpty(salemanId)) // if salesman null => thì lấy trên hợp đồng
                         {
-                            salemanId = catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
-                                                                                          && x.OfficeId.Contains(item.invoice.Where(z => z.OfficeId != null).FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId;
+                            var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
+                            salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
+
+                            salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
+                                                                                         && x.OfficeId.Contains(item.invoice.Where(z => z.OfficeId != null).FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                         }
                         if (!string.IsNullOrEmpty(salemanId))
                         {
