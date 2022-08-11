@@ -347,25 +347,12 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.StatusPayment == "Settled")
                 {
                     var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo).ToList();
-                    foreach(var item in result)
+                    foreach (var item in result)
                     {
-                        //if (item.Count() == 1)
-                        //{
-                        //    advanceRequests1.AddRange(item.ToList());
-                        //}
                         if (checkType(item.ToList()) == "settled")
                         {
                             lstAdvanceRequests.AddRange(item.ToList());
                         }
-                        //if (checkType(item.ToList()) == "notsettled")
-                        //{
-                        //    lstNotSettled = lstNotSettled.Concat(item);
-                        //}
-                        //if (checkType(item.ToList()) == "partial")
-                        //{
-                        //    lstPartial = lstPartial.Concat(item);
-                        //}
-                        //result = result.Except(lstPartial);
                     }
                 }
                 if (criteria.StatusPayment == "NotSettled")
