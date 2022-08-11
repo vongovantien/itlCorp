@@ -121,7 +121,7 @@
 
     </div>
 </div>
-<detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
+<detail-stage-popup [data]="selectedStage" [jobId]=jobId (onSuccess)="onAddSuccess()"></detail-stage-popup>
 <!-- modal assign stage -->
 <share-asign-stage-popup (onAssign)="getListStageJob(jobId)"></share-asign-stage-popup>
 
