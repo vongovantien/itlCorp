@@ -44,9 +44,12 @@
                                         </thead>
                                         <tbody>
                                             <ng-container *ngIf="!!debitNotes.length">
-                                                <tr *ngFor="let cd of debitNotes; let i = index; trackby: trackByFn">
+
+                                                <tr *ngFor="let cd of debitNotes; let i = index; trackby: trackByFn"
+                                                    [contextMenu]="CdContextMenu" (onTouch)="onSelectCd(cps)"
+                                                    [class.touch-row]="selectedCd?.id === cd.id">
                                                     <td>
-                                                        <div class="m-checkbox-list d-flex align-items-center">
+                                                        <div class=" m-checkbox-list d-flex align-items-center">
                                                             <ng-template #dblock>
                                                                 <span class="d-block" style="width:30px"></span>
                                                             </ng-template>
@@ -120,3 +123,42 @@
         </div>
     </div>
 </div>
+
+<app-context-menu #CdContextMenu (clickOutside)="selectedCd = null">
+    <ng-container *ngIf="selectedCd?.status === 'Unpaid' && selectedCd?.syncStatus !== 'Synced'">
+        <div class="menu-context__item" (click)="confirmItem()">
+            <span><i class="la la-cloud-upload text-primary"></i><span> Confirm this item </span></span>
+        </div>
+    </ng-container>
+    <div class="menu-context__item" (click)="syncSelectedItems()">
+        <span><i class="la la-list-alt text-primary"></i><span>Confirm full selected items</span></span>
+    </div>
+    <div class="menu-context__item" (click)="revertSelectedItems()">
+        <span><i class="la la-list-alt text-primary"></i><span>Revert selected items</span></span>
+    </div>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between">
+            <div>
+                <i class="la la-print text-primary"></i>
+                <span> Preview</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+
+    </div>
+</app-context-menu>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="preview(selectedCd)">
+        Origin
+    </span>
+    <span class="dropdown-item pointer" (click)="preview(selectedCd,'VN')">
+        VND
+    </span>
+
+    <span class="dropdown-item pointer" (click)="preview(selectedCd,'EN')">
+        USD
+    </span>
+</app-dropdown>

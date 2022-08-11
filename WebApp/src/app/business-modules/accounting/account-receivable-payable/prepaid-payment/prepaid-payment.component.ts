@@ -11,6 +11,8 @@ import { AppList } from 'src/app/app.list';
 })
 export class ARPrePaidPaymentComponent extends AppList implements OnInit {
     debitNotes: Partial<IPrepaidPayment[]> = [];
+    selectedCd: IPrepaidPayment = null;
+
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _sortService: SortService
@@ -81,6 +83,26 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
 
     onChangeSelectedCd() {
         this.isCheckAll = this.debitNotes.filter(x => x.status === 'Unpaid').every(x => x.isSelected === true);
+    }
+
+    onSelectCd(cd: IPrepaidPayment) {
+        this.selectedCd = cd;
+    }
+
+    preview(cd: IPrepaidPayment, currency: string = 'VND') {
+
+    }
+
+    confirmItem() {
+
+    }
+
+    syncSelectedItems() {
+
+    }
+
+    revertSelectedItems() {
+
     }
 }
 
