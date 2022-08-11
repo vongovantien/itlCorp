@@ -1930,6 +1930,14 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         payment.BranchName = officeData[(Guid)invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
+                        var surcharge = item.surcharge.FirstOrDefault();
+                        if (item.grp.BillingRefNoType == "DEBIT")
+                        {
+                            payment.JobNo = surcharge?.JobNo;
+                            payment.MBL = surcharge?.Mblno;
+                            payment.HBL = surcharge?.Hblno;
+                        }
+
                         var soaDetail = soaLst[item.grp.BillingRefNo].FirstOrDefault();
                         var cdNoteDetail = cdNoteLst[item.grp.BillingRefNo].FirstOrDefault();
                         // Get saleman name
@@ -1939,7 +1947,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var salemanOfShipment = opsLookup[cdNoteDetail.JobId].FirstOrDefault()?.SalemanId;
                             if (salemanOfShipment == null)
                             {
-                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == item.surcharge.FirstOrDefault().Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
+                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == surcharge.Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
                             }
                             if (!string.IsNullOrEmpty(salemanOfShipment))
                             {
