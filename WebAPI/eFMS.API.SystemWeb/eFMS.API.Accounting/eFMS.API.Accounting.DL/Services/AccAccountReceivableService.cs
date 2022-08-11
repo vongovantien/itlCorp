@@ -124,6 +124,13 @@ namespace eFMS.API.Accounting.DL.Services
 
         private CatContract ModifiedAgreementWithReceivables(CatContract agreement, IQueryable<AccAccountReceivable> receivables)
         {
+            agreement.BillingAmount = 0;
+            agreement.DebitAmount = 0;
+            agreement.UnpaidAmount = 0;
+            agreement.PaidAmount = 0;
+            agreement.CreditRate = 0;
+            agreement.IsOverDue = false;
+            agreement.IsOverLimit = false;
             if (receivables != null && receivables.Count() > 0)
             {
                 var partnerChildIds = partnerRepo.Get(x => x.ParentId == agreement.PartnerId).Select(s => s.Id).ToList();
@@ -184,9 +191,17 @@ namespace eFMS.API.Accounting.DL.Services
                 var partner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault();
                 if (partner != null)
                 {
+                    var contractPartner = Enumerable.Empty<CatContract>().AsQueryable();
                     //Agreement của partner
-                    var contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId
+                    if (agreementIds.Count == 0)
+                    {
+                        contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId);
+                    } else
+                    {
+                        contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId
                                                                     && agreementIds.Contains(x.Id));
+                    }
+                    
                     if (contractPartner.Count() > 0)
                     {
                         foreach (var item in contractPartner)
@@ -1796,9 +1811,10 @@ namespace eFMS.API.Accounting.DL.Services
                     hs = new HandleState((object)hsInsertOrUpdate.Message);
                 }
                 WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables, models);
-
+               
                 var partnerIds = receivables.Select(s => s.PartnerId).Distinct().ToList();
-                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+                var receivableRelatives = DataContext.Get(x => partnerIds.Contains(x.PartnerId)).ToList();
+                var agreementIds = receivableRelatives.Where(x => x.ContractId != null).Select(s => s.ContractId).Distinct().ToList();
 
                 await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
 
@@ -1957,6 +1973,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var currentReceivables = DataContext.Get(x => x.PartnerId == fe.PartnerId && x.Office == fe.Office && x.Service == fe.Service).ToList();
                 foreach (var item in currentReceivables)
                 {
+                    item.DebitAmount = 0;
                     item.SellingNoVat = 0;
                     item.ObhAmount = 0;
                     item.BillingUnpaid = 0;
