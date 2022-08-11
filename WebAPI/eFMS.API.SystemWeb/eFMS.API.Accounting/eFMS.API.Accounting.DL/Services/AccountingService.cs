@@ -801,9 +801,10 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        var currencyId = cdNote.CurrencyId; // [Alex-CR:16062022] Lấy currency theo currency đầu phiếu
+                        // Credit usd => currency theo charge, Credit vnd => charge vnd
+                        var currencyId = cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? cdNote.CurrencyId : surcharge.CurrencyId; // CR:#17937
                         charge.CurrencyCode = currencyId;
-                        charge.ExchangeRate = sync.ExchangeRate; // [Alex-CR:16062022] Set Exchange Rate of Charge = Exchange Rate of Credit Note
+                        charge.ExchangeRate = cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? sync.ExchangeRate : surcharge.FinalExchangeRate;
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -811,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Quantity9 = surcharge.Quantity;
                         // Exchange Rate from currency original charge to currency SOA
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode);
-                        charge.OriginalUnitPrice = (surcharge.UnitPrice ?? 0) * _exchargeRate; //Đơn giá không cần làm tròn
+                        charge.OriginalUnitPrice = (surcharge.UnitPrice ?? 0) * (cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? _exchargeRate : 1); //Đơn giá không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                         //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
                         //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
@@ -1123,9 +1124,10 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Description = _charge?.ChargeNameVn;
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                        var currencyId = soa.Currency; // [Alex-CR:16062022] Lấy currency theo currency đầu phiếu
+                        // Credit usd => currency theo charge, Credit vnd => charge vnd
+                        var currencyId = soa.Currency == AccountingConstants.CURRENCY_LOCAL ? soa.Currency : surcharge.CurrencyId; // [Alex-CR:16062022] Lấy currency theo currency đầu phiếu
                         charge.CurrencyCode = currencyId;
-                        charge.ExchangeRate = currencyId == AccountingConstants.CURRENCY_LOCAL ? sync.ExchangeRate : surcharge.FinalExchangeRate;  // [Alex-CR:16062022] lấy giống debit
+                        charge.ExchangeRate = soa.Currency == AccountingConstants.CURRENCY_LOCAL ? sync.ExchangeRate : surcharge.FinalExchangeRate;  // [Alex-CR:16062022] lấy giống debit 
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -1134,7 +1136,7 @@ namespace eFMS.API.Accounting.DL.Services
                         // Exchange Rate from currency original charge to currency SOA
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode);
 
-                        charge.OriginalUnitPrice = (surcharge.UnitPrice ?? 0) * _exchargeRate; //Không cần làm tròn
+                        charge.OriginalUnitPrice = (surcharge.UnitPrice ?? 0) * (soa.Currency == AccountingConstants.CURRENCY_LOCAL ? _exchargeRate : 1); //Không cần làm tròn
                         charge.TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100; //Thuế suất /100
                         //var _netAmount = NumberHelper.RoundNumber((surcharge.Quantity * surcharge.UnitPrice) ?? 0, decimalRound); //Net Amount làm tròn
                         //charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế đã làm tròn
