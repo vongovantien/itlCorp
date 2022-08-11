@@ -812,7 +812,6 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportOutsourcingRegcognising")]
         [HttpPost]
-        [HttpPost]
         [Authorize]
         public async Task<IActionResult> ExportOutsourcingRegcognising(OpsTransactionCriteria critera)
         {
