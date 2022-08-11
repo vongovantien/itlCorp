@@ -46,7 +46,7 @@
                                             <ng-container *ngIf="!!debitNotes.length">
 
                                                 <tr *ngFor="let cd of debitNotes; let i = index; trackby: trackByFn"
-                                                    [contextMenu]="CdContextMenu" (onTouch)="onSelectCd(cps)"
+                                                    [contextMenu]="CdContextMenu" (onTouch)="onSelectCd(cd)"
                                                     [class.touch-row]="selectedCd?.id === cd.id">
                                                     <td>
                                                         <div class=" m-checkbox-list d-flex align-items-center">
@@ -125,12 +125,12 @@
 </div>
 
 <app-context-menu #CdContextMenu (clickOutside)="selectedCd = null">
-    <ng-container *ngIf="selectedCd?.status === 'Unpaid' && selectedCd?.syncStatus !== 'Synced'">
+    <ng-container *ngIf="selectedCd?.status === 'Unpaid' && selectedCd?.syncStatus === null">
         <div class="menu-context__item" (click)="confirmItem()">
             <span><i class="la la-cloud-upload text-primary"></i><span> Confirm this item </span></span>
         </div>
     </ng-container>
-    <div class="menu-context__item" (click)="syncSelectedItems()">
+    <div class="menu-context__item" (click)="confirmSelectedItems()">
         <span><i class="la la-list-alt text-primary"></i><span>Confirm full selected items</span></span>
     </div>
     <div class="menu-context__item" (click)="revertSelectedItems()">
@@ -162,3 +162,5 @@
         USD
     </span>
 </app-dropdown>
+
+<ng-template inject></ng-template>

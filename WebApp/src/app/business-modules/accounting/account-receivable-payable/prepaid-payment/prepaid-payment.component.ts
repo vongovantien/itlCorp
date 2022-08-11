@@ -1,7 +1,11 @@
 import { T } from '@angular/cdk/keycodes';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ConfirmPopupComponent } from '@common';
+import { AccountingConstants } from '@constants';
+import { InjectViewContainerRefDirective } from '@directives';
 import { AccountingRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 
@@ -10,12 +14,17 @@ import { AppList } from 'src/app/app.list';
     templateUrl: './prepaid-payment.component.html',
 })
 export class ARPrePaidPaymentComponent extends AppList implements OnInit {
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
+
     debitNotes: Partial<IPrepaidPayment[]> = [];
     selectedCd: IPrepaidPayment = null;
 
     constructor(
         private readonly _accountingRepo: AccountingRepo,
-        private readonly _sortService: SortService
+        private readonly _sortService: SortService,
+        private readonly _toast: ToastrService,
+
 
     ) {
         super();
@@ -87,6 +96,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
 
     onSelectCd(cd: IPrepaidPayment) {
         this.selectedCd = cd;
+        console.log(this.selectedCd);
     }
 
     preview(cd: IPrepaidPayment, currency: string = 'VND') {
@@ -94,10 +104,67 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
     }
 
     confirmItem() {
-
+        const selectedCd = Object.assign({}, this.selectedCd);
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: `Are you sure to confirm <strong>${this.selectedCd.debitNote}</strong>`,
+            labelConfirm: 'Yes',
+            labelCancel: 'No',
+            center: true
+        }, () => {
+            if (selectedCd) {
+                const body = {
+                    id: selectedCd.id,
+                    status: 'Paid',
+                }
+                this.confirmData([body]);
+            }
+        });
     }
 
-    syncSelectedItems() {
+    private confirmData(body) {
+        this._accountingRepo.confirmCdNotePrepaid(body)
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toast.success(res.message);
+                        this.onSearchData(this.dataSearch);
+                    } else {
+                        this._toast.error(res.message);
+                    }
+                }
+            )
+    }
+
+    confirmSelectedItems() {
+        const cdList = this.debitNotes.filter(x => x.isSelected && x.status === 'Unpaid');
+        if (!cdList.length) {
+            this._toast.warning("Please select debit");
+            return;
+        }
+
+        const hasSynced: boolean = cdList.some(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED);
+        if (hasSynced) {
+            const debitHasSynced: string = cdList.filter(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED).map(a => a.debitNote).toString();
+            this._toast.warning(`${debitHasSynced} had synced, Please recheck!`);
+            return;
+        }
+
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.viewContainerRef.viewContainerRef,
+            {
+                body: `Are you sure you want to confirm paid <span class="font-weight-bold">${cdList.map(x => x.debitNote).join()}</span> ?`,
+                iconConfirm: 'la la-cloud-upload',
+                labelConfirm: 'Yes',
+                center: true
+            },
+            (v: boolean) => {
+                const body = cdList.map(x => ({
+                    id: x.id,
+                    status: 'Paid'
+                }));
+                this.confirmData(body);
+            });
 
     }
 

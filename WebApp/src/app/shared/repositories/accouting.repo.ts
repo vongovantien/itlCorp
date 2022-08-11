@@ -1091,12 +1091,15 @@ export class AccountingRepo {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue30`, partnerIds);
     }
 
-
     getPagingCdNotePrepaid(body: any, page: number, size: number) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment/Paging`, body, {
             page: '' + page,
             size: '' + size
         });
+    }
+
+    confirmCdNotePrepaid(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
     }
 
 }
