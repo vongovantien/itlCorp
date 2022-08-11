@@ -1,3 +1,5 @@
+import { transition } from '@angular/animations';
+import { finalize } from 'rxjs/operators';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
@@ -630,4 +632,68 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             )
 
     }
+
+    updateShipmentChanger(model) {
+        this._documentRepo.updateShipment(model)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.getShipmentDetails(this.opsTransaction.id);
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.editForm.formEdit.controls[error.error?.data?.errorCode].setErrors({ existed: true });
+                    }
+                }
+            );
+    }
+
+
+    onFinishJob() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to finish this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.handleChangeStatusJob(JobConstants.FINISH);
+        })
+    }
+
+    onReopenJob() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to reopen this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.handleChangeStatusJob(JobConstants.REOPEN);
+        })
+
+    }
+
+    handleChangeStatusJob(status: string) {
+        let body: any = {
+            jobId: this.jobId,
+            transitionType: JobConstants.OPSTRANSITION,
+            status
+        }
+        this._documentRepo.updateStatusJob(body).pipe(
+            catchError(this.catchError),
+            finalize(() => {
+                this._progressRef.complete();
+            })
+        ).subscribe(
+            (r: CommonInterface.IResult) => {
+                if (r.status) {
+                    this.getShipmentDetails(this.jobId);
+                    this._toastService.success(r.message);
+                } else {
+                    this._toastService.error(r.message);
+                }
+            },
+        );
+    }
+>>>>>>> 157500eb10 (updated finish reopen for opsTransition)
 }

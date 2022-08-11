@@ -68,7 +68,9 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
-
+        private readonly IContextBase<OpsStageAssigned> csStageAssignedRepository;
+        private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly IContextBase<CatStage> csStageRepository;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -107,6 +109,8 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IAccAccountReceivableService accAccountReceivable,
+            ICsStageAssignedService csStageAssigned,
+             IContextBase<CatStage> stageRepo,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -145,6 +149,9 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransactionRepository = opsTransactionRepo;
             csLinkChargeRepository = csLinkChargeRepo;
             accAccountReceivableService = accAccountReceivable;
+            csStageAssignedRepository = csStageAssignedRepo;
+            csStageAssignedService = csStageAssigned;
+            csStageRepository = stageRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -3560,6 +3567,110 @@ namespace eFMS.API.Documentation.DL.Services
             catch (Exception ex)
             {
                 return new HandleState(false, ex.ToString());
+            }
+        }
+
+        public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
+        {
+            CatStage stage = null;
+            CsTransaction csJob = null;
+            OpsTransaction opsJob = null;
+
+            switch (model.TransitionType.ToString().Trim())
+            {
+                case TermData.CsTransition:
+                    csJob = DataContext.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
+                    if (model.Status.ToString().Trim() == TermData.Finish)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        csJob.CurrentStatus = TermData.Finish;
+                    }
+                    if (model.Status.ToString().Trim() == TermData.Reopen)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
+                        csJob.CurrentStatus = TermData.Reopen;
+                    }
+                    break;
+                case TermData.OpsTransition:
+                    opsJob = opsTransactionRepository.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
+                    if (model.Status.ToString().Trim() == TermData.Finish)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        opsJob.CurrentStatus = TermData.Finish;
+                    }
+                    if (model.Status.ToString().Trim() == TermData.Reopen)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
+                        opsJob.CurrentStatus = TermData.Reopen;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (csJob == null && opsJob == null)
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            }
+
+            HandleState hs = new HandleState();
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    if(model.TransitionType == TermData.CsTransition)
+                    {
+                        hs = DataContext.Update(csJob, x => x.Id == model.JobId);
+                    }
+
+                    if (model.TransitionType == TermData.OpsTransition)
+                    {
+                        hs = opsTransactionRepository.Update(opsJob, x => x.Id == model.JobId);
+                    }
+
+                    if (hs.Success)
+                    {
+                        //add new Stage
+                        CsStageAssignedModel newStage = new CsStageAssignedModel();
+                        newStage.Id = Guid.NewGuid();
+                        newStage.StageId = stage.Id;
+                        newStage.Status = TermData.Done; ;
+                        newStage.DatetimeCreated = newStage.DatetimeModified = DateTime.Now;
+                        newStage.Deadline = DateTime.Now;
+                        newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
+                        if (model.TransitionType == TermData.CsTransition)
+                        {
+                            newStage.JobId = csJob.Id;
+                            int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == csJob.Id);
+                            newStage.OrderNumberProcessed = orderNumberProcess + 1;
+                        }
+                        if (model.TransitionType == TermData.OpsTransition)
+                        {
+                            newStage.JobId = opsJob.Id;
+                            int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == opsJob.Id);
+                            newStage.OrderNumberProcessed = orderNumberProcess + 1;
+                        }
+
+                        csStageAssignedService.AddNewStageAssigned(newStage);
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
     }

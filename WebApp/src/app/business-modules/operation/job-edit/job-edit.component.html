@@ -1,4 +1,29 @@
 <app-sub-header>
+    <ng-container *ngIf="!!opsTransaction && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish'">
+        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onFinishJob()">
+            <span>
+                <i class="la la-check-circle"></i>
+                <span>
+                    Finish
+                </span>
+            </span>
+        </button>
+    </ng-container>
+
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction.currentStatus === 'Finish' && opsTransaction.isLocked === false">
+        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onReopenJob()">
+            <span>
+                <i class="la la-refresh"></i>
+                <span>
+                    Reopen
+                </span>
+            </span>
+        </button>
+    </ng-container>
+
     <ng-container *ngIf="!!opsTransaction && !opsTransaction?.isLocked; else lockTpl">
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
@@ -114,8 +139,7 @@
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
                                                 [showGetCharge]="true" [showSyncStandard]="false"
-                                                [allowLinkFee]="allowLinkFeeSell"
-                                                [isDuplicateJob]="isDuplicate"
+                                                [allowLinkFee]="allowLinkFeeSell" [isDuplicateJob]="isDuplicate"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>

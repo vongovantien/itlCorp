@@ -1,13 +1,16 @@
 import { formatDate } from "@angular/common";
 
 export class JobConstants {
-    public static readonly Overdued: string = "Overdued";
-    public static readonly Processing: string = "Processing";
-    public static readonly InSchedule: string = "InSchedule";
-    public static readonly Pending = "Pending";
-    public static readonly Finish: string = "Finish";
-    public static readonly Canceled: string = "Canceled";
-    public static readonly Warning: string = "Warning";
+    public static readonly CSTRANSITION: string = "CsTransition";
+    public static readonly OPSTRANSITION: string = "OpsTransition";
+
+    public static readonly OVERDUED: string = "Overdued";
+    public static readonly PROCESSING: string = "Processing";
+    public static readonly PENDING = "Pending";
+    public static readonly FINISH: string = "Finish";
+    public static readonly WARNING: string = "Warning";
+    public static readonly REOPEN: string = "Reopen";
+    public static readonly DONE: string = "Done"
 
     public static COMMON_DATA = {
         FREIGHTTERMS: <string[]>['Collect', 'Prepaid'],
