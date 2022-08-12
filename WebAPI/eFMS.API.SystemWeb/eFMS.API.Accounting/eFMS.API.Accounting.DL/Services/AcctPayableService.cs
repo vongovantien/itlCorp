@@ -774,14 +774,14 @@ namespace eFMS.API.Accounting.DL.Services
         public GeneralAccPayableModel GetGeneralPayable(string partnerId,string currency)
         {
             var accPayable = DataContext.Get(x => x.PartnerId == partnerId).ToList();
-            var crdAvdAmount = currency=="VND"?DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.TotalAmountVnd): DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.TotalAmountUsd);
+            var crdAvdAmount = currency=="VND"?DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE & x.Status!="Paid").Sum(x => x.TotalAmountVnd): DataContext.Get(x => x.PartnerId == partnerId && x.TransactionType == AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE).Sum(x => x.TotalAmountUsd);
             var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
 
             return new GeneralAccPayableModel
             {
-                CreditAmount = currency == "VND" ? accPayable.Sum(x => x.TotalAmountVnd) : accPayable.Sum(x => x.TotalAmountUsd),
+                CreditAmount = currency == "VND" ? accPayable.Sum(x => x.TotalAmountVnd)-crdAvdAmount : accPayable.Sum(x => x.TotalAmountUsd)-crdAvdAmount,
                 CreditPaidAmount = currency == "VND" ? accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => x.PaymentAmountVnd) : accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => x.PaymentAmountUsd),
-                CreditUnpaidAmount = currency == "VND" ? (accPayable.Sum(x => x.RemainAmountVnd) <= 0 ? 0 : accPayable.Sum(x => x.RemainAmountVnd)) : (accPayable.Sum(x => x.RemainAmountUsd) <= 0 ? 0 : accPayable.Sum(x => x.RemainAmountUsd)),
+                CreditUnpaidAmount = currency == "VND" ? accPayable.Sum(x => x.RemainAmountVnd)-crdAvdAmount : accPayable.Sum(x => x.RemainAmountUsd)-crdAvdAmount,
                 //CreditAmount = accPayable.Sum(x => RateAmount(x.TotalAmountVnd, x.TotalAmountUsd, x.Currency, currency)),
                 //CreditPaidAmount = accPayable.Where(x => x.Status == "Paid" || x.Status == "Paid A Part").Sum(x => RateAmount(x.PaymentAmountVnd, x.PaymentAmountUsd, x.Currency, currency)),
                 //CreditUnpaidAmount = accPayable.Sum(x => RateAmount(x.RemainAmountVnd, x.RemainAmountUsd, x.Currency, currency)),
