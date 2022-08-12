@@ -390,7 +390,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     //Update Charge Debit (if valuable)
                     chargeInvoiceDebitUpdate = mapper.Map<List<ChargeInvoiceUpdateTable>>(debitChargesUpdate);
-                    var updateSurchargeDebit = UpdateSurchargeForInvoice(chargeInvoiceDebitUpdate);
+                    var updateSurchargeDebit = UpdateSurchargeForInvoiceVoucher(chargeInvoiceDebitUpdate, ForPartnerConstants.ACCOUNTING_INVOICE_TYPE);
                     if (!updateSurchargeDebit.Status)
                     {
                         WriteLogInsertInvoice(updateSurchargeDebit.Status, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, updateSurchargeDebit.Message.ToString());
@@ -402,7 +402,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     //Update Charge OBH (if valuable)
                     chargeInvoiceObhUpdate = mapper.Map<List<ChargeInvoiceUpdateTable>>(obhChargesUpdate);
-                    var updateSurchargeObh = UpdateSurchargeForInvoice(chargeInvoiceObhUpdate);
+                    var updateSurchargeObh = UpdateSurchargeForInvoiceVoucher(chargeInvoiceObhUpdate, ForPartnerConstants.ACCOUNTING_INVOICE_TYPE);
                     if (!updateSurchargeObh.Status)
                     {
                         WriteLogInsertInvoice(updateSurchargeObh.Status, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, updateSurchargeObh.Message.ToString());
@@ -492,7 +492,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return dueDate;
         }
 
-        private sp_UpdateChargeInvoiceUpdate UpdateSurchargeForInvoice(List<ChargeInvoiceUpdateTable> surcharges)
+        private sp_UpdateChargeInvoiceUpdate UpdateSurchargeForInvoiceVoucher(List<ChargeInvoiceUpdateTable> surcharges, string acctType)
         {
             var parameters = new[]{
                 new SqlParameter()
@@ -502,7 +502,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     Value = DataHelper.ToDataTable(surcharges),
                     SqlDbType = SqlDbType.Structured,
                     TypeName = "[dbo].[ChargeInvoiceUpdateTable]"
-                }
+                },
+                new SqlParameter(){ ParameterName = "@acctType", Value = acctType},
             };
             var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateChargeInvoiceUpdate>(parameters);
             return result.FirstOrDefault();
@@ -2339,6 +2340,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
                 })
                 .ToList();
+
             if (grpVoucherDetail.Count > 0)
             {
                 List<AccAccountingManagement> vouchers = new List<AccAccountingManagement>();
@@ -2436,6 +2438,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     vouchers.Add(voucher);
 
                 }
+
+                var surchargesUpdate = new List<CsShipmentSurcharge>();
                 using (var transVoucher = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -2443,7 +2447,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState hs = await DataContext.AddAsync(vouchers);
                         if (hs.Success)
                         {
-                            using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
+                            //using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
                             {
                                 try
                                 {
@@ -2498,8 +2502,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                                     surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                                 }
-
-                                                surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                                                surchargesUpdate.Add(surcharge);
+                                                //surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
 
                                             }
 
@@ -2514,8 +2518,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                         }
                                     }
 
-                                    HandleState hsSurcharge = surchargeRepo.SubmitChanges();
-                                    if (hsSurcharge.Success)
+                                    //HandleState hsSurcharge = surchargeRepo.SubmitChanges();
+                                    //if (hsSurcharge.Success)
                                     {
                                         HandleState hsUpdateBilling = new HandleState();
 
@@ -2560,31 +2564,25 @@ namespace eFMS.API.ForPartner.DL.Service
                                         if (hsUpdateBilling.Success)
                                         {
                                             transVoucher.Commit();
-                                            transSurcharge.Commit();
+                                            //transSurcharge.Commit();
                                         }
                                         else
                                         {
                                             transVoucher.Rollback();
-                                            transSurcharge.Rollback();
+                                            //transSurcharge.Rollback();
                                         }
-                                    }
-                                    else
-                                    {
-                                        transVoucher.Rollback();
-                                        transSurcharge.Rollback();
-
                                     }
                                 }
                                 catch (Exception ex)
                                 {
                                     transVoucher.Rollback();
-                                    transSurcharge.Rollback();
+                                    //transSurcharge.Rollback();
                                     throw ex;
 
                                 }
                                 finally
                                 {
-                                    transSurcharge.Dispose();
+                                    //transSurcharge.Dispose();
                                 }
                             }
                         }
@@ -2597,6 +2595,18 @@ namespace eFMS.API.ForPartner.DL.Service
                     finally
                     {
                         transVoucher.Dispose();
+                    }
+                }
+
+                if (surchargesUpdate.Count > 0)
+                {
+                    var surchargesVoucher = mapper.Map<List<ChargeInvoiceUpdateTable>>(surchargesUpdate);
+                    var updateSurchargeVoucher = UpdateSurchargeForInvoiceVoucher(surchargesVoucher, ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE);
+                    if (!updateSurchargeVoucher.Status)
+                    {
+                        var voucherNos = string.Join(";", vouchers.Select(x => x.VoucherId));
+                        WriteLogInsertVoucher(updateSurchargeVoucher.Status, voucherNos, vouchers, surchargesVoucher, updateSurchargeVoucher.Message.ToString());
+                        return new HandleState((object)updateSurchargeVoucher.Message);
                     }
                 }
             }
@@ -2896,6 +2906,26 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 new LogHelper("eFMS_Log_UpdateSurchargeSettle-" + settleCode, "UserModified: " + currentUser.UserID + "\nAction: " + action + "\nError " + ex.ToString() + "\n Settle: " + settleCode + "\n Charges:" + JsonConvert.SerializeObject(surcharges));
             }
+        }
+
+        /// <summary>
+        /// Log insert voucher
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="voucherNo"></param>
+        /// <param name="vouchers"></param>
+        /// <param name="surCharges"></param>
+        /// <param name="message"></param>
+        private void WriteLogInsertVoucher(bool status, string voucherNo, List<AccAccountingManagement> vouchers, List<ChargeInvoiceUpdateTable> surCharges, string message)
+        {
+            string logMessage = string.Format("InsertVoucher by {0} at {1} \n ** Message: {2} \n ** VoucherInfo: {3} \n ** Charges: {4} \n\n---------------------------\n\n",
+                            currentUser.UserID,
+                            DateTime.Now.ToString("dd/MM/yyyy HH:ss:mm"),
+                            message,
+                            vouchers != null ? JsonConvert.SerializeObject(vouchers) : "[]",
+                            surCharges != null ? JsonConvert.SerializeObject(surCharges) : "[]");
+            string logName = string.Format("InsertInvoice_{0}_{1}", (status ? "Success" : "Fail"), voucherNo);
+            new LogHelper(logName, logMessage);
         }
     }
 }

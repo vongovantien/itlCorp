@@ -25,7 +25,7 @@ export const environment = {
                 INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
                 // INDENTITY_SERVER_URL: "https://localhost:44369",
                 // EXPORT_CRYSTAL: "localhost:53717/ExportCrystal.aspx",
-                EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
+                EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner",
                 // FILE_SYSTEM: "localhost:44369",
                 FILE_SYSTEM: "test.api-efms.itlvn.com/file",

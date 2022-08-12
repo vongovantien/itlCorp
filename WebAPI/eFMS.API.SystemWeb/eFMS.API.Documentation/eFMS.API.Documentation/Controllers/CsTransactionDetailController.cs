@@ -573,6 +573,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get HAWB List Of Shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetHAWBListOfShipment")]
+        public IActionResult GetHAWBListOfShipment(Guid jobId)
+        {
+            var result = csTransactionDetailService.GetHAWBListOfShipment(jobId);
+            return Ok(result);
+        }
+
         private string CheckHasHBLUpdatePermitted(CsTransactionDetailModel model)
         {
             string errorMsg = string.Empty;

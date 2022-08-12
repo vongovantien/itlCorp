@@ -63,26 +63,45 @@ namespace eFMS.API.Documentation.Controllers
         /// Get info mail housebill of Air Export
         /// </summary>
         /// <param name="hblId">Housebill ID</param>
+        /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetInfoMailHBLAirExport")]
         [Authorize]
-        public IActionResult GetInfoMailHBLAirExport(Guid hblId)
+        public IActionResult GetInfoMailHBLAirExport(Guid? hblId, Guid? jobId)
         {
-            var data = sendMailService.GetInfoMailHBLAirExport(hblId);
-            return Ok(data);
+            if (hblId != null && hblId != Guid.Empty)
+            {
+                var data = sendMailService.GetInfoMailHBLAirExport(hblId);
+                return Ok(data);
+            }
+            else
+            {
+                var data = sendMailService.GetInfoMailAEPreAlert(jobId);
+                return Ok(data);
+            }
         }
 
         /// <summary>
         /// Get info mail housebill of Air Export
         /// </summary>
         /// <param name="hblId">Housebill ID</param>
+        /// <param name="jobId"></param>
+        /// <param name="serviceId"></param>
         /// <returns></returns>
         [HttpGet("GetInfoMailHBLPreAlerSeaExport")]
         [Authorize]
-        public IActionResult GetInfoMailHBLPreAlerSeaExport(Guid hblId, string serviceId)
+        public IActionResult GetInfoMailHBLPreAlerSeaExport(Guid? hblId, Guid? jobId, string serviceId)
         {
-            var data = sendMailService.GetInfoMailHBLPreAlerSeaExport(hblId, serviceId);
-            return Ok(data);
+            if (hblId != null && hblId != Guid.Empty)
+            {
+                var data = sendMailService.GetInfoMailHBLPreAlerSeaExport(hblId, serviceId);
+                return Ok(data);
+            }
+            else
+            {
+                var data = sendMailService.GetInfoMailPreAlerSeaExport(jobId, serviceId);
+                return Ok(data);
+            }
         }
 
         /// <summary>

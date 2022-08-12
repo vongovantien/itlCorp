@@ -331,6 +331,10 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: jobId, IsShipmentOperation: isShipmentOperation });
     }
 
+    getListCDNoteWithHbl(hblId: string, jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
+    }
+
     checkCdNoteAllowToDelete(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/CheckAllowDelete/${id}`).pipe(
             catchError((error) => throwError(error)),
@@ -911,6 +915,12 @@ export class DocumentationRepo {
         );
     }
 
+    getHAWBListOfShipment(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getInfoMailHBLAirImport(hblId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirImport`, { hblId: hblId }).pipe(
             map((data: any) => data)
@@ -923,14 +933,14 @@ export class DocumentationRepo {
         );
     }
 
-    getInfoMailHBLAirExport(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId }).pipe(
+    getInfoMailHBLAirExport(hblId: any, jobId: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId, jobId: jobId }).pipe(
             map((data: any) => data)
         );
     }
 
-    getInfoMailHBLPreAlertSeaExport(hblId: string, serviceId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, serviceId: serviceId }).pipe(
+    getInfoMailHBLPreAlertSeaExport(hblId: string, jobId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, jobId: jobId, serviceId: serviceId }).pipe(
             map((data: any) => data)
         );
     }

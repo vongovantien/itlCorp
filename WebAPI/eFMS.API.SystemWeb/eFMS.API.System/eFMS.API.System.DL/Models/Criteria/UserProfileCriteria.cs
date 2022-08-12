@@ -17,6 +17,7 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string BankCode { get; set; }
         public string Tel { get; set; }
         public string Description { get; set; }
+        public string SignatureImage { get; set; }
         public string PersonalId { get; set; }
     }
 }

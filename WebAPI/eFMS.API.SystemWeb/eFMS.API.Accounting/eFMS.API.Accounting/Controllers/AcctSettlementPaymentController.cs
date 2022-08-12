@@ -546,6 +546,20 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpPost]
+        [Route("CheckIfInvalidFeeShipmentSettle")]
+        public IActionResult CheckIfInvalidFeeShipmentSettle(CreateUpdateSettlementModel model)
+        {
+            // Check if Cost > Sell
+            var messInvalidShipment = acctSettlementPaymentService.CheckValidFeesOnShipment(model);
+            var _result = new ResultHandle() { Status = true };
+            if (!string.IsNullOrEmpty(messInvalidShipment))
+            {
+                _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
+            }
+            return Ok(_result);
+        }
+
+        [HttpPost]
         [Route("CheckValidToSendRequestSettle")]
         [Authorize]
         public IActionResult CheckValidToSendRequestSettle(CreateUpdateSettlementModel model)

@@ -13,6 +13,9 @@ namespace eFMS.API.ForPartner.DL.ViewModel
         public DateTime? InvoiceDate { get; set; }
         public string VoucherId { get; set; }
         public DateTime? VoucherIddate { get; set; }
+        public string VoucherIdre { get; set; }
+        public DateTime? VoucherIdredate { get; set; }
+        public Guid? PayerAcctManagementId { get; set; }
         public string SeriesNo { get; set; }
         public decimal? FinalExchangeRate { get; set; }
         public decimal? NetAmount { get; set; }

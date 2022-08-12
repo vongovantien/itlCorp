@@ -794,11 +794,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (model.CargoType == "FCL")
                 {
-                    productService = "SeaFCL";
+                    productService = "Sea FCL";
                 }
                 else
                 {
-                    productService = "SeaLCL";
+                    productService = "Sea LCL";
                 }
             }
             else
@@ -808,11 +808,11 @@ namespace eFMS.API.Documentation.DL.Services
                     model.ServiceType = "Sea";
                     if (model.CargoType == "FCL")
                     {
-                        productService = "SeaFCL";
+                        productService = "Sea FCL";
                     }
                     else
                     {
-                        productService = "SeaLCL";
+                        productService = "Sea LCL";
                     }
                 }
                 else

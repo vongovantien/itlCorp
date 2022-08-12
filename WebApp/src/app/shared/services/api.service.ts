@@ -79,7 +79,7 @@ export class ApiService {
                 'Content-Type': 'application/x-www-form-urlencoded',
             })
         };
-        return this._http.post(this.setUrl(url), formData, options);
+        return this._http.post(this.setUrl(url), formData);
 
     }
 
