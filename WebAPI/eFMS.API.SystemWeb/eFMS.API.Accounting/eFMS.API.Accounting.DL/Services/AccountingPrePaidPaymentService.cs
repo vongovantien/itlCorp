@@ -47,8 +47,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctCdnote> GetQuery(AccountingPrePaidPaymentCriteria criteria)
         {
-            Expression<Func<AcctCdnote, bool>> query = x => x.Status != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
-            && string.IsNullOrEmpty(x.SyncStatus);
+            Expression<Func<AcctCdnote, bool>> query = x => (x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID 
+            || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
 
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {

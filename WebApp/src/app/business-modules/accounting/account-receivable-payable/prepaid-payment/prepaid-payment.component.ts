@@ -39,7 +39,6 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
             { title: 'Partner Name', field: '', sortable: true },
             { title: 'Debit Note', field: '', sortable: true },
             { title: 'Debit Amount', field: '', sortable: true },
-            { title: 'PrePaid Amount', field: '', sortable: true },
             { title: 'Salesman', field: '', sortable: true },
             { title: 'AR Confirm', field: '', sortable: true },
         ];
