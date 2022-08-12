@@ -202,7 +202,7 @@ export class LinkFeeComponent extends AppList implements OnInit {
   }
 
   getCurrentService(res: any) {
-    let currService: any;
+    let currService = '';
     currService = this.formRule.services.find(
       x => x.id === res
     );
