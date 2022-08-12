@@ -34,6 +34,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(PayableComponent) payableComponent: PayableComponent;
     partnerId: string;
     partner: Partner;
+    currency: string;
+
+    isUpdated: boolean = false;
 
     constructor(
         protected _router: Router,
@@ -85,7 +88,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
-                    this.payableComponent.partnerId=res.partnerId;
+                    this.payableComponent.partnerId = res.partnerId;
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {
                     this.gotoList();
@@ -124,7 +127,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
                         this.formCreate.getShippingProvinces(res.countryShippingId);
                         this.formCreate.getBillingProvinces(res.countryId);
-                        this.payableComponent.getGeneralPayable(this.partner.id,this.partner.currency===null?"VND":this.partner.currency);
+                        this.payableComponent.getGeneralPayable(this.partner.id, this.partner.currency === null ? "VND" : this.partner.currency);
                     }
                     else {
                         this.back();
@@ -208,8 +211,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
-    onSaveWithPayable(payable : any){
+    onSaveWithPayable(payable: any) {
+        this.isUpdated = true;
         this.formCreate.isSubmitted = true;
+        console.log(payable);
 
         if (!this.formCreate.formGroup.valid) {
             this.infoPopup.show();
@@ -249,14 +254,14 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.partnerMode = this.partner.partnerMode;
         modelAdd.partnerLocation = this.formCreate.partnerLocation.value;
         //
-        modelAdd.paymentTerm=payable.paymentTerm;
-        modelAdd.currency=payable.currency;
+        modelAdd.paymentTerm = payable.paymentTerm;
+        modelAdd.currency = payable.currency;
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);
         console.log(this.partner);
-        
-        this.payableComponent.getGeneralPayable(this.partner.id,payable.currency);
+
+        //this.payableComponent.getGeneralPayable(this.partner.id, payable.currency);
     }
 
     onSaveDetail() {
@@ -368,6 +373,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.formCreate.formGroup.patchValue(res);
                     } else {
                         this._toastService.error(res.message);
+                    }
+                    if (this.isUpdated) {
+                        this.payableComponent.getGeneralPayable(this.partner.id, body.currency);
+                        this.isUpdated = false;
                     }
                 },
                 (error: HttpErrorResponse) => {
