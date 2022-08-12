@@ -1933,9 +1933,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var surcharge = item.surcharge.FirstOrDefault();
                         if (item.grp.BillingRefNoType == "DEBIT")
                         {
-                            payment.JobNo = surcharge?.JobNo;
-                            payment.MBL = surcharge?.Mblno;
-                            payment.HBL = surcharge?.Hblno;
+                            payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                            payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                            payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
                         }
 
                         var soaDetail = soaLst[item.grp.BillingRefNo].FirstOrDefault();
@@ -2264,9 +2264,9 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CombineNo = item.surcharge.Where(x => !string.IsNullOrEmpty(x.CombineNo)).FirstOrDefault()?.CombineNo;
                     if (item.grp.BillingRefNoType == "DEBIT")
                     {
-                        payment.JobNo = sur?.JobNo;
-                        payment.MBL = sur?.Mblno;
-                        payment.HBL = sur?.Hblno;
+                        payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                        payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                        payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
                         payment.CustomNo = customsDeclarationRepository.Get(x => x.JobNo == sur.JobNo).FirstOrDefault()?.ClearanceNo;
                     }
                     // Get saleman name
