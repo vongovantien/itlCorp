@@ -13,10 +13,10 @@ import { CommonEnum } from '@enums';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsComponent } from '@common';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { SearchList } from './store/actions/customer.action';
-import { ICustomerState, getCustomerSearchParamsState } from './store';
+import { LoadListCustomer, SearchList } from './store/actions/customer.action';
+import { ICustomerState, getCustomerSearchParamsState, getCustomerListState } from './store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
@@ -42,6 +42,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     dataSearchs: any = [];
 
+    isSearching: boolean = false;
 
     selectedCustomer: Customer;
 
@@ -78,6 +79,21 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                         this.dataSearchs = data;
                     }
 
+                }
+            );
+        this._store.select(getCustomerListState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Customer(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.customers = res.data || [];
+                    this.totalItems = res.totalItems || 0;
                 }
             );
         this.headerSalemans = [
@@ -119,7 +135,11 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.dataSearch.partnerType = 'Customer';
         // this.getPartners();
         this.onSearch(this.dataSearch);
+    }
 
+    onSearching(event: CommonInterface.ISearchOption) {
+        this.isSearching = true;
+        this.onSearch(event);
     }
 
     onSearch(event: CommonInterface.ISearchOption) {
@@ -134,13 +154,29 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             type: !!event.field ? event.field : this.dataSearchs.type,
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
-        this.page = 1;
+        //this.page = 1;
         this._store.dispatch(SearchList({ payload: searchData }));
+        this._store.select(getCustomerListState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
+                    return {
+                        page: data.page,
+                        pageSize: data.size
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.page = !!res.page ? res.page : 1,
+                        this.pageSize = !!res.pageSize ? res.pageSize : 15
+                }
+            );
+
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
             this.dataSearch[type] = this.dataSearchs.keyword;
         }
-
+        //this._store.dispatch(LoadListCustomer({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.requestList();
     }
 
@@ -210,18 +246,20 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     getPartners() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            })).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.customers = res.data || [];
-                    this.totalItems = res.totalItems;
-                }
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     })).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.customers = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        this._store.dispatch(LoadListCustomer({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this.isSearching = false;
     }
 
     sortPartners() {

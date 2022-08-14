@@ -19,6 +19,8 @@ import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
 import { UserCreatePopupComponent } from './components/user-create-popup/user-create-popup.component';
+import { EffectsModule } from '@ngrx/effects';
+import { partnerEffect } from './store/effect';
 
 const routing: Routes = [
     {
@@ -55,6 +57,7 @@ const routing: Routes = [
         TabsModule.forRoot(),
         ShareModulesModule,
         StoreModule.forFeature('partnerData', reducers),
+        EffectsModule.forFeature(partnerEffect),
     ],
     exports: [],
     declarations: [

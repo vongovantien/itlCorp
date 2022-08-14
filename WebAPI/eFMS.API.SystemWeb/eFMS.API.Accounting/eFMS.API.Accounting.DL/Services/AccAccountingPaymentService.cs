@@ -1930,6 +1930,14 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         payment.BranchName = officeData[(Guid)invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
+                        var surcharge = item.surcharge.FirstOrDefault();
+                        if (item.grp.BillingRefNoType == "DEBIT")
+                        {
+                            payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                            payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                            payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
+                        }
+
                         var soaDetail = soaLst[item.grp.BillingRefNo].FirstOrDefault();
                         var cdNoteDetail = cdNoteLst[item.grp.BillingRefNo].FirstOrDefault();
                         // Get saleman name
@@ -1939,7 +1947,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var salemanOfShipment = opsLookup[cdNoteDetail.JobId].FirstOrDefault()?.SalemanId;
                             if (salemanOfShipment == null)
                             {
-                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == item.surcharge.FirstOrDefault().Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
+                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == surcharge.Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
                             }
                             if (!string.IsNullOrEmpty(salemanOfShipment))
                             {
@@ -2256,9 +2264,9 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CombineNo = item.surcharge.Where(x => !string.IsNullOrEmpty(x.CombineNo)).FirstOrDefault()?.CombineNo;
                     if (item.grp.BillingRefNoType == "DEBIT")
                     {
-                        payment.JobNo = sur?.JobNo;
-                        payment.MBL = sur?.Mblno;
-                        payment.HBL = sur?.Hblno;
+                        payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                        payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                        payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
                         payment.CustomNo = customsDeclarationRepository.Get(x => x.JobNo == sur.JobNo).FirstOrDefault()?.ClearanceNo;
                     }
                     // Get saleman name

@@ -7,7 +7,7 @@
             <app-permission-button title="add new" (onClick)=addPartner()></app-permission-button>
             <app-permission-button title="Import" [routerLink]="['/home/catalogue/partner-data/import']" type="import">
             </app-permission-button>
-            <app-permission-button title="Export" type="export" (click)="exportPartnerData()" >
+            <app-permission-button title="Export" type="export" (click)="exportPartnerData()">
             </app-permission-button>
             <!-- <app-dropdown #dropdownMenu>
                 <a class="dropdown-item pointer" (click)="exportPartnerData()">
@@ -38,7 +38,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m-form">
-                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
+                <app-search-options [configSearch]="configSearch" (search)="onSearching($event)"
                     (reset_search)="resetSearch($event)"></app-search-options>
             </div>
         </div>
