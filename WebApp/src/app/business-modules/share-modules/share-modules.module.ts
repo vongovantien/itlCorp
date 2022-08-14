@@ -1,3 +1,4 @@
+import { PayableComponent } from './../commercial/components/payable/payable.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShareModulesInputShipmentPopupComponent, FormContractCommercialPopupComponent, PartnerRejectPopupComponent, ShareModulesReasonRejectPopupComponent } from './components';
@@ -31,7 +32,8 @@ const COMPONENTS = [
     FormUpdateEmailCommercialCatalogueComponent,
     ShareModulesReasonRejectPopupComponent,
     FormSearchExportComponent,
-    ShareBussinessAdjustDebitValuePopupComponent
+    ShareBussinessAdjustDebitValuePopupComponent,
+    PayableComponent
 ];
 @NgModule({
     declarations: [

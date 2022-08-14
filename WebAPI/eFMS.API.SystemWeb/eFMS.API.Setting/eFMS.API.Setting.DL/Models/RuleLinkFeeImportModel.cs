@@ -18,5 +18,12 @@ namespace eFMS.API.Setting.DL.Models
         public string RuleName { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
+        public string RuleNameError { get; set; }
+        public string ServiceBuyError { get; set; }
+        public string ServiceSellError { get; set; }
+        public string ChargeSellError { get; set; }
+        public string ChargeBuyError { get; set; }
+        public string StatusError { get; set; }
+        public string PartnerBuyError { get; set; }
     }
 }

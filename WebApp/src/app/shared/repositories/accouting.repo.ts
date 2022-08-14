@@ -1105,6 +1105,14 @@ export class AccountingRepo {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/CalculateOverDue30`, partnerIds);
     }
 
+    getGeneralPayable(partnerId: string, currency: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/GetGeneralPayable?partnerId=${partnerId}&currency=${currency}`);
+    }
+
+    updatePayable(partnerId: string, paymentTerm: number, currency: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/UpdatePayable?partnerId=${partnerId}&paymentTerm=${paymentTerm}&currency=${currency}`);
+    }
+
     getPagingCdNotePrepaid(body: any, page: number, size: number) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment/Paging`, body, {
             page: '' + page,
@@ -1115,7 +1123,6 @@ export class AccountingRepo {
     confirmCdNotePrepaid(body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
     }
-
 }
 
 
