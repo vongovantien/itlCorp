@@ -70,8 +70,10 @@
                                                     <td class="text-success">
                                                         {{ cd.partnerName }}
                                                     </td>
-                                                    <td>
-                                                        <span class="text-info">{{ cd.debitNote }}</span>
+                                                    <td app-copy-to-clipboard [text]="cd.debitNote" [hasIcon]="true"
+                                                        class="text-info">
+                                                        <span class="text-info" icon="la la-copy">{{
+                                                            cd.debitNote }}</span>
                                                         <ng-container [ngSwitch]="cd.syncStatus">
                                                             <span *ngSwitchCase="'Synced'"
                                                                 class="badge badge-success m--margin-left-10">

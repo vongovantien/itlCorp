@@ -113,6 +113,7 @@ namespace eFMS.API.Accounting.DL.Services
                            select new AccPrePaidPaymentResult
                            {
                                Id = cd.Id,
+                               JobID = cd.JobId,
                                Currency = cd.CurrencyId,
                                DebitNote = cd.Code,
                                SyncStatus = cd.SyncStatus,

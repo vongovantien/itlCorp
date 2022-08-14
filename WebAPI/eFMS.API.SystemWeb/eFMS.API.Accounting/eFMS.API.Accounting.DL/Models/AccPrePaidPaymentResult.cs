@@ -7,6 +7,7 @@ namespace eFMS.API.Accounting.DL.Models
     {
         public Guid Id { get; set; }
         public string JobNo { get; set; }
+        public Guid JobID { get; set; }
         public string MBL { get; set; }
         public string HBL { get; set; }
         public string DebitNote { get; set; }

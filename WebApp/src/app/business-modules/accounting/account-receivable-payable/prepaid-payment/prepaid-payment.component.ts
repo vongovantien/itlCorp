@@ -57,8 +57,9 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
             .subscribe(
                 (data: CommonInterface.IResponsePaging) => {
                     this.debitNotes = data.data || [];
-                    this.page = data.page;
-                    this.pageSize = data.pageSize;
+                    // this.page = data.page;
+                    // this.pageSize = data.pageSize;
+                    this.totalItems = data.totalItems;
                 }
             )
     }
@@ -66,7 +67,6 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit {
     onSearchData(dataSearch) {
         this.dataSearch = dataSearch;
         this.page = 1;
-        this.pageSize = 30;
 
         this.requestList();
     }
