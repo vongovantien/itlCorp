@@ -1,7 +1,6 @@
 <div class="job-detail-button-list d-flex align-items-center">
     <ng-container
-        *ngIf="!!shipmentDetail && !shipmentDetail?.isLocked && shipmentDetail?.currentStatus !== 'Finish'
-        && shipmentDetail?.permission?.allowUpdate && !isDuplicate && menuSpecialPermission | async | specialPermission:'FinishCharge'">
+        *ngIf="!!shipmentDetail && !shipmentDetail.isLocked && shipmentDetail.currentStatus !== 'Finish' && shipmentDetail?.permission?.allowUpdate && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
@@ -14,8 +13,7 @@
     </ng-container>
 
     <ng-container
-        *ngIf="!!shipmentDetail && shipmentDetail?.isLocked === false && shipmentDetail?.currentStatus === 'Finish'
-        && shipmentDetail?.permission?.allowUpdate && !isDuplicate && menuSpecialPermission | async | specialPermission:'ReopenCharge'">
+        *ngIf="!!shipmentDetail && shipmentDetail.currentStatus === 'Finish' && shipmentDetail.isLocked === false && shipmentDetail?.permission?.allowUpdate && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
