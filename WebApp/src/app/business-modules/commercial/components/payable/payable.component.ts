@@ -50,19 +50,21 @@ export class PayableComponent extends AppForm {
     onSavePayable() {
         this.savePayable.emit({
             paymentTerm: this.payableForm.get('paymentTerm').value,
-            currency: this.currency.value.id
+            currency: this.currency.value.id === undefined ? "VND" : this.currency.value.id,
         });
+
+        console.log(this.currency.value.id);
     }
 
-    getGeneralPayable(partnerId: string,currency: string) {
-        this._accountingRepo.getGeneralPayable(partnerId,currency)
+    getGeneralPayable(partnerId: string, currency: string) {
+        this._accountingRepo.getGeneralPayable(partnerId, currency)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
             ).subscribe(
                 (res: any) => {
                     console.log(res);
-                    res.currency=res.currency===null?'VND':res.currency;
+                    res.currency = res.currency === null ? 'VND' : res.currency;
                     this.creditAmount = res.creditAmount;
                     this.creditAdvanceAmount = res.creditAdvanceAmount;
                     this.creditPaidAmount = res.creditPaidAmount;
@@ -73,7 +75,7 @@ export class PayableComponent extends AppForm {
                     })
                     this.currency.setValue(res.currency);
                 },
-                
+
             );
     }
 
