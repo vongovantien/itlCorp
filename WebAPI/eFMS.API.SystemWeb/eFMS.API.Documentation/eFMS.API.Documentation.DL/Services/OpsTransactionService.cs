@@ -70,6 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly IContextBase<SysGroup> groupRepository;
+        private readonly IContextBase<CsShipmentSurcharge> surChargeRepository;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
         private readonly ICsTransactionService csTransactionServe;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -110,6 +111,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
+            IContextBase<CsShipmentSurcharge> surChargeRepo,
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable
@@ -152,6 +154,7 @@ namespace eFMS.API.Documentation.DL.Services
             groupRepository = groupRepo;
             databaseUpdateService = _databaseUpdateService;
             accAccountReceivableService = accAccountReceivable;
+            surChargeRepository= surChargeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1606,7 +1609,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
 
-            return result; 
+            return result;
         }
         public HandleState Update(OpsTransactionModel model)
         {
@@ -1670,7 +1673,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     // update saleman cdnote type debit/invoice
                     var cdnote = acctCdNoteRepository.Get(x => x.JobId == model.Id && x.Type != "CREDIT").FirstOrDefault();
-                    if(cdnote != null && cdnote?.SalemanId != model.SalemanId)
+                    if (cdnote != null && cdnote?.SalemanId != model.SalemanId)
                     {
                         cdnote.SalemanId = model.SalemanId;
                         acctCdNoteRepository.Update(cdnote, x => x.Id == cdnote.Id);
@@ -2251,7 +2254,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
             CatPartner partnerInternal = new CatPartner();
             var charges = GetChargesToLinkCharge(new Guid(currentUser.UserID), arrJob);
-           
+
             using (var trans = surchargeRepository.DC.Database.BeginTransaction())
             {
                 try
@@ -2363,7 +2366,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         HandleState hsSurchargeAdd = surchargeRepository.SubmitChanges();
-                        if(hsSurchargeAdd.Success)
+                        if (hsSurchargeAdd.Success)
                         {
                             Ids.AddRange(surchargeAdds.Select(x => x.Id));
                         }
@@ -2718,6 +2721,68 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetChargeAutoRateReplicate>(parameters);
             return listSurcharges;
+        }
+
+        public List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria)
+        {
+            criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            var data = Query(criteria);
+
+            data = data.OrderByDescending(x => x.DatetimeModified);
+            List<string> lstJobNo = new List<string>();
+            foreach (var item in data)
+            {
+                if (item.LinkSource == "Replicate")
+                {
+                    lstJobNo.Add(item.JobNo);
+                }
+                else if (item.ReplicatedId != null)
+                {
+                    lstJobNo.Add("R"+item.JobNo);
+                }
+            }
+            var lstJobNoDistinct = lstJobNo.Distinct().ToList();
+            string jobNos = "";
+            lstJobNoDistinct.ForEach(x =>
+            {
+                jobNos += x + ";";
+            });
+
+            var outRe = GetOutsourcingRegcognising(jobNos);
+
+            ExportOutsourcingRegcognisingModel[] result = new ExportOutsourcingRegcognisingModel[lstJobNoDistinct.Count()];
+
+            for (int i = 0; i < lstJobNoDistinct.Count(); i++)
+            {
+                var jobrep = outRe.Where(x => x.JobId == lstJobNoDistinct[i] && x.ChargeType == "JobRep").ToList();
+                var joborn = outRe.Where(x => x.JobId == lstJobNoDistinct[i].Substring(1) && x.ChargeType == "JobOrn").ToList();
+                result[i] = new ExportOutsourcingRegcognisingModel();
+                result[i].ReplicateJob = new List<sp_GetOutsourcingRegcognising>();
+                result[i].OriginalJob = new List<sp_GetOutsourcingRegcognising>();
+                result[i].ReplicateJob.AddRange(jobrep);
+                result[i].OriginalJob.AddRange(SortChargeOrn(jobrep,joborn));
+            }
+
+            return result.Where(x=>x.ReplicateJob.Count()>0).ToList();
+        }
+
+        private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@JobNos", Value = JobNos }
+            };
+            var OutRE = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOutsourcingRegcognising>(parameters);
+            return OutRE.ToList();
+        }
+
+        private List<sp_GetOutsourcingRegcognising> SortChargeOrn(List<sp_GetOutsourcingRegcognising> chargeReps, List<sp_GetOutsourcingRegcognising> chargeOrns)
+        {
+            List<sp_GetOutsourcingRegcognising> chargeOrnsChanged = new List<sp_GetOutsourcingRegcognising>();
+            for (int i = 0; i < chargeReps.Count(); i++)
+            {
+                chargeOrnsChanged.Add(chargeOrns.Where(x => x.ChargeId.ToString().ToLower() == chargeReps[i].LinkChargeId).FirstOrDefault());
+            }
+            return chargeOrnsChanged;
         }
     }
 }
