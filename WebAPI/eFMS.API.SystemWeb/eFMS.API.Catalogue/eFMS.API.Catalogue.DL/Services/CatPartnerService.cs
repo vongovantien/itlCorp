@@ -2475,11 +2475,12 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
-
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType)
+        
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId
+            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true)
             && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && x.SaleService.Contains(transactionType) 
             && x.Active == true);

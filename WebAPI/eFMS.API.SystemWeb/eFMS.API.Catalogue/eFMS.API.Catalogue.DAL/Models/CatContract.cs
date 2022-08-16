@@ -52,5 +52,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public int? SalesDepartment { get; set; }
         public string SalesOfficeId { get; set; }
         public string SalesCompanyId { get; set; }
+        public string ShipmentType { get; set; }
     }
 }

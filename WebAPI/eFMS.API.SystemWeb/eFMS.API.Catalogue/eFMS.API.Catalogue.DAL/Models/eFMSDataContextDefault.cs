@@ -609,6 +609,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("VAS")
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentType)
+                   .HasMaxLength(20)
+                   .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCountry>(entity =>

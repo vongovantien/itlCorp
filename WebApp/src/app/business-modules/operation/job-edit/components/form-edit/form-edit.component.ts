@@ -16,6 +16,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { E } from '@angular/cdk/keycodes';
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html'
@@ -140,7 +141,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
 
         this.containers = this._store.select(getContainerSaveState);
-
         this.initForm();
     }
 
@@ -187,7 +187,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.salesmanName = this.opsTransaction.salesmanName;
 
         if (this.opsTransaction.isAllowChangeSaleman) {
-            this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe((salesmans: any) => {
                     this.salesmans = salesmans;
                 })
@@ -301,7 +301,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     return;
                 }
 
-                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -333,7 +333,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':
+            case 'fieldOps':    
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -391,6 +391,17 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.billingOpsId.setValue(this.userLogged.id);
+    }
+    
+    UpdateSalesmanList(data: any){
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, data)        
+            .subscribe(
+                (res: any[]) => {
+                    if (!!res) {
+                        this.salesmans = res || [];
+                    }
+                }
+            );            
     }
 }
 export interface ILinkAirSeaInfoModel {
