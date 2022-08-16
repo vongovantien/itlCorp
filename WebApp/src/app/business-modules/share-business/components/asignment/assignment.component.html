@@ -7,8 +7,8 @@
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Finish Date:</span>
-                <span
-                    class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
+                <span class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date:
+                    'dd/MM/yyyy') : '-'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Job Status:</span>
@@ -73,10 +73,9 @@
                                 (click)="showDeletePopup(stage)">
                                 <i class="la la-trash"></i>
                             </button> -->
-
                         </td>
 
-                        <td class="sorting">
+                        <td class="sorting" style="width: 10px">
                             <span>{{stage.orderNumberProcessed}}</span>
                         </td>
                         <td class="sorting">

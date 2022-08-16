@@ -13,7 +13,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'share-assignment',
-    templateUrl: './assignment.component.html'
+    templateUrl: './assignment.component.html',
 })
 
 export class ShareBusinessAsignmentComponent extends AppList {

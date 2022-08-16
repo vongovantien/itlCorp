@@ -3588,7 +3588,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
                         stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
-                        csJob.CurrentStatus = TermData.Reopen;
+                        csJob.CurrentStatus = TermData.Processing;
                     }
                     break;
                 case TermData.OpsTransition:
@@ -3601,7 +3601,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
                         stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
-                        opsJob.CurrentStatus = TermData.Reopen;
+                        opsJob.CurrentStatus = TermData.Processing;
                     }
                     break;
                 default:

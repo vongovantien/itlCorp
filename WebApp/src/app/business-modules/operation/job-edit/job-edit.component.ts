@@ -1,3 +1,4 @@
+import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 import { transition } from '@angular/animations';
 import { finalize } from 'rxjs/operators';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
@@ -80,7 +81,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.subscriptionParamURLChange();
 
         this.subscriptionSaveContainerChange();
-
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     subscriptionParamURLChange() {

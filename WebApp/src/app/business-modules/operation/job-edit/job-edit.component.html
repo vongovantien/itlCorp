@@ -1,6 +1,8 @@
 <app-sub-header>
     <ng-container
-        *ngIf="!!opsTransaction && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish' && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
+        *ngIf="menuSpecialPermission | async | specialPermission:'FinishShipment'
+        && !!opsTransaction && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish'
+        && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
@@ -13,7 +15,9 @@
     </ng-container>
 
     <ng-container
-        *ngIf="!!opsTransaction && opsTransaction.currentStatus === 'Finish' && opsTransaction.isLocked === false && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
+        *ngIf="menuSpecialPermission | async | specialPermission:'ReopenShipment'
+        && !!opsTransaction && opsTransaction.currentStatus === 'Finish'
+        && opsTransaction.isLocked === false && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>

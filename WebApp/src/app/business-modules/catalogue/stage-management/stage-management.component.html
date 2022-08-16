@@ -65,17 +65,17 @@
                         <ng-container *ngIf="listStages.length > 0">
                             <tr *ngFor="let stage of listStages;let i = index;">
                                 <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 70px">
+                                    <div class="table-actions" style="width: 30px">
                                         <button type="button"
                                             class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
                                             (click)="showDetailStage(stage)" title="Edit stage">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button"
+                                        <!-- <button type="button"
                                             class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                             title="Remove stage" (click)="showConfirmDelete(stage)">
                                             <i class="la la-trash"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </td>
                                 <td>
