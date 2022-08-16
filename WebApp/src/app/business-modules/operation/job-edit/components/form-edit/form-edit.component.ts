@@ -16,7 +16,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
-import { E } from '@angular/cdk/keycodes';
+
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html'
