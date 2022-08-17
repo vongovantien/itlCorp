@@ -80,5 +80,7 @@ namespace eFMS.API.Catalogue.Models
         public bool? IsRequestApproval { get; set; }
         public string BankName { get; set; }
         public string BankCode { get; set; }
+        public int PaymentTerm { get; set; }
+        public string Currency { get; set; }
     }
 }

@@ -96,10 +96,12 @@
             public const string GetDataCommissionPRReportUrl = "/Documentation/api/v1/en-US/Shipment/GetCommissionReport?userId=";
             public const string GetDataIncentiveReportUrl = "/Documentation/api/v1/en-US/Shipment/GetIncentiveReport?userId=";
             public const string AddReportLogUrl = "/Documentation/api/v1/en-US/ReportLog/AddNew";
+            public const string GetOutsourcingRegcognisingUrl = "/Documentation/api/v1/en-US/OpsTransaction/GetOutsourcingRegcognising";
 
             public const string GetDataExporDebCretInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtDebCretInvExport";
 
             public const string GetDataOustandingDebitUrl = "/Documentation/api/v1/en-US/DocSendMail/GetDataOustandingDebit?salemanId=";
+            public const string GetOPSTransactionUrl = "/Documentation/api/v1/en-US/OpsTransaction/Query";
         }
 
         public class Setting

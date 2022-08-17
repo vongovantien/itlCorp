@@ -85,6 +85,9 @@ export class Partner {
     bankName: string = '';
     bankCode: string = '';
 
+    paymentTerm: number=0;
+    currency: string='';
+
     permission: PermissionPartner = new PermissionPartner();
 
     countryShippingName: string = null;

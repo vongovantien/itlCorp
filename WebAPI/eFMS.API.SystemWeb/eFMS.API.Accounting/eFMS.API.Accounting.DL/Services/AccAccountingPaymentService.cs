@@ -1715,7 +1715,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.BillingRefNoType
             }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.CombineNo, z.Hblid }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, invoicePayment = z.payment?.InvoiceNo, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.payment?.UnpaidPaymentAmountUsd, z.Type }) });
             var results = new List<AccountingCustomerPaymentExport>();
-            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated }).ToLookup(x => x.Soano);
+            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
             var opsLookup = opsTransactionRepository.Get(x => x.CurrentStatus != "Canceled").Select(x => new { x.Id, x.JobNo, x.Hblid, x.SalemanId }).ToLookup(x => x.Id);
             //var userLst = userRepository.Get().Select(x => new { x.Id, x.EmployeeId }).ToLookup(x => x.Id);
@@ -1930,6 +1930,14 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         payment.BranchName = officeData[(Guid)invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
+                        var surcharge = item.surcharge.FirstOrDefault();
+                        if (item.grp.BillingRefNoType == "DEBIT")
+                        {
+                            payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                            payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                            payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
+                        }
+
                         var soaDetail = soaLst[item.grp.BillingRefNo].FirstOrDefault();
                         var cdNoteDetail = cdNoteLst[item.grp.BillingRefNo].FirstOrDefault();
                         // Get saleman name
@@ -1939,7 +1947,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var salemanOfShipment = opsLookup[cdNoteDetail.JobId].FirstOrDefault()?.SalemanId;
                             if (salemanOfShipment == null)
                             {
-                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == item.surcharge.FirstOrDefault().Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
+                                salemanOfShipment = csTransactionDetailRepository.Get(x => x.Id == surcharge.Hblid).FirstOrDefault()?.SaleManId; // air/sea lấy saleman đại diện
                             }
                             if (!string.IsNullOrEmpty(salemanOfShipment))
                             {
@@ -1950,12 +1958,14 @@ namespace eFMS.API.Accounting.DL.Services
                         if (soaDetail != null)
                         {
                             #region saleman of contract
-                            var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
-                            var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
-                            if (string.IsNullOrEmpty(salemanId))
+                            var salemanId = soaDetail?.SalemanId; // Lấy salesman trên soa detail [CR: 30/05/2022 => lấy salesman trên detail soa]
+                            if (string.IsNullOrEmpty(salemanId)) // if salesman null => thì lấy trên hợp đồng
                             {
-                                salemanId = catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
-                                                                                           && x.OfficeId.Contains(invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId;
+                                var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
+                                salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
+
+                                salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId && x.Active == true
+                                                                                           && x.OfficeId.Contains(invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                             }
                             if (!string.IsNullOrEmpty(salemanId))
                             {
@@ -2254,9 +2264,9 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CombineNo = item.surcharge.Where(x => !string.IsNullOrEmpty(x.CombineNo)).FirstOrDefault()?.CombineNo;
                     if (item.grp.BillingRefNoType == "DEBIT")
                     {
-                        payment.JobNo = sur?.JobNo;
-                        payment.MBL = sur?.Mblno;
-                        payment.HBL = sur?.Hblno;
+                        payment.JobNo = string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
+                        payment.MBL = string.Join(",", item.surcharge.Select(x => x.Mblno).Distinct());
+                        payment.HBL = string.Join(",", item.surcharge.Select(x => x.Hblno).Distinct());
                         payment.CustomNo = customsDeclarationRepository.Get(x => x.JobNo == sur.JobNo).FirstOrDefault()?.ClearanceNo;
                     }
                     // Get saleman name
@@ -2276,15 +2286,17 @@ namespace eFMS.API.Accounting.DL.Services
                             payment.Salesman = employeeData == null ? string.Empty : employeeData.EmployeeNameEn;
                         }
                     }
-                    if (soaDetail != null) // Billing là soa
+                    if (soaDetail != null) // Billing là soa [CR: 30/05/2022 => lấy salesman trên detail soa]
                     {
                         #region saleman of contract
-                        var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
-                        var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
-                        if (string.IsNullOrEmpty(salemanId))
+                        var salemanId = soaDetail?.SalemanId; // Lấy salesman trên soa detail
+                        if (string.IsNullOrEmpty(salemanId)) // if salesman null => thì lấy trên hợp đồng
                         {
-                            salemanId = catContractRepository.Get(x => x.PartnerId == item.grp.PartnerId
-                                                                                          && x.OfficeId.Contains(item.invoice.Where(z => z.OfficeId != null).FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId;
+                            var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
+                            salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
+
+                            salemanId = string.IsNullOrEmpty(salemanId) ? catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
+                                                                                         && x.OfficeId.Contains(item.invoice.Where(z => z.OfficeId != null).FirstOrDefault().OfficeId.ToString())).FirstOrDefault()?.SaleManId : salemanId;
                         }
                         if (!string.IsNullOrEmpty(salemanId))
                         {
