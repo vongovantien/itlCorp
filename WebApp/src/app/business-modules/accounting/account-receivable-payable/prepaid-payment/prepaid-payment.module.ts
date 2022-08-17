@@ -6,6 +6,9 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ARPrePaidPaymentFormSearchComponent } from './components/form-search/form-search-prepaid-payment.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ARPrePaidPaymentConfirmPopupComponent } from './components/popup-confirm-prepaid/confirm-prepaid.popup';
 
 const routing: Routes = [
     {
@@ -19,14 +22,17 @@ const routing: Routes = [
 @NgModule({
     declarations: [
         ARPrePaidPaymentComponent,
-        ARPrePaidPaymentFormSearchComponent
+        ARPrePaidPaymentFormSearchComponent,
+        ARPrePaidPaymentConfirmPopupComponent
     ],
     imports: [
         SharedModule,
         RouterModule.forChild(routing),
         TabsModule.forRoot(),
         ModalModule.forRoot(),
-        NgSelectModule
+        NgSelectModule,
+        NgxDaterangepickerMd,
+        CollapseModule.forRoot(),
     ],
     exports: [],
     providers: [],

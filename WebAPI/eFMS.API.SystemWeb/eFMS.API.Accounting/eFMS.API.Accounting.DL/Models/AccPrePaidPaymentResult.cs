@@ -7,7 +7,7 @@ namespace eFMS.API.Accounting.DL.Models
     {
         public Guid Id { get; set; }
         public string JobNo { get; set; }
-        public Guid JobID { get; set; }
+        public Guid JobId { get; set; }
         public string MBL { get; set; }
         public string HBL { get; set; }
         public string DebitNote { get; set; }
@@ -24,6 +24,11 @@ namespace eFMS.API.Accounting.DL.Models
         public DateTime? LastSyncDate { get; set; }
         public string Notes { get; set; }
         public string PartnerName { get; set; }
+        public string DepartmentName { get; set; }
+        public string OfficeName { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public string UserCreatedName { get; set; }
+        public string TransactionType { get; set; }
     }
 
     public class AccountingPrePaidPaymentCriteria
@@ -35,6 +40,12 @@ namespace eFMS.API.Accounting.DL.Models
         public string Currency { get; set; }
         public string Status { get; set; }
         public string AgreementType { get; set; }
+        public List<int> DepartmentIds { get; set; }
+        public Guid? OfficeId { get; set; }
+        public DateTime? IssueDateFrom { get; set; }
+        public DateTime? IssueDateTo { get; set; }
+        public DateTime? ServiceDateFrom { get; set; }
+        public DateTime? ServiceDateTo { get; set; }
     }
 
     public class AccountingPrePaidPaymentUpdateModel

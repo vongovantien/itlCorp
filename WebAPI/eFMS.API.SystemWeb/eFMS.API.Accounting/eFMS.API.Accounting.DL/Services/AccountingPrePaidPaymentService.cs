@@ -66,6 +66,42 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SalemanId == criteria.SalesmanId);
             }
+            if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
+            {
+                query = query.And(x => x.OfficeId == criteria.OfficeId);
+            }
+
+            if (criteria.DepartmentIds != null && criteria.DepartmentIds.Count > 0)
+            {
+                query = query.And(x => criteria.DepartmentIds.Contains(x.DepartmentId ?? 1));
+            }
+            if (criteria.IssueDateFrom != null && criteria.IssueDateTo != null)
+            {
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.IssueDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.IssueDateTo.Value.Date);
+            }
+
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                var jobsOps = DC.OpsTransaction.Where(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date)
+                    .Select(x => x.Id).ToList();
+                var jobsCs = DC.CsTransaction.Where(x => x.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && x.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date)
+                    .Select(x => x.Id).ToList();
+
+                List<Guid> jobUnion = new List<Guid>();
+                if (jobsOps.Count > 0)
+                {
+                    jobUnion.AddRange(jobsOps);
+                }
+                if (jobsCs.Count > 0)
+                {
+                    jobUnion.AddRange(jobsCs);
+                }
+                if (jobUnion.Count() > 0)
+                {
+                    query = query.And(x => jobUnion.Contains(x.JobId));
+                }
+            }
+
             if (criteria.Keywords != null && criteria.Keywords.Count > 0)
             {
                 switch (criteria.SearchType)
@@ -98,7 +134,8 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
-            var cdNotes = DC.AcctCdnote.Where(query);
+
+            var cdNotes = DC.AcctCdnote.Where(query).OrderByDescending(x => x.DatetimeModified); ;
            
             return cdNotes;
         }
@@ -110,10 +147,13 @@ namespace eFMS.API.Accounting.DL.Services
                            join sur in DC.CsShipmentSurcharge on cd.Code equals sur.DebitNo
                            join u in DC.SysUser on cd.SalemanId equals u.Id into grps
                            from grp in grps.DefaultIfEmpty()
-                           select new AccPrePaidPaymentResult
+                           join o in DC.SysOffice on cd.OfficeId equals o.Id
+                           join d in DC.CatDepartment on cd.DepartmentId equals d.Id
+                           join u2 in DC.SysUser on cd.UserCreated equals u2.Id
+                         select new AccPrePaidPaymentResult
                            {
                                Id = cd.Id,
-                               JobID = cd.JobId,
+                               JobId = cd.JobId,
                                Currency = cd.CurrencyId,
                                DebitNote = cd.Code,
                                SyncStatus = cd.SyncStatus,
@@ -126,7 +166,12 @@ namespace eFMS.API.Accounting.DL.Services
                                TotalAmount = cd.Total,
                                SalesmanName = grp.Username,
                                TotalAmountVND = sur.Total,
-                               PartnerName = p.ShortName
+                               PartnerName = p.ShortName,
+                               DatetimeCreated = cd.DatetimeCreated,
+                               DepartmentName = d.DeptNameAbbr,
+                               OfficeName = o.Code,
+                               UserCreatedName = u2.Username,
+                               TransactionType = sur.TransactionType
                            };
 
            return result;

@@ -1117,7 +1117,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment/Paging`, body, {
             page: '' + page,
             size: '' + size
-        });
+        }, { "hideSpinner": "true" });
     }
 
     confirmCdNotePrepaid(body: any) {
