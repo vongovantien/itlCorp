@@ -1237,7 +1237,8 @@ namespace eFMS.API.Documentation.DL.Services
                         //POLName = pol.NameEn,
                         //CreatorName = creator.Username,
                         PackageQty = masterBill.PackageQty,
-                        BookingNo = masterBill.BookingNo
+                        BookingNo = masterBill.BookingNo,
+                        CurrentStatus = masterBill.CurrentStatus
                     };
 
             return query;
@@ -1688,6 +1689,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                     && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    && ((x.CurrentStatus ?? "") == criteria.CurrentStatus || string.IsNullOrEmpty(criteria.CurrentStatus))
                     &&
                     (
                            (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1709,6 +1711,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.CurrentStatus ?? "") == criteria.CurrentStatus || string.IsNullOrEmpty(criteria.CurrentStatus))
                     || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
@@ -3636,8 +3639,7 @@ namespace eFMS.API.Documentation.DL.Services
                         newStage.Id = Guid.NewGuid();
                         newStage.StageId = stage.Id;
                         newStage.Status = TermData.Done; ;
-                        newStage.DatetimeCreated = newStage.DatetimeModified = DateTime.Now;
-                        newStage.Deadline = DateTime.Now;
+                        newStage.DatetimeCreated = newStage.DatetimeModified = newStage.Deadline = DateTime.Now;
                         newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
                         if (model.TransitionType == TermData.CsTransition)
                         {

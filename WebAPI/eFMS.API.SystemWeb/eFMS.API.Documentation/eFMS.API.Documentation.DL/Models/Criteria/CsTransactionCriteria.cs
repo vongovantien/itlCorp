@@ -30,5 +30,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public PermissionRange RangeSearch { get; set; }
         public DateTime? FromServiceDate { get; set; }
         public DateTime? ToServiceDate { get; set; }
+
+        public string CurrentStatus { get; set; }
     }
 }

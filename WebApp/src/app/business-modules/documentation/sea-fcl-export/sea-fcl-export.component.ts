@@ -95,7 +95,7 @@ export class SeaFCLExportComponent extends AppList {
         ];
 
         this.getShipments();
-
+        console.log(this.shipments)
         this._store.select(fromShare.getTransactionDataSearchState)
             .pipe(
                 withLatestFrom(this._store.select(fromShare.getTransactionListPagingState)),
