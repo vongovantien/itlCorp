@@ -167,9 +167,11 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.formContractPopup.isSubmitted = false;
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.formContractPopup.selectedSalesman = { field: 'id', value: userLogged.id + '-' + userLogged.groupId + '-' + userLogged.departmentId };
-        this.formContractPopup.selectedSalesmanData = { userId: userLogged.id, userGroupId: userLogged.groupId,
-                                                    userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
-                                                    userCompanyId: userLogged.companyId};
+        this.formContractPopup.selectedSalesmanData = {
+            userId: userLogged.id, userGroupId: userLogged.groupId,
+            userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
+            userCompanyId: userLogged.companyId
+        };
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
 
@@ -235,7 +237,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         //     );
         console.log(this.isSearching);
 
-        this._store.dispatch(LoadListAgent({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch) }));
+        this._store.dispatch(LoadListAgent({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.isSearching = false;
     }
 
@@ -252,8 +254,10 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
+            const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type)?.title;
+            //this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type)?.title;
+            this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type !== "All" ? this.headerSearch.find(x => x.field === type).title : this.dataSearchs.type;
         }
         this._cd.detectChanges();
     }
