@@ -50,10 +50,8 @@ export class PayableComponent extends AppForm {
     onSavePayable() {
         this.savePayable.emit({
             paymentTerm: this.payableForm.get('paymentTerm').value,
-            currency: this.currency.value.id === undefined ? "VND" : this.currency.value.id,
+            currency: this.currency.value,
         });
-
-        console.log(this.currency.value.id);
     }
 
     getGeneralPayable(partnerId: string, currency: string) {
@@ -87,11 +85,23 @@ export class PayableComponent extends AppForm {
     initForm() {
         this.payableForm = this._fb.group({
             paymentTerm: this.paymentTermValue,
-            currency: ['VND'],
+            currency: [],
         });
         this.paymentTerm = this.payableForm.controls['paymentTerm'];
         this.currency = this.payableForm.controls['currency'];
 
+    }
+
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'currency':
+                console.log(data);
+
+                this.currency.setValue(data.id);
+                break;
+            default:
+                break;
+        }
     }
 
     uploadFileContract(id: string) {
