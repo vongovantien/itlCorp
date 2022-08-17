@@ -338,19 +338,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     showConfirmed() {
         this._accoutingRepo.checkSoaSynced(this.soa.id)
             .subscribe(
-                (res: any) => {
-                    if (res) {
-                        let messageValidate;
-                        if (this.soa.type !== 'Credit') {
-                            messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
-                        } else {
-                            messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
-                        }
-                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                            title: 'Alert',
-                            body: messageValidate
-                        });
-                    } else {
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
                         this.confirmType = "SYNC";
                         if (this.soa.type === "All") {
                             this._toastService.warning("Not allow send soa with type All");

@@ -30,7 +30,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<PaymentModel> GetListReceiptAllInToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs);
         HandleState SyncListReceiptToAccountant(List<Guid> ids, List<AcctReceiptSyncModel> receiptSyncs);
         bool CheckCdNoteSynced(Guid idCdNote);
-        bool CheckSoaSynced(string idSoa);
+        string CheckSoaSynced(string idSoa);
         bool CheckVoucherSynced(Guid idVoucher);
     }
 }

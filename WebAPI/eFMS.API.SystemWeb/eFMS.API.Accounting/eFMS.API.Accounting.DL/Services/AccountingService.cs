@@ -3394,18 +3394,34 @@ namespace eFMS.API.Accounting.DL.Services
             return false;
         }
 
-        public bool CheckSoaSynced(string idSoa)
+        public string CheckSoaSynced(string idSoa)
         {
+            string messageError = string.Empty;
             var soa = soaRepository.Get(x => x.Id == idSoa).FirstOrDefault();
             if (soa != null)
             {
                 if (soa.Type == "Debit")
                 {
-                    var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                    var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano);
+                    var surchargeDebitObhs = surcharges.Where(x => (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    var surchargeDebits = surcharges.Where(x => (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
                     if (surchargeDebitObhs.Any() || surchargeDebits.Any())
                     {
-                        return true;
+                        messageError = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS!Please you check again!";
+                    }
+                    var debitNotes = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).Distinct().ToList();
+                    if (debitNotes.Count() > 0)
+                    {
+                        foreach (var item in debitNotes)
+                        {
+                            var debit = cdNoteRepository.Get(x => x.Code == item)?.FirstOrDefault();
+                            if (debit == null) continue;
+                            if(debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                            {
+                                messageError = "Existing prepaid debit! Please you check again!";
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -3415,11 +3431,11 @@ namespace eFMS.API.Accounting.DL.Services
                     var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
                     if (surchargeCreditObhs.Any() || surchargeCredits.Any())
                     {
-                        return true;
+                        messageError = "Existing charge has been synchronized to the accounting system! Please you check again!";
                     }
                 }
             }
-            return false;
+            return messageError;
         }
 
         public bool CheckVoucherSynced(Guid idVoucher)
