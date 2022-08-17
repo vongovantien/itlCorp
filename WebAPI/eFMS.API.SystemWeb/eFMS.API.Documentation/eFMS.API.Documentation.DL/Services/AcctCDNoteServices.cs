@@ -326,6 +326,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
                 var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
                 && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
                 && x.SaleService.Contains(_transactionType)).FirstOrDefault();
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
