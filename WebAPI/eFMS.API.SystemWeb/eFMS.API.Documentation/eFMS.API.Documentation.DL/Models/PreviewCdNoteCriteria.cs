@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Common.Globals;
+using System;
 
 namespace eFMS.API.Documentation.DL.Models
 {
@@ -7,5 +8,6 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid JobId { get; set; }
         public string CreditDebitNo { get; set; }
         public string Currency { get; set; }
+        public ExportFormatType ExportFormatType { get; set; }
     }
 }

@@ -36,7 +36,36 @@ namespace ReportPerview
                 }
                 ReportDocument rpt = ShowReport(crystal);
                 //Format Export: PDF, WORD, EXCEL
-                ExportCrystalReport(rpt, "PDF", crystal.PathReportGenerate);
+                string _format = "PDF";
+                switch (crystal.FormatType)
+                {
+                    case ExportFormatType.NoFormat:
+                        break;
+                    case ExportFormatType.CrystalReport:
+                        break;
+                    case ExportFormatType.RichText:
+                        break;
+                    case ExportFormatType.WordForWindows:
+                        _format = "WORD";
+                        break;
+                    case ExportFormatType.Excel:
+                        _format = "EXCEL";
+                        break;
+                    case ExportFormatType.PortableDocFormat:
+                        _format = "PDF";
+                        break;
+                    case ExportFormatType.HTML32:
+                        break;
+                    case ExportFormatType.HTML40:
+                        break;
+                    case ExportFormatType.ExcelRecord:
+                        break;
+                    default:
+                        _format = "PDF";
+                        break;
+                }
+
+                ExportCrystalReport(rpt, _format, crystal.PathReportGenerate);
             }
         }
 

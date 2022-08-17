@@ -86,5 +86,39 @@ namespace eFMS.API.Common.Globals
                 return KeepSearchingFolder(list, directoryInfo, pathParent, folderNameSearch);
             }
         }
+
+        public static string GetExtension(ExportFormatType format)
+        {
+            string _extension = string.Empty;
+            switch (format)
+            {
+                case ExportFormatType.NoFormat:
+                    break;
+                case ExportFormatType.CrystalReport:
+                    break;
+                case ExportFormatType.RichText:
+                    break;
+                case ExportFormatType.WordForWindows:
+                    _extension = ".doc";
+                    break;
+                case ExportFormatType.Excel:
+                    _extension = ".xls";
+                    break;
+                case ExportFormatType.PortableDocFormat:
+                    _extension = ".pdf";
+                    break;
+                case ExportFormatType.HTML32:
+                    break;
+                case ExportFormatType.HTML40:
+                    break;
+                case ExportFormatType.ExcelRecord:
+                    break;
+                default:
+                    _extension = ".pdf";
+                    break;
+            }
+
+            return _extension;
+        }
     }
 }

@@ -1780,8 +1780,15 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = criteria.ExportFormatType;
             result.SetParameter(parameter);
             return result;
         }
@@ -1823,7 +1830,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2091,17 +2098,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }
 
-        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2388,12 +2395,12 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }

@@ -23,8 +23,8 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal Preview(AcctCDNoteDetailsModel model, bool isOrigin);
         AcctCDNoteExportResult GetDataExportOpsCDNote(AcctCDNoteDetailsModel model, Guid officeId);
         bool CheckAllowDelete(Guid cdNoteId);
-        Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency);
-        Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency);
+        Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat);
+        Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat);
         List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
         List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount);
         HandleState RejectCreditNote(RejectCreditNoteModel model);
