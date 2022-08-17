@@ -393,15 +393,30 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.billingOpsId.setValue(this.userLogged.id);
     }
     
-    UpdateSalesmanList(data: any){
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, data)        
+    getSalesmanList(data: any){
+        this.shipmentType.setValue(data); 
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
             .subscribe(
-                (res: any[]) => {
+                (res: any) => {
                     if (!!res) {
                         this.salesmans = res || [];
+                        if (!!this.salesmans.length) {
+                            this.salemansId.setValue(res[0].id);
+                            this.salesmanName = res[0].username;
+                        } else {
+                            this.salemansId.setValue(null);
+                            this.salesmanName = null;
+                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                            })
+                        }
+                    } else {
+                        this.salesmans = [];
+                        this.customerName = this.salesmanName = null;
+                        this.salemansId.setValue(null);
                     }
                 }
-            );            
+            );          
     }
 }
 export interface ILinkAirSeaInfoModel {

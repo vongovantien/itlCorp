@@ -108,7 +108,7 @@
                                         Shipment Type
                                     </label>
                                     <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
-                                        [clearable]="false" formControlName="shipmentType">
+                                        [clearable]="false" formControlName="shipmentType" (change)="getSalesmanList($event)">
                                     </ng-select>
                                 </div>
                             </div>

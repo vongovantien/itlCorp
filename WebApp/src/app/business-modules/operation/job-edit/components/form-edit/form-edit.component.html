@@ -354,7 +354,7 @@
 						Shipment Type
 					</label>
 					<ng-select class="custom" [clearable]="false" [items]="shipmentTypes" placeholder="Package Type"
-						formControlName="shipmentType" (change)="UpdateSalesmanList($event)">
+						formControlName="shipmentType" (change)="getSalesmanList($event)">
 					</ng-select>
 				</div>
 			</div>
