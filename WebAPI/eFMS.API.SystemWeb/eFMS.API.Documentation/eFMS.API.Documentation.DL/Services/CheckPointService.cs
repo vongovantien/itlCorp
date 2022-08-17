@@ -167,66 +167,29 @@ namespace eFMS.API.Documentation.DL.Services
                     valid = false;
                 }
             }
+           
+            return valid;
+        }
 
-            /*
-            // Tạm thời pending check issue debit
-            if (valid == false && checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+        private bool ValidateCheckPointPrepaidContractPartner(Guid HblId, string transactionType)
+        {
+            bool valid = true;
+            IQueryable<AcctCdnote> debitNotes = Enumerable.Empty<AcctCdnote>().AsQueryable();
+            if (transactionType == "CL")
             {
-                IQueryable<object> groupHblIdCs = Enumerable.Empty<object>().AsQueryable();
-                IQueryable<object> groupHblIdOps = Enumerable.Empty<object>().AsQueryable();
-
-                var hblidShipments = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
-                // K check cùng service, có thể dính lô khác service
-                groupHblIdOps = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
-                   .Where(x => x.TransactionType == DocumentConstants.LG_SHIPMENT)
-                   .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
-                   .SelectMany(j => j, (j, r) => new CsShipmentSurcharge() { JobNo = r.JobNo, Hblid = r.Hblid });
-
-                groupHblIdCs = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
-                    .Where(x => x.TransactionType != DocumentConstants.LG_SHIPMENT)
-                    .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
-                    .SelectMany(x => x, (x, y) => new CsShipmentSurcharge() { JobNo = y.JobNo, Hblid = y.Hblid });
-
-                var qGrServiceDateShipmentOps = Enumerable.Empty<object>().AsQueryable();
-                var qGrServiceDateShipmentCs = Enumerable.Empty<object>().AsQueryable();
-                object oldestShipment = null;
-
-                if (groupHblIdCs.Count() > 0)
-                {
-                    qGrServiceDateShipmentCs = from sur in groupHblIdCs
-                                               join cs in csTransactions on ObjectUtility.GetValue(sur, "JobNo") equals cs.JobNo // make sur jobNo k dup, đúng vs hblId
-                                               orderby cs.ServiceDate ascending
-                                               select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), cs.ServiceDate };
-
-                    if (qGrServiceDateShipmentCs.Count() > 0)
-                    {
-                        oldestShipment = qGrServiceDateShipmentCs.FirstOrDefault();
-
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
-                else if (groupHblIdOps.Count() > 0)
-                {
-                    qGrServiceDateShipmentOps = from sur in groupHblIdOps
-                                                join ops in opsTransactions on ObjectUtility.GetValue(sur, "Hblid") equals ops.Hblid
-                                                orderby ops.ServiceDate ascending
-                                                select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), ops.ServiceDate };
-
-                    if (qGrServiceDateShipmentOps.Count() > 0)
-                    {
-                        oldestShipment = qGrServiceDateShipmentOps.FirstOrDefault();
-
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
+                var opsJob = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+                debitNotes = DC.AcctCdnote.Where(x => x.JobId == opsJob.Id);
             }
-            */
+            else
+            {
+                var hbl = csTransactionDetail.Get(x => x.Id == HblId).FirstOrDefault();
+                var csJobs = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+
+                debitNotes = DC.AcctCdnote.Where(x => x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT && x.JobId == csJobs.Id);
+            }
+
+            bool hasDebitPrepaid = debitNotes.Any(x => x.Status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID);
+            valid = !hasDebitPrepaid;
             return valid;
         }
 
@@ -313,6 +276,15 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
+
+            if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+            {
+                isValid = ValidateCheckPointPrepaidContractPartner(HblId, transactionType);
+                if(isValid == false)
+                {
+                    return new HandleState((object)string.Format(@"Shipment has prepaid debit note that not paid yet, please you check it again!"));
+                }
+            }
 
             if (HblId == Guid.Empty)
             {
