@@ -33,7 +33,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     @ViewChild(ShareBussinessCdNoteDetailPopupComponent) cdNoteDetailPopupComponent: ShareBussinessCdNoteDetailPopupComponent;
     @ViewChild('popupDataCombine') reportPrePopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    
+
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -42,7 +42,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    
+
     isDesc = true;
     sortKey: string = '';
 
@@ -93,6 +93,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'SOA', field: 'soaNo', sortable: true },
+            { title: 'Status', field: 'status', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
@@ -286,7 +287,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 this.reportContainerRef.viewContainerRef.clear();
             });
     }
-    
+
     checkValidCDNote() {
         this.cdNotePrint = [];
         const listCheck = [];
@@ -320,21 +321,21 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         let transType = '';
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             transType = ChargeConstants.AI_CODE;
-        }else{
+        } else {
             transType = ChargeConstants.SFI_CODE;
         }
 
         this._documentationRepo.previewASCdNoteList(this.cdNotePrint, data, transType)
-        .pipe(catchError(this.catchError))
-        .subscribe(
-            (res: Crystal) => {
-                this.dataReport = res;
-                if (res.dataSource.length > 0) {
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
                         this.renderAndShowReport();
-                } else {
-                    this._toastService.warning('There is no data to display preview');
-                }
-            },
-        );
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

@@ -117,9 +117,7 @@
                                                             </ng-container>
                                                         </td>
                                                         <td>
-                                                            {{cd.syncStatus}}
-
-                                                            {{ cd.totalAmount }} {{ cd.currency }}
+                                                            {{ cd.totalAmount | number: '.0-3' }} {{ cd.currency }}
                                                         </td>
                                                         <td class="text-primary">
                                                             {{ cd.departmentName }}
