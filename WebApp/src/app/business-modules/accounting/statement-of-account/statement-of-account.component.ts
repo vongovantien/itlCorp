@@ -15,7 +15,7 @@ import { Router } from "@angular/router";
 import { RoutingConstants } from "@constants";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserSpecialPermissionState } from "@store";
-import { getDataSearchSOAState, getSOAListState, getSOAPagingState } from "./store/reducers";
+import { getDataSearchSOAState, getSOAListState, getSOALoadingListState, getSOAPagingState } from "./store/reducers";
 import { LoadListSOA } from "./store/actions";
 
 @Component({
@@ -67,6 +67,7 @@ export class StatementOfAccountComponent extends AppList {
         this.dataSearch = {
             CurrencyLocal: "VND"
         };
+        this.getSOAs()
         this._store.select(getDataSearchSOAState)
             .pipe(
                 withLatestFrom(this._store.select(getSOAPagingState)),
@@ -86,7 +87,9 @@ export class StatementOfAccountComponent extends AppList {
                     this.requestSearchSOA();
                 }
             );
-        this.getSOAs();
+
+        this.isLoading = this._store.select(getSOALoadingListState);
+
     }
 
     prepareDeleteSOA(soaItem: SOA) {
@@ -132,7 +135,7 @@ export class StatementOfAccountComponent extends AppList {
 
     getSOAs() {
         //this.pageSize=30;
-        this.isLoading = true;
+        //this.isLoading = true;
         this._progressRef.start();
         // this._accoutingRepo
         //     .getListSOA(
@@ -166,7 +169,7 @@ export class StatementOfAccountComponent extends AppList {
                 (res: any) => {
                     this.SOAs = res.data || [];
                     this.totalItems = res.totalItems || 0;
-                    this.isLoading = false;
+                    //this.isLoading = false;
                     this._progressRef.complete();
                 },
             );

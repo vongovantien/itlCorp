@@ -16,7 +16,7 @@ import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsCompon
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { LoadListCustomer, SearchList } from './store/actions/customer.action';
-import { ICustomerState, getCustomerSearchParamsState, getCustomerListState } from './store';
+import { ICustomerState, getCustomerSearchParamsState, getCustomerListState, getCustomerLoadingState } from './store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
@@ -78,6 +78,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                     if (!!data && !!data.keyword) {
                         this.dataSearchs = data;
                     }
+                    console.log(data);
 
                 }
             );
@@ -135,9 +136,12 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.dataSearch.partnerType = 'Customer';
         // this.getPartners();
         this.onSearch(this.dataSearch);
+        this.isLoading = this._store.select(getCustomerLoadingState);
     }
 
     onSearching(event: CommonInterface.ISearchOption) {
+        console.log(event);
+
         this.isSearching = true;
         this.onSearch(event);
     }
@@ -209,9 +213,11 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.formContractPopup.isSubmitted = false;
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.formContractPopup.selectedSalesman = { field: 'id', value: userLogged.id + '-' + userLogged.groupId + '-' + userLogged.departmentId };
-        this.formContractPopup.selectedSalesmanData = { userId: userLogged.id, userGroupId: userLogged.groupId,
-                                                    userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
-                                                    userCompanyId: userLogged.companyId};
+        this.formContractPopup.selectedSalesmanData = {
+            userId: userLogged.id, userGroupId: userLogged.groupId,
+            userDeparmentId: userLogged.departmentId, userOfficeId: userLogged.officeId,
+            userCompanyId: userLogged.companyId
+        };
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
         this.formContractPopup.autoExtendDays.setValue(0);
@@ -237,6 +243,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
+            console.log(this.dataSearchs);
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;

@@ -14,7 +14,7 @@ import { AppList } from 'src/app/app.list';
 
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchList, getAgentDataListState, LoadListAgent, getAgentPagingState } from './store';
+import { IAgentState, getAgentSearchParamsState, SearchListAgent, getAgentDataListState, LoadListAgent, getAgentPagingState, getAgentLoadingState } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
@@ -74,6 +74,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             )
             .subscribe(
                 (data: any) => {
+                    console.log(data);
+
                     if (!!data.dataSearch) {
                         this.dataSearchs = data.dataSearch;
                     }
@@ -134,8 +136,11 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         localStorage.removeItem('success_add_sub');
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Agent';
+
         // this.getPartners();
         this.onSearch(this.dataSearch);
+
+        this.isLoading = this._store.select(getAgentLoadingState);
     }
 
     onCustomerRequest() {
@@ -198,18 +203,21 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
-        this.dataSearch[event.field || "All"] = event.searchString || '';
         this.dataSearch.partnerType = 'Agent';
+        this.dataSearch[event.field || "All"] = event.searchString || '';
+
         if (!!event.field && event.searchString === "") {
             this.dataSearchs.keyword = "";
         }
+        console.log(this.dataSearchs.type);
+
         const searchData: ISearchGroup = {
-            type: !!event.field ? event.field : this.dataSearchs.type,
+            type: !!event.field ? event.field : this.dataSearchs.type !== undefined ? this.dataSearchs.type : 'All',
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
-        console.log(this.isSearching);
+        console.log(searchData);
 
-        this._store.dispatch(SearchList({ payload: searchData }));
+        this._store.dispatch(SearchListAgent({ payload: searchData }));
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
             this.dataSearch[type] = this.dataSearchs.keyword;
@@ -218,6 +226,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     }
 
     onSearching(event: CommonInterface.ISearchOption) {
+        console.log(event);
+
         this.isSearching = true;
         this.onSearch(event);
     }
@@ -253,10 +263,11 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
+            console.log(this.dataSearchs);
+
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            //this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type)?.title;
             this.searchOptionsComponent.searchObject.displayName = this.dataSearchs.type !== "All" ? this.headerSearch.find(x => x.field === type).title : this.dataSearchs.type;
         }
         this._cd.detectChanges();

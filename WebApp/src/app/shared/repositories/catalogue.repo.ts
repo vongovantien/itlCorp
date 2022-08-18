@@ -221,7 +221,7 @@ export class CatalogueRepo {
                 , {
                     page: '' + page,
                     size: '' + size
-                }).pipe(
+                }, { "hideSpinner": "true" }).pipe(
                     catchError((error) => throwError(error)),
                     map((res: any) => {
                         return res;
