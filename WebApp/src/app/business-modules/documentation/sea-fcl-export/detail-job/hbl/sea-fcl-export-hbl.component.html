@@ -23,7 +23,7 @@
             </button>
             <ng-container *ngIf="(isLocked | async) === false">
                 <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
-                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
+                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete && shipmentDetail.currentStatus !== 'Finish'">
                     <span>
                         <i class="la la-trash"></i>
                         <span>

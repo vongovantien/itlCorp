@@ -1,7 +1,6 @@
 import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
-import { transition } from '@angular/animations';
 import { finalize } from 'rxjs/operators';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -29,9 +28,7 @@ import * as fromShareBussiness from './../../share-business/store';
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
-import { HttpErrorResponse } from '@angular/common/http';
-import { take } from 'lodash';
-@Component({
+import { HttpErrorResponse } from '@angular/common/http'; @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
 })
@@ -79,7 +76,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     ngOnInit() {
         this.subscriptionParamURLChange();
-
         this.subscriptionSaveContainerChange();
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }

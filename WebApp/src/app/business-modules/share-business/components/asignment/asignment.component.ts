@@ -1,3 +1,4 @@
+import { style } from '@angular/animations';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -14,6 +15,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 @Component({
     selector: 'share-assignment',
     templateUrl: './assignment.component.html',
+    styleUrls: ['./assignment.components.scss']
 })
 
 export class ShareBusinessAsignmentComponent extends AppList {

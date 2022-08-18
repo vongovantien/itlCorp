@@ -1,6 +1,8 @@
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState } from '@store';
 import { AppPage } from 'src/app/app.base';
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
-
+import * as fromShareBussiness from '../../store/index';
 @Component({
     selector: 'job-detail-button-list',
     templateUrl: './job-detail-button-list.component.html',
@@ -20,10 +22,11 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
     @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
     @Output() onCancel: EventEmitter<any> = new EventEmitter<any>();
 
-    constructor() { super(); }
+    constructor(private _store: Store<fromShareBussiness.IShareBussinessState>,) { super(); }
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        console.log(this.menuSpecialPermission)
     }
 
     lockShipment() {
@@ -50,5 +53,11 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
         this.onCancel.emit();
     }
 
+    onFinishJob() {
+        this.onFinish.emit()
+    }
 
+    onReopenJob() {
+        this.onReopen.emit()
+    }
 }

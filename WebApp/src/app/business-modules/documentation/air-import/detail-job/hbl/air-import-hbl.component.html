@@ -24,7 +24,8 @@
                 </span>
             </button>
 
-            <ng-container *ngIf="!!shipmentDetail && !shipmentDetail.isLocked">
+            <ng-container
+                *ngIf="!!shipmentDetail && !shipmentDetail.isLocked && shipmentDetail.currentStatus !== 'Finish'">
                 <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
                     *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
@@ -73,7 +74,7 @@
                                                     <ng-container *ngIf="(isLocked | async) === false">
                                                         <app-permission-button title="Add New House Bill"
                                                             (onClick)="gotoCreate()"
-                                                            *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
+                                                            *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate  && shipmentDetail.currentStatus !== 'Finish'">
                                                         </app-permission-button>
                                                     </ng-container>
                                                 </div>
@@ -101,7 +102,7 @@
                                                                 </app-permission-button>
                                                                 <ng-container *ngIf="(isLocked | async) === false">
                                                                     <ng-container
-                                                                        *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
+                                                                        *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate && shipmentDetail.currentStatus !== 'Finish'">
                                                                         <app-permission-button type="delete"
                                                                             (onClick)="showDeletePopup(house, $event,i)">
                                                                         </app-permission-button>
