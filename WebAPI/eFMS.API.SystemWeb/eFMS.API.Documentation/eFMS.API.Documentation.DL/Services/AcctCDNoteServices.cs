@@ -337,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
 
-                if(_contractAcRef.ContractType == "Prepaid")
+                if(_contractAcRef?.ContractType == "Prepaid")
                 {
                     model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                 }
