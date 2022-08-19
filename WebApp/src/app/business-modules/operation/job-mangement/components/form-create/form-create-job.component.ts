@@ -252,23 +252,25 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     getSalesmanList(selectedShipmentType: any){
         this.shipmentType.setValue(selectedShipmentType); 
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.salesmans = res || [];
-                        if (!!this.salesmans.length) {
-                            this.salemansId.setValue(res[0].id);
+        if(!!this.customerId.value){
+            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.salesmans = res || [];
+                            if (!!this.salesmans.length) {
+                                this.salemansId.setValue(res[0].id);
+                            } else {
+                                this.salemansId.setValue(null);
+                                this.infoPopup.body = `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`;
+                                this.infoPopup.show();
+                            }
                         } else {
+                            this.salesmans = [];
                             this.salemansId.setValue(null);
-                            this.infoPopup.body = `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`;
-                            this.infoPopup.show();
                         }
-                    } else {
-                        this.salesmans = [];
-                        this.salemansId.setValue(null);
                     }
-                }
-            );
-    }  
+                );
+            }
+        }  
 }

@@ -780,24 +780,26 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     getSalesmanList(selectedShipmentType: any){
         this.shipmenttype.setValue(selectedShipmentType); 
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.saleMans = res || [];
-                        if (!!this.saleMans.length) {
-                            this.saleManId.setValue(res[0].id);
+        if(!!this.customerId.value){
+            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleManId.setValue(res[0].id);
+                            } else {
+                                this.saleManId.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
+                            }
                         } else {
+                            this.saleMans = [];
                             this.saleManId.setValue(null);
-                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                                body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
-                            })
                         }
-                    } else {
-                        this.saleMans = [];
-                        this.saleManId.setValue(null);
                     }
-                }
-            );           
+                );
+        }           
     }
 }
