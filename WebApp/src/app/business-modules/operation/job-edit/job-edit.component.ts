@@ -71,13 +71,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         protected _cd: ChangeDetectorRef,
     ) {
         super();
-
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        console.log(this.menuSpecialPermission);
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
-        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     subscriptionParamURLChange() {
@@ -433,7 +433,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-
+                        console.log(this.opsTransaction);
                         if (this.opsTransaction.linkSource == "Replicate") {
                             this.allowLinkFeeSell = false;
                         }

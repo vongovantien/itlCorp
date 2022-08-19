@@ -26,7 +26,6 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        console.log(this.menuSpecialPermission)
     }
 
     lockShipment() {

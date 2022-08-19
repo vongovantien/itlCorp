@@ -1,8 +1,6 @@
 <app-sub-header>
-    <ng-container
-        *ngIf="menuSpecialPermission | async | specialPermission:'FinishShipment'
-        && !!opsTransaction && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish'
-        && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
+    <ng-container *ngIf="(menuSpecialPermission | async | specialPermission:'FinishShipment') && !!opsTransaction && opsTransaction.permission.allowUpdate
+        && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish' && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
@@ -14,10 +12,8 @@
         </button>
     </ng-container>
 
-    <ng-container
-        *ngIf="menuSpecialPermission | async | specialPermission:'ReopenShipment'
-        && !!opsTransaction && opsTransaction.currentStatus === 'Finish'
-        && opsTransaction.isLocked === false && !!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate">
+    <ng-container *ngIf="(menuSpecialPermission | async | specialPermission:'ReopenShipment') && !!opsTransaction && opsTransaction.permission.allowUpdate
+        && !opsTransaction.isLocked && opsTransaction.currentStatus === 'Finish'&& !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
@@ -28,7 +24,6 @@
             </span>
         </button>
     </ng-container>
-
     <ng-container *ngIf="!!opsTransaction && !opsTransaction?.isLocked; else lockTpl">
         <div class="c-button-actions">
             <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
@@ -57,7 +52,8 @@
         </button>
     </ng-container>
 
-    <ng-container *ngIf="((opsTransaction?.isLocked === false) || isDuplicate)">
+    <ng-container
+        *ngIf="((opsTransaction?.isLocked === false) || isDuplicate) && opsTransaction.currentStatus !== 'Finish'">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()" *ngIf="opsTransaction?.permission?.allowDelete && !isDuplicate && !opsTransaction.replicatedId
             && !opsTransaction.isLinkFee && opsTransaction?.currentStatus !== 'Finish'" title="Shipment was deleted">
