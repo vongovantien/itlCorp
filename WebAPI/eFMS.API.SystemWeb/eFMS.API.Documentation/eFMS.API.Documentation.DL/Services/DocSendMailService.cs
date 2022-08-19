@@ -228,6 +228,348 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
+        /// <summary>
+        /// Get mail info Authorize Letter Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailAuthorizeLetterHBLAirImport(Guid hblId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _warehouseName = string.Empty;
+            if (_warehouse != null)
+            {
+                if (_warehouse.Code == "TCS")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
+                }
+                if (_warehouse.Code == "SCSC")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
+                }
+            }
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            // Group email của PIC
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+
+            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AI-AUTHORIZE-LETTER").FirstOrDefault();
+            string _subject = templateEmail.Subject;
+            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
+
+            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
+            decimal? exchangeRate = null;
+            if (!string.IsNullOrEmpty(debitNo))
+            {
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
+            }
+            string _body = templateEmail.Body;
+            _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
+            _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
+            _body = _body.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
+            _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
+            _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
+            _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{WareHouse}}", _warehouseName);
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{pic}}", picEmail);
+
+            var emailContent = new EmailContentModel();
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+
+
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        /// <summary>
+        /// Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailProofOfDeliveryHBLAir(Guid hblId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _warehouseName = string.Empty;
+            if (_warehouse != null)
+            {
+                if (_warehouse.Code == "TCS")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
+                }
+                if (_warehouse.Code == "SCSC")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
+                }
+            }
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            // Group email của PIC
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+
+            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AE-PROOF-OF-DELIVERY").FirstOrDefault();
+            string _subject = templateEmail.Subject;
+            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
+
+            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
+            decimal? exchangeRate = null;
+            if (!string.IsNullOrEmpty(debitNo))
+            {
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
+            }
+            string _body = templateEmail.Body;
+            var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
+            _body = _body.Replace("{{Service}}", _service.DisplayName);
+            _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
+            _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
+            _body = _body.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
+            _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
+            _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
+            _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{WareHouse}}", _warehouseName);
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{pic}}", picEmail);
+
+            var emailContent = new EmailContentModel();
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        /// <summary>
+        /// Get Mail Info Send HAWB HBL Air Export- Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailSendHAWBHBLAir(Guid hblId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _warehouseName = string.Empty;
+            if (_warehouse != null)
+            {
+                if (_warehouse.Code == "TCS")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
+                }
+                if (_warehouse.Code == "SCSC")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
+                }
+            }
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            // Group email của PIC
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+
+            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AE-SEND-HAWB").FirstOrDefault();
+            string _subject = templateEmail.Subject;
+            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
+
+            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
+            decimal? exchangeRate = null;
+            if (!string.IsNullOrEmpty(debitNo))
+            {
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
+            }
+            string _body = templateEmail.Body;
+            var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
+            _body = _body.Replace("{{Service}}", _service.DisplayName);
+            _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
+            _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
+            _body = _body.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
+            _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
+            _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
+            _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{WareHouse}}", _warehouseName);
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{pic}}", picEmail);
+
+            var emailContent = new EmailContentModel();
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        public EmailContentModel GetMailSendHAWBAirService(Guid hblId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
+            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _warehouseName = string.Empty;
+            if (_warehouse != null)
+            {
+                if (_warehouse.Code == "TCS")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
+                }
+                if (_warehouse.Code == "SCSC")
+                {
+                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
+                }
+            }
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            // Group email của PIC
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+
+            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AE-PROOF-OF-DELIVERY").FirstOrDefault();
+            string _subject = templateEmail.Subject;
+            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
+            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
+            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
+
+            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
+            decimal? exchangeRate = null;
+            if (!string.IsNullOrEmpty(debitNo))
+            {
+                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
+            }
+            string _body = templateEmail.Body;
+            var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
+            _body = _body.Replace("{{Service}}", _service.DisplayName);
+            _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
+            _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
+            _body = _body.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
+            _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
+            _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
+            _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{WareHouse}}", _warehouseName);
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{pic}}", picEmail);
+
+            var emailContent = new EmailContentModel();
+            // Email to: agent/customer
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"air@itlvn.com";
+            }
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
         public EmailContentModel GetInfoMailHBLAirExport(Guid? hblId)
         {
             var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
@@ -475,47 +817,355 @@ namespace eFMS.API.Documentation.DL.Services
             var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
             var pod = _housebill.FinalDestinationPlace; // catPlaceRepo.Get(x => x.Id == _housebill.Pod).FirstOrDefault()?.NameEn; => Final destination
             string _subject = string.Empty;
-            switch (serviceId)
+            #region Old template
+            //switch (serviceId)
+            //{
+            //    case "SFI":
+            //        {
+            //            _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3}// {4}",
+            //            _housebill.Hwbno,
+            //             pol,
+            //             pod,
+            //            _housebill.PackageContainer,
+            //            _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            //        }
+            //        break;
+            //    case "SLI":
+            //        {
+            //            var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+            //            _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3} {4}// {5}",
+            //            _housebill.Hwbno,
+            //            pol,
+            //            pod,
+            //            _housebill.PackageQty,
+            //            packageType,
+            //            _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            //        }
+            //        break;
+            //}
+            //string _body = string.Format(@"<div><b>Dear Client,</b></div></br><div>Please find Arrival notice in the attachment and confirm receipt.<br></br>" +
+            //                            "<div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Vessel : {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POL: {1}</div>" +
+            //                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POD: {2}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MB/L#: {3}</div>" +
+            //                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HB/L: {4}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Shipper: {5}</div></div>" +
+            //                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Cnee: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Notify: {7}</div></div>" +
+            //                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETD: {8}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETA: {9}</div></div>",
+            //    _housebill.LocalVessel,
+            //    pol,
+            //    pod,
+            //    _housebill.Mawb,
+            //    _housebill.Hwbno,
+            //    _shipper?.PartnerNameEn,
+            //    _consignee?.PartnerNameEn,
+            //    _housebill.NotifyPartyDescription,
+            //    _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper(),
+            //    _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            #endregion
+
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
+            _subject = template.Subject;
+            _subject = _subject.Replace("{{EmailType}}", "ARRIVAL NOTICE");
+            if (serviceId == "SFI")
             {
-                case "SFI":
-                    {
-                        _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3}// {4}",
-                        _housebill.Hwbno,
-                         pol,
-                         pod,
-                        _housebill.PackageContainer,
-                        _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
-                    }
-                    break;
-                case "SLI":
-                    {
-                        var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
-                        _subject = string.Format(@"ARRIVAL NOTICE- HB/L#: {0}// {1} - {2}// {3} {4}// {5}",
-                        _housebill.Hwbno,
-                        pol,
-                        pod,
-                        _housebill.PackageQty,
-                        packageType,
-                        _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
-                    }
-                    break;
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageContainer);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
             }
-            string _body = string.Format(@"<div><b>Dear Client,</b></div></br><div>Please find Arrival notice in the attachment and confirm receipt.<br></br>" +
-                                        "<div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Vessel : {0}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POL: {1}</div>" +
-                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;POD: {2}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;MB/L#: {3}</div>" +
-                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;HB/L: {4}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Shipper: {5}</div></div>" +
-                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Cnee: {6}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Notify: {7}</div></div>" +
-                                        "<div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETD: {8}</div><div>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;ETA: {9}</div></div>",
-                _housebill.LocalVessel,
-                pol,
-                pod,
-                _housebill.Mawb,
-                _housebill.Hwbno,
-                _shipper?.PartnerNameEn,
-                _consignee?.PartnerNameEn,
-                _housebill.NotifyPartyDescription,
-                _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper(),
-                _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            else if (serviceId == "SLI")
+            {
+                var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            string _body = template.Body;
+            _body = _body.Replace("{{EmailType}}", "Arrival notice");
+            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = _body.Replace("{{Pol}}", pol);
+            _body = _body.Replace("{{Pod}}", pod);
+            _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
+            _body = _body.Replace("{{Hbl}}", _housebill.Hwbno);
+            _body = _body.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
+            _body = _body.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _body = _body.Replace("{{NotiDescription}}", _housebill.NotifyPartyDescription);
+            _body = _body.Replace("{{Etd}}", _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+            _body = _body.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+
+            var emailContent = new EmailContentModel();
+            // Email PIC
+            var _shipment = DataContext.First(x => x.Id == _housebill.JobId);
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            // Email to: agent/customer + consignee
+            var mailTo = string.Empty;
+            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerEmail))
+            {
+                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+            mailTo += partnerEmail;
+            var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
+            mailTo += ";" + emailConsignee;
+
+            // Get email from of person in charge
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"sea@itlvn.com";
+            }
+
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        /// <summary>
+        /// Get mail info Delivery order Of Sea Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailDOHBLSeaImport(Guid hblId, string serviceId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shippinglineMail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
+
+            var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
+            var pod = _housebill.FinalDestinationPlace;
+            string _subject = string.Empty;
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
+            _subject = template.Subject;
+            _subject = _subject.Replace("{{EmailType}}", "DELIVERY ORDER");
+            if (serviceId == "SFI")
+            {
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageContainer);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            else if (serviceId == "SLI")
+            {
+                var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            string _body = template.Body;
+            _body = _body.Replace("{{EmailType}}", "Delivery order");
+            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = _body.Replace("{{Pol}}", pol);
+            _body = _body.Replace("{{Pod}}", pod);
+            _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
+            _body = _body.Replace("{{Hbl}}", _housebill.Hwbno);
+            _body = _body.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
+            _body = _body.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _body = _body.Replace("{{NotiDescription}}", _housebill.NotifyPartyDescription);
+            _body = _body.Replace("{{Etd}}", _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+            _body = _body.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+
+            var emailContent = new EmailContentModel();
+            // Email PIC
+            var _shipment = DataContext.First(x => x.Id == _housebill.JobId);
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            // Email to: agent/customer + consignee
+            var mailTo = string.Empty;
+            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerEmail))
+            {
+                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+            mailTo += partnerEmail;
+            var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
+            mailTo += ";" + emailConsignee;
+
+            // Get email from of person in charge
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"sea@itlvn.com";
+            }
+
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        /// <summary>
+        /// Get Mail Info Proof Of Delivery HBL Sea Services
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailProofOfDeliveryHBLSea(Guid hblId, string serviceId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shippinglineMail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
+
+            var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
+            var pod = _housebill.FinalDestinationPlace;
+            string _subject = string.Empty;
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
+            _subject = template.Subject;
+            _subject = _subject.Replace("{{EmailType}}", "PROOF OF DELIVERY");
+            if (serviceId == "SFI" || serviceId == "SFE")
+            {
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageContainer);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            else if (serviceId == "SLI" || serviceId == "SLE")
+            {
+                var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            string _body = template.Body;
+            _body = _body.Replace("{{EmailType}}", "Proof Of Delivery");
+            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = _body.Replace("{{Pol}}", pol);
+            _body = _body.Replace("{{Pod}}", pod);
+            _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
+            _body = _body.Replace("{{Hbl}}", _housebill.Hwbno);
+            _body = _body.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
+            _body = _body.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _body = _body.Replace("{{NotiDescription}}", _housebill.NotifyPartyDescription);
+            _body = _body.Replace("{{Etd}}", _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+            _body = _body.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+
+            var emailContent = new EmailContentModel();
+            // Email PIC
+            var _shipment = DataContext.First(x => x.Id == _housebill.JobId);
+            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            // Email to: agent/customer + consignee
+            var mailTo = string.Empty;
+            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerEmail))
+            {
+                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
+            }
+            mailTo += partnerEmail;
+            var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
+            mailTo += ";" + emailConsignee;
+
+            // Get email from of person in charge
+            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
+            var mailFrom = "Info FMS";
+            if (!string.IsNullOrEmpty(picEmail))
+            {
+                mailFrom = picEmail;
+            }
+            else
+            {
+                mailFrom = @"sea@itlvn.com";
+            }
+
+            emailContent.From = mailFrom; //email PIC của lô hàng
+            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
+        /// <summary>
+        /// Get Mail Info Send HBL Sea Services
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        public EmailContentModel GetMailSendHBLSeaServices(Guid hblId, string serviceId)
+        {
+            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+            if (_housebill == null) return null;
+            var _shippinglineMail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email;
+            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
+            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
+            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
+            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
+            var _shipper = catPartnerRepo.Get(x => x.Id == _housebill.ShipperId).FirstOrDefault();
+
+            var pol = catPlaceRepo.Get(x => x.Id == _housebill.Pol).FirstOrDefault()?.NameEn;
+            var pod = _housebill.FinalDestinationPlace;
+            string _subject = string.Empty;
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
+            _subject = template.Subject;
+            _subject = _subject.Replace("{{EmailType}}", "HOUSE BILL OF LADING");
+            if (serviceId == "SFI" || serviceId == "SFE")
+            {
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageContainer);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            else if (serviceId == "SLI" || serviceId == "SLE")
+            {
+                var packageType = _housebill.PackageType == null ? string.Empty : unitRepository.Get(x => x.Id == _housebill.PackageType).FirstOrDefault()?.UnitNameEn;
+                _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
+                _subject = _subject.Replace("{{Pol}}", pol);
+                _subject = _subject.Replace("{{Pod}}", pod);
+                _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
+                _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
+            }
+            string _body = template.Body;
+            _body = _body.Replace("{{EmailType}}", "House bill of lading");
+            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = _body.Replace("{{Pol}}", pol);
+            _body = _body.Replace("{{Pod}}", pod);
+            _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
+            _body = _body.Replace("{{Hbl}}", _housebill.Hwbno);
+            _body = _body.Replace("{{Shipper}}", _shipper?.PartnerNameEn);
+            _body = _body.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+            _body = _body.Replace("{{NotiDescription}}", _housebill.NotifyPartyDescription);
+            _body = _body.Replace("{{Etd}}", _housebill.Etd == null ? string.Empty : _housebill.Etd.Value.ToString("dd MMM").ToUpper());
+            _body = _body.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
 
             var emailContent = new EmailContentModel();
             // Email PIC

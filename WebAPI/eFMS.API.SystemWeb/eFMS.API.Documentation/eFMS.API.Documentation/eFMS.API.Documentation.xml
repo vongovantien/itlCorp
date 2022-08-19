@@ -910,17 +910,38 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirImport(System.Guid)">
             <summary>
-            Get info mail housebill of Air Import
+            Get info mail Arrival notice housebill of Air Import
             </summary>
             <param name="hblId">Housebill ID</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailAuthorizeLetterHBLAirImport(System.Guid)">
+            <summary>
+            Get mail info Authorize Letter Air Import
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Nullable{System.Guid},System.Nullable{System.Guid})">
             <summary>
-            Get info mail housebill of Air Export
+            Get info mail Pre Alert shipment/housebill of Air Export
             </summary>
             <param name="hblId">Housebill ID</param>
             <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailProofOfDeliveryHBLAir(System.Guid)">
+            <summary>
+            Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailSendHAWBHBLAir(System.Guid)">
+            <summary>
+            Get Mail Info Send HAWB HBL Air Export- Air Import
+            </summary>
+            <param name="hblId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Nullable{System.Guid},System.Nullable{System.Guid},System.String)">
@@ -945,6 +966,30 @@
             </summary>
             <param name="hblId">Housebill ID</param>
             <param name="serviceId">Type of sea service</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailDOHBLSeaImport(System.Guid,System.String)">
+            <summary>
+            Get mail info Delivery Order Of Sea Import
+            </summary>
+            <param name="hblId"></param>
+            <param name="serviceId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailProofOfDeliveryHBLSea(System.Guid,System.String)">
+            <summary>
+            Get Mail Info Proof Of Delivery HBL Sea Services
+            </summary>
+            <param name="hblId"></param>
+            <param name="serviceId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailSendHBLSeaServices(System.Guid,System.String)">
+            <summary>
+            Get Mail Info Send HBL Sea Services
+            </summary>
+            <param name="hblId"></param>
+            <param name="serviceId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.SendMailContractCashWithOutstandingDebit">
