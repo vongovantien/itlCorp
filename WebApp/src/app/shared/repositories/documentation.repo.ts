@@ -927,8 +927,44 @@ export class DocumentationRepo {
         );
     }
 
+    getMailAuthorizeLetterHBLAirImport(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailAuthorizeLetterHBLAirImport`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMailProofOfDeliveryHBLAir(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailProofOfDeliveryHBLAir`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMailSendHawbHBLAir(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailSendHAWBHBLAir`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getInfoMailHBLSeaImport(hblId: string, serviceId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLSeaImport`, { hblId: hblId, serviceId: serviceId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMailDOHBLSeaImport(hblId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailDOHBLSeaImport`, { hblId: hblId, serviceId: serviceId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMailProofOfDeliveryHBLSea(hblId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailProofOfDeliveryHBLSea`, { hblId: hblId, serviceId: serviceId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getMailSendHBLSeaServices(hblId: string, serviceId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetMailSendHBLSeaServices`, { hblId: hblId, serviceId: serviceId }).pipe(
             map((data: any) => data)
         );
     }
