@@ -37,7 +37,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<Guid> GetSurchargeIdBySoaId(string soaId);
         HandleState RejectSoaCredit(RejectSoaModel model);
         AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results);
-        HandleState ValidateCheckPointPartnerSOA(AcctSoa soa);
+        HandleState ValidateCheckPointPartnerSOA(AcctSoaModel soa);
         AdjustModel GetAdjustDebitValue(AdjustModel model);
         HandleState UpdateAdjustDebitValue(AdjustModel model);
         HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string action);
