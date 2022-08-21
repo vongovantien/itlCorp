@@ -187,7 +187,7 @@ namespace eFMS.API.Accounting.DL.Services
                              Status = cd.Key.Status,
                              TotalAmount = cd.Key.Total,
                              SalesmanName = grp.Username,
-                             TotalAmountVND = cd.FirstOrDefault().Total,
+                             TotalAmountVND = cd.Sum(x => x.AmountVnd + x.VatAmountVnd),
                              TotalAmountUSD = cd.Sum(x => x.AmountUsd + x.VatAmountUsd),
                              PartnerName = p.ShortName,
                              DatetimeCreated = cd.Key.DatetimeCreated,
