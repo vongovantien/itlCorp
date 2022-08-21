@@ -36,6 +36,18 @@ const routing: Routes = [
                 path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
                 data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SLI_CODE },
             },
+            {
+                path: 'deliveryorder', component: ShareBusinessReAlertComponent,
+                data: { name: "Delivery Order", level: 7, serviceId: ChargeConstants.SLI_CODE },
+            },
+            {
+                path: 'proofofdelivery', component: ShareBusinessReAlertComponent,
+                data: { name: "Proof Of Delivery", level: 7, serviceId: ChargeConstants.SLI_CODE },
+            },
+            {
+                path: 'sendhbl', component: ShareBusinessReAlertComponent,
+                data: { name: "Send HBL", level: 8, serviceId: ChargeConstants.SLI_CODE },
+            },
         ]
     }
 ];
