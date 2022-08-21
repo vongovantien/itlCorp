@@ -18,16 +18,16 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AccountingPrePaidPaymentService : RepositoryBase<AcctCdnote, AcctCdNoteModel>,  IAccountingPrePaidPaymentService
+    public class AccountingPrePaidPaymentService : RepositoryBase<AcctCdnote, AcctCdNoteModel>, IAccountingPrePaidPaymentService
     {
         private readonly ICurrentUser currentUser;
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)DataContext.DC;
 
-        public AccountingPrePaidPaymentService(ICurrentUser currentUser, 
+        public AccountingPrePaidPaymentService(ICurrentUser currentUser,
             IContextBase<AcctCdnote> repository,
             IMapper mapper,
-            IContextBase<CatPartner> catPartnerRepository): base(repository, mapper)
+            IContextBase<CatPartner> catPartnerRepository) : base(repository, mapper)
         {
             this.currentUser = currentUser;
         }
@@ -36,7 +36,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             IQueryable<AcctCdnote> cdNotes = GetQuery(criteria);
             rowsCount = cdNotes.CountAsync().Result;
-            if(rowsCount == 0)
+            if (rowsCount == 0)
             {
                 return Enumerable.Empty<AccPrePaidPaymentResult>().AsQueryable();
             }
@@ -47,7 +47,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctCdnote> GetQuery(AccountingPrePaidPaymentCriteria criteria)
         {
-            Expression<Func<AcctCdnote, bool>> query = x => (x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID 
+            Expression<Func<AcctCdnote, bool>> query = x => (x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID
             || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
 
             if (!string.IsNullOrEmpty(criteria.PartnerId))
@@ -113,7 +113,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var jobsCs = DC.CsTransaction.Where(x => keywordsCs.Contains(x.JobNo)).Select(x => x.Id).ToList();
 
                         List<Guid> jobUnion = new List<Guid>();
-                        if(jobsOps.Count > 0)
+                        if (jobsOps.Count > 0)
                         {
                             jobUnion.AddRange(jobsOps);
                         }
@@ -136,57 +136,80 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var cdNotes = DC.AcctCdnote.Where(query).OrderByDescending(x => x.DatetimeModified); ;
-           
+
             return cdNotes;
         }
 
         private IQueryable<AccPrePaidPaymentResult> FormatCdNotes(IQueryable<AcctCdnote> cdNotes)
         {
-            var result = from cd in cdNotes
-                           join p in DC.CatPartner on cd.PartnerId equals p.Id
-                           join sur in DC.CsShipmentSurcharge on cd.Code equals sur.DebitNo
-                           join u in DC.SysUser on cd.SalemanId equals u.Id into grps
-                           from grp in grps.DefaultIfEmpty()
-                           join o in DC.SysOffice on cd.OfficeId equals o.Id
-                           join d in DC.CatDepartment on cd.DepartmentId equals d.Id
-                           join u2 in DC.SysUser on cd.UserCreated equals u2.Id
-                         select new AccPrePaidPaymentResult
-                           {
-                               Id = cd.Id,
-                               JobId = cd.JobId,
-                               Currency = cd.CurrencyId,
-                               DebitNote = cd.Code,
-                               SyncStatus = cd.SyncStatus,
-                               LastSyncDate = cd.LastSyncDate,
-                               Notes = cd.Note,
-                               HBL = sur.Hblno,
-                               MBL = sur.Mblno,
-                               JobNo = sur.JobNo,
-                               Status = cd.Status,
-                               TotalAmount = cd.Total,
-                               SalesmanName = grp.Username,
-                               TotalAmountVND = sur.Total,
-                               PartnerName = p.ShortName,
-                               DatetimeCreated = cd.DatetimeCreated,
-                               DepartmentName = d.DeptNameAbbr,
-                               OfficeName = o.Code,
-                               UserCreatedName = u2.Username,
-                               TransactionType = sur.TransactionType
-                           };
+            var queryGroup = from cd in cdNotes
+                             join sur in DC.CsShipmentSurcharge on cd.Code equals sur.DebitNo
+                             group sur by new {
+                                 sur.DebitNo,
+                                 cd.Id,
+                                 cd.JobId,
+                                 cd.SalemanId,
+                                 cd.OfficeId,
+                                 cd.DepartmentId,
+                                 cd.UserCreated,
+                                 cd.DatetimeCreated,
+                                 cd.PartnerId,
+                                 cd.CurrencyId,
+                                 cd.SyncStatus,
+                                 cd.LastSyncDate,
+                                 cd.Code,
+                                 cd.Note,
+                                 cd.Status,
+                                 cd.Total
+                             } into cxGroup
+                             select cxGroup;
 
-           return result;
+            var result = 
+                         from cd in queryGroup
+                         join u in DC.SysUser on cd.Key.SalemanId equals u.Id into grps
+                         from grp in grps.DefaultIfEmpty()
+                         join o in DC.SysOffice on cd.Key.OfficeId equals o.Id
+                         join d in DC.CatDepartment on cd.Key.DepartmentId equals d.Id
+                         join u2 in DC.SysUser on cd.Key.UserCreated equals u2.Id
+                         join p in DC.CatPartner on cd.Key.PartnerId equals p.Id
+                         select new AccPrePaidPaymentResult
+                         {
+                             Id = cd.Key.Id,
+                             JobId = cd.Key.JobId,
+                             Currency = cd.Key.CurrencyId,
+                             DebitNote = cd.Key.Code,
+                             SyncStatus = cd.Key.SyncStatus,
+                             LastSyncDate = cd.Key.LastSyncDate,
+                             Notes = cd.Key.Note,
+                             HBL = cd.FirstOrDefault().Hblno,
+                             MBL = cd.FirstOrDefault().Mblno,
+                             JobNo = cd.FirstOrDefault().JobNo,
+                             Status = cd.Key.Status,
+                             TotalAmount = cd.Key.Total,
+                             SalesmanName = grp.Username,
+                             TotalAmountVND = cd.FirstOrDefault().Total,
+                             TotalAmountUSD = cd.Sum(x => x.AmountUsd + x.VatAmountUsd),
+                             PartnerName = p.ShortName,
+                             DatetimeCreated = cd.Key.DatetimeCreated,
+                             DepartmentName = d.DeptNameAbbr,
+                             OfficeName = o.Code,
+                             UserCreatedName = u2.Username,
+                             TransactionType = cd.FirstOrDefault().TransactionType
+                         };
+
+            return result;
 
         }
 
         public async Task<HandleState> UpdatePrePaidPayment(List<AccountingPrePaidPaymentUpdateModel> model)
         {
             HandleState result = new HandleState();
-            if(model.Count > 0)
+            if (model.Count > 0)
             {
                 foreach (var item in model)
                 {
                     var cd = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                    if(cd == null || cd.Status == "New")
+                    if (cd == null || cd.Status == "New")
                     {
                         continue;
                     }
