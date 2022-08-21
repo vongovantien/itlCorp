@@ -1947,9 +1947,9 @@ namespace eFMS.API.Accounting.DL.Services
                             var sendMailSuggest = true;
                             if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
-                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && advanceApprove.BuheadAprDate != null) // Create Charge For Shipment [advance carrier]
+                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment [advance carrier]
                                 {
-                                    UpdateChargesApprove(advancePayment, advanceApprove.BuheadAprDate);
+                                    UpdateChargesApprove(advancePayment, advanceApprove);
                                 }
                                 //Send Mail Approved
                                 sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2295,9 +2295,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                         {
-                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && approve.BuheadAprDate != null) // Create Charge For Shipment [Advance carrier]
+                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment [Advance carrier]
                             {
-                                UpdateChargesApprove(advancePayment, approve.BuheadAprDate);
+                                UpdateChargesApprove(advancePayment, approve);
                             }
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2336,7 +2336,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="advancePayment"></param>
         /// <returns></returns>
-        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment, DateTime? approveDate)
+        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment, AcctApproveAdvance approve)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -2354,7 +2354,7 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.IsFromShipment = true;
                             charge.UserModified = currentUser.UserID;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.ExchangeDate = approveDate; // exchange date = approve date
+                            charge.ExchangeDate = approve.BuheadAprDate ?? approve.AccountantAprDate ?? DateTime.Now; // exchange date = approve date
                             charge.FinalExchangeRate = null;
                             #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                             var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);

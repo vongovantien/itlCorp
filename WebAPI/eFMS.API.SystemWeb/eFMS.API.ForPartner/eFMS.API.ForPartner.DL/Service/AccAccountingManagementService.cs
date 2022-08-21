@@ -1627,6 +1627,7 @@ namespace eFMS.API.ForPartner.DL.Service
             soa.UserModified = currentUser.UserID;
             soa.DatetimeModified = DateTime.Now;
             soa.ReasonReject = reason;
+            soa.Status = ForPartnerConstants.STATUS_SOA_NEW;
 
             //Update PaySyncedFrom or SyncedFrom equal NULL by SoaNo (Sử dụng Store Procudure để Update Charge)
             if (surcharges != null)
@@ -2769,6 +2770,7 @@ namespace eFMS.API.ForPartner.DL.Service
             var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
             && x.VoucherId == model.VoucherNo
             && x.SourceCreated == "Bravo"
+            && x.AttachDocInfo == model.DocCode
             && x.Date.Value.Date == model.VoucherDate.Date)?.FirstOrDefault();
 
             if (voucherToDelete != null)

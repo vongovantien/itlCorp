@@ -53,5 +53,6 @@ namespace eFMS.API.ReportData.Consts
         public const string DebitAmountDetailByContract = "DebitAmountDetailByContract.xlsx";
         public const string CombineBillingByShipmentVND = "CombingBillingByJobVND.xlsx";
         public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
+        public const string OutsourcingRecognisingTemplate = "Outsourcing Recognising Template.xlsx";
     }
 }
