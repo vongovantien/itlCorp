@@ -282,7 +282,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
             _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
-            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
@@ -370,7 +370,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
             _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
-            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
@@ -457,89 +457,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
             _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
-            _body = _body.Replace("{{Routing}}", _shipment.Route);
-            _body = _body.Replace("{{WareHouse}}", _warehouseName);
-            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
-            _body = _body.Replace("{{pic}}", picEmail);
-
-            var emailContent = new EmailContentModel();
-            // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-
-            var mailFrom = "Info FMS";
-            if (!string.IsNullOrEmpty(picEmail))
-            {
-                mailFrom = picEmail;
-            }
-            else
-            {
-                mailFrom = @"air@itlvn.com";
-            }
-            emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
-            emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
-            emailContent.Subject = _subject;
-            emailContent.Body = _body;
-            emailContent.AttachFiles = new List<string>();
-            return emailContent;
-        }
-
-        public EmailContentModel GetMailSendHAWBAirService(Guid hblId)
-        {
-            var _housebill = detailRepository.Get(x => x.Id == hblId).FirstOrDefault();
-            if (_housebill == null) return null;
-            var _shipment = DataContext.Get(x => x.Id == _housebill.JobId).FirstOrDefault();
-            var _airlineMail = (_shipment != null) ? catPartnerRepo.Get(x => x.Id == _shipment.ColoaderId).FirstOrDefault()?.Email : string.Empty;
-            var _currentUser = sysUserRepo.Get(x => x.Id == currentUser.UserID).FirstOrDefault();
-            var _empCurrentUser = sysEmployeeRepo.Get(x => x.Id == _currentUser.EmployeeId).FirstOrDefault();
-            var _consignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault();
-            var _warehouse = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse" && x.Id == _housebill.WarehouseId).FirstOrDefault();
-            var _warehouseName = string.Empty;
-            if (_warehouse != null)
-            {
-                if (_warehouse.Code == "TCS")
-                {
-                    _warehouseName = "TAN SON NHAT AIRPORT, WH: TCS";
-                }
-                if (_warehouse.Code == "SCSC")
-                {
-                    _warehouseName = "TAN SON NHAT AIRPORT, WH: SCSC";
-                }
-            }
-
-            // Email PIC
-            var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
-            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
-            // Group email của PIC
-            var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
-
-            var templateEmail = sysEmailTemplateRepo.Get(x => x.Code == "AE-PROOF-OF-DELIVERY").FirstOrDefault();
-            string _subject = templateEmail.Subject;
-            _subject = _subject.Replace("{{MAWB}}", _housebill.Mawb);
-            _subject = _subject.Replace("{{HAWB}}", _housebill.Hwbno);
-            _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
-            _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
-
-            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
-            decimal? exchangeRate = null;
-            if (!string.IsNullOrEmpty(debitNo))
-            {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
-            }
-            string _body = templateEmail.Body;
-            var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
-            _body = _body.Replace("{{Service}}", _service.DisplayName);
-            _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
-            _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
-            _body = _body.Replace("{{QTy}}", _housebill.PackageQty?.ToString());
-            _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _housebill.GrossWeight));
-            _body = _body.Replace("{{FlightNo}}", _housebill.FlightNo);
-            _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
-            _body = _body.Replace("{{Routing}}", _shipment.Route);
+            _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
@@ -1063,9 +981,10 @@ namespace eFMS.API.Documentation.DL.Services
                 _subject = _subject.Replace("{{Package}}", _housebill.PackageQty + " " + packageType);
                 _subject = _subject.Replace("{{Eta}}", _housebill.Eta == null ? string.Empty : _housebill.Eta.Value.ToString("dd MMM").ToUpper());
             }
+
             string _body = template.Body;
             _body = _body.Replace("{{EmailType}}", "Proof Of Delivery");
-            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = serviceId.Contains("E") ? _body.Replace("{{Vessel}}", _housebill.OceanVoyNo) : _body.Replace("{{Vessel}}", _housebill.LocalVessel);
             _body = _body.Replace("{{Pol}}", pol);
             _body = _body.Replace("{{Pod}}", pod);
             _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
@@ -1156,7 +1075,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             string _body = template.Body;
             _body = _body.Replace("{{EmailType}}", "House bill of lading");
-            _body = _body.Replace("{{Vessel}}", _housebill.LocalVessel);
+            _body = serviceId.Contains("E") ? _body.Replace("{{Vessel}}", _housebill.OceanVoyNo) : _body.Replace("{{Vessel}}", _housebill.LocalVessel);
             _body = _body.Replace("{{Pol}}", pol);
             _body = _body.Replace("{{Pod}}", pod);
             _body = _body.Replace("{{Mbl}}", _housebill.Mawb);
