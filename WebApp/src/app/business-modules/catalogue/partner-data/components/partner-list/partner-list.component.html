@@ -73,8 +73,8 @@
                     </tr>
                 </ng-container>
             </ng-container>
-            <tr *ngIf="!isLoading && !partners.length" app-table-none-record></tr>
-            <tr *ngIf="isLoading" app-table-row-loading></tr>
+            <tr *ngIf="(!isLoading | async) && !partners.length" app-table-none-record></tr>
+            <tr *ngIf="isLoading | async" app-table-row-loading></tr>
         </tbody>
     </table>
 </div>

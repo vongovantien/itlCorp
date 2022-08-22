@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
@@ -6,7 +6,7 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 import { SortService } from '@services';
 import { Partner, Company, Office } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState } from '../../store';
+import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState, getPartnerDataListLoadingState } from '../../store';
 import { Store } from '@ngrx/store';
 
 
@@ -35,6 +35,7 @@ export class PartnerListComponent extends AppList implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private _store: Store<IPartnerDataState>,
+        private _cd: ChangeDetectorRef,
         private _systemRepo: SystemRepo) {
         super();
 
@@ -116,6 +117,9 @@ export class PartnerListComponent extends AppList implements OnInit {
         }
 
         this.getPartners();
+
+        this.isLoading = this._store.select(getPartnerDataListLoadingState);
+        console.log(this.isLoading);
     }
 
     replaceService() {
@@ -217,7 +221,6 @@ export class PartnerListComponent extends AppList implements OnInit {
         //             this.totalItems = res.totalItems;
         //         }
         //     );
-        console.log(this.isSearching);
 
         this._store.dispatch(LoadListPartner({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.isSearching = false;

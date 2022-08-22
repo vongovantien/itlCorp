@@ -12,7 +12,7 @@ export const partnerState = createFeatureSelector<IPartnerDataState>('partnerDat
 export const getPartnerDataSearchParamsState = createSelector(partnerState, (state: IPartnerDataState) => state && state.com && state.com.dataSearch);
 export const getPartnerDataListState = createSelector(partnerState, (state: IPartnerDataState) => state.com?.partners);
 export const getPartnerDataListPagingState = createSelector(partnerState, (state: IPartnerDataState) => state.com.pagingData);
-export const getPartnerDataListLoadingState = createSelector(partnerState, (state: IPartnerDataState) => state.com.isLoading);
+export const getPartnerDataListLoadingState = createSelector(partnerState, (state: IPartnerDataState) => state?.com?.isLoading);
 
 export const reducers: ActionReducerMap<IPartnerDataState> = {
     com: reducer
