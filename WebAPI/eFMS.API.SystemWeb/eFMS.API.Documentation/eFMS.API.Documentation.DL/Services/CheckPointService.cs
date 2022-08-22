@@ -171,25 +171,45 @@ namespace eFMS.API.Documentation.DL.Services
             return valid;
         }
 
-        private bool ValidateCheckPointPrepaidContractPartner(Guid HblId, string transactionType)
+        private bool ValidateCheckPointPrepaidContractPartner(Guid HblId, string partnerId, string transactionType)
         {
             bool valid = true;
-            IQueryable<AcctCdnote> debitNotes = Enumerable.Empty<AcctCdnote>().AsQueryable();
-            if (transactionType == "CL")
+            var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
+            if(surcharges.Count() == 0)
             {
-                var opsJob = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
-                debitNotes = DC.AcctCdnote.Where(x => x.JobId == opsJob.Id);
-            }
-            else
-            {
-                var hbl = csTransactionDetail.Get(x => x.Id == HblId).FirstOrDefault();
-                var csJobs = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
-
-                debitNotes = DC.AcctCdnote.Where(x => x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT && x.JobId == csJobs.Id);
+                return false;
             }
 
-            bool hasDebitPrepaid = debitNotes.Any(x => x.Status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID);
-            valid = !hasDebitPrepaid;
+            var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
+            if(hasIssuedDebit)
+            {
+                return false;
+            }
+            var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
+            var debitNotes = DC.AcctCdnote.Where(x => debitCodes.Contains(x.Code) 
+                            && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE));
+            var hasConfirm = debitNotes.Any(x => x.Status != DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+            if (hasConfirm)
+            {
+                valid = false;
+            }
+
+            //IQueryable<AcctCdnote> debitNotes = Enumerable.Empty<AcctCdnote>().AsQueryable();
+            //if (transactionType == "CL")
+            //{
+            //    var opsJob = opsTransactionRepository.Get(x => x.Hblid == HblId)?.FirstOrDefault();
+            //    debitNotes = DC.AcctCdnote.Where(x => x.JobId == opsJob.Id);
+            //}
+            //else
+            //{
+            //    var hbl = csTransactionDetail.Get(x => x.Id == HblId).FirstOrDefault();
+            //    var csJobs = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+
+            //    debitNotes = DC.AcctCdnote.Where(x => x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT && x.JobId == csJobs.Id);
+            //}
+
+            //bool hasDebitPrepaid = debitNotes.Any(x => x.Status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID);
+            //valid = !hasDebitPrepaid;
             return valid;
         }
 
@@ -277,15 +297,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
 
-            if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
-            {
-                isValid = ValidateCheckPointPrepaidContractPartner(HblId, transactionType);
-                if(isValid == false)
-                {
-                    return new HandleState((object)string.Format(@"Shipment has prepaid debit note that not paid yet, please you check it again!"));
-                }
-            }
-
+           
             if (HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(partnerId);
@@ -398,6 +410,17 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else isValid = true;
                     break;
+                case "Prepaid":
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                    {
+                        isValid = ValidateCheckPointPrepaidContractPartner(HblId, partnerId, transactionType);
+                    } else
+                    {
+                        isValid = true;
+                    }
+                    if (!isValid) errorCode = 5;
+
+                    break;
                 default:
                     isValid = true;
                     break;
@@ -423,6 +446,10 @@ namespace eFMS.API.Documentation.DL.Services
                     case 4:
                         messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please you check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
+                        break;
+                    case 5:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} has not issued debits or debits are not paid, please you check it again!",
+                            partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     default:
                         break;
