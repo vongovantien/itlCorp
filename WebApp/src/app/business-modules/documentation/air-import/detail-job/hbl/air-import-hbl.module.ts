@@ -40,6 +40,18 @@ const routing: Routes = [
                 path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
                 data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.AI_CODE },
             },
+            {
+                path: 'authorizeletter', component: ShareBusinessReAlertComponent,
+                data: { name: "Authorize Letter", level: 7, serviceId: ChargeConstants.AI_CODE },
+            },
+            {
+                path: 'proofofdelivery', component: ShareBusinessReAlertComponent,
+                data: { name: "Proof Of Delivery", level: 8, serviceId: ChargeConstants.AI_CODE },
+            },
+            {
+                path: 'houseairwaybill', component: ShareBusinessReAlertComponent,
+                data: { name: "Send HAWB", level: 9, serviceId: ChargeConstants.AI_CODE },
+            },
         ]
     },
 ];

@@ -85,8 +85,8 @@ export class Partner {
     bankName: string = '';
     bankCode: string = '';
 
-    paymentTerm: number=0;
-    currency: string='';
+    paymentTerm: number = 0;
+    currency: string = 'VND';
 
     permission: PermissionPartner = new PermissionPartner();
 
