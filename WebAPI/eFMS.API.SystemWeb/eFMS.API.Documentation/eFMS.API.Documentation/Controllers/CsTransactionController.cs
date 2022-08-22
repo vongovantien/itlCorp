@@ -590,22 +590,6 @@ namespace eFMS.API.Documentation.Controllers
             return BadRequest(res);
         }
 
-        [Authorize]
-        [HttpPut("UpdateJobStatus")]
-        public IActionResult UpdateJobStatus(ChargeShipmentStatusModel model)
-        {
-            HandleState hs = csTransactionService.UpdateJobStatus(model);
-
-            string message = HandleError.GetMessage(hs, Crud.Update);
-
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
