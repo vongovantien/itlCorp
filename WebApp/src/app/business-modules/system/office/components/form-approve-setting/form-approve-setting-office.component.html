@@ -157,6 +157,42 @@
         <hr />
         <div class="row m--margin-top-20">
             <div class="col-lg-12">
+
+                <h6 class="text-primary">Account Payable :
+                    <span>
+                        <i class="la la-user text-warning" style="font-size:30px"></i>
+                    </span>
+                </h6>
+            </div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col font-weight-bold"> Approval Advance </div>
+                    <div class="col font-weight-bold"> Approval Settlement </div>
+                    <div class="col"></div>
+                    <div class="col"></div>
+                    <div class="col"></div>
+                </div>
+                <ng-container>
+                    <div class="row m--margin-top-10">
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountPayable.approvalAdvance"></app-switch>
+                        </div>
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountPayable.approvalSettlement"></app-switch>
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <hr />
+        <div class="row m--margin-top-20">
+            <div class="col-lg-12">
                 <h6 class="text-primary">Replicate Setting :
                     <span>
                         <i class="la la-clone text-primary" style="font-size:30px"></i>

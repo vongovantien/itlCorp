@@ -72,6 +72,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
+        private readonly IContextBase<SysSettingFlow> settingflowRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -113,7 +114,8 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
-            IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
+            IContextBase<SysSettingFlow> settingflowRepo,
+        IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -151,6 +153,7 @@ namespace eFMS.API.Accounting.DL.Services
             opsStageAssignedRepository = opsStageAssignedRepo;
             databaseUpdateService = _databaseUpdateService;
             csLinkChargeRepository = csLinkChargeRepo;
+            settingflowRepository = settingflowRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -6238,7 +6241,16 @@ namespace eFMS.API.Accounting.DL.Services
                 return new ResultHandle();
             }
         }
-        
+
+        private bool checkSettleSettingFlow()
+        {
+            if (settingflowRepository.Get(x => x.OfficeId == currentUser.OfficeID&&x.Type== "AccountPayable").FirstOrDefault()?.ApprovalSettlement==true)
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// Check if payee not staff then not accept input cost > sell
         /// </summary>
         /// <param name="model"></param>
@@ -6246,6 +6258,10 @@ namespace eFMS.API.Accounting.DL.Services
         public string CheckValidFeesOnShipment(CreateUpdateSettlementModel model)
         {
             var invalidShipment = string.Empty;
+            if (!checkSettleSettingFlow())
+            {
+                return invalidShipment;
+            }
             if (!string.IsNullOrEmpty(model.Settlement.Payee))
             {
                 if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
@@ -6270,6 +6286,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
+            
             return invalidShipment;
         }
     }

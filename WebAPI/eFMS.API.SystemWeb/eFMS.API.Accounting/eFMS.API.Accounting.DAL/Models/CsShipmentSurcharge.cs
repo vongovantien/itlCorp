@@ -77,5 +77,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? UserIdLinkFee { get; set; }
         public string UserNameLinkFee { get; set; }
         public string LinkChargeId { get; set; }
+        public bool? IsRefundFee { get; set; }
     }
 }

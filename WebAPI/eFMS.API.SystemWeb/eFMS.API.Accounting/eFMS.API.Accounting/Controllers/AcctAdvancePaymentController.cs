@@ -79,7 +79,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost("QueryData")]
         [Authorize]
-        public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
+        public IActionResult QueryData(AcctAdvancePaymentCriteria criteria) 
         {
             var data = acctAdvancePaymentService.QueryData(criteria);
             return Ok(data);

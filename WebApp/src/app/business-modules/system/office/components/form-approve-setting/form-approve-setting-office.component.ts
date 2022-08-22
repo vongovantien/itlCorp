@@ -18,6 +18,7 @@ export class OfficeFormApproveSettingComponent
     approvePayments: FlowSetting[] = [];
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
+    accountPayable: FlowSetting = new FlowSetting();
 
     initRepilicate = new FlowSetting({ type: 'Other', flow: 'Replicate' });
     replicateOffice: FlowSetting = this.initRepilicate;
@@ -120,8 +121,11 @@ export class OfficeFormApproveSettingComponent
                     approvals: FlowSetting[],
                     unlocks: FlowSetting[],
                     account: FlowSetting,
-                    replicateOffice: FlowSetting
+                    replicateOffice: FlowSetting,
+                    accountPayable: FlowSetting,
                 }) => {
+                    console.log(res);
+
                     if (!res.lockingDateShipment.length) {
                         this.initLockingShipmentSetting();
                     } else {
@@ -144,6 +148,12 @@ export class OfficeFormApproveSettingComponent
                         this.accountReceivable.type = "AccountReceivable";
                     } else {
                         this.accountReceivable = res.account;
+                    }
+                    if (!res.accountPayable) {
+                        this.accountPayable = new FlowSetting();
+                        this.accountReceivable.type = "AccountPayable";
+                    } else {
+                        this.accountPayable = res.accountPayable;
                     }
                     if (!res.account.applyPartner) {
                         this.accountReceivable.applyPartner = "None";
@@ -170,7 +180,8 @@ export class OfficeFormApproveSettingComponent
             unlockShipments: this.unlockShipments,
             lockShipmentDate: this.serviceLockSettings,
             accountReceivable: this.accountReceivable,
-            replicateOffice: this.replicateOffice
+            replicateOffice: this.replicateOffice,
+            accountPayable: this.accountPayable,
         };
 
         this._systemRepo
@@ -204,4 +215,5 @@ interface ISettingFlowEditModel {
     lockShipmentDate: LockShipmentSetting[];
     accountReceivable: FlowSetting;
     replicateOffice: FlowSetting;
+    accountPayable: FlowSetting;
 }
