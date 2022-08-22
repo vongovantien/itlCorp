@@ -439,7 +439,7 @@ namespace eFMS.API.Documentation.Controllers
         #endregion -- DELETE --
 
         /// <summary>
-        /// import transaction
+        /// import transaction - save duplicate job
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
