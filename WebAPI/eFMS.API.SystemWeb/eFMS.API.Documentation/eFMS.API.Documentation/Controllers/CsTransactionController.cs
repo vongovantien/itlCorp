@@ -771,6 +771,22 @@ namespace eFMS.API.Documentation.Controllers
             type = _typeError;
             return errorMsg;
         }
+        
+        [Authorize]
+        [HttpPut("UpdateJobStatus")]
+        public IActionResult UpdateJobStatus(ChargeShipmentStatusModel model)
+        {
+            HandleState hs = csTransactionService.UpdateJobStatus(model);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
 
         /// <summary>
         /// Check if Service date update with another month
