@@ -1947,7 +1947,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var sendMailSuggest = true;
                             if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
-                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && advanceApprove.BuheadAprDate != null) // Create Charge For Shipment [advance carrier]
+                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment [advance carrier]
                                 {
                                     UpdateChargesApprove(advancePayment, advanceApprove.BuheadAprDate);
                                 }
@@ -2295,7 +2295,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                         {
-                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && approve.BuheadAprDate != null) // Create Charge For Shipment [Advance carrier]
+                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment [Advance carrier]
                             {
                                 UpdateChargesApprove(advancePayment, approve.BuheadAprDate);
                             }
