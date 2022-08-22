@@ -151,7 +151,7 @@ export class OfficeFormApproveSettingComponent
                     }
                     if (!res.accountPayable) {
                         this.accountPayable = new FlowSetting();
-                        this.accountReceivable.type = "AccountPayable";
+                        this.accountPayable.type = "AccountPayable";
                     } else {
                         this.accountPayable = res.accountPayable;
                     }
@@ -187,6 +187,8 @@ export class OfficeFormApproveSettingComponent
         this._systemRepo
             .updateSettingFlow(body)
             .subscribe((res: CommonInterface.IResult) => {
+                console.log(body);
+
                 if (res.status) {
                     this._toastService.success(res.message);
                     this.getSetting(this.officeId);
