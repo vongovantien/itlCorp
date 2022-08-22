@@ -1148,8 +1148,8 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<OpsTransaction> operations = null;
             IQueryable<CsTransaction> transactions = null;
 
-            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = (q => q.IsRefundFee != true);
-            Expression<Func<CsShipmentSurcharge, bool>> obhSurchargesQuery = (q => q.IsRefundFee != true);
+            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true;
+            Expression<Func<CsShipmentSurcharge, bool>> obhSurchargesQuery = q => true;
             Expression<Func<OpsTransaction, bool>> opsQuery = (q => q.CurrentStatus != TermData.Canceled);
             Expression<Func<CsTransaction, bool>> transQuery = (q => q.CurrentStatus != TermData.Canceled);
             Expression<Func<CsTransactionDetail, bool>> transDetailQuery = q => true;
