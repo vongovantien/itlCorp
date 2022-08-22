@@ -294,7 +294,6 @@ namespace eFMS.API.Documentation.DL.Services
         {
             HandleState result = new HandleState();
             if (criteria.Data.Count == 0) return result;
-          
             foreach (var partner in criteria.Data)
             {
                 var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
@@ -566,6 +565,8 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<CsShipmentSurcharge, bool>> querySurcharge = x => x.OfficeId != HM
                 && x.OfficeId != BH
                 && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            querySurcharge = querySurcharge.And(x => x.IsRefundFee != true);
+
             var hbls = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
             if (transactionType == "CL")
             {
@@ -582,19 +583,20 @@ namespace eFMS.API.Documentation.DL.Services
             if (surcharges.Count() > 0)
             {
                 partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
-            } else
+            }
+            else
             {
-                if(transactionType == "CL")
+                if (transactionType == "CL")
                 {
                     var opsJob = opsTransactionRepository.First(x => x.Hblid == Id);
-                    if(opsJob != null)
+                    if (opsJob != null)
                     {
                         partners.Add(new CheckPointPartnerHBLDataGroup { HblId = opsJob.Hblid, PartnerId = opsJob.CustomerId });
 
                         return partners;
                     }
                 }
-                if(hbls.Count() == 0)
+                if (hbls.Count() == 0)
                 {
                     return partners;
                 }

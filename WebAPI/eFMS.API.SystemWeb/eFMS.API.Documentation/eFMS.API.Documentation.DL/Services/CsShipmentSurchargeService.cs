@@ -316,7 +316,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Chỉ lấy những charge chưa sync
                     var _listCharges = listCharges.Where(x => x.IsSynced == false).ToList();
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, SalemanId = houseBill.SaleManId, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL=houseBill.ReferenceNo };
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, SalemanId = houseBill.SaleManId, listCharges = _listCharges, FlexId = houseBill.FlexId, ReferenceNoHBL = houseBill.ReferenceNo };
                     returnList.Add(returnObj);
                 }
             }
@@ -422,6 +422,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
                 charge.UnitCode = item.UnitCode;
+                charge.IsRefundFee = item.IsRefundFee;
                 charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//item.RateToLocal;
                 if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
@@ -644,8 +645,8 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             if (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                             {
-                                if (surcharge.PayerAcctManagementId == null 
-                                    || string.IsNullOrEmpty(surcharge.PaySoano) 
+                                if (surcharge.PayerAcctManagementId == null
+                                    || string.IsNullOrEmpty(surcharge.PaySoano)
                                     || string.IsNullOrEmpty(surcharge.CreditNo))
                                 {
                                     surcharge.PayerId = item.PayerId;
@@ -708,6 +709,7 @@ namespace eFMS.API.Documentation.DL.Services
                             surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                         }
 
+                        surcharge.IsRefundFee = item.IsRefundFee;
                         surchargesUpdate.Add(surcharge);
                     }
                 }
@@ -719,12 +721,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    foreach(var surchargeAdd in surchargesAdd)
+                    foreach (var surchargeAdd in surchargesAdd)
                     {
                         var hsAdd = DataContext.Add(surchargeAdd, false);
                     }
 
-                    foreach(var surchargeUpdate in surchargesUpdate)
+                    foreach (var surchargeUpdate in surchargesUpdate)
                     {
                         var hsUpdate = DataContext.Update(surchargeUpdate, x => x.Id == surchargeUpdate.Id, false);
                     }
@@ -838,12 +840,12 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
             {
                 if (criteria.ColoaderId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
+                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
             }
             else
             {
                 if (criteria.CustomerId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
+                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
             }
 
             if (houseIds.Count == 0) return null;
@@ -1105,7 +1107,7 @@ namespace eFMS.API.Documentation.DL.Services
                             List<string> descriptions = new List<string>();
                             foreach (var item in dataPartner)
                             {
-                                descriptions.Add( string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + " Please check it soon "));
+                                descriptions.Add(string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> is over Expired Date with" + dataAgreements.Where(x => ((x.ContractType == "Official" && x.ExpiredDate > DateTime.Now) || (x.ContractType == "Trial" && x.TrialExpiredDate > DateTime.Now)) && x.PartnerId == item.Id).Select(t => t.ExpiredDate).FirstOrDefault() + " Please check it soon "));
                             }
                             // Add Notification
                             HandleState resultAddNotification = AddNotifications(descriptions, dataAgreements.ToList());
@@ -1201,7 +1203,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 {
                                     type = "Partner Data";
                                 }
-                                descriptions.Add(type + " " + string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> has debit overdue" + dataAgreements.Where(x=> x.PartnerId == item.Id).Select(t => t.PaymentTerm).FirstOrDefault() + " Please check it soon "));
+                                descriptions.Add(type + " " + string.Format(@"<b style='color:#3966b6'>" + item.ShortName + "</b> has debit overdue" + dataAgreements.Where(x => x.PartnerId == item.Id).Select(t => t.PaymentTerm).FirstOrDefault() + " Please check it soon "));
                             }
                             // Add Notification
                             HandleState resultAddNotification = AddNotifications(descriptions, dataAgreements.ToList());
@@ -1263,7 +1265,7 @@ namespace eFMS.API.Documentation.DL.Services
                     isCheckedCreditterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.CreditLimit == true);
                     isCheckedPaymenterm = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.OverPaymentTerm == true);
                     isCheckedExpiredAgreement = settingFlowRepository.Any(x => x.OfficeId == csTransaction.OfficeId && x.ExpiredAgreement == true);
-                }   
+                }
                 else
                 {
                     csTransaction = csTransactionRepository.Get(x => x.JobNo == jobno).FirstOrDefault();
@@ -1282,7 +1284,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             PartnerAccountReceivable partnerAccountReceivable = new PartnerAccountReceivable();
                             partnerAccountReceivable.ShortName = item.ShortName;
-                            if (item.ParentId == agreement.PartnerId && ( ( agreement.CreditRate >= 120) || (accAccountReceivableRepository.Any(x => x.PartnerId == agreement.PartnerId && (agreement.OfficeId.Contains(x.Office.ToString()) && agreement.SaleService.Contains(x.Service) && x.Over30Day > 0)))))
+                            if (item.ParentId == agreement.PartnerId && ((agreement.CreditRate >= 120) || (accAccountReceivableRepository.Any(x => x.PartnerId == agreement.PartnerId && (agreement.OfficeId.Contains(x.Office.ToString()) && agreement.SaleService.Contains(x.Service) && x.Over30Day > 0)))))
                             {
                                 partnerAccountReceivable.PaymentTerm = agreement.PaymentTerm;
                                 partnerAccountReceivable.CreditRate = agreement.CreditRate;
@@ -1293,7 +1295,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (isCheckedCreditterm)
                     {
-                      
+
                         if (dataAgreements.Any(x => x.CreditRate >= 120)) validCreditTerm = false;
                         var data = partnerAccountReceivables.Find(x => x.CreditRate != null && x.CreditRate < 120);
                         partnerAccountReceivables.Remove(data);
@@ -1315,7 +1317,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                     }
-                    
+
                     return new { validCreditTerm, validPaymentTerm, validExpiredDate, transactionTypes, partnerAccountReceivables };
                 }
             }
@@ -1395,7 +1397,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return users;
         }
-        
+
         public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
@@ -1629,11 +1631,11 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-                
+
                 if (item.IsValid)
                 {
                     OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim() && x.OfficeId == currentUser.OfficeID).FirstOrDefault();
-                    if(currentOpsJob != null)
+                    if (currentOpsJob != null)
                     {
                         string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
                         string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
@@ -1733,7 +1735,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             list[i].IsValid = false;
                             list[j].IsValid = false;
-                            if((list[i].Type=="OBH"&&list[j].Type=="Buying")|| (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            if ((list[i].Type == "OBH" && list[j].Type == "Buying") || (list[j].Type == "OBH" && list[i].Type == "Buying"))
                             {
                                 list[i].IsValid = true;
                                 list[j].IsValid = true;
@@ -1746,7 +1748,7 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        public HandleState Import(List<CsShipmentSurchargeImportModel> list,  out List<Guid> Ids)
+        public HandleState Import(List<CsShipmentSurchargeImportModel> list, out List<Guid> Ids)
         {
             Ids = new List<Guid>(); // ds charge dùng để tính công nợ
             var chargeGroup = catChargeGroupRepository.Get();
@@ -1802,7 +1804,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(listImport);
-            if(datas.Count == 0)
+            if (datas.Count == 0)
             {
                 return new HandleState(true, "");
             }
@@ -1840,7 +1842,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             foreach (var cd in list)
             {
-                surcharges.Add(new CsShipmentSurcharge {
+                surcharges.Add(new CsShipmentSurcharge
+                {
                     Id = Guid.NewGuid(),
                     Hblid = Guid.Parse("C45EFF8A-9197-4D0C-A723-F416F21E90BC"),
                     Type = "SELL",
@@ -1995,7 +1998,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 else
-                    chargeBuy.Hblid = shipment.ServiceHblId??new Guid();
+                    chargeBuy.Hblid = shipment.ServiceHblId ?? new Guid();
 
                 surchargesAddBuy.Add(chargeBuy);
             }
@@ -2095,8 +2098,29 @@ namespace eFMS.API.Documentation.DL.Services
                 results.Add(amountSurcharge);
             }
 
-            return results; 
+            return results;
         }
+        public bool CheckExistRefundFee(Guid jobId, string transactionType)
+        {
+            bool result = false;
+            var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+            if (transactionType == TermData.OpsTransition)
+            {
+                OpsTransaction ops = opsTransRepository.Get(x => x.Id == jobId).FirstOrDefault();
+                surcharges = DataContext.Get(x => x.Hblid == ops.Hblid);
+            }
+            else
+            {
+                List<Guid> hblIds = tranDetailRepository.Get(x => x.JobId == jobId).Select(x => x.Id).ToList();
+                surcharges = DataContext.Get(x => hblIds.Contains(x.Hblid));
+
+            }
+
+            result = surcharges.Any(x => x.IsRefundFee == true);
+
+            return result;
+        }
+
     }
 }
 

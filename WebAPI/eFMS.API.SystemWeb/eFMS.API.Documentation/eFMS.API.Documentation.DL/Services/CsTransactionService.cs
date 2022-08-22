@@ -586,7 +586,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             currentUser.Action = "DeleteCsTransaction";
             //Xóa mềm hiện tại chỉ cập nhật CurrentStatus = Canceled cho Shipment Documment.
-            receivables = new List<ObjectReceivableModel>(); 
+            receivables = new List<ObjectReceivableModel>();
             var hs = new HandleState();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -638,7 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
-            
+
             return hs;
         }
 
@@ -780,7 +780,7 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
-            if(detail == null)
+            if (detail == null)
             {
                 return 0;
             }
@@ -1149,7 +1149,7 @@ namespace eFMS.API.Documentation.DL.Services
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
-                                                //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevel.Contains(t.SaleManId))
+                                                                                       //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevel.Contains(t.SaleManId))
                                                 || jobsInHouseLevGrp.Any(jobId => jobId == x.Id)
                                                 );
                     break;
@@ -1159,7 +1159,7 @@ namespace eFMS.API.Documentation.DL.Services
                     masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
                                                 || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
-                                                //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevelDepartment.Contains(t.SaleManId))
+                                                                                       //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevelDepartment.Contains(t.SaleManId))
                                                 || jobsInHouseLevDept.Any(jobId => jobId == x.Id)
                                                 );
                     break;
@@ -1191,16 +1191,16 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsTransactionModel> query = null;
 
             query = from masterBill in masterBills
-                    //join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
-                    //from coloader in coloader2.DefaultIfEmpty()
-                    //join agent in agents on masterBill.AgentId equals agent.Id into agent2
-                    //from agent in agent2.DefaultIfEmpty()
-                    //join pod in pods on masterBill.Pod equals pod.Id into pod2
-                    //from pod in pod2.DefaultIfEmpty()
-                    //join pol in pols on masterBill.Pol equals pol.Id into pol2
-                    //from pol in pol2.DefaultIfEmpty()
-                    //join creator in creators on masterBill.UserCreated equals creator.Id into creator2
-                    //from creator in creator2.DefaultIfEmpty()
+                        //join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
+                        //from coloader in coloader2.DefaultIfEmpty()
+                        //join agent in agents on masterBill.AgentId equals agent.Id into agent2
+                        //from agent in agent2.DefaultIfEmpty()
+                        //join pod in pods on masterBill.Pod equals pod.Id into pod2
+                        //from pod in pod2.DefaultIfEmpty()
+                        //join pol in pols on masterBill.Pol equals pol.Id into pol2
+                        //from pol in pol2.DefaultIfEmpty()
+                        //join creator in creators on masterBill.UserCreated equals creator.Id into creator2
+                        //from creator in creator2.DefaultIfEmpty()
                     select new CsTransactionModel
                     {
                         Id = masterBill.Id,
@@ -1272,12 +1272,12 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Expression<Func<CsTransaction, bool>> query = q => true;
             if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
-                && string.IsNullOrEmpty(criteria.MAWB) && string.IsNullOrEmpty(criteria.HWBNo) 
+                && string.IsNullOrEmpty(criteria.MAWB) && string.IsNullOrEmpty(criteria.HWBNo)
                 && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.SaleManId)
                 && string.IsNullOrEmpty(criteria.SealNo) && string.IsNullOrEmpty(criteria.ContainerNo)
                 && criteria.FromDate == null && criteria.ToDate == null
                 && string.IsNullOrEmpty(criteria.MarkNo) && string.IsNullOrEmpty(criteria.CreditDebitNo)
-                && string.IsNullOrEmpty(criteria.SoaNo) && string.IsNullOrEmpty(criteria.ColoaderId) 
+                && string.IsNullOrEmpty(criteria.SoaNo) && string.IsNullOrEmpty(criteria.ColoaderId)
                 && string.IsNullOrEmpty(criteria.AgentId) && string.IsNullOrEmpty(criteria.BookingNo)
                 && string.IsNullOrEmpty(criteria.UserCreated)
                 && criteria.FromServiceDate == null && criteria.ToServiceDate == null)
@@ -1290,7 +1290,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         public IQueryable<CsTransactionModel> TakeShipments(IQueryable<CsTransactionModel> masterBills)
-        {            
+        {
             var coloaders = catPartnerRepo.Get(x => x.PartnerGroup.Contains("CARRIER"));
             var agents = catPartnerRepo.Get(x => x.PartnerGroup.Contains("AGENT"));
             var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
@@ -1298,7 +1298,8 @@ namespace eFMS.API.Documentation.DL.Services
             var creators = sysUserRepo.Get();
             var csLinkCharges = csLinkChargeRepository.Get();
 
-            masterBills.ToList().ForEach(fe => {
+            masterBills.ToList().ForEach(fe =>
+            {
                 fe.SupplierName = coloaders.FirstOrDefault(x => x.Id == fe.ColoaderId)?.ShortName;
                 fe.AgentName = agents.FirstOrDefault(x => x.Id == fe.AgentId)?.ShortName;
                 fe.PODName = pods.FirstOrDefault(x => x.Id == fe.Pod)?.NameEn;
@@ -1306,7 +1307,7 @@ namespace eFMS.API.Documentation.DL.Services
                 fe.CreatorName = creators.FirstOrDefault(x => x.Id == fe.UserCreated)?.Username;
                 fe.IsLinkFee = csLinkCharges.Any(x => x.JobNoLink == fe.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
             });
-            
+
             return masterBills;
         }
 
@@ -2401,7 +2402,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 // Bill Instruction
-                if(siDetail != null)
+                if (siDetail != null)
                 {
                     siDetail.JobId = transaction.Id;
                     siDetail.IssuedUser = transaction.UserCreated;
@@ -2433,7 +2434,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         HandleState hsSurcharges = csShipmentSurchargeRepo.Add(surcharges, false);
                         HandleState addSurcharge = csShipmentSurchargeRepo.SubmitChanges();
-                        if(addSurcharge.Success)
+                        if (addSurcharge.Success)
                         {
                             surchargeIds = surcharges.Select(x => x.Id).ToList();
                         }
@@ -2445,7 +2446,7 @@ namespace eFMS.API.Documentation.DL.Services
                         freighchargesRepository.SubmitChanges();
                     }
 
-                    if(siDetail != null)
+                    if (siDetail != null)
                     {
                         HandleState hsBillSI = shippingInstructionServiceRepo.Add(siDetail, false);
                         shippingInstructionServiceRepo.SubmitChanges();
@@ -2453,7 +2454,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
                     {
                         var DataAirwayBilss = airwaybillRepository.Get(x => x.JobId == model.Id).FirstOrDefault();
-                        if(DataAirwayBilss != null)
+                        if (DataAirwayBilss != null)
                         {
                             var DataDimensionDetail = dimensionDetailRepository.Get(x => x.AirWayBillId == DataAirwayBilss.Id).ToList();
                             var DataOtherCharge = shipmentOtherChargeService.Get(x => x.JobId == model.Id).ToList();
@@ -2478,7 +2479,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                                 if (DataOtherCharge != null)
                                 {
-                                    DataOtherCharge.ForEach(x => {
+                                    DataOtherCharge.ForEach(x =>
+                                    {
                                         x.UserModified = currentUser.UserID;
                                         x.DatetimeModified = DateTime.Now;
                                         x.Id = Guid.NewGuid();
@@ -2529,12 +2531,12 @@ namespace eFMS.API.Documentation.DL.Services
             return charges;
         }
 
-        private string SetDefaultOnboard(string polName, string country,DateTime? etd)
+        private string SetDefaultOnboard(string polName, string country, DateTime? etd)
         {
             string value = string.Empty;
             if (etd != null && etd.HasValue)
             {
-                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName,country, etd.Value.ToString("MMM dd, yyyy"));
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName, country, etd.Value.ToString("MMM dd, yyyy"));
             }
             else
             {
@@ -2751,6 +2753,11 @@ namespace eFMS.API.Documentation.DL.Services
                     item.VoucherIdredate = null;
                     item.CombineBillingNo = null;
                     item.ObhcombineBillingNo = null;
+                    
+                    if (item.IsRefundFee == true)
+                    {
+                        item.PaymentObjectId = shipment.ColoaderId;
+                    }
 
                     surCharges.Add(item);
                 }
@@ -2937,7 +2944,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             revenue = surcharge.Total;
                         }
-                        
+
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo?.ToUpper(); //JobNo of shipment
