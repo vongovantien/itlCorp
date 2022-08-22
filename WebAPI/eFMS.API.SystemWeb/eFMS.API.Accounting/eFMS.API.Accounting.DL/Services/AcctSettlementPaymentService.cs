@@ -2455,6 +2455,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var settlementApprove = mapper.Map<AcctApproveSettlement>(approve);
                 var settlementPayment = DataContext.Get(x => x.SettlementNo == approve.SettlementNo).FirstOrDefault();
+                approve.Id = settlementPayment.Id;
 
                 if (!string.IsNullOrEmpty(approve.SettlementNo))
                 {
