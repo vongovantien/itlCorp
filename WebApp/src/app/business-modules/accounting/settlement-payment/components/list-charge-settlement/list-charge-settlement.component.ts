@@ -350,14 +350,14 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 return;
             }
 
-            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.linkChargeId);
+            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.isSelected && surcharge.linkChargeId);
             if (!!checkChargeLinks.length) {
                 this._toastService.warning('Charge already linked charge');
                 return;
             }
 
             if (!!surchargeSelected.length) {
-                this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected && surcharge.chargeAutoRated);
+                this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
             } else {
                 this._toastService.warning(`Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
                 return;
@@ -385,7 +385,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 if (charge.isFromShipment) {
                     charge.isSelected = true;
                 }
-                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued && !charge.chargeAutoRated) {
+                if (!charge.isFromShipment && !charge.isLocked && charge.hasNotSynce && !charge.hadIssued && !charge.linkChargeId && !charge.chargeAutoRated) {
                     charge.isSelected = true;
                 }
             } else {
