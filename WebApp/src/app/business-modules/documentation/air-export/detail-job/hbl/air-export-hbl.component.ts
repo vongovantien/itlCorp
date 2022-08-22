@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -28,10 +28,11 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         protected _progressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _sortService: SortService,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _catalogueRepo: CatalogueRepo
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
 
     gotoList() {

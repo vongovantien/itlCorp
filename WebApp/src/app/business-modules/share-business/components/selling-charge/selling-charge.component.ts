@@ -10,7 +10,7 @@ import { CsShipmentSurcharge, Charge, Unit } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, first, startWith } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
@@ -76,9 +76,17 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getPartner() {
-        this._store.dispatch(LoadListPartnerForKeyInSurcharge(
-            { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId })
-        );
+        this._catalogueRepo.getAgreement(
+            { partnerId: this.hbl.customerId, status: true, salesmanId: this.hbl.saleManId, service: this.serviceTypeId }
+        )
+            .subscribe(
+                (res) => {
+                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                        { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId, contractType: res[0]?.contractType })
+                    );
+                }
+            );
+
         this._store.select(getPartnerForKeyingChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((partners: any[]) => {

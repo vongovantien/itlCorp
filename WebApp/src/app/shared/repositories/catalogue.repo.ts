@@ -172,14 +172,9 @@ export class CatalogueRepo {
             }, null, { "hideSpinner": "true" });
     }
 
-    getPartnerForKeyingCharge(active: boolean = true, service: string = null, office: string = null, salemanId: string = null) {
+    getPartnerForKeyingCharge(body) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetPartnerForKeyingCharge`,
-            {
-                active: active,
-                service: service,
-                office: office,
-                salemanId: salemanId
-            }, null, { "hideSpinner": "true" });
+            body, null, { "hideSpinner": "true" });
     }
 
     getSalemanIdByPartnerId(partnerId: string, jobId: string = null) {

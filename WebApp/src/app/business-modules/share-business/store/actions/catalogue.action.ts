@@ -10,6 +10,7 @@ export interface ISearchPartnerForKeyInSurcharge {
     service: string;
     office: string;
     salemanId: string;
+    [key: string]: any;
 }
 
 export const LoadListPartnerForKeyInSurcharge = createAction(ShareBussinessCatalogueActionTypes.LOAD_PARTNER_KEYIN_CHARGE, props<ISearchPartnerForKeyInSurcharge>());

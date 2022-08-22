@@ -7,7 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     public class CatContractCriteria
     {
         public string All { get; set; }
-        public string Saleman_ID { get; set; }
+        public string SalesmanId { get; set; }
         public Guid Office { get; set; }
         public Guid Company { get; set; }
         public bool? Status { get; set; }
@@ -15,5 +15,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? EffectDate { get; set; }
         public string PartnerId { get; set; }
         public bool? IsGetChild { get; set; }
+        public string Service { get; set; }
     }
 }

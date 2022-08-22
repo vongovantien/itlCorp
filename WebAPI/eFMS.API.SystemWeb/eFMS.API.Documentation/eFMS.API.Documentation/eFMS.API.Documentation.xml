@@ -1108,6 +1108,14 @@
             <param name="currency"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.AutoRateReplicate(System.String,System.String)">
+            <summary>
+            Calling AutoRateReplicate
+            </summary>
+            <param name="settleNo">Settlement Code</param>
+            <param name="jobNo">Job No</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.GetOutsourcingRegcognising(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">
             <summary>
             get the list of countries by conditions

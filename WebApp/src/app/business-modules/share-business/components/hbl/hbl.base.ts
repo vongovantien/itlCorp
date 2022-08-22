@@ -10,14 +10,14 @@ import { NgProgress } from "@ngx-progressbar/core";
 import { ViewChild, Directive } from "@angular/core";
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
-import { DocumentationRepo } from "@repositories";
+import { CatalogueRepo, DocumentationRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
 import { takeUntil, catchError, finalize, map, switchMap } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants } from '@constants';
 
 
 @Directive()
@@ -56,7 +56,8 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         protected _toastService: ToastrService,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        protected _router: Router
+        protected _router: Router,
+        protected _catalogueRepo: CatalogueRepo
 
     ) {
         super();
@@ -202,15 +203,40 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                     this._store.dispatch(new GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
                     break;
                 case 'SELL':
-                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
-                        { office: (this.selectedHbl as any)?.officeId, salemanId: (this.selectedHbl as any).saleManId, service: this.selectedHbl.transactionType })
-                    );
+                    this._catalogueRepo.getAgreement(
+                        { partnerId: this.selectedHbl.customerId, status: true, salesmanId: this.selectedHbl.saleManId, service: this.selectedHbl.transactionType }
+                    )
+                        .subscribe(
+                            (res) => {
+                                this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                                    {
+                                        office: (this.selectedHbl as any)?.officeId,
+                                        salemanId: (this.selectedHbl as any).saleManId,
+                                        service: this.selectedHbl.transactionType,
+                                        contractType: res[0]?.contractType
+                                    })
+                                );
+                            }
+                        )
+
                     this._store.dispatch(new GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
                     break;
                 case 'OBH':
-                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
-                        { office: (this.selectedHbl as any)?.officeId, salemanId: (this.selectedHbl as any).saleManId, service: this.selectedHbl.transactionType })
-                    );
+                    this._catalogueRepo.getAgreement(
+                        { partnerId: this.selectedHbl.customerId, status: true, salesmanId: this.selectedHbl.saleManId, service: this.selectedHbl.transactionType }
+                    )
+                        .subscribe(
+                            (res) => {
+                                this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                                    {
+                                        office: (this.selectedHbl as any)?.officeId,
+                                        salemanId: (this.selectedHbl as any).saleManId,
+                                        service: this.selectedHbl.transactionType,
+                                        contractType: res[0]?.contractType
+                                    })
+                                );
+                            }
+                        )
                     this._store.dispatch(new GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
                     break;
                 default:

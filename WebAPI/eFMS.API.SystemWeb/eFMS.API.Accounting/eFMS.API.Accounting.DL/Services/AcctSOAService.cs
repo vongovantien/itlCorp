@@ -3698,7 +3698,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             isValid = false;
                         }
-                        var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo);
+                        var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
                         var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
                         var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID );
                         if(!hasConfirm)

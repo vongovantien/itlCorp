@@ -2561,6 +2561,10 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
             }
+            if (criteria.ContractType == "Prepaid")
+            {
+                queryContract = queryContract.And(x => x.ContractType == criteria.ContractType);
+            }
             IQueryable<CatContract> contractCustomers = contractRepository.Get(queryContract);
 
             var d2 = from p in dataCustomers
