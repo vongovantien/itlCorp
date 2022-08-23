@@ -507,6 +507,26 @@
                                         [value]="charge.paidDate | date: 'dd/MM/yyyy'">
                                 </div>
                             </td>
+                            <td>
+                                <ng-container *ngIf="(!!charge.debitNo
+                                || !!charge.debitNo
+                                || !!charge.soano
+                                || !!charge.settlementCode
+                                || !!charge.voucherId
+                                || !!charge.invoiceNo
+                                || !!charge.voucherIddate
+                                || !charge.isFromShipment
+                                || !!charge.linkChargeId
+                                || !!charge.linkFee
+                                || (isLocked | async) === true);else refundFeeTemplate">
+                                    <app-switch [(ngModel)]="charge.isRefundFee" disabled>
+                                    </app-switch>
+                                </ng-container>
+                                <ng-template #refundFeeTemplate>
+                                    <app-switch [(ngModel)]="charge.isRefundFee" (change)="onChangeRefundFee(charge)">
+                                    </app-switch>
+                                </ng-template>
+                            </td>
                         </tr>
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
@@ -534,7 +554,6 @@
         <span><i class="la la-edit"></i><span> View Detail</span></span>
     </div>
 </app-context-menu>
-
 <confirm-popup [body]="'Are you sure want to delete this Charge'" (onSubmit)="onDeleteShipmentSurcharge('SELL')">
 </confirm-popup>
 <info-popup #detailLinkFeePopup></info-popup>
