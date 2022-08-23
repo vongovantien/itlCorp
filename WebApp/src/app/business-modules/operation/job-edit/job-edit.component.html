@@ -30,7 +30,7 @@
     <ng-container *ngIf="(opsTransaction?.isLocked === false) || isDuplicate">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()"
-            *ngIf="opsTransaction.permission.allowDelete && !isDuplicate && !opsTransaction.replicatedId  && !opsTransaction.isLinkFee"
+            *ngIf="opsTransaction?.permission?.allowDelete && !isDuplicate && !opsTransaction.replicatedId  && !opsTransaction.isLinkFee  && opsTransaction?.currentStatus !== 'Finish'"
             title="Shipment was deleted">
             <span>
                 <i class="la la-trash"></i>
@@ -60,6 +60,18 @@
             </span>
         </button>
 
+    </ng-container>
+    <ng-container>
+        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
+            *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate" (click)="saveShipment()"
+            [disabled]="tab !== 'job-edit'">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
     </ng-container>
 
     <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=handleCancelForm()></app-default-button>

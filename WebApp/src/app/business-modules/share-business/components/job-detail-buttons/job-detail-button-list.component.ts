@@ -22,7 +22,9 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
 
     constructor() { super(); }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+    }
 
     lockShipment() {
         this.onLock.emit();
