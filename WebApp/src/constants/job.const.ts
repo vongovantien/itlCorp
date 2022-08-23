@@ -12,7 +12,7 @@ export class JobConstants {
     public static COMMON_DATA = {
         FREIGHTTERMS: <string[]>['Collect', 'Prepaid'],
 
-        SHIPMENTTYPES: <string[]>['Freehand', 'Nominated', 'Freehand & Nominated'],
+        SHIPMENTTYPES: <string[]>['Freehand', 'Nominated'],
 
         BILLOFLADINGS: <string[]>['Copy', 'Original', 'Sea Waybill', 'Surrendered'],
 
