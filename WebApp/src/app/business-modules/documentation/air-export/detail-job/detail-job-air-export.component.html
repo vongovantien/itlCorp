@@ -25,12 +25,21 @@
                         </div>
                         <ng-container *ngIf="!shipmentDetail.isLocked">
                             <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">
-                                <button class="btn btn-info  m-btn--icon m-btn--uppercase" type="button"
+                                <!-- <button class="btn btn-info  m-btn--icon m-btn--uppercase" type="button"
                                     (click)="showSyncHBL()">
                                     <span><i class="la la-refresh"></i>
                                         <span> Sync HAWB </span>
                                     </span>
-                                </button>
+                                </button> -->
+                                <div class="dropdown m-dropdown m-dropdown--inline">
+                                    <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">
+                                        Generate Infor<span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item pointer" (click)="showSyncHBL()">Sync HAWB</a>
+                                        <a class="dropdown-item pointer" (click)="updateFlightInfor()">Flight Infor</a>
+                                    </div>
+                                </div>
                             </div>
                         </ng-container>
                     </div>

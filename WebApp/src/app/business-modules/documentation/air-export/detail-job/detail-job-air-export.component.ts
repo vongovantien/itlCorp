@@ -537,5 +537,23 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this.viewContainerRef.viewContainerRef.clear();
             });
     }
+
+    updateFlightInfor() {
+        this._documentRepo.updateFlightInfo(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: any) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
+    }
 }
 

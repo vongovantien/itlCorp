@@ -30,6 +30,12 @@ export class DocumentationRepo {
         );
     }
 
+    updateFlightInfo(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteHbl(id: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Delete`, { id: id }).pipe(
             catchError((error) => throwError(error)),
