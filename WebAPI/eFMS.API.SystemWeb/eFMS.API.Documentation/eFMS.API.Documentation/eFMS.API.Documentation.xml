@@ -764,7 +764,7 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Import(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
             <summary>
-            import transaction
+            import transaction - save duplicate job
             </summary>
             <param name="model"></param>
             <returns></returns>
@@ -1106,6 +1106,14 @@
             </summary>
             <param name="jobId"></param>
             <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.AutoRateReplicate(System.String,System.String)">
+            <summary>
+            Calling AutoRateReplicate
+            </summary>
+            <param name="settleNo">Settlement Code</param>
+            <param name="jobNo">Job No</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.GetOutsourcingRegcognising(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">
