@@ -263,7 +263,7 @@ export class ExportRepo {
     }
 
     exportHawbAirwayBill(hblid: string, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportHAWBAirExport?hblid=${hblid}&officeId=${officeId}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportHAWBAirExport?hblid=${hblid}&officeId=${officeId}`, null, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

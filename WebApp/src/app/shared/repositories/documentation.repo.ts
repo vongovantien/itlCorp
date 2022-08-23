@@ -264,12 +264,13 @@ export class DocumentationRepo {
     }
 
     getListHouseBillOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/QueryData`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/QueryData`, data, null, { "hideSpinner": "true" })
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
     }
 
     checkViewDetailHblPermission(id: string) {
@@ -755,7 +756,7 @@ export class DocumentationRepo {
     }
 
     generateHBLNo(transactionTypeEnum: number) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
