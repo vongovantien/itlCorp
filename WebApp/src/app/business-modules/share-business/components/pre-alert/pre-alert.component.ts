@@ -219,7 +219,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         // Export Report Arrival Notice to PDF
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-                if (this.isPreAlert) {
+                if (this.isArrivalNotice) {
                     this.isExitsArrivalNotice = true;
                     this.isCheckedArrivalNotice = true;
 
@@ -227,7 +227,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
-                if (this.name === "Pre Alert") {
+                if (this.isPreAlert) {
                     this.checkExistManifestExport();
                 }
                 break;
