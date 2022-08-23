@@ -18,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace eFMS.API.Accounting.DL.Services
     public class AcctSOAService : RepositoryBase<AcctSoa, AcctSoaModel>, IAcctSOAService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly IContextBase<OpsTransaction> opsTransactionRepo;
@@ -64,6 +66,7 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
             ICurrentUser user,
+            IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<OpsTransaction> opsTransaction,
@@ -93,6 +96,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
+            stringLocalizer = localizer;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             catCurrencyExchangeRepo = catCurrencyExchange;
             opsTransactionRepo = opsTransaction;
@@ -3731,7 +3735,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if(error == 1)
                     {
-                        messError = string.Format(@"invalid soa, Please issue debit and confirm prepaid");
+                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_CONFIRM];
                     }
 
                     return new HandleState((object)messError);

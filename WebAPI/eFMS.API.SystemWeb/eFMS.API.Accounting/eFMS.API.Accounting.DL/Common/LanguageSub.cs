@@ -194,5 +194,8 @@ namespace eFMS.API.Accounting.DL.Common
         #region Receipt
         public static readonly string MSG_RECEIPT_HAVE_PAYMENT_PAID = "MSG_RECEIPT_HAVE_PAYMENT_PAID";
         #endregion
+
+        public static readonly string MSG_SOA_DEBIT_PREPAID_NOT_CONFIRM = "MSG_SOA_DEBIT_PREPAID_NOT_CONFIRM";
+
     }
 }
