@@ -3673,7 +3673,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (soa.Type == AccountingConstants.TYPE_SOA_DEBIT)
             {
-                CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer && x.Active == true && (x.IsExpired == false || x.IsExpired == null))
+                CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer 
+                && x.Active == true && (x.IsExpired == false || x.IsExpired == null)
+                && (string.IsNullOrEmpty(soa.SalemanId) ? true : x.SaleManId == soa.SalemanId))
                    .OrderBy(x => x.ContractType)
                    .FirstOrDefault();
                 CatPartner partner = catPartnerRepo.Get(x => x.Id == soa.Customer)?.FirstOrDefault();
@@ -3701,6 +3703,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if(!hasIssuedDebit)
                         {
                             isValid = false;
+                            error = 1;
                         }
                         var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
                         var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
@@ -3708,11 +3711,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if(!hasConfirm)
                         {
                             isValid = false;
-                        }
-
-                        if(!isValid)
-                        {
-                            error = 1;
+                            error = 2;
                         }
                         break; 
                     //case "Official":
@@ -3735,7 +3734,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if(error == 1)
                     {
-                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_CONFIRM];
+                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_ISSUED_DEBIT, partner.ShortName];
+                    }
+                    if (error == 2)
+                    {
+                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED];
                     }
 
                     return new HandleState((object)messError);

@@ -3418,7 +3418,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (debit == null) continue;
                             if(debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                             {
-                                messageError = "Existing prepaid debit! Please you check again!";
+                                messageError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED];
                                 break;
                             }
                         }

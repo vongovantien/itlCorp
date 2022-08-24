@@ -143,6 +143,7 @@
 
   // ----------------Receipt
   "MSG_RECEIPT_HAVE_PAYMENT_PAID": "Phiếu thu có hóa đơn đã thanh toán, Vui lòng xóa ra khỏi phiếu",
-  "MSG_SOA_DEBIT_PREPAID_NOT_CONFIRM": "SOA có khoản ghi nợ trả trước chưa được AR xác nhận, vui lòng đợi xác nhận từ AR"
+  "MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED": "SOA có khoản ghi nợ trả trước chưa được AR xác nhận, vui lòng đợi xác nhận từ AR",
+  "MSG_SOA_DEBIT_PREPAID_NOT_ISSUED_DEBIT": "Hợp đồng của {0} là trả trước. Vui xuất ghi nợ trả trước lòng đợi xác nhận từ AR"
 
 }

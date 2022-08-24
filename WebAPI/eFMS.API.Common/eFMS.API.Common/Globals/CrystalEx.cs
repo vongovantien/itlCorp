@@ -93,6 +93,7 @@ namespace eFMS.API.Common.Globals
             switch (format)
             {
                 case ExportFormatType.NoFormat:
+                    _extension = ".pdf";
                     break;
                 case ExportFormatType.CrystalReport:
                     break;
