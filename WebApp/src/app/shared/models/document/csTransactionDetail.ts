@@ -117,6 +117,7 @@ export class CsTransactionDetail {
     receivedBillTime: any = null;
     officeId: string = null;
     companyId: string = null;
+    jobStatus: string = null;
 
     constructor(object?: any) {
         const self = this;

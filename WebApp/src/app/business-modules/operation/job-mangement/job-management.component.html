@@ -97,7 +97,8 @@
                                                             <i class="fa fa-lock"></i>
                                                         </button>
 
-                                                        <ng-container *ngIf="!item.isLocked && !item.replicatedId">
+                                                        <ng-container
+                                                            *ngIf="!item.isLocked && !item.replicatedId && !item.isLinkFee && item?.currentStatus !== 'Finish'">
                                                             <app-permission-button (onClick)="deleteSipment(item)"
                                                                 type="delete" [user]="item.userCreated">
                                                             </app-permission-button>
@@ -266,5 +267,6 @@
         <span>Outsourcing Recognising</span>
     </a>
 </app-dropdown>
+
 
 <link-charge-from-job-rep></link-charge-from-job-rep>

@@ -549,6 +549,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.TransactionType = shipment.TransactionType;
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
+                    detail.JobStatus = shipment.CurrentStatus;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
                     detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;
