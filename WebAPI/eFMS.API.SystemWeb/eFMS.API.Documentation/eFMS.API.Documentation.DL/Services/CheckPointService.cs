@@ -611,7 +611,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         public bool CheckNoProfitShipment(string jobNo)
         {
-            var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == model.JobNo);
+            var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
             var buyAmount = surcharges.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
             var sellAmount = surcharges.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
             if (sellAmount - buyAmount > 0)
