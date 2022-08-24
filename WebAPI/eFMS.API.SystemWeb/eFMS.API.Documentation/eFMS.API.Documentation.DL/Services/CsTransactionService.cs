@@ -2670,8 +2670,6 @@ namespace eFMS.API.Documentation.DL.Services
             transaction.CurrentStatus = TermData.Processing;
             transaction.Active = true;
             transaction.IsLocked = false; // allow duplicate job was locked.
-            transaction.Ata = null;
-            transaction.Atd = null;
             return transaction;
         }
 
