@@ -1,10 +1,11 @@
+import { CsTransaction } from '@models';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
-import { CsTransactionDetail, HouseBill } from '@models';
+import { CsTransactionDetail, HouseBill, OpsTransaction } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
@@ -69,7 +70,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             }
         });
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-
 
         // * Shortcut
         //#region --- Shortcut ---

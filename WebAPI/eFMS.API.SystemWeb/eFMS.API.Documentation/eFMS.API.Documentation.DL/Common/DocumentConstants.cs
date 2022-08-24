@@ -67,6 +67,7 @@
 
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
+        public static readonly string CURRENT_STATUS_FINISH = "Finish";
         public static readonly string SHIPMENT_TYPE_NOMINATED = "Nominated";
         public static readonly string SHIPMENT_TYPE_FREEHAND = "Freehand";
 

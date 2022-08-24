@@ -785,7 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var userCurrent = currentUser.UserID;
             var advanceRequestJob = acctAdvanceRequestRepository.Get().Select(x => new { x.JobId, x.Mbl, x.Hblid }).ToList();
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_FINISH && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var customs = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
@@ -819,7 +819,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => new { g.MBL, g.HBLID }).Where(x => x.Count() > 1).Select(s => s.FirstOrDefault());
             }
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_FINISH && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
