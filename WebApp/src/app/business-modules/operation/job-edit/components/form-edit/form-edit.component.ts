@@ -18,7 +18,8 @@ import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
     selector: 'job-mangement-form-edit',
-    templateUrl: './form-edit.component.html'
+    templateUrl: './form-edit.component.html',
+    styleUrls: ['./form-edit.component.scss']
 })
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
 

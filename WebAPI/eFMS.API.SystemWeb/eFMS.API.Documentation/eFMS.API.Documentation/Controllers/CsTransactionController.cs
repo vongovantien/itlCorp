@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ISysImageService sysImageService;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+        private readonly ICheckPointService checkPointService;
         /// <summary>
         /// constructor
         /// </summary>
@@ -253,6 +254,15 @@ namespace eFMS.API.Documentation.Controllers
             if (msgCheckUpdateMawb.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
+            if (model.NoProfit == true)
+            {
+                var allowNoProfit = checkPointService.CheckNoProfitShipment(model.JobNo);
+                if (!allowNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + model.JobNo + " have profit, you can not check No Profit." });
+                }
             }
 
             model.UserModified = currentUser.UserID;

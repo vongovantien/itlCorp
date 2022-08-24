@@ -6251,7 +6251,13 @@ namespace eFMS.API.Accounting.DL.Services
                 if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
                 {
                     var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
+                    var validJobNo = new List<string>();
+                    var opsNoProfit = opsTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    var serviceNoProfit = csTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    validJobNo.AddRange(opsNoProfit);
+                    validJobNo.AddRange(serviceNoProfit);
+
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && validJobNo.Any(z => z == x.JobNo));
                     var listSipment = new List<string>();
                     var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
                     foreach (var job in shipmentGrp)

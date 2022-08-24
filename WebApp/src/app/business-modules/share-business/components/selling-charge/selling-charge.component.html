@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async)">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) || !noProfit">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                         <ng-container *ngIf="allowLinkFee">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
@@ -511,7 +511,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <tr *ngIf="(isLocked | async) === false">
+                    <tr *ngIf="(isLocked | async) === false || !noProfit">
                         <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                             <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"

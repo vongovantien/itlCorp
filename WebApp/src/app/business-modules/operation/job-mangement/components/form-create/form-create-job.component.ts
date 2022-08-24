@@ -193,7 +193,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             agentId: [],
             billingOpsId: [this.userLogged.id, Validators.required],
             salemansId: [null, Validators.required],
-            isReplicate: [false]
+            isReplicate: [false],
+            noProfit: [false]
 
         }, { validator: FormValidators.comparePort });
 

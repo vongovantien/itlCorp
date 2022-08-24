@@ -603,5 +603,22 @@ namespace eFMS.API.Documentation.DL.Services
 
             return partners;
         }
+
+        /// <summary>
+        /// Check if shipment allow no profit
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool CheckNoProfitShipment(string jobNo)
+        {
+            var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == model.JobNo);
+            var buyAmount = surcharges.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+            var sellAmount = surcharges.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+            if (sellAmount - buyAmount > 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
