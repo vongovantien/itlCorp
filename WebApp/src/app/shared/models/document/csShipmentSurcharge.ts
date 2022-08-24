@@ -92,6 +92,7 @@ export class CsShipmentSurcharge {
     vatPartnerShortName: string = null;
     officeId: string = null;
     transactionType: string = null;
+    isRefundFee: boolean = null;
 
     // * Custom
     duplicateCharge: boolean = false;

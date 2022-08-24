@@ -2113,7 +2113,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 List<Guid> hblIds = tranDetailRepository.Get(x => x.JobId == jobId).Select(x => x.Id).ToList();
                 surcharges = DataContext.Get(x => hblIds.Contains(x.Hblid));
-
             }
 
             result = surcharges.Any(x => x.IsRefundFee == true);

@@ -55,6 +55,10 @@ namespace eFMS.API.Documentation.DL.Common
     }
     public static class TermData
     {
+
+        public const string OpsTransition = "OpsTransition";
+        public const string CsTransition = "CsTransition";
+
         public static readonly string Canceled = "Canceled";
 
         public static readonly string InSchedule = "InSchedule";

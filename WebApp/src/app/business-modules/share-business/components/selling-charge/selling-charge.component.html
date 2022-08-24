@@ -133,10 +133,10 @@
                                     <ng-template #partnerTemplate>
                                         <input type="text" class="dropdown-toggle form-control"
                                             [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                            (click)="loadDynamicComoGrid(charge,i)">
+                                            [disabled]="isShowLoadingPartner || charge.isRefundFee ? 'disabled': null"
+                                            (click)="charge.isRefundFee !== true && loadDynamicComoGrid(charge,i)">
                                     </ng-template>
-                                    <combo-grid-icon (onDelete)="charge.paymentObjectId = null;
+                                    <combo-grid-icon *ngIf="charge.isRefundFee !== true" (onDelete)="charge.paymentObjectId = null;
                                             charge.partnerShortName = null"
                                         (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName
                                         && !charge.soano

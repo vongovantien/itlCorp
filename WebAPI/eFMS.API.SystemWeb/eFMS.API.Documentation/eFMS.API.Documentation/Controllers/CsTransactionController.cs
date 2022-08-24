@@ -222,6 +222,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Put(CsTransactionEditModel model)
         {
             currentUser.Action = "UpdateCsTransaction";
+            var currentJob = csTransactionService.Get(x => x.Id == model.Id).FirstOrDefault();
 
             if (!ModelState.IsValid) return BadRequest();
             if (!csTransactionService.Any(x => x.Id == model.Id))
@@ -233,6 +234,15 @@ namespace eFMS.API.Documentation.Controllers
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+
+            if (currentJob.ColoaderId != model.ColoaderId)
+            {
+                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.CsTransition);
+                if (checkExistRefundFee == true)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_REFUND_FEE_EXISTED] });
+                }
             }
 
             // Remove check etd, eta #15850

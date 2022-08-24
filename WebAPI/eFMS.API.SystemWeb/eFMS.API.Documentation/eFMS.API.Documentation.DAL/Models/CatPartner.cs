@@ -75,5 +75,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string CreditPayment { get; set; }
         public string BankName { get; set; }
         public string BankCode { get; set; }
+        public string Currency { get; set; }
+        public int? PaymentTerm { get; set; }
     }
 }

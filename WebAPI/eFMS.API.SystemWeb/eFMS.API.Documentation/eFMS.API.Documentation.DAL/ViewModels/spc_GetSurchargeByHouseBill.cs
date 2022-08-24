@@ -86,5 +86,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string LinkChargeId { get; set; }
         public string PaymentStatus { get; set; }
         public DateTime? PaidDate { get; set; }
+        public bool IsRefundFee { get; set; }
     }
 }
