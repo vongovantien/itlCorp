@@ -31,6 +31,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 export class AirImportDetailJobComponent extends AirImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
@@ -505,6 +506,10 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             });
     }
 
+    onUpdateFlightInfo() {
+        this.confirmPopup.show();
+    }
+
     updateFlightInfor() {
         this._documentRepo.updateFlightInfo(this.jobId)
             .pipe(
@@ -521,5 +526,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                     }
                 },
             );
+        this.confirmPopup.close();
     }
 }
