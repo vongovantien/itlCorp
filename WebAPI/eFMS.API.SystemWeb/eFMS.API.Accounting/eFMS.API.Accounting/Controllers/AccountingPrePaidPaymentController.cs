@@ -46,6 +46,20 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> Put([FromBody] List<AccountingPrePaidPaymentUpdateModel> model)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            if(model.First().Status == "Unpaid")
+            {
+                var isValid = prepaidService.ValidateRevertPayment(model.First().Id);
+                if(!isValid)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "SOA/DEBIT was synced, you cannot revert this payment" });
+                }
+            }
+
             HandleState hs = await prepaidService.UpdatePrePaidPayment(model);
 
             if (!hs.Success)

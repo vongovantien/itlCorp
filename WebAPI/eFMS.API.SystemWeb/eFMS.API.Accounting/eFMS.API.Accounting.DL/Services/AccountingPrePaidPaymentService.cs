@@ -223,5 +223,19 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        public bool ValidateRevertPayment(Guid Id)
+        {
+            var isValid = true;
+            var debit = DataContext.First(x => x.Id == Id);
+            if (debit == null) return false;
+            var surcharges = DC.CsShipmentSurcharge.Where(x => x.DebitNo == debit.Code);
+            if(surcharges.Count() > 0)
+            {
+                isValid = !surcharges.Any(x => (x.SyncedFrom == AccountingConstants.STATUS_SYNCED_SOA || x.SyncedFrom == AccountingConstants.STATUS_SYNCED_CDNOTE));
+            }
+
+            return isValid;
+        }
     }
 }

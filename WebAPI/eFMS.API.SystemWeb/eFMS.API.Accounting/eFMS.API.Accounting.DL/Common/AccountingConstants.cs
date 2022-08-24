@@ -178,6 +178,9 @@
         public static readonly string STATUS_INACTIVE = "Inactive";
 
         public static readonly string STATUS_SYNCED = "Synced";
+        public static readonly string STATUS_SYNCED_SOA = "SOA";
+        public static readonly string STATUS_SYNCED_SETTLEMENT = "SETTLEMENT";
+        public static readonly string STATUS_SYNCED_CDNOTE = "CDNOTE";
         public static readonly string STATUS_REJECTED = "Rejected";
 
         public static readonly string ACCOUNTANT_TYPE_DEBIT = "DEBIT";
