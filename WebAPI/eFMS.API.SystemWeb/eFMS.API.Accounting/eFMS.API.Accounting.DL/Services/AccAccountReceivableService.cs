@@ -671,6 +671,7 @@ namespace eFMS.API.Accounting.DL.Services
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
 
             var partnerContracts = QueryContractPartner(contracts, criteria);

@@ -448,8 +448,8 @@ namespace eFMS.API.Documentation.DL.Services
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
                         break;
                     case 5:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} has not issued debits or debits are not paid, please you check it again!",
-                            partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                        messError = string.Format(@"Contract of {0} is Prepaid. Please issue Prepaid Debit and wait AR confirm",
+                            partner?.ShortName);
                         break;
                     default:
                         break;
