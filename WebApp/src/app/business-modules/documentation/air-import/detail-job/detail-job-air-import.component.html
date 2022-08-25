@@ -36,7 +36,8 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item pointer" (click)="showSyncHBL()">Sync HAWB</a>
-                                        <a class="dropdown-item pointer" (click)="onUpdateFlightInfo()">Flight Infor</a>
+                                        <a class="dropdown-item pointer" (click)="showUpdateFlightInfo()">Flight
+                                            Infor</a>
                                     </div>
                                 </div>
                             </div>
@@ -88,5 +89,5 @@
 
 <ng-template inject></ng-template>
 
-<confirm-popup #confirmPopup body="Do you want to update Flight Info to HBL List" (onSubmit)="updateFlightInfor()">
-</confirm-popup>
+<!-- <confirm-popup #confirmPopup body="Do you want to update Flight Info to HBL List" (onSubmit)="updateFlightInfor()">
+</confirm-popup> -->

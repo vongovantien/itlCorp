@@ -32,7 +32,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-
+    confirmUpdateFlightInfo: string = 'Do you want to update Flight Info to HBL List ?';
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
     jobId: string;
@@ -506,8 +506,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             });
     }
 
-    onUpdateFlightInfo() {
-        this.confirmPopup.show();
+    showUpdateFlightInfo() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update Flight Infor',
+            body: this.confirmUpdateFlightInfo,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.updateFlightInfor();
+        })
     }
 
     updateFlightInfor() {

@@ -50,6 +50,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     Do you want to sync
     <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL, GW, CW, VW, Qty to HAWB ?<span>
     `;
+
+    confirmUpdateFlightInfo: string = 'Do you want to update Flight Info to HBL List ?';
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
@@ -422,6 +424,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         })
     }
 
+    showUpdateFlightInfo() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update Flight Infor',
+            body: this.confirmUpdateFlightInfo,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.updateFlightInfor();
+        })
+    }
+
     onSyncHBL() {
         this.formCreateComponent.isSubmitted = true;
 
@@ -539,9 +551,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             });
     }
 
-    onUpdateFlightInfo() {
-        this.confirmPopup.show();
-    }
+    // onUpdateFlightInfo() {
+    //     //this.confirmPopup.show();
+    // }
 
     updateFlightInfor() {
         this._documentRepo.updateFlightInfo(this.jobId)
@@ -560,7 +572,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 },
 
             );
-        this.confirmPopup.close();
+        //this.confirmPopup.close();
     }
 }
 
