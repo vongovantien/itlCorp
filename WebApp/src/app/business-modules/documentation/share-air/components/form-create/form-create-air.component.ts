@@ -243,10 +243,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             personIncharge: [],
             notes: [],
             mawb: ['', Validators.compose([
-                Validators.required,
-                Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                FormValidators.validateMAWB,
-                FormValidators.validateSpecialChar
+                // Validators.required,
+                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                // FormValidators.validateMAWB,
+                // FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([

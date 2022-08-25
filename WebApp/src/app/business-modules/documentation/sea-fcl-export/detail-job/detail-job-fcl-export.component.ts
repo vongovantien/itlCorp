@@ -30,7 +30,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;

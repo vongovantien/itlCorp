@@ -60,7 +60,6 @@ namespace eFMS.API.Documentation.Controllers
             ICsShipmentSurchargeService serviceSurcharge,
             IAccAccountReceivableService AccAccountReceivaService,
             IOptions<ApiServiceUrl> serviceUrl,
-            ICsTransactionDetailService transactionDetailService,
         ISysImageService imageService)
         {
             stringLocalizer = localizer;
@@ -159,7 +158,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            if(statusCode == 0)
+            if (statusCode == 0)
             {
                 return Ok();
             }
@@ -256,10 +255,10 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
-            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNtoF(model);
+            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model);
             if (msgCheckHasHBL.Length > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data=new { errorCode = 912 } });
+                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data = new { errorCode = 912 } });
             }
 
             model.UserModified = currentUser.UserID;
@@ -279,7 +278,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost("UploadFile")]
-        public IActionResult UploadFile([FromForm]IFormFile file)
+        public IActionResult UploadFile([FromForm] IFormFile file)
         {
             var s = JsonConvert.SerializeObject(file);
             return Ok(s);
@@ -294,7 +293,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
         [Authorize]
-        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId, bool? isTemp)
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required] Guid jobId, bool? isTemp)
         {
             DocumentFileUploadModel model = new DocumentFileUploadModel
             {
@@ -313,7 +312,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetFileAttachs")]
-        public IActionResult GetAttachedFiles([Required]Guid jobId)
+        public IActionResult GetAttachedFiles([Required] Guid jobId)
         {
             string id = jobId.ToString();
             var results = sysImageService.Get(x => x.ObjectId == id && x.IsTemp != true);
@@ -326,7 +325,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetFileAttachsPreAlert")]
-        public IActionResult GetAttachedFilesPreAlert([Required]Guid jobId)
+        public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
         {
             string id = jobId.ToString();
             var results = sysImageService.Get(x => x.ObjectId == id);
@@ -335,7 +334,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpPut("UpdateFilesToShipment")]
-        public IActionResult UpdateFilesToShipment([FromBody]List<SysImageModel> files)
+        public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
         {
             var result = sysImageService.UpdateFilesToShipment(files);
             return Ok(result);
@@ -343,7 +342,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]
-        public async Task<IActionResult> DeleteAttachedFile([Required]Guid id)
+        public async Task<IActionResult> DeleteAttachedFile([Required] Guid id)
         {
             HandleState hs = await sysImageService.DeleteFile(id);
             if (hs.Success)
@@ -355,7 +354,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteFileTempPreAlert/{jobId}")]
-        public async Task<IActionResult> DeleteFileTempPreAlert([Required]Guid jobId)
+        public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
         {
             HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
             if (hs.Success)
@@ -475,7 +474,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }

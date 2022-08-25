@@ -32,7 +32,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;

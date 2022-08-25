@@ -31,7 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};

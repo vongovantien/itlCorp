@@ -3566,20 +3566,23 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public string CheckHasHBLUpdateNtoF(CsTransactionEditModel model)
+        public string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model)
         {
             string errorMsg = string.Empty;
             var currentJob = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated" && csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
+            if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated")
             {
-                var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
-                tranDes.ForEach(x =>
+                if(csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
                 {
-                    if (catContractRepo.Get(y => y.PartnerId == x.CustomerId && y.SaleManId == x.SaleManId && y.SaleService.Contains(x.ServiceType)).FirstOrDefault().ShipmentType== "Nominated")
+                    var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
+                    tranDes.ForEach(x =>
                     {
-                        errorMsg += x.Hwbno + "; ";
-                    }
-                });
+                        if (catContractRepo.Get(y => y.PartnerId == x.CustomerId && y.SaleManId == x.SaleManId && y.SaleService.Contains(x.ServiceType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                        {
+                            errorMsg += x.Hwbno + "; ";
+                        }
+                    });
+                }
 
             }
             return errorMsg;
