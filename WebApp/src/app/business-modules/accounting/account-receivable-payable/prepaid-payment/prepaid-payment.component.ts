@@ -212,7 +212,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
             return;
         }
         if (selectedCd.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED) {
-            this._toast.warning(`${selectedCd.debitNote} had synced, Please recheck!`);
+            this._toast.warning(`${selectedCd.debitNote} was synced, you can not confirm this payment`);
             return;
         }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
