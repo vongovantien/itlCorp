@@ -62,6 +62,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     packageTypeId: AbstractControl;
     shipmentType: AbstractControl;
     note: AbstractControl;
+    noProfit: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -179,7 +180,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             commodityGroupId: this.opsTransaction.commodityGroupId,
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
-            note: this.opsTransaction.note
+            note: this.opsTransaction.note,
+            noProfit: this.opsTransaction.noProfit
         });
 
         this.customerName = this.opsTransaction.customerName;
@@ -239,6 +241,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             containerDescription: [null],
             packageTypeId: [null],
             note: [null],
+            noProfit: [false]
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -274,6 +277,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroupId = this.formEdit.controls['commodityGroupId'];
         this.shipmentType = this.formEdit.controls['shipmentType'];
         this.note = this.formEdit.controls['note'];
+        this.noProfit = this.formEdit.controls['noProfit'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {

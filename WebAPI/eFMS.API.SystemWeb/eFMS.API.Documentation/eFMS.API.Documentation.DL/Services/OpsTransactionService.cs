@@ -2000,7 +2000,6 @@ namespace eFMS.API.Documentation.DL.Services
                     model.IsLinkFee = null;
                     model.DateCreatedLinkJob = null;
                     model.UserCreatedLinkJob = null;
-                    model.NoProfit = false;
 
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 

@@ -6257,16 +6257,16 @@ namespace eFMS.API.Accounting.DL.Services
                     validJobNo.AddRange(opsNoProfit);
                     validJobNo.AddRange(serviceNoProfit);
 
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && validJobNo.Any(z => z == x.JobNo));
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
                     var listSipment = new List<string>();
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var job in shipmentGrp)
+                    var shipmentGrp = surcharges.GroupBy(x => x.Hblid);
+                    foreach (var shipment in shipmentGrp)
                     {
-                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
                         if (buyAmount > sellAmount)
                         {
-                            listSipment.Add(job.Key);
+                            listSipment.Add(shipment.FirstOrDefault().JobNo);
                         }
                     }
                     if (listSipment.Count > 0)

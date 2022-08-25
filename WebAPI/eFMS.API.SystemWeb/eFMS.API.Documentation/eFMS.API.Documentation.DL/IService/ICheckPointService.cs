@@ -17,7 +17,8 @@ namespace eFMS.API.Documentation.DL.IService
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         List<CheckPointPartnerHBLDataGroup> GetPartnerForCheckPointInShipment(Guid Id, string transactionType);
-        bool CheckNoProfitShipment(string jobNo);
+        bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked);
+        bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked);
     }
 
     public enum CHECK_POINT_TYPE

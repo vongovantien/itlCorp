@@ -41,7 +41,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
     @Input() allowLinkFee: boolean = false;
     @Input() isDuplicateJob: boolean = false;
-    @Input() noProfit: boolean = false;
 
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
     messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";

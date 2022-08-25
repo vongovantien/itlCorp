@@ -180,6 +180,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
+                        console.log('shipmentDetail', this.shipmentDetail)
                     }
                 },
             );

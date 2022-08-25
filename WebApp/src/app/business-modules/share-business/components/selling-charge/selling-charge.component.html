@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) || !noProfit">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) && (noProfit| async) === false">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                         <ng-container *ngIf="allowLinkFee">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
@@ -63,7 +63,7 @@
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="m--w-90 first table-actions-col fixed-side"
-                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true">
+                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true && (noProfit| async) === false">
                     </th>
                 </thead>
                 <tbody>
@@ -73,7 +73,7 @@
                             [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                             [contextMenu]="linkFeeContextMenu" [disableMenuContext]="!charge.linkFee"
                             (onTouch)="onSelectSurcharge(charge)">
-                            <ng-container *ngIf="(isLocked | async) === false">
+                            <ng-container *ngIf="(isLocked | async) === false && (noProfit| async) === false">
                                 <td class="table-actions-col fixed-side "
                                     [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge">
@@ -126,7 +126,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true ;else partnerTemplate">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName">
                                     </ng-container>
@@ -176,7 +177,8 @@
                                     || !charge.isFromShipment
                                     || !!charge.linkChargeId
                                     || !!charge.linkFee
-                                    || (isLocked | async) === true ;else chargeID">
+                                    || (isLocked | async) === true 
+                                    || (noProfit| async) === true;else chargeID">
                                     <div class="form-group">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.chargeNameEn">
@@ -226,7 +228,8 @@
                                                 || !charge.isFromShipment
                                                 || !!charge.linkChargeId
                                                 || !!charge.linkFee
-                                                || (isLocked | async) === true; else qtyHint">
+                                                || (isLocked | async) === true
+                                                || (noProfit| async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
                                                         {{(!!charge.quantityType && charge.quantityType !== 'null') ?
@@ -259,7 +262,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true; else unit">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true; else unit">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.unitCode">
                                     </ng-container>
@@ -288,7 +292,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true; else unitPrice">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true; else unitPrice">
                                         <input type="text" class="form-control" disabled [value]="charge.unitPrice"
                                             autoFormatCurrency>
                                     </ng-container>
@@ -311,7 +316,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true; else currency">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true; else currency">
                                         <select class="form-control" disabled>
                                             <option>{{charge.currencyId}}</option>
                                         </select>
@@ -338,7 +344,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true; else vatrate">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true; else vatrate">
                                         <input type="text" class="form-control" disabled [value]="charge.vatrate">
                                     </ng-container>
                                     <ng-template #vatrate>
@@ -401,7 +408,8 @@
                                         || !charge.isFromShipment
                                         || !!charge.linkChargeId
                                         || !!charge.linkFee
-                                        || (isLocked | async) === true;else exchangeDate">
+                                        || (isLocked | async) === true
+                                        || (noProfit| async) === true;else exchangeDate">
                                         <input type="text" class="form-control" disabled
                                             [value]="!!charge.exchangeDate && charge.exchangeDate.startDate ? (charge.exchangeDate.startDate | date: 'dd/MM/yyyy') : null ">
                                     </ng-container>
@@ -511,7 +519,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <tr *ngIf="(isLocked | async) === false || !noProfit">
+                    <tr *ngIf="(isLocked | async) === false && (noProfit| async) === false">
                         <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                             <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"

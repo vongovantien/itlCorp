@@ -27,6 +27,9 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> csSurchargeRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetail;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
+        private readonly IContextBase<AcctAdvanceRequest> advanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> advancePaymentRepository;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
 
         readonly string salemanBOD = string.Empty;
         readonly IQueryable<CsTransaction> csTransactions;
@@ -44,6 +47,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<CsShipmentSurcharge> csSurcharge,
             IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+            IContextBase<AcctAdvanceRequest> advanceRequest,
+            IContextBase<AcctAdvancePayment> advancePayment,
+            IContextBase<AcctSettlementPayment> settlementPayment,
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
@@ -58,6 +64,9 @@ namespace eFMS.API.Documentation.DL.Services
             this.csSurchargeRepository = csSurcharge;
             this.csTransactionDetail = csTransactionDetailRepo;
             sysSettingFlowRepository = sysSettingFlow;
+            advanceRequestRepository = advanceRequest;
+            advancePaymentRepository = advancePayment;
+            settlementPaymentRepository = settlementPayment;
 
             salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
@@ -605,20 +614,97 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// Check if shipment allow no profit
+        /// Check if shipment allow check no profit
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public bool CheckNoProfitShipment(string jobNo)
+        public bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked)
         {
-            var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
-            var buyAmount = surcharges.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-            var sellAmount = surcharges.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-            if (sellAmount - buyAmount > 0)
+            if (isCheked == true)
             {
-                return true;
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if (transaction == "CL")
+                {
+                    shipmentNoProfit = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+                else
+                {
+                    shipmentNoProfit = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+
+                if (surcharges.Count() > 0 && !shipmentNoProfit)
+                {
+                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
+                    foreach (var hblId in hblIds)
+                    {
+                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        if (sellAmount - buyAmount > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
-            return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Check if can uncheck no profit shipment
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <param name="isCheked"></param>
+        /// <returns></returns>
+        public bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked)
+        {
+            if (isCheked == false)
+            {
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if(transaction == "CL")
+                {
+                    shipmentNoProfit = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+                else
+                {
+                    shipmentNoProfit = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+
+                if (shipmentNoProfit) // Shipment with checked no profit
+                {
+                    // Check Advance
+                    var advanceNos = advanceRequestRepository.Get(x => x.JobId == jobNo).Select(x => x.AdvanceNo).Distinct().ToList();
+                    if (advanceNos.Count > 0)
+                    {
+                        var payees = advancePaymentRepository.Get(x => !string.IsNullOrEmpty(x.Payee) && advanceNos.Any(z => z == x.AdvanceNo)).Select(x => x.Payee);
+                        foreach (var payee in payees)
+                        {
+                            if (catPartnerRepository.Any(x => x.Id == payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Check Settlement
+                    var settleNos = surcharges.Where(x => !string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.SettlementCode).Distinct().ToList();
+                    if (settleNos.Count > 0)
+                    {
+                        var payees = settlementPaymentRepository.Get(x => !string.IsNullOrEmpty(x.Payee) && settleNos.Any(z => z == x.SettlementNo)).Select(x => x.Payee);
+                        foreach (var payee in payees)
+                        {
+                            if (catPartnerRepository.Any(x => x.Id == payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 }
