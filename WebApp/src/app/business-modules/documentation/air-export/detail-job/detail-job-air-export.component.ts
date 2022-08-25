@@ -51,7 +51,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL, GW, CW, VW, Qty to HAWB ?<span>
     `;
 
-    confirmUpdateFlightInfo: string = 'Do you want to update Flight Info to HBL List ?';
+    confirmUpdateFlightInfo: string = 'Do you want to sync Flight No, Flight Date, ETD, ETA to HAWB ?';
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
