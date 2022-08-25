@@ -1,10 +1,10 @@
+import { ShareDetailJobComponent } from '../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
-import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { CsTransaction } from '@models';
@@ -26,7 +26,7 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
     templateUrl: './create-job-air-export.component.html'
 })
 
-export class AirExportCreateJobComponent extends AppForm implements OnInit {
+export class AirExportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
@@ -39,7 +39,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         protected _router: Router,
         protected _store: Store<IShareBussinessState>
     ) {
-        super();
+        super(_toastService, _documenRepo);
         this.requestCancel = this.gotoList;
     }
 

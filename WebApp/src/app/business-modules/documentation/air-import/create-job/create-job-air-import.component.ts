@@ -1,3 +1,4 @@
+import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -27,7 +28,7 @@ import { InjectViewContainerRefDirective } from '@directives';
     templateUrl: './create-job-air-import.component.html'
 })
 
-export class AirImportCreateJobComponent extends AppForm implements OnInit {
+export class AirImportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
 
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -42,7 +43,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
         protected _cd: ChangeDetectorRef
     ) {
-        super();
+        super(_toastService, _documenRepo);
         this.requestCancel = this.gotoList;
     }
 

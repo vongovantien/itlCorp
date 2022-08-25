@@ -38,7 +38,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: CsTransaction;
+    //shipmentDetail: CsTransaction;
 
     dimensionDetails: DIM[];
 
@@ -116,7 +116,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     getDetailShipment(jobId: string) {
-        this._documenRepo.getDetailTransaction(jobId)
+        this._documentRepo.getDetailTransaction(jobId)
             .subscribe(
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
@@ -352,7 +352,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
