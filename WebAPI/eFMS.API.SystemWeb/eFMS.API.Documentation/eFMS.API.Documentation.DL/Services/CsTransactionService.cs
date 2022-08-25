@@ -3577,7 +3577,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
                     tranDes.ForEach(x =>
                     {
-                        if (catContractRepo.Get(y => y.PartnerId == x.CustomerId && y.SaleManId == x.SaleManId && y.SaleService.Contains(x.ServiceType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                        if (catContractRepo.Get(y => y.PartnerId == x.CustomerId && y.SaleManId == x.SaleManId && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                         {
                             errorMsg += x.Hwbno + "; ";
                         }
