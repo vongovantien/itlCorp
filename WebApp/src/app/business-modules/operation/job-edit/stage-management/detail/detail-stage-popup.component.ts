@@ -147,7 +147,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             description: form.value.description,
             deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
             status: form.value.status,
-            houseBill: form.value.houseBill
         };
         this._operationRepo.updateStageToJob(body).pipe(
             takeUntil(this.ngUnsubscribe),
@@ -191,18 +190,5 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             control.markAsUntouched({ onlySelf: true });
             control.markAsPristine({ onlySelf: true });
         }
-    }
-
-    getListHouseBillOfJob() {
-        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
-            catchError(this.catchError),
-            finalize(() => {
-                this._progressRef.complete();
-            })
-        ).subscribe(
-            (res: any) => {
-                console.log(res)
-            },
-        );
     }
 }
