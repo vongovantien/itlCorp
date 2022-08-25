@@ -255,7 +255,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         const hasSynced: boolean = cdList.some(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED);
         if (hasSynced) {
             const debitHasSynced: string = cdList.filter(x => x.syncStatus === AccountingConstants.SYNC_STATUS.SYNCED).map(a => a.debitNote).toString();
-            this._toast.warning(`${debitHasSynced} had synced, Please recheck!`);
+            this._toast.warning(`${debitHasSynced} was synced, you cannot revert this payment`);
             return;
         }
 

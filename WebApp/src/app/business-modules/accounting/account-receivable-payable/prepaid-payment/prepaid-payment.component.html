@@ -12,7 +12,7 @@
                 </tab>
                 <tab>
                     <ng-template tabHeading>
-                        <a routerLink="/home/accounting/account-receivable-payable" style="color:#6f727d">
+                        <a routerLink="/home/accounting/account-receivable-payable/summary" style="color:#6f727d">
                             AR Summary
                         </a>
                     </ng-template>
@@ -203,16 +203,10 @@
             </div>
         </div>
     </div>
-    <!-- <div class="menu-context__item" (click)="export(selectedCd, 'PDF')">
-        <span><i class="la la-download text-primary"></i><span>Export PDF</span></span>
-    </div>
-    <div class="menu-context__item" (click)="export(selectedCd, 'EXCEL')">
-        <span><i class="la la-download text-primary"></i><span>Export Excel</span></span>
-    </div> -->
 </app-context-menu>
 
 <app-dropdown #previewTpl>
-    <span class="dropdown-item pointer" (click)="preview(selectedCd,'VN')">
+    <span class="dropdown-item pointer" (click)="preview(selectedCd,'VND')">
         VND
     </span>
     <span class="dropdown-item pointer" (click)="preview(selectedCd,'USD')">
