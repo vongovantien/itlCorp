@@ -532,6 +532,5 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                     }
                 },
             );
-        this.confirmPopup.close();
     }
 }
