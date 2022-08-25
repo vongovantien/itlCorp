@@ -30,8 +30,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     mainPersonInCharge: AbstractControl;
     realPersonInCharge: AbstractControl;
     status: AbstractControl;
-    houseBill: AbstractControl;
-
     deadLineDate: AbstractControl;
 
     statusStage: string[] = ['InSchedule', 'Processing', 'Done', 'Overdued', 'Pending', 'Deleted'];
@@ -96,7 +94,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.mainPersonInCharge = this.form.controls['mainPersonInCharge'];
         this.realPersonInCharge = this.form.controls['realPersonInCharge'];
         this.status = this.form.controls['status'];
-        this.houseBill = this.form.controls['houseBill'];
     }
 
     initFormUpdate() {
