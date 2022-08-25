@@ -40,7 +40,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !shipmentType.valid}">
+                                    [ngClass]="{'m-form__group has-danger':(isSubmitted && !shipmentType.valid) || (shipmentType.errors | equalError: 'hasHBL')}">
                                     <label required>Shipment Type</label>
                                     <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
                                         formControlName="shipmentType" [clearable]="false"></ng-select>
@@ -410,3 +410,5 @@
 </div>
 
 <app-dim-volume-popup (onUpdate)="onUpdateDIM($event)"></app-dim-volume-popup>
+
+<ng-template inject></ng-template>

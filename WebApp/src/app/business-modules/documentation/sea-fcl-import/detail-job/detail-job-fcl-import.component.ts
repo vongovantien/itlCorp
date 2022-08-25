@@ -32,7 +32,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
@@ -215,7 +215,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 912) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -224,6 +228,13 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     }
                 }
             );
+    }
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {

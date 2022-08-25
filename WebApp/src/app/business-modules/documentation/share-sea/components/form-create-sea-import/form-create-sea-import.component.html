@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (shipmentType.dirty && !shipmentType.valid) || (isSubmitted && !shipmentType.valid)|| (shipmentType.errors | equalError: 'hasHBL')}">
                             <label required>Shipment Type</label>
                             <ng-select class="custom" [items]="shipmentTypes" placeholder="Please Select"
                                 formControlName="shipmentType" [clearable]="false"></ng-select>
@@ -240,3 +240,5 @@
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>

@@ -30,6 +30,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
@@ -43,6 +44,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     dimensionDetails: DIM[];
 
     isCancelFormPopupSuccess: boolean = false;
+
+    errHasHBL: boolean = false;
 
     nextState: RouterStateSnapshot;
     confirmSyncHBLText: string = `
@@ -215,6 +218,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    console.log(res);
+
                     if (res.status) {
                         this._toastService.success(res.message);
 
@@ -222,7 +227,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.getDetailShipment(this.jobId);
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 912) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -232,6 +241,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 }
             );
     }
+
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
+    }
+
 
     onSelectTab(tabName: string) {
         switch (tabName) {

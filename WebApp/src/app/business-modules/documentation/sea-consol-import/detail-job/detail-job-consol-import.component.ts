@@ -30,7 +30,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
@@ -89,7 +89,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     if (this.selectedTab === this.tabList[0]) {
                         this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     }
-
                     this.getDetailSeaFCLImport();
                     this.getListContainer();
                 } else {
@@ -212,7 +211,11 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 912) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -221,6 +224,14 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     }
                 }
             );
+    }
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {

@@ -60,7 +60,8 @@ namespace eFMS.API.Documentation.Controllers
             ICsShipmentSurchargeService serviceSurcharge,
             IAccAccountReceivableService AccAccountReceivaService,
             IOptions<ApiServiceUrl> serviceUrl,
-            ISysImageService imageService)
+            ICsTransactionDetailService transactionDetailService,
+        ISysImageService imageService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -253,6 +254,12 @@ namespace eFMS.API.Documentation.Controllers
             if (msgCheckUpdateMawb.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
+            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNtoF(model);
+            if (msgCheckHasHBL.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data=new { errorCode = 912 } });
             }
 
             model.UserModified = currentUser.UserID;
@@ -737,6 +744,7 @@ namespace eFMS.API.Documentation.Controllers
 
             return errorMsg;
         }
+
 
         private string CheckUpdateEtdEta(CsTransactionEditModel model, out string type)
         {

@@ -31,7 +31,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 export class AirImportDetailJobComponent extends AirImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
     jobId: string;
@@ -208,7 +208,11 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                         this.getDetailShipment(this.jobId);
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 912) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -217,6 +221,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                     }
                 }
             );
+    }
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {
