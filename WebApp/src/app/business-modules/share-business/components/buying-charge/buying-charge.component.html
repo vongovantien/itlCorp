@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div class="col-md-8" *ngIf="(isLocked | async) === false">
+            <div class="col-md-8" *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
                 <div class="m--align-right c-button-actions">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                         <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
@@ -520,7 +520,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <ng-container *ngIf="(isLocked | async) === false">
+                    <ng-container *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
                         <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge === true">
                             <tr>
                                 <td colspan=1 class="fixed-side" *ngIf="allowSaving">

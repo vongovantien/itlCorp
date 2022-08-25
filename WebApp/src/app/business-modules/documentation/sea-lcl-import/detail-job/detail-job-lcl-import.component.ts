@@ -15,7 +15,7 @@ import { switchMap, map, tap, skip, takeUntil, catchError, finalize, concatMap }
 
 import * as fromShareBussiness from './../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -48,14 +48,14 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     constructor(
         protected _router: Router,
-        protected _documenRepo: DocumentationRepo,
+        protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
         private _store: Store<any>,
         private _ngProgressService: NgProgress,
         private _cd: ChangeDetectorRef
     ) {
-        super(_router, _documenRepo, _toastService);
+        super(_router, _documentRepo, _toastService);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
     }

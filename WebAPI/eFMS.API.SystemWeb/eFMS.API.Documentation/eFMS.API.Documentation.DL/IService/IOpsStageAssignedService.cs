@@ -4,7 +4,7 @@ using ITL.NetCore.Connection.BL;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface IOpsStageAssignedService : IRepositoryBase<OpsStageAssigned, OpsStageAssignedModel>
+    public interface IOpsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedModel>
     {
     }
 }

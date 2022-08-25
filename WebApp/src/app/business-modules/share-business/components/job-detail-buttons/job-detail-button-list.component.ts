@@ -21,6 +21,8 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
     @Output() onDelete: EventEmitter<any> = new EventEmitter<any>();
     @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
     @Output() onCancel: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onFinish: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onReopen: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(private _store: Store<fromShareBussiness.IShareBussinessState>,) { super(); }
 

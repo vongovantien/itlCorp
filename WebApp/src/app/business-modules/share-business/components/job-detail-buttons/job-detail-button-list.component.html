@@ -66,7 +66,7 @@
                     </span>
                 </span>
             </button>
-            <ng-container *ngIf="shipmentDetail?.currentStatus !== 'Finish'">
+            <ng-container>
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()"
                     [disabled]="selectedTab !== 'SHIPMENT'"
                     *ngIf="(shipmentDetail?.permission?.allowUpdate && !isDuplicate && shipmentDetail?.currentStatus !== 'Finish')">

@@ -75,7 +75,6 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Pending = "Pending";
         public static readonly string Deleted = "Deleted";
         public static readonly string Warning = "Warning";
-        public static readonly string Finish = "Finish";
 
         public static readonly string CustomLogistic = "CL";
         public static readonly string InlandTrucking = "IT";//"InlandTrucking";

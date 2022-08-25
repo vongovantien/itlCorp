@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class OpsStageAssignedModel: OpsStageAssigned
+    public class CsStageAssignedModel: OpsStageAssigned
     {
     }
 }

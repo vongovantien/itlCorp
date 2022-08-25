@@ -14,7 +14,7 @@ import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@
 import { CommonEnum } from '@enums';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { InjectViewContainerRefDirective } from '@directives';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, JobConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
 
@@ -433,7 +433,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-                        console.log(this.opsTransaction);
                         if (this.opsTransaction.linkSource == "Replicate") {
                             this.allowLinkFeeSell = false;
                         }

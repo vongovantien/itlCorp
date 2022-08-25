@@ -53,6 +53,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICheckPointService, CheckPointService>();
             services.AddTransient<IDatabaseUpdateService, DatabaseUpdateService>();
             services.AddTransient<ICsLinkChargeService, CsLinkChargeService>();
+            services.AddTransient<ICsStageAssignedService, CsStageAssignedService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

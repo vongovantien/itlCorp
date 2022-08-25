@@ -9,7 +9,7 @@ import { DocumentationRepo } from '@repositories';
 import { ICanComponentDeactivate } from '@core';
 import { CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, SubHeaderComponent, ReportPreviewComponent } from '@common';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';

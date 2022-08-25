@@ -68,6 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
+
         private readonly IContextBase<OpsStageAssigned> csStageAssignedRepository;
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IContextBase<CatStage> csStageRepository;
@@ -109,8 +110,10 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IAccAccountReceivableService accAccountReceivable,
+
             ICsStageAssignedService csStageAssigned,
-             IContextBase<CatStage> stageRepo,
+            IContextBase<CatStage> stageRepo,
+            IContextBase<OpsStageAssigned> csStageAssignedRepo,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -146,9 +149,10 @@ namespace eFMS.API.Documentation.DL.Services
             shippingInstructionServiceRepo = shippingInstruction;
             apiUrl = url;
             sysImageService = imageService;
-            opsTransactionRepository = opsTransactionRepo;
             csLinkChargeRepository = csLinkChargeRepo;
             accAccountReceivableService = accAccountReceivable;
+
+            opsTransactionRepository = opsTransactionRepo;
             csStageAssignedRepository = csStageAssignedRepo;
             csStageAssignedService = csStageAssigned;
             csStageRepository = stageRepo;
@@ -3590,7 +3594,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
+                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         csJob.CurrentStatus = TermData.Processing;
                     }
                     break;
@@ -3603,7 +3607,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.Reopen).FirstOrDefault();
+                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         opsJob.CurrentStatus = TermData.Processing;
                     }
                     break;
