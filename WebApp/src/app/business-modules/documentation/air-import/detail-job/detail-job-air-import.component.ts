@@ -31,7 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 export class AirImportDetailJobComponent extends AirImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     confirmUpdateFlightInfo: string = 'Do you want to update Flight Info to HBL List ?';
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
