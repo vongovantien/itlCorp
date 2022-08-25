@@ -1,3 +1,4 @@
+import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -25,7 +26,7 @@ import _merge from 'lodash/merge';
     templateUrl: './create-job-fcl-export.component.html'
 })
 
-export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
+export class SeaFCLExportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -42,7 +43,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
     ) {
-        super();
+        super(_toastService, _documenRepo);
         this.requestCancel = this.gotoList;
     }
 

@@ -1,3 +1,4 @@
+import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -21,7 +22,7 @@ import _merge from 'lodash/merge';
     templateUrl: './create-job-lcl-import.component.html'
 })
 
-export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
+export class SeaLCLImportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
@@ -35,7 +36,7 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         protected _documenRepo: DocumentationRepo,
         protected _toastService: ToastrService
     ) {
-        super();
+        super(_toastService, _documenRepo);
 
         this.requestCancel = this.gotoList;
     }

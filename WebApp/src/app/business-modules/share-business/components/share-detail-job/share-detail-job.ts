@@ -25,7 +25,7 @@ export class ShareDetailJobComponent extends AppForm {
         super();
     }
 
-    getDetailShipment(jobId: string){
+    getDetailShipment(jobId: string) {
 
     }
 

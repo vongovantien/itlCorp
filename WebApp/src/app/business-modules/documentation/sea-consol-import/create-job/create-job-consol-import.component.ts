@@ -1,3 +1,4 @@
+import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionsSubject } from '@ngrx/store';
@@ -21,7 +22,7 @@ import _merge from 'lodash/merge';
     selector: 'app-create-job-consol-import',
     templateUrl: './create-job-consol-import.component.html',
 })
-export class SeaConsolImportCreateJobComponent extends AppForm {
+export class SeaConsolImportCreateJobComponent extends ShareDetailJobComponent {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -38,7 +39,7 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef
     ) {
-        super();
+        super(_toastService, _documenRepo);
         this.requestCancel = this.gotoList;
     }
 

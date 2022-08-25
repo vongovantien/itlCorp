@@ -335,10 +335,10 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     this._progressRef.complete();
                 })
             ).subscribe(
-                (respone: CommonInterface.IResult) => {
-                    if (respone.status) {
+                (response: CommonInterface.IResult) => {
+                    if (response.status) {
 
-                        this._toastService.success(respone.message, 'Delete Success !');
+                        this._toastService.success(response.message, 'Delete Success !');
 
                         this.gotoList();
                     }
