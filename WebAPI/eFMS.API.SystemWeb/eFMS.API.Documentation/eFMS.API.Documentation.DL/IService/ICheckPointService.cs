@@ -18,6 +18,7 @@ namespace eFMS.API.Documentation.DL.IService
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         List<CheckPointPartnerHBLDataGroup> GetPartnerForCheckPointInShipment(Guid Id, string transactionType);
         bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked);
+        bool AllowCheckNoProfitShipmentDuplicate(string jobNo, bool? isCheked, bool isReplicate, out string shipmentInvalid);
         bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked);
     }
 

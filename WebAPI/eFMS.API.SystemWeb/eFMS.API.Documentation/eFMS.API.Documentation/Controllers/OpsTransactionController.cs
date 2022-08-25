@@ -240,10 +240,11 @@ namespace eFMS.API.Documentation.Controllers
             }
             if (model.NoProfit == true)
             {
-                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                var jobNo = string.Empty;
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipmentDuplicate(model.JobNo, model.NoProfit, model.IsReplicate, out jobNo);
                 if (!allowCheckNoProfit)
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + model.JobNo + " have profit, check No Profit with this Duplicate job is invalid." });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + jobNo + " have profit, check No Profit with this Duplicate job is invalid." });
                 }
             }
 

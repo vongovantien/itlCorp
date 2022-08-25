@@ -30,6 +30,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> advanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> advancePaymentRepository;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
 
         readonly string salemanBOD = string.Empty;
         readonly IQueryable<CsTransaction> csTransactions;
@@ -50,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvanceRequest> advanceRequest,
             IContextBase<AcctAdvancePayment> advancePayment,
             IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<CsLinkCharge> csLinkCharge,
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
@@ -67,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             advanceRequestRepository = advanceRequest;
             advancePaymentRepository = advancePayment;
             settlementPaymentRepository = settlementPayment;
+            csLinkChargeRepository = csLinkCharge;
 
             salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
@@ -643,6 +646,78 @@ namespace eFMS.API.Documentation.DL.Services
                         var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
                         if (sellAmount - buyAmount > 0)
                         {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        ///  Check if duplicate shipment allow check no profit
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <param name="isCheked"></param>
+        /// <param name="isReplicate">shipment has Job Replicate</param>
+        /// <param name="shipmentInvalid"></param>
+        /// <returns></returns>
+        public bool AllowCheckNoProfitShipmentDuplicate(string jobNo, bool? isCheked, bool isReplicate, out string shipmentInvalid)
+        {
+            shipmentInvalid = string.Empty;
+            if (isCheked == true)
+            {
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true  && x.JobNo == jobNo);
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if (transaction == "CL")
+                {
+                    var opstraction = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
+                    shipmentNoProfit = opstraction?.NoProfit ?? false;
+                    surcharges = surcharges.Where(x => string.IsNullOrEmpty(x.LinkChargeId));
+                    if (isReplicate && !shipmentNoProfit)
+                    {
+                        // Không lấy phí đã AutoRate
+                        var jobRepNo = opsTransactionRepository.Get(x => x.Id == opstraction.ReplicatedId).FirstOrDefault()?.JobNo;
+                        var surchargesRep = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true && string.IsNullOrEmpty(x.LinkChargeId) && x.JobNo == jobRepNo);
+                        List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == jobRepNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_AUTO_RATE).ToList();
+                        if (csLinkFee.Count() > 0)
+                        {
+                            List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                            surchargesRep = surchargesRep.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+                            if (surchargesRep.Count() > 0)
+                            {
+                                surcharges = surcharges.Union(surchargesRep);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var cstransaction = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
+                    shipmentNoProfit = cstransaction?.NoProfit ?? false;
+                    if (!shipmentNoProfit)
+                    {
+                        //[01/03/2022] Không lấy những phí đã linkFee
+                        List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == cstransaction.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
+                        if (csLinkFee.Count > 0)
+                        {
+                            List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                            surcharges = surcharges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+                        }
+                    }
+                }
+
+                if (surcharges.Count() > 0 && !shipmentNoProfit)
+                {
+                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
+                    foreach (var hblId in hblIds)
+                    {
+                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        if (sellAmount - buyAmount > 0)
+                        {
+                            shipmentInvalid = surcharges.Where(x => x.Hblid == hblId).FirstOrDefault().JobNo;
                             return false;
                         }
                     }

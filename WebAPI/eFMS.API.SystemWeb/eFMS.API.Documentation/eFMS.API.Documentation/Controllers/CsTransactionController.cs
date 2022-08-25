@@ -478,7 +478,8 @@ namespace eFMS.API.Documentation.Controllers
             if (model.NoProfit == true)
             {
                 var jobNo = csTransactionService.First(x => x.Id == model.Id).JobNo;
-                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(jobNo, model.NoProfit);
+                string jobOrgNo = string.Empty;
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipmentDuplicate(jobNo, model.NoProfit, false, out jobOrgNo);
                 if (!allowCheckNoProfit)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + jobNo + " have profit, check No Profit with this Duplicate job is invalid." });
