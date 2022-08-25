@@ -547,7 +547,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     handleChangeStatusJob(status: string) {
         let body: any = {
             jobId: this.jobId,
-            transitionType: JobConstants.CSTRANSACTION,
+            transactionType: JobConstants.CSTRANSACTION,
             status
         }
         this._documentRepo.updateStatusJob(body).pipe(

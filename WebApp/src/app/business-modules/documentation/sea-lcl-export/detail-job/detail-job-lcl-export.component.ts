@@ -528,7 +528,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     handleChangeStatusJob(status: string) {
         let body: any = {
             jobId: this.jobId,
-            transitionType: JobConstants.CSTRANSITION,
+            transactionType: JobConstants.CSTRANSACTION,
             status
         }
         this._documentRepo.updateStatusJob(body).pipe(
