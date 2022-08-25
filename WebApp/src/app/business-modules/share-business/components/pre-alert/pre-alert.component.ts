@@ -1042,7 +1042,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     previewCDNoteExport(code: string){
         if(this.serviceId === 'AE'){
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
             .pipe(
             ).subscribe(
                 (res: any) => {
@@ -1057,7 +1057,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 },
             );
         }else{
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
             .pipe(
             ).subscribe(
                 (res: any) => {
