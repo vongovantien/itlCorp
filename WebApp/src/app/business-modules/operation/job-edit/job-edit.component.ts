@@ -648,47 +648,4 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 }
             );
     }
-
-
-    onFinishJob() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-            body: 'Do you want to finish this shipment ?',
-            labelConfirm: 'Yes'
-        }, () => {
-            this.handleChangeStatusJob(JobConstants.FINISH);
-        })
-    }
-
-    onReopenJob() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-            body: 'Do you want to reopen this shipment ?',
-            labelConfirm: 'Yes'
-        }, () => {
-            this.handleChangeStatusJob(JobConstants.REOPEN);
-        })
-
-    }
-
-    handleChangeStatusJob(status: string) {
-        let body: any = {
-            jobId: this.jobId,
-            transactionType: JobConstants.OPSTRANSACTION,
-            status
-        }
-        this._documentRepo.updateStatusJob(body).pipe(
-            catchError(this.catchError),
-            finalize(() => {
-                this._progressRef.complete();
-            })
-        ).subscribe(
-            (r: CommonInterface.IResult) => {
-                if (r.status) {
-                    this.getShipmentDetails(this.jobId);
-                    this._toastService.success(r.message);
-                } else {
-                    this._toastService.error(r.message);
-                }
-            },
-        );
-    }
 }
