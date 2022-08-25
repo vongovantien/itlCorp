@@ -121,7 +121,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="form-group m-form__group"
-                        *ngIf="serviceId === 'AI' || serviceId === 'SFI' || serviceId === 'SLI'">
+                        *ngIf="isArrivalNotice && (serviceId === 'AI' || serviceId === 'SFI' || serviceId === 'SLI')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -253,7 +253,7 @@
                     </div>
 
                     <div class="form-group m-form__group"
-                        *ngIf="!isPreAlert && (serviceId === 'SFE' || serviceId === 'SLE')">
+                        *ngIf="isSI && (serviceId === 'SFE' || serviceId === 'SLE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsSISummary else NotSISummary">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">

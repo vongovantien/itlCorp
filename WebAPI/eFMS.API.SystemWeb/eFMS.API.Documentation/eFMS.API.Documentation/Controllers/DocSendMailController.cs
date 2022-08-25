@@ -47,7 +47,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Get info mail housebill of Air Import
+        /// Get info mail Arrival notice housebill of Air Import
         /// </summary>
         /// <param name="hblId">Housebill ID</param>
         /// <returns></returns>
@@ -60,7 +60,20 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Get info mail housebill of Air Export
+        /// Get mail info Authorize Letter Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailAuthorizeLetterHBLAirImport")]
+        [Authorize]
+        public IActionResult GetMailAuthorizeLetterHBLAirImport(Guid hblId)
+        {
+            var data = sendMailService.GetMailAuthorizeLetterHBLAirImport(hblId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get info mail Pre Alert shipment/housebill of Air Export
         /// </summary>
         /// <param name="hblId">Housebill ID</param>
         /// <param name="jobId"></param>
@@ -79,6 +92,32 @@ namespace eFMS.API.Documentation.Controllers
                 var data = sendMailService.GetInfoMailAEPreAlert(jobId);
                 return Ok(data);
             }
+        }
+
+        /// <summary>
+        /// Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailProofOfDeliveryHBLAir")]
+        [Authorize]
+        public IActionResult GetMailProofOfDeliveryHBLAir(Guid hblId)
+        {
+            var data = sendMailService.GetMailProofOfDeliveryHBLAir(hblId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Mail Info Send HAWB HBL Air Export- Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailSendHAWBHBLAir")]
+        [Authorize]
+        public IActionResult GetMailSendHAWBHBLAir(Guid hblId)
+        {
+            var data = sendMailService.GetMailSendHAWBHBLAir(hblId);
+            return Ok(data);
         }
 
         /// <summary>
@@ -128,6 +167,48 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetInfoMailHBLSeaImport(Guid hblId, string serviceId)
         {
             var data = sendMailService.GetInfoMailHBLSeaImport(hblId, serviceId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get mail info Delivery Order Of Sea Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailDOHBLSeaImport")]
+        [Authorize]
+        public IActionResult GetMailDOHBLSeaImport(Guid hblId, string serviceId)
+        {
+            var data = sendMailService.GetMailDOHBLSeaImport(hblId, serviceId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Mail Info Proof Of Delivery HBL Sea Services
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailProofOfDeliveryHBLSea")]
+        [Authorize]
+        public IActionResult GetMailProofOfDeliveryHBLSea(Guid hblId, string serviceId)
+        {
+            var data = sendMailService.GetMailProofOfDeliveryHBLSea(hblId, serviceId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Mail Info Send HBL Sea Services
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns></returns>
+        [HttpGet("GetMailSendHBLSeaServices")]
+        [Authorize]
+        public IActionResult GetMailSendHBLSeaServices(Guid hblId, string serviceId)
+        {
+            var data = sendMailService.GetMailSendHBLSeaServices(hblId, serviceId);
             return Ok(data);
         }
 

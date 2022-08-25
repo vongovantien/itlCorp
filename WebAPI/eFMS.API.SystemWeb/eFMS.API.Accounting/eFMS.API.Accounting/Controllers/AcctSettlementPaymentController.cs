@@ -552,10 +552,10 @@ namespace eFMS.API.Accounting.Controllers
             // Check if Cost > Sell
             var messInvalidShipment = acctSettlementPaymentService.CheckValidFeesOnShipment(model);
             var _result = new ResultHandle() { Status = true };
-            if (!string.IsNullOrEmpty(messInvalidShipment))
-            {
-                _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
-            }
+            //if (!string.IsNullOrEmpty(messInvalidShipment))
+            //{
+            //    _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
+            //}
             return Ok(_result);
         }
 

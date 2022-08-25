@@ -117,28 +117,42 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.ruleName }}</span>
+                                    <span *ngIf="item.ruleNameError === null">{{ item.ruleName }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.ruleNameError !== null">{{item.ruleNameError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.serviceBuying }}</span>
+                                    <span *ngIf="item.serviceBuyError === null">{{ item.serviceBuying }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.serviceBuyError !== null">{{item.serviceBuyError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.serviceSelling }}</span>
+                                    <span *ngIf="item.serviceSellError === null">{{ item.serviceSelling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.serviceSellError !== null">{{item.serviceSellError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.chargeBuying }}</span>
+                                    <span *ngIf="item.chargeBuyError === null">{{ item.chargeBuying }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.chargeBuyError !== null">{{item.chargeBuyError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.chargeSelling }}</span>
+                                    <span *ngIf="item.chargeSellError === null">{{ item.chargeSelling }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.chargeSellError !== null">{{item.chargeSellError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.partnerBuying }}</span>
+                                    <span *ngIf="item.partnerBuyError === null">{{ item.partnerBuying }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.partnerBuyError !== null">{{item.partnerBuyError }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.partnerSelling }}</span>
+                                    <span>{{ item.partnerSelling }}</span>
                                 </td>
                                 <td>
-                                    <span>{{ item.status }}</span>
+                                    <span *ngIf="item.statusError === null">{{ item.status }}</span>
+                                    <span class="m--font-danger" *ngIf="item.statusError !== null">{{item.statusError
+                                        }}</span>
                                 </td>
                             </tr>
                         </ng-container>

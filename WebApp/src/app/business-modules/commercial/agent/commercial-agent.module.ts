@@ -10,6 +10,8 @@ import { CustomerAgentImportComponent } from '../components/customer-agent-impor
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { EffectsModule } from '@ngrx/effects';
+import { agentEffect } from './store/effect';
 
 const routing: Routes = [
     {
@@ -48,6 +50,7 @@ const routing: Routes = [
         ShareCommercialModule,
         ShareModulesModule,
         StoreModule.forFeature('agent', reducers),
+        EffectsModule.forFeature(agentEffect),
     ],
     exports: [],
     providers: [],

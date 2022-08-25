@@ -363,6 +363,7 @@ namespace eFMS.API.ReportData.Controllers
         #region Custom Clearance
         [Route("CustomsDeclaration/ExportCustomClearance")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportCustomClearance(CustomsDeclarationCriteria customsDeclarationCriteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();

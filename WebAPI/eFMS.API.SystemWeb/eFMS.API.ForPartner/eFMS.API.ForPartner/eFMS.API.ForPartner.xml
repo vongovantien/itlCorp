@@ -9,7 +9,7 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.ForPartner.DL.IService.IActionFuncLogService,eFMS.API.ForPartner.DL.IService.IAccountPayableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Common.ApiUrl})">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.ForPartner.DL.IService.IActionFuncLogService,eFMS.API.ForPartner.DL.IService.IAccountPayableService,eFMS.API.ForPartner.DL.IService.IAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Common.ApiUrl})">
             <summary>
             Accounting Contructor
             </summary>

@@ -444,6 +444,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportOutsourcingRegcognising(eFMS.API.ReportData.Models.Criteria.OpsTransactionCriteria)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.SettingReportController">
             <summary>
             Setting Report Controller

@@ -1,3 +1,6 @@
+import { Currency } from './../../../shared/models/catalogue/catCurrency.model';
+import { partnerState } from './../../catalogue/partner-data/store/reducers/index';
+import { PayableComponent } from '../components/payable/payable.component';
 import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -28,8 +31,12 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(CommercialFormCreateComponent) formCommercialComponent: CommercialFormCreateComponent;
     @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
     @ViewChild(CommercialBranchSubListComponent) formBranchSubList: CommercialBranchSubListComponent;
+    @ViewChild(PayableComponent) payableComponent: PayableComponent;
     partnerId: string;
     partner: Partner;
+    currency: string;
+
+    isUpdated: boolean = false;
 
     constructor(
         protected _router: Router,
@@ -81,6 +88,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
+                    this.payableComponent.partnerId = res.partnerId;
+                    this.payableComponent.getFileContract(res.partnerId);
                 } else {
                     this.gotoList();
                 }
@@ -118,6 +127,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
                         this.formCreate.getShippingProvinces(res.countryShippingId);
                         this.formCreate.getBillingProvinces(res.countryId);
+                        this.payableComponent.getGeneralPayable(this.partner.id, this.partner.currency === null ? "VND" : this.partner.currency);
                     }
                     else {
                         this.back();
@@ -167,6 +177,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             this.formCommercialComponent.isDisabled = true;
         }
         this.contractList.partnerLocation = partner.partnerLocation;
+        this.payableComponent.payableForm.patchValue({
+            paymentTerm: partner.paymentTerm,
+            currency: partner.currency
+        })
     }
 
     getListContract(partneId: string) {
@@ -195,6 +209,59 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     console.log(this.partnerList);
                 }
             );
+    }
+
+    onSaveWithPayable(payable: any) {
+        this.isUpdated = true;
+        this.formCreate.isSubmitted = true;
+        console.log(payable);
+
+        if (!this.formCreate.formGroup.valid) {
+            this.infoPopup.show();
+            return;
+        }
+
+        if (!this.formCreate.parentId.value && !this.contractList.contracts.length) {
+            this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
+            return;
+        }
+
+        const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
+        modelAdd.contracts = this.contractList.contracts;
+
+        modelAdd.id = this.isAddSubPartner ? null : this.partnerId;
+        modelAdd.userCreated = this.partner.userCreated;
+        modelAdd.datetimeCreated = this.partner.datetimeCreated;
+        modelAdd.partnerType = this.partner.partnerType;
+        modelAdd.partnerGroup = this.partner.partnerGroup;
+        modelAdd.datetimeCreated = this.partner.datetimeCreated;
+
+        // * Update catalogue partner data.
+        modelAdd.roundUpMethod = this.partner.roundUpMethod;
+        modelAdd.applyDim = this.partner.applyDim;
+        modelAdd.active = this.partner.active;
+        modelAdd.applyDim = this.partner.applyDim;
+        modelAdd.coLoaderCode = this.partner.coLoaderCode;
+        modelAdd.swiftCode = this.partner.swiftCode;
+        modelAdd.coLoaderCode = this.partner.coLoaderCode;
+        modelAdd.website = this.partner.website;
+        modelAdd.bankAccountNo = this.partner.bankAccountNo;
+        //modelAdd.bankAccountName = this.partner.bankAccountName;
+        modelAdd.bankAccountAddress = this.partner.bankAccountAddress;
+        modelAdd.note = this.partner.note;
+        modelAdd.public = this.partner.public;
+        modelAdd.workPlaceId = this.partner.workPlaceId;
+        modelAdd.partnerMode = this.partner.partnerMode;
+        modelAdd.partnerLocation = this.formCreate.partnerLocation.value;
+        //
+        modelAdd.paymentTerm = payable.paymentTerm;
+        modelAdd.currency = payable.currency;
+
+        console.log(modelAdd);
+        this.updatePartner(modelAdd);
+        console.log(this.partner);
+
+        //this.payableComponent.getGeneralPayable(this.partner.id, payable.currency);
     }
 
     onSaveDetail() {
@@ -306,6 +373,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.formCreate.formGroup.patchValue(res);
                     } else {
                         this._toastService.error(res.message);
+                    }
+                    if (this.isUpdated) {
+                        this.payableComponent.getGeneralPayable(this.partner.id, body.currency);
+                        this.isUpdated = false;
                     }
                 },
                 (error: HttpErrorResponse) => {

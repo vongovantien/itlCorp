@@ -6,13 +6,13 @@ import { Store } from '@ngrx/store';
 
 import { Shipment, CustomDeclaration } from '@models';
 import { SortService } from '@services';
-import { DocumentationRepo, OperationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, OperationRepo } from '@repositories';
 import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
-import { JobConstants, RoutingConstants } from '@constants';
+import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
 import { GetCurrenctUser, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
@@ -59,6 +59,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _operationRepo: OperationRepo,
         private _router: Router,
         private _store: Store<fromOperationStore.IOperationState>,
+        private _exportRepo: ExportRepo,
         private _spinner: NgxSpinnerService
     ) {
         super();
@@ -368,4 +369,26 @@ export class JobManagementComponent extends AppList implements OnInit {
             }
         });
     }
+
+    exportOutsourcingRegcognising() {
+        this._spinner.hide();
+        this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
+        this.loadingPopupComponent.show();
+        this._exportRepo.exportOutsourcingRegcognising(this.dataSearch)
+            .pipe(
+                catchError(() => of(
+                    this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is Fail</b>",
+                    this.loadingPopupComponent.proccessFail()
+                )),
+                finalize(() => { this._progressRef.complete(); })
+            ).subscribe(
+                (res: any) => {
+                    this.loadingPopupComponent.body = "<a>The Outsourcing Recognising Proccess is Completed</b>";
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    this.loadingPopupComponent.proccessCompleted();
+                },
+            );
+    }
+
+
 }

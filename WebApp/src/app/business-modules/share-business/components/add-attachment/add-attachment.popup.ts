@@ -134,6 +134,10 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         this.confirmDeletePopup.show();
     }
 
+    getFileShipmentUrls(){
+        return this.files;
+    }
+    
     onDeleteFile() {
         this.confirmDeletePopup.hide();
         this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)

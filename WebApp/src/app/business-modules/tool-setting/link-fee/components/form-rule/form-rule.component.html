@@ -17,7 +17,8 @@
                                     [ngClass]="{'m-form__group has-danger': (ruleName.dirty && !ruleName.valid) || (isSubmitted && !ruleName.valid) }">
                                     <label required>Rule Name</label>
                                     <input type="text" class="form-control" formControlName="ruleName">
-                                    <div class="form-control-feedback" *ngIf="(ruleName.dirty && !ruleName.valid) || (isSubmitted && !ruleName.valid)">
+                                    <div class="form-control-feedback"
+                                        *ngIf="(ruleName.dirty && !ruleName.valid) || (isSubmitted && !ruleName.valid)">
                                         Rule Name is required !
                                     </div>
                                 </div>
@@ -43,13 +44,12 @@
                                     <label class="form-control-label">
                                         Service Selling<span class="m--font-danger">(*)</span>
                                     </label>
-    
-                                    <ng-select [multiple]="false" class="custom"
-                                        bindLabel="text" [items]="services" placeholder="Select Service Selling"
-                                        formControlName="serviceSelling" (ngModelChange)="enableSelling()">
+
+                                    <ng-select [multiple]="false" class="custom" bindLabel="text" [items]="services"
+                                        placeholder="Select Service Selling" formControlName="serviceSelling"
+                                        (ngModelChange)="enableSelling()">
                                     </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="isSubmitted && !serviceSelling.valid">
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !serviceSelling.valid">
                                         Service is required !
                                     </div>
                                 </div>
@@ -63,10 +63,10 @@
                                         [selectedDisplayFields]="configChargeSelling.selectedDisplayFields"
                                         [dataSources]="configChargeSelling.dataSource" [disabled]="this.isSelling"
                                         [displayFields]="configChargeSelling.displayFields" [height]="200"
-                                        (remove)="resetChargeSelling()"
-                                        >
+                                        (remove)="resetChargeSelling()">
                                     </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeSelling.value">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !selectedChargeSelling.value">
                                         Charge Selling is required !
                                     </div>
                                 </div>
@@ -79,8 +79,7 @@
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource" [disabled]="this.isSelling"
                                         [displayFields]="configPartner.displayFields" [height]="200"
-                                        (remove)="resetPartnerSelling()"
-                                        >
+                                        (remove)="resetPartnerSelling()">
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerSelling.value">
                                         Partner Selling is required !
@@ -108,13 +107,12 @@
                                     <label class="form-control-label">
                                         Service Buying<span class="m--font-danger">(*)</span>
                                     </label>
-    
-                                    <ng-select [multiple]="false" class="custom"
-                                        bindLabel="text" [items]="services" placeholder="Select Service Buying"
-                                        formControlName="serviceBuying" (ngModelChange)="enableBuying()">
+
+                                    <ng-select [multiple]="false" class="custom" bindLabel="text" [items]="services"
+                                        placeholder="Select Service Buying" formControlName="serviceBuying"
+                                        (ngModelChange)="enableBuying()">
                                     </ng-select>
-                                    <div class="form-control-feedback"
-                                        *ngIf="isSubmitted && !serviceBuying.valid">
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !serviceBuying.valid">
                                         Service is required !
                                     </div>
                                 </div>
@@ -128,10 +126,10 @@
                                         [selectedDisplayFields]="configChargeBuying.selectedDisplayFields"
                                         [dataSources]="configChargeBuying.dataSource" [disabled]="this.isBuying"
                                         [displayFields]="configChargeBuying.displayFields" [height]="200"
-                                        (remove)="resetChargeBuying()"
-                                        >
+                                        (remove)="resetChargeBuying()">
                                     </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeBuying.value">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !selectedChargeBuying.value">
                                         Charge Buying is required !
                                     </div>
                                 </div>
@@ -148,63 +146,79 @@
                                         [displayFields]="configPartner.displayFields" [height]="200"
                                         (remove)="resetPartnerBuying()">
                                     </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerBuying.value">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !selectedPartnerBuying.value">
                                         Partner Buying is required !
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !effectiveDate.value.startDate}">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !effectiveDate.value.startDate}">
                                     <label required>Effective Date</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDateEffective" name="daterange" placeholder="Please Select"
-                                            readonly [singleDatePicker]="true" formControlName="effectiveDate"
-                                            [alwaysShowCalendars]="true" [autoApply]="true" />
+                                        <ng-template ngIf="isShowUpdate===true; else notUpdate">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                placeholder="Please Select" readonly [singleDatePicker]="true"
+                                                formControlName="effectiveDate" [alwaysShowCalendars]="true"
+                                                [autoApply]="true" />
+                                        </ng-template>
+                                        <ng-template #notUpdate>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [minDate]="minDateEffective" name="daterange"
+                                                placeholder="Please Select" readonly [singleDatePicker]="true"
+                                                formControlName="effectiveDate" [alwaysShowCalendars]="true"
+                                                [autoApply]="true" />
+                                        </ng-template>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
                                     </div>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !effectiveDate.value.startDate">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !effectiveDate.value.startDate">
                                         Effective Date is required !
                                     </div>
                                 </div>
+
                             </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"  >
-                                        <label>Expiration Date</label>
-                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
-                                                readonly [singleDatePicker]="true" formControlName="expiredDate"
-                                                [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate"
-                                                (remove)="resetExpiredDate()"
-                                                [alwaysShowCalendars]="true" [autoApply]="true"/>
-                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                <span>
-                                                    <i class="la la-calendar"></i>
-                                                </span>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Expiration Date</label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
+                                            readonly [singleDatePicker]="true" formControlName="expiredDate"
+                                            [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate"
+                                            (remove)="resetExpiredDate()" [alwaysShowCalendars]="true"
+                                            [autoApply]="true" />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
                                             </span>
-                                        </div>
+                                        </span>
                                     </div>
                                 </div>
-                                <div class="col-md-12" *ngIf="!!isShowUpdate"> 
-                                    <div class="form-group">
-                                        <label class="form-control-label">Status</label>
-                                        <div class="m-checkbox-inline">
-                                            <app-switch formControlName="status">
-                                            </app-switch>
-                                        </div>
+                            </div>
+                            <div class="col-md-12" *ngIf="!!isShowUpdate">
+                                <div class="form-group">
+                                    <label class="form-control-label">Status</label>
+                                    <div class="m-checkbox-inline">
+                                        <app-switch formControlName="status">
+                                        </app-switch>
                                     </div>
                                 </div>
+                            </div>
                             <ng-container *ngIf="!!isShowUpdate">
                                 <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                     <span class="m--font-bolder">Create:</span>
-                                    <span class="m--font-success m--margin-left-5">{{datetimeCreated | 
+                                    <span class="m--font-success m--margin-left-5">{{datetimeCreated |
                                         date:'dd/MM/yyyy h:mm:ss a'}}</span>
                                     <span class="m--font-bolder m--margin-left-5">by</span>
                                     <span class="m--font-success m--margin-left-5">{{userNameCreated}}</span>

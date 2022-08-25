@@ -18,6 +18,8 @@ import { VoucherListComponent } from './components/voucher-list/voucher-list.com
 import { GenerateSellingChargePopupComponent } from './components/popup/generate-selling-charge/generate-selling-charge.popup';
 import { reducers } from './store';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { EffectsModule } from '@ngrx/effects';
+import { chargeEffect } from './store/effect';
 
 const routing: Routes = [
     {
@@ -56,6 +58,7 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         StoreModule.forFeature('charge', reducers),
         ModalModule.forRoot(),
+        EffectsModule.forFeature(chargeEffect),
     ],
     exports: [],
     declarations: [

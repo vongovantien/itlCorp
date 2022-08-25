@@ -10,6 +10,9 @@ import { ContractImportComponent } from '../components/contract/import/contract-
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { EffectsModule } from '@ngrx/effects';
+import { CustomerEffect } from './store/effect/customer.effect';
+import { customerEffect } from './store/effect';
 
 const routing: Routes = [
     {
@@ -48,6 +51,7 @@ const routing: Routes = [
         ShareCommercialModule,
         ShareModulesModule,
         StoreModule.forFeature('customer', reducers),
+        EffectsModule.forFeature(customerEffect)
     ],
     exports: [],
     providers: [],

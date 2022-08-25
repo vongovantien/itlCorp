@@ -705,6 +705,14 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctPayableController.GetGeneralPayable(System.String,System.String)">
+            <summary>
+            Get data export accounting template payable
+            </summary>
+            <param name="partnerId"></param>
+             /// <param name="currency"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
             <summary>
             Get detail receipt

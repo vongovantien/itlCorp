@@ -33,8 +33,7 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange"
                                 [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
-                                [allowRemove]="!!selectedRange && !!selectedRange.startDate"
-                                (remove)="resetDate()"
+                                [allowRemove]="!!selectedRange && !!selectedRange.startDate" (remove)="resetDate()"
                                 placeholder="From date - to date" readonly />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
@@ -91,13 +90,11 @@
                             <option [ngValue]="null">All</option>
                             <option *ngFor="let user of users" [ngValue]="user">{{user.username}}</option>
                         </select> -->
-                        <app-combo-grid-virtual-scroll
-                            (itemSelected)="onSelectDataFormSearch($event,'user')"
-                            [currentActiveItemId]="{ field: 'id', value: currentUser}"
-                            [selectedDisplayFields]="['username']" [dataSources]="users"
-                            [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
-                            placeholder="Select Personal Handle" [height]="200" size="15"
-                            (remove)="resetPersonalHandle()">
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="currentUser"
+                            (itemSelected)="onSelectDataFormSearch($event, 'user')"
+                            [selectedDisplayFields]="configUser.selectedDisplayFields"
+                            [dataSources]="configUser.dataSource" [displayFields]="configUser.displayFields"
+                            [height]="200">
                         </app-combo-grid-virtual-scroll>
 
                     </div>

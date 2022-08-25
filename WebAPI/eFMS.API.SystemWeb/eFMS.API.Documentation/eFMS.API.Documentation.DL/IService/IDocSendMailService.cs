@@ -13,10 +13,16 @@ namespace eFMS.API.Documentation.DL.IService
     {
         bool SendMailDocument(EmailContentModel emailContent);
         EmailContentModel GetInfoMailHBLAirImport(Guid hblId);
+        EmailContentModel GetMailAuthorizeLetterHBLAirImport(Guid hblId);
+        EmailContentModel GetMailProofOfDeliveryHBLAir(Guid hblId);
+        EmailContentModel GetMailSendHAWBHBLAir(Guid hblId);
+        EmailContentModel GetMailProofOfDeliveryHBLSea(Guid hblId, string serviceId);
+        EmailContentModel GetMailSendHBLSeaServices(Guid hblId, string serviceId);
         EmailContentModel GetInfoMailHBLAirExport(Guid? hblId);
         EmailContentModel GetInfoMailAEPreAlert(Guid? jobId);
         EmailContentModel GetInfoMailSISeaExport(Guid jobId);
         EmailContentModel GetInfoMailHBLSeaImport(Guid jobId, string serviceId);
+        EmailContentModel GetMailDOHBLSeaImport(Guid jobId, string serviceId);
         EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid? hblId, string serviceId);
         EmailContentModel GetInfoMailPreAlerSeaExport(Guid? jobId, string serviceId);
         bool SendMailContractCashWithOutstandingDebit();

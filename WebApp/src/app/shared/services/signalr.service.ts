@@ -18,12 +18,12 @@ export class SignalRService {
         this.hubConnection = new HubConnectionBuilder()
             .configureLogging(LogLevel.None)
             .withAutomaticReconnect()
-            .withUrl(`http${environment.AUTHORIZATION.requireHttps ? 's' : ''}://${environment.HOST.SYSTEM}/notification`, { accessTokenFactory: () => this.getToken() }).build();
+            .withUrl(`http${environment.AUTHORIZATION.requireHttps ? 's' : ''}://${environment.HOST.SYSTEM}/notification`).build();
 
         this.hubConnection
             .start()
             .then(() => {
-                console.log("SignalR was connected");
+                console.log("SignalR was connected", this.hubConnection.connectionId);
                 // return this.hubConnection.invoke('getConnectionId');
             })
             // .then((connectionId: string) => {

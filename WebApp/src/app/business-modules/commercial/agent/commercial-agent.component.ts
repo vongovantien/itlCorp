@@ -12,9 +12,9 @@ import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AppList } from 'src/app/app.list';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchList } from './store';
+import { IAgentState, getAgentSearchParamsState, SearchList, getAgentDataListState, LoadListAgent, getAgentPagingState } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
@@ -40,6 +40,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     saleMans: Contract[] = [];
 
     dataSearchs: any = [];
+    isSearching: boolean = false;
 
     selectedAgent: Partner;
 
@@ -67,17 +68,35 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getAgentSearchParamsState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(getAgentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (data: any) => {
-                    if (!!data && !!data.keyword) {
-                        this.dataSearchs = data;
-                        console.log(this.dataSearchs);
+                    if (!!data.dataSearch) {
+                        this.dataSearchs = data.dataSearch;
                     }
-
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
                 }
             );
+        this._store.select(getAgentDataListState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.agents = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
+
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Salesman', field: 'username', sortable: true },
@@ -186,7 +205,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             type: !!event.field ? event.field : this.dataSearchs.type,
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
-        this.page = 1;
+        console.log(this.isSearching);
+
         this._store.dispatch(SearchList({ payload: searchData }));
         if (Object.keys(this.dataSearchs).length > 0) {
             const type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
@@ -195,19 +215,28 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.requestList();
     }
 
+    onSearching(event: CommonInterface.ISearchOption) {
+        this.isSearching = true;
+        this.onSearch(event);
+    }
+
     getPartners() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            })).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.agents = res.data || [];
-                    this.totalItems = res.totalItems;
-                }
-            );
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     })).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.agents = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        console.log(this.isSearching);
+
+        this._store.dispatch(LoadListAgent({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: Object.assign({}, this.dataSearch) }));
+        this.isSearching = false;
     }
 
     sortPartners() {
@@ -224,7 +253,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
-            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type).title;
+            this.searchOptionsComponent.searchObject.displayName = this.headerSearch.find(x => x.field === this.dataSearchs.type)?.title;
         }
         this._cd.detectChanges();
     }

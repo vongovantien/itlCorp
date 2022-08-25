@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <app-permission-button title="Export" type="export"(click)="export()">
+            <app-permission-button title="Export" type="export" (click)="export()">
             </app-permission-button>
             <!-- <app-dropdown #dropdownMenu>
                 <a class="dropdown-item pointer" (click)="export()">
@@ -50,7 +50,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m-form">
-                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
+                <app-search-options [configSearch]="configSearch" (search)="onSearching($event)"
                     (reset_search)="resetSearch($event)"></app-search-options>
             </div>
         </div>

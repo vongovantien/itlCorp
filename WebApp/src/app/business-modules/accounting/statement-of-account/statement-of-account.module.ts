@@ -29,6 +29,11 @@ import { ConfirmBillingDatePopupComponent } from './components/poup/confirm-bill
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { SOAEffect } from './store/effects/soa.effect';
+import { soaEffect } from './store/effects';
 
 const routing: Routes = [
     {
@@ -111,7 +116,9 @@ const COMPONENTS = [
         ShareAccountingModule,
         BsDropdownModule.forRoot(),
         ShareModulesModule,
-        ShareBussinessModule
+        ShareBussinessModule,
+        StoreModule.forFeature('soa', reducers),
+        EffectsModule.forFeature(soaEffect),
     ],
     exports: [],
     providers: [

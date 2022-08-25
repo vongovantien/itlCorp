@@ -68,6 +68,9 @@
      <None Update="FormatExcel\TemplateExport\AccountReceivable\Statement_of_Receivable-Customer.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
+     <None Update="FormatExcel\TemplateExport\Outsourcing Recognising Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-Detail Template.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>

@@ -45,7 +45,15 @@ const routing: Routes = [
             {
                 path: 'manifest', component: ShareBusinessReAlertComponent,
                 data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.AE_CODE },
-            }
+            },
+            {
+                path: 'proofofdelivery', component: ShareBusinessReAlertComponent,
+                data: { name: "Proof Of Delivery", level: 7, serviceId: ChargeConstants.AE_CODE },
+            },
+            {
+                path: 'houseairwaybill', component: ShareBusinessReAlertComponent,
+                data: { name: "Send HAWB", level: 8, serviceId: ChargeConstants.AE_CODE },
+            },
         ],
     },
     {

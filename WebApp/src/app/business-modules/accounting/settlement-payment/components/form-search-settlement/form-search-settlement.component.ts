@@ -93,7 +93,10 @@ export class SettlementFormSearchComponent extends AppForm {
                 { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
             statusApproval: !!data.statusApproval && data.statusApproval !== 'All' ? data.statusApproval : null,
             paymentMethod: !!data.paymentMethod && data.paymentMethod !== 'All' ? data.paymentMethod : null,
-            requester: !!data.requester ? data.requester : null
+            requester: !!data.requester ? data.requester : null,
+            payeeId: !!data.payeeId ? data.payeeId : null,
+            departmentId: !!data.departmentId ? data.departmentId : null,
+            currencyId: !!data.currencyId ? data.currencyId : null
         });
     }
 
@@ -133,7 +136,7 @@ export class SettlementFormSearchComponent extends AppForm {
             currencyId: !!this.currencyId.value ? this.currencyId.value : 'All',
             requester: !!this.requester.value ? this.requester.value : this.userLogged.id,
             payeeId: !!this.payeeId.value ? this.payeeId.value : null,
-            departmentId: !!this.departmentId.value ? this.departmentId.value: null
+            departmentId: !!this.departmentId.value ? this.departmentId.value : null
         };
         this._store.dispatch(SearchListSettlePayment(body));
     }
@@ -174,7 +177,7 @@ export class SettlementFormSearchComponent extends AppForm {
                 },
             );
     }
-    
+
     reset() {
         this.resetFormControl(this.requestDate);
         this.resetFormControl(this.modifiedDate);

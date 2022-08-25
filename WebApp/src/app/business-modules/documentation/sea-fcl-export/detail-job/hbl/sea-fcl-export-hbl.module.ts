@@ -33,7 +33,15 @@ const routing: Routes = [
             {
                 path: 'manifest', component: ShareBusinessReAlertComponent,
                 data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SFE_CODE },
-            }
+            },
+            {
+                path: 'proofofdelivery', component: ShareBusinessReAlertComponent,
+                data: { name: "Proof Of Delivery", level: 7, serviceId: ChargeConstants.SFE_CODE },
+            },
+            {
+                path: 'sendhbl', component: ShareBusinessReAlertComponent,
+                data: { name: "Send HBL", level: 8, serviceId: ChargeConstants.SFE_CODE },
+            },
         ],
     }
 ];
