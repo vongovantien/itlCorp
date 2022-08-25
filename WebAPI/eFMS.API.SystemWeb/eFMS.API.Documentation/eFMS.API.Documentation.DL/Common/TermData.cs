@@ -59,8 +59,8 @@ namespace eFMS.API.Documentation.DL.Common
         public const string Finish = "Finish";
         public const string Reopen = "Reopen";
 
-        public const string OpsTransition = "OpsTransition";
-        public const string CsTransition = "CsTransition";
+        public const string OpsTransaction = "OpsTransaction";
+        public const string CsTransaction = "CsTransaction";
 
 
         public static readonly string FinishCode = "FINISHED";

@@ -527,7 +527,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     handleChangeStatusJob(status: string) {
         let body: any = {
             jobId: this.jobId,
-            transitionType: JobConstants.CSTRANSITION,
+            transitionType: JobConstants.CSTRANSACTION,
             status
         }
         this._documentRepo.updateStatusJob(body).pipe(

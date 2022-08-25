@@ -672,7 +672,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     handleChangeStatusJob(status: string) {
         let body: any = {
             jobId: this.jobId,
-            transitionType: JobConstants.OPSTRANSITION,
+            transitionType: JobConstants.OPSTRANSACTION,
             status
         }
         this._documentRepo.updateStatusJob(body).pipe(

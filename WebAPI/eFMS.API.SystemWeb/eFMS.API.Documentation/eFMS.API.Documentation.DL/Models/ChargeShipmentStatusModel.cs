@@ -8,6 +8,6 @@ namespace eFMS.API.Documentation.DL.Models
     {
         public Guid JobId { get; set; }
         public string Status { get; set; }
-        public string TransitionType { get; set; }
+        public string TransactionType { get; set; }
     }
 }

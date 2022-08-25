@@ -3583,9 +3583,9 @@ namespace eFMS.API.Documentation.DL.Services
             CsTransaction csJob = null;
             OpsTransaction opsJob = null;
 
-            switch (model.TransitionType.ToString().Trim())
+            switch (model.TransactionType.ToString().Trim())
             {
-                case TermData.CsTransition:
+                case TermData.CsTransaction:
                     csJob = DataContext.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
@@ -3598,7 +3598,7 @@ namespace eFMS.API.Documentation.DL.Services
                         csJob.CurrentStatus = TermData.Processing;
                     }
                     break;
-                case TermData.OpsTransition:
+                case TermData.OpsTransaction:
                     opsJob = opsTransactionRepository.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
@@ -3626,12 +3626,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    if(model.TransitionType == TermData.CsTransition)
+                    if(model.TransactionType == TermData.CsTransaction)
                     {
                         hs = DataContext.Update(csJob, x => x.Id == model.JobId);
                     }
 
-                    if (model.TransitionType == TermData.OpsTransition)
+                    if (model.TransactionType == TermData.OpsTransaction)
                     {
                         hs = opsTransactionRepository.Update(opsJob, x => x.Id == model.JobId);
                     }
@@ -3645,13 +3645,13 @@ namespace eFMS.API.Documentation.DL.Services
                         newStage.Status = TermData.Done; ;
                         newStage.DatetimeCreated = newStage.DatetimeModified = newStage.Deadline = DateTime.Now;
                         newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                        if (model.TransitionType == TermData.CsTransition)
+                        if (model.TransactionType == TermData.CsTransaction)
                         {
                             newStage.JobId = csJob.Id;
                             int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == csJob.Id);
                             newStage.OrderNumberProcessed = orderNumberProcess + 1;
                         }
-                        if (model.TransitionType == TermData.OpsTransition)
+                        if (model.TransactionType == TermData.OpsTransaction)
                         {
                             newStage.JobId = opsJob.Id;
                             int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == opsJob.Id);

@@ -1,8 +1,8 @@
 import { formatDate } from "@angular/common";
 
 export class JobConstants {
-    public static readonly CSTRANSITION: string = "CsTransition";
-    public static readonly OPSTRANSITION: string = "OpsTransition";
+    public static readonly CSTRANSACTION: string = "CsTransaction";
+    public static readonly OPSTRANSACTION: string = "OpsTransaction";
 
     public static readonly OVERDUED: string = "Overdued";
     public static readonly PROCESSING: string = "Processing";
