@@ -164,29 +164,31 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 });
             })
 
-        if (this.paymentList.length === 0) {
-            this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
-            return;
-        }
-        if (this.listInvoice.currencyId.value === 'VND') {
-            if (this.paymentList.some(x => (!x.paidAmountVnd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
-                this._toastService.warning("Paid amount vnd is required");
+        if (action == 2) {
+            if (this.paymentList.length === 0) {
+                this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
                 return;
             }
-        } else {
-            if (this.paymentList.some(x => (!x.paidAmountUsd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
-                this._toastService.warning("Paid amount usd is required");
-                return;
+            if (this.listInvoice.currencyId.value === 'VND') {
+                if (this.paymentList.some(x => (!x.paidAmountVnd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
+                    this._toastService.warning("Paid amount vnd is required");
+                    return;
+                }
+            } else {
+                if (this.paymentList.some(x => (!x.paidAmountUsd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
+                    this._toastService.warning("Paid amount usd is required");
+                    return;
+                }
             }
-        }
 
-        if ((this.listInvoice.cusAdvanceAmountVnd.value > 0 || this.listInvoice.cusAdvanceAmountUsd.value > 0)
-            && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
-            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
-            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH].includes(this.listInvoice.paymentMethod.value)) {
-            this.listInvoice.paymentMethod.setErrors({ method_invalid: true });
-            this._toastService.warning("Cus Advance Amount >0 <br> so Payment Method must be one of Clear-advance/Clear-Advance-Cash/Clear-Advance-Bank", 'Payment method is incorrect', { enableHtml: true });
-            return;
+            if ((this.listInvoice.cusAdvanceAmountVnd.value > 0 || this.listInvoice.cusAdvanceAmountUsd.value > 0)
+                && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+                AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+                AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH].includes(this.listInvoice.paymentMethod.value)) {
+                this.listInvoice.paymentMethod.setErrors({ method_invalid: true });
+                this._toastService.warning("Cus Advance Amount >0 <br> so Payment Method must be one of Clear-advance/Clear-Advance-Cash/Clear-Advance-Bank", 'Payment method is incorrect', { enableHtml: true });
+                return;
+            }
         }
 
         const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
@@ -217,41 +219,42 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         sumPaidAmountUsd = +((+sumPaidAmountUsd).toFixed(2));
         sumPaidAmountVnd = +((+sumPaidAmountVnd).toFixed(0));
-
-        if ((receiptModel.currencyId === 'VND' && Math.abs(receiptModel.paidAmountVnd) > Math.abs(sumPaidAmountVnd)) || (receiptModel.currencyId !== 'VND' && Math.abs(receiptModel.paidAmountUsd) > Math.abs(sumPaidAmountUsd))) {
-            this._toastService.warning("Collect amount > Sum paid amount, please process clear");
-            return;
-        }
-        if (Math.abs(sumTotalPaidVnd) > Math.abs(receiptModel.finalPaidAmountVnd) || Math.abs(sumTotalPaidUsd) > Math.abs(receiptModel.finalPaidAmountUsd)) {
-            this._toastService.warning("Final paid amount < Sum total paid amount");
-            return;
-        }
-        if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
-            this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
-        ) {
-            this._toastService.warning("Receipt type is wrong, please you correct it!");
-            return;
-        }
-        if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            const isCreditHaveInvoice = DEBIT_LIST.some(x => !!x.netOffVnd || !!x.netOffUsd);
-            if (!isCreditHaveInvoice) {
-                this._toastService.warning("Some credit do not have net off invoice");
+        if (action == 2) {
+            if ((receiptModel.currencyId === 'VND' && Math.abs(receiptModel.paidAmountVnd) > Math.abs(sumPaidAmountVnd)) || (receiptModel.currencyId !== 'VND' && Math.abs(receiptModel.paidAmountUsd) > Math.abs(sumPaidAmountUsd))) {
+                this._toastService.warning("Collect amount > Sum paid amount, please process clear");
                 return;
             }
-        }
+            if (Math.abs(sumTotalPaidVnd) > Math.abs(receiptModel.finalPaidAmountVnd) || Math.abs(sumTotalPaidUsd) > Math.abs(receiptModel.finalPaidAmountUsd)) {
+                this._toastService.warning("Final paid amount < Sum total paid amount");
+                return;
+            }
+            if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
+                this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
+            ) {
+                this._toastService.warning("Receipt type is wrong, please you correct it!");
+                return;
+            }
+            if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+                const isCreditHaveInvoice = DEBIT_LIST.some(x => !!x.netOffVnd || !!x.netOffUsd);
+                if (!isCreditHaveInvoice) {
+                    this._toastService.warning("Some credit do not have net off invoice");
+                    return;
+                }
+            }
 
-        if (this.paymentList.some(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && x.isChangeValue == true)) {
-            this._toastService.warning('Please you do process clear firstly!');
-            return;
-        }
-        const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
-        if (hasRowTotalInvalid) {
-            const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
-            rowInvalid.forEach(x => {
-                x.isValid = false;
-            })
-            this._toastService.warning("Total paid must <= Unpaid");
-            return;
+            if (this.paymentList.some(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && x.isChangeValue == true)) {
+                this._toastService.warning('Please you do process clear firstly!');
+                return;
+            }
+            const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+            if (hasRowTotalInvalid) {
+                const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+                rowInvalid.forEach(x => {
+                    x.isValid = false;
+                })
+                this._toastService.warning("Total paid must <= Unpaid");
+                return;
+            }
         }
         receiptModel.payments = this.paymentList;
         this.onSaveDataReceipt(receiptModel, action);
