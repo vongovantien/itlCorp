@@ -1,7 +1,7 @@
 import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
@@ -22,6 +22,7 @@ import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/com
 import { takeUntil, catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
 
+import * as fromShareBusiness from '../../../share-business/store';
 @Component({
     selector: ' app-create-job-consol-export',
     templateUrl: './create-job-consol-export.component.html',
@@ -39,11 +40,12 @@ export class SeaConsolExportCreateJobComponent extends ShareDetailJobComponent i
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
+        protected _shareStore: Store<fromShareBusiness.IShareBussinessState>,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
     ) {
-        super(_toastService, _documenRepo);
+        super(_toastService, _documenRepo, _shareStore);
         this.requestCancel = this.gotoList;
     }
 

@@ -46,16 +46,17 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     isCancelFormPopupSuccess: boolean = false;
 
     constructor(
+        private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
+        protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        protected _store: Store<fromShareBussiness.ITransactionState>,
-        protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
         private _ngProgressService: NgProgress
     ) {
-        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
+        super(_router, _documentRepo, _actionStoreSubject, _shareStore, _toastService, cdr);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
@@ -21,6 +21,8 @@ import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/com
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+
+import * as fromShareBusiness from '../../../share-business/store';
 @Component({
     selector: 'app-create-job-fcl-export',
     templateUrl: './create-job-fcl-export.component.html'
@@ -39,11 +41,12 @@ export class SeaFCLExportCreateJobComponent extends ShareDetailJobComponent impl
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
     ) {
-        super(_toastService, _documenRepo);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

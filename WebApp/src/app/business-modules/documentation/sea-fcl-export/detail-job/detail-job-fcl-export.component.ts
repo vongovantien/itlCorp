@@ -1,3 +1,6 @@
+import { transition } from '@angular/animations';
+import { IShareBussinessState } from './../../../share-business/store/reducers/index';
+import { TransactionActions } from './../../../share-business/store/actions/transaction.action';
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
@@ -45,7 +48,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     isCancelFormPopupSuccess: boolean = false;
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -54,9 +57,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
-
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _shareStore, _router, _actionStoreSubject, _cd);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

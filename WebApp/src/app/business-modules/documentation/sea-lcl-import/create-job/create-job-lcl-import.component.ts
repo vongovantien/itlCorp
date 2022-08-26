@@ -1,3 +1,4 @@
+import { Store } from '@ngrx/store';
 import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -17,6 +18,8 @@ import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import * as fromShareBussiness from '../../../share-business/store';
+
 @Component({
     selector: 'app-create-job-lcl-import',
     templateUrl: './create-job-lcl-import.component.html'
@@ -34,10 +37,10 @@ export class SeaLCLImportCreateJobComponent extends ShareDetailJobComponent impl
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super(_toastService, _documenRepo);
-
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

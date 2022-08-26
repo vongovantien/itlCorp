@@ -38,8 +38,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    //shipmentDetail: CsTransaction;
-
     dimensionDetails: DIM[];
 
     isCancelFormPopupSuccess: boolean = false;

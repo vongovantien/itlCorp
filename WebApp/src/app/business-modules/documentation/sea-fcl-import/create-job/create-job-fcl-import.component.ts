@@ -1,7 +1,7 @@
 import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -40,10 +40,11 @@ export class SeaFCLImportCreateJobComponent extends ShareDetailJobComponent {
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
         protected _actionStoreSubject: ActionsSubject,
+        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef
     ) {
-        super(_toastService , _documenRepo);
+        super(_toastService , _documenRepo, _shareStore);
         this.requestCancel = this.gotoList;
     }
 

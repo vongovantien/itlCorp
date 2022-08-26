@@ -1,3 +1,4 @@
+import { Store } from '@ngrx/store';
 import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
@@ -18,6 +19,8 @@ import * as fromShareBussiness from './../../../share-business/store';
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+
+import * as fromShareBusiness from '../../../share-business/store';
 @Component({
     selector: 'app-create-job-consol-import',
     templateUrl: './create-job-consol-import.component.html',
@@ -35,11 +38,12 @@ export class SeaConsolImportCreateJobComponent extends ShareDetailJobComponent {
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
+        protected _shareStore: Store<fromShareBusiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef
     ) {
-        super(_toastService, _documenRepo);
+        super(_toastService, _documenRepo, _shareStore);
         this.requestCancel = this.gotoList;
     }
 

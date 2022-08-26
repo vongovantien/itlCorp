@@ -39,7 +39,7 @@ export class AirExportCreateJobComponent extends ShareDetailJobComponent impleme
         protected _router: Router,
         protected _store: Store<IShareBussinessState>
     ) {
-        super(_toastService, _documenRepo);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

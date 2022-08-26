@@ -21,12 +21,21 @@ export class ShareDetailJobComponent extends AppForm {
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
+        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
     ) {
         super();
     }
 
     getDetailShipment(jobId: string) {
-
+        this._documenRepo.getDetailTransaction(jobId)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.shipmentDetail = res;
+                        this._shareStore.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
+                    }
+                },
+            );
     }
 
     onFinishJob() {

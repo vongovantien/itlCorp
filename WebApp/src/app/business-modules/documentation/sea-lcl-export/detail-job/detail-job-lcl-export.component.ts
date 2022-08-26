@@ -46,6 +46,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -54,13 +55,10 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
-
-
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _shareStore);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
-
     }
 
     ngAfterViewInit() {

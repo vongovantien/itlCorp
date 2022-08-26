@@ -51,11 +51,11 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<any>,
+        protected _store: Store<any>,
         private _ngProgressService: NgProgress,
         private _cd: ChangeDetectorRef
     ) {
-        super(_router, _documentRepo, _toastService);
+        super(_router, _documentRepo, _toastService, _store);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
     }

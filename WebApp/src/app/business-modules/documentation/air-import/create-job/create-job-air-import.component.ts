@@ -43,7 +43,7 @@ export class AirImportCreateJobComponent extends ShareDetailJobComponent impleme
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
         protected _cd: ChangeDetectorRef
     ) {
-        super(_toastService, _documenRepo);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 
