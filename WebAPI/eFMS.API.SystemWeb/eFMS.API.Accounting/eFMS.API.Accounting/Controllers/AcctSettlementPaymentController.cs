@@ -169,7 +169,7 @@ namespace eFMS.API.Accounting.Controllers
                 // deny delete settlement has autorated charges 
                 if (acctSettlementPaymentService.CheckSettleHasAutoRateCharges(settlementNo))
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = settlementNo + " has autorate charges. Delete denied." });
+                    return BadRequest(new ResultHandle { Status = false, Message = settlementNo + " has autorated charges. You can not delete." });
                 }
             }
             
