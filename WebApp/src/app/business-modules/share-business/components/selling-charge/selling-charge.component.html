@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) && (noProfit| async) === false">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) && !(noProfit| async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                         <ng-container *ngIf="allowLinkFee">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
@@ -63,7 +63,7 @@
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="m--w-90 first table-actions-col fixed-side"
-                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true && (noProfit| async) === false">
+                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true && !(noProfit| async)">
                     </th>
                 </thead>
                 <tbody>
@@ -73,7 +73,7 @@
                             [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                             [contextMenu]="linkFeeContextMenu" [disableMenuContext]="!charge.linkFee"
                             (onTouch)="onSelectSurcharge(charge)">
-                            <ng-container *ngIf="(isLocked | async) === false && (noProfit| async) === false">
+                            <ng-container *ngIf="(isLocked | async) === false && !(noProfit| async)">
                                 <td class="table-actions-col fixed-side "
                                     [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge">
@@ -519,7 +519,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <tr *ngIf="(isLocked | async) === false && (noProfit| async) === false">
+                    <tr *ngIf="(isLocked | async) === false && !(noProfit| async)">
                         <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                             <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"

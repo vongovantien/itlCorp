@@ -6258,6 +6258,10 @@ namespace eFMS.API.Accounting.DL.Services
                     validJobNo.AddRange(serviceNoProfit);
 
                     var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    if (surcharges.Count() <= 0)
+                    {
+                        return invalidShipment;
+                    }
                     var listSipment = new List<string>();
                     var shipmentGrp = surcharges.GroupBy(x => x.Hblid);
                     foreach (var shipment in shipmentGrp)

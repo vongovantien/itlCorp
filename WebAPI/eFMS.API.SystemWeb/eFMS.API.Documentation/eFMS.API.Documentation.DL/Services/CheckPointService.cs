@@ -626,6 +626,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (isCheked == true)
             {
                 var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                if (surcharges.Count() <= 0)
+                {
+                    return true;
+                }
                 var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
                 var shipmentNoProfit = false;
                 if (transaction == "CL")
@@ -668,6 +672,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (isCheked == true)
             {
                 var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true  && x.JobNo == jobNo);
+                if(surcharges.Count() <= 0)
+                {
+                    return true;
+                }
                 var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
                 var shipmentNoProfit = false;
                 if (transaction == "CL")
@@ -737,6 +745,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (isCheked == false)
             {
                 var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                if (surcharges.Count() <= 0)
+                {
+                    return true;
+                }
                 var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
                 var shipmentNoProfit = false;
                 if(transaction == "CL")
