@@ -178,22 +178,23 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!string.IsNullOrEmpty(receiptModel.PaymentRefNo))
+            {
+                if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+                {
+                    string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                    return BadRequest(_result);
+                }
+            }
+            else
+            {
+                string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel);
+                receiptModel.PaymentRefNo = receiptNo;
+            }
             if (saveAction == SaveAction.SAVEDONE)
             {
-                if (!string.IsNullOrEmpty(receiptModel.PaymentRefNo))
-                {
-                    if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
-                    {
-                        string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
-                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
-                        return BadRequest(_result);
-                    }
-                }
-                else
-                {
-                    string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel);
-                    receiptModel.PaymentRefNo = receiptNo;
-                }
                 if (receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
                 {
                     bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId
