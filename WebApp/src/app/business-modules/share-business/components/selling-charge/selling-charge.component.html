@@ -19,14 +19,14 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async)">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) && !(noProfit| async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                        <ng-container *ngIf="allowLinkFee && !(noProfit| async)">
+                        <ng-container *ngIf="allowLinkFee">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
                                 <i class="la la-plus"></i> Link Fee
                             </button>
                         </ng-container>
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge && !(noProfit| async)">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
@@ -40,7 +40,7 @@
                             class="btn btn-default">
                             <i class="la la-download"></i> Get Charge Recently<span class="caret"></span>
                         </button> -->
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving && !(noProfit| async)">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving ">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-refresh"></i>Sync charge<span class="caret"></span>
                             </button>
