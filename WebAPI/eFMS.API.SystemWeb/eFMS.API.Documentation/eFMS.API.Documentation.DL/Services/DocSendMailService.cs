@@ -182,12 +182,14 @@ namespace eFMS.API.Documentation.DL.Services
             _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
             _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
 
-            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x=>x.DebitNo).FirstOrDefault();
-            decimal? exchangeRate = null;
-            if(!string.IsNullOrEmpty(debitNo))
-            {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
-            }
+            // [CR]: get exchange rate bất kì của phí ngoại tệ thuộc debit note
+            decimal? exchangeRate = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo) && x.CurrencyId != DocumentConstants.CURRENCY_LOCAL).FirstOrDefault()?.FinalExchangeRate;
+            //var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x=>x.DebitNo).FirstOrDefault();
+            //if(!string.IsNullOrEmpty(debitNo))
+            //{
+            //    exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
+            //}
+
             string _body = templateEmail.Body;
             _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
             _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
@@ -197,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{Routing}}", _shipment.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
-            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Format("{0:n2}", 1) : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
             _body = _body.Replace("{{emailGroup}}", groupUser?.Email);
 
@@ -269,12 +271,9 @@ namespace eFMS.API.Documentation.DL.Services
             _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
             _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
 
-            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
-            decimal? exchangeRate = null;
-            if (!string.IsNullOrEmpty(debitNo))
-            {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
-            }
+            // [CR]: get exchange rate bất kì của phí ngoại tệ thuộc debit note
+            decimal? exchangeRate = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo) && x.CurrencyId != DocumentConstants.CURRENCY_LOCAL).FirstOrDefault()?.FinalExchangeRate;
+
             string _body = templateEmail.Body;
             _body = _body.Replace("{{MAWB}}", _housebill.Mawb);
             _body = _body.Replace("{{HAWB}}", _housebill.Hwbno);
@@ -284,7 +283,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
-            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Format("{0:n2}", 1) : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
 
             var emailContent = new EmailContentModel();
@@ -355,12 +354,9 @@ namespace eFMS.API.Documentation.DL.Services
             _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
             _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
 
-            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
-            decimal? exchangeRate = null;
-            if (!string.IsNullOrEmpty(debitNo))
-            {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
-            }
+            // [CR]: get exchange rate bất kì của phí ngoại tệ thuộc debit note
+            decimal? exchangeRate = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo) && x.CurrencyId != DocumentConstants.CURRENCY_LOCAL).FirstOrDefault()?.FinalExchangeRate;
+
             string _body = templateEmail.Body;
             var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
             _body = _body.Replace("{{Service}}", _service.DisplayName);
@@ -372,7 +368,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
-            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Format("{0:n2}", 1) : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
 
             var emailContent = new EmailContentModel();
@@ -442,12 +438,9 @@ namespace eFMS.API.Documentation.DL.Services
             _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
             _subject = _subject.Replace("{{UserName}}", currentUser.UserName);
 
-            var debitNo = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).FirstOrDefault();
-            decimal? exchangeRate = null;
-            if (!string.IsNullOrEmpty(debitNo))
-            {
-                exchangeRate = acctCdnoteRepo.First(x => x.Code == debitNo && x.Type.ToLower() != "credit")?.ExchangeRate;
-            }
+            // [CR]: get exchange rate bất kì của phí ngoại tệ thuộc debit note
+            decimal? exchangeRate = suchargeRepo.Get(x => x.Hblid == hblId && !string.IsNullOrEmpty(x.DebitNo) && x.CurrencyId != DocumentConstants.CURRENCY_LOCAL).FirstOrDefault()?.FinalExchangeRate;
+
             string _body = templateEmail.Body;
             var _service = CustomData.Services.Where(x => x.Value == _shipment.TransactionType).FirstOrDefault();
             _body = _body.Replace("{{Service}}", _service.DisplayName);
@@ -459,7 +452,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{ATA}}", (_housebill.FlightDate != null) ? _housebill.FlightDate.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{Routing}}", _housebill.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
-            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Empty : string.Format("{0:n2}", exchangeRate));
+            _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Format("{0:n2}", 1) : string.Format("{0:n2}", exchangeRate));
             _body = _body.Replace("{{pic}}", picEmail);
 
             var emailContent = new EmailContentModel();

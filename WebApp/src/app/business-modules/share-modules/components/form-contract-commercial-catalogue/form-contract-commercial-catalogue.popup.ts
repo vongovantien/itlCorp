@@ -922,7 +922,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
                     });
                 }
-                this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[2]);
+                this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
@@ -932,13 +932,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 } else {
                     this.isDisabledExpiredDateField = false;
                 }
-                this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[2]);
+                this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
             case 'Cash':
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
                 break;
             default:
-                this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[2]);
+                this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
         }
 

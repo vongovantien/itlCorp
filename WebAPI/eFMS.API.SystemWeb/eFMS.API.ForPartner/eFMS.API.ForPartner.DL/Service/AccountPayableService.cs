@@ -87,10 +87,15 @@ namespace eFMS.API.ForPartner.DL.Service
                     var paymentMethod = model.PaymentMethod.ToLower().Contains("net") ? ForPartnerConstants.PAYMENT_METHOD_NETOFF : model.PaymentMethod;
                     var paymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
 
-                    var voucherDetail = model.Details.Where(x => x.TransactionType != "NONE");
+                    var voucherDetail = model.Details.Where(x => x.TransactionType != "NONE"
+                                            && x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
+                                            && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                                            && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
+                                            && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE).ToList();
+                    voucherDetail.ToList().ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
                     var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
                     // Update TransactionType without charge mode
-                    model.Details.ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
+                    
                     // Get surcharges info => comment use case hd có tiền âm
                     //var listCharges = model.Details.Select(x => x.ChargeId).ToList();
                     //var sucharges = surchargeRepository.Get(x => listCharges.Any(chg => chg == x.Id));
