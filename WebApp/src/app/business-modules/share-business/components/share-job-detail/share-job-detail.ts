@@ -11,7 +11,7 @@ import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from '../../store';
 
 @Directive()
-export class ShareJobDetailComponent extends AppForm {
+export abstract class ShareJobDetailComponent extends AppForm {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
