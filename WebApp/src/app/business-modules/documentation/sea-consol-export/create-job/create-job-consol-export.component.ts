@@ -1,4 +1,4 @@
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
+
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionsSubject, Store } from '@ngrx/store';
@@ -8,7 +8,7 @@ import { formatDate } from '@angular/common';
 import {
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent,
-    ContainerAction, ContainerActionTypes
+    ContainerAction, ContainerActionTypes, ShareJobDetailComponent
 } from '@share-bussiness';
 import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
@@ -27,7 +27,7 @@ import * as fromShareBusiness from '../../../share-business/store';
     selector: ' app-create-job-consol-export',
     templateUrl: './create-job-consol-export.component.html',
 })
-export class SeaConsolExportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
+export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -40,12 +40,12 @@ export class SeaConsolExportCreateJobComponent extends ShareDetailJobComponent i
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
-        protected _shareStore: Store<fromShareBusiness.IShareBussinessState>,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
     ) {
-        super(_toastService, _documenRepo, _shareStore);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

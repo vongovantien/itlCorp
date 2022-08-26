@@ -47,14 +47,13 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        private _store: Store<fromShareBussiness.ITransactionState>,
-        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
-        private readonly _ngProgressService: NgProgress
+        private readonly _ngProgressService: NgProgress,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super(_router, _documentRepo, _shareStore, _actionStoreSubject, _toastService, cdr);
+        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr, _store);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

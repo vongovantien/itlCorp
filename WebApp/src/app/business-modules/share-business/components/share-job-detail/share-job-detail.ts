@@ -11,7 +11,7 @@ import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from '../../store';
 
 @Directive()
-export class ShareDetailJobComponent extends AppForm {
+export class ShareJobDetailComponent extends AppForm {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
@@ -21,7 +21,7 @@ export class ShareDetailJobComponent extends AppForm {
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
-        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
         super();
     }
@@ -32,7 +32,7 @@ export class ShareDetailJobComponent extends AppForm {
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-                        this._shareStore.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
                     }
                 },
             );

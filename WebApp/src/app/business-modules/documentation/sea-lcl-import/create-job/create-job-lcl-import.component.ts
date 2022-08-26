@@ -1,12 +1,10 @@
 import { Store } from '@ngrx/store';
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
-import { AppForm } from '@app';
-import { ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
+import { ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import { DocumentationRepo } from '@repositories';
@@ -25,7 +23,7 @@ import * as fromShareBussiness from '../../../share-business/store';
     templateUrl: './create-job-lcl-import.component.html'
 })
 
-export class SeaLCLImportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
+export class SeaLCLImportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;

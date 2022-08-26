@@ -58,7 +58,7 @@ export * from './input-daily-export/input-daily-export.popup';
 export * from './payment-method/payment-method.popup';
 export * from './job-detail-buttons/job-detail-button-list.component';
 
-export * from './share-detail-job/share-detail-job';
+export * from './share-job-detail/share-job-detail';
 
 
 // TODO export components from shareBussiness.

@@ -1,4 +1,3 @@
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -11,7 +10,7 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import {
-    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent,
 } from '@share-bussiness';
 
 import { RoutingConstants } from '@constants';
@@ -28,7 +27,7 @@ import { InjectViewContainerRefDirective } from '@directives';
     templateUrl: './create-job-air-import.component.html'
 })
 
-export class AirImportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
+export class AirImportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;

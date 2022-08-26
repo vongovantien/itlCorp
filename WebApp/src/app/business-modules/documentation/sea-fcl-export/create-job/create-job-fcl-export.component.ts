@@ -1,4 +1,3 @@
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -12,7 +11,8 @@ import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import {
     ShareBussinessShipmentGoodSummaryComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareJobDetailComponent
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
@@ -28,7 +28,7 @@ import * as fromShareBusiness from '../../../share-business/store';
     templateUrl: './create-job-fcl-export.component.html'
 })
 
-export class SeaFCLExportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
+export class SeaFCLExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;

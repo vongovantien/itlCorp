@@ -1,4 +1,3 @@
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
@@ -11,7 +10,7 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import {
-    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent,
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
@@ -26,7 +25,7 @@ import * as fromShareBussiness from '../../../share-business/store';
     templateUrl: './create-job-lcl-export.component.html'
 })
 
-export class SeaLCLExportCreateJobComponent extends ShareDetailJobComponent implements OnInit {
+export class SeaLCLExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
@@ -42,9 +41,9 @@ export class SeaLCLExportCreateJobComponent extends ShareDetailJobComponent impl
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
-        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>
+        protected _store: Store<fromShareBussiness.IShareBussinessState>
     ) {
-        super(_toastService, _documenRepo, _shareStore);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

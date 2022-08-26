@@ -1,5 +1,4 @@
 import { Store } from '@ngrx/store';
-import { ShareDetailJobComponent } from './../../../share-business/components/share-detail-job/share-detail-job';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionsSubject } from '@ngrx/store';
@@ -11,7 +10,7 @@ import { CsTransaction, Container } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
-import { ShareBusinessImportJobDetailPopupComponent, ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
+import { ShareBusinessImportJobDetailPopupComponent, ShareBussinessShipmentGoodSummaryComponent, ShareJobDetailComponent } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
 import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
@@ -25,7 +24,7 @@ import * as fromShareBusiness from '../../../share-business/store';
     selector: 'app-create-job-consol-import',
     templateUrl: './create-job-consol-import.component.html',
 })
-export class SeaConsolImportCreateJobComponent extends ShareDetailJobComponent {
+export class SeaConsolImportCreateJobComponent extends ShareJobDetailComponent {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -38,12 +37,12 @@ export class SeaConsolImportCreateJobComponent extends ShareDetailJobComponent {
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
-        protected _shareStore: Store<fromShareBusiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
     ) {
-        super(_toastService, _documenRepo, _shareStore);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

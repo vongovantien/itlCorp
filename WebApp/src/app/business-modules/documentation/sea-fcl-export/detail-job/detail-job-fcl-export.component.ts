@@ -1,6 +1,3 @@
-import { transition } from '@angular/animations';
-import { IShareBussinessState } from './../../../share-business/store/reducers/index';
-import { TransactionActions } from './../../../share-business/store/actions/transaction.action';
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
@@ -19,7 +16,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
+import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -48,7 +45,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     isCancelFormPopupSuccess: boolean = false;
 
     constructor(
-        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -58,7 +55,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
     ) {
-        super(_toastService, _documenRepo, _shareStore, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _store, _router, _actionStoreSubject, _cd);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

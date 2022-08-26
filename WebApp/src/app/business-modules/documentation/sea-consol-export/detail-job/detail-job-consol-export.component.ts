@@ -47,8 +47,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     nextState: RouterStateSnapshot;
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
-        protected _shareStore: Store<fromShareBussiness.IShareBussinessState>,
+
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -56,9 +55,10 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress
+        private _ngProgressService: NgProgress,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super(_toastService, _documenRepo, _shareStore, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
