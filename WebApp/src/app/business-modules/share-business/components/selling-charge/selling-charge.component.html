@@ -19,14 +19,14 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async) && !(noProfit| async)">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                        <ng-container *ngIf="allowLinkFee">
+                        <ng-container *ngIf="allowLinkFee && !(noProfit| async)">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
                                 <i class="la la-plus"></i> Link Fee
                             </button>
                         </ng-container>
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge && !(noProfit| async)">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
@@ -40,7 +40,7 @@
                             class="btn btn-default">
                             <i class="la la-download"></i> Get Charge Recently<span class="caret"></span>
                         </button> -->
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving">
+                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving && !(noProfit| async)">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-refresh"></i>Sync charge<span class="caret"></span>
                             </button>
@@ -73,21 +73,23 @@
                             [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                             [contextMenu]="linkFeeContextMenu" [disableMenuContext]="!charge.linkFee"
                             (onTouch)="onSelectSurcharge(charge)">
-                            <ng-container *ngIf="(isLocked | async) === false && !(noProfit| async)">
+                            <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side "
                                     [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                                     <div class="table-actions" *ngIf="allowSaving">
-                                        <ng-container *ngIf="allowLinkFee && !charge.linkFee">
+                                        <ng-container *ngIf="allowLinkFee && !charge.linkFee && !(noProfit| async)">
                                             <label class="m-checkbox">
                                                 <input type="checkbox" [(ngModel)]="charge.isSelected">
                                                 <span></span>
                                             </label>
                                         </ng-container>
-                                        <button (click)="duplicate(i, 'SELL')"
-                                            class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
-                                            title="Duplicate"><i class="la la-copy"></i>
-                                        </button>
+                                        <ng-container *ngIf="!(noProfit| async)">
+                                            <button (click)="duplicate(i, 'SELL')"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
+                                                title="Duplicate"><i class="la la-copy"></i>
+                                            </button>
+                                        </ng-container>
                                         <ng-container *ngIf="
                                         !charge.soano
                                         && !charge.debitNo
