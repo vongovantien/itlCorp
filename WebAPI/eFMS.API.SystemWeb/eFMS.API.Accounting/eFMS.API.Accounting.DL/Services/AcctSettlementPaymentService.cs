@@ -5827,6 +5827,28 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
+        /// Check if settlement has autorate charges
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <returns></returns>
+        public bool CheckSettleHasAutoRateCharges(string settlementNo)
+        {
+            var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
+            var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+            var surchargesSettle = surcharges.Where(x => x.SettlementCode == settlementNo);
+            var chargesLinked = from sur in surchargesSettle
+                                join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
+                                join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
+                                select sell.Id;
+            if (chargesLinked != null && chargesLinked.Any())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Update surcharge settlement
         /// </summary>
         /// <param name="newSurcharges"></param>
