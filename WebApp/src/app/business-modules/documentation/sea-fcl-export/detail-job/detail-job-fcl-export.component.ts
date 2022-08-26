@@ -173,7 +173,12 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
                         this.isDuplicate = true;
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -197,7 +202,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     } else {
-                        if (res.data.errorCode = 912) {
+                        if (res.data.errorCode = 452) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);

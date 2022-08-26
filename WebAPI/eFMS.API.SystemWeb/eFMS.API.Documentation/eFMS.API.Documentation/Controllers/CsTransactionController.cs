@@ -255,10 +255,10 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
-            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model);
+            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model,true);
             if (msgCheckHasHBL.Length > 0)
             {
-                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data = new { errorCode = 912 } });
+                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data = new { errorCode = 452 } });
             }
 
             model.UserModified = currentUser.UserID;
@@ -461,6 +461,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
+            string msgcheckShipmentTypeWithHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model,false);
+            if (msgcheckShipmentTypeWithHBL.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = msgcheckShipmentTypeWithHBL, Data = new { errorCode = 453 } });
+            }
+
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model, out List<Guid> surchargeIds);
 

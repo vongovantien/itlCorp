@@ -3358,6 +3358,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         #region preview
         public Crystal PreviewShipmentCoverPage(Guid Id)
         {
@@ -3566,28 +3567,53 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model)
+        public string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model, bool isUpdate)
         {
             string errorMsg = string.Empty;
-            var currentJob = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated")
+            if (isUpdate)
             {
-                if(csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
+                var currentJob = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated")
                 {
-                    var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
-                    tranDes.ForEach(x =>
+                    if (csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
                     {
-                        if (catContractRepo.Get(y => y.PartnerId == x.CustomerId && y.SaleManId == x.SaleManId && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
+                        tranDes.ForEach(x =>
                         {
-                            errorMsg += x.Hwbno + "; ";
-                        }
-                    });
-                }
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
 
+                }
             }
+            else
+            {
+                if (model.ShipmentType == "Freehand")
+                {
+                    if (csTransactionDetailRepo.Any(x => x.JobId == model.Id))
+                    {
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == model.Id).ToList();
+                        tranDes.ForEach(x =>
+                        {
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
+
+                }
+            }
+           
             return errorMsg;
         }
-
     }
     #endregion
 
