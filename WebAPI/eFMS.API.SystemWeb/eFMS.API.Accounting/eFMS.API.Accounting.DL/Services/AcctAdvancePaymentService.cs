@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
+        private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
 
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
@@ -96,6 +97,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<SysSettingFlow> sysSettingFlowRepos,
             IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -130,6 +132,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
             catChargeRepository = catChargeRepo;
+            sysSettingFlowRepository = sysSettingFlowRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -4505,6 +4508,15 @@ namespace eFMS.API.Accounting.DL.Services
             return dataDuplicate;
         }
 
+        private bool checkAdvSettingFlow()
+        {
+            if (sysSettingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Type== "AccountPayable").FirstOrDefault()?.ApprovalAdvance == true)
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Check if payee not staff then not accept input cost > sell
         /// </summary>
@@ -4513,6 +4525,10 @@ namespace eFMS.API.Accounting.DL.Services
         public string CheckValidFeesOnShipment(AcctAdvancePaymentModel model)
         {
             var invalidShipment = string.Empty;
+            if (!checkAdvSettingFlow())
+            {
+                return invalidShipment;
+            }
             if (!string.IsNullOrEmpty(model.Payee))
             {
                 if (catPartnerRepo.Any(x => x.Id == model.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
