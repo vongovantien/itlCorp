@@ -96,5 +96,6 @@
   "MSG_SERIES_NO_REQUIRED": "SeriesNo is required!",
   "MSG_INVOICE_NO_REQUIRED": "InvoiceNo is required!",
   "MSG_CDNOTE_ISSUED_COMBINE": "CD Note have issued combine billing {0}. Please remove CD Note from combine billing before update CD Note.",
-  "MSG_TOTAL_OVER_LIMIT": "Amount is too large with currency {0}"
+  "MSG_TOTAL_OVER_LIMIT": "Amount is too large with currency {0}",
+  "MSG_REFUND_FEE_EXISTED": "Cannot update, Refund fee has existed in selling charge!"
 }

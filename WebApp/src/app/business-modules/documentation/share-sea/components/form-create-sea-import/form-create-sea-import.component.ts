@@ -155,6 +155,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
 
                                 podDescription: !!this.fclImportDetail.podDescription ? this.fclImportDetail.podDescription : res.podName,
                                 polDescription: !!this.fclImportDetail.polDescription ? this.fclImportDetail.polDescription : res.polName,
+                                noProfit: this.fclImportDetail.noProfit,
                             });
 
                             this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
@@ -199,6 +200,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             pod: [null, Validators.required],
             coloader: [],
             deliveryPlace: [],
+            noProfit: [false],
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formCreate.controls["etd"];

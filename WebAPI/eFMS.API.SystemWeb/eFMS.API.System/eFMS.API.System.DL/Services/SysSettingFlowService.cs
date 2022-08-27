@@ -47,6 +47,7 @@ namespace eFMS.API.System.DL.Services
             resultData.Unlocks = data.Where(x => x.Flow == "Unlock").ToList();
             resultData.Account = data.FirstOrDefault(x => x.Type == "AccountReceivable");
             resultData.ReplicateOffice = data.FirstOrDefault(x => x.Type == "Other" && x.Flow == "Replicate");
+            resultData.AccountPayable = data.FirstOrDefault(x => x.Type == "AccountPayable");
 
             List<SetLockingDateShipment> dataLockingDateShipment = setLockingDateShipmentRepository.Where(x => x.OfficeId == officeId).ToList();
 
@@ -79,7 +80,7 @@ namespace eFMS.API.System.DL.Services
 
             list.Add(model.ReplicateOffice);
             list.Add(model.AccountReceivable);
-
+            list.Add(model.AccountPayable);
 
             if (data.Count() == 0)
             {

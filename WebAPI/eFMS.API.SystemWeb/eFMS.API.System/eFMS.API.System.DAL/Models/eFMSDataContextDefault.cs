@@ -46,13 +46,13 @@ namespace eFMS.API.System.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
+                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -743,6 +743,10 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerMapping)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShortName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -788,7 +792,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Description).HasMaxLength(10);
+                entity.Property(e => e.Description).HasMaxLength(100);
 
                 entity.Property(e => e.Environment).HasMaxLength(150);
 
@@ -1014,6 +1018,10 @@ namespace eFMS.API.System.Service.Models
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("sysUser");
+
+                entity.HasIndex(e => e.Username)
+                    .HasName("Index_SysUser_ID")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")

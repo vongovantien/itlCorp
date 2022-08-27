@@ -30,6 +30,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    //@ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
@@ -49,6 +50,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     Do you want to sync
     <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL, GW, CW, VW, Qty to HAWB ?<span>
     `;
+
+    confirmUpdateFlightInfo: string = 'Do you want to sync Flight No, Flight Date, ETD, ETA to HAWB ?';
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
@@ -421,6 +424,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         })
     }
 
+    showUpdateFlightInfo() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update Flight Infor',
+            body: this.confirmUpdateFlightInfo,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.updateFlightInfor();
+        })
+    }
+
     onSyncHBL() {
         this.formCreateComponent.isSubmitted = true;
 
@@ -536,6 +549,30 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+    }
+
+    // onUpdateFlightInfo() {
+    //     //this.confirmPopup.show();
+    // }
+
+    updateFlightInfor() {
+        this._documentRepo.updateFlightInfo(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: any) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+
+            );
+        //this.confirmPopup.close();
     }
 }
 

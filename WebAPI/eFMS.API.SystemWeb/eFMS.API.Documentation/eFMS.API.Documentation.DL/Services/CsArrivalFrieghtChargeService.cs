@@ -524,8 +524,23 @@ namespace eFMS.API.Documentation.DL.Services
             var houseBill = houseBills.GetById(criteria.HblId);
             if (arrival != null && houseBill != null)
             {
-                var _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
-                var _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
+                var _polName = string.Empty;
+                var _podName = string.Empty;
+                if(string.IsNullOrEmpty(houseBill.PolDescription))
+                {
+                    _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
+                } else
+                {
+                    _polName = houseBill.PolDescription;
+                }
+                if (string.IsNullOrEmpty(houseBill.PodDescription))
+                {
+                    _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
+                }
+                else
+                {
+                    _podName = houseBill.PodDescription;
+                }
                 var _shipperName = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
                 //var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                 var _agentName = partnerRepositoty.Get(x => x.Id == houseBill.ForwardingAgentId).FirstOrDefault()?.PartnerNameEn;

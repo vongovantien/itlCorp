@@ -1154,6 +1154,9 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<CsTransaction, bool>> transQuery = (q => q.CurrentStatus != TermData.Canceled);
             Expression<Func<CsTransactionDetail, bool>> transDetailQuery = q => true;
 
+            surchargesQuery = surchargesQuery.And(x => x.IsRefundFee != true);
+            obhSurchargesQuery = obhSurchargesQuery.And(x => x.IsRefundFee != true);
+
             string typeCharge = AccountingConstants.TYPE_CHARGE_SELL; //Default is SELL
 
             //Type Charge

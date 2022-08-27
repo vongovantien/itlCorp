@@ -67,5 +67,6 @@ namespace eFMS.API.Documentation.DL.IService
 
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
         IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId);
+        HandleState UpdateFlightInfo(Guid Id);
     }
 }

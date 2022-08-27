@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
+        private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
 
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
@@ -96,6 +97,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<SysSettingFlow> sysSettingFlowRepos,
             IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -130,6 +132,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
             catChargeRepository = catChargeRepo;
+            sysSettingFlowRepository = sysSettingFlowRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -4505,6 +4508,15 @@ namespace eFMS.API.Accounting.DL.Services
             return dataDuplicate;
         }
 
+        private bool checkAdvSettingFlow()
+        {
+            if (sysSettingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Type== "AccountPayable").FirstOrDefault()?.ApprovalAdvance == true)
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Check if payee not staff then not accept input cost > sell
         /// </summary>
@@ -4513,21 +4525,35 @@ namespace eFMS.API.Accounting.DL.Services
         public string CheckValidFeesOnShipment(AcctAdvancePaymentModel model)
         {
             var invalidShipment = string.Empty;
+            if (!checkAdvSettingFlow())
+            {
+                return invalidShipment;
+            }
             if (!string.IsNullOrEmpty(model.Payee))
             {
                 if (catPartnerRepo.Any(x => x.Id == model.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
                 {
                     var jobIds = model.AdvanceRequests.Select(x => x.JobId).ToList();
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
-                    var listSipment = new List<string>();
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var job in shipmentGrp)
+                    var validJobNo = new List<string>();
+                    var opsNoProfit = opsTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    var serviceNoProfit = csTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    validJobNo.AddRange(opsNoProfit);
+                    validJobNo.AddRange(serviceNoProfit);
+
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    if (surcharges.Count() <= 0)
                     {
-                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        return invalidShipment;
+                    }
+                    var listSipment = new List<string>();
+                    var shipmentGrp = surcharges.GroupBy(x => x.Hblid);
+                    foreach (var shipment in shipmentGrp)
+                    {
+                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => (x.AmountVnd ?? 0));
+                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => (x.AmountVnd ?? 0));
                         if (buyAmount > sellAmount)
                         {
-                            listSipment.Add(job.Key);
+                            listSipment.Add(shipment.FirstOrDefault().JobNo);
                         }
                     }
                     if (listSipment.Count > 0)
