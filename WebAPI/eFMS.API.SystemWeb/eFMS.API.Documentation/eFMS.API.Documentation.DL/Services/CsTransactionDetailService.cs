@@ -392,6 +392,29 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public HandleState UpdateFlightInfo(Guid Id)
+        {
+            var job = csTransactionRepo.Get(x => x.Id == Id).FirstOrDefault();
+            var jobDetails = DataContext.Get(x => x.JobId == Id).ToList();
+            try
+            {
+                jobDetails.ForEach(x =>
+                {
+                    x.FlightNo = job.FlightVesselName;
+                    x.FlightDate = job.FlightDate;
+                    x.Eta = job.Eta;
+                    x.Etd = job.Etd;
+                    var hsUpdateFlightInfo = DataContext.Update(x, z => x.Id == z.Id, false);
+                });
+                var sm = DataContext.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
         public string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum)
         {
             string hblNo = string.Empty;
