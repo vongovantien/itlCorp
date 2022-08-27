@@ -1,0 +1,8 @@
+:host ::ng-deep {
+    .app-switch-custom .switch-noProfit .m-switch.m-switch--success:not(.m-switch--outline) input:empty ~ span:before{
+        background-color: #d7ece8 !important;
+    }
+    .app-switch-custom .switch-noProfit .m-switch.m-switch--success:not(.m-switch--outline) input:checked ~ span:before{
+        background-color: #34bfa3 !important;
+    }
+}

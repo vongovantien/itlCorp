@@ -296,6 +296,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
             isHawb: [false],
             isMawb: [false],
+            noProfit: [false],
             incotermId: [null, Validators.required],
             ata: [],
             atd: []

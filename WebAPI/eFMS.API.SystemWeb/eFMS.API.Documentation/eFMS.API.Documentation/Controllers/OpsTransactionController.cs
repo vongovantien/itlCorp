@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly ICheckPointService checkPointService;
 
         /// <summary>
         /// 
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
             ICsShipmentSurchargeService surchargeshipment,
+            ICheckPointService checkPoint,
             Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
@@ -69,6 +71,7 @@ namespace eFMS.API.Documentation.Controllers
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
             surchargeService = surchargeshipment;
+            checkPointService = checkPoint;
         }
 
         /// <summary>
@@ -202,6 +205,23 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
+            if (model.NoProfit == true)
+            {
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + model.JobNo + " have profit, you can not check No Profit." });
+                }
+            }
+            else
+            {
+                var allowUnCheckNoProfit = checkPointService.AllowUnCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowUnCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Can not remove No Profit. " + model.JobNo + " already has Advance/Settlement." });
+                }
+            }
+
             var hs = transactionService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -231,6 +251,16 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
             }
+            if (model.NoProfit == true)
+            {
+                var jobNo = string.Empty;
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipmentDuplicate(model.JobNo, model.NoProfit, model.IsReplicate, out jobNo);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + jobNo + " have profit, check No Profit with this Duplicate job is invalid." });
+                }
+            }
+
             ResultHandle hs = transactionService.ImportDuplicateJob(model, out List<Guid> surchargeIds);
             if (!hs.Status)
             {

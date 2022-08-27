@@ -42,7 +42,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() allowLinkFee: boolean = false;
     @Input() isDuplicateJob: boolean = false;
 
-
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
     messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 

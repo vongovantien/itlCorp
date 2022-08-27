@@ -6292,16 +6292,26 @@ namespace eFMS.API.Accounting.DL.Services
                 if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
                 {
                     var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
-                    var listSipment = new List<string>();
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var job in shipmentGrp)
+                    var validJobNo = new List<string>();
+                    var opsNoProfit = opsTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    var serviceNoProfit = csTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    validJobNo.AddRange(opsNoProfit);
+                    validJobNo.AddRange(serviceNoProfit);
+
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    if (surcharges.Count() <= 0)
                     {
-                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        return invalidShipment;
+                    }
+                    var listSipment = new List<string>();
+                    var shipmentGrp = surcharges.GroupBy(x => x.Hblid);
+                    foreach (var shipment in shipmentGrp)
+                    {
+                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
                         if (buyAmount > sellAmount)
                         {
-                            listSipment.Add(job.Key);
+                            listSipment.Add(shipment.FirstOrDefault().JobNo);
                         }
                     }
                     if (listSipment.Count > 0)
