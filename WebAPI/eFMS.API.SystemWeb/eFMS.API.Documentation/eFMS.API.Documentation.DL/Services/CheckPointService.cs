@@ -313,7 +313,10 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
-
+            if (partner.PartnerMode == "Internal")
+            {
+                return result;
+            }
             if (HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(partnerId);
