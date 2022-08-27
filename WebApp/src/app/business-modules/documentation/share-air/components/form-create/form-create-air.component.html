@@ -133,11 +133,10 @@
                             <label>A.O.L - Departure
                                 <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                                [currentActiveItemId]="{ field: 'id', value: pol.value}"
+                            <app-combo-grid-virtual-scroll allowFreeText (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Select A.O.L"
-                                (remove)="resetFormControl(pol)" [loading]="isLoadingPort | async">
+                                (remove)="resetFormControl(pol); resetFormControl(polDescription)" [loading]="isLoadingPort | async" formControlName="polDescription" >
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -148,11 +147,10 @@
                             <label>A.O.D - Destination
                                 <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                                [currentActiveItemId]="{ field: 'id', value: pod.value}"
+                            <app-combo-grid-virtual-scroll allowFreeText (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Please select A.O.D"
-                                (remove)="resetFormControl(pod)" [loading]="isLoadingPort | async">
+                                (remove)="resetFormControl(pod); resetFormControl(podDescription)" [loading]="isLoadingPort | async" formControlName="podDescription" >
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">Port of

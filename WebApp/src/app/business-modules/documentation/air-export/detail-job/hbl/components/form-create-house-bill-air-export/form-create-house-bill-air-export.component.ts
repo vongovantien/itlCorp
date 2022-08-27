@@ -72,7 +72,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     warehouseId: AbstractControl;
     rateCharge: AbstractControl;
     handingInformation: AbstractControl;
-    incotermId:AbstractControl;
+    incotermId: AbstractControl;
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -186,7 +188,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 freightPayment: shipment.paymentTerm,
                                 kgIb: 'K',
                                 handingInformation: this.setDefaultHandlingInformation(shipment),
-                                incotermId: shipment.incotermId
+                                incotermId: shipment.incotermId,
+                                polDescription: shipment.polDescription,
+                                podDescription: shipment.podDescription,
                             });
 
                             // *  CR 14501
@@ -387,7 +391,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
             // * Array
             dimensionDetails: this._fb.array([]),
-            incotermId: [null, Validators.required]
+            incotermId: [null, Validators.required],
+            podDescription: [],
+            polDescription: [],
 
         },
             { validator: FormValidators.compareGW_CW }
@@ -423,6 +429,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.rateCharge = this.formCreate.controls["rateCharge"];
         this.handingInformation = this.formCreate.controls["handingInformation"];
         this.incotermId = this.formCreate.controls["incotermId"];
+        this.polDescription = this.formCreate.controls["polDescription"];
+        this.podDescription = this.formCreate.controls["podDescription"];
 
         // this.formCreate.get('dimensionDetails')
         //     .valueChanges
@@ -491,7 +499,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             formValue.issueHbldate = { startDate: new Date(), endDate: new Date() };
         }
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
-
         this.totalHeightWeight = data.hw;
 
         this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AE_CODE)
@@ -556,9 +563,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+                this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             default:
                 break;
