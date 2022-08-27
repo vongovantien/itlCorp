@@ -507,14 +507,25 @@
                 <div class="col-md-12" [class.opacity-5]="!formCreate.controls['showDim'].value">
                     <div class="row align-items-center bg-white p-2 m-0">
                         <div class="col-md-2 font-weight-bold">Volume</div>
-                        <div class="col-md-4 text-center font-weight-bold">
+                        <div class="col-md-3 text-center font-weight-bold">
                             HW: &nbsp;
                             <span class="text-primary">{{totalHeightWeight}}</span>
                         </div>
-                        <div
-                            class="col-md-6 text-right d-flex justify-content-between align-items-center font-weight-bold">
-                            CBM:&nbsp;
+                        <div class="col-md-3 text-center font-weight-bold">
+                            CBM: &nbsp;
                             <span class="text-primary">{{totalCBM}}</span>
+                        </div>
+                        <div class="col-md-2 text-center font-weight-bold">
+                            Total Pcs:&nbsp;
+                            <ng-container *ngIf="formCreate.controls['packageQty'].value !== totalPCS">
+                                <span class="text-danger">{{totalPCS}}</span>
+                            </ng-container>
+                            <ng-container *ngIf="formCreate.controls['packageQty'].value === totalPCS">
+                                <span class="text-primary">{{totalPCS}}</span>
+                            </ng-container>
+                        </div>
+                        <div
+                            class="col-md-2 text-right d-flex justify-content-between align-items-center font-weight-bold">
                             <span>
                                 <app-switch size="sm" formControlName="showDim"></app-switch>
                             </span>

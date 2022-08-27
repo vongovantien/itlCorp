@@ -109,6 +109,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     hwconstant: number = null;
     totalHeightWeight: number = null;
     totalCBM: number = null;
+    totalPCS: number = null;
 
     shipmentDetail: CsTransaction;
     customerName: string;
@@ -265,6 +266,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.updateHeightWeight(this.dims);
                     this.formCreate.get('dimensionDetails')
                         .valueChanges
+                        .pipe(
+                            debounceTime(500),
+                            distinctUntilChanged(),
+                        )
                         .subscribe(changes => {
                             this.updateHeightWeight(changes);
                         });
@@ -419,17 +424,19 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.handingInformation = this.formCreate.controls["handingInformation"];
         this.incotermId = this.formCreate.controls["incotermId"];
 
-        this.formCreate.get('dimensionDetails')
-            .valueChanges
-            .pipe(
-                debounceTime(500),
-                distinctUntilChanged(),
-            )
-            .subscribe(changes => {
-                this.updateHeightWeight(changes);
-            });
+        // this.formCreate.get('dimensionDetails')
+        //     .valueChanges
+        //     .pipe(
+        //         debounceTime(500),
+        //         distinctUntilChanged(),
+        //     )
+        //     .subscribe(changes => {
+        //         this.updateHeightWeight(changes);
+        //     });
 
-        this.freightPayment.valueChanges.subscribe(
+        this.freightPayment.valueChanges
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
             (c: string) => {
                 if (!!c) {
                     if (c === "Prepaid") {
@@ -607,6 +614,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             });
             // this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
+            this.totalPCS = this.updatePCS(dims);
+        }else{
+            this.totalCBM = null;
+            this.totalPCS = null;
         }
     }
 
@@ -624,6 +635,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     updateCBM(dims: DIM[]) {
         return +dims.reduce((acc: number, curr: DIM) => acc += curr.cbm, 0).toFixed(3);
+    }
+
+    updatePCS(dims: DIM[]) {
+        return +dims.reduce((acc: number, curr: DIM) => acc += curr.package, 0).toFixed(3);
     }
 
     onWTVALChange() {
