@@ -111,5 +111,6 @@ namespace eFMS.API.Accounting.DL.IService
         void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action);
         Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId);
         string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
+        bool CheckSettleHasAutoRateCharges(string settlementNo);
     }
 }
