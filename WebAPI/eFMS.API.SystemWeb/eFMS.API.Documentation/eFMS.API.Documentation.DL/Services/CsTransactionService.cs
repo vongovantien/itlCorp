@@ -2316,7 +2316,8 @@ namespace eFMS.API.Documentation.DL.Services
                         item.ArrivalHeader = null;
                         item.ArrivalFooter = null;
                         item.ArrivalDate = null;
-
+                        item.DeliveryDate = null;
+                        item.DeliveryPerson = null;
 
                         if (model.TransactionType == "SFE" || model.TransactionType == "SLE" || model.TransactionType == "SCE")
                         {
