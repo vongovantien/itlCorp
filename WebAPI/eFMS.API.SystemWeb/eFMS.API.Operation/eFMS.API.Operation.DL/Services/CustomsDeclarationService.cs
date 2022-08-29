@@ -465,14 +465,16 @@ namespace eFMS.API.Operation.DL.Services
             try
             {
                 var jobHBLId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
-                if (csShipmentSurchargeRepo.Get(x=>x.Hblid== jobHBLId).FirstOrDefault()!=null)
+                var surs = csShipmentSurchargeRepo.Get(x => x.Hblid == jobHBLId).ToList();
+                if (surs.Count()>0)
                 {
-                    csShipmentSurchargeRepo.Get(x => x.Hblid == jobHBLId && x.ClearanceNo == null).ToList().ForEach(x =>
+                    surs.ForEach(x =>
                     {
                         var sur = x;
                         sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
                         csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id,false);
                     });
+                    csShipmentSurchargeRepo.SubmitChanges();
                 }
                 foreach (var item in clearances)
                 {
