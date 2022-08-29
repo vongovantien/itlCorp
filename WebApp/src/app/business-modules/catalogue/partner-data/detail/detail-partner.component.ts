@@ -186,15 +186,16 @@ export class PartnerDetailComponent extends AppList {
 
                         this.userCreatePopup.partnerId = this.partner.id;
                         this._store.select(getMenuUserPermissionState)
-                        .pipe(takeUntil(this.ngUnsubscribe))
-                        .subscribe(x=>{
-                            if(!x.specialActions.length){getMenuUserPermissionState
-                                const changeUser = x.specialActions.filter( permiss => permiss['action'] === 'ChangeInfo' && permiss['isAllow']).length;
-                                if(changeUser && !this.isAddSubPartner){
-                                    this.userCreatePopup.partnerId = this.partner.id;
+                            .pipe(takeUntil(this.ngUnsubscribe))
+                            .subscribe(x => {
+                                if (!x.specialActions.length) {
+                                    getMenuUserPermissionState
+                                    const changeUser = x.specialActions.filter(permiss => permiss['action'] === 'ChangeInfo' && permiss['isAllow']).length;
+                                    if (changeUser && !this.isAddSubPartner) {
+                                        this.userCreatePopup.partnerId = this.partner.id;
+                                    }
                                 }
-                            }
-                        });
+                            });
                     }
                 }
             );
@@ -399,6 +400,9 @@ export class PartnerDetailComponent extends AppList {
             this.formPartnerComponent.partnerMode.setErrors(null);
         }
         if (!this.formPartnerComponent.partnerForm.valid) {
+            console.log('fails');
+            console.log(this.formPartnerComponent.partnerForm);
+
             return;
         }
         this.getFormPartnerData();

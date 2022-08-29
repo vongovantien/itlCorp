@@ -16,7 +16,7 @@ export interface AgentListState {
     isLoaded: boolean;
     dataSearch: any;
     pagingData: any;
-    
+
 }
 
 
@@ -32,7 +32,7 @@ export const initialState: AgentListState = {
 
 const agentReducer = createReducer(
     initialState,
-    on(Types.SearchList, (state: AgentListState, data: any) => ({
+    on(Types.SearchListAgent, (state: AgentListState, data: any) => ({
         ...state, dataSearch: { ...data.payload }
     })),
     on(

@@ -615,5 +615,23 @@ namespace eFMS.API.Documentation.Controllers
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
+
+        [HttpGet]
+        [Route("UpdateFlightInfo")]
+        [Authorize]
+        public IActionResult UpdateGenerateInfo(Guid id)
+        {
+            var hs = csTransactionDetailService.UpdateFlightInfo(id);
+
+            if (!hs.Success)
+            {
+                return BadRequest(hs);
+            }
+
+            var result=new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" };
+
+            return Ok(result);
+        }
+
     }
 }

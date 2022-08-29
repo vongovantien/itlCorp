@@ -42,7 +42,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() allowLinkFee: boolean = false;
     @Input() isDuplicateJob: boolean = false;
 
-
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
     messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
 
@@ -147,6 +146,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Net Amount', field: 'netAmount', sortable: true },
             { title: 'Payment Status', field: 'paymentStatus', sortable: true },
             { title: 'Paid Date', field: 'paidDate', sortable: true },
+            { title: 'Refund Fee', field: 'isRefundFee', sortable: true },
         ];
     }
 
@@ -259,6 +259,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.kickBack = null;
                         c.paySoano = null;
                         c.syncedFrom = null;
+                        c.isRefundFee = null;
                         // Mặc định lấy customer name của HBL
                         c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
                         c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;
@@ -395,4 +396,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 }
             );
     }
+
+    onChangeRefundFee(charge: CsShipmentSurcharge) {
+        if (charge.isRefundFee === true) {
+            charge.partnerShortName = this.shipment.supplierName;
+            charge.paymentObjectId = this.shipment.coloaderId;
+        }
+    }
+
 }

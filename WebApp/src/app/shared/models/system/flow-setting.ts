@@ -20,6 +20,8 @@ export class FlowSetting {
     applyPartner: string = null;
     replicateOfficeId: string = null;
     replicatePrefix: string = null;
+    approvalAdvance: boolean = false;
+    approvalSettlement: boolean = false;
 
     constructor(data?: any) {
         const self = this;

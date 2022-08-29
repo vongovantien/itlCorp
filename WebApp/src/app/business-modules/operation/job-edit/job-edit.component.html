@@ -104,6 +104,7 @@
                                                 [showGetCharge]="true" [showSyncStandard]="false"
                                                 [allowLinkFee]="allowLinkFeeSell"
                                                 [isDuplicateJob]="isDuplicate"
+                                                [noProfit]="opsTransaction.noProfit"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>

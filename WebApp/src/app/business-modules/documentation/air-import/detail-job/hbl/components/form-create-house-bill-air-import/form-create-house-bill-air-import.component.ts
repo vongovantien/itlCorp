@@ -54,7 +54,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     flightNoOrigin: AbstractControl;
     finalPod: AbstractControl;
     packageQty: AbstractControl;
-    incotermId:AbstractControl;
+    incotermId: AbstractControl;
     freightPayment: AbstractControl;
 
     currencyId: AbstractControl;
@@ -74,6 +74,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     issueHBLDate: AbstractControl;
     desOfGoods: AbstractControl;
     wareHouseAnDate: AbstractControl;
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
@@ -174,6 +176,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             chargeWeight: shipment.chargeWeight,
                             packageType: +shipment.packageType,
                             incontermId: shipment.incotermId,
+                            polDescription: shipment.polDescription,
+                            podDescription: shipment.polDescription,
                         });
                     }
                 }),
@@ -281,7 +285,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             flightDateOrigin: [],
             eta: [],
             incotermId: [null, Validators.required],
-            wareHouseAnDate:[]
+            wareHouseAnDate: [],
+            polDescription: [],
+            podDescription: [],
 
         },
             { validator: FormValidators.compareGW_CW }
@@ -315,6 +321,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.flightDateOrigin = this.formCreate.controls['flightDateOrigin'];
         this.wareHouseAnDate = this.formCreate.controls['wareHouseAnDate'];
         this.incotermId = this.formCreate.controls['incotermId'];
+        this.polDescription = this.formCreate.controls['polDescription'];
+        this.podDescription = this.formCreate.controls['podDescription'];
 
     }
 
@@ -372,11 +380,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
-
+                this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
-
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 // * Update default value for sentTo delivery order.
                 this._dataService.setDataService("podName", data.warehouseNameVn || "");
                 break;

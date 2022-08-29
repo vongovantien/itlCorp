@@ -171,7 +171,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                 pono: res.pono,
                                 podDescription: !!res.podDescription ? res.podDescription : res.podName,
                                 polDescription: !!res.polDescription ? res.polDescription : res.polName,
-
+                                noProfit: res.noProfit
 
                             });
 
@@ -216,7 +216,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             shipmentType: [this.shipmentTypes[0], Validators.required], // * select
             typeOfService: [null, Validators.required], // * select
             personalIncharge: [],  // * select
-            incotermId: []
+            incotermId: [],
+            noProfit: [false],
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formGroup.controls["etd"];

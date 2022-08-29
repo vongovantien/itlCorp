@@ -137,22 +137,22 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Departure Airport</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                            [currentActiveItemId]="{ field: 'id', value: pol.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            placeholder="Select Departure Airport" [loading]="isLoadingPort | async"
-                            (remove)="resetFormControl(pol)" [displayFields]="displayFieldPort">
+                        <app-combo-grid-virtual-scroll allowFreeText
+                            (itemSelected)="onSelectDataFormInfo($event, 'pol')" [selectedDisplayFields]="['nameEn']"
+                            [dataSources]="ports | async" placeholder="Select Departure Airport"
+                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pol)"
+                            [displayFields]="displayFieldPort" formControlName="polDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !pod.value}">
                         <label required>Destination Airport</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                            [currentActiveItemId]="{ field: 'id', value: pod.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [loading]="isLoadingPort | async" placeholder="Select Destination Airport"
-                            (remove)="resetFormControl(pod)" [displayFields]="displayFieldPort">
+                        <app-combo-grid-virtual-scroll allowFreeText
+                            (itemSelected)="onSelectDataFormInfo($event, 'pod')" [selectedDisplayFields]="['nameEn']"
+                            [dataSources]="ports | async" [loading]="isLoadingPort | async"
+                            placeholder="Select Destination Airport" (remove)="resetFormControl(pod)"
+                            [displayFields]="displayFieldPort" formControlName="podDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -280,10 +280,11 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
                                 <label required>Incoterm</label>
                                 <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
-                                           [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
                             </div>
                         </div>
