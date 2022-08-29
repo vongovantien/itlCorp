@@ -632,26 +632,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     }
 
-    updateShipmentChanger(model) {
-        this._documentRepo.updateShipment(model)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        this.getShipmentDetails(this.opsTransaction.id);
-                    } else {
-                        this._toastService.warning(res.message);
-                    }
-                },
-                (error: HttpErrorResponse) => {
-                    if (error.error?.data?.errorCode) {
-                        this.editForm.formEdit.controls[error.error?.data?.errorCode].setErrors({ existed: true });
-                    }
-                }
-            );
-    }
-
     onFinishJob() {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             body: 'Do you want to finish this shipment ?',
