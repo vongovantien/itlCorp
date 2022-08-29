@@ -58,6 +58,7 @@ export class OpsTransaction extends BaseModel {
     serviceHblId: string = null;
     linkSource: string = null;
     replicatedId: string = null;
+    noProfit: boolean = false;
 
     note: string = '';
     isLinkFee: boolean = false;

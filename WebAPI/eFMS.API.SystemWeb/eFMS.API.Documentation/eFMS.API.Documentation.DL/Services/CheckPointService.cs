@@ -27,6 +27,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> csSurchargeRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetail;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
+        private readonly IContextBase<AcctAdvanceRequest> advanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> advancePaymentRepository;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
+        private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
 
         readonly string salemanBOD = string.Empty;
         readonly IQueryable<CsTransaction> csTransactions;
@@ -44,6 +48,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<CsShipmentSurcharge> csSurcharge,
             IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+            IContextBase<AcctAdvanceRequest> advanceRequest,
+            IContextBase<AcctAdvancePayment> advancePayment,
+            IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<CsLinkCharge> csLinkCharge,
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
@@ -58,6 +66,10 @@ namespace eFMS.API.Documentation.DL.Services
             this.csSurchargeRepository = csSurcharge;
             this.csTransactionDetail = csTransactionDetailRepo;
             sysSettingFlowRepository = sysSettingFlow;
+            advanceRequestRepository = advanceRequest;
+            advancePaymentRepository = advancePayment;
+            settlementPaymentRepository = settlementPayment;
+            csLinkChargeRepository = csLinkCharge;
 
             salemanBOD = sysUserRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
@@ -294,7 +306,6 @@ namespace eFMS.API.Documentation.DL.Services
         {
             HandleState result = new HandleState();
             if (criteria.Data.Count == 0) return result;
-          
             foreach (var partner in criteria.Data)
             {
                 var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
@@ -313,7 +324,10 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
             CatContract contract;
-
+            if (partner.PartnerMode == "Internal")
+            {
+                return result;
+            }
             if (HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(partnerId);
@@ -566,6 +580,8 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<CsShipmentSurcharge, bool>> querySurcharge = x => x.OfficeId != HM
                 && x.OfficeId != BH
                 && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            querySurcharge = querySurcharge.And(x => x.IsRefundFee != true);
+
             var hbls = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
             if (transactionType == "CL")
             {
@@ -582,19 +598,20 @@ namespace eFMS.API.Documentation.DL.Services
             if (surcharges.Count() > 0)
             {
                 partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
-            } else
+            }
+            else
             {
-                if(transactionType == "CL")
+                if (transactionType == "CL")
                 {
                     var opsJob = opsTransactionRepository.First(x => x.Hblid == Id);
-                    if(opsJob != null)
+                    if (opsJob != null)
                     {
                         partners.Add(new CheckPointPartnerHBLDataGroup { HblId = opsJob.Hblid, PartnerId = opsJob.CustomerId });
 
                         return partners;
                     }
                 }
-                if(hbls.Count() == 0)
+                if (hbls.Count() == 0)
                 {
                     return partners;
                 }
@@ -602,6 +619,184 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return partners;
+        }
+
+        /// <summary>
+        /// Check if shipment allow check no profit
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked)
+        {
+            if (isCheked == true)
+            {
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                if (surcharges.Count() <= 0)
+                {
+                    return true;
+                }
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if (transaction == "CL")
+                {
+                    shipmentNoProfit = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+                else
+                {
+                    shipmentNoProfit = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+
+                if (surcharges.Count() > 0 && !shipmentNoProfit)
+                {
+                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
+                    foreach (var hblId in hblIds)
+                    {
+                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        if (sellAmount - buyAmount > 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        ///  Check if duplicate shipment allow check no profit
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <param name="isCheked"></param>
+        /// <param name="isReplicate">shipment has Job Replicate</param>
+        /// <param name="shipmentInvalid"></param>
+        /// <returns></returns>
+        public bool AllowCheckNoProfitShipmentDuplicate(string jobNo, bool? isCheked, bool isReplicate, out string shipmentInvalid)
+        {
+            shipmentInvalid = string.Empty;
+            if (isCheked == true)
+            {
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true  && x.JobNo == jobNo);
+                if(surcharges.Count() <= 0)
+                {
+                    return true;
+                }
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if (transaction == "CL")
+                {
+                    var opstraction = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
+                    shipmentNoProfit = opstraction?.NoProfit ?? false;
+                    surcharges = surcharges.Where(x => string.IsNullOrEmpty(x.LinkChargeId));
+                    if (isReplicate && !shipmentNoProfit)
+                    {
+                        // Không lấy phí đã AutoRate
+                        var jobRepNo = opsTransactionRepository.Get(x => x.Id == opstraction.ReplicatedId).FirstOrDefault()?.JobNo;
+                        var surchargesRep = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true && string.IsNullOrEmpty(x.LinkChargeId) && x.JobNo == jobRepNo);
+                        List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == jobRepNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_AUTO_RATE).ToList();
+                        if (csLinkFee.Count() > 0)
+                        {
+                            List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                            surchargesRep = surchargesRep.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+                            if (surchargesRep.Count() > 0)
+                            {
+                                surcharges = surcharges.Union(surchargesRep);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var cstransaction = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
+                    shipmentNoProfit = cstransaction?.NoProfit ?? false;
+                    if (!shipmentNoProfit)
+                    {
+                        //[01/03/2022] Không lấy những phí đã linkFee
+                        List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == cstransaction.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
+                        if (csLinkFee.Count > 0)
+                        {
+                            List<string> listChargeExisted = csLinkFee.Select(x => x.ChargeLinkId).ToList();
+                            surcharges = surcharges.Where(x => !listChargeExisted.Contains(x.Id.ToString()));
+                        }
+                    }
+                }
+
+                if (surcharges.Count() > 0 && !shipmentNoProfit)
+                {
+                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
+                    foreach (var hblId in hblIds)
+                    {
+                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        if (sellAmount - buyAmount > 0)
+                        {
+                            shipmentInvalid = surcharges.Where(x => x.Hblid == hblId).FirstOrDefault().JobNo;
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Check if can uncheck no profit shipment
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <param name="isCheked"></param>
+        /// <returns></returns>
+        public bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked)
+        {
+            if (isCheked == false)
+            {
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.JobNo == jobNo);
+                if (surcharges.Count() <= 0)
+                {
+                    return true;
+                }
+                var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
+                var shipmentNoProfit = false;
+                if(transaction == "CL")
+                {
+                    shipmentNoProfit = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+                else
+                {
+                    shipmentNoProfit = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
+                }
+
+                if (shipmentNoProfit) // Shipment with checked no profit
+                {
+                    // Check Advance
+                    var advanceNos = advanceRequestRepository.Get(x => x.JobId == jobNo).Select(x => x.AdvanceNo).Distinct().ToList();
+                    if (advanceNos.Count > 0)
+                    {
+                        var payees = advancePaymentRepository.Get(x => !string.IsNullOrEmpty(x.Payee) && advanceNos.Any(z => z == x.AdvanceNo)).Select(x => x.Payee);
+                        foreach (var payee in payees)
+                        {
+                            if (catPartnerRepository.Any(x => x.Id == payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Check Settlement
+                    var settleNos = surcharges.Where(x => !string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.SettlementCode).Distinct().ToList();
+                    if (settleNos.Count > 0)
+                    {
+                        var payees = settlementPaymentRepository.Get(x => !string.IsNullOrEmpty(x.Payee) && settleNos.Any(z => z == x.SettlementNo)).Select(x => x.Payee);
+                        foreach (var payee in payees)
+                        {
+                            if (catPartnerRepository.Any(x => x.Id == payee && !x.PartnerGroup.ToLower().Contains("staff")))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 }

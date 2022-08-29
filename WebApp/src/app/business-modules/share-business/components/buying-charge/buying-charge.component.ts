@@ -86,6 +86,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     userLogged: any;
     selectedCs: CsShipmentSurcharge;
     messageConfirmRevertLinkFee: string = "Do you want to Revert Fee these Jobs ?";
+    noProfit: boolean | any = false;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -116,6 +117,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             );
 
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
+        this.noProfit = this._store.select(fromStore.getTransactionNoProfit);
         this.permissionShipments = this._store.select(fromStore.getTransactionPermission);
     }
 

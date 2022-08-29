@@ -309,6 +309,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.packageTypeId = form.packageTypeId;
         this.opsTransaction.commodityGroupId = form.commodityGroupId;
         this.opsTransaction.shipmentType = form.shipmentType;
+        this.opsTransaction.noProfit = form.noProfit;
 
         if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
@@ -465,7 +466,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             agentName: this.opsTransaction.agentName,
                             supplierName: this.opsTransaction.supplierName,
                             coloaderId: this.opsTransaction.supplierId,
-                            mawb: this.opsTransaction.mblno
+                            mawb: this.opsTransaction.mblno,
+                            noProfit: this.opsTransaction.noProfit
                         }));
 
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));

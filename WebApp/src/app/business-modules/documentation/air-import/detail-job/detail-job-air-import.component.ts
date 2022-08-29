@@ -31,7 +31,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 export class AirImportDetailJobComponent extends AirImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
+    confirmUpdateFlightInfo: string = 'Do you want to sync Flight No, Flight Date, ETD, ETA to HAWB ?';
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
     jobId: string;
@@ -502,5 +502,33 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+    }
+
+    showUpdateFlightInfo() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update Flight Infor',
+            body: this.confirmUpdateFlightInfo,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.updateFlightInfor();
+        })
+    }
+
+    updateFlightInfor() {
+        this._documentRepo.updateFlightInfo(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: any) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 }

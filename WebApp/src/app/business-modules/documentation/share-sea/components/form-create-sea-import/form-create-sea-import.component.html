@@ -218,14 +218,24 @@
                     </div>
 
                     <div class="col-md-4">
-
-                        <div class="form-group">
-                            <label>Incoterm</label>
-                            <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
-                                [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
-                            </ng-select>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label>Incoterm</label>
+                                    <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id" [clearable]="true"
+                                        formControlName="incotermId" placeholder="Select Incoterm">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>
+                                        No Profit
+                                    </label>
+                                    <app-switch size="md" formControlName="noProfit"></app-switch>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">

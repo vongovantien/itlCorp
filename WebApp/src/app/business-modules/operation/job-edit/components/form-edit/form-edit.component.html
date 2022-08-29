@@ -349,14 +349,28 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.valid}">
-					<label class="form-control-label" required>
-						Shipment Type
-					</label>
-					<ng-select class="custom" [clearable]="false" [items]="shipmentTypes" placeholder="Package Type"
-						formControlName="shipmentType">
-					</ng-select>
+			
+				<div class="row">
+					<div class="col-lg-8">
+						<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.valid}">
+							<label class="form-control-label" required>
+								Shipment Type
+							</label>
+							<ng-select class="custom" [clearable]="false" [items]="shipmentTypes" placeholder="Package Type"
+								formControlName="shipmentType">
+							</ng-select>
+						</div>
+					</div>
+					<div class="col-lg-4 app-switch-custom">
+						<div class="form-group">
+							<label class="form-control-label">
+								No Profit
+							</label>
+							<app-switch size="md" formControlName="noProfit" class="success switch-noProfit"></app-switch>
+						</div>
+					</div>
 				</div>
+			
 			</div>
 		</div>
 		<div class="row" *ngIf="opsTransaction && !isJobCopy">
