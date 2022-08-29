@@ -31,7 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES' | 'HBL';
 
 export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
@@ -175,7 +174,12 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
 
                         this.isDuplicate = true;
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -199,7 +203,11 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -208,6 +216,15 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                     }
                 }
             );
+    }
+
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     getListContainer() {

@@ -106,6 +106,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     userCreated: string;
     userModified: string;
 
+    shipmentType: string;
+
     hblId: string = '';
 
     constructor(
@@ -139,6 +141,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                     this.dateTimeModified = res.datetimeModified;
                     this.userCreated = res.userNameCreated;
                     this.userModified = res.userNameModified;
+                    this.shipmentType = res.shipmentType;
                     if (!this.isUpdate) {
                         const formData = {
                             masterBill: this.shipmentDetail.mawb,
@@ -243,7 +246,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             ],
             arrivalVoyage: [
             ],
-            receivedBillTime:[],
+            receivedBillTime: [],
             documentNo: [],
             referenceNo: [],
             inWord: [],
@@ -261,7 +264,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             consigneeDescription: [],
             notifyPartyDescription: [],
             alsonotifyPartyDescription: [],
-            incotermId: [null,Validators.required],
+            incotermId: [null, Validators.required],
             serviceType: [null,
                 Validators.required]
         }, { validator: [FormValidators.comparePort] });
@@ -333,7 +336,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             remark: data.remark,
             inWord: data.inWord,
             serviceType: data.serviceType,
-            receivedBillTime:data.receivedBillTime
+            receivedBillTime: data.receivedBillTime
         });
     }
 
@@ -399,7 +402,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
 
-                this._catalogueRepo.getListSalemanByPartner(data.id, this.type)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.type, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];

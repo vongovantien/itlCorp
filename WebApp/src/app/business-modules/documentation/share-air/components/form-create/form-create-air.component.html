@@ -15,7 +15,7 @@
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)"
                                 placeholder="xxx-xxxxxxxx">
-                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
+                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
                             mawb.errors | equalError:'pattern':''">
                                 MAWB must be xxx-xxxxxxxx
                             </div>
@@ -26,7 +26,7 @@
                             <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidSpecial'
                             ">
                                 MAWB No must be not have special charater!
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -40,7 +40,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !shipmentType.valid}">
+                                    [ngClass]="{'m-form__group has-danger':(isSubmitted && !shipmentType.valid) || (shipmentType.errors | equalError: 'hasHBL')}">
                                     <label required>Shipment Type</label>
                                     <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
                                         formControlName="shipmentType" [clearable]="false"></ng-select>

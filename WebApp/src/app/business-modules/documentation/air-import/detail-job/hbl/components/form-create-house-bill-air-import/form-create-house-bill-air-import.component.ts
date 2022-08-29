@@ -93,6 +93,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     isLoadingPort: Observable<boolean>;
 
+    shipmentType: string;
+
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
@@ -159,6 +161,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
+                        this.shipmentType = shipment.shipmentType;
                         this.formCreate.patchValue({
                             mawb: shipment.mawb,
                             pod: shipment.pod,
@@ -336,7 +339,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.consigneeId.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.AI_CODE)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AI_CODE, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];

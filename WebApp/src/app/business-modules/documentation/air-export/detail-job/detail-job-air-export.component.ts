@@ -43,6 +43,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     isCancelFormPopupSuccess: boolean = false;
 
+    errHasHBL: boolean = false;
+
     nextState: RouterStateSnapshot;
     confirmSyncHBLText: string = `
     Do you want to sync
@@ -201,7 +203,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.isDuplicate = true;
 
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -216,6 +224,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    console.log(res);
+
                     if (res.status) {
                         this._toastService.success(res.message);
 
@@ -223,7 +233,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.getDetailShipment(this.jobId);
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -233,6 +247,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 }
             );
     }
+
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
+    }
+
 
     onSelectTab(tabName: string) {
         switch (tabName) {

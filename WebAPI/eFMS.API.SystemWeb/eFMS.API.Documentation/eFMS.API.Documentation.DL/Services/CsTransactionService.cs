@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<CatContract> catContractRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
@@ -110,10 +111,10 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IAccAccountReceivableService accAccountReceivable,
-
             ICsStageAssignedService csStageAssigned,
             IContextBase<CatStage> stageRepo,
             IContextBase<OpsStageAssigned> csStageAssignedRepo,
+            IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -151,11 +152,6 @@ namespace eFMS.API.Documentation.DL.Services
             sysImageService = imageService;
             csLinkChargeRepository = csLinkChargeRepo;
             accAccountReceivableService = accAccountReceivable;
-
-            opsTransactionRepository = opsTransactionRepo;
-            csStageAssignedRepository = csStageAssignedRepo;
-            csStageAssignedService = csStageAssigned;
-            csStageRepository = stageRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -3377,6 +3373,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         #region preview
         public Crystal PreviewShipmentCoverPage(Guid Id)
         {
@@ -3583,6 +3580,54 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState(false, ex.ToString());
             }
+        }
+
+        public string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model, bool isUpdate)
+        {
+            string errorMsg = string.Empty;
+            if (isUpdate)
+            {
+                var currentJob = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated")
+                {
+                    if (csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
+                    {
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
+                        tranDes.ForEach(x =>
+                        {
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
+
+                }
+            }
+            else
+            {
+                if (model.ShipmentType == "Freehand")
+                {
+                    if (csTransactionDetailRepo.Any(x => x.JobId == model.Id))
+                    {
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == model.Id).ToList();
+                        tranDes.ForEach(x =>
+                        {
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
+
+                }
+            }
+           
+            return errorMsg;
         }
 
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
