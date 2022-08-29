@@ -464,6 +464,18 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
+                var jobHBLId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
+                var surs = csShipmentSurchargeRepo.Get(x => x.Hblid == jobHBLId).ToList();
+                if (surs.Count()>0)
+                {
+                    surs.ForEach(x =>
+                    {
+                        var sur = x;
+                        sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
+                        csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id,false);
+                    });
+                    csShipmentSurchargeRepo.SubmitChanges();
+                }
                 foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
