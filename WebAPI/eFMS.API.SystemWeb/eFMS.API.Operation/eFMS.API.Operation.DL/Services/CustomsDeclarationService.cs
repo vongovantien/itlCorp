@@ -471,7 +471,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var sur = x;
                         sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
-                        csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id);
+                        csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id,false);
                     });
                 }
                 foreach (var item in clearances)
