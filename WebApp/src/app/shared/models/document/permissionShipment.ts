@@ -6,6 +6,8 @@ export class PermissionShipment {
     allowAddCharge: boolean = true;
     allowUpdateCharge: boolean = true;
     allowLock: boolean = false;
+    allowFinish: boolean = false;
+    allowReopen: boolean = false;
 
     constructor(object?: any) {
         const self = this;

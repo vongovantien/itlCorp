@@ -411,6 +411,8 @@ namespace eFMS.API.Documentation.DL.Common
                 detailPermission.AllowLock = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("LockShipment"))?.IsAllow;
                 detailPermission.AllowUpdateCharge = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("UpdateCharge"))?.IsAllow;
                 detailPermission.AllowAssignStage = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("AssignStage"))?.IsAllow;
+                detailPermission.AllowFinish = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("FinishShipment"))?.IsAllow;
+                detailPermission.AllowReopen = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("ReopenShipment"))?.IsAllow;
             }
             return detailPermission;
         }

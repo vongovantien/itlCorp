@@ -1,6 +1,6 @@
 <app-sub-header>
-    <ng-container *ngIf="(menuSpecialPermission | async | specialPermission:'FinishShipment') && !!opsTransaction && opsTransaction.permission.allowUpdate
-        && !opsTransaction.isLocked  && opsTransaction.currentStatus !== 'Finish' && !isDuplicate">
+    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowFinish && opsTransaction?.currentStatus !== 'Finish'
+        && !opsTransaction.isLocked && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
@@ -11,9 +11,8 @@
             </span>
         </button>
     </ng-container>
-
-    <ng-container *ngIf="(menuSpecialPermission | async | specialPermission:'ReopenShipment') && !!opsTransaction && opsTransaction.permission.allowUpdate
-        && !opsTransaction.isLocked && opsTransaction.currentStatus === 'Finish'&& !isDuplicate">
+    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish'
+        && !opsTransaction.isLocked && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
@@ -53,7 +52,7 @@
     </ng-container>
 
     <ng-container
-        *ngIf="((opsTransaction?.isLocked === false) || isDuplicate) && opsTransaction.currentStatus !== 'Finish'">
+        *ngIf="((opsTransaction?.isLocked === false) || isDuplicate)">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()" *ngIf="opsTransaction?.permission?.allowDelete && !isDuplicate && !opsTransaction.replicatedId
             && !opsTransaction.isLinkFee && opsTransaction?.currentStatus !== 'Finish'" title="Shipment was deleted">
@@ -77,20 +76,6 @@
 
         <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" *ngIf="isDuplicate"
             (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
-
-    </ng-container>
-
-    <ng-container *ngIf="opsTransaction?.isLocked === true">
-        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-            *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate" (click)="saveShipment()"
-            [disabled]="tab !== 'job-edit'">
             <span>
                 <i class="la la la-save"></i>
                 <span>

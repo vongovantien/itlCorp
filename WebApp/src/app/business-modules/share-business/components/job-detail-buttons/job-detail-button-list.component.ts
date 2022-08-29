@@ -9,7 +9,7 @@ import * as fromShareBussiness from '../../store/index';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ShareBussinessJobDetailButtonListComponent extends AppPage implements OnInit {
+export class ShareBussinessJobDetailButtonListComponent extends AppPage {
 
     @Input() shipmentDetail: any;
     @Input() isDuplicate: boolean = false;
@@ -24,10 +24,8 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
     @Output() onFinish: EventEmitter<any> = new EventEmitter<any>();
     @Output() onReopen: EventEmitter<any> = new EventEmitter<any>();
 
-    constructor(private _store: Store<fromShareBussiness.IShareBussinessState>,) { super(); }
-
-    ngOnInit() {
-        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+    constructor() {
+        super();
     }
 
     lockShipment() {
