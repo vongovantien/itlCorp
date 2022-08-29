@@ -46,7 +46,6 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         this._progressRef = this._ngProgressService.ref();
         this.requestSort = this.sortLocal;
         this.requestList = this.getCustomClearanesOfJob;
-
     }
 
     ngOnInit() {
@@ -64,7 +63,6 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         this._activedRouter.params.subscribe((param: { id: string }) => {
             if (!!param.id) {
                 this.getShipmentDetails(param.id);
-
             }
         });
     }

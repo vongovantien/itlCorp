@@ -1,4 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
+import { finalize } from 'rxjs/operators';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -12,7 +14,7 @@ import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@
 import { CommonEnum } from '@enums';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { InjectViewContainerRefDirective } from '@directives';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, JobConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
 
@@ -26,9 +28,7 @@ import * as fromShareBussiness from './../../share-business/store';
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
-import { HttpErrorResponse } from '@angular/common/http';
-import { take } from 'lodash';
-@Component({
+import { HttpErrorResponse } from '@angular/common/http'; @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
 })
@@ -71,14 +71,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         protected _cd: ChangeDetectorRef,
     ) {
         super();
-
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        console.log(this.menuSpecialPermission);
         this.subscriptionParamURLChange();
-
         this.subscriptionSaveContainerChange();
-
     }
 
     subscriptionParamURLChange() {
@@ -387,6 +386,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.insertDuplicateShipment();
         }
     }
+
     insertDuplicateShipment() {
         this._documentRepo.insertDuplicateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError))
@@ -435,7 +435,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-
                         if (this.opsTransaction.linkSource == "Replicate") {
                             this.allowLinkFeeSell = false;
                         }
@@ -631,5 +630,67 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 }
             )
 
+    }
+
+    updateShipmentChanger(model) {
+        this._documentRepo.updateShipment(model)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.getShipmentDetails(this.opsTransaction.id);
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.editForm.formEdit.controls[error.error?.data?.errorCode].setErrors({ existed: true });
+                    }
+                }
+            );
+    }
+
+    onFinishJob() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to finish this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.handleChangeStatusJob(JobConstants.FINISH);
+        })
+    }
+
+    onReopenJob() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to reopen this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.handleChangeStatusJob(JobConstants.REOPEN);
+        })
+
+    }
+
+    handleChangeStatusJob(status: string) {
+        let body: any = {
+            jobId: this.jobId,
+            transactionType: JobConstants.OPSTRANSACTION,
+            status
+        }
+        this._documentRepo.updateStatusJob(body).pipe(
+            catchError(this.catchError),
+            finalize(() => {
+                this._progressRef.complete();
+            })
+        ).subscribe(
+            (r: CommonInterface.IResult) => {
+                if (r.status) {
+                    this.getShipmentDetails(this.jobId);
+                    this._toastService.success(r.message);
+                } else {
+                    this._toastService.error(r.message);
+                }
+            },
+        );
     }
 }

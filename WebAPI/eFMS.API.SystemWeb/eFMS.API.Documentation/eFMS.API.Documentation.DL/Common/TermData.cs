@@ -56,8 +56,15 @@ namespace eFMS.API.Documentation.DL.Common
     public static class TermData
     {
 
-        public const string OpsTransition = "OpsTransition";
-        public const string CsTransition = "CsTransition";
+        public const string Finish = "Finish";
+        public const string Reopen = "Reopen";
+
+        public const string OpsTransaction = "OpsTransaction";
+        public const string CsTransaction = "CsTransaction";
+
+
+        public static readonly string FinishCode = "FINISHED";
+        public static readonly string ReopenCode = "REOPEN";
 
         public static readonly string Canceled = "Canceled";
 
@@ -68,7 +75,6 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Pending = "Pending";
         public static readonly string Deleted = "Deleted";
         public static readonly string Warning = "Warning";
-        public static readonly string Finish = "Finish";
 
         public static readonly string CustomLogistic = "CL";
         public static readonly string InlandTrucking = "IT";//"InlandTrucking";

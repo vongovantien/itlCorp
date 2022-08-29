@@ -9,7 +9,7 @@ import { CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants} from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -45,7 +45,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -54,13 +54,10 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
-
-
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
-
     }
 
     ngAfterViewInit() {

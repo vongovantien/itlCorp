@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-8" *ngIf="(isLocked | async) === false">
+            <div class="col-md-8" *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
                 <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                     <div class="m--align-right c-button-actions">
                         <div class="dropdown m-dropdown m-dropdown--inline"
@@ -415,7 +415,7 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group "
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
                                         currencyMask placeholder="Total">
                                 </div>
@@ -626,7 +626,7 @@
                     </ng-container>
                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
                     </tr>
-                    <tr *ngIf="(isLocked | async) === false">
+                    <tr *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                             <td colspan=1 class="fixed-side" *ngIf="allowSaving">
                                 <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"

@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.IService
         LinkAirSeaInfoModel GetLinkASInfomation(string jobNo, string mblNo, string hblNo, string serviceName, string serviceMode);
         int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs);
         Task<HandleState> CreateFileZip(FileDowloadZipModel m);
+        HandleState UpdateJobStatus(ChargeShipmentStatusModel model);
     }
     public class FileDowloadZipModel
     {

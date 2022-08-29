@@ -17,7 +17,7 @@ import isUUID from 'validator/lib/isUUID';
 import { CsTransaction } from '@models';
 import { SeaConsolExportCreateJobComponent } from '../create-job/create-job-consol-export.component';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -47,7 +47,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     nextState: RouterStateSnapshot;
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
+
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -55,9 +55,10 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress
+        private _ngProgressService: NgProgress,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

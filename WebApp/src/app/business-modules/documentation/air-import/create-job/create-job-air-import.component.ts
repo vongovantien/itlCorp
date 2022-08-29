@@ -10,7 +10,7 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import {
-    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent,
 } from '@share-bussiness';
 
 import { RoutingConstants } from '@constants';
@@ -27,7 +27,7 @@ import { InjectViewContainerRefDirective } from '@directives';
     templateUrl: './create-job-air-import.component.html'
 })
 
-export class AirImportCreateJobComponent extends AppForm implements OnInit {
+export class AirImportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareAirServiceFormCreateComponent) formCreateComponent: ShareAirServiceFormCreateComponent;
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
@@ -42,7 +42,7 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
         protected _cd: ChangeDetectorRef
     ) {
-        super();
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 
