@@ -515,7 +515,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     updateFlightInfor() {
-        this._documentRepo.updateFlightInfo(this.jobId)
+        this._documenRepo.updateFlightInfo(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {

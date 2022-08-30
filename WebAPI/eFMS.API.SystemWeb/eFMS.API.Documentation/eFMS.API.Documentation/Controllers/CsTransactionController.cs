@@ -241,7 +241,7 @@ namespace eFMS.API.Documentation.Controllers
 
             if (currentJob.ColoaderId != model.ColoaderId)
             {
-                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.CsTransition);
+                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.CsTransaction);
                 if (checkExistRefundFee == true)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_REFUND_FEE_EXISTED] });
