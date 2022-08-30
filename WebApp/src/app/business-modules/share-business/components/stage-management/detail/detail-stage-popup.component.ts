@@ -17,6 +17,7 @@ import { formatDate } from "@angular/common";
 export class ShareBusinessStageManagementDetailComponent extends PopupBase implements OnInit, OnChanges {
 
     @Input() data: Stage = null;
+    @Input() jobId: string = '';
     @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
 
     form: FormGroup;
