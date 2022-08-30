@@ -152,6 +152,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysImageService = imageService;
             csLinkChargeRepository = csLinkChargeRepo;
             accAccountReceivableService = accAccountReceivable;
+            catContractRepo = catContractRepository;
+            csStageRepository = stageRepo;
         }
 
         #region -- INSERT & UPDATE --
