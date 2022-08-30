@@ -155,6 +155,7 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepo = catContractRepository;
             csStageRepository = stageRepo;
             csStageAssignedService = csStageAssigned;
+            csStageAssignedRepository = csStageAssignedRepo;
         }
 
         #region -- INSERT & UPDATE --
