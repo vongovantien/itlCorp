@@ -154,6 +154,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
             catContractRepo = catContractRepository;
             csStageRepository = stageRepo;
+            csStageAssignedService = csStageAssigned;
         }
 
         #region -- INSERT & UPDATE --
