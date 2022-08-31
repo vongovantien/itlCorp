@@ -464,17 +464,46 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                var jobHBLId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
+                var job = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault();
+                var jobHBLId = job.Hblid;
                 var surs = csShipmentSurchargeRepo.Get(x => x.Hblid == jobHBLId).ToList();
                 if (surs.Count()>0)
                 {
-                    surs.ForEach(x =>
+                    string CustomNo = clearances.FirstOrDefault().ClearanceNo;
+                    if (surs.Any(x => x.ClearanceNo != null))
                     {
-                        var sur = x;
-                        sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
-                        csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id,false);
-                    });
+                        var clearanceOld = clearances.FirstOrDefault();
+                        if (clearanceOld.DatetimeCreated > DataContext.Get(x => x.ClearanceNo == clearances.FirstOrDefault().ClearanceNo).FirstOrDefault().DatetimeCreated){
+                            surs.ForEach(x =>
+                            {
+                                var sur = x;
+                                sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
+                                csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id, false);
+                            });
+                        }
+                        else
+                        {
+                            CustomNo = clearanceOld.ClearanceNo;
+                        }
+                    }
+                    else
+                    {
+                        surs.ForEach(x =>
+                        {
+                            var sur = x;
+                            sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
+                            csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id, false);
+                        });
+                    }
                     csShipmentSurchargeRepo.SubmitChanges();
+                    var advRequest = accAdvanceRequestRepository.Get(x => x.Hblid == jobHBLId && x.JobId == job.JobNo).FirstOrDefault();
+                    if (advRequest.CustomNo!=CustomNo)
+                    {
+                        var advRQ = advRequest;
+                        advRQ.CustomNo = CustomNo;
+                        accAdvanceRequestRepository.Update(advRQ, z => z.Id == advRQ.Id, false);
+                    }
+                    accAdvanceRequestRepository.SubmitChanges();
                 }
                 foreach (var item in clearances)
                 {
