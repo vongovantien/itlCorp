@@ -51,8 +51,7 @@
         </button>
     </ng-container>
 
-    <ng-container
-        *ngIf="((opsTransaction?.isLocked === false) || isDuplicate)">
+    <ng-container *ngIf="((opsTransaction?.isLocked === false) || isDuplicate)">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()" *ngIf="opsTransaction?.permission?.allowDelete && !isDuplicate && !opsTransaction.replicatedId
             && !opsTransaction.isLinkFee && opsTransaction?.currentStatus !== 'Finish'" title="Shipment was deleted">
@@ -75,6 +74,19 @@
         </button>
 
         <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" *ngIf="isDuplicate"
+            (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+    </ng-container>
+
+    <ng-container *ngIf="(opsTransaction?.isLocked === true)">
+        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
+            *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate && opsTransaction?.currentStatus !== 'Finish'"
             (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
             <span>
                 <i class="la la la-save"></i>
@@ -125,8 +137,7 @@
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
                                                 [showGetCharge]="true" [showSyncStandard]="false"
-                                                [allowLinkFee]="allowLinkFeeSell"
-                                                [isDuplicateJob]="isDuplicate"
+                                                [allowLinkFee]="allowLinkFeeSell" [isDuplicateJob]="isDuplicate"
                                                 [noProfit]="opsTransaction.noProfit"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>

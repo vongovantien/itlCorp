@@ -3706,13 +3706,13 @@ namespace eFMS.API.Documentation.DL.Services
                         if (model.TransactionType == TermData.CsTransaction)
                         {
                             newStage.JobId = csJob.Id;
-                            int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == csJob.Id);
+                            int orderNumberProcess = csStageAssignedService.Count(x => x.JobId == csJob.Id);
                             newStage.OrderNumberProcessed = orderNumberProcess + 1;
                         }
                         if (model.TransactionType == TermData.OpsTransaction)
                         {
                             newStage.JobId = opsJob.Id;
-                            int orderNumberProcess = csStageAssignedRepository.Count(x => x.JobId == opsJob.Id);
+                            int orderNumberProcess = csStageAssignedService.Count(x => x.JobId == opsJob.Id);
                             newStage.OrderNumberProcessed = orderNumberProcess + 1;
                         }
 
