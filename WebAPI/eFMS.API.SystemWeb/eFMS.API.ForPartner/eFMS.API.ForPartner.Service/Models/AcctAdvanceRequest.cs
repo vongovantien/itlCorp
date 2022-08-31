@@ -25,5 +25,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? AmountVnd { get; set; }
         public decimal? AmountUsd { get; set; }
         public string ReferenceNo { get; set; }
+        public string AdvanceFor { get; set; }
     }
 }
