@@ -57,6 +57,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         if (!!this.data) {
             this.initFormUpdate();
         }
+        console.log(this.data)
     }
 
     ngOnInit() {

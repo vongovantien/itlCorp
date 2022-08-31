@@ -490,7 +490,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         setTimeout(() => {
                             this.sendMail();
                         }, 3000);
-                        
+
                         console.log('Experiment completed');
                     });
             })
@@ -1087,11 +1087,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     onChangeCheckBox() {
         switch (this.serviceId) {
-            case ChargeConstants.AI_CODE: // Air Import               
+            case ChargeConstants.AI_CODE: // Air Import
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralArrivalNotice, this.isCheckedArrivalNotice);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralDO, this.isCheckedDO);
                 break;
-            case ChargeConstants.AE_CODE: // Air Export               
+            case ChargeConstants.AE_CODE: // Air Export
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
                 break;
@@ -1216,6 +1216,28 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+    }
+
+    assignStageByEventType(jobId: string, hblId: string) {
+        if (this.isPOD) {
+            this.stageType = "Send_POD"
+        }
+        if (this.isAL) {
+            this.stageType = "Send_AL"
+        }
+        if (this.isArrivalNotice) {
+            this.stageType = "Send_AN"
+        }
+        if (this.isDO) {
+            this.stageType = "Send_DO"
+        }
+        if (this.isPreAlert) {
+            this.stageType = "Send_PA"
+        }
+
+        this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe();
     }
 }
 
