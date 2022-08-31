@@ -19,7 +19,7 @@ const routing: Routes = [
                 path: '', component: StageManagementComponent
             },
             {
-                path: 'stage-import', component: StageImportComponent, data: { name: "Import" }
+                path: 'stage-imporpt', component: StageImportComponent, data: { name: "Import" }
             },
         ]
     },

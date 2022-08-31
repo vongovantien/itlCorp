@@ -7,7 +7,9 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedModel>
     {
+        HandleState AddNewStageAssignedByTransactionType(CsStageAssignedCriteria criteria);
         HandleState AddNewStageAssigned(CsStageAssignedModel model);
+        HandleState AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);
     }
 
 }

@@ -1296,4 +1296,10 @@ export class DocumentationRepo {
         );
     }
 
+    assignStageByEventType(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsStageAssigned/AddNewStageByTransactionType`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }

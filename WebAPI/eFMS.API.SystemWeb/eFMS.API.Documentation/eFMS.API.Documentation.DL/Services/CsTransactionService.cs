@@ -113,7 +113,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
-            IContextBase<CatStage> stageRepo) : base(repository, mapper)
+            IContextBase<CatStage> stageRepo,
+            IContextBase<OpsTransaction> opsTransactionRepo
+            ) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -3733,6 +3735,99 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+        public HandleState AssignJobStage(Guid jobId, CsTransaction currentJob)
+        {
+            List<CsStageAssignedModel> listStages = new List<CsStageAssignedModel>();
+            CsTransaction updatedJob = GetById(jobId);
+
+            var dateTimeCreated = DateTime.Now;
+            var dateTimedealine = DateTime.Now;
+            var transitionType = currentJob.TransactionType.Substring(0, 1);
+            if (currentJob.Ata != updatedJob.Ata)
+            {
+                CatStage stage = new CatStage();
+                switch (transitionType)
+                {
+                    case "A":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateAirATA).FirstOrDefault();
+                        break;
+                    case "S":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateSeaATA).FirstOrDefault();
+                        break;
+                    default:
+                        break;
+                }
+
+                CsStageAssignedModel newStage = new CsStageAssignedModel();
+                newStage.Id = Guid.NewGuid();
+                newStage.StageId = stage.Id;
+                newStage.Status = TermData.Done;
+                newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
+                newStage.Deadline = dateTimedealine;
+                newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
+                newStage.JobId = jobId;
+
+                listStages.Add(newStage);
+            }
+
+            if (currentJob.Atd != updatedJob.Atd)
+            {
+                CatStage stage = new CatStage();
+                switch (transitionType)
+                {
+                    case "A":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateAirATD).FirstOrDefault();
+                        break;
+                    case "S":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateSeaATD).FirstOrDefault();
+                        break;
+                    default:
+                        break;
+                }
+
+                CsStageAssignedModel newStage = new CsStageAssignedModel();
+                newStage.Id = Guid.NewGuid();
+                newStage.StageId = stage.Id;
+                newStage.Status = TermData.Done;
+                newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
+                newStage.Deadline = dateTimedealine;
+                newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
+                newStage.JobId = jobId;
+
+                listStages.Add(newStage);
+            }
+
+            if (currentJob.IncotermId != updatedJob.IncotermId)
+            {
+                CatStage stage = new CatStage();
+                switch (transitionType)
+                {
+                    case "A":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateAirICT).FirstOrDefault();
+                        break;
+                    case "S":
+                        stage = csStageRepository.Get(x => x.Code == TermData.UpdateSeaICT).FirstOrDefault();
+                        break;
+                    default:
+                        break;
+                }
+
+                CsStageAssignedModel newStage = new CsStageAssignedModel();
+                newStage.Id = Guid.NewGuid();
+                newStage.StageId = stage.Id;
+                newStage.Status = TermData.Done;
+                newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
+                newStage.Deadline = dateTimedealine;
+                newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
+                newStage.JobId = jobId;
+
+                listStages.Add(newStage);
+            }
+
+            var result = csStageAssignedService.AddMutipleStageAssigned(listStages, jobId);
+
+            return result;
         }
     }
     #endregion
