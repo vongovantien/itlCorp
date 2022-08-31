@@ -16,7 +16,6 @@ using ITL.NetCore.Connection.BL;
 using eFMS.API.Provider.Services.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
-using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Common;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Globals;
@@ -25,14 +24,12 @@ using eFMS.API.Operation.Service.ViewModels;
 using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
 using eFMS.API.Common.Models;
-using AutoMapper.QueryableExtensions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.DL.Services
 {
     public class CustomsDeclarationService : RepositoryBase<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
     {
-        private readonly ICatPartnerApiService catPartnerApi;
         private readonly ICatPlaceApiService catPlaceApi;
         private readonly IEcusConnectionService ecusCconnectionService;
         private readonly ICatCountryApiService countryApi;
@@ -49,7 +46,6 @@ namespace eFMS.API.Operation.DL.Services
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
-            , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
             , ICatCountryApiService country
             , ICatCommodityApiService commodity
@@ -64,7 +60,6 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
-            catPartnerApi = catPartner;
             catPlaceApi = catPlace;
             countryApi = country;
             commodityApi = commodity;
@@ -191,6 +186,12 @@ namespace eFMS.API.Operation.DL.Services
                 Regex pattern = new Regex("[-_ ]");
                 pattern.Replace(clearance.MA_DV, "");
             }
+            string _accountNo = clearance.MA_DV;
+            var partner = customerRepository.Get(x => x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
+            if(partner != null)
+            {
+                _accountNo = partner.AccountNo;
+            }
             var newItem = new CustomsDeclaration
             {
                 IdfromEcus = clearance.DToKhaiMDID,
@@ -221,7 +222,7 @@ namespace eFMS.API.Operation.DL.Services
                 DepartmentId = currentUser.DepartmentId,
                 OfficeId = currentUser.OfficeID,
                 CompanyId = currentUser.CompanyID,
-                AccountNo = clearance.MA_DV
+                AccountNo = _accountNo
             };
             return newItem;
         }
