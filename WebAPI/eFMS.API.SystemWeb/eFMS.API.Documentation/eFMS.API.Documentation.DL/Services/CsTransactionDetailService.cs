@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+            int code = checkOwnerPermission(model,permissionRange)?200: GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
             if (code == 403) return new HandleState(403, "");
             model.DatetimeModified = DateTime.Now;
             model.Active = true;
@@ -594,7 +594,17 @@ namespace eFMS.API.Documentation.DL.Services
             var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId,Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
+            var trans = csTransactionRepo.Get(x => x.Id == detail.JobId).FirstOrDefault();
+            int code = 0;
+            if (checkOwnerPermission(detail,permissionRange))
+            {
+                code = 200;
+            }
+            else
+            {
+                code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
+            }
+            
             return code;
         }
 
@@ -608,10 +618,12 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+       
             detail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
+                AllowUpdate = checkOwnerPermission (detail,permissionRangeWrite)? true: GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
             };
+                 
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             if (specialActions.Count > 0)
             {
@@ -629,6 +641,16 @@ namespace eFMS.API.Documentation.DL.Services
             return detail;
         }
 
+        private bool checkOwnerPermission(CsTransactionDetailModel transDe, PermissionRange permission)
+        {
+            var trans = csTransactionRepo.Get(x => x.Id == transDe.JobId).FirstOrDefault();
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(transDe.TransactionType, currentUser);
+            if (permission == PermissionRange.Owner && trans.UserCreated==_currentUser.UserID)
+            {
+                return true;
+            }
+            return false;
+        }
 
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
