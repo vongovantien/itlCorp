@@ -1891,7 +1891,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPartnerImportModel> CheckValidCustomerAgentImport(List<CatPartnerImportModel> list)
         {
-            var partners = Get().ToList();
+            var partners = DataContext.Get().ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = countryService.Get().ToList();
             var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
@@ -1912,24 +1912,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode;
-                    string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Replace(" ", "") : string.Empty;
+                    string taxCode = item.TaxCode.Trim();
+                    string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Trim() : string.Empty;
 
-                    var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
-                    var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
-                    if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
-                    {
-                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
-                        item.IsValid = false;
-                    }
-                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
+                    //var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
+                    //var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
+                    //if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
+                    //{
+                    //    item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
+                    //    item.IsValid = false;
+                    //}
+                    //else 
+                    if (list.Count(x => x.TaxCode == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode?.Replace(" ", "") == taxCode))
+                        if (partners.Any(x => x.TaxCode.Trim() == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
