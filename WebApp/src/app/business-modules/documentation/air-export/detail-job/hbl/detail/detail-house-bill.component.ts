@@ -64,6 +64,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
                 this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
                 this.getDetailHbl();
             } else {
                 this.gotoList();
@@ -276,7 +277,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             .subscribe(
                 (response: ArrayBuffer | any) => {
                     if (response !== false) {
-                        if (response.byteLength > 0) {
+                        if (response.body.byteLength > 0) {
                             this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                         } else {
                             this._toastService.warning('There is no neutral hawb data to print', '');

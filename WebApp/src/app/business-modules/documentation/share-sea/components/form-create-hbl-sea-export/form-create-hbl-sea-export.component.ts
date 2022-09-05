@@ -71,7 +71,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     moveType: AbstractControl;
     issueHbldate: AbstractControl;
     issueHblplace: AbstractControl;
-    incotermId:AbstractControl;
+    incotermId: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: User[];
@@ -106,6 +106,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     dateTimeModified: string;
     userCreated: string;
     userModified: string;
+
+    shipmentType: string;
 
     hblId: string = '';
 
@@ -185,6 +187,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.shipmmentDetail = new CsTransaction(shipment);
+                        this.shipmentType = shipment.shipmentType;
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
@@ -481,7 +484,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                     this.shipper.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.getListSalemanByPartner(data.id, this.type)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.type, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];

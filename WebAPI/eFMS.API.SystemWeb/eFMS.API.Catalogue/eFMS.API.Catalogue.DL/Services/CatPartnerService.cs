@@ -457,7 +457,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
-            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
 
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
@@ -2485,11 +2485,12 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
-
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType)
+        
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId
+            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true)
             && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && x.SaleService.Contains(transactionType) 
             && x.Active == true);

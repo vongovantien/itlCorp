@@ -247,10 +247,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             personIncharge: [],
             notes: [],
             mawb: ['', Validators.compose([
-                Validators.required,
-                Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                FormValidators.validateMAWB,
-                FormValidators.validateSpecialChar
+                // Validators.required,
+                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                // FormValidators.validateMAWB,
+                // FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([
@@ -575,10 +575,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 else {
                     this.isCheckedActive = false;
                     this.formGroup.get('mawb').setValidators([
-                        Validators.required,
-                        Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                        FormValidators.validateMAWB,
-                        FormValidators.validateSpecialChar
+                        // Validators.required,
+                        // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                        // FormValidators.validateMAWB,
+                        // FormValidators.validateSpecialChar
                     ]);
                 }
                 this.formGroup.get('mawb').updateValueAndValidity();

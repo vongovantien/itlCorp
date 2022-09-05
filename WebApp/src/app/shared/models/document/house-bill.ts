@@ -171,6 +171,7 @@ export class HouseBill extends BaseModel {
     wareHouseAnDate: any = null;
     polDescription: string = null;
     podDescription: string = null;
+    showDim: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;
