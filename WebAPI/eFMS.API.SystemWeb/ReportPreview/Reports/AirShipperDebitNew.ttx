@@ -42,3 +42,4 @@ DecimalNo	Number
 CurrDecimalNo	Number		
 ETA	DateTime		
 FlexID	String	255	
+UnitPriceStr	String	50	
