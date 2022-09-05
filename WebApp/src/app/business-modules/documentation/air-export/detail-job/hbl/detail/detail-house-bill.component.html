@@ -30,7 +30,7 @@
                 </div>
             </div>
 
-            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
+            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'" [buttonSetting]="saveButtonSetting"
                 (onClick)="confirmSaveHBL()">
             </app-default-button>
 
