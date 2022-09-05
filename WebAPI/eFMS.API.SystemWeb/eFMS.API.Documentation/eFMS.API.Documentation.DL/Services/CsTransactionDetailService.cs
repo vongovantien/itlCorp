@@ -1322,7 +1322,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
 
-                    int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
+                    int code = checkOwnerPermission(_mapper.Map<CsTransactionDetailModel>(hbl), permissionRange) ? 200 : GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403, "");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id);
