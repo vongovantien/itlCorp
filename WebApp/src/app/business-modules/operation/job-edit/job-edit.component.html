@@ -8,7 +8,8 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowFinish && opsTransaction?.currentStatus !== 'Finish' && !isDuplicate">
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowFinish && opsTransaction?.currentStatus !== 'Finish' && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
@@ -61,17 +62,6 @@
                 <i class="la la-trash"></i>
                 <span>
                     delete
-                </span>
-            </span>
-        </button>
-
-        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-            *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate && opsTransaction?.currentStatus !== 'Finish'"
-            (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
                 </span>
             </span>
         </button>

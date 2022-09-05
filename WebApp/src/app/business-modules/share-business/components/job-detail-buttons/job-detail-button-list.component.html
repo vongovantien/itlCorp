@@ -8,7 +8,8 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowFinish && shipmentDetail?.currentStatus !== 'Finish' && !isDuplicate ">
+    <ng-container
+        *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowFinish && shipmentDetail?.currentStatus !== 'Finish' && !isDuplicate ">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
             <span>
