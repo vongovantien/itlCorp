@@ -1,4 +1,13 @@
 <div class="job-detail-button-list d-flex align-items-center">
+    <ng-container *ngIf="!!shipmentDetail && !shipmentDetail?.isLocked;else lockTpl">
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
+                class="m--margin-right-10"
+                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock && !isDuplicate">
+            </app-default-button>
+        </div>
+    </ng-container>
+
     <ng-container *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowFinish && shipmentDetail?.currentStatus !== 'Finish' && !isDuplicate ">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
@@ -22,15 +31,6 @@
                 </span>
             </span>
         </button>
-    </ng-container>
-
-    <ng-container *ngIf="!!shipmentDetail && !shipmentDetail?.isLocked;else lockTpl">
-        <div class="c-button-actions">
-            <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
-                class="m--margin-right-10"
-                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowLock && !isDuplicate">
-            </app-default-button>
-        </div>
     </ng-container>
 
     <div class="dropdown m-dropdown m-dropdown--inline">

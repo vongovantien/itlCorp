@@ -1,4 +1,13 @@
 <app-sub-header>
+    <ng-container *ngIf="!!opsTransaction && !opsTransaction?.isLocked; else lockTpl">
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
+                class="m--margin-right-10"
+                *ngIf="!!opsTransaction && opsTransaction.permission.allowLock && !isDuplicate">
+            </app-default-button>
+        </div>
+    </ng-container>
+
     <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowFinish && opsTransaction?.currentStatus !== 'Finish' && !isDuplicate">
         <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onFinishJob()">
@@ -10,6 +19,7 @@
             </span>
         </button>
     </ng-container>
+
     <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish'
         && !opsTransaction.isLocked && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
@@ -22,14 +32,6 @@
             </span>
         </button>
     </ng-container>
-    <ng-container *ngIf="!!opsTransaction && !opsTransaction?.isLocked; else lockTpl">
-        <div class="c-button-actions">
-            <app-default-button [buttonSetting]="lockButtonSetting" (onClick)="lockShipment()"
-                class="m--margin-right-10"
-                *ngIf="!!opsTransaction && opsTransaction.permission.allowLock && !isDuplicate">
-            </app-default-button>
-        </div>
-    </ng-container>
 
     <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
         (click)="onOpePLPrint()">
@@ -40,6 +42,7 @@
             </span>
         </span>
     </button>
+
     <ng-container
         *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate && opsTransaction.linkSource !== 'Replicate'">
         <button class="btn btn-success dropdown-toggle m--margin-right-10" [dpToggle]="dropdownMenuDuplicate"
@@ -61,6 +64,7 @@
                 </span>
             </span>
         </button>
+
         <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
             *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate && opsTransaction?.currentStatus !== 'Finish'"
             (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
