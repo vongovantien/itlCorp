@@ -111,7 +111,7 @@
                             <span>{{stage.deadline | date: 'HH:mm dd/MM/yyyy'}}</span>
                         </td>
                         <td class="sorting">
-                            <span>{{stage.doneDate | date: 'dd/mm/yyyy'}}</span>
+                            <span>{{stage.doneDate | date: 'dd/MM/yyyy'}}</span>
                         </td>
                     </tr>
                     <tr app-table-none-record *ngIf="!stages.length"></tr>
@@ -121,7 +121,7 @@
 
     </div>
 </div>
-<detail-stage-popup [data]="selectedStage" [jobId]="jobId" (onSuccess)="onAddSuccess()"></detail-stage-popup>
+<detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
 <!-- modal assign stage -->
 <share-asign-stage-popup (onAssign)="getListStageJob(jobId)"></share-asign-stage-popup>
 
