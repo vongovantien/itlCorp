@@ -695,7 +695,7 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Custom No":
                         foreach (var item in criteria.DocumentNo)
                         {
-                            var jobNo = customsDeclarationRepo.Get(x => x.ClearanceNo == item.Trim() && !string.IsNullOrEmpty(x.JobNo)).Select(x => x.JobNo);
+                            var jobNo = customsDeclarationRepo.Get(x => x.ClearanceNo == item.Trim() && !string.IsNullOrEmpty(x.JobNo)).Select(x => x.JobNo).ToList();
                             var jobNoInfo = surchargeInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
                             var jobNoObhInfo = surchargeOBHInfo.Where(x => jobNo.Any(z => z == x.JobNo) && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo)) && (x.CombineBillingNo != criteria.CombineNo && x.ObhcombineBillingNo != criteria.CombineNo));
                             if (jobNoInfo.Count() > 0)
