@@ -4278,36 +4278,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 int startRow = 4;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 1;
+                decimal TotalRNet = 0, TotalRVAT = 0, TotalRSell = 0, TotalNET = 0, TotalBUY = 0, TotalBalance = 0, TotalVAT = 0;
                 foreach (var outRe in result)
                 {
                     var ornHead = outRe.OriginalJob.Where(x => x != null).FirstOrDefault();
                     var repHead = outRe.ReplicateJob.FirstOrDefault();
                     excel.IndexOfGroup = 1;
                     excel.SetGroupsTable();
-                    //var listGroupHead = new Dictionary<string, object>()
-                    //    {
-                    //        { "RJobID", repHead!=null?repHead.JobId:null },
-                    //        { "RCustomNo", repHead!=null?repHead.CustomNo:null },
-                    //        { "RHBL", repHead!=null?repHead.HBL:null },
-                    //        { "RCustomer", repHead!=null?repHead.Customer:null },
-                    //        { "RProductService", repHead!=null?repHead.ProductService:null },
-                    //        { "RDateService", repHead!=null?repHead.DateService.ToString("dd/MM/yyyy"):null },
-                    //        { "JobID", ornHead!=null?ornHead.JobId:null },
-                    //        { "CustomNo", ornHead!=null?ornHead.CustomNo:null },
-                    //        { "HBL", ornHead!=null?ornHead.HBL:null },
-                    //        { "Customer", ornHead!=null?ornHead.Customer:null },
-                    //        { "ProductService", ornHead!=null?ornHead.ProductService:null },
-                    //        { "DateService", ornHead!=null?ornHead.DateService.ToString("dd/MM/yyyy"):null },
-                    //        { "Creator", ornHead!=null?ornHead.Creator:null },
-                    //        { "RCreator", repHead!=null?repHead.Creator:null },
-                    //        { "SumRNetAmount", outRe.ReplicateJob.Sum(x=>x?.NETAmount) },
-                    //        { "SumRVATAmount", outRe.ReplicateJob.Sum(x=>x?.VATAmount) },
-                    //        { "SumNetAmount", outRe.OriginalJob.Sum(x=>x?.NETAmount) },
-                    //        { "SumVATAmount", outRe.OriginalJob.Sum(x=>x?.VATAmount) },
-                    //        { "SumRTotalSelling", outRe.ReplicateJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //        { "SumTotalBuying", outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //        { "Balance", outRe.ReplicateJob.Sum(x=>x?.VATAmount+x?.NETAmount)-outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //    };
                     var listGroupHead = new Dictionary<string, object>()
                         {
                             { "RJobID", repHead?.JobId },
@@ -4332,7 +4309,15 @@ namespace eFMS.API.ReportData.FormatExcel
                             { "SumTotalBuying", outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
                             { "Balance", outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
                         };
-            startRow++;
+                    TotalRNet += (decimal)outRe.ReplicateJob.Sum(x => x?.NETAmount);
+                    TotalBalance += (decimal)(outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount));
+                    TotalBUY += (decimal)outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount);
+                    TotalNET += (decimal)outRe.OriginalJob.Sum(x => x?.NETAmount);
+                    TotalRSell += (decimal)outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount);
+                    TotalRVAT += (decimal)outRe.ReplicateJob.Sum(x => x?.VATAmount);
+                    TotalVAT += (decimal)outRe.OriginalJob.Sum(x => x?.VATAmount);
+
+                    startRow++;
                     excel.SetData(listGroupHead);
                     for (int i = 0; i < outRe.ReplicateJob.Count(); i++)
                         {
@@ -4373,6 +4358,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             excel.SetData(listKeyData);
                             startRow++;
                         }
+
                     if (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) > 0)
                     {
                         excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
@@ -4381,8 +4367,26 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
                     }
+
                 }
-                    return excel.ExcelStream();
+                var listDataTotal = new Dictionary<string, object>();
+                listDataTotal.Add("TotalRNet", TotalRNet);
+                listDataTotal.Add("TotalRVAT", TotalRVAT);
+                listDataTotal.Add("TotalRSell", TotalRSell);
+                listDataTotal.Add("TotalNet", TotalNET);
+                listDataTotal.Add("TotalBuy", TotalBUY);
+                listDataTotal.Add("TotalBalance", TotalBalance);
+                listDataTotal.Add("TotalVAT", TotalVAT);
+                excel.SetData(listDataTotal);
+                if (TotalBalance > 0)
+                {
+                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                }
+                else
+                {
+                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                }
+                return excel.ExcelStream();
                 }
             catch (Exception ex)
             {
