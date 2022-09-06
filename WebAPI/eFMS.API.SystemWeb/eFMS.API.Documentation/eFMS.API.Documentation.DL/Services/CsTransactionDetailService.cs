@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            int code = checkOwnerPermission(model,permissionRange)?200: GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+            int code = checkOwnerPermission(model)?200: GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
             if (code == 403) return new HandleState(403, "");
             model.DatetimeModified = DateTime.Now;
             model.Active = true;
@@ -596,7 +596,7 @@ namespace eFMS.API.Documentation.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
             var trans = csTransactionRepo.Get(x => x.Id == detail.JobId).FirstOrDefault();
             int code = 0;
-            if (checkOwnerPermission(detail,permissionRange))
+            if (checkOwnerPermission(detail))
             {
                 code = 200;
             }
@@ -621,7 +621,7 @@ namespace eFMS.API.Documentation.DL.Services
        
             detail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = checkOwnerPermission (detail,permissionRangeWrite)? true: GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
+                AllowUpdate = checkOwnerPermission (detail)? true: GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
             };
                  
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
@@ -641,11 +641,11 @@ namespace eFMS.API.Documentation.DL.Services
             return detail;
         }
 
-        private bool checkOwnerPermission(CsTransactionDetailModel transDe, PermissionRange permission)
+        private bool checkOwnerPermission(CsTransactionDetailModel transDe)
         {
             var trans = csTransactionRepo.Get(x => x.Id == transDe.JobId).FirstOrDefault();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(transDe.TransactionType, currentUser);
-            if (permission == PermissionRange.Owner && trans.UserCreated==_currentUser.UserID)
+            if (trans.UserCreated==_currentUser.UserID)
             {
                 return true;
             }
@@ -1322,7 +1322,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
 
-                    int code = checkOwnerPermission(_mapper.Map<CsTransactionDetailModel>(hbl), permissionRange) ? 200 : GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
+                    int code = checkOwnerPermission(_mapper.Map<CsTransactionDetailModel>(hbl)) ? 200 : GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403, "");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id);
