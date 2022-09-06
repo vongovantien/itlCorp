@@ -465,17 +465,79 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                var jobHBLId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
-                var surs = csShipmentSurchargeRepo.Get(x => x.Hblid == jobHBLId).ToList();
-                if (surs.Count()>0)
+                var job = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault();
+                var hblid = job.Hblid;
+                var surCharge = csShipmentSurchargeRepo.Get(x => x.Hblid == hblid);
+                var lstCleNoOnSur = surCharge.Where(x => x.ClearanceNo != null).ToList().Select(x => x.ClearanceNo);
+                var lastCleNo = lstCleNoOnSur.Count() > 0 ? DataContext.Where(x => lstCleNoOnSur.Contains(x.ClearanceNo)).OrderBy(x => x.DatetimeCreated).FirstOrDefault().ClearanceNo : null;
+                if (surCharge.Count()>0 && lastCleNo!=null)
                 {
-                    surs.ForEach(x =>
+                    var clerOldest = DataContext.Get(x => x.ClearanceNo == lastCleNo).OrderBy(x => x.DatetimeCreated).FirstOrDefault();
+                    var oldestFromCle = clearances.Where(x => x.ClearanceNo != null).OrderBy(x => x.DatetimeCreated).FirstOrDefault();
+                    if (clerOldest.DatetimeCreated < oldestFromCle.DatetimeCreated && clerOldest.DatetimeCreated.HasValue)
                     {
-                        var sur = x;
-                        sur.ClearanceNo = clearances.FirstOrDefault().ClearanceNo;
-                        csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id,false);
-                    });
-                    csShipmentSurchargeRepo.SubmitChanges();
+                        surCharge.ToList().ForEach(x =>
+                        {
+                            var sur = x;
+                            sur.ClearanceNo = clerOldest.ClearanceNo;
+                            csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id, false);
+                        });
+                        csShipmentSurchargeRepo.SubmitChanges();
+                        clearances.ForEach(y =>
+                        {
+                            y.ClearanceNo = clerOldest.ClearanceNo;
+                        });
+                        var advRequest = accAdvanceRequestRepository.Get(x => x.Hblid == hblid && x.CustomNo != clerOldest.ClearanceNo).ToList();
+                        if (advRequest.Count > 0)
+                        {
+                            advRequest.ForEach(x =>
+                            {
+                                var adv = x;
+                                adv.CustomNo = clerOldest.ClearanceNo;
+                                accAdvanceRequestRepository.Update(adv, z => z.Id == adv.Id, false);
+                            });
+                            accAdvanceRequestRepository.SubmitChanges();
+                        }
+                    }
+                    else
+                    {
+                        surCharge.ToList().ForEach(x =>
+                        {
+                            var sur = x;
+                            sur.ClearanceNo = oldestFromCle.ClearanceNo;
+                            csShipmentSurchargeRepo.Update(sur, y => y.Id == sur.Id, false);
+                        });
+                        csShipmentSurchargeRepo.SubmitChanges();
+                        clearances.ForEach(y =>
+                        {
+                            y.ClearanceNo = oldestFromCle.ClearanceNo;
+                        });
+                        var advRequest = accAdvanceRequestRepository.Get(x => x.Hblid == hblid && x.CustomNo != oldestFromCle.ClearanceNo).ToList();
+                        if (advRequest.Count > 0)
+                        {
+                            advRequest.ForEach(x =>
+                            {
+                                var adv = x;
+                                adv.CustomNo = oldestFromCle.ClearanceNo;
+                                accAdvanceRequestRepository.Update(adv, z => z.Id == adv.Id, false);
+                            });
+                            accAdvanceRequestRepository.SubmitChanges();
+                        }
+                    }
+                }
+                if (lastCleNo == null)
+                {
+                    var advRequest = accAdvanceRequestRepository.Get(x => x.Hblid == hblid).ToList();
+                    if (advRequest.Count > 0)
+                    {
+                        advRequest.ForEach(x =>
+                        {
+                            var adv = x;
+                            adv.CustomNo = clearances.Where(g => g.ClearanceNo != null).FirstOrDefault().ClearanceNo;
+                            accAdvanceRequestRepository.Update(adv, z => z.Id == adv.Id, false);
+                        });
+                        accAdvanceRequestRepository.SubmitChanges();
+                    }
                 }
                 foreach (var item in clearances)
                 {
