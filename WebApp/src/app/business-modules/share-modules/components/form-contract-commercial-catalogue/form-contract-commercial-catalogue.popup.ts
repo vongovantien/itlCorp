@@ -64,6 +64,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialCreditLimit: AbstractControl;
     autoExtendDays: AbstractControl;
     noDue: AbstractControl;
+    emailAddress: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -237,7 +238,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditUnlimited: [],
             autoExtendDays: [],
             noDue: [],
-            shipmentType: []
+            shipmentType: [],
+            emailAddress: [null, Validators.email],
         });
         // this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -260,6 +262,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
         this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
         this.noDue = this.formGroup.controls['noDue'];
+        this.emailAddress = this.formGroup.controls['emailAddress'];
     }
 
     initDataForm() {

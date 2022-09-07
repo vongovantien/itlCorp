@@ -1499,7 +1499,11 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserCreated = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
-            contract.SaleService = GetContractServicesName(contract.SaleService);
+            string _saleService = GetContractServicesName(contract.SaleService);
+            contract.Arconfirmed = false;
+            contract.DatetimeModified = DateTime.Now;
+            ClearCache();
+            var hs = DataContext.Update(contract, x => x.Id.ToString() == contractId);
 
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, string.Empty);
 
@@ -1558,7 +1562,7 @@ namespace eFMS.API.Catalogue.DL.Services
             body = body.Replace("{{PartnerName}}", partner.PartnerNameVn);
             body = body.Replace("{{TaxCode}}", partner.TaxCode);
             body = body.Replace("{{ContractNo}}", contract.ContractNo);
-            body = body.Replace("{{SaleService}}", contract.SaleService);
+            body = body.Replace("{{SaleService}}", _saleService);
             body = body.Replace("{{ContractType}}", contract.ContractType);
             body = body.Replace("{{ShipmentType}}", contract.ShipmentType);
             body = body.Replace("{{Comment}}", comment);
@@ -1590,6 +1594,7 @@ namespace eFMS.API.Catalogue.DL.Services
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
+
             return result;
 
         }
