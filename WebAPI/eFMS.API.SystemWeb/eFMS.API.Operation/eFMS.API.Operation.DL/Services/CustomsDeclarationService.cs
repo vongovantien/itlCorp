@@ -551,7 +551,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        var customExist = cusExist.Where(x => clearances.Any(y => x.ClearanceNo != y.ClearanceNo));
+                        var customExist = cusExist.Where(x => clearances.Any(y => x.ClearanceNo != y.ClearanceNo)).OrderBy(x=>x.ClearanceDate).OrderBy(x=>x.DatetimeModified);
                         List<CustomsDeclarationModel> lstCleUpdate = new List<CustomsDeclarationModel>();
                         lstCleUpdate.Add(_mapper.Map<CustomsDeclarationModel>(customExist.FirstOrDefault()));
                         updateChargeAndAdvRequest(lstCleUpdate, jobOps.Hblid, JobToCleType.DeleteAndUpdate);
@@ -590,28 +590,27 @@ namespace eFMS.API.Operation.DL.Services
             DeleteAndUpdate,
             Update
         }
-
-        private void updateChargeAndAdvRequest(List<CustomsDeclarationModel> clearances,Guid hblId, JobToCleType type)
+        private void updateChargeAndAdvRequest(List<CustomsDeclarationModel> clearances, Guid hblId, JobToCleType type)
         {
-            var charges = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? csShipmentSurchargeRepo.Get(x => x.Hblid == hblId):csShipmentSurchargeRepo.Get(x => x.Hblid == hblId &&  x.ClearanceNo == null);
+            var charges = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? csShipmentSurchargeRepo.Get(x => x.Hblid == hblId) : csShipmentSurchargeRepo.Get(x => x.Hblid == hblId && x.ClearanceNo == null);
             if (charges.Count() > 0)
             {
                 charges.ToList().ForEach(x =>
                 {
                     var charge = x;
-                    charge.ClearanceNo = type== JobToCleType.Delete ? null:clearances.FirstOrDefault().ClearanceNo;
+                    charge.ClearanceNo = type == JobToCleType.Delete ? null : clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().ClearanceNo;
                     csShipmentSurchargeRepo.Update(charge, y => y.Id == charge.Id, false);
                 });
                 csShipmentSurchargeRepo.SubmitChanges();
             }
 
-            var advs = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? accAdvanceRequestRepository.Get(x => x.Hblid == hblId):accAdvanceRequestRepository.Get(x => x.Hblid == hblId && x.CustomNo == null);
+            var advs = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? accAdvanceRequestRepository.Get(x => x.Hblid == hblId) : accAdvanceRequestRepository.Get(x => x.Hblid == hblId && string.IsNullOrEmpty(x.CustomNo));
             if (advs.Count() > 0)
             {
                 advs.ToList().ForEach(x =>
                 {
                     var adv = x;
-                    x.CustomNo = type== JobToCleType .Delete? null:clearances.FirstOrDefault().ClearanceNo;
+                    x.CustomNo = type == JobToCleType.Delete ? null : clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().ClearanceNo;
                     accAdvanceRequestRepository.Update(adv, y => y.Id == adv.Id, false);
                 });
                 accAdvanceRequestRepository.SubmitChanges();
