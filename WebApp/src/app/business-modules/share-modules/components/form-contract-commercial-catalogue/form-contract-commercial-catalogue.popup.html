@@ -114,7 +114,7 @@
                                                 </span>
                                             </span>
                                             <ng-container
-                                                *ngIf="!!effectiveDate.value && !!effectiveDate.value.startDate && contractType.value === 'Guarantee'">
+                                                *ngIf="!!effectiveDate.value && !!effectiveDate.value.startDate">
                                                 <span class=" m-input-icon_clear"
                                                     (click)="resetFormControl('effectiveDate')"><i
                                                         class="la la-times"></i></span>
@@ -144,8 +144,7 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
-                                            <ng-container
-                                                *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && contractType.value === 'Guarantee'">
+                                            <ng-container *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
                                                 <span class="m-input-icon_clear"
                                                     (click)="resetFormControl('expiredDate')"><i
                                                         class="la la-times"></i></span>
