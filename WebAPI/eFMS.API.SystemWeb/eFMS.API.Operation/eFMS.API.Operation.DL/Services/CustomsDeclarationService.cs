@@ -539,30 +539,30 @@ namespace eFMS.API.Operation.DL.Services
                 //    }
                 //}
 
-                var hblId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
-                var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId && x.ClearanceNo == null);
-                if (charges.Count() > 0)
+                //Case Delete
+                var jobOps = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault();
+                if (clearances.FirstOrDefault().isDelete==true)
                 {
-                    charges.ToList().ForEach(x =>
+                    var cusExist = DataContext.Get(x => x.JobNo == jobOps.JobNo);
+                    if (cusExist.Count() == clearances.Count())
                     {
-                        var charge = x;
-                        charge.ClearanceNo = clearances.LastOrDefault().ClearanceNo;
-                        csShipmentSurchargeRepo.Update(charge, y => y.Id == charge.Id, false);
-                    });
-                    csShipmentSurchargeRepo.SubmitChanges();
+                        updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Delete);
+                    }
+                    else
+                    {
+                        var customExist = cusExist.Where(x => clearances.Any(y => x.ClearanceNo != y.ClearanceNo));
+                        List<CustomsDeclarationModel> lstCleUpdate = new List<CustomsDeclarationModel>();
+                        lstCleUpdate.Add(_mapper.Map<CustomsDeclarationModel>(customExist.FirstOrDefault()));
+                        updateChargeAndAdvRequest(lstCleUpdate, jobOps.Hblid, JobToCleType.DeleteAndUpdate);
+                    }
                 }
-                
-                var advs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId&& x.CustomNo == null);
-                if (advs.Count() > 0)
+
+                //Case Add or Update
+                else
                 {
-                    advs.ToList().ForEach(x =>
-                    {
-                        var adv = x;
-                        x.CustomNo = clearances.LastOrDefault().ClearanceNo;
-                        accAdvanceRequestRepository.Update(adv, y => y.Id == adv.Id, false);
-                    });
-                    accAdvanceRequestRepository.SubmitChanges();
+                    updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Update);
                 }
+               
                 foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
@@ -582,6 +582,39 @@ namespace eFMS.API.Operation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
+        }
+        private enum JobToCleType
+        {
+            Delete,
+            DeleteAndUpdate,
+            Update
+        }
+
+        private void updateChargeAndAdvRequest(List<CustomsDeclarationModel> clearances,Guid hblId, JobToCleType type)
+        {
+            var charges = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? csShipmentSurchargeRepo.Get(x => x.Hblid == hblId):csShipmentSurchargeRepo.Get(x => x.Hblid == hblId &&  x.ClearanceNo == null);
+            if (charges.Count() > 0)
+            {
+                charges.ToList().ForEach(x =>
+                {
+                    var charge = x;
+                    charge.ClearanceNo = type== JobToCleType.Delete ? null:clearances.FirstOrDefault().ClearanceNo;
+                    csShipmentSurchargeRepo.Update(charge, y => y.Id == charge.Id, false);
+                });
+                csShipmentSurchargeRepo.SubmitChanges();
+            }
+
+            var advs = (type == JobToCleType.DeleteAndUpdate || type == JobToCleType.Delete) ? accAdvanceRequestRepository.Get(x => x.Hblid == hblId):accAdvanceRequestRepository.Get(x => x.Hblid == hblId && x.CustomNo == null);
+            if (advs.Count() > 0)
+            {
+                advs.ToList().ForEach(x =>
+                {
+                    var adv = x;
+                    x.CustomNo = type== JobToCleType .Delete? null:clearances.FirstOrDefault().ClearanceNo;
+                    accAdvanceRequestRepository.Update(adv, y => y.Id == adv.Id, false);
+                });
+                accAdvanceRequestRepository.SubmitChanges();
+            }
         }
         public CustomsDeclaration GetById(int id)
         {
