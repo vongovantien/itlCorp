@@ -187,36 +187,25 @@ namespace eFMS.API.Documentation.DL.Services
         {
             bool valid = true;
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
-            if(surcharges.Count() == 0)
+            if (surcharges.Count() == 0)
             {
                 return false;
             }
 
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
-                else if (groupHblIdOps.Count() > 0)
-                {
-                    qGrServiceDateShipmentOps = from sur in groupHblIdOps
-                                                join ops in opsTransactions on ObjectUtility.GetValue(sur, "Hblid") equals ops.Hblid
-                                                orderby ops.ServiceDate ascending
-                                                select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), ops.ServiceDate };
-
-                    if (qGrServiceDateShipmentOps.Count() > 0)
-                    {
-                        oldestShipment = qGrServiceDateShipmentOps.FirstOrDefault();
-
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
+            var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
+            if (hasIssuedDebit)
+            {
+                return false;
             }
-            */
+            var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
+            var debitNotes = DC.AcctCdnote.Where(x => debitCodes.Contains(x.Code)
+                            && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE));
+            var hasConfirm = debitNotes.Any(x => x.Status != DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+            if (hasConfirm)
+            {
+                valid = false;
+            }
+
             return valid;
         }
 
