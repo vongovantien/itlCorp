@@ -141,6 +141,16 @@ namespace eFMS.API.Common.Helpers
                                 Name = "Status",
                                 Value = "False"
                             },
+                             new ValueName
+                            {
+                                Name = "User",
+                                Value = model.UserName
+                            },
+                              new ValueName
+                            {
+                                Name = "Token",
+                                Value = model.Token
+                            },
                         }
                     }
                 }
