@@ -4671,7 +4671,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var shipmentSettlement = new InfoShipmentSettlementExport();
 
                 #region -- CHANRGE AND ADVANCE OF SETTELEMENT --
-                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
+                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, houseBillId.customNo, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 shipmentSettlement.ShipmentCharges = _shipmentCharges;
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
@@ -4729,11 +4729,11 @@ namespace eFMS.API.Accounting.DL.Services
             return result.ToList();
         }
 
-        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
+        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string customNo, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var shipmentSettlement = new InfoShipmentSettlementExport();
             var listCharge = new List<InfoShipmentChargeSettlementExport>();
-            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
+            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo && x.ClearanceNo == customNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var sur in surChargeByHblId)
             {
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
