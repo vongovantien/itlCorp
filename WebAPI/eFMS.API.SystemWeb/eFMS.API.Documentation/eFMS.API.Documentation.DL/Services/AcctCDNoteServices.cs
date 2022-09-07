@@ -2168,6 +2168,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     var _unitPrice = (item.UnitPrice ?? 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency và không làm tròn
                     charge.UnitPrice = _unitPrice + _decimalNumber; //cộng thêm phần thập phân
+                    charge.UnitPriceStr = (_unitPrice + _decimalNumber).ToString(); //cộng thêm phần thập phân
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
 
