@@ -1422,8 +1422,14 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet("CheckSoaSynced/{id}")]
         public IActionResult CheckSoaSynced(string id)
         {
-            var result = accountingService.CheckSoaSynced(id);
-            return Ok(result);
+            string messageError = accountingService.CheckSoaSynced(id);
+            if(messageError.Length > 0)
+            {
+                var _result = new ResultHandle { Status = false, Message = messageError };
+                return BadRequest(_result);
+            }
+
+            return Ok(new ResultHandle { Status = true  });
         }
 
         [HttpGet("CheckVoucherSynced/{id}")]

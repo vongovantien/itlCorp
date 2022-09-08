@@ -324,7 +324,10 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
+                && x.SaleService.Contains(_transactionType)).FirstOrDefault();
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     model.CurrencyId = _contractAcRef.CurrencyId;
@@ -332,6 +335,11 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
+                }
+
+                if(_contractAcRef?.ContractType == "Prepaid")
+                {
+                    model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                 }
                 #endregion  --- Set Currency For CD Note ---
 
@@ -1773,8 +1781,15 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = criteria.ExportFormatType;
             result.SetParameter(parameter);
             return result;
         }
@@ -1816,7 +1831,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2084,17 +2099,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }
 
-        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2382,12 +2397,12 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }

@@ -2531,6 +2531,8 @@ namespace eFMS.API.Catalogue.DL.Services
             
             IQueryable<CatPartner> dataAgents = Enumerable.Empty<CatPartner>().AsQueryable();
             IQueryable<CatPartner> dataCustomers = Enumerable.Empty<CatPartner>().AsQueryable();
+            IQueryable<CatPartnerForKeyinCharge> queryAgentForKeyIn = Enumerable.Empty<CatPartnerForKeyinCharge>().AsQueryable();
+            IQueryable<CatPartnerForKeyinCharge> queryInternalForKeyIn = Enumerable.Empty<CatPartnerForKeyinCharge>().AsQueryable();
 
             Expression<Func<CatPartner, bool>> queryAgent = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_AGENT;
             Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true 
@@ -2544,30 +2546,37 @@ namespace eFMS.API.Catalogue.DL.Services
                                                             && (x.IsExpired == null || x.IsExpired == false)
                                                             && IsMatchService(x.SaleService, criteria.Service)
                                                             && IsMatchOffice(x.OfficeId, criteria.Office);
-           
-            IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
+           if(criteria.ContractType != "Prepaid")
+           {
+                IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
 
-            var d = from p in dataAgents
-                    join c in contractAgents on p.Id equals c.PartnerId
-                    select new CatPartnerForKeyinCharge
-                    {
-                        Id = p.Id,
-                        PartnerGroup = p.PartnerGroup,
-                        PartnerNameVn = p.PartnerNameVn,
-                        PartnerNameEn = p.PartnerNameEn,
-                        ShortName = p.ShortName,
-                        TaxCode = p.TaxCode,
-                        AccountNo = p.AccountNo,
-                        PartnerType = p.PartnerType,
-                    };
+                queryAgentForKeyIn = from p in dataAgents
+                        join c in contractAgents on p.Id equals c.PartnerId
+                        select new CatPartnerForKeyinCharge
+                        {
+                            Id = p.Id,
+                            PartnerGroup = p.PartnerGroup,
+                            PartnerNameVn = p.PartnerNameVn,
+                            PartnerNameEn = p.PartnerNameEn,
+                            ShortName = p.ShortName,
+                            TaxCode = p.TaxCode,
+                            AccountNo = p.AccountNo,
+                            PartnerType = p.PartnerType,
+                        };
+            }
+            
 
             if (criteria.SalemanId != null)
             {
                 queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
             }
+            if (criteria.ContractType == "Prepaid")
+            {
+                queryContract = queryContract.And(x => x.ContractType == criteria.ContractType);
+            }
             IQueryable<CatContract> contractCustomers = contractRepository.Get(queryContract);
 
-            var d2 = from p in dataCustomers
+            var queryICustomerForKeyIn = from p in dataCustomers
                      join c in contractCustomers on p.Id equals c.PartnerId
                      select new CatPartnerForKeyinCharge
                      {
@@ -2580,21 +2589,25 @@ namespace eFMS.API.Catalogue.DL.Services
                         AccountNo = p.AccountNo,
                         PartnerType = p.PartnerType,
                      };
+            if(criteria.ContractType != "Prepaid")
+            {
+                var partnersInternal = DataContext.Get(x => x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER && x.PartnerMode == DataEnums.PARTNER_MODE_INTERNAL);
+                queryInternalForKeyIn = from p in partnersInternal
+                         select new CatPartnerForKeyinCharge
+                         {
+                             Id = p.Id,
+                             PartnerGroup = p.PartnerGroup,
+                             PartnerNameVn = p.PartnerNameVn,
+                             PartnerNameEn = p.PartnerNameEn,
+                             ShortName = p.ShortName,
+                             TaxCode = p.TaxCode,
+                             AccountNo = p.AccountNo,
+                             PartnerType = p.PartnerType,
+                         };
+                return queryAgentForKeyIn.Union(queryICustomerForKeyIn).Union(queryInternalForKeyIn);
+            }
 
-            var partnersInternal = DataContext.Get(x => x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER && x.PartnerMode == DataEnums.PARTNER_MODE_INTERNAL);
-            var d3 = from p in partnersInternal
-                     select new CatPartnerForKeyinCharge
-                     {
-                         Id = p.Id,
-                         PartnerGroup = p.PartnerGroup,
-                         PartnerNameVn = p.PartnerNameVn,
-                         PartnerNameEn = p.PartnerNameEn,
-                         ShortName = p.ShortName,
-                         TaxCode = p.TaxCode,
-                         AccountNo = p.AccountNo,
-                         PartnerType = p.PartnerType,
-                     };
-            return d.Union(d2).Union(d3);
+            return queryICustomerForKeyIn;
         }
     }
 }

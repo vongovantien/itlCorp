@@ -1112,6 +1112,17 @@ export class AccountingRepo {
     updatePayable(partnerId: string, paymentTerm: number, currency: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctPayable/UpdatePayable?partnerId=${partnerId}&paymentTerm=${paymentTerm}&currency=${currency}`);
     }
+
+    getPagingCdNotePrepaid(body: any, page: number, size: number) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }, { "hideSpinner": "true" });
+    }
+
+    confirmCdNotePrepaid(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
+    }
 }
 
 

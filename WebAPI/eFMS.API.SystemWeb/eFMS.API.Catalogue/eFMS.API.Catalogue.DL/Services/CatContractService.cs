@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1878,8 +1879,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (partnerAcRef != null)
                 {
                     var partnerId = criteria.IsGetChild == true ? partnerAcRef.Id : partnerAcRef.ParentId;
-                    IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
-
+                    // IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
+                    Expression<Func<CatContract, bool>> queryContract = x => x.PartnerId == partnerId;
+                    if(criteria.Status != null)
+                    {
+                        queryContract = queryContract.And(x => x.Active == criteria.Status);
+                    }
+                    if(!string.IsNullOrEmpty(criteria.SalesmanId))
+                    {
+                        queryContract = queryContract.And(x => x.SaleManId == criteria.SalesmanId);
+                    }
+                    if (criteria.Office != null && criteria.Office != Guid.Empty)
+                    {
+                        queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(criteria.Service))
+                    {
+                        queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
+                    }
+                    IQueryable<CatContract> catContracts = DataContext.Get(queryContract);
                     var queryContracts = from contract in catContracts
                                          join users in sysUser on contract.SaleManId equals users.Id
                                          join employee in employees on users.EmployeeId equals employee.Id
@@ -1913,6 +1931,38 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatContract GetContractById(Guid Id)
         {
             return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+        }
+
+        private bool IsMatchService(string saleService, string serviceTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(saleService) && !string.IsNullOrEmpty(serviceTerm))
+            {
+                var serviceList = saleService.ToLower().Split(";").ToList();
+                if (serviceList.Count > 0)
+                {
+                    isMatch = serviceList.Any(z => z == serviceTerm.ToLower());
+                }
+            }
+
+            return isMatch;
+        }
+
+        private bool IsMatchOffice(string saleOffice, string officeTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(saleOffice) && !string.IsNullOrEmpty(officeTerm))
+            {
+                var officeList = saleOffice.ToLower().Split(";").ToList();
+                if (officeList.Count > 0)
+                {
+                    isMatch = officeList.Any(z => z == officeTerm.ToLower());
+                }
+            }
+
+            return isMatch;
         }
     }
 }

@@ -83,6 +83,7 @@ export class OpsCDNoteComponent extends AppList {
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'SOA', field: 'soaNo', sortable: true },
+            { title: 'Status', field: 'status', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
@@ -321,7 +322,7 @@ export class OpsCDNoteComponent extends AppList {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('No data found');

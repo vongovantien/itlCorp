@@ -302,7 +302,7 @@
                                 &&CdNoteDetail.cdNote.type === 'DEBIT'
                                 &&CdNoteDetail.cdNote.currencyId ==='VND'
                                 &&CdNoteDetail.listSurcharges.length > 0">
-                                <!-- &&CdNoteDetail.cdNote.syncStatus !== 'Synced' -->
+                                    <!-- &&CdNoteDetail.cdNote.syncStatus !== 'Synced' -->
                                     <div class="col-md-auto">
                                         <strong>Total Adjust:</strong> <span
                                             class="m--margin-left-5">{{totalAdjustVND}}</span>
@@ -319,15 +319,18 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
-                    <span>
-                        <i class="la la-trash"></i>
+                <ng-container *ngIf="CdNoteDetail.status !== 'Paid'">
+                    <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
+                        *ngIf="CdNoteDetail.syncStatus !== 'Synced'"
+                        (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                         <span>
-                            Delete note
+                            <i class="la la-trash"></i>
+                            <span>
+                                Delete note
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </ng-container>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
                     *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
                     (click)="openPopupEdit()">
@@ -338,16 +341,18 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
-                    title="Send to Accountant">
-                    <span>
-                        <i class="la la-cloud-upload"></i>
+                <ng-container *ngIf="CdNoteDetail?.status !== 'Unpaid'">
+                    <button class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="showConfirmed()"
+                        *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
+                        title="Send to Accountant">
                         <span>
-                            Send to Acc
+                            <i class="la la-cloud-upload"></i>
+                            <span>
+                                Send to Acc
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </ng-container>
                 <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" data-dismiss="modal"
                     (click)="closePopup()">
                     <span>
