@@ -540,28 +540,6 @@ namespace eFMS.API.Operation.DL.Services
                 //}
 
                 //Case Delete
-                var jobOps = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault();
-                if (clearances.FirstOrDefault().isDelete==true)
-                {
-                    var cusExist = DataContext.Get(x => x.JobNo == jobOps.JobNo);
-                    if (cusExist.Count() == clearances.Count())
-                    {
-                        updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Delete);
-                    }
-                    else
-                    {
-                        var customExist = cusExist.Where(x => clearances.Any(y => x.ClearanceNo != y.ClearanceNo)).OrderBy(x=>x.ClearanceDate).OrderBy(x=>x.DatetimeModified);
-                        List<CustomsDeclarationModel> lstCleUpdate = new List<CustomsDeclarationModel>();
-                        lstCleUpdate.Add(_mapper.Map<CustomsDeclarationModel>(customExist.FirstOrDefault()));
-                        updateChargeAndAdvRequest(lstCleUpdate, jobOps.Hblid, JobToCleType.DeleteAndUpdate);
-                    }
-                }
-
-                //Case Add or Update
-                else
-                {
-                    updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Update);
-                }
                
                 foreach (var item in clearances)
                 {
@@ -576,6 +554,30 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
+
+                var jobOps = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault();
+                if (clearances.FirstOrDefault().isDelete == true)
+                {
+                    var cusExist = DataContext.Get(x => x.JobNo == jobOps.JobNo);
+                    if (cusExist.Count() == clearances.Count())
+                    {
+                        updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Delete);
+                    }
+                    else
+                    {
+                        var customExist = cusExist.Where(x => clearances.Any(y => x.ClearanceNo != y.ClearanceNo)).OrderBy(x => x.ClearanceDate).OrderBy(x => x.DatetimeModified);
+                        List<CustomsDeclarationModel> lstCleUpdate = new List<CustomsDeclarationModel>();
+                        lstCleUpdate.Add(_mapper.Map<CustomsDeclarationModel>(customExist.FirstOrDefault()));
+                        updateChargeAndAdvRequest(lstCleUpdate, jobOps.Hblid, JobToCleType.DeleteAndUpdate);
+                    }
+                }
+
+                //Case Add or Update
+                else
+                {
+                    updateChargeAndAdvRequest(clearances, jobOps.Hblid, JobToCleType.Update);
+                }
+
             }
             catch (Exception ex)
             {
