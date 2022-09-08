@@ -1,3 +1,4 @@
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
@@ -25,6 +26,8 @@ import { CommonEnum } from '@enums';
 
 export class FormContractCommercialPopupComponent extends PopupBase {
 
+    currentUserType: string = '';
+    infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims();
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
 
@@ -65,6 +68,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     autoExtendDays: AbstractControl;
     noDue: AbstractControl;
     emailAddress: AbstractControl;
+    paymentTermOBH: AbstractControl;
+    firstShipmentDate: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -148,6 +153,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         private _ngProgressService: NgProgress,
         protected _activeRoute: ActivatedRoute,
         private _store: Store<IAppState>,
+        private _oauthService: OAuthService,
 
     ) {
         super();
@@ -155,7 +161,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-
+        this.getCurrentUserType();
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -240,6 +246,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             noDue: [],
             shipmentType: [],
             emailAddress: [null, Validators.email],
+            firstShipmentDate: [null],
+            paymentTermOBH: [null]
         });
         // this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -263,6 +271,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
         this.noDue = this.formGroup.controls['noDue'];
         this.emailAddress = this.formGroup.controls['emailAddress'];
+        this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
+        this.paymentTermOBH = this.formGroup.controls['paymentTermOBH'];
     }
 
     initDataForm() {
@@ -979,6 +989,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
+                        this.selectedContract.arconfirmed = false;
+                        this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error('something went wrong!');
                     }
@@ -1049,5 +1061,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             );
     }
 
-
+    getCurrentUserType() {
+        this._systemRepo.getDetailUser(this.infoCurrentUser.id)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this.currentUserType = res.data.userType;
+                    }
+                }
+            );
+    }
 }

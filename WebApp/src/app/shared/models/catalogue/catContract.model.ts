@@ -59,6 +59,9 @@ export class Contract {
     salesOfficeId: string = null;
     salesCompanyId: string = null;
     shipmentType: string = null;
+    emailAddress: string = null;
+    firstShipmentDate: string = null;
+    paymentTermOBH: string = null;
 
     constructor(data?: any) {
         const self = this;

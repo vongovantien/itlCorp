@@ -100,7 +100,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             description: null,
             vas: null,
             saleService: null,
-            shipmentType: null
+            shipmentType: null,
+            emailAddress: null,
+            firstShipmentDate: null,
+            paymentTermOBH: null
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;
@@ -254,6 +257,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.selectedContract = contract;
         this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
+
     getListContract(partneId: string) {
         this.isLoading = true;
         this._catalogueRepo.getListContract(partneId, false)
@@ -305,6 +309,4 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.contracts = this.contracts;
         this.onActiveContract.emit(this.selectedContract);
     }
-
-
 }

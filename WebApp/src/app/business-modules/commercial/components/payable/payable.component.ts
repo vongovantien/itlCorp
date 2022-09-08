@@ -61,7 +61,6 @@ export class PayableComponent extends AppForm {
                 finalize(() => { this.isLoading = false; }),
             ).subscribe(
                 (res: any) => {
-                    console.log(res);
                     res.currency = res.currency === null ? 'VND' : res.currency;
                     this.creditAmount = res.creditAmount;
                     this.creditAdvanceAmount = res.creditAdvanceAmount;

@@ -262,7 +262,8 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !emailAddress.valid}">
                                 <label>Email Address</label>
                                 <input type="text" class="form-control" formControlName="emailAddress">
                             </div>
@@ -274,7 +275,8 @@
                                     <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
                                         class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
+                                        name="daterange" [autoApply]="true" formControlName="firstShipmentDate"
+                                        readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -373,19 +375,10 @@
                                     <div class="form-group">
                                         <label>Payment Term OBH</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input
+                                            <input type="number" min="0" numeric [decimals]="digitDecimal"
                                                 [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
-                                                type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd
-                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                                formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
-                                                readonly />
-                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                <span>
-                                                    <i class="la la-calendar"></i>
-                                                </span>
-                                            </span>
+                                                autoFormatCurrency class="form-control"
+                                                formControlName="paymentTermOBH">
                                         </div>
                                     </div>
                                 </div>
@@ -573,16 +566,31 @@
                             <span> Request Approval </span>
                         </span>
                     </button>
-                    <button (click)="onARConfirmed()"
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
-                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-check"></i>
-                            <span> AR Confirmed </span>
-                        </span>
-                    </button>
 
-                    <ng-container *ngIf="selectedContract.arconfirmed === true">
+                    <ng-container
+                        *ngIf="contractType.value !=='Cash' && contractType.value !=='Guarantee' && currentUserType !== 'Super Admin'; else template">
+                        <button (click)="onARConfirmed()"
+                            *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
+                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-check"></i>
+                                <span> AR Confirmed </span>
+                            </span>
+                        </button>
+                    </ng-container>
+                    <ng-template #template>
+                        <button (click)="onARConfirmed()"
+                            *ngIf="(contractType.value ==='Cash' || contractType.value ==='Guarantee') && (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)"
+                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-check"></i>
+                                <span> AR Confirmed </span>
+                            </span>
+                        </button>
+                    </ng-template>
+
+                    <ng-container
+                        *ngIf="currentUserType !== 'Super Admin' && contractType.value !=='Cash' && contractType.value !=='Guarantee' ; else elseBlock">
                         <button (click)="activeInactiveContract(selectedContract.id)"
                             *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -600,6 +608,24 @@
                             </span>
                         </button>
                     </ng-container>
+                    <ng-template #elseBlock>
+                        <button (click)="activeInactiveContract(selectedContract.id)"
+                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-check-square-o"></i>
+                                <span> Active </span>
+                            </span>
+                        </button>
+                        <button (click)="activeInactiveContract(selectedContract.id)"
+                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                            class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-remove"></i>
+                                <span> Inactive </span>
+                            </span>
+                        </button>
+                    </ng-template>
 
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"

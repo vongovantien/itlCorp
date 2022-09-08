@@ -545,7 +545,13 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
+                entity.Property(e => e.EmailAddress)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")

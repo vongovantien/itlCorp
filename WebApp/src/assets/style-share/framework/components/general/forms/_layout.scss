@@ -14,18 +14,18 @@
             .form-control-label,
     		label {
                 font-size: get-font-size(regular);
-                font-weight: get-font-weight(bold);
+                font-weight: get-font-weight(bolder);
                 &.col-form-label {
-                    padding-top: array-get($m--forms, input, layout, self, size, default, padding, y); 
-                    //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y); 
+                    padding-top: array-get($m--forms, input, layout, self, size, default, padding, y);
+                    //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y);
                 }
     		}
-            
+
             .form-control-label {
                 color: #575962;
     			font-weight: 500;
             }
-            // margin-bottom: 0;    		
+            // margin-bottom: 0;
             padding-top: 15px;
             padding-bottom: 15px;
 
@@ -43,18 +43,18 @@
                 display: inline-block;
                 font-weight: get-font-weight(normal);
                 font-size: get-font-size(regular);
-                padding-top: array-get($m--forms, input, layout, self, size, default, padding, y); 
+                padding-top: array-get($m--forms, input, layout, self, size, default, padding, y);
             }
 
             &.m-form__group--first {
                 padding-top: 0;
             }
-            
+
 
             &.m-form__group--last {
                 padding-bottom: 0;
             }
-            
+
             @include desktop() {
                 // &:first-child {
                 //     padding-top: 0;
@@ -91,7 +91,7 @@
                     width: 100%;
                 }
             }
-    	}        
+    	}
 
         //== Form control help
     	.m-form__help {
@@ -116,7 +116,7 @@
             &:last-child,
             &.m-form__section--last {
                 margin-bottom: 0;
-            }       
+            }
         }
 
         //== Form separator
@@ -130,7 +130,7 @@
 
             &.m-form__seperator--space-2x {
                 margin: 30px 0;
-            }           
+            }
 
             &.m-form__seperator--space-3x {
                 margin: 40px 0;
@@ -141,7 +141,7 @@
         .m-form__heading {
             padding: 0;
             margin: 0 0 15px 0;
-            
+
             .m-form__heading-title {
                 font-weight: get-font-weight(bolder);
                 font-size: get-font-size(regular, '+++');
@@ -187,22 +187,22 @@
                 margin-top: $space;
 
                 &.m-form__actions--top {
-                    margin-top: 0; 
+                    margin-top: 0;
                     margin-bottom: $space;
                 }
             }
         }
 
         //== form layout options
-        
+
         // fit form option
         &.m-form--fit {
             .m-form__content,
-            .m-form__heading, 
+            .m-form__heading,
             .m-form__group {
                 padding-left: $space;
                 padding-right: $space;
-            }             
+            }
         }
 
         // form labels right aligned option
@@ -215,7 +215,7 @@
                     }
                 }
             }
-        }      
+        }
 
         // form labels right aligned option
         @include tablet {
@@ -226,7 +226,7 @@
                     }
                 }
             }
-        }        
+        }
 
         &.m-form--group-seperator-dashed,
         &.m-form--group-seperator {
@@ -269,7 +269,7 @@
 
         &.m-form--group-seperator {
             .m-form__group {
-                border-bottom: 1px solid get-color($skin, panel, '-'); 
+                border-bottom: 1px solid get-color($skin, panel, '-');
 
                 &.m-form__group--last,
                 &:last-child {
@@ -280,7 +280,7 @@
 
         &.m-form--group-seperator-dashed {
             .m-form__group {
-                border-bottom: 1px dashed get-color($skin, panel); 
+                border-bottom: 1px dashed get-color($skin, panel);
 
                 &.m-form__group--last,
                 &:last-child {
@@ -294,10 +294,10 @@
     	}
 
         .m-form__seperator {
-            border-top: 1px solid get-color($skin, panel); 
+            border-top: 1px solid get-color($skin, panel);
 
             &.m-form__seperator--dashed {
-                border-top: 1px dashed get-color($skin, panel); 
+                border-top: 1px dashed get-color($skin, panel);
             }
         }
 
@@ -325,14 +325,14 @@
 
         .m-form__actions {
             &.m-form__actions--line {
-        	   border-top: 1px solid get-color($skin, panel); 
+        	   border-top: 1px solid get-color($skin, panel);
             }
 
             &.m-form__actions--top {
                 &.m-form__actions--line {
                     border-top: 0;
                     border-bottom: 1px solid get-color($skin, panel);
-                }                
+                }
             }
 
             &.m-form__actions--solid {
@@ -362,7 +362,7 @@
     }
 
     .m-form.m-form--state {
-        .has-#{$state} { 
+        .has-#{$state} {
             .input-group .input-group-text,
             .input-group .btn.btn-secondary,
             .form-control:focus,
@@ -393,4 +393,4 @@
 //== Component States
 @include m-build-component--form-validation-state(success, array-get($m--state-colors, success, base));
 @include m-build-component--form-validation-state(warning, array-get($m--state-colors, warning, base));
-@include m-build-component--form-validation-state(danger, array-get($m--state-colors, danger, base));  
+@include m-build-component--form-validation-state(danger, array-get($m--state-colors, danger, base));
