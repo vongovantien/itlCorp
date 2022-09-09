@@ -69,7 +69,6 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
 
-        private readonly IContextBase<OpsStageAssigned> csStageAssignedRepository;
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IContextBase<CatStage> csStageRepository;
 
@@ -113,8 +112,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             ICsStageAssignedService csStageAssigned,
             IContextBase<CatStage> stageRepo,
-            IContextBase<OpsStageAssigned> csStageAssignedRepo,
-            IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opsTransactionRepo,
+            ) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -153,7 +152,6 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
 
             opsTransactionRepository = opsTransactionRepo;
-            csStageAssignedRepository = csStageAssignedRepo;
             csStageAssignedService = csStageAssigned;
             csStageRepository = stageRepo;
         }
