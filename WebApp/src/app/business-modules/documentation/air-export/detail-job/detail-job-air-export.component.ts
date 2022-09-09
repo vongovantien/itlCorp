@@ -464,6 +464,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             grossWeight: modelAdd.grossWeight,
             hw: modelAdd.hw,
             chargeWeight: modelAdd.chargeWeight,
+            cbm: modelAdd.cbm,
+            polDescription: modelAdd.polDescription,
+            podDescription: modelAdd.podDescription,
         };
 
         this._progressRef.start();

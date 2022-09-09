@@ -30,7 +30,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SoftDeleteJob(Guid jobId, out List<ObjectReceivableModel> modelReceivable);
         List<object> GetListTotalHB(Guid JobId);
         Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency);
-        ResultHandle SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
+        Task<ResultHandle> SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
         HandleState SyncShipmentByAirWayBill(Guid JobId, csTransactionSyncAirWayBill model);
         int CheckDeletePermission(Guid id);
         HandleState LockCsTransaction(Guid jobId);
