@@ -1502,8 +1502,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string _saleService = GetContractServicesName(contract.SaleService);
             contract.Arconfirmed = false;
             contract.DatetimeModified = DateTime.Now;
-            ClearCache();
-            var hs = DataContext.Update(contract, x => x.Id.ToString() == contractId);
+            DataContext.Update(contract, x => x.Id.ToString() == contractId);
 
             ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, string.Empty);
 
