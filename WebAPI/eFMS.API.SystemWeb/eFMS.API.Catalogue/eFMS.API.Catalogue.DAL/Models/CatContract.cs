@@ -55,5 +55,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string ShipmentType { get; set; }
         public string EmailAddress { get; set; }
         public DateTime? FirstShipmentDate { get; set; }
+        public int? PaymentTermObh { get; set; }
     }
 }

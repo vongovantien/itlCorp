@@ -568,6 +568,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentTermObh).HasColumnName("PaymentTermOBH");
+
                 entity.Property(e => e.SaleManId)
                     .HasMaxLength(50)
                     .IsUnicode(false);
