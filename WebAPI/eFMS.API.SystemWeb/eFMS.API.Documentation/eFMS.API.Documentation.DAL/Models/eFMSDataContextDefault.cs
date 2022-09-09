@@ -1323,6 +1323,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
+                entity.Property(e => e.NoDue).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -3019,9 +3021,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(250)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ContainerNote).HasMaxLength(250);
+                entity.Property(e => e.ContainerNote).HasMaxLength(500);
 
-                entity.Property(e => e.ContainerSealNo).HasMaxLength(250);
+                entity.Property(e => e.ContainerSealNo).HasMaxLength(500);
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
@@ -3047,7 +3049,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.PackagesNote).HasMaxLength(250);
+                entity.Property(e => e.PackagesNote).HasMaxLength(500);
 
                 entity.Property(e => e.PaymenType)
                     .HasMaxLength(50)
