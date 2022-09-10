@@ -16,7 +16,7 @@
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             placeholder="Select Customer" [displayFields]="displayFieldsCustomer"
-                            (remove)="resetFormControl(customerId)" [height]="200">
+                            (remove)="resetFormControl(customerId)" [clearable]="false">
                         </app-combo-grid-virtual-scroll>
 
                     </div>
@@ -28,8 +28,8 @@
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans"
                             [displayFields]="[{field: 'username', label: 'User Name'}]" placeholder="Select Salesman"
-                            [height]="200" [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)"
-                            size="15">
+                            [height]="100" [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)"
+                            [size]="15" [clearable]="false">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                             [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
                             placeholder="Select Consignee" (remove)="resetFormControl(consigneeId)"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
-                            [displayFields]="displayFieldsCustomer" [height]="200">
+                            [displayFields]="displayFieldsCustomer" [clearable]="false">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -152,7 +152,7 @@
                             (itemSelected)="onSelectDataFormInfo($event, 'pod')" [selectedDisplayFields]="['nameEn']"
                             [dataSources]="ports | async" [loading]="isLoadingPort | async"
                             placeholder="Select Destination Airport" (remove)="resetFormControl(pod)"
-                            [displayFields]="displayFieldPort" formControlName="podDescription">
+                            [displayFields]="displayFieldPort" formControlName="podDescription" [clearable]="false">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -284,7 +284,7 @@
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
                                 <label required>Incoterm</label>
                                 <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
-                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                    [clearable]="false" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
                             </div>
                         </div>
