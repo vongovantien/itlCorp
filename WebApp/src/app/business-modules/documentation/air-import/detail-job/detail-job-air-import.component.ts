@@ -186,7 +186,12 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         this.isDuplicate = true;
 
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -208,7 +213,11 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                         this.getDetailShipment(this.jobId);
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -217,6 +226,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                     }
                 }
             );
+    }
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {

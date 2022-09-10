@@ -95,7 +95,7 @@
                             <div class="form-group">
                                 <label>Shipment Type</label>
                                 <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
-                                    formControlName="shipmenttype"></ng-select>
+                                    formControlName="shipmenttype" (change)="getSalesmanList($event)"></ng-select>
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
