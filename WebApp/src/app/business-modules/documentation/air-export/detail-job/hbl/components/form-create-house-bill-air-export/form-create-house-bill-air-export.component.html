@@ -564,24 +564,29 @@
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="length" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Length">
+                                                            autoFormatCurrency [digits]=2 placeholder="Length"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="width" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Width">
+                                                            autoFormatCurrency [digits]=2 placeholder="Width"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="height" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Height">
+                                                            autoFormatCurrency [digits]=2 placeholder="Height"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="package" integer placeholder="PCS">
+                                                            formControlName="package" integer placeholder="PCS"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
+                                                            *ngIf="formCreate.controls['showDim'].value"
                                                             title="Delete" (click)="deleteDIM(j)">
                                                             <i class="fa fa-times fa-lg"></i>
                                                         </a>
@@ -592,7 +597,7 @@
                                         <tr app-table-none-record
                                             *ngIf="!formCreate?.get('dimensionDetails')['controls'].length">
                                         </tr>
-                                        <tr>
+                                        <tr *ngIf="formCreate.controls['showDim'].value">
                                             <td colspan=1>
                                                 <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
                                                     (click)="addDIM()">

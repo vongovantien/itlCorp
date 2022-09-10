@@ -1898,15 +1898,20 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedOn = data.IssueHblplace?.ToUpper(); //Issued On
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
-                var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s =>
-                        (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
-                        + "*"
-                        + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
-                        + "*"
-                        + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
-                        + "*"
-                        + string.Format("{0:n0}", s.Package)));
+
+                string _dimensions = string.Empty;
+                if (data.ShowDim == true)
+                {
+                    var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
+                    _dimensions = string.Join("\r\n", dimHbl.Select(s =>
+                           (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
+                           + "*"
+                           + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
+                           + "*"
+                           + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
+                           + "*"
+                           + string.Format("{0:n0}", s.Package)));
+                }
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
@@ -2259,8 +2264,12 @@ namespace eFMS.API.Documentation.DL.Services
             result.RateCharge = hbDetail.RateCharge;
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
-            var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
+            string _dimensions = string.Empty;
+            if (hbDetail.ShowDim == true)
+            {
+                var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
+                _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
+            }
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;
