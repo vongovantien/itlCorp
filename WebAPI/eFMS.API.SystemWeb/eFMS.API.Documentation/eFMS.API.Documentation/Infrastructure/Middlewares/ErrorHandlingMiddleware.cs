@@ -1,16 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using eFMS.API.Common;
-using eFMS.API.Common.Helpers;
-using eFMS.API.Common.Models;
-using eFMS.API.Shipment.Infrastructure.Common;
+using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace eFMS.API.Shipment.Infrastructure.Middlewares
 {
@@ -53,37 +48,7 @@ namespace eFMS.API.Shipment.Infrastructure.Middlewares
 
         private static async Task WriteExceptionAsync(HttpContext context, Exception exception, HttpStatusCode code, IOptions<MsWebHookUrl> _webHookUrl)
         {
-            HttpResponse response = context.Response;
-            response.ContentType = "application/json";
-            response.StatusCode = (int)code;
-
-            if (!context.Request.Body.CanSeek)
-            {
-                context.Request.EnableBuffering();
-            }
-
-            context.Request.Body.Position = 0;
-            StreamReader reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-            string body = await reader.ReadToEndAsync().ConfigureAwait(false);
-            context.Request.Body.Position = 0;
-
-            ResponseExModel log = new ResponseExModel
-            {
-                Code = (int)code,
-                Message = exception.Message,
-                Exception = body,
-                Success = false,
-                Source = exception.Source,
-                Name = exception.GetType().Name,
-                Body = body,
-                Path = context.Request.Path
-            };
-
-            await response.WriteAsync(JsonConvert.SerializeObject(log));
-
-            LogHelper LogWebHook = new LogHelper();
-            LogWebHook.LogWrite("eFMS_Log_Ex", JsonConvert.SerializeObject(log));
-            await LogWebHook.PushWebhook(_webHookUrl.Value.Url.ToString(), log);
+            await HandleException.HandleExceptionAsync(context, exception, code, _webHookUrl.Value.Url.ToString());
         }
     }
 }
