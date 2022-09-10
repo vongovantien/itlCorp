@@ -19,7 +19,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 import isUUID from 'validator/lib/isUUID';
 import { CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -45,16 +45,16 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     isCancelFormPopupSuccess: boolean = false;
 
     constructor(
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
+        protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        protected _store: Store<fromShareBussiness.ITransactionState>,
-        protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
         private _ngProgressService: NgProgress
     ) {
-        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
+        super(_router, _documentRepo, _actionStoreSubject, _store, _toastService, cdr);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;

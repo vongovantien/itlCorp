@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
+        public virtual DbSet<CatStage> CatStage { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
         public virtual DbSet<CsAirWayBill> CsAirWayBill { get; set; }
         public virtual DbSet<CsArrivalAndDeliveryDefault> CsArrivalAndDeliveryDefault { get; set; }
@@ -83,7 +84,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -1879,6 +1880,60 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+            });
+
+            modelBuilder.Entity<CatStage>(entity =>
+            {
+                entity.ToTable("catStage");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("U_catStage")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Code)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DescriptionEn)
+                    .HasColumnName("Description_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.DescriptionVn)
+                    .HasColumnName("Description_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.StageNameEn)
+                    .HasColumnName("StageName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.StageNameVn)
+                    .HasColumnName("StageName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatUnit>(entity =>

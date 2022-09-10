@@ -46,6 +46,8 @@ export class OpsTransaction extends BaseModel {
     containerDescription: string = '';
     commodityGroupId: string = '';
     isLocked: boolean = false;
+    isFinish: boolean = false;
+    isReopen: boolean = false;
     userCreatedName: string = '';
     userModifiedName: string = '';
     currentStatus: string = '';

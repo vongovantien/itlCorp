@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
@@ -11,7 +11,8 @@ import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import {
     ShareBussinessShipmentGoodSummaryComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareJobDetailComponent
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
@@ -20,12 +21,14 @@ import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/com
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+
+import * as fromShareBusiness from '../../../share-business/store';
 @Component({
     selector: 'app-create-job-fcl-export',
     templateUrl: './create-job-fcl-export.component.html'
 })
 
-export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
+export class SeaFCLExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -38,11 +41,12 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
     constructor(
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
     ) {
-        super();
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

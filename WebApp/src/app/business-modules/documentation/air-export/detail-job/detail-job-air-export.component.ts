@@ -15,7 +15,7 @@ import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -38,8 +38,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
-
-    shipmentDetail: CsTransaction;
 
     dimensionDetails: DIM[];
 
@@ -121,7 +119,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     getDetailShipment(jobId: string) {
-        this._documenRepo.getDetailTransaction(jobId)
+        this._documentRepo.getDetailTransaction(jobId)
             .subscribe(
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
@@ -379,7 +377,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {

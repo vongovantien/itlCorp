@@ -39,6 +39,7 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs);
         Task<HandleState> CreateFileZip(FileDowloadZipModel m);
         string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model,bool isUpdate);
+        HandleState UpdateJobStatus(ChargeShipmentStatusModel model);
     }
     public class FileDowloadZipModel
     {

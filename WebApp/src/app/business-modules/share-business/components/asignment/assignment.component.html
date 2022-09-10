@@ -7,8 +7,8 @@
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Finish Date:</span>
-                <span
-                    class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
+                <span class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date:
+                    'dd/MM/yyyy') : '-'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Job Status:</span>
@@ -68,12 +68,11 @@
                                 class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
-                            <button type="button" *ngIf="!!data && !data.isLocked"
+                            <!-- <button type="button" *ngIf="!!data && !data.isLocked"
                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove"
                                 (click)="showDeletePopup(stage)">
                                 <i class="la la-trash"></i>
-                            </button>
-
+                            </button> -->
                         </td>
 
                         <td class="sorting">
@@ -112,7 +111,7 @@
                             <span>{{stage.deadline | date: 'HH:mm dd/MM/yyyy'}}</span>
                         </td>
                         <td class="sorting">
-                            <span>{{stage.doneDate | date: 'dd/mm/yyyy'}}</span>
+                            <span>{{stage.doneDate | date: 'dd/MM/yyyy'}}</span>
                         </td>
                     </tr>
                     <tr app-table-none-record *ngIf="!stages.length"></tr>

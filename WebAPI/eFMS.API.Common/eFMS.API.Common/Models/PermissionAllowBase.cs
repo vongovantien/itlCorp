@@ -7,5 +7,7 @@
         public bool AllowUpdateCharge { get; set; } = false;
         public bool AllowAssignStage { get; set; } = false;
         public bool AllowLock { get; set; } = false;
+        public bool AllowFinish { get; set; } = false;
+        public bool AllowReopen { get; set; } = false;
     }
 }

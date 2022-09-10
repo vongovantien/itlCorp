@@ -2104,7 +2104,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             bool result = false;
             var surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
-            if (transactionType == TermData.OpsTransition)
+            if (transactionType == TermData.OpsTransaction)
             {
                 OpsTransaction ops = opsTransRepository.Get(x => x.Id == jobId).FirstOrDefault();
                 surcharges = DataContext.Get(x => x.Hblid == ops.Hblid);

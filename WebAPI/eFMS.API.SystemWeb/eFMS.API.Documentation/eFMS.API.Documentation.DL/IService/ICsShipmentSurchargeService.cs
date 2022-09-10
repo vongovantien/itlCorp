@@ -35,6 +35,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateChargeLinkFee(List<CsShipmentSurchargeModel> list);
         List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids);
         HandleState ImportPQL(List<string> cds);
-        bool CheckExistRefundFee(Guid jobId, string TransitionStype);
+        bool CheckExistRefundFee(Guid jobId, string transactionType);
     }
 }
