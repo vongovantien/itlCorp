@@ -63,6 +63,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
                 this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
                 this.getDetailHbl();
             } else {
                 this.gotoList();
