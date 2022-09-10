@@ -1374,7 +1374,7 @@ namespace eFMS.API.Operation.DL.Services
             return new List<CustomsDeclarationModel>();
         }
 
-        public bool CheckAllowUpdate(Guid? jobId)
+        public bool CheckAllowUpdate(Guid? jobId,List<string> clearanceNos)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
             var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
@@ -1388,9 +1388,9 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           );
-            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
+            if (query.Any() || clearanceNos.Any(x => x == accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault().CustomNo))
             {
-                return false;
+                    return false;
             }
             return true;
         }
