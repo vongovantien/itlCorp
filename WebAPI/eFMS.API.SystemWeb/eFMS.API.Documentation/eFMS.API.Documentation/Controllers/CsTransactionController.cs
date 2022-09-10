@@ -262,6 +262,12 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateServiceDate, Data = new { errorCode = "ServiceDate" } });
             }
 
+            string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
+            if (msgCheckUpdateMawb.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
             if (model.NoProfit == true)
             {
                 var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);
@@ -279,7 +285,7 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
 
-            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model,true);
+            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model, true);
             if (msgCheckHasHBL.Length > 0)
             {
                 return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data = new { errorCode = 452 } });
@@ -485,7 +491,6 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            
             if (model.NoProfit == true)
             {
                 var jobNo = csTransactionService.First(x => x.Id == model.Id).JobNo;

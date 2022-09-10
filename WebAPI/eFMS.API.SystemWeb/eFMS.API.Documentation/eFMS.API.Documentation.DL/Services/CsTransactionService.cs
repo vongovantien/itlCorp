@@ -70,7 +70,6 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
 
-        private readonly IContextBase<OpsStageAssigned> csStageAssignedRepository;
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IContextBase<CatStage> csStageRepository;
 
@@ -111,11 +110,10 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IAccAccountReceivableService accAccountReceivable,
-            ICsStageAssignedService csStageAssigned,
-            IContextBase<CatStage> stageRepo,
-            IContextBase<OpsStageAssigned> csStageAssignedRepo,
             IContextBase<CatContract> catContractRepository,
-            IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opsTransactionRepo,
+            ICsStageAssignedService csStageAssigned,
+            IContextBase<CatStage> stageRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -154,7 +152,6 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
             catContractRepo = catContractRepository;
             opsTransactionRepository = opsTransactionRepo;
-            csStageAssignedRepository = csStageAssignedRepo;
             csStageAssignedService = csStageAssigned;
             csStageRepository = stageRepo;
         }
@@ -3634,7 +3631,7 @@ namespace eFMS.API.Documentation.DL.Services
            
             return errorMsg;
         }
-
+        
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
         {
             CatStage stage = null;

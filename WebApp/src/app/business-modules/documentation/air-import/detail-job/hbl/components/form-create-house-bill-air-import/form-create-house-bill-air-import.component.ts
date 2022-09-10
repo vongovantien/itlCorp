@@ -178,9 +178,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             grossWeight: shipment.grossWeight,
                             chargeWeight: shipment.chargeWeight,
                             packageType: +shipment.packageType,
-                            incontermId: shipment.incotermId,
+                            incotermId: shipment.incotermId,
                             polDescription: shipment.polDescription,
-                            podDescription: shipment.polDescription,
+                            podDescription: shipment.podDescription,
                         });
                     }
                 }),
