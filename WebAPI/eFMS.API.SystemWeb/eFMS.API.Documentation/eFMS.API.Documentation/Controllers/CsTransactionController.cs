@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ISysImageService sysImageService;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+        private readonly ICheckPointService checkPointService;
         /// <summary>
         /// constructor
         /// </summary>
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             ICsShipmentSurchargeService serviceSurcharge,
             IAccAccountReceivableService AccAccountReceivaService,
             IOptions<ApiServiceUrl> serviceUrl,
+            ICheckPointService checkPoint,
             ISysImageService imageService)
         {
             stringLocalizer = localizer;
@@ -69,6 +71,7 @@ namespace eFMS.API.Documentation.Controllers
             sysImageService = imageService;
             AccAccountReceivableService = AccAccountReceivaService;
             apiServiceUrl = serviceUrl;
+            checkPointService = checkPoint;
         }
 
         /// <summary>
@@ -158,7 +161,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            if(statusCode == 0)
+            if (statusCode == 0)
             {
                 return Ok();
             }
@@ -222,6 +225,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Put(CsTransactionEditModel model)
         {
             currentUser.Action = "UpdateCsTransaction";
+            var currentJob = csTransactionService.Get(x => x.Id == model.Id).FirstOrDefault();
 
             if (!ModelState.IsValid) return BadRequest();
             if (!csTransactionService.Any(x => x.Id == model.Id))
@@ -233,6 +237,15 @@ namespace eFMS.API.Documentation.Controllers
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+
+            if (currentJob.ColoaderId != model.ColoaderId)
+            {
+                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.CsTransaction);
+                if (checkExistRefundFee == true)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_REFUND_FEE_EXISTED] });
+                }
             }
 
             // Remove check etd, eta #15850
@@ -255,6 +268,29 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
+            if (model.NoProfit == true)
+            {
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + model.JobNo + " have profit, you can not check No Profit." });
+                }
+            }
+            else
+            {
+                var allowUnCheckNoProfit = checkPointService.AllowUnCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowUnCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Can not remove No Profit. " + model.JobNo + " already has Advance/Settlement." });
+                }
+            }
+
+            string msgCheckHasHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model, true);
+            if (msgCheckHasHBL.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = msgCheckHasHBL, Data = new { errorCode = 452 } });
+            }
+
             model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
             if (hs.Code == 403)
@@ -272,7 +308,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost("UploadFile")]
-        public IActionResult UploadFile([FromForm]IFormFile file)
+        public IActionResult UploadFile([FromForm] IFormFile file)
         {
             var s = JsonConvert.SerializeObject(file);
             return Ok(s);
@@ -287,7 +323,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
         [Authorize]
-        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId, bool? isTemp)
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required] Guid jobId, bool? isTemp)
         {
             DocumentFileUploadModel model = new DocumentFileUploadModel
             {
@@ -306,7 +342,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetFileAttachs")]
-        public IActionResult GetAttachedFiles([Required]Guid jobId)
+        public IActionResult GetAttachedFiles([Required] Guid jobId)
         {
             string id = jobId.ToString();
             var results = sysImageService.Get(x => x.ObjectId == id && x.IsTemp != true);
@@ -319,7 +355,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet("GetFileAttachsPreAlert")]
-        public IActionResult GetAttachedFilesPreAlert([Required]Guid jobId)
+        public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
         {
             string id = jobId.ToString();
             var results = sysImageService.Get(x => x.ObjectId == id);
@@ -328,7 +364,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpPut("UpdateFilesToShipment")]
-        public IActionResult UpdateFilesToShipment([FromBody]List<SysImageModel> files)
+        public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
         {
             var result = sysImageService.UpdateFilesToShipment(files);
             return Ok(result);
@@ -336,7 +372,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]
-        public async Task<IActionResult> DeleteAttachedFile([Required]Guid id)
+        public async Task<IActionResult> DeleteAttachedFile([Required] Guid id)
         {
             HandleState hs = await sysImageService.DeleteFile(id);
             if (hs.Success)
@@ -348,7 +384,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteFileTempPreAlert/{jobId}")]
-        public async Task<IActionResult> DeleteFileTempPreAlert([Required]Guid jobId)
+        public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
         {
             HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
             if (hs.Success)
@@ -439,7 +475,7 @@ namespace eFMS.API.Documentation.Controllers
         #endregion -- DELETE --
 
         /// <summary>
-        /// import transaction
+        /// import transaction - save duplicate job
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -455,6 +491,23 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            if (model.NoProfit == true)
+            {
+                var jobNo = csTransactionService.First(x => x.Id == model.Id).JobNo;
+                string jobOrgNo = string.Empty;
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipmentDuplicate(jobNo, model.NoProfit, false, out jobOrgNo);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + jobOrgNo + " have profit, check No Profit with this Duplicate job is invalid." });
+                }
+            }
+
+            string msgcheckShipmentTypeWithHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model,false);
+            if (msgcheckShipmentTypeWithHBL.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = msgcheckShipmentTypeWithHBL, Data = new { errorCode = 453 } });
+            }
+
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model, out List<Guid> surchargeIds);
 
@@ -468,7 +521,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -589,6 +642,23 @@ namespace eFMS.API.Documentation.Controllers
                 return File((MemoryStream)res.Message, "application/zip", m.FileName);
             return BadRequest(res);
         }
+
+        [Authorize]
+        [HttpPut("UpdateJobStatus")]
+        public IActionResult UpdateJobStatus(ChargeShipmentStatusModel model)
+        {
+            HandleState hs = csTransactionService.UpdateJobStatus(model);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
 
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
@@ -737,6 +807,7 @@ namespace eFMS.API.Documentation.Controllers
 
             return errorMsg;
         }
+
 
         private string CheckUpdateEtdEta(CsTransactionEditModel model, out string type)
         {

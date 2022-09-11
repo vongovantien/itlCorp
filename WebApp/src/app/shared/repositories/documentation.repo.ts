@@ -30,6 +30,12 @@ export class DocumentationRepo {
         );
     }
 
+    updateFlightInfo(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteHbl(id: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Delete`, { id: id }).pipe(
             catchError((error) => throwError(error)),
@@ -264,12 +270,13 @@ export class DocumentationRepo {
     }
 
     getListHouseBillOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/QueryData`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/QueryData`, data, null, { "hideSpinner": "true" })
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
     }
 
     checkViewDetailHblPermission(id: string) {
@@ -755,7 +762,7 @@ export class DocumentationRepo {
     }
 
     generateHBLNo(transactionTypeEnum: number) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -1281,4 +1288,12 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartnerForCheckPointInShipment`, { id, transactionType });
 
     }
+
+    updateStatusJob(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UpdateJobStatus`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }

@@ -72,6 +72,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
+        private readonly IContextBase<SysSettingFlow> settingflowRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -113,7 +114,8 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
-            IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
+            IContextBase<SysSettingFlow> settingflowRepo,
+        IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -151,6 +153,7 @@ namespace eFMS.API.Accounting.DL.Services
             opsStageAssignedRepository = opsStageAssignedRepo;
             databaseUpdateService = _databaseUpdateService;
             csLinkChargeRepository = csLinkChargeRepo;
+            settingflowRepository = settingflowRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -2465,6 +2468,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var settlementApprove = mapper.Map<AcctApproveSettlement>(approve);
                 var settlementPayment = DataContext.Get(x => x.SettlementNo == approve.SettlementNo).FirstOrDefault();
+                approve.Id = settlementPayment.Id;
 
                 if (!string.IsNullOrEmpty(approve.SettlementNo))
                 {
@@ -4667,7 +4671,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var shipmentSettlement = new InfoShipmentSettlementExport();
 
                 #region -- CHANRGE AND ADVANCE OF SETTELEMENT --
-                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
+                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, houseBillId.customNo, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 shipmentSettlement.ShipmentCharges = _shipmentCharges;
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
@@ -4725,11 +4729,11 @@ namespace eFMS.API.Accounting.DL.Services
             return result.ToList();
         }
 
-        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
+        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string customNo, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var shipmentSettlement = new InfoShipmentSettlementExport();
             var listCharge = new List<InfoShipmentChargeSettlementExport>();
-            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
+            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo && x.ClearanceNo == customNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var sur in surChargeByHblId)
             {
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
@@ -5772,55 +5776,80 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public ResultHandle CheckAllowDenySettle(List<Guid> ids)
         {
-            #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
-            var invalidSettles = new List<Guid>();
-            var invalidCodeSettles = new List<string>();
+            if (false)
+            {
+                #region Check allow deny direct settlement nếu có charge obh đã issue debit/soa
+                var invalidSettles = new List<Guid>();
+                var invalidCodeSettles = new List<string>();
 
+                var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
+                var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
+                var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
+                var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
+                foreach (var settlementId in ids)
+                {
+                    var detail = settlementData.First(x => x.Id == settlementId);
+                    if (detail == null) return null;
+
+                    #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
+                    //if (detail.SettlementType == "DIRECT")
+                    //{
+                    //    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
+                    //    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
+                    //    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
+                    //    if (isDebit || isSoa)
+                    //    {
+                    //        invalidSettles.Add(settlementId);
+                    //        invalidCodeSettles.Add(detail.SettlementNo);
+                    //    }
+                    //}
+                    //if (invalidSettles.Count > 0)
+                    //            {
+                    //                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                    //            }
+                    #endregion
+
+                    // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
+                    var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
+                    var chargesLinked = from sur in surchargesSettle
+                                        join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
+                                        join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
+                                        select sell.Id;
+                    if (chargesLinked != null && chargesLinked.Count() > 0)
+                    {
+                        invalidSettles.Add(settlementId);
+                        invalidCodeSettles.Add(detail.SettlementNo);
+                    }
+                }
+                if (invalidSettles.Count > 0)
+                {
+                    return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had auto rate fees. You can not deny.", invalidCodeSettles.Join(",")), Data = invalidSettles };
+                }
+                #endregion
+            }
+            return new ResultHandle();
+        }
+
+        /// <summary>
+        /// Check if settlement has autorate charges
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <returns></returns>
+        public bool CheckSettleHasAutoRateCharges(string settlementNo)
+        {
             var csLinkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == AccountingConstants.LINK_TYPE_AUTO_RATE);
-            var settlementData = DataContext.Get(x => ids.Any(z => z == x.Id));
             var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH);
             var chargesSelling = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL);
-            foreach (var settlementId in ids)
+            var surchargesSettle = surcharges.Where(x => x.SettlementCode == settlementNo);
+            var chargesLinked = from sur in surchargesSettle
+                                join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
+                                join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
+                                select sell.Id;
+            if (chargesLinked != null && chargesLinked.Any())
             {
-                var detail = settlementData.First(x => x.Id == settlementId);
-                if (detail == null) return null;
-
-                #region // Bỏ rule => Check Settlements had OBH Partner issue Debit/Soa. Please re-check.
-                //if (detail.SettlementType == "DIRECT")
-                //{
-                //    var obhDebitSurcharges = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == false && x.SettlementCode == detail.SettlementNo && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano))).ToList();
-                //    var isDebit = acctCdnoteRepo.Any(x => obhDebitSurcharges.Any(z => z.DebitNo == x.Code && z.PaymentObjectId == x.PartnerId));
-                //    var isSoa = acctSoaRepo.Any(x => obhDebitSurcharges.Any(z => z.Soano == x.Soano && z.PaymentObjectId == x.Customer));
-                //    if (isDebit || isSoa)
-                //    {
-                //        invalidSettles.Add(settlementId);
-                //        invalidCodeSettles.Add(detail.SettlementNo);
-                //    }
-                //}
-                //if (invalidSettles.Count > 0)
-                //            {
-                //                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had OBH Partner issue Debit/Soa. Please re-check.", invalidCodeSettles.Join(",")), Data = invalidSettles };
-                //            }
-                #endregion
-
-                // [CR:17807]: Không cho phép DENY bất khì phiếu Settlement nào có phí đã Autorate
-                var surchargesSettle = surcharges.Where(x => x.SettlementCode == detail.SettlementNo);
-                var chargesLinked = from sur in surchargesSettle
-                                    join linkChg in csLinkCharges on sur.Id.ToString() equals linkChg.ChargeOrgId
-                                    join sell in chargesSelling on linkChg.ChargeLinkId equals sell.ToString()
-                                    select sell.Id;
-                if (chargesLinked != null && chargesLinked.Count() > 0)
-                {
-                    invalidSettles.Add(settlementId);
-                    invalidCodeSettles.Add(detail.SettlementNo);
-                }
+                return true;
             }
-            if (invalidSettles.Count > 0)
-            {
-                return new ResultHandle { Status = false, Message = string.Format("Settlements : {0} had auto rate fees. You can not deny.", invalidCodeSettles.Join(",")), Data = invalidSettles };
-            }
-            #endregion
-            return new ResultHandle();
+            return false;
         }
 
         /// <summary>
@@ -6238,7 +6267,16 @@ namespace eFMS.API.Accounting.DL.Services
                 return new ResultHandle();
             }
         }
-        
+
+        private bool checkSettleSettingFlow()
+        {
+            if (settingflowRepository.Get(x => x.OfficeId == currentUser.OfficeID&&x.Type== "AccountPayable").FirstOrDefault()?.ApprovalSettlement==true)
+            {
+                return true;
+            }
+            return false;
+        }
+
         /// Check if payee not staff then not accept input cost > sell
         /// </summary>
         /// <param name="model"></param>
@@ -6246,21 +6284,36 @@ namespace eFMS.API.Accounting.DL.Services
         public string CheckValidFeesOnShipment(CreateUpdateSettlementModel model)
         {
             var invalidShipment = string.Empty;
+            if (!checkSettleSettingFlow())
+            {
+                return invalidShipment;
+            }
             if (!string.IsNullOrEmpty(model.Settlement.Payee))
             {
                 if (catPartnerRepo.Any(x => x.Id == model.Settlement.Payee && !x.PartnerGroup.ToLower().Contains("staff")))
                 {
                     var jobIds = model.ShipmentCharge.Select(x => x.JobId).ToList();
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != "OBH" && jobIds.Any(z => z == x.JobNo));
-                    var listSipment = new List<string>();
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var job in shipmentGrp)
+                    var validJobNo = new List<string>();
+                    var opsNoProfit = opsTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    var serviceNoProfit = csTransactionRepo.Get(x => jobIds.Any(z => z == x.JobNo) && x.NoProfit != true).Select(x => x.JobNo);
+                    validJobNo.AddRange(opsNoProfit);
+                    validJobNo.AddRange(serviceNoProfit);
+
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    if (surcharges.Count() <= 0)
                     {
-                        var buyAmount = job.Where(x => x.Type == "BUY").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                        var sellAmount = job.Where(x => x.Type == "SELL").Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        return invalidShipment;
+                    }
+                    var listSipment = new List<string>();
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    foreach (var shipment in shipmentGrp)
+                    {
+                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
                         if (buyAmount > sellAmount)
                         {
-                            listSipment.Add(job.Key);
+                            listSipment.Add(shipment.FirstOrDefault().JobNo);
                         }
                     }
                     if (listSipment.Count > 0)
@@ -6270,6 +6323,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
+            
             return invalidShipment;
         }
     }

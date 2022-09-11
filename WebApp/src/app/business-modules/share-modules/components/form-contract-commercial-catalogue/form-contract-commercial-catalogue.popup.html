@@ -103,7 +103,7 @@
                                         [ngClass]="{'m-form__group has-danger': isSubmitted  &&  !effectiveDate.value.startDate }">
                                         <label required for="">Effective Date</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
+                                            <input type="text" (datesUpdated)="onUpdateEffectiveDate($event)"
                                                 class="form-control m-input m-input--square" ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                 [singleDatePicker]="true" name="daterange" [autoApply]="true"
@@ -113,14 +113,25 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <ng-container
+                                                *ngIf="!!effectiveDate.value && !!effectiveDate.value.startDate">
+                                                <span class=" m-input-icon_clear"
+                                                    (click)="resetFormControl('effectiveDate')"><i
+                                                        class="la la-times"></i></span>
+                                            </ng-container>
+
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!expiredDate.value.startDate && contractType.value !=='Cash') }">
-                                        <label *ngIf="contractType.value !=='Cash'" required for="">Expired Date</label>
-                                        <label *ngIf="contractType.value === 'Cash'" for="">Expired Date</label>
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' }">
+                                        <label
+                                            *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee'"
+                                            required for="">Expired Date</label>
+                                        <label
+                                            *ngIf="contractType.value === 'Cash' || contractType.value === 'Guarantee'"
+                                            for="">Expired Date</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
@@ -133,6 +144,11 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <ng-container *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
+                                                <span class="m-input-icon_clear"
+                                                    (click)="resetFormControl('expiredDate')"><i
+                                                        class="la la-times"></i></span>
+                                            </ng-container>
                                         </div>
                                     </div>
                                 </div>

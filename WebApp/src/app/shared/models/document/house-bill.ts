@@ -168,8 +168,10 @@ export class HouseBill extends BaseModel {
     incotermId: string = null;
     userNameCreated: string = null;
     userNameModified: string = null;
-    wareHouseAnDate:any = null;
-
+    wareHouseAnDate: any = null;
+    polDescription: string = null;
+    podDescription: string = null;
+    showDim: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

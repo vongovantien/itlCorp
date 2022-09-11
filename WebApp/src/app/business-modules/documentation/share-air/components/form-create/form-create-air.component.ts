@@ -53,6 +53,9 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     pol: AbstractControl;
     pod: AbstractControl;
 
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
+
     agentId: AbstractControl;
     agentName: string = null;
 
@@ -218,7 +221,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
                                 ata: !!res.ata ? { startDate: new Date(res.ata), endDate: new Date(res.ata) } : null,
                                 atd: !!res.atd ? { startDate: new Date(res.atd), endDate: new Date(res.atd) } : null,
-
+                                podDescription: !!this.shipmentDetail.podDescription ? this.shipmentDetail.podDescription : res.podName,
+                                polDescription: !!this.shipmentDetail.polDescription ? this.shipmentDetail.polDescription : res.polName,
                                 commodity: !!res.commodity ? res.commodity.split(",") : [],
                                 packageType: +res.packageType, // * Unit
                             };
@@ -243,10 +247,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             personIncharge: [],
             notes: [],
             mawb: ['', Validators.compose([
-                Validators.required,
-                Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                FormValidators.validateMAWB,
-                FormValidators.validateSpecialChar
+                // Validators.required,
+                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                // FormValidators.validateMAWB,
+                // FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([
@@ -284,12 +288,15 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             agentId: [null, this.type === 'import' ? Validators.required : null],
             pol: [null, this.type !== 'import' ? Validators.required : null],
             pod: [null, this.type === 'import' ? Validators.required : null],
+            podDescription: [],
+            polDescription: [],
             coloaderId: [null, this.type !== 'import' ? Validators.required : null],
             warehouseId: [],
             airlineInfo: [],
 
             isHawb: [false],
             isMawb: [false],
+            noProfit: [false],
             incotermId: [null, Validators.required],
             ata: [],
             atd: []
@@ -311,6 +318,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this.coloaderId = this.formGroup.controls["coloaderId"];
         this.pol = this.formGroup.controls["pol"];
         this.pod = this.formGroup.controls["pod"];
+
+        this.polDescription = this.formGroup.controls["polDescription"];
+        this.podDescription = this.formGroup.controls["podDescription"];
+
         this.agentId = this.formGroup.controls["agentId"];
         this.warehouseId = this.formGroup.controls["warehouseId"];
         this.personalIncharge = this.formGroup.controls["personIncharge"];
@@ -405,9 +416,11 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+                this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'agent':
                 this.agentName = data.shortName;
@@ -562,10 +575,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 else {
                     this.isCheckedActive = false;
                     this.formGroup.get('mawb').setValidators([
-                        Validators.required,
-                        Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                        FormValidators.validateMAWB,
-                        FormValidators.validateSpecialChar
+                        // Validators.required,
+                        // Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                        // FormValidators.validateMAWB,
+                        // FormValidators.validateSpecialChar
                     ]);
                 }
                 this.formGroup.get('mawb').updateValueAndValidity();

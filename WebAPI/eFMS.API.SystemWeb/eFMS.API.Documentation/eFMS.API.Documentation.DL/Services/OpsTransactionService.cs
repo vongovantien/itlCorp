@@ -2079,6 +2079,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = new List<CsShipmentSurcharge>();
             IQueryable<CsShipmentSurcharge> charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true && string.IsNullOrEmpty(x.LinkChargeId));
+            OpsTransaction jobRepOld = DataContext.Get(x => x.Hblid == _oldHblId)?.FirstOrDefault();
 
             if (isOrigin == false)
             {
@@ -2156,6 +2157,12 @@ namespace eFMS.API.Documentation.DL.Services
                     item.Hblid = shipment.Hblid;
                     item.CombineBillingNo = null;
                     item.ObhcombineBillingNo = null;
+
+                    if (jobRepOld.SupplierId != shipment.SupplierId && item.IsRefundFee == true)
+                    {
+                        item.PaymentObjectId = shipment.SupplierId;
+                    }
+
                     surCharges.Add(item);
                 }
             }

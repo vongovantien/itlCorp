@@ -221,7 +221,7 @@ export class CatalogueRepo {
                 , {
                     page: '' + page,
                     size: '' + size
-                }).pipe(
+                }, { "hideSpinner": "true" }).pipe(
                     catchError((error) => throwError(error)),
                     map((res: any) => {
                         return res;
@@ -1389,6 +1389,11 @@ export class CatalogueRepo {
 
     getListSalemanByPartner(partnerId: string, transactionType: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType });
+
+    }
+
+    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType });
 
     }
 

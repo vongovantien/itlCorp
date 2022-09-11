@@ -15,7 +15,7 @@ import { switchMap, map, tap, skip, takeUntil, catchError, finalize, concatMap }
 
 import * as fromShareBussiness from './../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,7 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
@@ -48,14 +47,14 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     constructor(
         protected _router: Router,
-        protected _documenRepo: DocumentationRepo,
+        protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<any>,
+        protected _store: Store<any>,
         private _ngProgressService: NgProgress,
         private _cd: ChangeDetectorRef
     ) {
-        super(_router, _documenRepo, _toastService);
+        super(_router, _documentRepo, _toastService, _store);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
     }
@@ -165,7 +164,12 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -183,7 +187,11 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -192,6 +200,13 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                     }
                 }
             );
+    }
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {
@@ -488,5 +503,4 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 this.viewContainerRef.viewContainerRef.clear();
             });
     }
-
 }

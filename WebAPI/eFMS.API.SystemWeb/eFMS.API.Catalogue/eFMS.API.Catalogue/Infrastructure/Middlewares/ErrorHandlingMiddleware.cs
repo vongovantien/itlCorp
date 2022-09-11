@@ -2,22 +2,24 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Common;
+using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Catalogue.Infrastructure.Middlewares
 {
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate next;
+        private readonly IOptions<MsWebHookUrl> webHookUrl;
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+        public ErrorHandlingMiddleware(RequestDelegate next, IOptions<MsWebHookUrl> _webHookUrl)
         {
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context /* other scoped dependencies */)
+        public async Task Invoke(HttpContext context /* other scoped dependencies */, IOptions<MsWebHookUrl> _webHookUrl)
         {
             try
             {
@@ -26,11 +28,11 @@ namespace eFMS.API.Catalogue.Infrastructure.Middlewares
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex, _webHookUrl);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception exception, IOptions<MsWebHookUrl> _webHookUrl)
         {
             // if it's not one of the expected exception, set it to 500
             var code = HttpStatusCode.InternalServerError;
@@ -41,24 +43,12 @@ namespace eFMS.API.Catalogue.Infrastructure.Middlewares
             else if (exception is UnauthorizedAccessException) code = HttpStatusCode.Unauthorized;
 
 
-            return WriteExceptionAsync(context, exception, code);
+            await WriteExceptionAsync(context, exception, code, _webHookUrl);
         }
 
-        private static Task WriteExceptionAsync(HttpContext context, Exception exception, HttpStatusCode code)
+        private static async Task WriteExceptionAsync(HttpContext context, Exception exception, HttpStatusCode code, IOptions<MsWebHookUrl> _webHookUrl)
         {
-            var response = context.Response;
-            response.ContentType = "application/json";
-            response.StatusCode = (int)code;
-            return response.WriteAsync(JsonConvert.SerializeObject(new
-            {
-                error = new ResponseModel
-                {
-                    Code = (int)code,
-                    Message = exception.Message,
-                    Exception = exception.GetType().Name,
-                    Success = false
-                }
-            }));
+            await HandleException.HandleExceptionAsync(context, exception, code, _webHookUrl.Value.Url.ToString());
         }
     }
 }

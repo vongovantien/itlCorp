@@ -42,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string UserNameModified { get; set; }
         public string Group { get; set; }
         public string Department { get; set; }
+        public string JobStatus { get; set; }
         public PermissionAllowBase Permission { get; set; }
     }
 }

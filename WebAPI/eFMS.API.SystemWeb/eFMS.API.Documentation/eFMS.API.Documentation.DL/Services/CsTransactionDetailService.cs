@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+            int code = checkOwnerPermission(model)?200: GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
             if (code == 403) return new HandleState(403, "");
             model.DatetimeModified = DateTime.Now;
             model.Active = true;
@@ -389,6 +389,29 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     trans.Dispose();
                 }
+            }
+        }
+
+        public HandleState UpdateFlightInfo(Guid Id)
+        {
+            var job = csTransactionRepo.Get(x => x.Id == Id).FirstOrDefault();
+            var jobDetails = DataContext.Get(x => x.JobId == Id).ToList();
+            try
+            {
+                jobDetails.ForEach(x =>
+                {
+                    x.FlightNo = job.FlightVesselName;
+                    x.FlightDate = job.FlightDate;
+                    x.Eta = job.Eta;
+                    x.Etd = job.Etd;
+                    var hsUpdateFlightInfo = DataContext.Update(x, z => x.Id == z.Id, false);
+                });
+                var sm = DataContext.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
             }
         }
 
@@ -549,6 +572,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.TransactionType = shipment.TransactionType;
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
+                    detail.JobStatus = shipment.CurrentStatus;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
                     detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;
@@ -567,11 +591,25 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            if (detail == null)
+            {
+                return 200;
+            }
             var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
             var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId,Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
+            var trans = csTransactionRepo.Get(x => x.Id == detail.JobId).FirstOrDefault();
+            int code = 0;
+            if (checkOwnerPermission(detail))
+            {
+                code = 200;
+            }
+            else
+            {
+                code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
+            }
+            
             return code;
         }
 
@@ -585,10 +623,12 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+       
             detail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
+                AllowUpdate = checkOwnerPermission (detail)? true: GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
             };
+                 
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             if (specialActions.Count > 0)
             {
@@ -606,6 +646,16 @@ namespace eFMS.API.Documentation.DL.Services
             return detail;
         }
 
+        private bool checkOwnerPermission(CsTransactionDetailModel transDe)
+        {
+            var trans = csTransactionRepo.Get(x => x.Id == transDe.JobId).FirstOrDefault();
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(transDe.TransactionType, currentUser);
+            if (trans.UserCreated==_currentUser.UserID)
+            {
+                return true;
+            }
+            return false;
+        }
 
 
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
@@ -1277,7 +1327,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
 
-                    int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
+                    int code = checkOwnerPermission(_mapper.Map<CsTransactionDetailModel>(hbl)) ? 200 : GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
                     if (code == 403) return new HandleState(403, "");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id);
@@ -1416,8 +1466,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var proofOfDelivery = new AirProofOfDeliveryReport();
                 proofOfDelivery.MAWB = data.Mawb?.ToUpper();
                 proofOfDelivery.HWBNO = data.Hwbno?.ToUpper();
-                proofOfDelivery.LastDestination = dataPOD?.NameEn?.ToUpper();
-                proofOfDelivery.DepartureAirport = dataPOL?.NameEn?.ToUpper();
+                proofOfDelivery.LastDestination = !string.IsNullOrEmpty(data.PodDescription) ? data.PodDescription : dataPOD?.NameEn?.ToUpper();
+                proofOfDelivery.DepartureAirport = !string.IsNullOrEmpty(data.PolDescription) ? data.PolDescription : dataPOL?.NameEn?.ToUpper();
                 proofOfDelivery.ShippingMarkImport = data.ShippingMark?.ToUpper();
                 proofOfDelivery.Consignee = dataConsignee.PartnerNameEn?.ToUpper();
                 proofOfDelivery.ATTN = dataATTN?.PartnerNameEn?.ToUpper();
@@ -1488,8 +1538,8 @@ namespace eFMS.API.Documentation.DL.Services
                 documentRelease.HWBNO = data.Hwbno?.ToUpper();
                 documentRelease.FlightNo = data.FlightNo?.ToUpper();
                 documentRelease.CussignedDate = data.FlightDate;
-                documentRelease.DepartureAirport = dataPOL?.NameEn?.ToUpper();
-                documentRelease.LastDestination = dataPOD?.NameEn?.ToUpper();
+                documentRelease.LastDestination = !string.IsNullOrEmpty(data.PodDescription) ? data.PodDescription : dataPOD?.NameEn?.ToUpper();
+                documentRelease.DepartureAirport = !string.IsNullOrEmpty(data.PolDescription) ? data.PolDescription : dataPOL?.NameEn?.ToUpper();
                 documentRelease.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : "";
                 documentRelease.WChargeable = data.ChargeWeight ?? 0;
                 listDocument.Add(documentRelease);
@@ -1795,7 +1845,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
                     housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //AOL - Departure
-                    housebill.DepartureAirport = housebill.DepartureAirport?.ToUpper();
+                    housebill.DepartureAirport = !string.IsNullOrEmpty(data.PolDescription) ? data.PolDescription : housebill.DepartureAirport?.ToUpper();
                 }
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
@@ -1817,7 +1867,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
                     housebill.LastDestination = dataPOD?.NameEn;//+ (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport - CR: 15121 Không lấy country
-                    housebill.LastDestination = housebill.LastDestination?.ToUpper();
+                    housebill.LastDestination = !string.IsNullOrEmpty(data.PodDescription) ? data.PodDescription : housebill.LastDestination?.ToUpper();
                 }
                 housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No
                 housebill.FlightDate = data.FlightDate; //Flight Date
@@ -1871,15 +1921,20 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedOn = data.IssueHblplace?.ToUpper(); //Issued On
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
-                var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s =>
-                        (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
-                        + "*"
-                        + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
-                        + "*"
-                        + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
-                        + "*"
-                        + string.Format("{0:n0}", s.Package)));
+
+                string _dimensions = string.Empty;
+                if (data.ShowDim == true)
+                {
+                    var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
+                    _dimensions = string.Join("\r\n", dimHbl.Select(s =>
+                           (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
+                           + "*"
+                           + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
+                           + "*"
+                           + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
+                           + "*"
+                           + string.Format("{0:n0}", s.Package)));
+                }
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
@@ -2232,8 +2287,12 @@ namespace eFMS.API.Documentation.DL.Services
             result.RateCharge = hbDetail.RateCharge;
             result.Total = hbDetail.Total;
             result.DesOfGood = hbDetail.DesOfGoods;
-            var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
-            string _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
+            string _dimensions = string.Empty;
+            if (hbDetail.ShowDim == true)
+            {
+                var dimHbl = dimensionDetailService.Get(x => x.Hblid == housebillId);
+                _dimensions = string.Join("\r\n", dimHbl.Select(s => NumberHelper.RoundNumber(s.Length.Value, 2) + "*" + NumberHelper.RoundNumber(s.Width.Value, 2) + "*" + NumberHelper.RoundNumber(s.Height.Value, 2) + "*" + NumberHelper.RoundNumber(s.Package.Value, 2)));
+            }
             result.VolumeField = _dimensions;
             result.PrepaidTotal = hbDetail.TotalPp;
             result.CollectTotal = hbDetail.TotalCll;

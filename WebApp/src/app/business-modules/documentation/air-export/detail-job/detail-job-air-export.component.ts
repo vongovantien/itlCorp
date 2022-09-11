@@ -15,7 +15,7 @@ import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -30,6 +30,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
+    //@ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
@@ -38,17 +39,19 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: CsTransaction;
-
     dimensionDetails: DIM[];
 
     isCancelFormPopupSuccess: boolean = false;
+
+    errHasHBL: boolean = false;
 
     nextState: RouterStateSnapshot;
     confirmSyncHBLText: string = `
     Do you want to sync
     <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL, GW, CW, VW, Qty to HAWB ?<span>
     `;
+
+    confirmUpdateFlightInfo: string = 'Do you want to sync Flight No, Flight Date, ETD, ETA to HAWB ?';
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
@@ -116,7 +119,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     getDetailShipment(jobId: string) {
-        this._documenRepo.getDetailTransaction(jobId)
+        this._documentRepo.getDetailTransaction(jobId)
             .subscribe(
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
@@ -200,7 +203,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.isDuplicate = true;
 
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -215,6 +224,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    console.log(res);
+
                     if (res.status) {
                         this._toastService.success(res.message);
 
@@ -222,7 +233,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.getDetailShipment(this.jobId);
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -232,6 +247,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 }
             );
     }
+
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
+    }
+
 
     onSelectTab(tabName: string) {
         switch (tabName) {
@@ -352,7 +377,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
@@ -418,6 +443,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             labelConfirm: 'Yes'
         }, () => {
             this.onSyncHBL();
+        })
+    }
+
+    showUpdateFlightInfo() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Update Flight Infor',
+            body: this.confirmUpdateFlightInfo,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.updateFlightInfor();
         })
     }
 
@@ -536,6 +571,30 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+    }
+
+    // onUpdateFlightInfo() {
+    //     //this.confirmPopup.show();
+    // }
+
+    updateFlightInfor() {
+        this._documentRepo.updateFlightInfo(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: any) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+
+            );
+        //this.confirmPopup.close();
     }
 }
 

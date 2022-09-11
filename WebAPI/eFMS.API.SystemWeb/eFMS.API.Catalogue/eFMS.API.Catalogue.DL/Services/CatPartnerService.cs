@@ -2485,11 +2485,12 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
-
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType)
+        
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            var contracts = contractRepository.Get(x => x.PartnerId == partnerId 
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId
+            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true)
             && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && x.SaleService.Contains(transactionType) 
             && x.Active == true);
@@ -2531,7 +2532,9 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatPartner> dataCustomers = Enumerable.Empty<CatPartner>().AsQueryable();
 
             Expression<Func<CatPartner, bool>> queryAgent = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_AGENT;
-            Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER;
+            Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true 
+            && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER 
+            && x.PartnerMode != DataEnums.PARTNER_MODE_INTERNAL;
 
 
             dataAgents = DataContext.Get(queryAgent);
@@ -2564,9 +2567,9 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatContract> contractCustomers = contractRepository.Get(queryContract);
 
             var d2 = from p in dataCustomers
-                    join c in contractCustomers on p.Id equals c.PartnerId
-                    select new CatPartnerForKeyinCharge
-                    {
+                     join c in contractCustomers on p.Id equals c.PartnerId
+                     select new CatPartnerForKeyinCharge
+                     {
                         Id = p.Id,
                         PartnerGroup = p.PartnerGroup,
                         PartnerNameVn = p.PartnerNameVn,
@@ -2575,10 +2578,22 @@ namespace eFMS.API.Catalogue.DL.Services
                         TaxCode = p.TaxCode,
                         AccountNo = p.AccountNo,
                         PartnerType = p.PartnerType,
-                    };
+                     };
 
-            var results = d.Union(d2);
-            return results;
+            var partnersInternal = DataContext.Get(x => x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER && x.PartnerMode == DataEnums.PARTNER_MODE_INTERNAL);
+            var d3 = from p in partnersInternal
+                     select new CatPartnerForKeyinCharge
+                     {
+                         Id = p.Id,
+                         PartnerGroup = p.PartnerGroup,
+                         PartnerNameVn = p.PartnerNameVn,
+                         PartnerNameEn = p.PartnerNameEn,
+                         ShortName = p.ShortName,
+                         TaxCode = p.TaxCode,
+                         AccountNo = p.AccountNo,
+                         PartnerType = p.PartnerType,
+                     };
+            return d.Union(d2).Union(d3);
         }
     }
 }

@@ -56,6 +56,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
     salesmans: User[]; // * Load động theo Partner được chọn.
+    customerName: string; 
 
     jobLinkAirSeaNo: string = '';
     jobLinkAirSeaInfo: LinkAirSeaModel;
@@ -125,13 +126,14 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 break;
             case 'customer':
                 this._toaster.clear();
+                this.customerName = data.shortName;
                 this._documentRepo.validateCheckPointContractPartner(data.id, '', 'CL', null, 1)
                     .pipe(
                         switchMap(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this.customerId.setValue(data.id);
-                                    return this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE);
+                                    return this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value);
                                 }
                                 this.customerId.setValue(null);
                                 this._toaster.warning(res.message);
@@ -193,7 +195,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             agentId: [],
             billingOpsId: [this.userLogged.id, Validators.required],
             salemansId: [null, Validators.required],
-            isReplicate: [false]
+            isReplicate: [false],
+            noProfit: [false]
 
         }, { validator: FormValidators.comparePort });
 
@@ -247,4 +250,28 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 });
         }
     }
+
+    getSalesmanList(selectedShipmentType: any){
+        this.shipmentType.setValue(selectedShipmentType); 
+        if(!!this.customerId.value){
+            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.salesmans = res || [];
+                            if (!!this.salesmans.length) {
+                                this.salemansId.setValue(res[0].id);
+                            } else {
+                                this.salemansId.setValue(null);
+                                this.infoPopup.body = `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`;
+                                this.infoPopup.show();
+                            }
+                        } else {
+                            this.salesmans = [];
+                            this.salemansId.setValue(null);
+                        }
+                    }
+                );
+            }
+        }  
 }

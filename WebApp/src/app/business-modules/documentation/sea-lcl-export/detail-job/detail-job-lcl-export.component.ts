@@ -9,7 +9,7 @@ import { CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants} from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -31,7 +31,6 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
@@ -45,7 +44,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
 
     constructor(
-        private _store: Store<fromShareBussiness.TransactionActions>,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
@@ -54,13 +53,10 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
-
-
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
-
     }
 
     ngAfterViewInit() {
@@ -169,7 +165,12 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                         this.ACTION = 'SHIPMENT';
                         this.isDuplicate = true;
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -192,7 +193,11 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -201,6 +206,13 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                     }
                 }
             );
+    }
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {

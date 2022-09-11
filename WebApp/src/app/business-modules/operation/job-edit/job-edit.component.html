@@ -8,6 +8,32 @@
         </div>
     </ng-container>
 
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowFinish && opsTransaction?.currentStatus !== 'Finish' && !isDuplicate">
+        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onFinishJob()">
+            <span>
+                <i class="la la-check-circle"></i>
+                <span>
+                    Finish
+                </span>
+            </span>
+        </button>
+    </ng-container>
+
+    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish'
+        && !opsTransaction.isLocked && !isDuplicate">
+        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onReopenJob()">
+            <span>
+                <i class="la la-refresh"></i>
+                <span>
+                    Reopen
+                </span>
+            </span>
+        </button>
+    </ng-container>
+
     <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
         (click)="onOpePLPrint()">
         <span>
@@ -17,6 +43,7 @@
             </span>
         </span>
     </button>
+
     <ng-container
         *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate && opsTransaction.linkSource !== 'Replicate'">
         <button class="btn btn-success dropdown-toggle m--margin-right-10" [dpToggle]="dropdownMenuDuplicate"
@@ -27,25 +54,14 @@
         </button>
     </ng-container>
 
-    <ng-container *ngIf="(opsTransaction?.isLocked === false) || isDuplicate">
+    <ng-container *ngIf="((opsTransaction?.isLocked === false) || isDuplicate)">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="checkDelete()"
-            *ngIf="opsTransaction.permission.allowDelete && !isDuplicate && !opsTransaction.replicatedId  && !opsTransaction.isLinkFee"
-            title="Shipment was deleted">
+            (click)="checkDelete()" *ngIf="opsTransaction?.permission?.allowDelete && !isDuplicate && !opsTransaction.replicatedId
+            && !opsTransaction.isLinkFee && opsTransaction?.currentStatus !== 'Finish'" title="Shipment was deleted">
             <span>
                 <i class="la la-trash"></i>
                 <span>
                     delete
-                </span>
-            </span>
-        </button>
-        <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-            *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate" (click)="saveShipment()"
-            [disabled]="tab !== 'job-edit'">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
                 </span>
             </span>
         </button>
@@ -59,8 +75,18 @@
                 </span>
             </span>
         </button>
-
     </ng-container>
+
+    <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate && opsTransaction?.currentStatus !== 'Finish'"
+        (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
+        <span>
+            <i class="la la la-save"></i>
+            <span>
+                save
+            </span>
+        </span>
+    </button>
 
     <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=handleCancelForm()></app-default-button>
 
@@ -102,8 +128,8 @@
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
                                                 [showGetCharge]="true" [showSyncStandard]="false"
-                                                [allowLinkFee]="allowLinkFeeSell"
-                                                [isDuplicateJob]="isDuplicate"
+                                                [allowLinkFee]="allowLinkFeeSell" [isDuplicateJob]="isDuplicate"
+                                                [noProfit]="opsTransaction.noProfit"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>

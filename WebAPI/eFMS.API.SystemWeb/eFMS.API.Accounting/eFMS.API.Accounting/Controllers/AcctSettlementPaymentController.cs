@@ -165,6 +165,12 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",", shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
                 }
+
+                // deny delete settlement has autorated charges 
+                if (acctSettlementPaymentService.CheckSettleHasAutoRateCharges(settlementNo))
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = settlementNo + " has autorated charges. You can not delete." });
+                }
             }
             
 
@@ -552,10 +558,10 @@ namespace eFMS.API.Accounting.Controllers
             // Check if Cost > Sell
             var messInvalidShipment = acctSettlementPaymentService.CheckValidFeesOnShipment(model);
             var _result = new ResultHandle() { Status = true };
-            //if (!string.IsNullOrEmpty(messInvalidShipment))
-            //{
-            //    _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
-            //}
+            if (!string.IsNullOrEmpty(messInvalidShipment))
+            {
+                _result = new ResultHandle { Status = false, Message = messInvalidShipment, Data = null };
+            }
             return Ok(_result);
         }
 

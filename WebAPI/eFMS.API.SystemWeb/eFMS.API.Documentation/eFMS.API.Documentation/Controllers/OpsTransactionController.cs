@@ -42,6 +42,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+        private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly ICheckPointService checkPointService;
 
         /// <summary>
         /// 
@@ -58,6 +60,8 @@ namespace eFMS.API.Documentation.Controllers
             ICurrentUser curUser,
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
+            ICsShipmentSurchargeService surchargeshipment,
+            ICheckPointService checkPoint,
             Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
@@ -66,6 +70,8 @@ namespace eFMS.API.Documentation.Controllers
             _hostingEnvironment = hostingEnvironment;
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
+            surchargeService = surchargeshipment;
+            checkPointService = checkPoint;
         }
 
         /// <summary>
@@ -168,12 +174,22 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Update(OpsTransactionModel model)
         {
             currentUser.Action = "UpdateOpsTransaction";
+            var currentJob = transactionService.Get(x => x.Id == model.Id).FirstOrDefault();
 
             if (!ModelState.IsValid) return BadRequest();
             var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+
+            if (currentJob.SupplierId != model.SupplierId)
+            {
+                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.OpsTransaction);
+                if (checkExistRefundFee == true)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_REFUND_FEE_EXISTED] });
+                }
             }
 
             string msgCheckUpdateServiceDate = CheckUpdateServiceDate(model);
@@ -187,6 +203,23 @@ namespace eFMS.API.Documentation.Controllers
             if (msgCheckUpdateMawb.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
+            }
+
+            if (model.NoProfit == true)
+            {
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + model.JobNo + " have profit, you can not check No Profit." });
+                }
+            }
+            else
+            {
+                var allowUnCheckNoProfit = checkPointService.AllowUnCheckNoProfitShipment(model.JobNo, model.NoProfit);
+                if (!allowUnCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Can not remove No Profit. " + model.JobNo + " already has Advance/Settlement." });
+                }
             }
 
             var hs = transactionService.Update(model);
@@ -218,6 +251,16 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
             }
+            if (model.NoProfit == true)
+            {
+                var jobNo = string.Empty;
+                var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipmentDuplicate(model.JobNo, model.NoProfit, model.IsReplicate, out jobNo);
+                if (!allowCheckNoProfit)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Shipment " + jobNo + " have profit, check No Profit with this Duplicate job is invalid." });
+                }
+            }
+
             ResultHandle hs = transactionService.ImportDuplicateJob(model, out List<Guid> surchargeIds);
             if (!hs.Status)
             {

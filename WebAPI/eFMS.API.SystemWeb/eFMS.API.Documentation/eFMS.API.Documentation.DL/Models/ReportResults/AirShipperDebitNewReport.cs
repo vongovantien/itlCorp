@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public decimal CurrDecimalNo { get; set; }
         public string FlexID { get; set; }
         public DateTime? ETA { get; set; }
+        public string UnitPriceStr { get; set; }
     }
 
     public class AirShipperDebitNewReportParams

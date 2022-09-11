@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if ( model.SaleManId == currentUser.UserID
+                    if (model.SaleManId == currentUser.UserID
                         || (model.GroupId == currentUser.GroupId
                             && model.DepartmentId == currentUser.DepartmentId
                             && model.OfficeId == currentUser.OfficeID
@@ -46,9 +46,9 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Department:
-                    if ( model.SaleManId == currentUser.UserID
-                        || (model.DepartmentId == currentUser.DepartmentId 
-                            && model.OfficeId == currentUser.OfficeID 
+                    if (model.SaleManId == currentUser.UserID
+                        || (model.DepartmentId == currentUser.DepartmentId
+                            && model.OfficeId == currentUser.OfficeID
                             && model.CompanyId == currentUser.CompanyID)
                         || model.Departments.Any(x => model.SalemanIds.Contains(x))
                         || model.SalemanIds.Contains(currentUser.UserID)
@@ -58,8 +58,8 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Office:
-                    if ( model.SaleManId == currentUser.UserID
-                        || (model.OfficeId == currentUser.OfficeID 
+                    if (model.SaleManId == currentUser.UserID
+                        || (model.OfficeId == currentUser.OfficeID
                             && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.BillingOpsId)
                         || model.SalemanIds.Contains(currentUser.UserID)
@@ -69,7 +69,7 @@ namespace eFMS.API.Documentation.DL.Common
                     }
                     break;
                 case PermissionRange.Company:
-                    if ( model.SaleManId == currentUser.UserID
+                    if (model.SaleManId == currentUser.UserID
                         || model.CompanyId == currentUser.CompanyID
                         || authorizeUserIds.Contains(model.BillingOpsId)
                         || model.SalemanIds.Contains(currentUser.UserID)
@@ -205,7 +205,7 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.PersonInCharge == currentUser.UserID 
+                    if (model.PersonInCharge == currentUser.UserID
                         || model.UserCreated == currentUser.UserID)
                     {
                         code = 200;
@@ -254,7 +254,7 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.UserCreated == currentUser.UserID) 
+                    if (model.UserCreated == currentUser.UserID)
                     {
                         code = 200;
                     }
@@ -408,9 +408,11 @@ namespace eFMS.API.Documentation.DL.Common
         {
             if (specialActions.Count > 0)
             {
-                detailPermission.AllowLock = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("LockShipment"))?.IsAllow;
-                detailPermission.AllowUpdateCharge = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("UpdateCharge"))?.IsAllow;
-                detailPermission.AllowAssignStage = (bool)specialActions.FirstOrDefault(x => x.Action.Contains("AssignStage"))?.IsAllow;
+                detailPermission.AllowLock = specialActions.FirstOrDefault(x => x.Action.Contains("LockShipment"))?.IsAllow == null ? false : (bool)specialActions.FirstOrDefault(x => x.Action.Contains("LockShipment"))?.IsAllow;
+                detailPermission.AllowUpdateCharge = specialActions.FirstOrDefault(x => x.Action.Contains("UpdateCharge"))?.IsAllow == null ? false : (bool)specialActions.FirstOrDefault(x => x.Action.Contains("UpdateCharge"))?.IsAllow;
+                detailPermission.AllowAssignStage = specialActions.FirstOrDefault(x => x.Action.Contains("AssignStage"))?.IsAllow == null ? false : (bool)specialActions.FirstOrDefault(x => x.Action.Contains("AssignStage"))?.IsAllow;
+                detailPermission.AllowFinish = specialActions.FirstOrDefault(x => x.Action.Contains("FinishShipment"))?.IsAllow == null ? false : (bool)specialActions.FirstOrDefault(x => x.Action.Contains("FinishShipment"))?.IsAllow;
+                detailPermission.AllowReopen = specialActions.FirstOrDefault(x => x.Action.Contains("ReopenShipment"))?.IsAllow == null ? false : (bool)specialActions.FirstOrDefault(x => x.Action.Contains("ReopenShipment"))?.IsAllow;
             }
             return detailPermission;
         }

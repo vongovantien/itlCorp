@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
@@ -10,7 +10,7 @@ import { DocumentationRepo } from '@repositories';
 import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
 import {
-    ShareBusinessImportJobDetailPopupComponent,
+    ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent,
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
@@ -19,13 +19,13 @@ import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-
+import * as fromShareBussiness from '../../../share-business/store';
 @Component({
     selector: 'app-create-job-lcl-export',
     templateUrl: './create-job-lcl-export.component.html'
 })
 
-export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
+export class SeaLCLExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
@@ -41,8 +41,9 @@ export class SeaLCLExportCreateJobComponent extends AppForm implements OnInit {
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>
     ) {
-        super();
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

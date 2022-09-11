@@ -95,7 +95,7 @@
                             <div class="form-group">
                                 <label>Shipment Type</label>
                                 <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
-                                    formControlName="shipmenttype"></ng-select>
+                                    formControlName="shipmenttype" (change)="getSalesmanList($event)"></ng-select>
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
@@ -147,11 +147,11 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Departure Airport</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                            [currentActiveItemId]="{ field: 'id', value: pol.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
-                            (remove)="resetFormControl(pol)" placeholder="Select departure airport">
+                        <app-combo-grid-virtual-scroll allowFreeText
+                            (itemSelected)="onSelectDataFormInfo($event, 'pol')" [selectedDisplayFields]="['nameEn']"
+                            [dataSources]="ports | async" [displayFields]="displayFieldPort"
+                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pol)"
+                            placeholder="Select departure airport" formControlName="polDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -214,11 +214,11 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Destination Airport</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                            [currentActiveItemId]="{ field: 'id', value: pod.value}"
-                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" [loading]="isLoadingPort | async"
-                            (remove)="resetFormControl(pod)" placeholder="Select destination airport">
+                        <app-combo-grid-virtual-scroll allowFreeText
+                            (itemSelected)="onSelectDataFormInfo($event, 'pod')" [selectedDisplayFields]="['nameEn']"
+                            [dataSources]="ports | async" [displayFields]="displayFieldPort"
+                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pod)"
+                            placeholder="Select destination airport" formControlName="podDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -358,10 +358,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted && !incotermId.value)}">
                                 <label required>Incoterm</label>
                                 <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
-                                [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
                                 </ng-select>
                             </div>
                         </div>
@@ -507,14 +507,25 @@
                 <div class="col-md-12" [class.opacity-5]="!formCreate.controls['showDim'].value">
                     <div class="row align-items-center bg-white p-2 m-0">
                         <div class="col-md-2 font-weight-bold">Volume</div>
-                        <div class="col-md-4 text-center font-weight-bold">
+                        <div class="col-md-3 text-center font-weight-bold">
                             HW: &nbsp;
                             <span class="text-primary">{{totalHeightWeight}}</span>
                         </div>
-                        <div
-                            class="col-md-6 text-right d-flex justify-content-between align-items-center font-weight-bold">
-                            CBM:&nbsp;
+                        <div class="col-md-3 text-center font-weight-bold">
+                            CBM: &nbsp;
                             <span class="text-primary">{{totalCBM}}</span>
+                        </div>
+                        <div class="col-md-2 text-center font-weight-bold">
+                            Total Pcs:&nbsp;
+                            <ng-container *ngIf="formCreate.controls['packageQty'].value !== totalPCS">
+                                <span class="text-danger">{{totalPCS}}</span>
+                            </ng-container>
+                            <ng-container *ngIf="formCreate.controls['packageQty'].value === totalPCS">
+                                <span class="text-primary">{{totalPCS}}</span>
+                            </ng-container>
+                        </div>
+                        <div
+                            class="col-md-2 text-right d-flex justify-content-between align-items-center font-weight-bold">
                             <span>
                                 <app-switch size="sm" formControlName="showDim"></app-switch>
                             </span>
@@ -553,24 +564,29 @@
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="length" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Length">
+                                                            autoFormatCurrency [digits]=2 placeholder="Length"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="width" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Width">
+                                                            autoFormatCurrency [digits]=2 placeholder="Width"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="height" numeric [decimals]="digitDecimal"
-                                                            autoFormatCurrency [digits]=2 placeholder="Height">
+                                                            autoFormatCurrency [digits]=2 placeholder="Height"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="package" integer placeholder="PCS">
+                                                            formControlName="package" integer placeholder="PCS"
+                                                            [attr.disabled]="formCreate.controls['showDim'].value ? null : 'disabled'">
                                                     </td>
                                                     <td>
                                                         <a class="btn m-btn--icon m-btn--icon-only m--font-danger"
+                                                            *ngIf="formCreate.controls['showDim'].value"
                                                             title="Delete" (click)="deleteDIM(j)">
                                                             <i class="fa fa-times fa-lg"></i>
                                                         </a>
@@ -581,7 +597,7 @@
                                         <tr app-table-none-record
                                             *ngIf="!formCreate?.get('dimensionDetails')['controls'].length">
                                         </tr>
-                                        <tr>
+                                        <tr *ngIf="formCreate.controls['showDim'].value">
                                             <td colspan=1>
                                                 <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add"
                                                     (click)="addDIM()">

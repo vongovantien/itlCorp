@@ -16,9 +16,11 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+
 @Component({
     selector: 'job-mangement-form-edit',
-    templateUrl: './form-edit.component.html'
+    templateUrl: './form-edit.component.html',
+    styleUrls: ['./form-edit.component.scss']
 })
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
@@ -61,6 +63,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     packageTypeId: AbstractControl;
     shipmentType: AbstractControl;
     note: AbstractControl;
+    noProfit: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -140,7 +143,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
 
         this.containers = this._store.select(getContainerSaveState);
-
         this.initForm();
     }
 
@@ -178,7 +180,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             commodityGroupId: this.opsTransaction.commodityGroupId,
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
-            note: this.opsTransaction.note
+            note: this.opsTransaction.note,
+            noProfit: this.opsTransaction.noProfit
         });
 
         this.customerName = this.opsTransaction.customerName;
@@ -187,7 +190,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.salesmanName = this.opsTransaction.salesmanName;
 
         if (this.opsTransaction.isAllowChangeSaleman) {
-            this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe((salesmans: any) => {
                     this.salesmans = salesmans;
                 })
@@ -238,6 +241,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             containerDescription: [null],
             packageTypeId: [null],
             note: [null],
+            noProfit: [false]
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -273,6 +277,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroupId = this.formEdit.controls['commodityGroupId'];
         this.shipmentType = this.formEdit.controls['shipmentType'];
         this.note = this.formEdit.controls['note'];
+        this.noProfit = this.formEdit.controls['noProfit'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -301,7 +306,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     return;
                 }
 
-                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -333,7 +338,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':
+            case 'fieldOps':    
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -391,6 +396,32 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.billingOpsId.setValue(this.userLogged.id);
+    }
+    
+    getSalesmanList(data: any){
+        this.shipmentType.setValue(data); 
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.salesmans = res || [];
+                        if (!!this.salesmans.length) {
+                            this.salemansId.setValue(res[0].id);
+                            this.salesmanName = res[0].username;
+                        } else {
+                            this.salemansId.setValue(null);
+                            this.salesmanName = null;
+                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                            })
+                        }
+                    } else {
+                        this.salesmans = [];
+                        this.customerName = this.salesmanName = null;
+                        this.salemansId.setValue(null);
+                    }
+                }
+            );          
     }
 }
 export interface ILinkAirSeaInfoModel {
