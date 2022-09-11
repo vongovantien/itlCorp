@@ -24,7 +24,6 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
     debitNotes: Partial<IPrepaidPayment[]> = [];
     selectedCd: IPrepaidPayment = null;
     totalSelectedItem: number;
-
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _sortService: SortService,
@@ -41,11 +40,13 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
     }
 
     ngOnInit(): void {
+        this.pageSize = 30;
         this.headers = [
             { title: 'AR Confirm', field: 'status', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'MBL - HBL', field: 'hbl', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
+            { title: 'Taxcode', field: 'taxCode', sortable: true },
             { title: 'Debit Note', field: 'debitNote', sortable: true },
             { title: 'Debit Amount', field: 'totalAmount', sortable: true },
             { title: 'Department', field: 'DeparmentName', sortable: true },
@@ -372,6 +373,7 @@ interface IPrepaidPayment {
     lastSyncDate: Date;
     notes: string;
     partnerName: string;
+    taxCode: string;
     datetimeCreated: string;
     userCreatedName: string;
     officeName: string;

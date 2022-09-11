@@ -23,6 +23,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string SyncStatus { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public string Notes { get; set; }
+        public string TaxCode { get; set; }
         public string PartnerName { get; set; }
         public string DepartmentName { get; set; }
         public string OfficeName { get; set; }
