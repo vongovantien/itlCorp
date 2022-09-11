@@ -1,6 +1,6 @@
 {
     "name": "e-fms-web",
-    "version": "1.2.29",
+    "version": "1.2.31",
     "scripts": {
         "ng": "ng",
         "start": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve ",
@@ -18,7 +18,7 @@
         "build:stag:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=staging-vi",
         "build:stag:en": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=staging-en",
         "prebuild:uat:en": "npm --no-git-tag-version version patch",
-        "build:uat:en": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en",
+        "build:uat:en": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en && deploy-uat.cmd",
         "build:uat:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-vi",
         "build:uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-vi",
         "prebuild:uat:en:stl": "npm --no-git-tag-version version patch",
@@ -46,7 +46,8 @@
         "build test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "analyze": "webpack-bundle-analyzer dist/eFMS-Web/stats.json"
+        "analyze": "webpack-bundle-analyzer dist/eFMS-Web/stats.json",
+        "deploy:uat": "deploy-uat.cmd"
     },
     "private": true,
     "dependencies": {
