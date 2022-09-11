@@ -208,18 +208,45 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     }
 
     onApply(body) {
+        let sourceFilter$ = null;
         if (this.type.includes("CUSTOMER")) {
-            this._accountingRepo.getDataIssueCustomerPayment(body)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: ReceiptInvoiceModel[]) => {
-                        if (!!res) {
-                            this.listDebit = res || [];
-                            this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
-                            this.filterList();
-                        }
-                    },
-                );
+            if (!!this.listDebit.length) {
+                if (!!body?.referenceNos?.length) {
+                    let resultsCached = [];
+                    switch (body.searchType) {
+                        case 'VAT Invoice':
+                            resultsCached = this.listDebit.filter(x => body.referenceNos.includes(x.invoiceNo));
+                            break;
+                        default:
+                            resultsCached = this.listDebit.filter(x => body.referenceNos.includes(x.refNo) || body.referenceNos.includes(x.invoiceNo));
+                            break;
+                    }
+                    if (resultsCached.length === body.referenceNos.length) {
+                        this.listDebit = [...resultsCached];
+                        return;
+                    }
+                    sourceFilter$ = this._accountingRepo.getDataIssueCustomerPayment(body);
+                } else {
+                    sourceFilter$ = this._accountingRepo.getDataIssueCustomerPayment(body);
+                }
+            } else {
+                sourceFilter$ = this._accountingRepo.getDataIssueCustomerPayment(body);
+            }
+
+            if (sourceFilter$ !== null) {
+                sourceFilter$
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: ReceiptInvoiceModel[]) => {
+                            if (!!res) {
+                                this.listDebit = res || [];
+                                this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
+                                this.filterList();
+                            }
+                        },
+                    );
+            }
+
         } else {
             this._accountingRepo.getDataIssueAgencyPayment(body)
                 .pipe(catchError(this.catchError))

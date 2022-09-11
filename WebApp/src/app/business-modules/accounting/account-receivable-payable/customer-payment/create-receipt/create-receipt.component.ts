@@ -119,13 +119,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.listInvoice.isSubmitted = true;
         this.listInvoice.receiptDebitList.isSubmitted = true;
 
-        if (!this.checkValidateForm()) {
-            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                body: this.invalidFormText
-            })
-            return;
-        }
-
         if (!actionString) {
             return;
         }
@@ -148,6 +141,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 break;
         }
 
+        if ((action === 2 || action == 3) && !this.checkValidateForm()) {
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            })
+            return;
+        }
+
         const receiptModel: ReceiptModel = this.getDataForm();
 
         this.paymentList = [];
@@ -164,7 +164,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 });
             })
 
-        if (action == 2) {
+        if (action === 2 || action == 3) {
             if (this.paymentList.length === 0) {
                 this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
                 return;

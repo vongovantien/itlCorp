@@ -205,7 +205,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     d.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
                     d.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
-                    d.CustomerName = item.CustomerId == null ? null : catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
+                    d.CustomerName = item.CustomerId == null ? null : catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString())?.FirstOrDefault()?.ShortName;
 
                     //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
                     if (criteria.Currency != null)
@@ -2268,6 +2268,7 @@ namespace eFMS.API.Accounting.DL.Services
                         else
                         {
                             invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
+                            paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                         }
                     }
                     else if (paidVnd < invoice.PaidAmountVnd)
@@ -2301,6 +2302,7 @@ namespace eFMS.API.Accounting.DL.Services
                         else
                         {
                             invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
+                            paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
                         }
                     }
                     else if (paidUsd < invoice.PaidAmountUsd)

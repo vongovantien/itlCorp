@@ -36,7 +36,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="text-primary">{{debit.refNo}}</span>
+                                                <span class="text-primary" app-copy-to-clipboard
+                                                    [text]="debit.refNo">{{debit.refNo}}</span>
                                             </td>
                                             <td>
                                                 {{!!debit.voucherId ? debit.voucherId : (!!debit.voucherIdre ?
@@ -85,7 +86,7 @@
                                                 </ng-template>
                                             </td>
                                             <td>
-                                                <span>{{debit.taxCode}}</span>
+                                                <span class="text-primary">{{debit.taxCode}}</span>
                                             </td>
                                             <td>
                                                 <span>{{debit.partnerName}}</span>
