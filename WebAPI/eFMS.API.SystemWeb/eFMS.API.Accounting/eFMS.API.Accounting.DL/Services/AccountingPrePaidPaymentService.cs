@@ -41,7 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return Enumerable.Empty<AccPrePaidPaymentResult>().AsQueryable();
             }
             var resultPaging = cdNotes.Skip((page - 1) * size).Take(size);
-            IQueryable<AccPrePaidPaymentResult> result = FormatCdNotes(resultPaging);
+            IQueryable<AccPrePaidPaymentResult> result = FormatCdNotes(resultPaging).OrderByDescending(x => x.DatetimeCreated);
             return result;
         }
 
@@ -135,7 +135,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            var cdNotes = DC.AcctCdnote.Where(query).OrderByDescending(x => x.DatetimeModified); ;
+            var cdNotes = DC.AcctCdnote.Where(query).OrderByDescending(x => x.DatetimeCreated);
 
             return cdNotes;
         }
@@ -194,7 +194,8 @@ namespace eFMS.API.Accounting.DL.Services
                              DepartmentName = d.DeptNameAbbr,
                              OfficeName = o.Code,
                              UserCreatedName = u2.Username,
-                             TransactionType = cd.FirstOrDefault().TransactionType
+                             TransactionType = cd.FirstOrDefault().TransactionType,
+                             TaxCode = p.AccountNo
                          };
 
             return result;

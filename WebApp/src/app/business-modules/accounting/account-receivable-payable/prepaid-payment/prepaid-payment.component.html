@@ -25,7 +25,7 @@
                         </a>
                     </ng-template>
                 </tab>
-                <tab heading="PrePaid" [active]="true">
+                <tab heading="Prepaid" [active]="true">
                     <form-search-prepaid-payment (onSearch)="onSearchData($event)"></form-search-prepaid-payment>
                     <div class="m-portlet">
                         <div class="m-portlet__body">
@@ -101,6 +101,9 @@
                                                         </td>
                                                         <td class="text-primary">
                                                             {{ cd.partnerName }}
+                                                        </td>
+                                                        <td class="text-primary">
+                                                            {{ cd.taxCode }}
                                                         </td>
                                                         <td>
                                                             <span class="text-info" app-copy-to-clipboard

@@ -328,6 +328,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
                 && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
                 && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     model.CurrencyId = _contractAcRef.CurrencyId;
@@ -336,11 +337,21 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
-
-                if(_contractAcRef?.ContractType == "Prepaid")
+                var hblId = model.listShipmentSurcharge.First().Hblid;
+                var hbl = trandetailRepositoty.First(x => x.Id == hblId);
+                if(hbl != null)
                 {
-                    model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                    var contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == hbl.CustomerId
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                    && x.SaleManId == hbl.SaleManId
+                    && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+
+                    if (contractHbl?.ContractType == "Prepaid")
+                    {
+                        model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                    }
                 }
+                
                 #endregion  --- Set Currency For CD Note ---
 
                 //Quy đổi tỉ giá currency CD Note về currency Local
@@ -420,7 +431,7 @@ namespace eFMS.API.Documentation.DL.Services
                         hs = DataContext.Add(model, false);
                         var sc = DataContext.SubmitChanges();
 
-                        UpdateJobModifyTime(model.JobId);
+                        // UpdateJobModifyTime(model.JobId);
 
                         if (hs.Success)
                         {
