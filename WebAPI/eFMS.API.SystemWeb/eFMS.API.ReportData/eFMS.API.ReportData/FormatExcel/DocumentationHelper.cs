@@ -4278,36 +4278,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 int startRow = 4;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 1;
+                decimal TotalBalance = 0;
                 foreach (var outRe in result)
                 {
                     var ornHead = outRe.OriginalJob.Where(x => x != null).FirstOrDefault();
                     var repHead = outRe.ReplicateJob.FirstOrDefault();
                     excel.IndexOfGroup = 1;
                     excel.SetGroupsTable();
-                    //var listGroupHead = new Dictionary<string, object>()
-                    //    {
-                    //        { "RJobID", repHead!=null?repHead.JobId:null },
-                    //        { "RCustomNo", repHead!=null?repHead.CustomNo:null },
-                    //        { "RHBL", repHead!=null?repHead.HBL:null },
-                    //        { "RCustomer", repHead!=null?repHead.Customer:null },
-                    //        { "RProductService", repHead!=null?repHead.ProductService:null },
-                    //        { "RDateService", repHead!=null?repHead.DateService.ToString("dd/MM/yyyy"):null },
-                    //        { "JobID", ornHead!=null?ornHead.JobId:null },
-                    //        { "CustomNo", ornHead!=null?ornHead.CustomNo:null },
-                    //        { "HBL", ornHead!=null?ornHead.HBL:null },
-                    //        { "Customer", ornHead!=null?ornHead.Customer:null },
-                    //        { "ProductService", ornHead!=null?ornHead.ProductService:null },
-                    //        { "DateService", ornHead!=null?ornHead.DateService.ToString("dd/MM/yyyy"):null },
-                    //        { "Creator", ornHead!=null?ornHead.Creator:null },
-                    //        { "RCreator", repHead!=null?repHead.Creator:null },
-                    //        { "SumRNetAmount", outRe.ReplicateJob.Sum(x=>x?.NETAmount) },
-                    //        { "SumRVATAmount", outRe.ReplicateJob.Sum(x=>x?.VATAmount) },
-                    //        { "SumNetAmount", outRe.OriginalJob.Sum(x=>x?.NETAmount) },
-                    //        { "SumVATAmount", outRe.OriginalJob.Sum(x=>x?.VATAmount) },
-                    //        { "SumRTotalSelling", outRe.ReplicateJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //        { "SumTotalBuying", outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //        { "Balance", outRe.ReplicateJob.Sum(x=>x?.VATAmount+x?.NETAmount)-outRe.OriginalJob.Sum(x=>x?.VATAmount+x?.NETAmount) },
-                    //    };
                     var listGroupHead = new Dictionary<string, object>()
                         {
                             { "RJobID", repHead?.JobId },
@@ -4324,15 +4301,55 @@ namespace eFMS.API.ReportData.FormatExcel
                             { "DateService", ornHead?.DateService.ToString("dd/MM/yyyy") },
                             { "Creator", ornHead?.Creator },
                             { "RCreator", repHead?.Creator },
-                            { "SumRNetAmount", outRe.ReplicateJob.Sum(x => x?.NETAmount) },
-                            { "SumRVATAmount", outRe.ReplicateJob.Sum(x => x?.VATAmount) },
-                            { "SumNetAmount", outRe.OriginalJob.Sum(x => x?.NETAmount) },
-                            { "SumVATAmount", outRe.OriginalJob.Sum(x => x?.VATAmount) },
-                            { "SumRTotalSelling", outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) },
-                            { "SumTotalBuying", outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
-                            { "Balance", outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
+                            //{ "SumRNetAmount", outRe.ReplicateJob.Sum(x => x?.NETAmount) },
+                            //{ "SumRVATAmount", outRe.ReplicateJob.Sum(x => x?.VATAmount) },
+                            //{ "SumNetAmount", outRe.OriginalJob.Sum(x => x?.NETAmount) },
+                            //{ "SumVATAmount", outRe.OriginalJob.Sum(x => x?.VATAmount) },
+                            //{ "SumRTotalSelling", outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) },
+                            //{ "SumTotalBuying", outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
+                            //{ "Balance", outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) },
                         };
-            startRow++;
+                    var listKeyFormula = new Dictionary<string, string>();
+                    var startGroup = startRow;
+                    int columnNum = startRow + outRe.ReplicateJob.Count();
+
+                    var _address = excel.AddressOfKey("SumRNetAmount");
+                    var _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumRNetAmount", _statement);
+
+                    _address = excel.AddressOfKey("SumRVATAmount");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumRVATAmount", _statement);
+
+                    _address = excel.AddressOfKey("SumNetAmount");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumNetAmount", _statement);
+
+                    _address = excel.AddressOfKey("SumVATAmount");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumVATAmount", _statement);
+
+                    _address = excel.AddressOfKey("SumRTotalSelling");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumRTotalSelling", _statement);
+
+                    _address = excel.AddressOfKey("SumTotalBuying");
+                    _statement = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _address.ColumnLetter, startRow + 1, columnNum);
+                    listKeyFormula.Add("SumTotalBuying", _statement);
+
+                    _address = excel.AddressOfKey("Balance");
+                    _statement = string.Format("SUBTOTAL(9,{0}:{1})-SUBTOTAL(9,{2}:{3})", "N"+(startRow+1).ToString(), "P"+ columnNum, "AD"+(startRow+1).ToString(),"AF"+ columnNum);
+                    listKeyFormula.Add("Balance", _statement);
+
+                    //TotalRNet += outRe.ReplicateJob.Sum(x => x?.NETAmount)??0;
+                    TotalBalance += (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount))??0;
+                    //TotalBUY += outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) ?? 0;
+                    //TotalNET += outRe.OriginalJob.Sum(x => x?.NETAmount) ?? 0;
+                    //TotalRSell += outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) ?? 0;
+                    //TotalRVAT += outRe.ReplicateJob.Sum(x => x?.VATAmount) ?? 0;
+                    //TotalVAT += outRe.OriginalJob.Sum(x => x?.VATAmount) ?? 0;
+                    
+                    startRow++;
                     excel.SetData(listGroupHead);
                     for (int i = 0; i < outRe.ReplicateJob.Count(); i++)
                         {
@@ -4373,7 +4390,8 @@ namespace eFMS.API.ReportData.FormatExcel
                             excel.SetData(listKeyData);
                             startRow++;
                         }
-                    if (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) > 0)
+
+                    if (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) != 0)
                     {
                         excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
                     }
@@ -4381,8 +4399,52 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
                     }
+                    excel.SetFormula(listKeyFormula,startGroup);
                 }
-                    return excel.ExcelStream();
+                var listDataTotal = new Dictionary<string, object>();
+                //listDataTotal.Add("TotalRNet", TotalRNet);
+                //listDataTotal.Add("TotalRVAT", TotalRVAT);
+                //listDataTotal.Add("TotalRSell", TotalRSell);
+                //listDataTotal.Add("TotalNet", TotalNET);
+                //listDataTotal.Add("TotalBuy", TotalBUY);
+                //listDataTotal.Add("TotalBalance", TotalBalance);
+                //listDataTotal.Add("TotalVAT", TotalVAT);
+
+                var listKeyFormulaTotal = new Dictionary<string, string>();
+                var _addressTotal = excel.AddressOfKey("TotalRNet");
+                var _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalRNet", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TotalRVAT");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalRVAT", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TotalRSell");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalRSell", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TotalNet");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalNet", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TotalBuy");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalBuy", _statementTotal);
+
+                _addressTotal = excel.AddressOfKey("TotalVAT");
+                _statementTotal = string.Format("SUBTOTAL(9,{0}{1}:{0}{2})", _addressTotal.ColumnLetter, 4, startRow - 1);
+                listKeyFormulaTotal.Add("TotalVAT", _statementTotal);
+
+                excel.SetFormula(listKeyFormulaTotal);
+                if (TotalBalance != 0)
+                {
+                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                }
+                else
+                {
+                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                }
+                return excel.ExcelStream();
                 }
             catch (Exception ex)
             {

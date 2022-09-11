@@ -8,7 +8,7 @@ import { EMPTY, Observable, of } from "rxjs";
 
 import { mergeMap, catchError, map, switchMap, } from "rxjs/operators";
 import {
-    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction, ShareBussinessCatalogueActionTypes, ISearchPartnerForKeyInSurcharge, LoadListPartnerForKeyInSurchargeSuccess
+    TransactionActionTypes, TransactionGetProfitSuccessAction, TransactionActions, TransactionGetProfitFailFailAction, ContainerAction, ContainerActionTypes, GetContainerSuccessAction, GetContainerFailAction, HBLActions, HBLActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, GetProfitHBLSuccessAction, GetProfitHBLAction, GetContainersHBLSuccessAction, GetContainersHBLFailAction, TransactionGetDetailSuccessAction, TransactionGetDetailFailAction, TransactionUpdateSuccessAction, TransactionUpdateFailAction, TransactionLoadListSuccessAction, TransactionLoadListFailAction, GetListHBLSuccessAction, GetListHBLFailAction, DimensionActionTypes, GetDimensionSuccessAction, GetDimensionFailAction, ShareBussinessCatalogueActionTypes, ISearchPartnerForKeyInSurcharge, LoadListPartnerForKeyInSurchargeSuccess, GetDimensionHBLSuccessAction
 } from "../actions";
 import { ITransactionProfit } from "../reducers";
 import { CsTransaction } from "@models";
@@ -170,7 +170,7 @@ export class ShareBussinessEffects {
             mergeMap(
                 (hblId: string) => this._documentRepo.getHBLDemensionDetail(hblId)
                     .pipe(
-                        map((data: any) => new GetDimensionSuccessAction(data)),
+                        map((data: any) => new GetDimensionHBLSuccessAction(data)),
                         catchError(err => of(new GetDimensionFailAction(err)))
                     ))
         );

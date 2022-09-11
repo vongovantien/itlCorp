@@ -282,7 +282,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
-                    console.log(this.hbl);
                 }
             );
     }

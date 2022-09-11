@@ -154,7 +154,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -200,7 +199,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 });
 
         }
-
     }
 
     initForm() {
@@ -414,12 +412,16 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 break;
             case 'partner': this.partnerIds.setValue(null);
                 break;
+            case 'effectiveDate': this.effectiveDate.setValue(null);
+                break;
+            case 'expiredDate': this.expiredDate.setValue(null);
+                break;
         }
     }
 
     checkSubmitData() {
         if ((this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) ||
-            (this.contractType.value !== 'Cash' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
+            (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
@@ -440,6 +442,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         return true;
     }
+
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);

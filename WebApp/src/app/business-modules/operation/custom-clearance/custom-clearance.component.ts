@@ -77,6 +77,7 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Clearance Location', field: 'gatewayName', sortable: true },
             { title: 'Partner Name', field: 'customerName', sortable: true },
+            { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Package Qty', field: 'pcs', sortable: true },
             { title: 'GW', field: 'grossWeight', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },

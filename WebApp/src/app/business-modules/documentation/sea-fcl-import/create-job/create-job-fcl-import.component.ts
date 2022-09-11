@@ -1,6 +1,6 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -12,7 +12,8 @@ import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import {
     ShareBussinessShipmentGoodSummaryComponent,
-    ShareBusinessImportJobDetailPopupComponent
+    ShareBusinessImportJobDetailPopupComponent,
+    ShareJobDetailComponent
 } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/components/form-create-sea-import/form-create-sea-import.component';
@@ -25,7 +26,7 @@ import _merge from 'lodash/merge';
     selector: 'app-create-job-fcl-import',
     templateUrl: './create-job-fcl-import.component.html',
 })
-export class SeaFCLImportCreateJobComponent extends AppForm {
+export class SeaFCLImportCreateJobComponent extends ShareJobDetailComponent {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -39,10 +40,11 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
         protected _actionStoreSubject: ActionsSubject,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef
     ) {
-        super();
+        super(_toastService , _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

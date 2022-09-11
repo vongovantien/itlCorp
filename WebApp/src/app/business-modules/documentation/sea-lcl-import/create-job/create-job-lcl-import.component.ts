@@ -1,10 +1,10 @@
+import { Store } from '@ngrx/store';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
-import { AppForm } from '@app';
-import { ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
+import { ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import { DocumentationRepo } from '@repositories';
@@ -16,12 +16,14 @@ import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
+import * as fromShareBussiness from '../../../share-business/store';
+
 @Component({
     selector: 'app-create-job-lcl-import',
     templateUrl: './create-job-lcl-import.component.html'
 })
 
-export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
+export class SeaLCLImportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaImportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaImportComponent;
     @ViewChild(ShareSeaServiceShipmentGoodSummaryLCLComponent) shipmentGoodSummaryComponent: ShareSeaServiceShipmentGoodSummaryLCLComponent;
@@ -33,10 +35,10 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super();
-
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 
