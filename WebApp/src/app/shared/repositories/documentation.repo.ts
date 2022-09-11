@@ -31,7 +31,7 @@ export class DocumentationRepo {
     }
 
     updateFlightInfo(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
             map((data: any) => data)
         );
     }

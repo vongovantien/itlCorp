@@ -616,21 +616,17 @@ namespace eFMS.API.Documentation.Controllers
             return response;
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("UpdateFlightInfo")]
         [Authorize]
-        public IActionResult UpdateGenerateInfo(Guid id)
+        public async Task<IActionResult> UpdateGenerateInfo(Guid id)
         {
-            var hs = csTransactionDetailService.UpdateFlightInfo(id);
-
+            var hs = await csTransactionDetailService.UpdateFlightInfo(id);
             if (!hs.Success)
             {
                 return BadRequest(hs);
             }
-
-            var result=new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" };
-
-            return Ok(result);
+            return Ok(new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" });
         }
 
     }
