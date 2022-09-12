@@ -366,11 +366,11 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.PaymentObjectId, x.Hblid } ).Select(x => x.Key).Distinct().ToList();
+                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid } ).Select(x => x.Key).Distinct().ToList();
                         var hasPrepaid = false;
                         foreach (var item in dataGrpPartners)
                         {
-                            var hbl = trandetailRepositoty.First(x => x.Id == chargeFirst.Hblid);
+                            var hbl = trandetailRepositoty.First(x => x.Id == item.Hblid);
                             _salesmanId = hbl?.SaleManId;
                             _customerId = hbl?.CustomerId;
 
