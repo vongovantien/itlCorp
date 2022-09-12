@@ -3244,10 +3244,12 @@ namespace eFMS.API.Documentation.DL.Services
                             if (model.Pod != null)
                             {
                                 hbl.Pod = model.Pod;
+                                hbl.PodDescription = model.PodDescription;
                             }
                             if (model.Pol != null)
                             {
                                 hbl.Pol = model.Pol;
+                                hbl.PolDescription = model.PolDescription;
                             }
 
                             hbl.CustomsBookingNo = model.BookingNo;
