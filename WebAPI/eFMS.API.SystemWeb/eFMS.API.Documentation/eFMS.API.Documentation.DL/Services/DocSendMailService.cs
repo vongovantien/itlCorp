@@ -775,7 +775,7 @@ namespace eFMS.API.Documentation.DL.Services
             var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
             _subject = template.Subject;
             _subject = _subject.Replace("{{EmailType}}", "ARRIVAL NOTICE");
-            if (serviceId == "SFI")
+            if (serviceId == "SFI" || serviceId == "SCI")
             {
                 _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
                 _subject = _subject.Replace("{{Pol}}", pol);

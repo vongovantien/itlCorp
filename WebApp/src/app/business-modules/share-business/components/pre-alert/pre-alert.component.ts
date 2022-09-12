@@ -70,17 +70,30 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     isSendHbl: boolean = false; // Send HBL (Sea Services)
     isSendHawb: boolean = false; // Send HAWB (Air Services)
     // Import
-    isExitsArrivalNotice: boolean = false;
+    // isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
-    isExitsDebitNote: boolean = false;
-    isCheckedDebitNote: boolean = false;
+    messageCPArrivalNotice: string = null;
+
     isExitsDO: boolean = false;
     isCheckedDO: boolean = false;
+    messageCPDO: string = null;
+
+    isExitsDebitNote: boolean = false;
+    isCheckedDebitNote: boolean = false;
+    
+    isExitsPOD: boolean = false;
+    isCheckedPOD: boolean = false;
+    messageCPPOD: string = null;
+
+    isExitsHbl: boolean = false;
+    isCheckedHbl: boolean = false;
 
     isExitsManifest: boolean = false;
     isCheckedManifest: boolean = false;
+    
     isExitsHawb: boolean = false;
     isCheckedHawb: boolean = false;
+
     isExitsSI: boolean = false;
     isCheckedSI: boolean = false;
     isExitsSISummary: boolean = false;
@@ -219,23 +232,63 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         // Export Report Arrival Notice to PDF
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
+            case ChargeConstants.SFI_CODE: // Sea FCL Import
+            case ChargeConstants.SLI_CODE: // Sea LCL Import
+            case ChargeConstants.SCI_CODE: // Sea Consol Import
                 if (this.isArrivalNotice) {
-                    this.isExitsArrivalNotice = true;
-                    this.isCheckedArrivalNotice = true;
+                    this._documentRepo.validateCheckPointContractPartner(this.hawbDetails[0].customerId, this.hblId, 'DOC', null, 7)
+                        .pipe(
+                    ).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.messageCPArrivalNotice = null;
+                                this.isCheckedArrivalNotice = true;
+                            } else {
+                                this.messageCPArrivalNotice = res.message;
+                                this.isCheckedArrivalNotice = false;
+                            }
+                        },
+                    );
+                }
 
-                    this.isExitsDO = true;
+                if (this.isArrivalNotice || this.isDO) {
+                    this._documentRepo.validateCheckPointContractPartner(this.hawbDetails[0].customerId, this.hblId, 'DOC', null, 7)
+                        .pipe(
+                    ).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this.messageCPDO = null;
+                                this.isExitsDO = true;
+                                this.isCheckedDO = true;
+                            } else {
+                                this.messageCPDO = res.message;
+                                this.isExitsDO = false;
+                                this.isCheckedDO = false;
+                            }
+                        },
+                    );
+                }
+
+                if (this.isPOD) {
+                    this._documentRepo.validateCheckPointContractPartner(this.hawbDetails[0].customerId, this.hblId, 'DOC', null, 7)
+                        .pipe(
+                        ).subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this.messageCPPOD = null;
+                                    this.isCheckedPOD = true;
+                                } else {
+                                    this.messageCPPOD = res.message;
+                                    this.isCheckedPOD = false;
+                                }
+                            },
+                        );
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 if (this.isPreAlert) {
                     this.checkExistManifestExport();
                 }
-                break;
-            case ChargeConstants.SFI_CODE: // Sea FCL Import
-            case ChargeConstants.SLI_CODE: // Sea LCL Import
-                this.isExitsArrivalNotice = true;
-                this.isCheckedArrivalNotice = true;
-                this.isExitsDO = true;
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -319,9 +372,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         } else {
                             this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
                         }
-                        if (this.debitNos.length > 0) {
-                            this.isExitsDebitNote = true;
-                        }
+                    }
+                    if (this.debitNos.length > 0) {
+                        this.isExitsDebitNote = true;
                     } else {
                         this.isExitsDebitNote = false;
                     }
@@ -372,10 +425,10 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         switch (service) {
             case ChargeConstants.AI_CODE:
                 if (this.isArrivalNotice) {
-                    if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
+                    if (this.isCheckedArrivalNotice) {
                         streamUploadReport.push(this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' }));
                     }
-                    if (this.isExitsDO && this.isCheckedDO) {
+                    if (this.isCheckedDO) {
                         streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
                     }
                     this.debitNos.forEach(element => {
@@ -404,11 +457,12 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
+            case ChargeConstants.SCI_CODE:
                 if (this.isArrivalNotice) {
-                    if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
+                    if (this.isCheckedArrivalNotice) {
                         streamUploadReport.push(this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' }))
                     }
-                    if (this.isExitsDO && this.isCheckedDO) {
+                    if (this.isCheckedDO) {
                         streamUploadReport.push(this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id));
                     }
                     this.debitNos.forEach(element => {
@@ -600,6 +654,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             case ChargeConstants.SFI_CODE: // Sea Import
             case ChargeConstants.SLI_CODE:
+            case ChargeConstants.SCI_CODE:
                 if (this.isDO) {
                     this.sendMailButtonName = "Send Delivery Order";
                     this.getInfoMailHBLSeaImport(hblId, serviceId);
@@ -774,44 +829,48 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     //#region Preview Report
     previewArrivalNotice() {
-        this._progressRef.start();
-        switch (this.serviceId) {
-            case ChargeConstants.AI_CODE:
-                this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
-                    .pipe(
-                        catchError(this.catchError),
-                        finalize(() => { this._progressRef.complete(); })
-                    )
-                    .subscribe(
-                        (res: Crystal) => {
-                            this.dataReport = res;
-                            if (res?.dataSource?.length > 0) {
+        if (!!this.messageCPArrivalNotice && !!this.messageCPArrivalNotice.length) {
+            this._toastService.warning(this.messageCPArrivalNotice);
+        } else {
+            this._progressRef.start();
+            switch (this.serviceId) {
+                case ChargeConstants.AI_CODE:
+                    this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
+                        .pipe(
+                            catchError(this.catchError),
+                            finalize(() => { this._progressRef.complete(); })
+                        )
+                        .subscribe(
+                            (res: Crystal) => {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
-                            } else {
-                                this._toastService.warning('There is no data to display preview');
-                            }
-                        },
-                    );
-                break;
-            case ChargeConstants.SFI_CODE:
-            case ChargeConstants.SLI_CODE:
-                this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
-                    .pipe(
-                        catchError(this.catchError),
-                        finalize(() => { this._progressRef.complete(); })
-                    )
-                    .subscribe(
-                        (res: Crystal) => {
-                            if (res?.dataSource?.length > 0) {
-                                this.dataReport = res;
-                                this.renderAndShowReport();
-                            } else {
-                                this._toastService.warning('There is no data to display preview');
-                            }
-                        },
-                    );
-                break;
+                                if (res?.dataSource?.length > 0) {
+                                    this.dataReport = res;
+                                    this.renderAndShowReport();
+                                } else {
+                                    this._toastService.warning('There is no data to display preview');
+                                }
+                            },
+                        );
+                    break;
+                case ChargeConstants.SFI_CODE:
+                case ChargeConstants.SLI_CODE:
+                    this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
+                        .pipe(
+                            catchError(this.catchError),
+                            finalize(() => { this._progressRef.complete(); })
+                        )
+                        .subscribe(
+                            (res: Crystal) => {
+                                if (res?.dataSource?.length > 0) {
+                                    this.dataReport = res;
+                                    this.renderAndShowReport();
+                                } else {
+                                    this._toastService.warning('There is no data to display preview');
+                                }
+                            },
+                        );
+                    break;
+            }
         }
     }
 
@@ -853,26 +912,30 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
-    previewHawb(hblId: string) {
-        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
-            this.previewHBL(hblId);
+    previewHawb(hbl: any) {
+        if (!!hbl.messageCPHawb && !!hbl.messageCPHawb.length) {
+            this._toastService.warning(hbl.messageCPHawb);
         } else {
-            this._progressRef.start();
-            this._documentRepo.previewHouseAirwayBillLastest(hblId, 'LASTEST_ITL_FRAME')
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); })
-                )
-                .subscribe(
-                    (res: Crystal) => {
-                        this.dataReport = res;
-                        if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    },
-                );
+            if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
+                this.previewHBL(hbl.id);
+            } else {
+                this._progressRef.start();
+                this._documentRepo.previewHouseAirwayBillLastest(hbl.id, 'LASTEST_ITL_FRAME')
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => { this._progressRef.complete(); })
+                    )
+                    .subscribe(
+                        (res: Crystal) => {
+                            this.dataReport = res;
+                            if (res.dataSource.length > 0) {
+                                this.renderAndShowReport();
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
+                        },
+                    );
+            }
         }
     }
 
@@ -972,9 +1035,12 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     previewDO() {
-        if (this.serviceId === 'AI') {
-            this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false)
-                .pipe(
+        if (!!this.messageCPDO && !!this.messageCPDO.length) {
+            this._toastService.warning(this.messageCPDO);
+        } else {
+            if (this.serviceId === 'AI') {
+                this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false)
+                    .pipe(
                 ).subscribe(
                     (res: any) => {
                         if (res !== false) {
@@ -988,21 +1054,22 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
                     },
                 );
-        } else{
-            this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id)
-            .pipe(
-            ).subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.dataReport = res;
-                        if (this.dataReport.dataSource?.length > 0) {
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no container data to display preview');
+            } else {
+                this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id)
+                    .pipe(
+                ).subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.dataReport = res;
+                            if (this.dataReport.dataSource?.length > 0) {
+                                this.renderAndShowReport();
+                            } else {
+                                this._toastService.warning('There is no container data to display preview');
+                            }
                         }
-                    }
-                },
-            );
+                    },
+                );
+            }
         }
     }
 
@@ -1085,6 +1152,26 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
+    previewProofofDelivery() {
+        if (!!this.messageCPPOD && !!this.messageCPPOD.length) {
+            this._toastService.warning(this.messageCPPOD);
+        } else {
+            this._documentRepo.previewProofofDelivery(this.hblId)
+                .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        }
+    }
     onChangeCheckBox() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import               
@@ -1117,6 +1204,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             case ChargeConstants.SFI_CODE: // Air Import
             case ChargeConstants.SLI_CODE:
+            case ChargeConstants.SCI_CODE:
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralArrivalNotice, this.isCheckedArrivalNotice);
                 break;
             default:
@@ -1177,6 +1265,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SLI_CODE: // Sea LCL Import
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 break;
+            case ChargeConstants.SCI_CODE:
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                break;
             default:
                 break;
         }
@@ -1187,10 +1278,23 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res: any[]) => {
                     if (this.hblId === SystemConstants.EMPTY_GUID) {
-                        this.hawbDetails = [...res.map(v => ({ ...v, isCheckedHawb: true }))];
+                        this.hawbDetails = [...res.map(v => ({ ...v, isCheckedHawb: true, messageCPHawb: '' }))];
                     } else {
-                        this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true }));
+                        this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true, messageCPHawb: '' }));
                     }
+                    this.hawbDetails.forEach(item => {
+                        this._documentRepo.validateCheckPointContractPartner(item.customerId, item.id, 'DOC', null, 7)
+                        .pipe(
+                        )
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (!res.status) {
+                                    item.isCheckedHawb = false;
+                                    item.messageCPHawb = res.message;
+                                }
+                            },
+                        );
+                    });
                     this.exportFileCrystalToPdf(this.serviceId);
                 },
             );

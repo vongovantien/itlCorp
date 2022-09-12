@@ -13,6 +13,7 @@ import { SeaConsolImportHBLComponent } from './sea-consol-import-hbl.component';
 import { SeaConsolImportCreateHBLComponent } from './create/create-hbl-consol-import.component';
 import { SeaConsolImportDetailHBLComponent } from './detail/detail-hbl-consol-import.component';
 import { ShareSeaServiceModule } from '../../../share-sea/share-sea-service.module';
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -24,8 +25,17 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: SeaConsolImportDetailHBLComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: SeaConsolImportDetailHBLComponent, data: { name: "" }
+            },
+            {
+                path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
+                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.SCI_CODE },
+            },
+        ]
     }
 ];
 
