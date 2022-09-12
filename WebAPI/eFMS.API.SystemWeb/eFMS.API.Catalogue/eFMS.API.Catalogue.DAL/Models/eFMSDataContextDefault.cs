@@ -541,8 +541,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.Description).HasColumnType("text");
-
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)

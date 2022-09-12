@@ -10,7 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
@@ -26,8 +26,6 @@ import { CommonEnum } from '@enums';
 
 export class FormContractCommercialPopupComponent extends PopupBase {
 
-    currentUserType: string = '';
-    infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims();
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
 
@@ -161,7 +159,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.getCurrentUserType();
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+            if (!!res) {
+                this.currentUser = res;
+            }
+        })
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -291,6 +293,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 },
             );
+        console.log(this.users)
     }
 
     getCompanies() {
@@ -1060,18 +1063,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this.getFileContract();
                     } else {
                         this._toastService.error("some thing wrong");
-                    }
-                }
-            );
-    }
-
-    getCurrentUserType() {
-        this._systemRepo.getDetailUser(this.infoCurrentUser.id)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (!!res) {
-                        this.currentUserType = res.data.userType;
                     }
                 }
             );

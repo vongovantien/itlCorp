@@ -26,5 +26,6 @@ namespace eFMS.API.System.DL.ViewModels
         public string Photo { get; set; }
         public string EmpPhotoSize { get; set; }
         public bool Active { get; set; }
+        public string UserType { get; set; }
     }
 }

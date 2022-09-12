@@ -14,4 +14,8 @@ export class IdentityRepo {
     getUserProfile() {
         return this._api.get(`${environment.HOST.INDENTITY_SERVER_URL}/Connect/Userinfo`, null, null, false);
     }
+
+    getCurrentUserType() {
+        return this._api.get(`${environment.HOST.INDENTITY_SERVER_URL}/Connect/Userinfo`, null, null, false);
+    }
 }
