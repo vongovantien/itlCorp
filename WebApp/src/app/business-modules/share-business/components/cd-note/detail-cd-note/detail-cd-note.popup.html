@@ -219,6 +219,7 @@
                         &&CdNoteDetail.cdNote.type === 'DEBIT'
                         &&CdNoteDetail.cdNote.syncStatus !== 'Synced'
                         &&CdNoteDetail.cdNote.currencyId ==='VND'
+                        &&CdNoteDetail.cdNote.status ==='New'
                         &&CdNoteDetail.listSurcharges.length > 0">
                         <div class="div-inside">
                             <div class="m--align-right foat-right">
@@ -331,7 +332,7 @@
                     </span>
                 </button>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv'"
+                    *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv' && CdNoteDetail.status== 'Paid'"
                     (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
