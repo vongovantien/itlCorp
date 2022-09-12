@@ -66,7 +66,6 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IOptions<ApiUrl> apiUrl;
         private readonly ICheckPointService checkPointService;
-        readonly string salemanBOD = string.Empty;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
             IContextBase<AcctCdnote> repository, IMapper mapper, ICurrentUser user,
@@ -136,8 +135,6 @@ namespace eFMS.API.Documentation.DL.Services
             acctCombineBillingRepository = acctCombineBillingRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
-
-            salemanBOD = sysUser.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault()?.Id;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
