@@ -519,6 +519,31 @@ namespace eFMS.API.Operation.DL.Services
             }
             return result;
         }
+
+        private void updateChargeAndAdvReq(Guid hblId, string clearanceNo)
+        {
+            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId);
+            if (charges.Count() > 0)
+            {
+                charges.ToList().ForEach(sur =>
+                {
+                    sur.ClearanceNo = clearanceNo;
+                    csShipmentSurchargeRepo.Update(sur, x => x.Hblid == hblId, false);
+                });
+                csShipmentSurchargeRepo.SubmitChanges();
+            }
+            var advRQs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId);
+            if (advRQs.Count() > 0)
+            {
+                advRQs.ToList().ForEach(rq =>
+                {
+                    rq.CustomNo = clearanceNo;
+                    accAdvanceRequestRepository.Update(rq, x => x.Hblid == hblId);
+                });
+                accAdvanceRequestRepository.SubmitChanges();
+            }
+        }
+
         public CustomsDeclaration GetById(int id)
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
