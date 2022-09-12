@@ -67,7 +67,7 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
             contactPerson: this.contactPerson.value,
             closingTime: this.closingTime.value
         };
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
