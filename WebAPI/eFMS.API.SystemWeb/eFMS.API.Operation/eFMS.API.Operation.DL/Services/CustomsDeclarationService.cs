@@ -1415,7 +1415,7 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           );
-            if (query.Any() || clearanceNos.Any(x => x == accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault().CustomNo))
+            if (query.Any() || clearanceNos.Any(x => x == accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault()?.CustomNo))
             {
                     return false;
             }
