@@ -39,7 +39,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpGet]
         [Route("Paging")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Paging(int page, int size)
         {
             var data = sysUserNotificationService.Paging(page, size, out int rowCount, out int totalNoRead);
