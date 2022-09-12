@@ -1,10 +1,11 @@
+import { CsTransaction } from '@models';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
-import { CsTransactionDetail, HouseBill } from '@models';
+import { CsTransactionDetail, HouseBill, OpsTransaction } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
@@ -63,13 +64,13 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
                 this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
                 this.getDetailHbl();
             } else {
                 this.gotoList();
             }
         });
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-
 
         // * Shortcut
         //#region --- Shortcut ---
@@ -276,7 +277,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             .subscribe(
                 (response: ArrayBuffer | any) => {
                     if (response !== false) {
-                        if (response.byteLength > 0) {
+                        if (response.body.byteLength > 0) {
                             this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                         } else {
                             this._toastService.warning('There is no neutral hawb data to print', '');

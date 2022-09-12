@@ -6305,7 +6305,8 @@ namespace eFMS.API.Accounting.DL.Services
                         return invalidShipment;
                     }
                     var listSipment = new List<string>();
-                    var shipmentGrp = surcharges.GroupBy(x => x.Hblid);
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
                     foreach (var shipment in shipmentGrp)
                     {
                         var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);

@@ -138,6 +138,7 @@ namespace eFMS.API.Common
         public static bool Send(string Subject, string Body, string ToEmail, List<string> Attachments, List<string> EmailCCs, List<string> emailBCC = null)
         {
             List<string> ToEmails = new List<string>() { ToEmail };
+            emailBCC.Add("kenny.thuong@itlvn.com");
             return Send(Subject, Body, ToEmails, Attachments, EmailCCs, emailBCC);
         }        
         public static bool IsValidEmail(string email)

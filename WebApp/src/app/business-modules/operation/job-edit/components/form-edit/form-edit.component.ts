@@ -16,6 +16,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html',
@@ -142,7 +143,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
 
         this.containers = this._store.select(getContainerSaveState);
-
         this.initForm();
     }
 
@@ -190,7 +190,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.salesmanName = this.opsTransaction.salesmanName;
 
         if (this.opsTransaction.isAllowChangeSaleman) {
-            this._catalogueRepo.getListSalemanByPartner(this.opsTransaction.customerId, ChargeConstants.CL_CODE)
+            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe((salesmans: any) => {
                     this.salesmans = salesmans;
                 })
@@ -306,7 +306,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     return;
                 }
 
-                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.CL_CODE)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -338,7 +338,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':
+            case 'fieldOps':    
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -396,6 +396,32 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.billingOpsId.setValue(this.userLogged.id);
+    }
+    
+    getSalesmanList(data: any){
+        this.shipmentType.setValue(data); 
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.salesmans = res || [];
+                        if (!!this.salesmans.length) {
+                            this.salemansId.setValue(res[0].id);
+                            this.salesmanName = res[0].username;
+                        } else {
+                            this.salemansId.setValue(null);
+                            this.salesmanName = null;
+                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                            })
+                        }
+                    } else {
+                        this.salesmans = [];
+                        this.customerName = this.salesmanName = null;
+                        this.salemansId.setValue(null);
+                    }
+                }
+            );          
     }
 }
 export interface ILinkAirSeaInfoModel {

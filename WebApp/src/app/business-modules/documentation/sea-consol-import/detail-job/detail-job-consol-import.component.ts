@@ -9,7 +9,7 @@ import { DocumentationRepo } from '@repositories';
 import { ICanComponentDeactivate } from '@core';
 import { CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, SubHeaderComponent, ReportPreviewComponent } from '@common';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';
@@ -30,7 +30,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
@@ -47,13 +46,13 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
-        protected _store: Store<fromShareBussiness.ITransactionState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
-        private readonly _ngProgressService: NgProgress
+        private readonly _ngProgressService: NgProgress,
+        protected _store: Store<fromShareBussiness.IShareBussinessState>,
     ) {
-        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr);
+        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr, _store);
 
         this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
@@ -89,7 +88,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     if (this.selectedTab === this.tabList[0]) {
                         this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     }
-
                     this.getDetailSeaFCLImport();
                     this.getListContainer();
                 } else {
@@ -191,7 +189,12 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                         this.ACTION = 'SHIPMENT';
                         this.isDuplicate = true;
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -212,7 +215,11 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 912) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -221,6 +228,14 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                     }
                 }
             );
+    }
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {

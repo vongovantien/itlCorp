@@ -9,7 +9,7 @@ import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, Info
 import { DIM, CsTransaction } from '@models';
 import { AirImportCreateJobComponent } from '../create-job/create-job-air-import.component';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -53,7 +53,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
 
     ) {
@@ -186,7 +185,12 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         this.isDuplicate = true;
 
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -208,7 +212,11 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                         this.getDetailShipment(this.jobId);
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -217,6 +225,14 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                     }
                 }
             );
+    }
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
     }
 
     onSelectTab(tabName: string) {
@@ -263,7 +279,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     prepareDeleteJob() {
-        this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
+        this._documenRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(
                 concatMap((isAllowDelete: boolean) => {
                     if (isAllowDelete) {
@@ -301,7 +317,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     onDeleteJob() {
         this._progressRef.start();
-        this._documentRepo.deleteMasterBill(this.jobId)
+        this._documenRepo.deleteMasterBill(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -339,7 +355,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                             type: 5,
                             settlementCode: null,
                         };
-                        return this._documentRepo.validateCheckPointMultiplePartner(criteria)
+                        return this._documenRepo.validateCheckPointMultiplePartner(criteria)
                     }
                     return of({ data: null, message: null, status: true });
                 })
@@ -432,7 +448,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         };
 
         this._progressRef.start();
-        this._documentRepo.syncHBL(this.jobId, bodySyncData)
+        this._documenRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -524,7 +540,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     updateFlightInfor() {
-        this._documentRepo.updateFlightInfo(this.jobId)
+        this._documenRepo.updateFlightInfo(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {

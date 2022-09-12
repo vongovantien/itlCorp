@@ -4,7 +4,7 @@
             <app-menu-preview-hbl-sea-export [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-export>
 
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
-                *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
+                *ngIf=" (permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>

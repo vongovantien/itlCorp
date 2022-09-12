@@ -648,15 +648,12 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (surcharges.Count() > 0 && !shipmentNoProfit)
                 {
-                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
-                    foreach (var hblId in hblIds)
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.JobNo == jobNo).Sum(x => x.AmountVnd ?? 0);
+                    var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.JobNo == jobNo).Sum(x => x.AmountVnd ?? 0);
+                    if (sellAmount - buyAmount > 0)
                     {
-                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
-                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
-                        if (sellAmount - buyAmount > 0)
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
             }
@@ -723,14 +720,15 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (surcharges.Count() > 0 && !shipmentNoProfit)
                 {
-                    var hblIds = surcharges.Select(x => x.Hblid).Distinct().ToList();
-                    foreach (var hblId in hblIds)
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    var jobNos = surcharges.Select(x => x.JobNo).Distinct().ToList();
+                    foreach (var shipmentNo in jobNos)
                     {
-                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
-                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblId).Sum(x => x.AmountVnd ?? 0);
+                        var buyAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.JobNo == shipmentNo).Sum(x => x.AmountVnd ?? 0);
+                        var sellAmount = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.JobNo == shipmentNo).Sum(x => x.AmountVnd ?? 0);
                         if (sellAmount - buyAmount > 0)
                         {
-                            shipmentInvalid = surcharges.Where(x => x.Hblid == hblId).FirstOrDefault().JobNo;
+                            shipmentInvalid = surcharges.Where(x => x.JobNo == shipmentNo).FirstOrDefault().JobNo;
                             return false;
                         }
                     }

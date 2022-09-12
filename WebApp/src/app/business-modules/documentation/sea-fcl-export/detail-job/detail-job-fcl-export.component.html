@@ -3,7 +3,7 @@
         <job-detail-button-list [shipmentDetail]="shipmentDetail" [isDuplicate]="isDuplicate"
             [selectedTab]="selectedTab" (onCancel)="onCancelDeactivate()" (onDelete)="prepareDeleteJob()"
             (onDuplicate)="showDuplicateConfirm()" (onSave)="onSaveJob()" (onPreviewPL)="previewPLsheet($event)"
-            (onLock)="lockShipment()">
+            (onLock)="lockShipment()" (onFinish)="onFinishJob()" (onReopen)="onReopenJob()">
         </job-detail-button-list>
     </app-sub-header>
 

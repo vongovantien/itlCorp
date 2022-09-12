@@ -185,7 +185,7 @@ namespace eFMS.API.Documentation.Controllers
 
             if (currentJob.SupplierId != model.SupplierId)
             {
-                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.OpsTransition);
+                bool checkExistRefundFee = surchargeService.CheckExistRefundFee(model.Id, TermData.OpsTransaction);
                 if (checkExistRefundFee == true)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_REFUND_FEE_EXISTED] });
