@@ -465,7 +465,8 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                foreach (var item in clearances.OrderBy(x=>x.ClearanceDate).OrderBy(x=>x.DatetimeModified))
+                var clearanceList=clearances.OrderBy(x => x.ClearanceDate);
+                foreach (var item in clearanceList)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
@@ -478,9 +479,39 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
-                var cleareceLasted = DataContext.Get(x => x.Id == clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().Id).FirstOrDefault();
-                var HblId = opsTransactionRepo.Get(x => x.JobNo == cleareceLasted.JobNo).FirstOrDefault().Hblid;
-                updateChargeAndAdvReq(HblId, cleareceLasted.ClearanceNo);
+                var HblId=opsTransactionRepo.Get(x=>x.Id==clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
+                string clearanceNo = "";
+                var mainClearanceNo = csShipmentSurchargeRepo.Get(x => x.Hblid == HblId).FirstOrDefault().ClearanceNo;
+                var jobNo = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().JobNo;
+                if (mainClearanceNo != null)
+                {
+                    if(clearances.Any(x => x.isDelete == true))
+                    {
+                        if (DataContext.Get(x => x.JobNo == jobNo).Count() == 0)
+                        {
+                            clearanceNo = null;
+                        }
+                        else
+                        {
+                            if (clearances.Any(x => x.ClearanceNo == mainClearanceNo))
+                            {
+                                var mainClearance = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault();
+                                clearances.Add(new CustomsDeclarationModel()
+                                {
+                                    ClearanceNo = mainClearance.ClearanceNo,
+                                    DatetimeModified = mainClearance.DatetimeModified,
+                                    ClearanceDate = mainClearance.ClearanceDate
+                                });
+                                clearanceNo = DataContext.Get(x => x.Id == clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().Id).FirstOrDefault().ClearanceNo;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    clearanceNo = DataContext.Get(x => x.JobNo == jobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+                }
+                updateChargeAndAdvReq(HblId, clearanceNo);
             }
             catch (Exception ex)
             {
