@@ -340,13 +340,25 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
-                var hblId = model.listShipmentSurcharge.First().Hblid;
-                var hbl = trandetailRepositoty.First(x => x.Id == hblId);
-                if(hbl != null)
+                var chargeFirst = model.listShipmentSurcharge.First();
+                var _customerId = string.Empty;
+                var _salesmanId = string.Empty;
+                if (chargeFirst.TransactionType == "CL")
                 {
-                    var contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == hbl.CustomerId
+                    var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
+                    _salesmanId = opsJob?.SalemanId;
+                    _customerId = opsJob?.CustomerId;
+                } else
+                {
+                    var hbl = trandetailRepositoty.First(x => x.Id == chargeFirst.Hblid);
+                    _salesmanId = hbl?.SaleManId;
+                    _customerId = hbl?.CustomerId;
+                }
+                if(_salesmanId != null && _customerId != null)
+                {
+                    var contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
                     && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && x.SaleManId == hbl.SaleManId
+                    && x.SaleManId == _salesmanId
                     && x.SaleService.Contains(_transactionType)).FirstOrDefault();
 
                     if (contractHbl?.ContractType == "Prepaid")
