@@ -465,7 +465,7 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                foreach (var item in clearances)
+                foreach (var item in clearances.OrderBy(x=>x.ClearanceDate).OrderBy(x=>x.DatetimeModified))
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
@@ -478,12 +478,39 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
+                var cleareceLasted = DataContext.Get(x => x.Id == clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().Id).FirstOrDefault();
+                var HblId = opsTransactionRepo.Get(x => x.JobNo == cleareceLasted.JobNo).FirstOrDefault().Hblid;
+                updateChargeAndAdvReq(HblId, cleareceLasted.ClearanceNo);
             }
             catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
             }
             return result;
+        }
+
+        private void updateChargeAndAdvReq(Guid hblId,string clearanceNo)
+        {
+            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId);
+            if (charges.Count() > 0)
+            {
+                charges.ToList().ForEach(sur =>
+                {
+                    sur.ClearanceNo = clearanceNo;
+                    csShipmentSurchargeRepo.Update(sur, x => x.Hblid == hblId, false);
+                });
+                csShipmentSurchargeRepo.SubmitChanges();
+            }
+            var advRQs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId);
+            if (advRQs.Count() > 0)
+            {
+                advRQs.ToList().ForEach(rq =>
+                {
+                    rq.CustomNo = clearanceNo;
+                    accAdvanceRequestRepository.Update(rq, x => x.Hblid == hblId);
+                });
+                accAdvanceRequestRepository.SubmitChanges();
+            }
         }
         public CustomsDeclaration GetById(int id)
         {

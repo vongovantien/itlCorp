@@ -1939,8 +1939,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
-            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+            var customNos = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.ClearanceDate).OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
             return customNos;
         }
 
