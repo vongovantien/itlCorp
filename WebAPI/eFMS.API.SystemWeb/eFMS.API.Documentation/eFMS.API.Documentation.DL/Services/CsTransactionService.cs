@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<CatContract> catContractRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
@@ -69,6 +70,8 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private readonly IAccAccountReceivableService accAccountReceivableService;
 
+        private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly IContextBase<CatStage> csStageRepository;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -107,7 +110,10 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<ApiUrl> url,
             ISysImageService imageService,
             IAccAccountReceivableService accAccountReceivable,
-            IContextBase<OpsTransaction> opsTransactionRepo) : base(repository, mapper)
+            IContextBase<CatContract> catContractRepository,
+            IContextBase<OpsTransaction> opsTransactionRepo,
+            ICsStageAssignedService csStageAssigned,
+            IContextBase<CatStage> stageRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -142,9 +148,12 @@ namespace eFMS.API.Documentation.DL.Services
             shippingInstructionServiceRepo = shippingInstruction;
             apiUrl = url;
             sysImageService = imageService;
-            opsTransactionRepository = opsTransactionRepo;
             csLinkChargeRepository = csLinkChargeRepo;
             accAccountReceivableService = accAccountReceivable;
+            catContractRepo = catContractRepository;
+            opsTransactionRepository = opsTransactionRepo;
+            csStageAssignedService = csStageAssigned;
+            csStageRepository = stageRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -835,7 +844,7 @@ namespace eFMS.API.Documentation.DL.Services
             detail.Permission = new PermissionAllowBase
             {
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
-                AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
+                AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail),
             };
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
@@ -1230,7 +1239,8 @@ namespace eFMS.API.Documentation.DL.Services
                         //POLName = pol.NameEn,
                         //CreatorName = creator.Username,
                         PackageQty = masterBill.PackageQty,
-                        BookingNo = masterBill.BookingNo
+                        BookingNo = masterBill.BookingNo,
+                        CurrentStatus = masterBill.CurrentStatus
                     };
 
             return query;
@@ -1682,6 +1692,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.AgentId ?? "") == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
                     && ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     && ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    && ((x.CurrentStatus ?? "") == criteria.CurrentStatus || string.IsNullOrEmpty(criteria.CurrentStatus))
                     &&
                     (
                            (((x.Etd ?? null) >= (criteria.FromServiceDate ?? null)) && ((x.Etd ?? null) <= (criteria.ToServiceDate ?? null)))
@@ -1703,6 +1714,7 @@ namespace eFMS.API.Documentation.DL.Services
                     || ((x.ColoaderId ?? "") == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
                     || ((x.SaleManId ?? "") == criteria.SaleManId || string.IsNullOrEmpty(criteria.SaleManId))
                     || ((x.UserCreated ?? "") == criteria.UserCreated || string.IsNullOrEmpty(criteria.UserCreated))
+                    || ((x.CurrentStatus ?? "") == criteria.CurrentStatus || string.IsNullOrEmpty(criteria.CurrentStatus))
                     || ((x.BookingNo ?? "") == criteria.BookingNo || string.IsNullOrEmpty(criteria.BookingNo))
                     ||
                     (
@@ -3363,6 +3375,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+
         #region preview
         public Crystal PreviewShipmentCoverPage(Guid Id)
         {
@@ -3568,6 +3581,157 @@ namespace eFMS.API.Documentation.DL.Services
             catch (Exception ex)
             {
                 return new HandleState(false, ex.ToString());
+            }
+        }
+
+        public string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model, bool isUpdate)
+        {
+            string errorMsg = string.Empty;
+            if (isUpdate)
+            {
+                var currentJob = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                if (model.ShipmentType == "Freehand" && currentJob.ShipmentType == "Nominated")
+                {
+                    if (csTransactionDetailRepo.Any(x => x.JobId == currentJob.Id))
+                    {
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == currentJob.Id).ToList();
+                        tranDes.ForEach(x =>
+                        {
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
+
+                }
+            }
+            else
+            {
+                if (model.ShipmentType == "Freehand")
+                {
+                    if (csTransactionDetailRepo.Any(x => x.JobId == model.Id))
+                    {
+                        var tranDes = csTransactionDetailRepo.Get(x => x.JobId == model.Id).ToList();
+                        tranDes.ForEach(x =>
+                        {
+                            if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
+                            && y.SaleManId == x.SaleManId
+                            && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
+                            {
+                                errorMsg += x.Hwbno + "; ";
+                            }
+                        });
+                    }
+
+                }
+            }
+           
+            return errorMsg;
+        }
+        
+        public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
+        {
+            CatStage stage = null;
+            CsTransaction csJob = null;
+            OpsTransaction opsJob = null;
+
+            switch (model.TransactionType.ToString().Trim())
+            {
+                case TermData.CsTransaction:
+                    csJob = DataContext.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
+                    if (model.Status.ToString().Trim() == TermData.Finish)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        csJob.CurrentStatus = TermData.Finish;
+                    }
+                    if (model.Status.ToString().Trim() == TermData.Reopen)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        csJob.CurrentStatus = TermData.Processing;
+                    }
+                    break;
+                case TermData.OpsTransaction:
+                    opsJob = opsTransactionRepository.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
+                    if (model.Status.ToString().Trim() == TermData.Finish)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        opsJob.CurrentStatus = TermData.Finish;
+                    }
+                    if (model.Status.ToString().Trim() == TermData.Reopen)
+                    {
+                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        opsJob.CurrentStatus = TermData.Processing;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (csJob == null && opsJob == null)
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            }
+
+            HandleState hs = new HandleState();
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (model.TransactionType == TermData.CsTransaction)
+                    {
+                        hs = DataContext.Update(csJob, x => x.Id == model.JobId);
+                    }
+
+                    if (model.TransactionType == TermData.OpsTransaction)
+                    {
+                        hs = opsTransactionRepository.Update(opsJob, x => x.Id == model.JobId);
+                    }
+
+                    if (hs.Success)
+                    {
+                        //add new Stage
+                        CsStageAssignedModel newStage = new CsStageAssignedModel();
+                        newStage.Id = Guid.NewGuid();
+                        newStage.StageId = stage.Id;
+                        newStage.Status = TermData.Done; ;
+                        newStage.DatetimeCreated = newStage.DatetimeModified = newStage.Deadline = DateTime.Now;
+                        newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
+                        if (model.TransactionType == TermData.CsTransaction)
+                        {
+                            newStage.JobId = csJob.Id;
+                            int orderNumberProcess = csStageAssignedService.Count(x => x.JobId == csJob.Id);
+                            newStage.OrderNumberProcessed = orderNumberProcess + 1;
+                        }
+                        if (model.TransactionType == TermData.OpsTransaction)
+                        {
+                            newStage.JobId = opsJob.Id;
+                            int orderNumberProcess = csStageAssignedService.Count(x => x.JobId == opsJob.Id);
+                            newStage.OrderNumberProcessed = orderNumberProcess + 1;
+                        }
+
+                        csStageAssignedService.AddNewStageAssigned(newStage);
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                    }
+
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
         }
     }

@@ -15,7 +15,7 @@ import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -39,11 +39,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     action: any = {};
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: CsTransaction;
-
     dimensionDetails: DIM[];
 
     isCancelFormPopupSuccess: boolean = false;
+
+    errHasHBL: boolean = false;
 
     nextState: RouterStateSnapshot;
     confirmSyncHBLText: string = `
@@ -119,7 +119,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     getDetailShipment(jobId: string) {
-        this._documenRepo.getDetailTransaction(jobId)
+        this._documentRepo.getDetailTransaction(jobId)
             .subscribe(
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
@@ -203,7 +203,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.isDuplicate = true;
 
                     } else {
-                        this._toastService.error(res.message);
+                        //this._toastService.error(res.message);
+
+                        if (res.data.errorCode = 453) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -218,6 +224,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    console.log(res);
+
                     if (res.status) {
                         this._toastService.success(res.message);
 
@@ -225,7 +233,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.getDetailShipment(this.jobId);
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
-                        this._toastService.error(res.message);
+                        if (res.data.errorCode = 452) {
+                            this.showHBLsInvalid(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
                     }
                 },
                 (error: HttpErrorResponse) => {
@@ -235,6 +247,16 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 }
             );
     }
+
+
+    showHBLsInvalid(message: string) {
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Warning',
+            body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
+            class: 'bg-danger'
+        });
+    }
+
 
     onSelectTab(tabName: string) {
         switch (tabName) {
@@ -355,7 +377,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'AE')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {

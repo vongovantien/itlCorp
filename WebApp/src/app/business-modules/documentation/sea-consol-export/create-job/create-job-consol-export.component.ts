@@ -1,13 +1,14 @@
+
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import {
     ShareBussinessShipmentGoodSummaryComponent,
     ShareBusinessImportJobDetailPopupComponent,
-    ContainerAction, ContainerActionTypes
+    ContainerAction, ContainerActionTypes, ShareJobDetailComponent
 } from '@share-bussiness';
 import { InfoPopupComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
@@ -21,11 +22,12 @@ import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/com
 import { takeUntil, catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
 
+import * as fromShareBusiness from '../../../share-business/store';
 @Component({
     selector: ' app-create-job-consol-export',
     templateUrl: './create-job-consol-export.component.html',
 })
-export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit {
+export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent implements OnInit {
 
     @ViewChild(ShareSeaServiceFormCreateSeaExportComponent) formCreateComponent: ShareSeaServiceFormCreateSeaExportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
@@ -41,8 +43,9 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
+        protected _store: Store<fromShareBusiness.IShareBussinessState>,
     ) {
-        super();
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 

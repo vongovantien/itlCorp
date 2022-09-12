@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right"
-                    *ngIf="!!currentJob && currentJob.permission.allowUpdate">
+                    *ngIf="!!currentJob && currentJob.permission.allowUpdate && currentJob.currentStatus !== 'Finish'">
                     <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase"
                         (click)="removeImported()" appLoadingButton [state]="!!currentJob && currentJob.isLocked">
                         <span>

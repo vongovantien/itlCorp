@@ -1392,4 +1392,9 @@ export class CatalogueRepo {
 
     }
 
+    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType });
+
+    }
+
 }

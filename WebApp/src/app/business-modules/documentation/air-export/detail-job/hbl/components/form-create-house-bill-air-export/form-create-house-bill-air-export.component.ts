@@ -501,7 +501,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
         this.totalHeightWeight = data.hw;
 
-        this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AE_CODE)
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AE_CODE, this.shipmenttype.value)
             .subscribe((salesmans: any) => {
                 this.saleMans = salesmans;
             });
@@ -524,7 +524,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.shipperId.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.getListSalemanByPartner(data.id, ChargeConstants.AE_CODE)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AE_CODE, this.shipmenttype.value)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];
@@ -802,4 +802,28 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherCharges = data.charges;
     }
 
+    getSalesmanList(selectedShipmentType: any){
+        this.shipmenttype.setValue(selectedShipmentType); 
+        if(!!this.customerId.value){
+            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.saleMans = res || [];
+                            if (!!this.saleMans.length) {
+                                this.saleManId.setValue(res[0].id);
+                            } else {
+                                this.saleManId.setValue(null);
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                })
+                            }
+                        } else {
+                            this.saleMans = [];
+                            this.saleManId.setValue(null);
+                        }
+                    }
+                );
+        }           
+    }
 }

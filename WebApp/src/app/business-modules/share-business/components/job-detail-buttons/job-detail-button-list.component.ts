@@ -1,13 +1,15 @@
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState } from '@store';
 import { AppPage } from 'src/app/app.base';
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
-
+import * as fromShareBussiness from '../../store/index';
 @Component({
     selector: 'job-detail-button-list',
     templateUrl: './job-detail-button-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ShareBussinessJobDetailButtonListComponent extends AppPage implements OnInit {
+export class ShareBussinessJobDetailButtonListComponent extends AppPage {
 
     @Input() shipmentDetail: any;
     @Input() isDuplicate: boolean = false;
@@ -19,10 +21,12 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
     @Output() onDelete: EventEmitter<any> = new EventEmitter<any>();
     @Output() onSave: EventEmitter<any> = new EventEmitter<any>();
     @Output() onCancel: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onFinish: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onReopen: EventEmitter<any> = new EventEmitter<any>();
 
-    constructor() { super(); }
-
-    ngOnInit() { }
+    constructor() {
+        super();
+    }
 
     lockShipment() {
         this.onLock.emit();
@@ -48,5 +52,11 @@ export class ShareBussinessJobDetailButtonListComponent extends AppPage implemen
         this.onCancel.emit();
     }
 
+    onFinishJob() {
+        this.onFinish.emit()
+    }
 
+    onReopenJob() {
+        this.onReopen.emit()
+    }
 }

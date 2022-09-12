@@ -10,6 +10,7 @@ using eFMS.API.Accounting.DL.Infrastructure.Http;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -20,6 +21,7 @@ using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -39,6 +41,8 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly BravoLoginModel loginInfo;
         private readonly ISysImageService sysFileService;
+        public IBackgroundTaskQueue _queue { get; }
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
@@ -46,8 +50,9 @@ namespace eFMS.API.Accounting.Controllers
             IOptions<ESBUrl> appSettings,
             IActionFuncLogService actionFuncLog,
             ICurrentUser currUser,
-            ISysImageService SysImageService
-
+            ISysImageService SysImageService,
+            IBackgroundTaskQueue queue, 
+            IServiceScopeFactory serviceScopeFactory
             )
         {
             stringLocalizer = localizer;
@@ -62,8 +67,23 @@ namespace eFMS.API.Accounting.Controllers
             };
 
             sysFileService = SysImageService;
+            _queue = queue;
+            _serviceScopeFactory = serviceScopeFactory;
         }
-
+        [HttpGet]
+        public IActionResult Get()
+        {
+            _queue.QueueBackgroundWorkItem(async token =>
+            {
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    new LogHelper("Ghi log sau mỗi 10 giây", DateTime.Now.ToString(""));
+                    // TODO
+                    await Task.Delay(TimeSpan.FromSeconds(10), token);
+                }
+            });
+            return Ok("In progress..");
+        }
         #region -- Test API --
         [HttpPost("GetListAdvanceToSync")]
         [Authorize]

@@ -95,7 +95,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
                             }
                             this.selectedPartner = Object.assign({}, !!!data.dataSearch.customerID ? { field: 'partnerNameEn', value: 'All' } : { field: 'id', value: data.dataSearch.customerID });
                             //this.selectedStatus = { title: data.dataSearch?.soaStatus, name: data.dataSearch?.soaStatus };
-                            this.reference = !!data.dataSearch.strCodes ? data.dataSearch.strCodes : "";
+                            this.reference = !!data.dataSearch.strCodesForSearch ? data.dataSearch.strCodesForSearch : "";
 
                             this.selectedStatus = !!data.dataSearch.soaStatus ? this.statusSOA.filter((soa) => soa.name === data.dataSearch.soaStatus)[0] : null;
                             this.selectedCurrency = !!data.dataSearch.soaCurrency ? this.currencyList.filter((cur) => cur.id === data.dataSearch.soaCurrency)[0] : null;
@@ -197,6 +197,7 @@ export class StatementOfAccountSearchComponent extends AppForm {
     search() {
         const body = {
             strCodes: this.reference.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').split(',').toString().trim(),
+            strCodesForSearch: this.reference,
             customerID: (this.selectedPartner.value === 'All' ? '' : this.selectedPartner.value) || '',
             soaFromDateCreate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
             soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,

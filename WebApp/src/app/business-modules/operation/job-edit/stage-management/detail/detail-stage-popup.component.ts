@@ -1,10 +1,11 @@
+import { chargeState } from './../../../../catalogue/charge/store/reducers/index';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
 import { FormBuilder, FormGroup, AbstractControl, Validators, FormControl } from "@angular/forms";
 import { formatDate } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
 
 import { PopupBase } from "@app";
-import { SystemRepo, OperationRepo } from "@repositories";
+import { SystemRepo, OperationRepo, DocumentationRepo } from "@repositories";
 import { User, Stage } from "@models";
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
@@ -17,6 +18,7 @@ import { takeUntil, catchError, finalize } from "rxjs/operators";
 export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit, OnChanges {
 
     @Input() data: Stage = null;
+    @Input() jobId: string = '';
     @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
 
     form: FormGroup;
@@ -28,7 +30,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     mainPersonInCharge: AbstractControl;
     realPersonInCharge: AbstractControl;
     status: AbstractControl;
-
     deadLineDate: AbstractControl;
 
     statusStage: string[] = ['InSchedule', 'Processing', 'Done', 'Overdued', 'Pending', 'Deleted'];
@@ -44,6 +45,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     constructor(
         private _fb: FormBuilder,
         private _operationRepo: OperationRepo,
+        private _documentRepo: DocumentationRepo,
         private _toaster: ToastrService,
         private _systemRepo: SystemRepo
     ) {
@@ -141,7 +143,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             comment: form.value.comment,
             description: form.value.description,
             deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
-            status: form.value.status
+            status: form.value.status,
         };
         this._operationRepo.updateStageToJob(body).pipe(
             takeUntil(this.ngUnsubscribe),

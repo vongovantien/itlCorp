@@ -349,15 +349,16 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-			
 				<div class="row">
 					<div class="col-lg-8">
-						<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.valid}">
+						<div class="form-group"
+							[ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.valid}">
 							<label class="form-control-label" required>
 								Shipment Type
 							</label>
-							<ng-select class="custom" [clearable]="false" [items]="shipmentTypes" placeholder="Package Type"
-								formControlName="shipmentType">
+							<ng-select class="custom" [clearable]="false" [items]="shipmentTypes"
+								placeholder="Package Type" formControlName="shipmentType"
+								(change)="getSalesmanList($event)">
 							</ng-select>
 						</div>
 					</div>
@@ -366,11 +367,11 @@
 							<label class="form-control-label">
 								No Profit
 							</label>
-							<app-switch size="md" formControlName="noProfit" class="success switch-noProfit"></app-switch>
+							<app-switch size="md" formControlName="noProfit" class="success switch-noProfit">
+							</app-switch>
 						</div>
 					</div>
 				</div>
-			
 			</div>
 		</div>
 		<div class="row" *ngIf="opsTransaction && !isJobCopy">
