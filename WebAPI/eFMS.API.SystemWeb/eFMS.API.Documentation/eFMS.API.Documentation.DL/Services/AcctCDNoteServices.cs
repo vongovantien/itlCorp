@@ -340,30 +340,55 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
-                var chargeFirst = model.listShipmentSurcharge.First();
-                var _customerId = string.Empty;
-                var _salesmanId = string.Empty;
-                if (chargeFirst.TransactionType == "CL")
+                if(model.Type == "DEBIT")
                 {
-                    var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
-                    _salesmanId = opsJob?.SalemanId;
-                    _customerId = opsJob?.CustomerId;
-                } else
-                {
-                    var hbl = trandetailRepositoty.First(x => x.Id == chargeFirst.Hblid);
-                    _salesmanId = hbl?.SaleManId;
-                    _customerId = hbl?.CustomerId;
-                }
-                if(_salesmanId != null && _customerId != null)
-                {
-                    var contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && x.SaleManId == _salesmanId
-                    && x.SaleService.Contains(_transactionType)).FirstOrDefault();
-
-                    if (contractHbl?.ContractType == "Prepaid")
+                    var chargeFirst = model.listShipmentSurcharge.First();
+                    var _customerId = string.Empty;
+                    var _salesmanId = string.Empty;
+                    if (chargeFirst.TransactionType == "CL")
                     {
-                        model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                        var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
+                        _salesmanId = opsJob?.SalemanId;
+                        _customerId = opsJob?.CustomerId;
+
+                        if (_salesmanId != null && _customerId != null)
+                        {
+                            CatContract contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
+                            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                            && x.SaleManId == _salesmanId
+                            && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+
+                            if (contractHbl?.ContractType == "Prepaid")
+                            {
+                                model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.PaymentObjectId, x.Hblid } ).Select(x => x.Key).Distinct().ToList();
+                        var hasPrepaid = false;
+                        foreach (var item in dataGrpPartners)
+                        {
+                            var hbl = trandetailRepositoty.First(x => x.Id == chargeFirst.Hblid);
+                            _salesmanId = hbl?.SaleManId;
+                            _customerId = hbl?.CustomerId;
+
+                            CatContract contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
+                               && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                               && x.SaleManId == _salesmanId
+                               && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                            if (contractHbl?.ContractType == "Prepaid")
+                            {
+                                hasPrepaid = true;
+                                break;
+                            }
+                        }
+
+                        if(hasPrepaid)
+                        {
+                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                        }
                     }
                 }
                 
