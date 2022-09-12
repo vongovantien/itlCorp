@@ -207,7 +207,7 @@
 
                             <ng-container>
                                 <ng-container *ngFor="let hbl of hawbDetails">
-                                    <label class="m-checkbox m-checkbox--bold" *ngIf="!messageCPHawb || !messageCPHawb.length"
+                                    <label class="m-checkbox m-checkbox--bold" *ngIf="!hbl.messageCPHawb || !hbl.messageCPHawb.length"
                                         style="display: initial;margin-left: 20px;">
                                         <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb"
                                             (change)="onChangeCheckBox()">
