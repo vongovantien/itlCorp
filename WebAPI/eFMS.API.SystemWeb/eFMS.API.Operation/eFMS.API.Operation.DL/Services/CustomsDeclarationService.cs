@@ -465,6 +465,7 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
+                bool isUpdate = true;
                 var clearanceList=clearances.OrderBy(x => x.ClearanceDate);
                 foreach (var item in clearanceList)
                 {
@@ -496,22 +497,39 @@ namespace eFMS.API.Operation.DL.Services
                             if (clearances.Any(x => x.ClearanceNo == mainClearanceNo))
                             {
                                 var mainClearance = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault();
-                                clearances.Add(new CustomsDeclarationModel()
-                                {
-                                    ClearanceNo = mainClearance.ClearanceNo,
-                                    DatetimeModified = mainClearance.DatetimeModified,
-                                    ClearanceDate = mainClearance.ClearanceDate
-                                });
-                                clearanceNo = DataContext.Get(x => x.Id == clearances.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().Id).FirstOrDefault().ClearanceNo;
+                                //clearances.Add(new CustomsDeclarationModel()
+                                //{
+                                //    ClearanceNo = mainClearance.ClearanceNo,
+                                //    DatetimeModified = mainClearance.DatetimeModified,
+                                //    ClearanceDate = mainClearance.ClearanceDate
+                                //});
+                                var lstCleranceNo = DataContext.Get(x => x.JobNo == jobNo).ToList();
+                                //lstCleranceNo.RemoveAll(x => clearances.Any(z => z.Hblid == x.Hblid));
+                                clearanceNo = lstCleranceNo.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().ClearanceNo;
+                            }
+                            else
+                            {
+                                isUpdate = false;
                             }
                         }
                     }
                 }
                 else
                 {
-                    clearanceNo = DataContext.Get(x => x.JobNo == jobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+                    if (mainClearanceNo != null)
+                    {
+                        clearanceNo = DataContext.Get(x => x.JobNo == jobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+                    }
+                    else
+                    {
+                        isUpdate = false;
+                    }
                 }
-                updateChargeAndAdvReq(HblId, clearanceNo);
+                if (isUpdate)
+                {
+                    updateChargeAndAdvReq(HblId, clearanceNo);
+                }
+                
             }
             catch (Exception ex)
             {
@@ -528,7 +546,7 @@ namespace eFMS.API.Operation.DL.Services
                 charges.ToList().ForEach(sur =>
                 {
                     sur.ClearanceNo = clearanceNo;
-                    csShipmentSurchargeRepo.Update(sur, x => x.Hblid == hblId, false);
+                    csShipmentSurchargeRepo.Update(sur, x => x.Id == sur.Id, false);
                 });
                 csShipmentSurchargeRepo.SubmitChanges();
             }
@@ -538,7 +556,7 @@ namespace eFMS.API.Operation.DL.Services
                 advRQs.ToList().ForEach(rq =>
                 {
                     rq.CustomNo = clearanceNo;
-                    accAdvanceRequestRepository.Update(rq, x => x.Hblid == hblId);
+                    accAdvanceRequestRepository.Update(rq, x => x.Id == rq.Id);
                 });
                 accAdvanceRequestRepository.SubmitChanges();
             }
