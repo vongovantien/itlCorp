@@ -24,6 +24,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -72,6 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IContextBase<CatStage> csStageRepository;
+        private readonly IStageService catStageService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -113,7 +115,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
-            IContextBase<CatStage> stageRepo) : base(repository, mapper)
+            IContextBase<CatStage> stageRepo,
+            IStageService stageService
+            ) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -154,6 +158,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransactionRepository = opsTransactionRepo;
             csStageAssignedService = csStageAssigned;
             csStageRepository = stageRepo;
+            catStageService = stageService;
         }
 
         #region -- INSERT & UPDATE --
@@ -385,6 +390,7 @@ namespace eFMS.API.Documentation.DL.Services
                     transaction.LockedDate = DateTime.Now;
                 }
             }
+            var listAssignedStages = SetMutipleStageAssigned(job, model);
             try
             {
                 var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id, false);
@@ -459,6 +465,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if (hsTrans.Success)
                     {
+                        var hs = csStageAssignedService.AddMutipleStageAssigned(listAssignedStages, job.Id);
                         accAdvanceRequestRepository.SubmitChanges();
                     }
                 }
@@ -3746,6 +3753,47 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+        public List<CsStageAssignedModel> SetMutipleStageAssigned(CsTransaction currentJob, CsTransaction updateJob)
+        {
+            List<CatStage> listStages = new List<CatStage>();
+            List<CsStageAssignedModel> listAssignedStages = new List<CsStageAssignedModel>();
+        
+            CatStage stage = new CatStage();
+
+            if (currentJob.Ata != updateJob.Ata)
+            {
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATA, currentJob.TransactionType);
+                listStages.Add(stage);
+            }
+
+            if (currentJob.Atd != updateJob.Atd)
+            {
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATD, currentJob.TransactionType);
+                listStages.Add(stage);
+            }
+
+            if (currentJob.IncotermId != updateJob.IncotermId)
+            {
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM, currentJob.TransactionType);
+                listStages.Add(stage);
+            }
+            foreach (var item in listStages)
+            {
+                CsStageAssignedModel assignedStage = new CsStageAssignedModel();
+
+                assignedStage.Id = Guid.NewGuid();
+                assignedStage.StageId = item.Id;
+                assignedStage.Status = TermData.Done;
+                assignedStage.DatetimeCreated = assignedStage.DatetimeModified = DateTime.Now;
+                assignedStage.Deadline = DateTime.Now;
+                assignedStage.MainPersonInCharge = assignedStage.RealPersonInCharge = currentUser.UserID;
+                assignedStage.JobId = currentJob.Id;
+
+                listAssignedStages.Add(assignedStage);
+            }
+
+            return listAssignedStages;
         }
     }
     #endregion

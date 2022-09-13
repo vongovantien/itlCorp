@@ -87,7 +87,8 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 startDate: null,
                 endDate: null
             }],
-            'status': [this.statusStage[0]]
+            'status': [this.statusStage[0]],
+            'hblNo': null
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -96,7 +97,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
         this.status = this.form.controls['status'];
-
     }
 
     initFormUpdate() {
@@ -107,7 +107,8 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             description: this.data.description || '',
             processTime: this.data.processTime,
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
-            status: this.data.status
+            status: this.data.status,
+            hblNo: this.data.hblNo
         });
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
