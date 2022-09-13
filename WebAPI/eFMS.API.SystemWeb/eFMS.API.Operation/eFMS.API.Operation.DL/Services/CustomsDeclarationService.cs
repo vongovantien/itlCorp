@@ -513,6 +513,16 @@ namespace eFMS.API.Operation.DL.Services
                             }
                         }
                     }
+                    else
+                    {
+
+                        var clearaceDateMain = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault().ClearanceDate;
+                        var clearanceLast = clearances.OrderBy(x => x.ClearanceDate).FirstOrDefault();
+                        if (clearaceDateMain.HasValue && clearaceDateMain > clearanceLast.ClearanceDate)
+                        {
+                            clearanceNo=clearanceLast.ClearanceNo;
+                        }
+                    }
                 }
                 else
                 {
