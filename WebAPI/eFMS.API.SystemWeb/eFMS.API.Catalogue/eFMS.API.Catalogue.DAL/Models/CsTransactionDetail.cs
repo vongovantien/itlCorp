@@ -161,6 +161,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? IncotermId { get; set; }
         public DateTime? WareHouseAnDate { get; set; }
         public DateTime? ReceivedBillTime { get; set; }
+        public bool? ShowDim { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }
