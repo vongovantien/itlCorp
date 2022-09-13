@@ -2,12 +2,14 @@
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedModel>
+    public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>
     {
-        HandleState AddNewStageAssignedByTransactionType(CsStageAssignedCriteria criteria);
+        HandleState AddNewStageAssignedByType(CsStageAssignedCriteria criteria);
         HandleState AddNewStageAssigned(CsStageAssignedModel model);
         HandleState AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);
     }

@@ -83,8 +83,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             }],
             mainPersonInCharge: [null, Validators.required],
             realPersonInCharge: [null],
-            'status': [this.statusStage[0]]
-
+            'status': [this.statusStage[0]],
+            'hblNo': null
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -107,7 +107,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
             mainPersonInCharge: this.data.mainPersonInCharge,
             realPersonInCharge: this.data.realPersonInCharge,
-            status: this.data.status
+            status: this.data.status,
+            hblNo: this.data.hblNo
         });
 
     }

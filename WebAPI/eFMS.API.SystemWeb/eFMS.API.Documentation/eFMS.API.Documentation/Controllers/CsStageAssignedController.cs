@@ -27,11 +27,11 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPost]
-        [Route("AddNewStageByTransactionType")]
+        [Route("AddNewStageByEventType")]
         [Authorize]
-        public IActionResult AddNewStageByTransactionType(CsStageAssignedCriteria criteria)
+        public IActionResult AddNewStageByType(CsStageAssignedCriteria criteria)
         {
-            var status = csStageAssignedService.AddNewStageAssignedByTransactionType(criteria);
+            var status = csStageAssignedService.AddNewStageAssignedByType(criteria);
             return Ok(status);
         }
     }

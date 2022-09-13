@@ -104,6 +104,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         { title: 'Attach File', field: 'name' }
     ];
 
+    stageType: string = '';
     constructor(
         private _documentRepo: DocumentationRepo,
         private _export: ExportRepo,
@@ -532,6 +533,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this.assignStageByEventType(this.jobId, this.hblId);
                         this._toastService.success(res.message);
                         this.deleteFileTemp(this.jobId);
                     } else {
@@ -664,11 +666,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     getInfoMailHBLAirImport(hblId: string) {
         if (this.isAL) {
             this._documentRepo.getMailAuthorizeLetterHBLAirImport(hblId)
-            .subscribe(
-                (res: EmailContent) => {
-                    this.formMail.patchValue(res);
-                },
-            );
+                .subscribe(
+                    (res: EmailContent) => {
+                        this.formMail.patchValue(res);
+                    },
+                );
         } else {
             this._documentRepo.getInfoMailHBLAirImport(hblId)
                 .subscribe(
@@ -697,22 +699,22 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
-    getMailProofOfDeliveryHBLSea(hblId: string, serviceId: string){
+    getMailProofOfDeliveryHBLSea(hblId: string, serviceId: string) {
         this._documentRepo.getMailProofOfDeliveryHBLSea(hblId, serviceId)
-        .subscribe(
-            (res: EmailContent) => {
-                this.formMail.patchValue(res);
-            },
-        );
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.patchValue(res);
+                },
+            );
     }
 
-    getMailSendHBLSeaServices(hblId: string, serviceId: string){
+    getMailSendHBLSeaServices(hblId: string, serviceId: string) {
         this._documentRepo.getMailSendHBLSeaServices(hblId, serviceId)
-        .subscribe(
-            (res: EmailContent) => {
-                this.formMail.patchValue(res);
-            },
-        );
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.patchValue(res);
+                },
+            );
     }
 
     getInfoMailHBLAirExport(hblId: string, jobId: string) {
@@ -975,22 +977,22 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         if (this.serviceId === 'AI') {
             this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false)
                 .pipe(
-                ).subscribe(
-                    (res: any) => {
-                        if (res !== false) {
-                            if (res?.dataSource?.length > 0) {
-                                this.dataReport = res;
-                                this.renderAndShowReport();
-                            } else {
-                                this._toastService.warning('There is no data to display preview');
-                            }
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
                         }
+                    }
 
-                    },
-                );
-        } else{
+                },
+            );
+        } else {
             this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id)
-            .pipe(
+                .pipe(
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
@@ -1010,40 +1012,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         if (this.serviceId === 'AI') {
             this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
                 .pipe(
-                ).subscribe(
-                    (res: any) => {
-                        if (res !== false) {
-                            if (res?.dataSource?.length > 0) {
-                                this.dataReport = res;
-                                this.renderAndShowReport();
-                            } else {
-                                this._toastService.warning('There is no data to display preview');
-                            }
-                        }
-                    },
-                );
-        }else{
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (res != null) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
-                },
-            );
-        }
-    }
-
-    previewCDNoteExport(code: string){
-        if(this.serviceId === 'AE'){
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
-            .pipe(
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
@@ -1056,9 +1024,43 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     }
                 },
             );
-        }else{
+        } else {
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res != null) {
+                            if (res?.dataSource?.length > 0) {
+                                this.dataReport = res;
+                                this.renderAndShowReport();
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
+                        }
+                    },
+                );
+        }
+    }
+
+    previewCDNoteExport(code: string) {
+        if (this.serviceId === 'AE') {
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
+                .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        } else {
             this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
-            .pipe(
+                .pipe(
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
@@ -1220,19 +1222,19 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     assignStageByEventType(jobId: string, hblId: string) {
         if (this.isPOD) {
-            this.stageType = "Send_POD"
+            this.stageType = "SEND_POD"
         }
         if (this.isAL) {
-            this.stageType = "Send_AL"
+            this.stageType = "SEND_AL"
         }
         if (this.isArrivalNotice) {
-            this.stageType = "Send_AN"
+            this.stageType = "SEND_AN"
         }
         if (this.isDO) {
-            this.stageType = "Send_DO"
+            this.stageType = "SEND_DO"
         }
         if (this.isPreAlert) {
-            this.stageType = "Send_PA"
+            this.stageType = "SEND_PA"
         }
 
         this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })

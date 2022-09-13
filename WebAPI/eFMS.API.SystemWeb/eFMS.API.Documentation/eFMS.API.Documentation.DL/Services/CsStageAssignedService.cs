@@ -14,150 +14,26 @@ using System.Security.Cryptography;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedModel>, ICsStageAssignedService
+    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>, ICsStageAssignedService
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
-        private readonly IContextBase<CsTransaction> csTransactionReporsitory;
-        private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<CsTransaction> csTransRepository;
+        private readonly IStageService _stageService;
         public CsStageAssignedService(
             ICurrentUser user,
             IContextBase<OpsTransaction> opsTransRepo,
-            IContextBase<CsTransaction> csTransactionRepo,
-            IContextBase<SysUser> userRepo,
+            IContextBase<CsTransaction> csTransRepo,
             IContextBase<CatStage> catStageRepo,
+            IStageService stageService,
             IContextBase<OpsStageAssigned> repository,
             IMapper mapper
             ) : base(repository, mapper)
         {
             currentUser = user;
             opsTransRepository = opsTransRepo;
-            catStageRepository = catStageRepo;
-        }
-        public HandleState AddNewStageAssignedByTransactionType(CsStageAssignedCriteria criteria)
-        {
-            CsTransaction job = csTransactionReporsitory.First(x => x.Id == criteria.JobId);
-            CatStage stage = new CatStage();
-            OpsStageAssigned newStage = new OpsStageAssigned();
-            int orderNumberProcess = 0;
-            var dateTimeCreated = DateTime.Now;
-            var transactionType = job.TransactionType.Substring(0, 1);
-
-            switch (criteria.StageType)
-            {
-                case TermData.SEND_POD:
-                    switch (transactionType)
-                    {
-                        case "A":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendAirPOD);
-                            break;
-                        case "S":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendSeaPOD);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    newStage.Id = Guid.NewGuid();
-                    newStage.StageId = stage.Id;
-                    newStage.Status = TermData.Done;
-                    newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
-                    newStage.Deadline = dateTimeCreated;
-                    newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                    newStage.Hblid = criteria.HblId;
-                    newStage.JobId = criteria.JobId;
-                    orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
-                    newStage.OrderNumberProcessed = orderNumberProcess + 1;
-                    break;
-
-                case TermData.SEND_PA:
-                    switch (transactionType)
-                    {
-                        case "A":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendAirPA);
-                            break;
-                        case "S":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendSeaPA);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    newStage.Id = Guid.NewGuid();
-                    newStage.StageId = stage.Id;
-                    newStage.Status = TermData.Done;
-                    newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
-                    newStage.Deadline = dateTimeCreated;
-                    newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                    newStage.JobId = criteria.JobId;
-                    newStage.Hblid = criteria.HblId;
-                    orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
-                    newStage.OrderNumberProcessed = orderNumberProcess + 1;
-                    break;
-                case TermData.SEND_AL:
-                    stage = catStageRepository.First(x => x.Code == TermData.SendAirAL);
-
-                    newStage.Id = Guid.NewGuid();
-                    newStage.StageId = stage.Id;
-                    newStage.Status = TermData.Done;
-                    newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
-                    newStage.Deadline = dateTimeCreated;
-                    newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                    newStage.JobId = criteria.JobId;
-                    orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
-                    newStage.OrderNumberProcessed = orderNumberProcess + 1;
-                    break;
-                case TermData.SEND_AN:
-                    switch (transactionType)
-                    {
-                        case "A":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendAirAN);
-                            break;
-                        case "S":
-                            stage = catStageRepository.First(x => x.Code == TermData.SendSeaAN);
-                            break;
-                        default:
-                            break;
-                    }
-
-                    newStage.Id = Guid.NewGuid();
-                    newStage.StageId = stage.Id;
-                    newStage.Status = TermData.Done;
-                    newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
-                    newStage.Deadline = dateTimeCreated;
-                    newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                    newStage.JobId = criteria.JobId;
-                    orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
-                    newStage.OrderNumberProcessed = orderNumberProcess + 1;
-                    break;
-                case TermData.SEND_DO:
-                    stage = catStageRepository.First(x => x.Code == TermData.SendSeaDO);
-
-                    newStage.Id = Guid.NewGuid();
-                    newStage.StageId = stage.Id;
-                    newStage.Status = TermData.Done;
-                    newStage.DatetimeCreated = newStage.DatetimeModified = dateTimeCreated;
-                    newStage.Deadline = dateTimeCreated;
-                    newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
-                    newStage.JobId = criteria.JobId;
-                    orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
-                    newStage.OrderNumberProcessed = orderNumberProcess + 1;
-                    break;
-                default:
-                    break;
-            }
-
-            DataContext.Add(newStage, false);
-
-            HandleState hs = DataContext.SubmitChanges();
-            return hs;
-        }
-
-        public HandleState AddNewStageAssigned(CsStageAssignedModel model)
-        {
-                result = new HandleState(ex.Message);
-            }
-            return result;
+            csTransRepository = csTransRepo;
+            _stageService = stageService;
         }
 
         public HandleState AddMutipleStageAssigned(List<CsStageAssignedModel> listStages, Guid jobId)
@@ -172,21 +48,56 @@ namespace eFMS.API.Documentation.DL.Services
                 assignedItem.JobId = jobId;
                 assignedItem.Deadline = stage.Deadline ?? null;
                 assignedItem.Status = TermData.Done;
+                assignedItem.Hblid = stage.Hblid;
+                assignedItem.JobId = stage.JobId;
                 assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
                 assignedItem.UserCreated = currentUser.UserID;
-                assignedItem.OrderNumberProcessed = orderNumberProcess;
+                assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
                 DataContext.Add(assignedItem, false);
 
                 orderNumberProcess++;
             }
+
             try
             {
-                DataContext.SubmitChanges();
+                result = DataContext.SubmitChanges();
             }
             catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
             }
+            return result;
+        }
+
+
+        public HandleState AddNewStageAssigned(CsStageAssignedModel model)
+        {
+            var stageAssigned = mapper.Map<OpsStageAssigned>(model);
+            DataContext.Add(stageAssigned, false);
+
+            HandleState hs = DataContext.SubmitChanges();
+            return hs;
+        }
+
+        public HandleState AddNewStageAssignedByType(CsStageAssignedCriteria criteria)
+        {
+            var currentJob = csTransRepository.First(x => x.Id == criteria.JobId);
+            var stage = _stageService.GetStageByType(criteria.StageType, currentJob.TransactionType);
+
+            CsStageAssignedModel newItem = new CsStageAssignedModel();
+
+            newItem.Id = Guid.NewGuid();
+            newItem.StageId = stage.Id;
+            newItem.Status = TermData.Done;
+            newItem.DatetimeCreated = newItem.DatetimeModified;
+            newItem.Deadline = DateTime.Now;
+            newItem.MainPersonInCharge = newItem.RealPersonInCharge = currentUser.UserID;
+            newItem.Hblid = criteria.HblId;
+            newItem.JobId = criteria.JobId;
+            var orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
+            newItem.OrderNumberProcessed = orderNumberProcess + 1;
+
+            var result = AddNewStageAssigned(newItem);
             return result;
         }
     }
