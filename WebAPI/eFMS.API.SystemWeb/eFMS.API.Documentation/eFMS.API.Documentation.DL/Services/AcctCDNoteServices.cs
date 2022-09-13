@@ -340,7 +340,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
-                if(model.Type == "DEBIT")
+                #endregion  --- Set Currency For CD Note ---
+                if (model.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || model.Type == DocumentConstants.CDNOTE_TYPE_INVOICE)
                 {
                     var chargeFirst = model.listShipmentSurcharge.First();
                     var _customerId = string.Empty;
@@ -366,7 +367,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid } ).Select(x => x.Key).Distinct().ToList();
+                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid }).Select(x => x.Key).Distinct().ToList();
                         var hasPrepaid = false;
                         foreach (var item in dataGrpPartners)
                         {
@@ -385,15 +386,12 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if(hasPrepaid)
+                        if (hasPrepaid)
                         {
                             model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                         }
                     }
                 }
-                
-                #endregion  --- Set Currency For CD Note ---
-
                 //Quy đổi tỉ giá currency CD Note về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 model.ExchangeRate = _exchangeRate;
