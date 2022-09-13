@@ -151,7 +151,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         private _ngProgressService: NgProgress,
         protected _activeRoute: ActivatedRoute,
         private _store: Store<IAppState>,
-        private _oauthService: OAuthService,
 
     ) {
         super();
