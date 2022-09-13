@@ -72,7 +72,6 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
 
         private readonly ICsStageAssignedService csStageAssignedService;
-        private readonly IContextBase<CatStage> csStageRepository;
         private readonly IStageService catStageService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
@@ -115,7 +114,6 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
-            IContextBase<CatStage> stageRepo,
             IStageService stageService
             ) : base(repository, mapper)
         {
@@ -157,7 +155,6 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepo = catContractRepository;
             opsTransactionRepository = opsTransactionRepo;
             csStageAssignedService = csStageAssigned;
-            csStageRepository = stageRepo;
             catStageService = stageService;
         }
 
@@ -3651,12 +3648,12 @@ namespace eFMS.API.Documentation.DL.Services
                     csJob = DataContext.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
                         csJob.CurrentStatus = TermData.Finish;
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         csJob.CurrentStatus = TermData.Processing;
                     }
                     break;
@@ -3664,12 +3661,12 @@ namespace eFMS.API.Documentation.DL.Services
                     opsJob = opsTransactionRepository.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
                         opsJob.CurrentStatus = TermData.Finish;
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         opsJob.CurrentStatus = TermData.Processing;
                     }
                     break;
