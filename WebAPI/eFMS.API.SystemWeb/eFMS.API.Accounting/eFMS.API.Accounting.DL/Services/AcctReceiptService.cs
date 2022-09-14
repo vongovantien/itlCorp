@@ -3935,7 +3935,8 @@ namespace eFMS.API.Accounting.DL.Services
             CatContract contract = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault();
             if (contract != null && (contract.CustomerAdvanceAmountUsd != null || contract.CustomerAdvanceAmountUsd != null))
             {
-                if (cusVnd > contract.CustomerAdvanceAmountVnd || cusUsd > contract.CustomerAdvanceAmountUsd)
+                if ((contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL && cusVnd > contract.CustomerAdvanceAmountVnd ) 
+                    || (contract.CreditCurrency != AccountingConstants.CURRENCY_LOCAL && cusUsd > contract.CustomerAdvanceAmountUsd))
                 {
                     valid = false;
                 }
