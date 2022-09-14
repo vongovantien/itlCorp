@@ -1353,7 +1353,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var _shipment = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
             if (_shipment == null) return null;
-            var _housebills = detailRepository.Get(x => x.JobId == _shipment.Id);
+            var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
 
             var _pol = catPlaceRepo.Get(x => x.Id == _shipment.Pol).FirstOrDefault(); // Departure Airport
             var _pod = catPlaceRepo.Get(x => x.Id == _shipment.Pod).FirstOrDefault(); // Destination Airpor
