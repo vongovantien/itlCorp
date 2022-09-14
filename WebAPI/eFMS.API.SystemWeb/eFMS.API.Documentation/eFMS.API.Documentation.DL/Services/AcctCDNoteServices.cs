@@ -348,26 +348,25 @@ namespace eFMS.API.Documentation.DL.Services
                     var _salesmanId = string.Empty;
                     if (chargeFirst.TransactionType == "CL")
                     {
+                        // kiểm tra prepaid trên shipment trước
                         var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
                         _salesmanId = opsJob?.SalemanId;
                         _customerId = opsJob?.CustomerId;
 
                         if (_salesmanId != null && _customerId != null)
                         {
-                            CatContract contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
-                            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                            && x.SaleManId == _salesmanId
-                            && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                            model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+                        }
 
-                            if (contractHbl?.ContractType == "Prepaid")
-                            {
-                                model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-                            }
+                        if(model.Status == "New")
+                        {
+                            _customerId = chargeFirst.PaymentObjectId;
+                            model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
                         }
                     }
                     else
                     {
-                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid }).Select(x => x.Key).Distinct().ToList();
+                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid, x.PaymentObjectId }).Select(x => x.Key).Distinct().ToList();
                         var hasPrepaid = false;
                         foreach (var item in dataGrpPartners)
                         {
@@ -375,11 +374,9 @@ namespace eFMS.API.Documentation.DL.Services
                             _salesmanId = hbl?.SaleManId;
                             _customerId = hbl?.CustomerId;
 
-                            CatContract contractHbl = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
-                               && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                               && x.SaleManId == _salesmanId
-                               && x.SaleService.Contains(_transactionType)).FirstOrDefault();
-                            if (contractHbl?.ContractType == "Prepaid")
+                            string _status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+
+                            if (_status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                             {
                                 hasPrepaid = true;
                                 break;
@@ -389,9 +386,25 @@ namespace eFMS.API.Documentation.DL.Services
                         if (hasPrepaid)
                         {
                             model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                        } else
+                        {
+                            foreach (var item in dataGrpPartners)
+                            {
+                                var hbl = trandetailRepositoty.First(x => x.Id == item.Hblid);
+                                _salesmanId = hbl?.SaleManId;
+                                _customerId = item.PaymentObjectId;
+                                string _status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+
+                                if (_status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                                {
+                                    hasPrepaid = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
+
                 //Quy đổi tỉ giá currency CD Note về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 model.ExchangeRate = _exchangeRate;
@@ -500,6 +513,20 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        private string GenerateDebitStatus(string _customerId, string _salesmanId, string _service)
+        {
+            CatContract contract = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
+                             && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                             && x.SaleManId == _salesmanId
+                             && x.SaleService.Contains(_service)).FirstOrDefault();
+            if (contract?.ContractType == "Prepaid")
+            {
+                return DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            }
+
+            return "New";
         }
 
         public HandleState UpdateCDNote(AcctCdnoteModel model)
