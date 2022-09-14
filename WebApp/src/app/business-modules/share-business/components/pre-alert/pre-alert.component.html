@@ -123,8 +123,8 @@
                     <div class="form-group m-form__group"
                         *ngIf="isArrivalNotice && (serviceId === 'AI' || serviceId === 'SFI' || serviceId === 'SLI' || serviceId === 'SCI')">
                         <div class="m-checkbox-inline">
-                            <ng-container>
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;" *ngIf="!messageCPArrivalNotice || !messageCPArrivalNotice.length">
+                            <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
                                     <input type="checkbox" [(ngModel)]="isCheckedArrivalNotice"
                                         (change)="onChangeCheckBox()">
                                     <span></span>
@@ -133,14 +133,14 @@
                                     <a class="pointer" (click)="previewArrivalNotice()">Arrival Notice</a>
                                 </span>
                             </ng-container>
-                            <!-- <ng-template #NotArrivalNotice>
+                            <ng-template #NotArrivalNotice>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
                                     Arrival Notice
                                     <span></span>
                                 </label>
-                            </ng-template> -->
+                            </ng-template>
 
                             <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
                                 <ng-container *ngFor="let debitNo of debitNos">
@@ -164,9 +164,8 @@
                                 </label>
                             </ng-template>
 
-                            <ng-container>
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;"
-                                    *ngIf="!messageCPDO || !messageCPDO.length">
+                            <ng-container *ngIf="isExitsDO else NotDO">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
                                     <input type="checkbox" [(ngModel)]="isCheckedDO" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
@@ -174,14 +173,14 @@
                                     <a class="pointer" (click)="previewDO()">Delivery Order</a>
                                 </span>
                             </ng-container>
-                            <!-- <ng-template #NotDO>
+                            <ng-template #NotDO>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
                                     Delivery Order
                                     <span></span>
                                 </label>
-                            </ng-template> -->
+                            </ng-template>
                         </div>
                     </div>
                     <div class="form-group m-form__group"
@@ -205,28 +204,28 @@
                                 </label>
                             </ng-template>
 
-                            <ng-container>
+                            <ng-container *ngIf="isExitsHawb else NotHawb">
                                 <ng-container *ngFor="let hbl of hawbDetails">
-                                    <label class="m-checkbox m-checkbox--bold" *ngIf="!hbl.messageCPHawb || !hbl.messageCPHawb.length"
+                                    <label class="m-checkbox m-checkbox--bold"
                                         style="display: initial;margin-left: 20px;">
                                         <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb"
                                             (change)="onChangeCheckBox()">
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a class="pointer" (click)="previewHawb(hbl)">{{hbl.hwbno}}</a>
+                                        <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
                                     </span>
                                 </ng-container>
                                 <!-- {{hblRptName}} -->
                             </ng-container>
-                            <!-- <ng-template #NotHawb>
+                            <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
                                     HAWB
                                     <span></span>
                                 </label>
-                            </ng-template> -->
+                            </ng-template>
 
                             <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
                                 <ng-container *ngFor="let debitNo of debitNos">
@@ -341,7 +340,7 @@
 
                     <!-- Send POD -->
                     <div class="form-group m-form__group"
-                        *ngIf="isPOD && (serviceId === 'SFI' || serviceId === 'SLI' || serviceId === 'SCI')">
+                        *ngIf="isPOD && (serviceId === 'SFI' || serviceId === 'SLI' || serviceId === 'AI')">
                         <div class="m-checkbox-inline">
                             <ng-container>
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;"
@@ -359,32 +358,16 @@
 
                     <!-- Send HBL -->
                     <div class="form-group m-form__group"
-                        *ngIf="isSendHbl && (serviceId === 'SFI' || serviceId === 'SLI' || serviceId === 'SCI')">
+                        *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE')">
                         <div class="m-checkbox-inline">
                             <ng-container>
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedPOD"
+                                    <input type="checkbox" [(ngModel)]="hawbDetails[0].isCheckedHawb"
                                         (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
                                 <span style='margin-right: 20px;'>
-                                    <a class="pointer" (click)="previewDO()">Proof Of Delivery</a>
-                                </span>
-                            </ng-container>
-                        </div>
-                    </div>
-
-                    <div class="form-group m-form__group"
-                    *ngIf="isSendHawb && (serviceId === 'AI' || serviceId === 'AE')">
-                        <div class="m-checkbox-inline">
-                            <ng-container>
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedPOD"
-                                        (change)="onChangeCheckBox()">
-                                    <span></span>
-                                </label>
-                                <span style='margin-right: 20px;'>
-                                    <a class="pointer" (click)="previewDO()">Proof Of Delivery</a>
+                                    <a class="pointer" (click)="previewHawb(hawbDetails[0].id)">{{hawbDetails[0].hwbno}}</a>
                                 </span>
                             </ng-container>
                         </div>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
@@ -75,21 +76,22 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Get info mail Pre Alert shipment/housebill of Air Export
         /// </summary>
-        /// <param name="hblId">Housebill ID</param>
+        /// <param name="hblIds">Housebill ID</param>
         /// <param name="jobId"></param>
+        /// <param name="isFromShipment">Button send mail is from shipment or Hbl detail</param>
         /// <returns></returns>
         [HttpGet("GetInfoMailHBLAirExport")]
         [Authorize]
-        public IActionResult GetInfoMailHBLAirExport(Guid? hblId, Guid? jobId)
+        public IActionResult GetInfoMailHBLAirExport(List<Guid?> hblIds, Guid? jobId, bool? isFromShipment)
         {
-            if (hblId != null && hblId != Guid.Empty)
+            if (hblIds != null && hblIds.Count == 1 && isFromShipment == false)
             {
-                var data = sendMailService.GetInfoMailHBLAirExport(hblId);
+                var data = sendMailService.GetInfoMailHBLAirExport(hblIds[0]);
                 return Ok(data);
             }
             else
             {
-                var data = sendMailService.GetInfoMailAEPreAlert(jobId);
+                var data = sendMailService.GetInfoMailAEPreAlert(hblIds, jobId);
                 return Ok(data);
             }
         }
@@ -123,22 +125,23 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Get info mail housebill of Air Export
         /// </summary>
-        /// <param name="hblId">Housebill ID</param>
+        /// <param name="hblIds">Housebill ID</param>
         /// <param name="jobId"></param>
         /// <param name="serviceId"></param>
+        /// <param name="isFromShipment">Button send mail is from shipment or Hbl detail</param>
         /// <returns></returns>
         [HttpGet("GetInfoMailHBLPreAlerSeaExport")]
         [Authorize]
-        public IActionResult GetInfoMailHBLPreAlerSeaExport(Guid? hblId, Guid? jobId, string serviceId)
+        public IActionResult GetInfoMailHBLPreAlerSeaExport(List<Guid?> hblIds, Guid? jobId, string serviceId, bool? isFromShipment)
         {
-            if (hblId != null && hblId != Guid.Empty)
+            if (hblIds != null && hblIds.Count == 1 && isFromShipment == false)
             {
-                var data = sendMailService.GetInfoMailHBLPreAlerSeaExport(hblId, serviceId);
+                var data = sendMailService.GetInfoMailHBLPreAlerSeaExport(hblIds[0], serviceId);
                 return Ok(data);
             }
             else
             {
-                var data = sendMailService.GetInfoMailPreAlerSeaExport(jobId, serviceId);
+                var data = sendMailService.GetInfoMailPreAlerSeaExport(hblIds, jobId, serviceId);
                 return Ok(data);
             }
         }

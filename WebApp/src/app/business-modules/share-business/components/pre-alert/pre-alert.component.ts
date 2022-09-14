@@ -70,27 +70,21 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     isSendHbl: boolean = false; // Send HBL (Sea Services)
     isSendHawb: boolean = false; // Send HAWB (Air Services)
     // Import
-    // isExitsArrivalNotice: boolean = false;
+    isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
-    messageCPArrivalNotice: string = null;
 
     isExitsDO: boolean = false;
     isCheckedDO: boolean = false;
-    messageCPDO: string = null;
 
     isExitsDebitNote: boolean = false;
     isCheckedDebitNote: boolean = false;
-
+    
     isExitsPOD: boolean = false;
     isCheckedPOD: boolean = false;
-    messageCPPOD: string = null;
-
-    isExitsHbl: boolean = false;
-    isCheckedHbl: boolean = false;
 
     isExitsManifest: boolean = false;
     isCheckedManifest: boolean = false;
-
+    
     isExitsHawb: boolean = false;
     isCheckedHawb: boolean = false;
 
@@ -153,7 +147,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) ? "HBL" : "HAWB";
 
                     this.getDetailHAWB();
-                    this.getContentMail(this.serviceId, this.hblId, this.jobId);
+                    // this.getContentMail(this.serviceId, this.hblId, this.jobId);
 
                     // Is Locked Shipment?
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
@@ -186,6 +180,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.isSendHbl = true;
                 break;
             case "Send HAWB":
+                this.isSendHbl = true;
                 this.isSendHawb = true;
                 break;
             case "Send S.I":
@@ -233,61 +228,24 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         // Export Report Arrival Notice to PDF
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-            case ChargeConstants.SFI_CODE: // Sea FCL Import
-            case ChargeConstants.SLI_CODE: // Sea LCL Import
-            case ChargeConstants.SCI_CODE: // Sea Consol Import
-                if (this.isArrivalNotice || this.isDO) {
-                    this._documentRepo.validateCheckPointContractPartner(this.hawbDetails[0].customerId, this.hblId, 'DOC', null, 7, 'false')
-                        .pipe(
-                            catchError((err: HttpErrorResponse) => {
-                                if (this.isArrivalNotice) {
-                                    this.messageCPArrivalNotice = err.error.message;
-                                    this.isCheckedArrivalNotice = false;
-                                }
+                if (this.isArrivalNotice) {
+                    this.isExitsArrivalNotice = true;
+                    this.isCheckedArrivalNotice = true;
 
-                                this.messageCPDO = err.error.message;
-                                this.isExitsDO = false;
-                                this.isCheckedDO = false;
-                                return throwError(err.error.message);
-                            }),
-                        ).subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    if (this.isArrivalNotice) {
-                                        this.messageCPArrivalNotice = null;
-                                        this.isCheckedArrivalNotice = true;
-                                    }
-
-                                    this.messageCPDO = null;
-                                    this.isExitsDO = true;
-                                    this.isCheckedDO = true;
-                                }
-                            },
-                        );
-                }
-
-                if (this.isPOD) {
-                    this._documentRepo.validateCheckPointContractPartner(this.hawbDetails[0].customerId, this.hblId, 'DOC', null, 7, 'false')
-                        .pipe(
-                            catchError((err: HttpErrorResponse) => {
-                                this.messageCPPOD = err.error.message;
-                                this.isCheckedPOD = false;
-                                return throwError(err.error.message);
-                            }),
-                        ).subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    this.messageCPPOD = null;
-                                    this.isCheckedPOD = true;
-                                }
-                            },
-                        );
+                    this.isExitsDO = true;
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 if (this.isPreAlert) {
                     this.checkExistManifestExport();
                 }
+                break;
+            case ChargeConstants.SFI_CODE: // Sea FCL Import
+            case ChargeConstants.SLI_CODE: // Sea LCL Import
+            case ChargeConstants.SCI_CODE: // Sea Consol Import
+                this.isExitsArrivalNotice = true;
+                this.isCheckedArrivalNotice = true;
+                this.isExitsDO = true;
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -424,10 +382,10 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         switch (service) {
             case ChargeConstants.AI_CODE:
                 if (this.isArrivalNotice) {
-                    if (this.isCheckedArrivalNotice) {
+                    if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
                         streamUploadReport.push(this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' }));
                     }
-                    if (this.isCheckedDO) {
+                    if (this.isExitsDO && this.isCheckedDO) {
                         streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
                     }
                     this.debitNos.forEach(element => {
@@ -458,10 +416,10 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SLI_CODE:
             case ChargeConstants.SCI_CODE:
                 if (this.isArrivalNotice) {
-                    if (this.isCheckedArrivalNotice) {
+                    if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
                         streamUploadReport.push(this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' }))
                     }
-                    if (this.isCheckedDO) {
+                    if (this.isExitsDO && this.isCheckedDO) {
                         streamUploadReport.push(this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id));
                     }
                     this.debitNos.forEach(element => {
@@ -678,13 +636,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailHawbHBLAirService(hblId);
                 } else {
                     this.sendMailButtonName = "Send Pre Alert";
-                    this.getInfoMailHBLAirExport(hblId, jobId);
+                    this.getInfoMailHBLAirExport(this.hawbDetails.map(x => x.id), jobId);
                 }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
-                    this.getInfoMailHBLPreAlertSeaExport(hblId, jobId, serviceId);
+                    this.getInfoMailHBLPreAlertSeaExport(this.hawbDetails.map(x => x.id), jobId, serviceId);
                 } else if (this.isPOD) {
                     this.sendMailButtonName = "Send Proof Of Delivery";
                     this.getMailProofOfDeliveryHBLSea(hblId, serviceId);
@@ -699,7 +657,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
-                    this.getInfoMailHBLPreAlertSeaExport(hblId, jobId, serviceId);
+                    this.getInfoMailHBLPreAlertSeaExport(this.hawbDetails.map(x => x.id), jobId, serviceId);
                 } else if (this.isPOD) {
                     this.sendMailButtonName = "Send Proof Of Delivery";
                     this.getMailProofOfDeliveryHBLSea(hblId, serviceId);
@@ -719,11 +677,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     getInfoMailHBLAirImport(hblId: string) {
         if (this.isAL) {
             this._documentRepo.getMailAuthorizeLetterHBLAirImport(hblId)
-                .subscribe(
-                    (res: EmailContent) => {
-                        this.formMail.patchValue(res);
-                    },
-                );
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.patchValue(res);
+                },
+            );
         } else {
             this._documentRepo.getInfoMailHBLAirImport(hblId)
                 .subscribe(
@@ -770,8 +728,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             );
     }
 
-    getInfoMailHBLAirExport(hblId: string, jobId: string) {
-        this._documentRepo.getInfoMailHBLAirExport(hblId, jobId)
+    getInfoMailHBLAirExport(hblIds: any[], jobId: string) {
+        this._documentRepo.getInfoMailHBLAirExport(hblIds, jobId, this.hblId === SystemConstants.EMPTY_GUID)
             .subscribe(
                 (res: EmailContent) => {
                     this.formMail.patchValue(res);
@@ -797,8 +755,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             );
     }
 
-    getInfoMailHBLPreAlertSeaExport(hblId: string, jobId: string, serviceId: string) {
-        this._documentRepo.getInfoMailHBLPreAlertSeaExport(hblId, jobId, serviceId)
+    getInfoMailHBLPreAlertSeaExport(hblIds: any, jobId: string, serviceId: string) {
+        this._documentRepo.getInfoMailHBLPreAlertSeaExport(hblIds, jobId, serviceId, this.hblId === SystemConstants.EMPTY_GUID)
             .subscribe(
                 (res: EmailContent) => {
                     this.formMail.patchValue(res);
@@ -908,30 +866,26 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
-    previewHawb(hbl: any) {
-        if (!!hbl.messageCPHawb && !!hbl.messageCPHawb.length) {
-            this._toastService.warning(hbl.messageCPHawb);
+    previewHawb(hblId: string) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
+            this.previewHBL(hblId);
         } else {
-            if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
-                this.previewHBL(hbl.id);
-            } else {
-                this._progressRef.start();
-                this._documentRepo.previewHouseAirwayBillLastest(hbl.id, 'LASTEST_ITL_FRAME')
-                    .pipe(
-                        catchError(this.catchError),
-                        finalize(() => { this._progressRef.complete(); })
-                    )
-                    .subscribe(
-                        (res: Crystal) => {
-                            this.dataReport = res;
-                            if (res.dataSource.length > 0) {
-                                this.renderAndShowReport();
-                            } else {
-                                this._toastService.warning('There is no data to display preview');
-                            }
-                        },
-                    );
-            }
+            this._progressRef.start();
+            this._documentRepo.previewHouseAirwayBillLastest(hblId, 'LASTEST_ITL_FRAME')
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
+                )
+                .subscribe(
+                    (res: Crystal) => {
+                        this.dataReport = res;
+                        if (res.dataSource.length > 0) {
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    },
+                );
         }
     }
 
@@ -1145,25 +1099,22 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     previewProofofDelivery() {
-        if (!!this.messageCPPOD && !!this.messageCPPOD.length) {
-            this._toastService.warning(this.messageCPPOD);
-        } else {
-            this._documentRepo.previewProofofDelivery(this.hblId)
-                .pipe(
-            ).subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
+        this._documentRepo.previewProofofDelivery(this.hblId)
+            .pipe(
+        ).subscribe(
+            (res: any) => {
+                if (res !== false) {
+                    if (res?.dataSource?.length > 0) {
+                        this.dataReport = res;
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
-                },
-            );
-        }
+                }
+            },
+        );
     }
+
     onChangeCheckBox() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
@@ -1266,29 +1217,23 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     getDetailHAWB() {
-        this._documentRepo.getHAWBListOfShipment(this.jobId)
-            .pipe(
-        )
+        this._documentRepo.getHAWBListOfShipment(this.jobId, this.hblId)
             .subscribe(
                 (res: any[]) => {
-                    if (this.hblId === SystemConstants.EMPTY_GUID) {
-                        this.hawbDetails = [...res.map(v => ({ ...v, isCheckedHawb: true, messageCPHawb: '' }))];
-                    } else {
-                        this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true, messageCPHawb: '' }));
+                    // if (this.hblId === SystemConstants.EMPTY_GUID) {
+                    //     this.hawbDetails = [...res.map(v => ({ ...v, isCheckedHawb: true }))];
+                    // } else {
+                    //     this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true }));
+                    // }
+                    var invalidHawb = res.filter(x => !!x.errorMessage && !!x.errorMessage.length);
+                    if(this.hblId === SystemConstants.EMPTY_GUID && res.length === invalidHawb.length){
+                        this._toastService.warning(invalidHawb[0].errorMessage);
+                        this.cancelPreAlert();
+                    } else{
+                        this.hawbDetails = res.filter(x => !x.errorMessage || !x.errorMessage.length).map(v => ({ ...v.hbl, isCheckedHawb: true }));
                     }
-                    this.hawbDetails.forEach(item => {
-                        this._documentRepo.validateCheckPointContractPartner(item.customerId, item.id, 'DOC', null, 7, 'false')
-                            .pipe(
-                                catchError((err: HttpErrorResponse) => {
-                                    item.isCheckedHawb = err.error.status;
-                                    item.messageCPHawb = err.error.message;
-                                    return throwError(err.error.message);
-                                }),
-                            )
-                            .subscribe(
-                        );
-                    });
                     this.exportFileCrystalToPdf(this.serviceId);
+                    this.getContentMail(this.serviceId, this.hblId, this.jobId);
                 },
             );
     }
