@@ -171,7 +171,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             // Email PIC
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
-            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            var picInfo = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault();
             // Group email của PIC
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
 
@@ -200,7 +200,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{Routing}}", _shipment.Route);
             _body = _body.Replace("{{WareHouse}}", _warehouseName);
             _body = _body.Replace("{{ExcRate}}", exchangeRate == null ? string.Format("{0:n2}", 1) : string.Format("{0:n2}", exchangeRate));
-            _body = _body.Replace("{{pic}}", picEmail);
+            _body = _body.Replace("{{pic}}", picInfo?.Email);
             _body = _body.Replace("{{emailGroup}}", groupUser?.Email);
 
             var emailContent = new EmailContentModel();
@@ -213,14 +213,17 @@ namespace eFMS.API.Documentation.DL.Services
 
             
             var mailFrom = "Info FMS";
-            if (!string.IsNullOrEmpty(picEmail))
+            var signImg = string.Empty;
+            if (!string.IsNullOrEmpty(picInfo?.Email)) //Email from
             {
-                mailFrom = picEmail;
+                mailFrom = picInfo.Email;
+                signImg = picInfo.SignatureImage;
             }
             else
             {
                 mailFrom = @"air@itlvn.com";
             }
+            _body = _body.Replace("{{Signature}}", signImg);
             emailContent.From = mailFrom; //email PIC của lô hàng
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
@@ -600,12 +603,12 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
-        public EmailContentModel GetInfoMailAEPreAlert(Guid? jobId)
+        public EmailContentModel GetInfoMailAEPreAlert(List<Guid?> hblIds, Guid? jobId)
         {
             var shipmentInfo = DataContext.First(x => x.Id == jobId);
             if (shipmentInfo == null) return null;
 
-            var _housebills = detailRepository.Get(x => x.JobId == jobId);
+            var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
             var _pol = catPlaceRepo.Get(x => x.Id == shipmentInfo.Pol).FirstOrDefault()?.Code; // Departure Airport
             _pol = string.IsNullOrEmpty(_pol) ? string.Empty : _pol;
             var _pod = catPlaceRepo.Get(x => x.Id == shipmentInfo.Pod).FirstOrDefault()?.Code; // Destination Airpor
@@ -775,7 +778,7 @@ namespace eFMS.API.Documentation.DL.Services
             var template = sysEmailTemplateRepo.Get(x => x.Code == "SI-ARRIVAL-NOTICE").FirstOrDefault();
             _subject = template.Subject;
             _subject = _subject.Replace("{{EmailType}}", "ARRIVAL NOTICE");
-            if (serviceId == "SFI")
+            if (serviceId == "SFI" || serviceId == "SCI")
             {
                 _subject = _subject.Replace("{{Hbl}}", _housebill.Hwbno);
                 _subject = _subject.Replace("{{Pol}}", pol);
@@ -809,8 +812,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Email PIC
             var _shipment = DataContext.First(x => x.Id == _housebill.JobId);
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
-            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
-
+            var picInfo = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault();
             // Email to: agent/customer + consignee
             var mailTo = string.Empty;
             var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
@@ -825,14 +827,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
             var mailFrom = "Info FMS";
-            if (!string.IsNullOrEmpty(picEmail))
+            var signImg = string.Empty;
+            if (!string.IsNullOrEmpty(picInfo?.Email)) //Email from
             {
-                mailFrom = picEmail;
+                mailFrom = picInfo.Email;
+                signImg = picInfo.SignatureImage;
             }
             else
             {
                 mailFrom = @"sea@itlvn.com";
             }
+            _body = _body.Replace("{{Signature}}", signImg);
 
             emailContent.From = mailFrom; //email PIC của lô hàng
             emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
@@ -1344,7 +1349,7 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
-        public EmailContentModel GetInfoMailPreAlerSeaExport(Guid? jobId, string serviceId)
+        public EmailContentModel GetInfoMailPreAlerSeaExport(List<Guid?> hblIds, Guid? jobId, string serviceId)
         {
             var _shipment = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
             if (_shipment == null) return null;

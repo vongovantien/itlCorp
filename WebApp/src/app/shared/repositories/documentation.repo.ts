@@ -922,8 +922,8 @@ export class DocumentationRepo {
         );
     }
 
-    getHAWBListOfShipment(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId }).pipe(
+    getHAWBListOfShipment(jobId: string, hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId, hblId: hblId }).pipe(
             map((data: any) => data)
         );
     }
@@ -976,14 +976,14 @@ export class DocumentationRepo {
         );
     }
 
-    getInfoMailHBLAirExport(hblId: any, jobId: any) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId, jobId: jobId }).pipe(
+    getInfoMailHBLAirExport(hblIds: any, jobId: any, isFromShipment: boolean = false) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblIds: hblIds, jobId: jobId, isFromShipment: isFromShipment }).pipe(
             map((data: any) => data)
         );
     }
 
-    getInfoMailHBLPreAlertSeaExport(hblId: string, jobId: string, serviceId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblId: hblId, jobId: jobId, serviceId: serviceId }).pipe(
+    getInfoMailHBLPreAlertSeaExport(hblIds: any, jobId: string, serviceId: string, isFromShipment: boolean = false) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLPreAlerSeaExport`, { hblIds: hblIds, jobId: jobId, serviceId: serviceId, isFromShipment: isFromShipment }).pipe(
             map((data: any) => data)
         );
     }
@@ -1260,7 +1260,8 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo: jobNo });
     }
 
-    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5) {
+    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5
+        , showErrMessage: string = 'true') {
         /*
             1 - SHIPMENT
             2 - SOA
@@ -1271,7 +1272,7 @@ export class DocumentationRepo {
             7 - Preview HBL
         */
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
-            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type });
+            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type }, { "showErrMessage": showErrMessage });
     }
 
     detailLinkFee(id: any) {

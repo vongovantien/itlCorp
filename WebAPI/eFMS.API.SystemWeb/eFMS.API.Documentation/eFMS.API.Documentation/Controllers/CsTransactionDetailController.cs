@@ -574,15 +574,15 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Get HAWB List Of Shipment
+        /// Get HAWB List Of Shipment with check Check point
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetHAWBListOfShipment")]
-        public IActionResult GetHAWBListOfShipment(Guid jobId)
+        public IActionResult GetHAWBListOfShipment(Guid jobId, Guid? hblId)
         {
-            var result = csTransactionDetailService.GetHAWBListOfShipment(jobId);
+            var result = csTransactionDetailService.GetHAWBListOfShipment(jobId, hblId);
             return Ok(result);
         }
 

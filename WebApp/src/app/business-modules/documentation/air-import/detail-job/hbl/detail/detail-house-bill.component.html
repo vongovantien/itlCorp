@@ -79,15 +79,15 @@
 
 <ul class="m-nav-sticky fms-shipment-sidebar">
     <li class="m-nav-sticky__item">
-        <a title="Send Arrival Notice" [routerLink]="['./arrivalnotice']">Send A.N</a>
+        <a title="Send Arrival Notice" (click)="sendMail('ArrivalNotice')">Send A.N</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send Authorize Letter" [routerLink]="['./authorizeletter']">Send A/L</a>
+        <a title="Send Authorize Letter" (click)="sendMail('AuthorizeLetter')">Send A/L</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send Proof Of Delivery" [routerLink]="['./proofofdelivery']">Send POD</a>
+        <a title="Send Proof Of Delivery" (click)="sendMail('POD')">Send POD</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send HAWB" [routerLink]="['./houseairwaybill']">Send HAWB</a>
+        <a title="Send HAWB" (click)="sendMail('HAWB')">Send HAWB</a>
     </li>
 </ul>
