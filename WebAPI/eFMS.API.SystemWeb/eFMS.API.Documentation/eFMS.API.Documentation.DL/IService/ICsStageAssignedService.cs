@@ -4,14 +4,15 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>
     {
-        HandleState AddNewStageAssignedByType(CsStageAssignedCriteria criteria);
-        HandleState AddNewStageAssigned(CsStageAssignedModel model);
-        HandleState AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);
+        Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria);
+        Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model);
+        Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);
     }
 
 }

@@ -11,10 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>, ICsStageAssignedService
+    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>, ICsStageAssignedService 
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
@@ -36,7 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
             _stageService = stageService;
         }
 
-        public HandleState AddMutipleStageAssigned(List<CsStageAssignedModel> listStages, Guid jobId)
+        public async Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listStages, Guid jobId)
         {
             int orderNumberProcess = DataContext.Count(x => x.JobId == jobId);
             var result = new HandleState();
@@ -70,7 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
 
-        public HandleState AddNewStageAssigned(CsStageAssignedModel model)
+        public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
         {
             var stageAssigned = mapper.Map<OpsStageAssigned>(model);
             DataContext.Add(stageAssigned, false);
@@ -79,10 +80,10 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddNewStageAssignedByType(CsStageAssignedCriteria criteria)
+        public async Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria)
         {
             var currentJob = csTransRepository.First(x => x.Id == criteria.JobId);
-            var stage = _stageService.GetStageByType(criteria.StageType, currentJob.TransactionType);
+            var stage = _stageService.GetStageByType(criteria.StageType);
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -97,7 +98,7 @@ namespace eFMS.API.Documentation.DL.Services
             var orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
             newItem.OrderNumberProcessed = orderNumberProcess + 1;
 
-            var result = AddNewStageAssigned(newItem);
+            var result = await AddNewStageAssigned(newItem);
             return result;
         }
     }

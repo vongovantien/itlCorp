@@ -9,6 +9,6 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IStageService: IRepositoryBase<CatStage, CatStageModel>
     {
-        CatStage GetStageByType(string stageType, string transactionType);
+        CatStage GetStageByType(string stageType);
     }
 }
