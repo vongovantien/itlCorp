@@ -342,7 +342,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     uploadFileContract(id: string) {
-        this._systemFileManageRepo.uploadFileContract(id, this.fileList)
+        this._systemFileManageRepo.uploadFile('Catalogue', 'CatContract', id, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -369,7 +369,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         //             this.files = res;
         //         }
         //     );
-        this._systemFileManageRepo.getContractFilesAttach(this.selectedContract.id).
+        this._systemFileManageRepo.getFile('Catalogue', 'CatContract', this.selectedContract.id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -384,7 +384,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     deleteFileContract() {
         this._progressRef.start();
-        this._catalogueRepo.deleteContractFilesAttach(this.files.id)
+        // this._catalogueRepo.deleteContractFilesAttach(this.files.id)
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     }))
+        //     .subscribe(
+        //         (res: any) => {
+        //             if (res.result.success) {
+        //                 this.uploadFileContract(this.selectedContract.id);
+        //             } else {
+        //                 this._toastService.error("some thing wrong");
+        //             }
+        //         }
+        //     );
+        this._systemFileManageRepo.deleteFolder('Catalogue', 'CatContract', this.files.id)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -1033,7 +1047,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onDeleteFile() {
         this.confirmDeletePopup.hide();
-        this._systemFileManageRepo.deleteContractFilesAttach(this.selectedContract.id, this.selectedFile.name)
+        this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.selectedContract.id, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))

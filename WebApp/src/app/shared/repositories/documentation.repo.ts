@@ -805,17 +805,17 @@ export class DocumentationRepo {
         );
     }
 
-    uploadFileShipment(jobId: string, isTemp: boolean = null, body: any) {
-        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}/${isTemp}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileShipment(jobId: string, isTemp: boolean = null, body: any) {
+    //     return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}/${isTemp}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    getShipmentFilesAttach(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getShipmentFilesAttach(jobId: string) {
+    //     return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     getShipmentFilesAttachPreAlert(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachsPreAlert`, { jobId: jobId }).pipe(
@@ -829,11 +829,11 @@ export class DocumentationRepo {
         );
     }
 
-    deleteShipmentFilesAttach(fileId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteShipmentFilesAttach(fileId: string) {
+    //     return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     getShipmentToUnlock(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentToUnLock`, body).pipe(

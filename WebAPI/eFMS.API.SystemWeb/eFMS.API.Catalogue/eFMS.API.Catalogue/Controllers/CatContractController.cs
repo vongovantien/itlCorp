@@ -283,20 +283,20 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="contractId"></param>
         /// 
         /// <returns></returns>
-        [HttpPut("UploadFile/{PartnerId}/{contractId}")]
-        [Authorize]
-        public async Task<IActionResult> UploadFileContract(IFormFile files, [Required]string partnerId, [Required]string contractId)
-        {
-            ContractFileUploadModel model = new ContractFileUploadModel
-            {
-                Files = files,
-                PartnerId = partnerId,
-                ChildId = contractId
-            };
+        //[HttpPut("UploadFile/{PartnerId}/{contractId}")]
+        //[Authorize]
+        //public async Task<IActionResult> UploadFileContract(IFormFile files, [Required]string partnerId, [Required]string contractId)
+        //{
+        //    ContractFileUploadModel model = new ContractFileUploadModel
+        //    {
+        //        Files = files,
+        //        PartnerId = partnerId,
+        //        ChildId = contractId
+        //    };
 
-            var result = await catContractService.UploadContractFile(model);
-            return Ok(result);
-        }
+        //    var result = await catContractService.UploadContractFile(model);
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// attach file for more contract
@@ -351,20 +351,20 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("GetFileAttachsContract")]
-        public IActionResult GetFileAttachsContract(string partnerId, string contractId)
-        {
-            var results = catContractService.GetFileContract(partnerId, contractId);
-            return Ok(results);
-        }
+        //[HttpGet("GetFileAttachsContract")]
+        //public IActionResult GetFileAttachsContract(string partnerId, string contractId)
+        //{
+        //    var results = catContractService.GetFileContract(partnerId, contractId);
+        //    return Ok(results);
+        //}
 
-        [Authorize]
-        [HttpDelete("DeleteContractAttachedFile/{id}")]
-        public IActionResult DeleteAttachedFile([Required]Guid id)
-        {
-            var result = catContractService.DeleteFileContract(id);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpDelete("DeleteContractAttachedFile/{id}")]
+        //public IActionResult DeleteAttachedFile([Required]Guid id)
+        //{
+        //    var result = catContractService.DeleteFileContract(id);
+        //    return Ok(result);
+        //}
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{Id}/{partnerId}")]

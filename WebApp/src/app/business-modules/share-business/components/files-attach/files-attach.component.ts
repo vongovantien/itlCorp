@@ -56,7 +56,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CsTransaction) => {
-                   this.fileNo = res.jobNo;
+                    this.fileNo = res.jobNo;
                 }
             );
     }
@@ -88,7 +88,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
             //             }
             //         }
             //     );
-            this._systemFileManagerRepo.uploadFileShipment(this.jobId, fileList)
+            this._systemFileManagerRepo.uploadFile('Document', 'Shipment', this.jobId, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -105,7 +105,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
 
     getFileShipment(jobId: string) {
         this.isLoading = true;
-        this._systemFileManagerRepo.getShipmentFilesAttach(jobId).
+        this._systemFileManagerRepo.getFile('Document', 'Shipment', jobId).
             pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))
@@ -128,7 +128,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
 
     onDeleteFile() {
         this.confirmDeletePopup.hide();
-        this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)
+        this._systemFileManagerRepo.deleteFile('Document', 'Shipment', this.jobId, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))
@@ -189,6 +189,6 @@ interface IShipmentAttachFile {
     userCreated: string;
     dateTimeCreated: string;
     fileName: string;
-    dowFile :boolean;
-    viewFileUrl:string;
+    dowFile: boolean;
+    viewFileUrl: string;
 }

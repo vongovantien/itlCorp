@@ -10,65 +10,89 @@ export class SystemFileManageRepo {
     constructor(protected _api: ApiService) {
     }
 
-    uploadFileContract(id: string, files: any) {
-        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${id}`, files, 'files').pipe(
+    uploadFile(moduleName: string, folder: string, id: string, files: any) {
+        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/${moduleName}/${folder}/${id}`, files, 'files').pipe(
             map((data: any) => data)
         );
     }
 
-    uploadFileContractPayable(partnerId: string, files: any) {
-        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${partnerId}`, files, 'files').pipe(
+    deleteFile(moduleName: string, folder: string, id: string, file: string) {
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/${moduleName}/${folder}/${id}/${file}`).pipe(
             map((data: any) => data)
         );
     }
 
-    uploadFileShipment(jobId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Document/Shipment/${jobId}`, body, 'files').pipe(
+    getFile(moduleName: string, folder: string, id: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/${moduleName}/${folder}/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
-    deleteShipmentFilesAttach(jobId: string, fileName: string) {
-        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Document/Shipment/${jobId}/${fileName}`).pipe(
+    deleteFolder(moduleName: string, folder: string, id: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteAttachedFile/${moduleName}/${folder}/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
-    getShipmentFilesAttach(jobId: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Document/Shipment/${jobId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileContract(id: string, files: any) {
+    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${id}`, files, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    dowloadallAttach(body:any) {
-        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DowloadAllFileAttached`,body).pipe(
+    // uploadFileContractPayable(partnerId: string, files: any) {
+    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${partnerId}`, files, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+
+    // uploadFileShipment(jobId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Document/Shipment/${jobId}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+
+    // deleteShipmentFilesAttach(jobId: string, fileName: string) {
+    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Document/Shipment/${jobId}/${fileName}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+
+    // getShipmentFilesAttach(jobId: string) {
+    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Document/Shipment/${jobId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    getContractFilesAttach(contractId: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${contractId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getContractFilesAttach(contractId: string) {
+    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${contractId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    getContractPayableFilesAttach(partnerId: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${partnerId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getContractPayableFilesAttach(partnerId: string) {
+    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${partnerId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deleteContractFilesAttach(contractId: string, fileName: string) {
-        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${contractId}/${fileName}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteContractFilesAttach(contractId: string, fileName: string) {
+    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${contractId}/${fileName}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deleteContractPayableFilesAttach(partnerId: string, fileName: string) {
-        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${partnerId}/${fileName}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteContractPayableFilesAttach(partnerId: string, fileName: string) {
+    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${partnerId}/${fileName}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
 }

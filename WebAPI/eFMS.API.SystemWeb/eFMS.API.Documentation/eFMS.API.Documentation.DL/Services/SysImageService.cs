@@ -35,18 +35,18 @@ namespace eFMS.API.Documentation.DL.Services
             apiUrl = url;
         }
 
-        public async Task<HandleState> DeleteFile(Guid id)
-        {
-            var item = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            if (item == null) return new HandleState("Not found data");
-            var result = DataContext.Delete(x => x.Id == id);
-            if (result.Success)
-            {
-                string fileName = Path.GetFileName(item.Url);
-                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + fileName, "Shipment");
-            }
-            return result;
-        }
+        //public async Task<HandleState> DeleteFile(Guid id)
+        //{
+        //    var item = DataContext.Get(x => x.Id == id).FirstOrDefault();
+        //    if (item == null) return new HandleState("Not found data");
+        //    var result = DataContext.Delete(x => x.Id == id);
+        //    if (result.Success)
+        //    {
+        //        string fileName = Path.GetFileName(item.Url);
+        //        var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + fileName, "Shipment");
+        //    }
+        //    return result;
+        //}
 
         public async Task<HandleState> DeleteFileTempPreAlert(Guid jobId)
         {
@@ -64,10 +64,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
-        {
-            return await WriteFile(model);
-        }
+        //public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
+        //{
+        //    return await WriteFile(model);
+        //}
 
         public HandleState UpdateFilesToShipment(List<SysImageModel> files)
         {

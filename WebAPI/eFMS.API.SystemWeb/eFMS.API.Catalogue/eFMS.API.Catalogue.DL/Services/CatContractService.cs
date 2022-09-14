@@ -1750,11 +1750,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return emailBCCs;
         }
 
-        public SysImage GetFileContract(string partnerId, string contractId)
-        {
-            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
-            return result;
-        }
+        //public SysImage GetFileContract(string partnerId, string contractId)
+        //{
+        //    var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
+        //    return result;
+        //}
 
         public HandleState UpdateFileToContract(List<SysImage> files)
         {
@@ -1798,10 +1798,10 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
-        {
-            return await WriteFile(model);
-        }
+        //public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
+        //{
+        //    return await WriteFile(model);
+        //}
 
         private async Task<ResultHandle> WriteFile(ContractFileUploadModel model)
         {
@@ -1853,17 +1853,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-        public async Task<HandleState> DeleteFileContract(Guid id)
-        {
-            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
-            if (item == null) return new HandleState("Not found data");
-            var result = sysImageRepository.Delete(x => x.Id == id);
-            if (result.Success)
-            {
-                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
-            }
-            return result;
-        }
+        //public async Task<HandleState> DeleteFileContract(Guid id)
+        //{
+        //    var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+        //    if (item == null) return new HandleState("Not found data");
+        //    var result = sysImageRepository.Delete(x => x.Id == id);
+        //    if (result.Success)
+        //    {
+        //        var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
+        //    }
+        //    return result;
+        //}
 
         public IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria)
         {

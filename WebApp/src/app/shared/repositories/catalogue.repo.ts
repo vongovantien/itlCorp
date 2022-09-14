@@ -404,17 +404,17 @@ export class CatalogueRepo {
         );
     }
 
-    getContractFilesAttach(partnerId: string, contractId) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getContractFilesAttach(partnerId: string, contractId) {
+    //     return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deleteContractFilesAttach(fileId: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteContractFilesAttach(fileId: string) {
+    //     return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     checkViewDetailPartnerPermission(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/CheckPermission/${id}`).pipe(
