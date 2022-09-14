@@ -14,7 +14,7 @@
             .form-control-label,
     		label {
                 font-size: get-font-size(regular);
-                font-weight: get-font-weight(bolder);
+                font-weight: get-font-weight(bold);
                 &.col-form-label {
                     padding-top: array-get($m--forms, input, layout, self, size, default, padding, y);
                     //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y);
@@ -143,7 +143,7 @@
             margin: 0 0 15px 0;
 
             .m-form__heading-title {
-                font-weight: get-font-weight(bold);
+                font-weight: get-font-weight(bolder);
                 font-size: get-font-size(regular, '+++');
 
                 .m-form__heading-help-icon {
