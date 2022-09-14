@@ -13,73 +13,35 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class StageService : RepositoryBase<CatStage, CatStageModel>, IStageService
     {
-        private readonly IContextBase<CatStage> catStageRepository;
-        public StageService(IContextBase<CatStage> repository, IMapper mapper, IContextBase<CatStage> catStageRepo) : base(repository, mapper)
+        public StageService(IContextBase<CatStage> repository, IMapper mapper) : base(repository, mapper)
         {
-            catStageRepository = catStageRepo;
         }
 
-        public CatStage GetStageByType(string stageType, string transactionType)
+        public CatStage GetStageByType(string stageType)
         {
             CatStage stage = new CatStage();
-            transactionType = transactionType.Substring(0, 1);
-            switch (transactionType)
+            switch (stageType)
             {
-                case "A":
-                    switch (stageType)
-                    {
-                        case DocumentConstants.UPDATE_ATA:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ATA);
-                            break;
-                        case DocumentConstants.UPDATE_ATD:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ATD);
-                            break;
-                        case DocumentConstants.UPDATE_INCOTERM:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ICT);
-                            break;
-                        case DocumentConstants.SEND_POD:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_POD);
-                            break;
-                        case DocumentConstants.SEND_PA:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_PA);
-                            break;
-                        case DocumentConstants.SEND_AN:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_AN);
-                            break;
-                        case DocumentConstants.SEND_AL:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_AL);
-                            break;
-                        default:
-                            break;
-                    }
+                case DocumentConstants.UPDATE_ATA:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.UPDATE_ATA_CODE);
                     break;
-                case "S":
-                    switch (stageType)
-                    {
-                        case DocumentConstants.UPDATE_ATA:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ATA);
-                            break;
-                        case DocumentConstants.UPDATE_ATD:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ATD);
-                            break;
-                        case DocumentConstants.UPDATE_INCOTERM:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.UPDATE_AIR_ICT);
-                            break;
-                        case DocumentConstants.SEND_POD:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_POD);
-                            break;
-                        case DocumentConstants.SEND_PA:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_PA);
-                            break;
-                        case DocumentConstants.SEND_AN:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_AIR_AN);
-                            break;
-                        case DocumentConstants.SEND_DO:
-                            stage = catStageRepository.First(x => x.Code == DocumentConstants.SEND_SEA_DO);
-                            break;
-                        default:
-                            break;
-                    }
+                case DocumentConstants.UPDATE_ATD:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.UPDATE_ATD_CODE);
+                    break;
+                case DocumentConstants.UPDATE_INCOTERM:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.UPDATE_ICT_CODE);
+                    break;
+                case DocumentConstants.SEND_POD:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.SEND_POD_CODE);
+                    break;
+                case DocumentConstants.SEND_PA:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.SEND_PA_CODE);
+                    break;
+                case DocumentConstants.SEND_AN:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.SEND_AN_CODE);
+                    break;
+                case DocumentConstants.SEND_AL:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.SEND_AL_CODE);
                     break;
                 default:
                     break;

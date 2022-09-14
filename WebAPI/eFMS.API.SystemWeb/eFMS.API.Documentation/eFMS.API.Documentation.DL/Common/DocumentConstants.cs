@@ -3,25 +3,21 @@
     public static class DocumentConstants
     {
         //Document stage code
-        public static readonly string UPDATE_AIR_ATA = "U_AI_ATA";
-        public static readonly string UPDATE_SEA_ATA = "U_SI_ATA";
-        public static readonly string UPDATE_AIR_ATD = "U_AE_ATD";
-        public static readonly string UPDATE_SEA_ATD = "U_SE_ATD";
-        public static readonly string UPDATE_AIR_ICT = "U_A_ICT";
-        public static readonly string UPDATE_SEA_ICT = "U_S_ICT";
-        public static readonly string SEND_AIR_POD = "S_A_POD";
-        public static readonly string SEND_SEA_POD = "S_S_POD";
-        public static readonly string SEND_AIR_PA = "S_AE_PA";
-        public static readonly string SEND_SEA_PA = "S_SE_PA";
-        public static readonly string SEND_AIR_AN = "S_AI_AN";
-        public static readonly string SEND_SEA_AN = "S_SI_AN";
-        public static readonly string SEND_SEA_DO = "S_SI_DO";
-        public static readonly string SEND_AIR_AL = "S_AI_AL";
+        public static readonly string UPDATE_ATA_CODE = "U_ATA";
+        public static readonly string UPDATE_ATD_CODE = "U_ATD";
+        public static readonly string UPDATE_ICT_CODE = "U_ICT";
+
+        public static readonly string SEND_POD_CODE = "S_POD";
+        public static readonly string SEND_PA_CODE = "S_PA";
+        public static readonly string SEND_AN_CODE = "S_AN";
+        public static readonly string SEND_DO_CODE = "S_DO";
+        public static readonly string SEND_AL_CODE = "S_AL";
 
         //stage constants
         public const string UPDATE_ATA = "UPDATE_ATA";
         public const string UPDATE_ATD = "UPDATE_ATD";
         public const string UPDATE_INCOTERM = "UPDATE_INCOTERM";
+
         public const string SEND_POD = "SEND_POD";
         public const string SEND_PA = "SEND_PA";
         public const string SEND_AL = "SEND_AL";

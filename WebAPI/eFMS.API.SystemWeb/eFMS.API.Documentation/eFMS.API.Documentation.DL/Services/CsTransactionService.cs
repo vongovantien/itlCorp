@@ -3747,19 +3747,19 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (currentJob.Ata != updateJob.Ata)
             {
-                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATA, currentJob.TransactionType);
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATA);
                 listStages.Add(stage);
             }
 
             if (currentJob.Atd != updateJob.Atd)
             {
-                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATD, currentJob.TransactionType);
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATD);
                 listStages.Add(stage);
             }
 
             if (currentJob.IncotermId != updateJob.IncotermId)
             {
-                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM, currentJob.TransactionType);
+                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM);
                 listStages.Add(stage);
             }
             foreach (var item in listStages)
