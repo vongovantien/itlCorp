@@ -394,6 +394,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         }
                     });
                 }
+                if(this.isAL){
+                    streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
+                }
                 break;
             case ChargeConstants.AE_CODE:
                 if (this.isPreAlert) {
