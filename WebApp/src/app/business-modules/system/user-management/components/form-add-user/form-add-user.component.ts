@@ -46,7 +46,6 @@ export class FormAddUserComponent extends AppList {
     creditRate: AbstractControl;
     userRole: AbstractControl;
     //
-    currentUserType: string = '';
     selectedCompanyId: any;
     infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims(); //Get info of current ser.
     infoCurrentUserId: string = this.infoCurrentUser.id;
@@ -177,7 +176,6 @@ export class FormAddUserComponent extends AppList {
             { title: 'Department', field: 'departmentName' },
             { title: 'Position', field: 'position' },
         ];
-        this.getCurrentUserType();
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((currentUser) => {
@@ -185,7 +183,7 @@ export class FormAddUserComponent extends AppList {
             });
     }
 
-    updateCookies(username: string, password: string){
+    updateCookies(username: string, password: string) {
         const username_encrypt = crypto_js.AES.encrypt(username, SystemConstants.SECRET_KEY).toString();
         this.cookieService.set("__u", username_encrypt, 1, "/", window.location.hostname);
 
@@ -208,19 +206,6 @@ export class FormAddUserComponent extends AppList {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
                 },
-            );
-    }
-
-
-    getCurrentUserType() {
-        this._systemRepo.getDetailUser(this.infoCurrentUser.id)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (!!res) {
-                        this.currentUserType = res.data.userType;
-                    }
-                }
             );
     }
 

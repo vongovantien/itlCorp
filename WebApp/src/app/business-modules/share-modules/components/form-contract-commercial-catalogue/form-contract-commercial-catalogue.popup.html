@@ -584,7 +584,7 @@
                     </button>
 
                     <ng-container
-                        *ngIf="contractType.value !=='Cash' && contractType.value !=='Guarantee' && currentUserType !== 'Super Admin'; else template">
+                        *ngIf="contractType.value !=='Cash' && contractType.value !=='Guarantee' && currentUser.userType !== 'Super Admin'; else template">
                         <button (click)="onARConfirmed()"
                             *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -631,14 +631,14 @@
                             <span>
                                 <i class="la la-check-square-o"></i>
                                 <span> Active </span>
-                            </span>
-                        </button>
-                        <button (click)="activeInactiveContract(selectedContract.id)"
-                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                            class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-remove"></i>
-                                <span> Inactive </span>
+                        </span>
+                    </button>
+                    <button (click)="activeInactiveContract(selectedContract.id)"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                        class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-remove"></i>
+                            <span> Inactive </span>
                             </span>
                         </button>
                     </ng-template>

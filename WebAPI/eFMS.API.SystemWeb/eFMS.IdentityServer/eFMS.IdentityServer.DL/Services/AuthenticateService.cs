@@ -69,6 +69,7 @@ namespace eFMS.IdentityServer.DL.Services
             result.Photo = employee?.Photo;
             result.UserType = user.UserType;
             result.EmpPhotoSize = employee?.EmpPhotoSize;
+            result.UserType = user.UserType;
             var active = (user.Active == null || user.Active == true) ? true : false;
             result.Active = active;
             return result;
