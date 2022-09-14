@@ -398,7 +398,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         //             }
         //         }
         //     );
-        this._systemFileManageRepo.deleteFolder('Catalogue', 'CatContract', this.files.id)
+        this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.selectedContract.id, this.files.id)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;

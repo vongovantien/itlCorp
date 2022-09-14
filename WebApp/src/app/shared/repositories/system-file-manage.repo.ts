@@ -28,11 +28,11 @@ export class SystemFileManageRepo {
         );
     }
 
-    deleteFolder(moduleName: string, folder: string, id: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteAttachedFile/${moduleName}/${folder}/${id}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteFolder(moduleName: string, folder: string, id: string) {
+    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteAttachedFile/${moduleName}/${folder}/${id}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     // uploadFileContract(id: string, files: any) {
     //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${id}`, files, 'files').pipe(

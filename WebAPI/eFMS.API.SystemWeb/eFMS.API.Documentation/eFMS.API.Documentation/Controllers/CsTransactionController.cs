@@ -354,21 +354,21 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("GetFileAttachsPreAlert")]
-        public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
-        {
-            string id = jobId.ToString();
-            var results = sysImageService.Get(x => x.ObjectId == id);
-            return Ok(results);
-        }
+        //[HttpGet("GetFileAttachsPreAlert")]
+        //public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
+        //{
+        //    string id = jobId.ToString();
+        //    var results = sysImageService.Get(x => x.ObjectId == id);
+        //    return Ok(results);
+        //}
 
-        [Authorize]
-        [HttpPut("UpdateFilesToShipment")]
-        public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
-        {
-            var result = sysImageService.UpdateFilesToShipment(files);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpPut("UpdateFilesToShipment")]
+        //public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
+        //{
+        //    var result = sysImageService.UpdateFilesToShipment(files);
+        //    return Ok(result);
+        //}
 
         //[Authorize]
         //[HttpDelete("DeleteAttachedFile/{id}")]
@@ -382,17 +382,17 @@ namespace eFMS.API.Documentation.Controllers
         //    return BadRequest(hs);
         //}
 
-        [Authorize]
-        [HttpDelete("DeleteFileTempPreAlert/{jobId}")]
-        public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
-        {
-            HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
-            if (hs.Success)
-            {
-                return Ok(new ResultHandle { Message = "Delete file Successfully" });
-            }
-            return BadRequest(hs);
-        }
+        //[Authorize]
+        //[HttpDelete("DeleteFileTempPreAlert/{jobId}")]
+        //public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
+        //{
+        //    HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
+        //    if (hs.Success)
+        //    {
+        //        return Ok(new ResultHandle { Message = "Delete file Successfully" });
+        //    }
+        //    return BadRequest(hs);
+        //}
         #endregion -- INSERT & UPDATE
 
         #region -- DELETE --

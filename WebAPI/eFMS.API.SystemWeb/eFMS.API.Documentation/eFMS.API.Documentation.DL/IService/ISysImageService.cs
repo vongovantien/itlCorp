@@ -13,8 +13,8 @@ namespace eFMS.API.Documentation.DL.IService
     {
         //Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model);
         //Task<HandleState> DeleteFile(Guid id);
-        HandleState UpdateFilesToShipment(List<SysImageModel> files);
-        Task<HandleState> DeleteFileTempPreAlert(Guid jobId);
+        //HandleState UpdateFilesToShipment(List<SysImageModel> files);
+        //Task<HandleState> DeleteFileTempPreAlert(Guid jobId);
 
     }
 }

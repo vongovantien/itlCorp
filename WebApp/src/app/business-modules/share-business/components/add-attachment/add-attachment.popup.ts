@@ -53,7 +53,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
 
     getFileShipment(jobId: string) {
         this.isLoading = true;
-        this._documentRepo.getShipmentFilesAttachPreAlert(jobId).
+        this._systemFileManagerRepo.getFile('Document', 'Shipment', jobId).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;

@@ -1756,47 +1756,47 @@ namespace eFMS.API.Catalogue.DL.Services
         //    return result;
         //}
 
-        public HandleState UpdateFileToContract(List<SysImage> files)
-        {
+        //public HandleState UpdateFileToContract(List<SysImage> files)
+        //{
 
-            var isUpdateDone = new HandleState();
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var item in files)
-                    {
-                        item.IsTemp = null;
-                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
-                        isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
-                    }
-                    trans.Commit();
-                    return isUpdateDone;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-        }
+        //    var isUpdateDone = new HandleState();
+        //    using (var trans = DataContext.DC.Database.BeginTransaction())
+        //    {
+        //        try
+        //        {
+        //            foreach (var item in files)
+        //            {
+        //                item.IsTemp = null;
+        //                item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+        //                isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
+        //            }
+        //            trans.Commit();
+        //            return isUpdateDone;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            trans.Rollback();
+        //            return new HandleState(ex.Message);
+        //        }
+        //        finally
+        //        {
+        //            trans.Dispose();
+        //        }
+        //    }
+        //}
 
-        public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
-        {
-            var result = new ResultHandle();
-            foreach (var item in model)
-            {
-                if (item.Files != null)
-                {
-                    result = await WriteFile(item);
-                }
-            }
-            return result;
-        }
+        //public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
+        //{
+        //    var result = new ResultHandle();
+        //    foreach (var item in model)
+        //    {
+        //        if (item.Files != null)
+        //        {
+        //            result = await WriteFile(item);
+        //        }
+        //    }
+        //    return result;
+        //}
 
         //public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
         //{

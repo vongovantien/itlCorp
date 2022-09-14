@@ -368,20 +368,17 @@ export class CatalogueRepo {
             );
     }
 
+    // uploadFileContract(partnerId: string, contractId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-
-    uploadFileContract(partnerId: string, contractId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
-
-
-    uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
 
     deleteContract(id: string, partnerId: string) {

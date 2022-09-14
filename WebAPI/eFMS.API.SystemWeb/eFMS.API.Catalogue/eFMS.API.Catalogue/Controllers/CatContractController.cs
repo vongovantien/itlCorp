@@ -306,29 +306,29 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="contractIds"></param>
         /// 
         /// <returns></returns>
-        [HttpPut("UploadFileMoreContract/{PartnerId}/{contractIds}")]
-        [Authorize]
-        public async Task<IActionResult> UploadFileMoreContract(List<IFormFile> files, string contractIds, string partnerId)
-        {
-            string folderName = Request.Headers["Module"];
-            ResultHandle result = new ResultHandle();
-            List<string> contractIdlst = contractIds.Split(',').ToList();
-            List<ContractFileUploadModel> lst = new List<ContractFileUploadModel>();
-            int i = 0;
-            foreach (var item in contractIdlst)
-            {
-                ContractFileUploadModel model = new ContractFileUploadModel
-                {
-                    ChildId = item,
-                    PartnerId = partnerId,
-                    Files = files[i]
-                };
-                lst.Add(model);
-                i++;
-            }
-            result = await catContractService.UploadMoreContractFile(lst);
-            return Ok(result);
-        }
+        //[HttpPut("UploadFileMoreContract/{PartnerId}/{contractIds}")]
+        //[Authorize]
+        //public async Task<IActionResult> UploadFileMoreContract(List<IFormFile> files, string contractIds, string partnerId)
+        //{
+        //    string folderName = Request.Headers["Module"];
+        //    ResultHandle result = new ResultHandle();
+        //    List<string> contractIdlst = contractIds.Split(',').ToList();
+        //    List<ContractFileUploadModel> lst = new List<ContractFileUploadModel>();
+        //    int i = 0;
+        //    foreach (var item in contractIdlst)
+        //    {
+        //        ContractFileUploadModel model = new ContractFileUploadModel
+        //        {
+        //            ChildId = item,
+        //            PartnerId = partnerId,
+        //            Files = files[i]
+        //        };
+        //        lst.Add(model);
+        //        i++;
+        //    }
+        //    result = await catContractService.UploadMoreContractFile(lst);
+        //    return Ok(result);
+        //}
 
 
         [HttpGet("GetById")]
@@ -339,13 +339,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
-        [Authorize]
-        [HttpPut("UpdateFileToContract")]
-        public IActionResult UpdateFilesToContract([FromBody]List<SysImage> files)
-        {
-            var result = catContractService.UpdateFileToContract(files);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpPut("UpdateFileToContract")]
+        //public IActionResult UpdateFilesToContract([FromBody]List<SysImage> files)
+        //{
+        //    var result = catContractService.UpdateFileToContract(files);
+        //    return Ok(result);
+        //}
 
         /// get file contract of partner
         /// </summary>

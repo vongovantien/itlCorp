@@ -155,39 +155,39 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="HblId"></param>
         /// 
         /// <returns></returns>
-        [HttpPut("UploadFileProofOfDelivery/{HblId}")]
-        [Authorize]
-        public async Task<IActionResult> UploadFileProofOfDelivery(IFormFile files, Guid HblId)
-        {
-            ProofDeliveryFileUploadModel model = new ProofDeliveryFileUploadModel
-            {
-                FolderName = "Shipment",
-                Files = files,
-                HblId = HblId
-            };
+        //[HttpPut("UploadFileProofOfDelivery/{HblId}")]
+        //[Authorize]
+        //public async Task<IActionResult> UploadFileProofOfDelivery(IFormFile files, Guid HblId)
+        //{
+        //    ProofDeliveryFileUploadModel model = new ProofDeliveryFileUploadModel
+        //    {
+        //        FolderName = "Shipment",
+        //        Files = files,
+        //        HblId = HblId
+        //    };
 
-            var result = await arrivalFreightChargeServices.UploadProofOfDeliveryFile(model);
-            return Ok(result);
-        }
+        //    var result = await arrivalFreightChargeServices.UploadProofOfDeliveryFile(model);
+        //    return Ok(result);
+        //}
 
         /// get file contract of partner
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("GetFileAttachsProofOfDelivery")]
-        public IActionResult GetFileAttachsProofOfDelivery(Guid HblId)
-        {
-            var results = arrivalFreightChargeServices.GetFileProofOfDelivery(HblId);
-            return Ok(results);
-        }
+        //[HttpGet("GetFileAttachsProofOfDelivery")]
+        //public IActionResult GetFileAttachsProofOfDelivery(Guid HblId)
+        //{
+        //    var results = arrivalFreightChargeServices.GetFileProofOfDelivery(HblId);
+        //    return Ok(results);
+        //}
 
-        [Authorize]
-        [HttpDelete("DeletePODAttachedFile/{id}")]
-        public IActionResult DeleteAttachedFile([Required]Guid id)
-        {
-            var result = arrivalFreightChargeServices.DeleteFilePOD(id);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpDelete("DeletePODAttachedFile/{id}")]
+        //public IActionResult DeleteAttachedFile([Required]Guid id)
+        //{
+        //    var result = arrivalFreightChargeServices.DeleteFilePOD(id);
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// set freight charge default of an user in a shipment type

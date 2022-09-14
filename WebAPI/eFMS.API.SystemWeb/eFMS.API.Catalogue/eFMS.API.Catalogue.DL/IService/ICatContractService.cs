@@ -25,11 +25,11 @@ namespace eFMS.API.Catalogue.DL.IService
         object GetContractIdByPartnerId(string partnerId, string jobId);
         //Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
         //Task<ResultHandle> UploadMoreContractFile(UploadFileMoreContractModel model);
-        Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model);
+        //Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model);
         CatContractModel GetById(Guid Id);
         //SysImage GetFileContract(string partnerId, string contractId);
-        HandleState UpdateFileToContract(List<SysImage> files);
-        Task<HandleState> DeleteFileContract(Guid id);
+        //HandleState UpdateFileToContract(List<SysImage> files);
+        //Task<HandleState> DeleteFileContract(Guid id);
         HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit, out bool active);
         IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId);
         CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
