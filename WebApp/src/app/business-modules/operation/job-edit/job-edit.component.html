@@ -163,6 +163,11 @@
                         <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
                         <!-- * old version lazy load component-->
                     </tab>
+                    <tab heading="Attach Files" (selectTab)="selectTab('files')" [active]="tab === 'files'"
+                        [disabled]="isDuplicate">
+                        <ng-container *ngIf="tab === 'files'" loadModule="jobManagement_attachFile">
+                        </ng-container>
+                    </tab>
                     <tab heading="Advance/Settlement" [active]="tab === 'advance-settle'"
                         (selectTab)="selectTab('advance-settle')" [disabled]="isDuplicate">
                         <ng-container *ngIf="tab === 'advance-settle'" loadModule="Share_advanceSettle"></ng-container>

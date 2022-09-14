@@ -43,11 +43,18 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     }
 
     ngOnInit(): void {
+        console.log('running');
+
         this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((params: Params) => {
+                console.log(params);
                 if (params.jobId) {
                     this.jobId = params.jobId;
+                    this.getFileShipment(this.jobId);
+                    console.log(params);
+                } else {
+                    this.jobId = params.id;
                     this.getFileShipment(this.jobId);
                 }
             });
