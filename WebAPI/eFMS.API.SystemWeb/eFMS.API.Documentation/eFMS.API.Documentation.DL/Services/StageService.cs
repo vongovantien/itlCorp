@@ -43,6 +43,9 @@ namespace eFMS.API.Documentation.DL.Services
                 case DocumentConstants.SEND_AL:
                     stage = DataContext.First(x => x.Code == DocumentConstants.SEND_AL_CODE);
                     break;
+                case DocumentConstants.SEND_DO:
+                    stage = DataContext.First(x => x.Code == DocumentConstants.SEND_DO_CODE);
+                    break;
                 default:
                     break;
             }
