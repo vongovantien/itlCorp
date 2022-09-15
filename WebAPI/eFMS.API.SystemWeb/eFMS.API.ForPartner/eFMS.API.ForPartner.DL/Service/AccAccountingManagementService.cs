@@ -2823,14 +2823,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                     surcharge.VoucherIdre = null;
                                     surcharge.PayerAcctManagementId = null;
                                     surcharge.VoucherIdredate = null;
-                                    surcharge.SyncedFrom = null;
+                                    surcharge.PaySyncedFrom = null;
                                 }
                                 else
                                 {
                                     surcharge.VoucherId = null;
                                     surcharge.VoucherIddate = null;
                                     surcharge.AcctManagementId = null;
-                                    surcharge.PaySyncedFrom = null;
+                                    surcharge.SyncedFrom = null;
+
                                 }
 
                                 // Giữ nguyên các giá trị amount hay recalculate ???
