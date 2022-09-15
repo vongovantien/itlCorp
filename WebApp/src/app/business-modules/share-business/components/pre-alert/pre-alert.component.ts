@@ -106,6 +106,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     hblRptName: string = '';
     listSI: string[] = [];
     debitNos: any[] = [];
+    signImgUrl: string = '';
 
     headers: any[] = [
         { title: 'Attach File', field: 'name' }
@@ -234,6 +235,14 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
                     this.isExitsDO = true;
                 }
+                if (this.isAL) {
+                    this.isCheckedDO = true;
+                    this.isExitsDO = true;
+                }
+                if(this.isPOD){
+                    this.isCheckedDO = true;
+                    this.isExitsDO = true;
+                }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 if (this.isPreAlert) {
@@ -243,9 +252,19 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SFI_CODE: // Sea FCL Import
             case ChargeConstants.SLI_CODE: // Sea LCL Import
             case ChargeConstants.SCI_CODE: // Sea Consol Import
-                this.isExitsArrivalNotice = true;
-                this.isCheckedArrivalNotice = true;
-                this.isExitsDO = true;
+                if (this.isArrivalNotice) {
+                    this.isExitsArrivalNotice = true;
+                    this.isCheckedArrivalNotice = true;
+                    this.isExitsDO = true;
+                }
+                if (this.isDO) {
+                    this.isCheckedDO = true;
+                    this.isExitsDO = true;
+                }
+                if(this.isPOD){
+                    this.isCheckedDO = true;
+                    this.isExitsDO = true;
+                }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -395,7 +414,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     });
                 }
                 if(this.isAL){
+                    if(this.isExitsDO)
                     streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
+                }
+                if (this.isPOD) {
+                    if (this.isExitsDO && this.isCheckedDO) {
+                        streamUploadReport.push(this._documentRepo.previewProofofDelivery(this.hawbDetails[0].id));
+                    }
                 }
                 break;
             case ChargeConstants.AE_CODE:
@@ -431,6 +456,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         }
                     });
                 }
+                if(this.isDO){
+                    if(this.isCheckedDO && this.isExitsDO){
+                        streamUploadReport.push(this._documentRepo.previewDeliveryOrder(this.hawbDetails[0].id));
+                    }
+                }
+                if (this.isPOD) {
+                    if (this.isExitsDO && this.isCheckedDO) {
+                        streamUploadReport.push(this._documentRepo.previewProofofDelivery(this.hawbDetails[0].id));
+                    }
+                }
                 break;
             case ChargeConstants.SFE_CODE:
             case ChargeConstants.SLE_CODE:
@@ -458,6 +493,12 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (this.isCheckedSIDetailCont) {
                         streamUploadReport.push(this._documentRepo.previewSIContReport(this.jobId));
                     }
+                } else if(this.isSendHbl){
+                    this.hawbDetails.forEach(ele => {
+                        if (ele.isCheckedHawb) {
+                            streamUploadReport.push(this._documentRepo.previewSeaHBLOfLanding(ele.id, 'ITL_FRAME'));
+                        }
+                    });
                 }
                 break;
             default:
@@ -513,11 +554,20 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             });
     }
 
+    addSignImgToBody(){
+        if(!!this.body.value){
+            this.body.setValue(this.body.value + "<p> <img src='" + this.signImgUrl + "'/></p>")
+        }
+    }
+
     sendMail() {
         console.log("after 5s send");
 
         this.attachFileUpload();
 
+        if(this.isArrivalNotice){
+            this.addSignImgToBody();
+        }
         const emailContent: EmailContent = {
             from: this.from.value,
             to: this.to.value,
@@ -690,6 +740,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 .subscribe(
                     (res: EmailContent) => {
                         this.formMail.patchValue(res);
+                        this.signImgUrl = res.attachFiles[0];
+                        res.attachFiles = [];
                     },
                 );
         }
@@ -708,6 +760,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 .subscribe(
                     (res: EmailContent) => {
                         this.formMail.patchValue(res);
+                        this.signImgUrl = res.attachFiles[0];
+                        res.attachFiles = [];
                     },
                 );
         }

@@ -316,7 +316,7 @@
                     <div class="form-group m-form__group"
                         *ngIf="(isDO && (serviceId === 'SFI' || serviceId === 'SLI' || serviceId === 'SCI')) || (isAL && serviceId === 'AI')">
                         <div class="m-checkbox-inline">
-                            <ng-container>
+                            <ng-container *ngIf="isExitsDO else NotDO">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
                                     <input type="checkbox" [(ngModel)]="isCheckedDO"
                                         (change)="onChangeCheckBox()">
@@ -329,14 +329,14 @@
                                     <a class="pointer" (click)="previewDO()">Authorize Letter</a>
                                 </span>
                             </ng-container>
-                            <!-- <ng-template #NotDO>
+                            <ng-template #NotDO>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
-                                    Delivery Order
+                                        {{isDO ? 'Delivery Order' : 'Authorize Letter'}}
                                     <span></span>
                                 </label>
-                            </ng-template> -->
+                            </ng-template>
                         </div>
                     </div>
 
@@ -346,7 +346,7 @@
                         <div class="m-checkbox-inline">
                             <ng-container>
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedPOD"
+                                    <input type="checkbox" [(ngModel)]="isCheckedDO"
                                         (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
@@ -361,15 +361,19 @@
                     <div class="form-group m-form__group"
                         *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE')">
                         <div class="m-checkbox-inline">
-                            <ng-container>
-                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="hawbDetails[0].isCheckedHawb"
-                                        (change)="onChangeCheckBox()">
-                                    <span></span>
-                                </label>
-                                <span style='margin-right: 20px;'>
-                                    <a class="pointer" (click)="previewHawb(hawbDetails[0].id)">{{hawbDetails[0].hwbno}}</a>
-                                </span>
+                            <ng-container *ngFor="let hbl of hawbDetails">
+                                    <label class="m-checkbox m-checkbox--bold"
+                                        style="display: initial;margin-left: 20px;">
+                                        <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb"
+                                            (change)="onChangeCheckBox()">
+                                        <span></span>
+                                    </label>
+                                    <span *ngIf="serviceId === 'AE'">
+                                        <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
+                                    </span>
+                                    <span *ngIf="serviceId !== 'AE'">
+                                        <a class="pointer" (click)="previewHBL(hbl.id)">{{hbl.hwbno}}</a>
+                                    </span>
                             </ng-container>
                         </div>
                     </div>

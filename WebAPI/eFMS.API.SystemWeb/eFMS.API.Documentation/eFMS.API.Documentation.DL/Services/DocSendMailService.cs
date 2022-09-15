@@ -214,22 +214,22 @@ namespace eFMS.API.Documentation.DL.Services
             
             var mailFrom = "Info FMS";
             var signImg = string.Empty;
+            emailContent.AttachFiles = new List<string>();
             if (!string.IsNullOrEmpty(picInfo?.Email)) //Email from
             {
                 mailFrom = picInfo.Email;
-                signImg = picInfo.SignatureImage;
+                emailContent.AttachFiles.Add(picInfo.SignatureImage);
             }
             else
             {
                 mailFrom = @"air@itlvn.com";
             }
-            _body = _body.Replace("{{Signature}}", signImg);
             emailContent.From = mailFrom; //email PIC của lô hàng
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
-            emailContent.AttachFiles = new List<string>();
+            //emailContent.AttachFiles = new List<string>();
             return emailContent;
         }
 
@@ -827,24 +827,23 @@ namespace eFMS.API.Documentation.DL.Services
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
             var mailFrom = "Info FMS";
-            var signImg = string.Empty;
+            emailContent.AttachFiles = new List<string>();
             if (!string.IsNullOrEmpty(picInfo?.Email)) //Email from
             {
                 mailFrom = picInfo.Email;
-                signImg = picInfo.SignatureImage;
+                emailContent.AttachFiles.Add(picInfo.SignatureImage);
             }
             else
             {
                 mailFrom = @"sea@itlvn.com";
             }
-            _body = _body.Replace("{{Signature}}", signImg);
 
             emailContent.From = mailFrom; //email PIC của lô hàng
             emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
-            emailContent.AttachFiles = new List<string>();
+            //emailContent.AttachFiles = new List<string>();
             return emailContent;
         }
 
