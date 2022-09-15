@@ -187,8 +187,8 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                             case 'POD':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/proofofdelivery`]);
                                 break;
-                                case 'HBL':
-                                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/sendhbl`]);
+                            case 'HBL':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/sendhbl`]);
                                 break;
                         }
                     }
