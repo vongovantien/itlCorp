@@ -562,7 +562,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     addSignImgToBody(){
         if(!!this.body.value){
-            return "<span><img src='" + this.signImgUrl + "' width='350'/></span>";
+            return "<span><img src='" + this.signImgUrl + "' width='459'/></span>";
         }
     }
 

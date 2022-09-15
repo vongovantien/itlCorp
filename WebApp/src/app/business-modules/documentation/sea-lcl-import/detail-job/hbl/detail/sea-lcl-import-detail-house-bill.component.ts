@@ -244,7 +244,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                             case 'POD':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/proofofdelivery`]);
                                 break;
-                            case 'HAWB':
+                            case 'HBL':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/sendhbl`]);
                                 break;
                         }
