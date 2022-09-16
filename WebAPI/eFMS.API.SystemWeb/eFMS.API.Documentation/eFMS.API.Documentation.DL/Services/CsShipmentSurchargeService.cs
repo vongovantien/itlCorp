@@ -123,6 +123,12 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
+                    var mesageDelete = CheckDeleteChargeShipmentNoProfit(charge); //Check is valid delete charge Buy/Sell in shipment with no profit
+                    if (!string.IsNullOrEmpty(mesageDelete))
+                    {
+                        return new HandleState((object)mesageDelete);
+                    }
+
                     DataContext.Delete(x => x.Id == chargeId);
                 }
             }
@@ -131,6 +137,55 @@ namespace eFMS.API.Documentation.DL.Services
                 hs = new HandleState(ex.Message);
             }
             return hs;
+        }
+
+        /// <summary>
+        /// Check is valid delete charge Buy/Sell in shipment with no profit
+        /// </summary>
+        /// <param name="charge"></param>
+        /// <returns></returns>
+        private string CheckDeleteChargeShipmentNoProfit(CsShipmentSurcharge charge)
+        {
+            if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+            {
+                return string.Empty;
+            }
+            var hblId = charge.Hblid;
+            var opsTrans = opsTransRepository.First(x => x.Hblid == hblId);
+            if (opsTrans != null)
+            {
+                if (opsTrans.NoProfit != true)
+                {
+                    return string.Empty;
+                }
+                var surcharges = DataContext.Get(x => x.Hblid == opsTrans.Hblid && x.Type != DocumentConstants.CHARGE_OBH_TYPE && x.Id != charge.Id);
+                var totalBuying = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => x.AmountVnd ?? 0);
+                var totalSelling = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => x.AmountVnd ?? 0);
+                if (totalSelling - totalBuying > 0)
+                {
+                    return "You can not delete this charge because Profit of Shipment NoProfit is bigger than 0";
+                }
+            }
+            else
+            {
+                var hblDetail = tranDetailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+                if (hblDetail != null)
+                {
+                    var csTransaction = csTransactionRepository.Get(x => x.Id == hblDetail.JobId).FirstOrDefault();
+                    if (csTransaction.NoProfit != true)
+                    {
+                        return string.Empty;
+                    }
+                    var surcharges = DataContext.Get(x => x.JobNo == csTransaction.JobNo && x.Type != DocumentConstants.CHARGE_OBH_TYPE && x.Id != charge.Id);
+                    var totalBuying = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => x.AmountVnd ?? 0);
+                    var totalSelling = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => x.AmountVnd ?? 0);
+                    if (totalSelling - totalBuying > 0)
+                    {
+                        return "You can not delete this charge because Profit of Shipment NoProfit is bigger than 0";
+                    }
+                }
+            }
+            return string.Empty;
         }
 
         public HandleState CancelLinkCharge(Guid chargeId)
@@ -551,7 +606,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, bool isChargesUpdated, out List<Guid> Ids)
         {
             var result = new HandleState();
             Ids = new List<Guid>(); // ds các charge phí update công nợ.
@@ -565,16 +620,19 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (item.Id == Guid.Empty)
                 {
-                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                    item.FinalExchangeRate = null;
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
-                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    if (!isChargesUpdated)
+                    {
+                        //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                        item.FinalExchangeRate = null;
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                        item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    }
 
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.UserCreated = currentUser.UserID;
@@ -674,18 +732,21 @@ namespace eFMS.API.Documentation.DL.Services
                             surcharge.QuantityType = item.QuantityType;
                             surcharge.VatPartnerId = item.VatPartnerId;
 
-                            //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                            surcharge.FinalExchangeRate = null;
-                            surcharge.ExchangeDate = item.ExchangeDate;
+                            if (!isChargesUpdated)
+                            {
+                                //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                                surcharge.FinalExchangeRate = null;
+                                surcharge.ExchangeDate = item.ExchangeDate;
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
-                            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
+                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                                surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            }
 
                             //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
                             if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
@@ -746,6 +807,151 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Check add or update fee (Buy/Sell) is valid in no profit shipment
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="isValid"></param>
+        /// <returns></returns>
+        public List<CsShipmentSurchargeModel> CheckAddAndUpdateSellingsShipmentNoProfit(List<CsShipmentSurchargeModel> list, out bool isValid)
+        {
+            isValid = true;
+            if (list.Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE).FirstOrDefault() != null) // Chỉ áp dụng check nhập và sửa phí Buy và Sell
+            {
+                return new List<CsShipmentSurchargeModel>();
+            }
+
+            var hblId = list.Where(x => x.Hblid != Guid.Empty).FirstOrDefault().Hblid;
+            var opsTrans = opsTransRepository.First(x => x.Hblid == hblId);
+            CsTransaction csTransaction = null;
+            if (opsTrans != null)
+            {
+                if (opsTrans.NoProfit != true)
+                {
+                    return new List<CsShipmentSurchargeModel>();
+                }
+            }
+            else
+            {
+                var hblDetail = tranDetailRepository.Get(x => x.Id == hblId).FirstOrDefault();
+                if (hblDetail != null)
+                {
+                    csTransaction = csTransactionRepository.Get(x => x.Id == hblDetail.JobId).FirstOrDefault();
+                    if (csTransaction.NoProfit != true)
+                    {
+                        return new List<CsShipmentSurchargeModel>();
+                    }
+                }
+            }
+
+            var newSurcharges = list.Where(x => x.Id == Guid.Empty);
+            var updateSurcharges = list.Where(x => x.Id != Guid.Empty);
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            foreach (var item in newSurcharges)
+            {
+                //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                item.FinalExchangeRate = null;
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+            }
+            foreach (var item in updateSurcharges)
+            {
+                var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
+                //Chỉ cập nhật và tính lại giá trị Amount cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                if (string.IsNullOrEmpty(item.SettlementCode)
+                    && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
+                    && (surcharge.PayerAcctManagementId == Guid.Empty || surcharge.PayerAcctManagementId == null)
+                    && (string.IsNullOrEmpty(surcharge.Soano) && string.IsNullOrEmpty(surcharge.PaySoano))
+                    && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
+                {
+                    //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
+                    surcharge.FinalExchangeRate = null;
+                    surcharge.ExchangeDate = item.ExchangeDate;
+
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
+                    surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                }
+            }
+
+            var chargesResult = new List<CsShipmentSurchargeModel>();
+            if (newSurcharges.Count() > 0)
+            {
+                chargesResult.AddRange(newSurcharges);
+            }
+            if (updateSurcharges.Count() > 0)
+            {
+                chargesResult.AddRange(updateSurcharges);
+            }
+
+
+            if (opsTrans != null)
+            {
+                if (chargesResult.FirstOrDefault().Type == DocumentConstants.CHARGE_BUY_TYPE)
+                {
+                    var chargeSellings = DataContext.Get(x => x.Hblid == opsTrans.Hblid && x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                    if (chargeSellings.Sum(x => x.AmountVnd ?? 0) - chargesResult.Sum(x => x.AmountVnd ?? 0) > 0)
+                    {
+                        isValid = false;
+                        return chargesResult;
+                    }
+                }
+                else
+                {
+                    var chargeBuyings = DataContext.Get(x => x.Hblid == opsTrans.Hblid && x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+                    if (chargesResult.Sum(x => x.AmountVnd ?? 0) - chargeBuyings.Sum(x => x.AmountVnd ?? 0) > 0)
+                    {
+                        isValid = false;
+                        return chargesResult;
+                    }
+                }
+            }
+            else
+            {
+                var surcharges = DataContext.Get(x => x.JobNo == csTransaction.JobNo && x.Type != DocumentConstants.CHARGE_OBH_TYPE);
+                if (chargesResult.FirstOrDefault().Type == DocumentConstants.CHARGE_BUY_TYPE)
+                {
+                    var chargeBuyings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+                    var remainSellings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid != hblId);
+                    var totalSellings = mapper.Map<List<CsShipmentSurchargeModel>>(remainSellings);
+                    totalSellings.AddRange(chargesResult);
+
+                    if (totalSellings.Sum(x => x.AmountVnd ?? 0) - chargeBuyings.Sum(x => x.AmountVnd ?? 0) > 0)
+                    {
+                        isValid = false;
+                        return chargesResult;
+                    }
+                }
+                else
+                {
+                    var chargeSellings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+                    var remainBuyings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid != hblId);
+                    var totalBuyings = mapper.Map<List<CsShipmentSurchargeModel>>(remainBuyings);
+                    totalBuyings.AddRange(chargesResult);
+
+                    if (chargeSellings.Sum(x => x.AmountVnd ?? 0) - totalBuyings.Sum(x => x.AmountVnd ?? 0) > 0)
+                    {
+                        isValid = false;
+                        return chargesResult;
+                    }
+                }
+
+            }
+
+            return chargesResult;
         }
 
         public HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids)
@@ -1724,6 +1930,21 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
             });
+            var validList = list.Where(x => x.IsValid && x.Type.ToLower() != "obh").ToList();
+            var jobNoProfits = InvalidShipmentNoProfitImport(validList);
+            list.ForEach(item =>
+            {
+                if (item.IsValid)
+                {
+                    if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "hbl " + item.Hblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "mbl " + item.Mblno);
+                        item.IsValid = false;
+                    }
+                }
+            });
+
             if (list.Count > 1)
             {
                 for (int i = 0; i < list.Count() - 1; i++)
@@ -1746,6 +1967,67 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return list;
+        }
+
+        /// <summary>
+        /// Check if import fee is valid with no profit shipment
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<OpsTransaction> InvalidShipmentNoProfitImport(List<CsShipmentSurchargeImportModel> list)
+        {
+            var shipmentGrp = list.Where(x => x.Type.ToLower() != "obh").GroupBy(x => new { x.Hblno, x.Mblno }).Select(x => new { x.Key, charges = x.Select(z => z).ToList() });
+            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);
+            var chargeGroup = catChargeGroupRepository.Get();
+            var catCharge = catChargeRepository.Get();
+            var jobNoProfit = new List<OpsTransaction>();
+            foreach (var shipment in shipmentGrp)
+            {
+                var opsDetail = opsTransaction.First(x => x.Hwbno == shipment.Key.Hblno && x.Mblno == shipment.Key.Mblno);
+                if (opsDetail != null)
+                {
+                    if (opsDetail.NoProfit == true)
+                    {
+                        shipment.charges.ForEach(item =>
+                        {
+                            switch (item.Type.ToLower())
+                            {
+                                case "buying":
+                                    item.Type = "BUY";
+                                    break;
+                                case "obh":
+                                    item.Type = "OBH";
+                                    break;
+                                case "selling":
+                                    item.Type = "SELL";
+                                    break;
+                            }
+                            var chargeGroupId = catCharge.Where(x => x.Id == item.ChargeId).Select(x => x.ChargeGroup).FirstOrDefault();
+                            item.KickBack = chargeGroup.Where(x => x.Id == chargeGroupId && x.Name == "Com").FirstOrDefault() != null ? true : false;
+
+                            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                            #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                            item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                        });
+                        var surcharges = DataContext.Get(x => x.Hblid == opsDetail.Hblid && x.Type != DocumentConstants.CHARGE_OBH_TYPE);
+                        var chargesBuyings = new List<CsShipmentSurcharge>();
+                        var chargesSellings = new List<CsShipmentSurcharge>();
+                        chargesBuyings.AddRange(surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE));
+                        chargesBuyings.AddRange(shipment.charges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE));
+
+                        chargesSellings.AddRange(surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                        chargesSellings.AddRange(shipment.charges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                        if (chargesSellings.Sum(x => x.AmountVnd ?? 0) - chargesBuyings.Sum(x => x.AmountVnd ?? 0) > 0)
+                        {
+                            jobNoProfit.Add(opsDetail);
+                        }
+                    }
+                }
+            }
+            return jobNoProfit;
         }
 
         public HandleState Import(List<CsShipmentSurchargeImportModel> list, out List<Guid> Ids)

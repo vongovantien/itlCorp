@@ -20,7 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
         HousbillProfit GetHouseBillTotalProfit(Guid hblid);
         List<HousbillProfit> GetShipmentTotalProfit(Guid jobId);
         HandleState DeleteMultiple(List<Guid> listId);
-        HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids);
+        HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, bool isChargesUpdated, out List<Guid> Ids);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         object CheckAccountReceivable(List<CsShipmentSurchargeModel> list);
         HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);
@@ -36,5 +36,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<AmountSurchargeResult> GetAmountSurchargeResult(List<Guid> Ids);
         HandleState ImportPQL(List<string> cds);
         bool CheckExistRefundFee(Guid jobId, string transactionType);
+        List<CsShipmentSurchargeModel> CheckAddAndUpdateSellingsShipmentNoProfit(List<CsShipmentSurchargeModel> list, out bool isValid);
     }
 }
