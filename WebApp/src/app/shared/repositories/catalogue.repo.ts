@@ -363,20 +363,17 @@ export class CatalogueRepo {
             );
     }
 
+    // uploadFileContract(partnerId: string, contractId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-
-    uploadFileContract(partnerId: string, contractId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
-
-
-    uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
 
     deleteContract(id: string, partnerId: string) {
@@ -399,17 +396,17 @@ export class CatalogueRepo {
         );
     }
 
-    getContractFilesAttach(partnerId: string, contractId) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getContractFilesAttach(partnerId: string, contractId) {
+    //     return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deleteContractFilesAttach(fileId: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteContractFilesAttach(fileId: string) {
+    //     return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     checkViewDetailPartnerPermission(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/CheckPermission/${id}`).pipe(

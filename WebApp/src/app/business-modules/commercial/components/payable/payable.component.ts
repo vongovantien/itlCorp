@@ -105,7 +105,7 @@ export class PayableComponent extends AppForm {
     }
 
     uploadFileContract(id: string) {
-        this._systemFileManageRepo.uploadFileContractPayable(id, this.fileList)
+        this._systemFileManageRepo.uploadFile('Catalogue', 'CatContract', id, this.fileList)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -120,7 +120,7 @@ export class PayableComponent extends AppForm {
 
     getFileContract(partnertId: string) {
         this.isLoading = true;
-        this._systemFileManageRepo.getContractPayableFilesAttach(partnertId).
+        this._systemFileManageRepo.getFile('Catalogue', 'CatContract', partnertId).
             pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))
@@ -141,7 +141,7 @@ export class PayableComponent extends AppForm {
 
     onDeleteFile() {
         this.confirmDeletePopup.hide();
-        this._systemFileManageRepo.deleteContractPayableFilesAttach(this.partnerId, this.selectedFile.name)
+        this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.partnerId, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))

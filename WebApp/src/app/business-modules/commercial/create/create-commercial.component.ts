@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppForm } from 'src/app/app.form';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { Partner } from '@models';
 
@@ -50,7 +50,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         protected _catalogueRepo: CatalogueRepo,
         protected _ngProgressService: NgProgress,
         protected _activeRoute: ActivatedRoute,
-        protected _store: Store<IAppState>
+        protected _store: Store<IAppState>,
+        protected _sysFileManageRep: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -155,7 +156,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                                 if (this.fileList.length === 0) {
                                     return of({ status: true, id: res.model.id });
                                 }
-                                return this._catalogueRepo.uploadFileMoreContract(idsContract, res.model.id, this.fileList).pipe(
+                                return this._sysFileManageRep.uploadFile('Catalogue', 'CatContract', idsContract, this.fileList).pipe(
                                     catchError((err, caught) => this.catchError),
                                     concatMap((rs: any) => {
                                         if (!!rs) {
