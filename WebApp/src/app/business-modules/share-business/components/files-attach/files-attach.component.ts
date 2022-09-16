@@ -9,6 +9,7 @@ import { Params, ActivatedRoute } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
 import { CsTransaction } from '@models';
+import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 
 
 @Component({
@@ -24,6 +25,8 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
 
     files: IShipmentAttachFile[] = [];
     selectedFile: IShipmentAttachFile;
+
+    isOps: boolean = false;
 
     fileNo: string;
 
@@ -56,16 +59,27 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 } else {
                     this.jobId = params.id;
                     this.getFileShipment(this.jobId);
+                    this.isOps = true;
                 }
             });
 
-        this._store.select(getTransactionDetailCsTransactionState)
-            .pipe(skip(1), takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: CsTransaction) => {
-                    this.fileNo = res.jobNo;
-                }
-            );
+        if (this.isOps == false) {
+            this._store.select(getTransactionDetailCsTransactionState)
+                .pipe(skip(1), takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: CsTransaction) => {
+                        this.fileNo = res.jobNo;
+                    }
+                );
+        } else {
+            this._store.select(getOperationTransationState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: any) => {
+                        this.fileNo = res.opstransaction.jobNo;
+                    }
+                );
+        }
     }
 
     chooseFile(event: any) {

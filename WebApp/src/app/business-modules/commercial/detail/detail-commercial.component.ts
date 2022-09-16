@@ -7,7 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { Partner } from '@models';
 
 import { CommercialCreateComponent } from '../create/create-commercial.component';
@@ -45,9 +45,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         private _activedRoute: ActivatedRoute,
         private _cd: ChangeDetectorRef,
         protected _ngProgressService: NgProgress,
+        protected _sysFilemanagementRepo: SystemFileManageRepo,
         protected _store: Store<IAppState>
     ) {
-        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute, _store);
+        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute, _sysFilemanagementRepo, _store);
     }
 
     ngOnInit(): void {
