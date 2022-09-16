@@ -102,6 +102,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_CHARGE_CODE_DUPLICATE = "MSG_CHARGE_CODE_DUPLICATE";
         public static readonly string MSG_SERIES_NO_REQUIRED = "MSG_SERIES_NO_REQUIRED";
         public static readonly string MSG_INVOICE_NO_REQUIRED = "MSG_INVOICE_NO_REQUIRED";
+        public static readonly string MSG_SHIPMENT_INVALID_NO_PROFIT = "MSG_SHIPMENT_INVALID_NO_PROFIT";
 
         public static readonly string MSG_OBH_PARTNER_CODE_WRONG = "MSG_OBH_PARTNER_CODE_WRONG";
         public static readonly string MSG_OBH_PARTNER_CODE_EMPTY = "MSG_OBH_PARTNER_CODE_EMPTY";
