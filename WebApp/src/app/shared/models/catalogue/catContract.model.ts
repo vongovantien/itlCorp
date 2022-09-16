@@ -59,7 +59,11 @@ export class Contract {
     salesOfficeId: string = null;
     salesCompanyId: string = null;
     shipmentType: string = null;
+    isExpired: boolean = false;
+    isOverLimit: boolean = false;
+    isOverDue: boolean = false;
 
+    
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
