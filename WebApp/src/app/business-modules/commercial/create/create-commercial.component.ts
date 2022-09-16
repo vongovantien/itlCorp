@@ -50,8 +50,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         protected _catalogueRepo: CatalogueRepo,
         protected _ngProgressService: NgProgress,
         protected _activeRoute: ActivatedRoute,
-        protected _store: Store<IAppState>,
-        protected _sysFileManageRep: SystemFileManageRepo
+        private readonly _sysFileManageRep: SystemFileManageRepo,
+        protected _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
