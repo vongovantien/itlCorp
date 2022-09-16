@@ -787,7 +787,6 @@ namespace eFMS.API.Documentation.DL.Services
             var advanceRequestJob = acctAdvanceRequestRepository.Get().Select(x => new { x.JobId, x.Mbl, x.Hblid }).ToList();
             var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_FINISH && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var customs = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
-            var surs = surCharge.Get().Select(x => new {x.ClearanceNo,x.Hblid});
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
                                join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
@@ -797,9 +796,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
             //Merger Shipment Ops assign & PIC
             var shipmentsOpsMerge = from data in shipmentsOps.Union(shipmentsOpsPIC)
-                                    join sur in surs on data.Hblid equals sur.Hblid into grpSur
-                                    from sur in grpSur.DefaultIfEmpty()
-                                    join cus in customs on sur.ClearanceNo equals cus.ClearanceNo into grpCus
+                                    join cus in customs on data.JobNo equals cus.JobNo into grpCus
                                     from cus in grpCus.DefaultIfEmpty()
                                     select new Shipments
                                     {
