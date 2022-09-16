@@ -146,7 +146,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string CheckDeleteChargeShipmentNoProfit(CsShipmentSurcharge charge)
         {
-            if (charge.Type != DocumentConstants.CHARGE_OBH_TYPE)
+            if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
             {
                 return string.Empty;
             }
@@ -1930,15 +1930,18 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
             });
-            var validList = list.Where(x => x.IsValid).ToList();
+            var validList = list.Where(x => x.IsValid && x.Type.ToLower() != "obh").ToList();
             var jobNoProfits = InvalidShipmentNoProfitImport(validList);
-            validList.ForEach(item =>
+            list.ForEach(item =>
             {
-                if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
+                if (item.IsValid)
                 {
-                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "hbl " + item.Hblno);
-                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "mbl " + item.Mblno);
-                    item.IsValid = false;
+                    if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "hbl " + item.Hblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "mbl " + item.Mblno);
+                        item.IsValid = false;
+                    }
                 }
             });
 
@@ -1973,7 +1976,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private List<OpsTransaction> InvalidShipmentNoProfitImport(List<CsShipmentSurchargeImportModel> list)
         {
-            var shipmentGrp = list.GroupBy(x => new { x.Hblno, x.Mblno }).Select(x => new { x.Key, charges = x.Select(z => z).ToList() });
+            var shipmentGrp = list.Where(x => x.Type.ToLower() != "obh").GroupBy(x => new { x.Hblno, x.Mblno }).Select(x => new { x.Key, charges = x.Select(z => z).ToList() });
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);
             var chargeGroup = catChargeGroupRepository.Get();
             var catCharge = catChargeRepository.Get();
