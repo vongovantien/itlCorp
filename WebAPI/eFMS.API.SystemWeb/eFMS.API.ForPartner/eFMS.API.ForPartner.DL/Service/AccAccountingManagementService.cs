@@ -1520,6 +1520,11 @@ namespace eFMS.API.ForPartner.DL.Service
             settlement.ReasonReject = reason;
 
             var surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).ToList();
+            if(surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
+            || (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH && x.PayerAcctManagementId != null)))
+            {
+                return new HandleState((object)string.Format("{0} đã đồng bộ dữ liệu AP", settlement.SettlementNo));
+            }
             UpdateSurchargeDataToDB(surcharges, settlement.SettlementNo, "Reject");
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -1611,6 +1616,11 @@ namespace eFMS.API.ForPartner.DL.Service
             if (soa.Type == "Credit")
             {
                 surcharges = surchargeRepo.Get(x => x.PaySoano == soa.Soano);
+                if (surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
+                   || (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH && x.PayerAcctManagementId != null)))
+                {
+                    return new HandleState((object)string.Format("{0} đã đồng bộ dữ liệu AP", soa.Soano));
+                }
             }
             if (soa.Type == "Debit")
             {
@@ -1760,6 +1770,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 if (!string.IsNullOrEmpty(existInvoice))
                 {
                     return new HandleState((object)existInvoice);
+                }
+            } else
+            {
+                if (surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
+                || (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH && x.PayerAcctManagementId != null)))
+                {
+                    return new HandleState((object)string.Format("{0} đã đồng bộ dữ liệu AP", cdNote.Code));
                 }
             }
 
@@ -2773,13 +2790,13 @@ namespace eFMS.API.ForPartner.DL.Service
             && x.AttachDocInfo == model.DocCode
             && x.Date.Value.Date == model.VoucherDate.Date)?.FirstOrDefault();
 
+            IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
             if (voucherToDelete != null)
             {
                 using (var transS = surchargeRepo.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
                         Expression<Func<CsShipmentSurcharge, bool>> query = q => true;
                         switch (model.DocType)
                         {
@@ -2806,12 +2823,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                     surcharge.VoucherIdre = null;
                                     surcharge.PayerAcctManagementId = null;
                                     surcharge.VoucherIdredate = null;
+                                    surcharge.PaySyncedFrom = null;
                                 }
                                 else
                                 {
                                     surcharge.VoucherId = null;
                                     surcharge.VoucherIddate = null;
                                     surcharge.AcctManagementId = null;
+                                    surcharge.SyncedFrom = null;
+
                                 }
 
                                 // Giữ nguyên các giá trị amount hay recalculate ???
@@ -2871,6 +2891,54 @@ namespace eFMS.API.ForPartner.DL.Service
             else
             {
                 hsDeletVoucher = new HandleState(false);
+            }
+
+            if(hsDeletVoucher.Success)
+            {
+                switch (model.DocType)
+                {
+                    case "SOA":
+                        var soa = acctSOARepository.First(x => x.Soano == model.DocCode);
+                        if(soa != null)
+                        {
+                            soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                            soa.UserModified = currentUser.UserID;
+                            soa.DatetimeModified = DateTime.Now;
+                            soa.ReasonReject = "Dữ liệu huỷ";
+                            soa.Status = ForPartnerConstants.STATUS_SOA_NEW;
+
+                            acctSOARepository.SubmitChanges();
+                        }
+                        break;
+                    case "CDNOTE":
+                        var credit = acctCdNoteRepo.First(x => x.Code == model.DocCode);
+                        if (credit != null)
+                        {
+                            credit.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                            credit.UserModified = currentUser.UserID;
+                            credit.DatetimeModified = DateTime.Now;
+                            credit.ReasonReject = "Dữ liệu huỷ";
+
+                            acctCdNoteRepo.SubmitChanges();
+                        }
+                        break;
+                    case "SETTLEMENT":
+                        var settle = acctSettlementRepo.First(x => x.SettlementNo == model.DocCode);
+                        if (settle != null)
+                        {
+                            settle.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                            settle.UserModified = currentUser.UserID;
+                            settle.DatetimeModified = DateTime.Now;
+                            settle.ReasonReject = "Dữ liệu huỷ";
+                            settle.VoucherNo = null;
+                            settle.VoucherDate = null;
+
+                            acctSettlementRepo.SubmitChanges();
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             return hsDeletVoucher;
         }
