@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
 import { CsTransactionDetail, HouseBill } from '@models';
-import { ChargeConstants } from '@constants';
+import { ChargeConstants, RoutingConstants } from '@constants';
 import { DataService } from '@services';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
@@ -16,8 +16,9 @@ import { AirImportCreateHBLComponent } from '../create/create-house-bill.compone
 
 import { skip, catchError, takeUntil, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 enum HBL_TAB {
@@ -438,5 +439,36 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             labelCancel: 'No',
             labelConfirm: 'Yes'
         }, () => { this.saveHBL() });
+    }
+
+    sendMail(type: string){
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    if (!!err.error.message) {
+                        this._toastService.error("Can not Send mail. " + err.error.message + ". Please recheck again.");
+                    }
+                    return throwError(err.error.message);
+                })
+            ).subscribe(
+                (res: any) => {
+                    if(res.status){
+                        switch (type) {
+                            case 'ArrivalNotice':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}/arrivalnotice`]);
+                                break;
+                            case 'AuthorizeLetter':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}/authorizeletter`]);
+                                break;
+                            case 'POD':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}/proofofdelivery`]);
+                                break;
+                            case 'HAWB':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}/houseairwaybill`]);
+                                break;
+                        }
+                    }
+                },
+            );
     }
 }

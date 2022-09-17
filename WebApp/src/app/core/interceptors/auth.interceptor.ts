@@ -44,6 +44,7 @@ export class AuthInterceptor implements HttpInterceptor {
             timeout(+timeoutValue),
             catchError((error: HttpErrorResponse) => {
                 let message: string = '';
+                const showErrMessage = req.headers.get('showErrMessage');
                 switch (error.status) {
                     case 400:
                         console.log(error);
@@ -68,7 +69,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (error instanceof TimeoutError) {
                     message = "Request time out";
                 }
-                if (!!message) {
+                if (!!message && showErrMessage != 'false') {
                     this._toastService.error(message);
                 }
                 return throwError(error);

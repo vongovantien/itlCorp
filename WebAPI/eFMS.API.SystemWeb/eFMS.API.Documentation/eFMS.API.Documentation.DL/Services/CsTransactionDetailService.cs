@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctCdnote> acctCdnoteRepository;
         private readonly IContextBase<SysGroup> sysGroupRepository;
         private readonly IAccAccountReceivableService accAccountReceivableService;
-
+        private readonly ICheckPointService checkPointService;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -96,7 +96,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCdnote> acctCdnoteRepo,
             IContextBase<SysGroup> sysGroupRepo,
             IAccAccountReceivableService accAccountReceivable,
-            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
+            ICheckPointService checkPoint) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -129,6 +130,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCdnoteRepository = acctCdnoteRepo;
             sysGroupRepository = sysGroupRepo;
             accAccountReceivableService = accAccountReceivable;
+            checkPointService = checkPoint;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -2597,7 +2599,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        public IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId)
+        public List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId)
         {
             var shipment = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
             if(shipment == null)
@@ -2605,7 +2607,20 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             var transDetails = DataContext.Get(x => x.JobId == shipment.Id);
-            return transDetails;
+            var result = new List<object>();
+            if (hblId != null && hblId != Guid.Empty) // TH checkpoint của 1 Hblid đã được check trước đó
+            {
+                var hbl = transDetails.Where(x => x.Id == hblId).FirstOrDefault();
+                result.Add(new { hbl, ErrorMessage = string.Empty });
+                return result;
+            }
+            
+            foreach (var hbl in transDetails)
+            {
+                HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(hbl.CustomerId, hbl.Id, "DOC", CHECK_POINT_TYPE.PREVIEW_HBL, "");
+                result.Add(new { hbl, ErrorMessage = hs.Message?.ToString() });
+            }
+            return result;
         }
     }
 }

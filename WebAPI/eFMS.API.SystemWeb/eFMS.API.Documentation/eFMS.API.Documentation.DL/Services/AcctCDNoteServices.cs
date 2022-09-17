@@ -65,6 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IOptions<ApiUrl> apiUrl;
+        private readonly ICheckPointService checkPointService;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
             IContextBase<AcctCdnote> repository, IMapper mapper, ICurrentUser user,
@@ -97,7 +98,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
-            IOptions<ApiUrl> aUrl
+            IOptions<ApiUrl> aUrl,
+            ICheckPointService checkPoint
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -132,6 +134,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
             apiUrl = aUrl;
+            checkPointService = checkPoint;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -3934,22 +3937,22 @@ namespace eFMS.API.Documentation.DL.Services
         public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid? hblId, Guid? jobId)
         {
             var cdNoteCodes = new List<string>();
+            Expression<Func<CsShipmentSurcharge, bool>> query = x => (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo));
             if (hblId != null && hblId != Guid.Empty)
             {
-                var surcharges = surchargeRepository.Get(x => x.Hblid == hblId && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)));
-                cdNoteCodes = surcharges.Select(x => x.DebitNo).ToList();
-                cdNoteCodes.AddRange(surcharges.Select(x => x.CreditNo));
-                cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                query = query.And(x => x.Hblid == hblId);
             }
             else
             {
                 var jobNo = cstransRepository.First(x => x.Id == jobId).JobNo;
-                var surcharges = surchargeRepository.Get(x => x.JobNo == jobNo && (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)));
-                cdNoteCodes = surcharges.Select(x => x.DebitNo).ToList();
-                cdNoteCodes.AddRange(surcharges.Select(x => x.CreditNo));
-                cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+                query = query.And(x => x.JobNo == jobNo);
             }
+            var surcharges = surchargeRepository.Get(query);
+            cdNoteCodes = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).ToList();
+            cdNoteCodes.AddRange(surcharges.Where(x => !string.IsNullOrEmpty(x.CreditNo)).Select(x => x.CreditNo));
+
             var data = DataContext.Get(x => cdNoteCodes.Any(z => z == x.Code)).ToList();
+
             var results = mapper.Map<List<AcctCdnoteModel>>(data);
             return results;
         }
