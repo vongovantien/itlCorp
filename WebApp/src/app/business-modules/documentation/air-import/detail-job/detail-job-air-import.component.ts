@@ -435,7 +435,15 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            mblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb,
+
+            packageQty: modelAdd.packageQty,
+            grossWeight: modelAdd.grossWeight,
+            hw: modelAdd.hw,
+            chargeWeight: modelAdd.chargeWeight,
+            cbm: modelAdd.cbm,
+            polDescription: modelAdd.polDescription,
+            podDescription: modelAdd.podDescription,
 
         };
 

@@ -568,14 +568,14 @@ namespace eFMS.API.Documentation.Controllers
         /// Sync HBL with id
         /// </summary>
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         [Route("SyncHBLByShipment/{id}")]
-        public IActionResult SyncHBL(Guid id, CsTransactionSyncHBLCriteria model)
+        public async Task<IActionResult> SyncHBL(Guid id, CsTransactionSyncHBLCriteria model)
         {
             currentUser.Action = "SyncHBLByShipment";
 
             if (!ModelState.IsValid) return BadRequest();
-            var result = csTransactionService.SyncHouseBills(id, model);
+            var result = await csTransactionService.SyncHouseBills(id, model);
             return Ok(result);
         }
 
