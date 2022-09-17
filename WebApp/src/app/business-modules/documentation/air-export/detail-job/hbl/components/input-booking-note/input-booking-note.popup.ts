@@ -1,23 +1,24 @@
 import { PopupBase } from "src/app/popup.base";
-import { Component, ViewChild, ElementRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild } from "@angular/core";
 import { FormGroup, AbstractControl, FormBuilder } from "@angular/forms";
 import { DocumentationRepo } from "@repositories";
 import { catchError, finalize, switchMap, concatMap } from "rxjs/operators";
 import { CsTransactionDetail } from "@models";
 import { ToastrService } from "ngx-toastr";
-import { DomSanitizer } from "@angular/platform-browser";
-import { ModalDirective } from "ngx-bootstrap/modal";
-import { environment } from "src/environments/environment";
 import { of } from "rxjs";
+import { ICrystalReport } from "@interfaces";
+import { ReportPreviewComponent } from "@common";
+import { InjectViewContainerRefDirective } from "@directives";
+import { delayTime } from "@decorators";
 
 @Component({
     selector: 'input-booking-note-popup',
-    templateUrl: './input-booking-note.popup.html'
+    templateUrl: './input-booking-note.popup.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class InputBookingNotePopupComponent extends PopupBase {
-    @ViewChild('formPreviewBookingNote') formPreviewBookingNote: ElementRef;
-    @ViewChild("popupReport") popupReport: ModalDirective;
+export class InputBookingNotePopupComponent extends PopupBase implements ICrystalReport {
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     formInputBN: FormGroup;
 
@@ -34,7 +35,8 @@ export class InputBookingNotePopupComponent extends PopupBase {
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _fb: FormBuilder,
-        private sanitizer: DomSanitizer, ) {
+        private _cd: ChangeDetectorRef
+    ) {
         super();
     }
 
@@ -65,7 +67,7 @@ export class InputBookingNotePopupComponent extends PopupBase {
             contactPerson: this.contactPerson.value,
             closingTime: this.closingTime.value
         };
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -78,15 +80,8 @@ export class InputBookingNotePopupComponent extends PopupBase {
                 concatMap((data: any) => {
                     if (!!data) {
                         if (data !== null && data.dataSource.length > 0) {
-                            this.dataReport = JSON.stringify(data);
-                            setTimeout(() => {
-                                if (!this.popupReport.isShown) {
-                                    this.popupReport.config = this.options;
-                                    this.popupReport.show();
-                                }
-                                this.submitFormPreview();
-                            }, 1000);
-
+                            this.dataReport = data;
+                            this.renderAndShowReport();
                             return this._documentationRepo.updateInputBookingNoteAirExport(body);
                         } else {
                             this._toastService.warning('There is no data to display preview');
@@ -143,26 +138,25 @@ export class InputBookingNotePopupComponent extends PopupBase {
         this.hide();
     }
 
-    get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.ShowWithDelay();
+        this._cd.detectChanges();
     }
 
-    ngAfterViewInit() {
-        if (!!this.dataReport) {
-            this.formPreviewBookingNote.nativeElement.submit();
-        }
-    }
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
 
-    submitFormPreview() {
-        this.formPreviewBookingNote.nativeElement.submit();
-    }
+        this.showReport();
 
-    onSubmitForm() {
-        return true;
-    }
-
-    hidePreview() {
-        this.popupReport.hide();
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
     }
 }
 

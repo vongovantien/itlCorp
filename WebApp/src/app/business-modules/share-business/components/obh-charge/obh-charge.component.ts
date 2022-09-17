@@ -63,9 +63,16 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getPartner() {
-        this._store.dispatch(LoadListPartnerForKeyInSurcharge(
-            { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId })
-        );
+        this._catalogueRepo.getAgreement(
+            { partnerId: this.hbl.customerId, status: true, salesmanId: this.hbl.saleManId, service: this.serviceTypeId }
+        )
+            .subscribe(
+                (res) => {
+                    this._store.dispatch(LoadListPartnerForKeyInSurcharge(
+                        { office: this.hbl?.officeId, salemanId: this.hbl.saleManId, service: this.serviceTypeId, contractType: res[0]?.contractType })
+                    );
+                }
+            );
 
         this._store.select(getPartnerForKeyingChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))

@@ -252,7 +252,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewSIFCdNote(PreviewCdNoteCriteria criteria)
         {
             var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
-            var result = cdNoteServices.PreviewSIF(data, criteria.Currency);
+            var result = cdNoteServices.PreviewSIF(data, criteria.Currency, criteria.ExportFormatType);
             return Ok(result);
         }
 
@@ -266,7 +266,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewAirCdNote(PreviewCdNoteCriteria criteria)
         {
             var data = cdNoteServices.GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
-            var result = cdNoteServices.PreviewAir(data, criteria.Currency);
+            var result = cdNoteServices.PreviewAir(data, criteria.Currency, criteria.ExportFormatType);
             return Ok(result);
         }
 

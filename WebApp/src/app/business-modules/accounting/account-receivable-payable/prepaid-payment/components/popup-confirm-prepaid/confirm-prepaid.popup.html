@@ -1,0 +1,114 @@
+<div class="modal charge-from-shipment m-animate-fade-in" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Prepaid</h5>
+                <button type="button" (click)="hide()" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul class="list-unstyled list-group-debit" style="max-height: 600px;
+                        overflow-y: scroll;">
+                            <ng-container *ngFor="let groupItem of groupData; let i = index; trackBy: trackByFn">
+                                <li class="item_group-wrapper m--margin-bottom-30"
+                                    style="box-shadow: 0px 1px 15px 1px rgb(69 65 78 / 8%);">
+                                    <div class="bg-warning d-flex justify-content-start m--padding-10">
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <button type="button" title="Remove" (click)="deletegroupItem(i)"
+                                                class="btn btn-danger m-btn--air btn-sm m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex flex-wrap m--margin-left-20">
+                                            <div class="m--margin-right-10 m--margin-bottom-20">
+                                                <span class="font-weight-bold font-14">Job: &nbsp;</span>
+                                                <span class="text-primary">{{groupItem.job}}</span>
+                                            </div>
+                                            <div class="m--margin-right-10">
+                                                <span class="font-weight-bold font-14">MBL-HBL: &nbsp;</span>
+                                                <span class="text-primary">{{groupItem.mbl}} - {{groupItem.hbl}}</span>
+                                            </div>
+                                            <div class="m--margin-right-10">
+                                                <span class="font-weight-bold font-14">Partner: &nbsp;</span>
+                                                <span class="text-primary"> {{groupItem.partnerName}}</span>
+                                            </div>
+                                            <div class="m--margin-right-10">
+                                                <span class="font-weight-bold font-14">Total Payable: &nbsp;</span>
+                                                <span class="text-primary"> {{groupItem.total | number: '.0-3'}}
+                                                    {{groupItem.currency}}</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <table class="table table-striped table-brand">
+                                        <thead>
+                                            <th></th>
+                                            <th class="text-center">Debit Note</th>
+                                            <th class="text-center">Debit Amount</th>
+                                            <th class="text-center">User Created</th>
+                                        </thead>
+                                        <tbody>
+                                            <ng-container
+                                                *ngFor="let item of groupItem.details; let j = index; trackBy: trackbyFn">
+                                                <tr>
+                                                    <td>
+                                                        <button title="Xóa" (click)="deleteDebitnoteItem(i, j)"
+                                                            class="btn m-btn--icon m-btn--icon-only m--font-danger m--margin-left-10">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td class="text-center text-primary">{{item.debitNote}}</td>
+                                                    <td class="text-center">{{item.totalAmount | number: '.0-3'}}</td>
+                                                    <td class="text-center text-success">{{item.userCreatedName}}</td>
+                                                </tr>
+                                                <tr app-table-none-record *ngIf="!groupItem.details.length"></tr>
+                                            </ng-container>
+
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="font-weight-bold font-15">
+                                                <td></td>
+                                                <td ALIGN="center">TOTAL</td>
+                                                <td class="text-center">{{groupItem.details | sum:'totalAmount' |
+                                                    number: '.0-3'}} {{groupItem.currency}}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </li>
+                            </ng-container>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer row">
+                <div class="col-lg-12">
+                    <div class="m--align-center m--margin-top-20">
+                        <button class="btn btn-primary  m-btn--icon m-btn--uppercase m--margin-right-10" title="Save"
+                            (click)="submitConfirm()">
+                            <span>
+                                <i class="la la-save"></i>
+                                <span>
+                                    Confirm
+                                </span>
+                            </span>
+                        </button>
+                        <button class="btn btn-default  m-btn--icon m-btn--uppercase" title="Cancel" (click)="hide()">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    Cancel
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template inject></ng-template>

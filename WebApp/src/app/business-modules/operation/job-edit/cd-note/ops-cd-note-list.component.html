@@ -132,13 +132,15 @@
                                                                     (click)="openPopupDetail(cdNote.jobId, cdNote.code)">
                                                                     <i class="la la-list"></i>
                                                                 </button>
-                                                                <button type="button"
-                                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                                    *ngIf="cdNote.syncStatus !== 'Synced'"
-                                                                    title="Remove"
-                                                                    (click)="checkDeleteCdNote(cdNote.id)">
-                                                                    <i class="la la-trash"></i>
-                                                                </button>
+                                                                <ng-container *ngIf="cdNote.status !== 'Paid'">
+                                                                    <button type="button"
+                                                                        class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                                                        *ngIf="cdNote.syncStatus !== 'Synced'"
+                                                                        title="Remove"
+                                                                        (click)="checkDeleteCdNote(cdNote.id)">
+                                                                        <i class="la la-trash"></i>
+                                                                    </button>
+                                                                </ng-container>
                                                             </div>
                                                         </td>
                                                         <td>
@@ -147,6 +149,12 @@
                                                         <td>
                                                             <a style="cursor: pointer;"
                                                                 (click)="openPopupDetail(cdNote.jobId, cdNote.code)">{{cdNote.code}}</a>
+                                                            <ng-container [ngSwitch]="cdNote.status">
+                                                                <span *ngSwitchCase="'Unpaid'"
+                                                                    class="badge badge-info m--margin-left-10">
+                                                                    Prepaid
+                                                                </span>
+                                                            </ng-container>
                                                         </td>
                                                         <td class="text-center">
                                                             <span>{{cdNote.total_charge}}</span>
@@ -171,6 +179,13 @@
                                                         </td>
                                                         <td>
                                                             <span>{{cdNote.soaNo}}</span>
+                                                        </td>
+                                                        <td [ngSwitch]="cdNote.status">
+                                                            <span *ngSwitchCase="'Paid'" class="text-success">
+                                                                {{cdNote.status}}</span>
+                                                            <span *ngSwitchDefault class="text-danger">
+                                                                {{cdNote.status}}
+                                                            </span>
                                                         </td>
                                                         <td [ngSwitch]="cdNote.syncStatus">
                                                             <span *ngSwitchCase="'Synced'" class="text-success">

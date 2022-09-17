@@ -171,12 +171,16 @@
         public static readonly string ARGEEMENT_TYPE_OFFICIAL = "Official";
         public static readonly string ARGEEMENT_TYPE_GUARANTEE = "Guarantee";
         public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
-        public static readonly string ARGEEMENT_TYPE_PARENT= "Parent Contract";
+        public static readonly string ARGEEMENT_TYPE_PARENT = "Parent Contract";
+        public static readonly string ARGEEMENT_TYPE_PREPAID = "Prepaid";
 
         public static readonly string STATUS_ACTIVE = "Active";
         public static readonly string STATUS_INACTIVE = "Inactive";
 
         public static readonly string STATUS_SYNCED = "Synced";
+        public static readonly string STATUS_SYNCED_SOA = "SOA";
+        public static readonly string STATUS_SYNCED_SETTLEMENT = "SETTLEMENT";
+        public static readonly string STATUS_SYNCED_CDNOTE = "CDNOTE";
         public static readonly string STATUS_REJECTED = "Rejected";
 
         public static readonly string ACCOUNTANT_TYPE_DEBIT = "DEBIT";
