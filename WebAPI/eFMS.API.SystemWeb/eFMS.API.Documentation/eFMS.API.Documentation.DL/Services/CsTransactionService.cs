@@ -3167,10 +3167,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                IQueryable<CsTransactionDetail> housebills = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
+                IQueryable<CsTransactionDetail> housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId);
                 if (shipment.TransactionType == DocumentConstants.AE_SHIPMENT || shipment.TransactionType == DocumentConstants.AI_SHIPMENT)
                 {
-                    housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId);
                     if (housebills.Count() == 0)
                     {
                         return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
