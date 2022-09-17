@@ -29,7 +29,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         private _ngProgressService: NgProgress,
         private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>,
-        private _systemFileManagerRepo:SystemFileManageRepo,
+        private _systemFileManagerRepo: SystemFileManageRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -47,13 +47,13 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
             });
         this.headers = [
             { title: 'Attach File', field: 'name' },
-            { title : '', field: ''}
+            { title: '', field: '' }
         ];
     }
 
     getFileShipment(jobId: string) {
         this.isLoading = true;
-        this._documentRepo.getShipmentFilesAttachPreAlert(jobId).
+        this._systemFileManagerRepo.getFile('Document', 'Shipment', jobId).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -82,7 +82,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
             //             }
             //         }
             //     );
-            this._systemFileManagerRepo.uploadFileShipment(this.jobId, fileList)
+            this._systemFileManagerRepo.uploadFile('Document', 'Shipment', this.jobId, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -95,7 +95,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                     }
                 );
         }
-        event.target.value ='';
+        event.target.value = '';
     }
 
     checkAllChange() {
@@ -134,13 +134,13 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         this.confirmDeletePopup.show();
     }
 
-    getFileShipmentUrls(){
+    getFileShipmentUrls() {
         return this.files;
     }
-    
+
     onDeleteFile() {
         this.confirmDeletePopup.hide();
-        this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)
+        this._systemFileManagerRepo.deleteFile('Document', 'Shipment', this.jobId, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))

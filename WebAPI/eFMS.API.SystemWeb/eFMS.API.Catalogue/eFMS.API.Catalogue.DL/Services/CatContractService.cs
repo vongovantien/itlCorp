@@ -1750,58 +1750,58 @@ namespace eFMS.API.Catalogue.DL.Services
             return emailBCCs;
         }
 
-        public SysImage GetFileContract(string partnerId, string contractId)
-        {
-            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
-            return result;
-        }
+        //public SysImage GetFileContract(string partnerId, string contractId)
+        //{
+        //    var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
+        //    return result;
+        //}
 
-        public HandleState UpdateFileToContract(List<SysImage> files)
-        {
+        //public HandleState UpdateFileToContract(List<SysImage> files)
+        //{
 
-            var isUpdateDone = new HandleState();
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var item in files)
-                    {
-                        item.IsTemp = null;
-                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
-                        isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
-                    }
-                    trans.Commit();
-                    return isUpdateDone;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-        }
+        //    var isUpdateDone = new HandleState();
+        //    using (var trans = DataContext.DC.Database.BeginTransaction())
+        //    {
+        //        try
+        //        {
+        //            foreach (var item in files)
+        //            {
+        //                item.IsTemp = null;
+        //                item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+        //                isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
+        //            }
+        //            trans.Commit();
+        //            return isUpdateDone;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            trans.Rollback();
+        //            return new HandleState(ex.Message);
+        //        }
+        //        finally
+        //        {
+        //            trans.Dispose();
+        //        }
+        //    }
+        //}
 
-        public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
-        {
-            var result = new ResultHandle();
-            foreach (var item in model)
-            {
-                if (item.Files != null)
-                {
-                    result = await WriteFile(item);
-                }
-            }
-            return result;
-        }
+        //public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
+        //{
+        //    var result = new ResultHandle();
+        //    foreach (var item in model)
+        //    {
+        //        if (item.Files != null)
+        //        {
+        //            result = await WriteFile(item);
+        //        }
+        //    }
+        //    return result;
+        //}
 
-        public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
-        {
-            return await WriteFile(model);
-        }
+        //public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
+        //{
+        //    return await WriteFile(model);
+        //}
 
         private async Task<ResultHandle> WriteFile(ContractFileUploadModel model)
         {
@@ -1853,17 +1853,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-        public async Task<HandleState> DeleteFileContract(Guid id)
-        {
-            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
-            if (item == null) return new HandleState("Not found data");
-            var result = sysImageRepository.Delete(x => x.Id == id);
-            if (result.Success)
-            {
-                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
-            }
-            return result;
-        }
+        //public async Task<HandleState> DeleteFileContract(Guid id)
+        //{
+        //    var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+        //    if (item == null) return new HandleState("Not found data");
+        //    var result = sysImageRepository.Delete(x => x.Id == id);
+        //    if (result.Success)
+        //    {
+        //        var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
+        //    }
+        //    return result;
+        //}
 
         public IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria)
         {

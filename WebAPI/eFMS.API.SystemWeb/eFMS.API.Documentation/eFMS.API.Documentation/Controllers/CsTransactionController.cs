@@ -321,78 +321,78 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <param name="isTemp"></param>
         /// <returns></returns>
-        [HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
-        [Authorize]
-        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required] Guid jobId, bool? isTemp)
-        {
-            DocumentFileUploadModel model = new DocumentFileUploadModel
-            {
-                Files = files,
-                FolderName = "Shipment",
-                JobId = jobId,
-                IsTemp = isTemp
-            };
-            var result = await sysImageService.UploadDocumentationFiles(model);
-            return Ok(result);
-        }
+        //[HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
+        //[Authorize]
+        //public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required] Guid jobId, bool? isTemp)
+        //{
+        //    DocumentFileUploadModel model = new DocumentFileUploadModel
+        //    {
+        //        Files = files,
+        //        FolderName = "Shipment",
+        //        JobId = jobId,
+        //        IsTemp = isTemp
+        //    };
+        //    var result = await sysImageService.UploadDocumentationFiles(model);
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// get all attached files in a shipment
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("GetFileAttachs")]
-        public IActionResult GetAttachedFiles([Required] Guid jobId)
-        {
-            string id = jobId.ToString();
-            var results = sysImageService.Get(x => x.ObjectId == id && x.IsTemp != true);
-            return Ok(results);
-        }
+        //[HttpGet("GetFileAttachs")]
+        //public IActionResult GetAttachedFiles([Required] Guid jobId)
+        //{
+        //    string id = jobId.ToString();
+        //    var results = sysImageService.Get(x => x.ObjectId == id && x.IsTemp != true);
+        //    return Ok(results);
+        //}
 
         /// <summary>
         /// get all attached files in a shipment for pre alert
         /// </summary>
         /// <param name="jobId"></param>
         /// <returns></returns>
-        [HttpGet("GetFileAttachsPreAlert")]
-        public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
-        {
-            string id = jobId.ToString();
-            var results = sysImageService.Get(x => x.ObjectId == id);
-            return Ok(results);
-        }
+        //[HttpGet("GetFileAttachsPreAlert")]
+        //public IActionResult GetAttachedFilesPreAlert([Required] Guid jobId)
+        //{
+        //    string id = jobId.ToString();
+        //    var results = sysImageService.Get(x => x.ObjectId == id);
+        //    return Ok(results);
+        //}
 
-        [Authorize]
-        [HttpPut("UpdateFilesToShipment")]
-        public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
-        {
-            var result = sysImageService.UpdateFilesToShipment(files);
-            return Ok(result);
-        }
+        //[Authorize]
+        //[HttpPut("UpdateFilesToShipment")]
+        //public IActionResult UpdateFilesToShipment([FromBody] List<SysImageModel> files)
+        //{
+        //    var result = sysImageService.UpdateFilesToShipment(files);
+        //    return Ok(result);
+        //}
 
-        [Authorize]
-        [HttpDelete("DeleteAttachedFile/{id}")]
-        public async Task<IActionResult> DeleteAttachedFile([Required] Guid id)
-        {
-            HandleState hs = await sysImageService.DeleteFile(id);
-            if (hs.Success)
-            {
-                return Ok(new ResultHandle { Message = "Delete file Successfully", Status = true });
-            }
-            return BadRequest(hs);
-        }
+        //[Authorize]
+        //[HttpDelete("DeleteAttachedFile/{id}")]
+        //public async Task<IActionResult> DeleteAttachedFile([Required] Guid id)
+        //{
+        //    HandleState hs = await sysImageService.DeleteFile(id);
+        //    if (hs.Success)
+        //    {
+        //        return Ok(new ResultHandle { Message = "Delete file Successfully", Status = true });
+        //    }
+        //    return BadRequest(hs);
+        //}
 
-        [Authorize]
-        [HttpDelete("DeleteFileTempPreAlert/{jobId}")]
-        public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
-        {
-            HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
-            if (hs.Success)
-            {
-                return Ok(new ResultHandle { Message = "Delete file Successfully" });
-            }
-            return BadRequest(hs);
-        }
+        //[Authorize]
+        //[HttpDelete("DeleteFileTempPreAlert/{jobId}")]
+        //public async Task<IActionResult> DeleteFileTempPreAlert([Required] Guid jobId)
+        //{
+        //    HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
+        //    if (hs.Success)
+        //    {
+        //        return Ok(new ResultHandle { Message = "Delete file Successfully" });
+        //    }
+        //    return BadRequest(hs);
+        //}
         #endregion -- INSERT & UPDATE
 
         #region -- DELETE --

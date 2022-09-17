@@ -11,10 +11,10 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ISysImageService: IRepositoryBase<SysImage, SysImageModel>
     {
-        Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model);
-        Task<HandleState> DeleteFile(Guid id);
-        HandleState UpdateFilesToShipment(List<SysImageModel> files);
-        Task<HandleState> DeleteFileTempPreAlert(Guid jobId);
+        //Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model);
+        //Task<HandleState> DeleteFile(Guid id);
+        //HandleState UpdateFilesToShipment(List<SysImageModel> files);
+        //Task<HandleState> DeleteFileTempPreAlert(Guid jobId);
 
     }
 }
