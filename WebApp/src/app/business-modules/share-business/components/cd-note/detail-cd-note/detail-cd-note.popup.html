@@ -322,15 +322,18 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
-                    *ngIf="CdNoteDetail.syncStatus !== 'Synced'" (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
-                    <span>
-                        <i class="la la-trash"></i>
+                <ng-container *ngIf="CdNoteDetail.status !== 'Paid'">
+                    <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
+                        *ngIf="CdNoteDetail.syncStatus !== 'Synced'"
+                        (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                         <span>
-                            Delete note
+                            <i class="la la-trash"></i>
+                            <span>
+                                Delete note
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </ng-container>
                 <button class="btn btn-success  m-btn--icon m-btn--uppercase"
                     *ngIf="CdNoteDetail.syncStatus !== 'Synced' && CdNoteDetail.syncStatus !== 'Removed Inv' && CdNoteDetail.status !== 'Paid'"
                     (click)="openPopupEdit()">

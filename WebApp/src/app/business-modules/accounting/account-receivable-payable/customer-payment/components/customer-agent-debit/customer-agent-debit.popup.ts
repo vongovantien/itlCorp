@@ -221,7 +221,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                             resultsCached = this.listDebit.filter(x => body.referenceNos.includes(x.refNo) || body.referenceNos.includes(x.invoiceNo));
                             break;
                     }
-                    if (resultsCached.length === body.referenceNos.length) {
+                    if (resultsCached.length >= body.referenceNos.length) {
                         this.listDebit = [...resultsCached];
                         return;
                     }

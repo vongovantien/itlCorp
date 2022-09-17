@@ -67,7 +67,7 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
 
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
-        List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
         Task<HandleState> UpdateFlightInfo(Guid Id);
+        List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
     }
 }

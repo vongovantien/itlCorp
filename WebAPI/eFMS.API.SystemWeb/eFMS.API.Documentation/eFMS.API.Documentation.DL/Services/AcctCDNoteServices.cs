@@ -3949,22 +3949,8 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(x => x.JobNo == jobNo);
             }
             var surcharges = surchargeRepository.Get(query);
-            var debitNos = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).ToList();
-            if (debitNos.Count > 0)
-            {
-                var surchargeDebit = surcharges.Where(x => debitNos.Any(z => z == x.DebitNo));
-                var shipmentGrp = surchargeDebit.GroupBy(x => new { x.Hblid, x.PaymentObjectId, TransactionType = (x.TransactionType == "CL" ? "CL" : "DOC") });
-                foreach (var debit in shipmentGrp)
-                {
-                    HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(debit.Key.PaymentObjectId, debit.Key.Hblid, debit.Key.TransactionType, CHECK_POINT_TYPE.DEBIT_NOTE, "");
-                    if (string.IsNullOrEmpty(hs.Message?.ToString()))
-                    {
-                        cdNoteCodes.AddRange(surchargeDebit.Where(x => x.PaymentObjectId == debit.Key.PaymentObjectId && x.Hblid == debit.Key.Hblid).Select(x => x.DebitNo).Distinct());
-                    }
-                }
-            }
+            cdNoteCodes = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).ToList();
             cdNoteCodes.AddRange(surcharges.Where(x => !string.IsNullOrEmpty(x.CreditNo)).Select(x => x.CreditNo));
-            cdNoteCodes = cdNoteCodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
 
             var data = DataContext.Get(x => cdNoteCodes.Any(z => z == x.Code)).ToList();
 
