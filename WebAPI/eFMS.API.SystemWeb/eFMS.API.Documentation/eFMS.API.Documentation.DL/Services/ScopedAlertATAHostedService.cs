@@ -1,20 +1,16 @@
 ﻿using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.IService;
-using eFMS.API.Documentation.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class ScopedAlertATAHostedService : BackgroundService, IHostedService
+    public class ScopedAlertATDHostedService : BackgroundService
     {
         public IServiceScopeFactory services { get; }
-        public ScopedAlertATAHostedService(IServiceScopeFactory _service)
+        public ScopedAlertATDHostedService(IServiceScopeFactory _service)
         {
             services = _service;
         }
@@ -32,19 +28,15 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var scopedProcessingService =
                         scope.ServiceProvider
-                            .GetRequiredService<IScopedProcessingAlertATAService>();
-                    //var csTransaction =
-                    //    scope.ServiceProvider
-                    //        .GetRequiredService<ICsTransactionScoped>();
-                    await scopedProcessingService.AlertATA();
+                            .GetRequiredService<IScopedProcessingAlertATDService>();
+                    await scopedProcessingService.AlertATD();
                 }
             }
-            
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
-            new LogHelper("ScopedAlertATAHostedService", "STOP\n");
+            new LogHelper("ScopedAlertATDHostedService", "STOP\n");
             await base.StopAsync(stoppingToken);
         }
     }

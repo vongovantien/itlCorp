@@ -52,8 +52,8 @@ namespace eFMS.API.Shipment
             services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
-            services.AddHostedService<ScopedAlertATAHostedService>();
-            services.AddScoped<IScopedProcessingAlertATAService, ScopedProcessingAlertATAService>();
+            services.AddHostedService<ScopedAlertATDHostedService>();
+            services.AddScoped<IScopedProcessingAlertATDService, ScopedProcessingAlertATDService>();
             services.Configure<ApiServiceUrl>(option => {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
                 option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
