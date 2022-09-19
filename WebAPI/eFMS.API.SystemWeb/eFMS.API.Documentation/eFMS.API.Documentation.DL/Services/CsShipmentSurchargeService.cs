@@ -2221,10 +2221,13 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.ClearanceDate).GroupBy(x=>x.ClearanceDate).FirstOrDefault();
-            if(customLastGrp != null&& customLastGrp.Count()>1)
+            var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).OrderBy(o => o.ClearanceDate).GroupBy(x=>x.ClearanceDate)?.FirstOrDefault();
+            if(customLastGrp != null)
             {
-                customLastGrp.OrderBy(x => x.DatetimeCreated);
+                if(customLastGrp.Count() > 1)
+                {
+                    customLastGrp.OrderBy(x => x.DatetimeModified);
+                }
             }
             var customNos = customLastGrp.FirstOrDefault().ClearanceNo;
             return customNos;
