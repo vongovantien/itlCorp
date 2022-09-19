@@ -240,14 +240,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "NoProfit shipment is not applicable to profit bigger than 0" });
             }
-            var isChargesUpdated = false;
-            if (chargesCheckNoProfit.Count() > 0)
-            {
-                isChargesUpdated = true;
-                list = chargesCheckNoProfit;
-            }
 
-            var hs = csShipmentSurchargeService.AddAndUpdate(list, isChargesUpdated, out List<Guid> Ids);
+            var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
