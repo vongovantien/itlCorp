@@ -12,7 +12,6 @@ namespace eFMS.API.Documentation.DL.IService
     {
         Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria);
         Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model);
-        Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);
-    }
+        Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listItem, Guid jobId);}
 
 }

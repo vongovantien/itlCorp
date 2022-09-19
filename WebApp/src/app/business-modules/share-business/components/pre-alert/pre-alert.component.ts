@@ -1344,7 +1344,10 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         if (this.isPreAlert) {
             this.stageType = "SEND_PA"
         }
-        if (this.stageType.length === 0) {
+        if (this.isSendHbl || this.isSendHawb) {
+            this.stageType = "SEND_HB"
+        }
+        if (this.stageType.length !== 0) {
             this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe();
