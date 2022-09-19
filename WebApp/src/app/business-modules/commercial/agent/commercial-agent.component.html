@@ -99,13 +99,13 @@
                                                     </td>
                                                     <td>
                                                         <span>{{sale.contractType}}</span>
-                                                        <span *ngIf="!sale.expiredDate" title="Contract is expired">
+                                                        <span *ngIf="!!sale.isExpired" title="Contract is expired">
                                                             <i class="la la-history la-lg"></i>
                                                         </span>
-                                                        <span *ngIf="!sale.trialCreditLimited" title="Contract is over credit limit">
+                                                        <span *ngIf="!!sale.isOverLimit" title="Contract is over credit limit">
                                                             <i class="la la-exclamation la-lg text-danger"></i>
-                                                        </span>
-                                                        <span *ngIf="!sale.noDue && !!sale" title="Contract have overdued">
+                                                        </span> 
+                                                        <span *ngIf="!!sale.isOverDue && !sale.noDue" title="Contract have overdued">
                                                             <i class="la la-exclamation-triangle la-lg text-warning"></i>
                                                         </span>
                                                     </td>

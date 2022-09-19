@@ -117,7 +117,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
-            { title: 'Billing Address', field: 'addressVn', sortable: true },
+            { title: 'Billing Address', field: 'addressVn', sortable: true }
         ];
 
         this.headerSearch = [
