@@ -416,7 +416,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     });
                 }
                 if(this.isAL){
-                    if(this.isExitsDO)
+                    if(this.isExitsDO  && this.isCheckedDO)
                     streamUploadReport.push(this._documentRepo.previewAirImportAuthorizeLetter1(this.hblId, false));
                 }
                 if (this.isPOD) {
