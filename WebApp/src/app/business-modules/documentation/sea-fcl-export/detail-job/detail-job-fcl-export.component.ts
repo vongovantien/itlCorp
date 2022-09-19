@@ -457,7 +457,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             pod: modelAdd.pod,
             bookingNo: modelAdd.bookingNo,
             voyNo: modelAdd.voyNo,
-            mblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb,
+            polDescription: modelAdd.polDescription,
+            podDescription: modelAdd.podDescription
         };
 
         this._progressRef.start();

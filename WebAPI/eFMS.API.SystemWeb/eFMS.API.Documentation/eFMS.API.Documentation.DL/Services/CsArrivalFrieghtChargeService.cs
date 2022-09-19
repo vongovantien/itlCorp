@@ -836,16 +836,16 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public SysImage GetFileProofOfDelivery(Guid hblId)
-        {
-            var result = sysImageRepository.Get(x => x.ObjectId == hblId.ToString()).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
-            return result;
-        }
+        //public SysImage GetFileProofOfDelivery(Guid hblId)
+        //{
+        //    var result = sysImageRepository.Get(x => x.ObjectId == hblId.ToString()).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
+        //    return result;
+        //}
 
-        public async Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model)
-        {
-            return await WriteFile(model);
-        }
+        //public async Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model)
+        //{
+        //    return await WriteFile(model);
+        //}
 
         private async Task<ResultHandle> WriteFile(ProofDeliveryFileUploadModel model)
         {
@@ -895,17 +895,17 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
 
-        public async Task<HandleState> DeleteFilePOD(Guid id)
-        {
-            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
-            if (item == null) return new HandleState("Not found data");
-            var result = sysImageRepository.Delete(x => x.Id == id);
-            if (result.Success)
-            {
-                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, "Shipment");
-            }
-            return result;
-        }
+        //public async Task<HandleState> DeleteFilePOD(Guid id)
+        //{
+        //    var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+        //    if (item == null) return new HandleState("Not found data");
+        //    var result = sysImageRepository.Delete(x => x.Id == id);
+        //    if (result.Success)
+        //    {
+        //        var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, "Shipment");
+        //    }
+        //    return result;
+        //}
 
 
         public Crystal PreviewDeliveryOrder(Guid hblid)

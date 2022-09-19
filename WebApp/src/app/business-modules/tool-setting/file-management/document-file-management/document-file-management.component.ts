@@ -253,7 +253,7 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
         this.onResetFilterValue()
         this.page = 1
         this.pageSize = this.numberToShow[0];
-        
+
         if ($event === "Document") {
             this.isDisplayFolderParent = true;
             this.itemsDefault = this.dataDefault;
@@ -306,7 +306,7 @@ export class DocumentFileManagementComponent extends AppList implements OnInit, 
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._systemFileManageRepo.uploadFileShipment(this.folderChild, fileList)
+            this._systemFileManageRepo.uploadFile('Document', 'Shipment', this.folderChild, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {

@@ -3163,15 +3163,15 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion -- PREVIEW --
 
-        public ResultHandle SyncHouseBills(Guid JobId, CsTransactionSyncHBLCriteria model)
+        public async Task<ResultHandle> SyncHouseBills(Guid JobId, CsTransactionSyncHBLCriteria model)
         {
+            ResultHandle result = new ResultHandle();
             try
             {
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                List<CsTransactionDetail> housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
-
+                IQueryable<CsTransactionDetail> housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId);
                 if (shipment.TransactionType == DocumentConstants.AE_SHIPMENT || shipment.TransactionType == DocumentConstants.AI_SHIPMENT)
                 {
                     if (housebills.Count() == 0)
@@ -3180,6 +3180,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
+                        bool isManyHBls = housebills.Count() > 1;
                         foreach (var hbl in housebills)
                         {
                             hbl.UserModified = currentUser.UserID;
@@ -3190,6 +3191,8 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.Etd = model.Etd;
                             hbl.Pod = model.Pod;
                             hbl.Pol = model.Pol;
+                            hbl.PodDescription = model.PodDescription;
+                            hbl.PolDescription = model.PolDescription;
                             hbl.IssuedBy = model.IssuedBy;
                             hbl.FlightDate = model.FlightDate;
                             hbl.ForwardingAgentId = model.AgentId;
@@ -3200,17 +3203,24 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.ForwardingAgentDescription = agentDescription;
 
 
-                            // CR 14501
-                            hbl.PackageQty = model.PackageQty;
-                            hbl.GrossWeight = model.GrossWeight;
-                            hbl.Hw = model.Hw;
-                            hbl.ChargeWeight = model.ChargeWeight;
-
+                            // CR 14501 -> 18083
+                            if(!isManyHBls)
+                            {
+                                hbl.PackageQty = model.PackageQty;
+                                hbl.GrossWeight = model.GrossWeight;
+                                hbl.Hw = model.Hw;
+                                hbl.ChargeWeight = model.ChargeWeight;
+                                hbl.Cbm = model.Cbm;
+                            }
+                           
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
-                        csTransactionDetailRepo.SubmitChanges();
-
-                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                        HandleState hs = csTransactionDetailRepo.SubmitChanges();
+                        if(hs.Success)
+                        {
+                            return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                        }
+                        return result;
                     }
                 }
                 else
@@ -3237,10 +3247,12 @@ namespace eFMS.API.Documentation.DL.Services
                             if (model.Pod != null)
                             {
                                 hbl.Pod = model.Pod;
+                                hbl.PodDescription = model.PodDescription;
                             }
                             if (model.Pol != null)
                             {
                                 hbl.Pol = model.Pol;
+                                hbl.PolDescription = model.PolDescription;
                             }
 
                             hbl.CustomsBookingNo = model.BookingNo;
@@ -3255,7 +3267,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 var status = string.Empty;
                                 foreach (var st in _onBoardStatus)
                                 {
-                                    if (DateTime.TryParse(st, out DateTime result))
+                                    if (DateTime.TryParse(st, out DateTime r))
                                     {
                                         status += model.Etd?.ToString("MMM dd, yyyy");
                                     }
@@ -3268,15 +3280,17 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
-                        csTransactionDetailRepo.SubmitChanges();
-
-                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                        HandleState hs = csTransactionDetailRepo.SubmitChanges();
+                        if(hs.Success)
+                        {
+                            return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                        }
+                        return result;
                     }
                 }
             }
             catch (Exception ex)
             {
-                var result = new HandleState(ex.Message);
                 return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }

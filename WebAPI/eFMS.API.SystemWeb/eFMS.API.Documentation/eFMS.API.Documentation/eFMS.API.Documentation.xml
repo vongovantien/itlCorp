@@ -639,7 +639,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Documentation.DL.IService.ISysImageService)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Documentation.DL.IService.ICheckPointService,eFMS.API.Documentation.DL.IService.ISysImageService)">
             <summary>
             constructor
             </summary>
@@ -764,7 +764,7 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Import(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
             <summary>
-            import transaction
+            import transaction - save duplicate job
             </summary>
             <param name="model"></param>
             <returns></returns>
@@ -870,9 +870,9 @@
             <param name="issuedDate">Issued Date of housebill</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.GetHAWBListOfShipment(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.GetHAWBListOfShipment(System.Guid,System.Nullable{System.Guid})">
             <summary>
-            Get HAWB List Of Shipment
+            Get HAWB List Of Shipment with check Check point
             </summary>
             <param name="jobId"></param>
             <returns></returns>
@@ -922,12 +922,13 @@
             <param name="hblId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Nullable{System.Guid},System.Nullable{System.Guid})">
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirExport(System.Collections.Generic.List{System.Nullable{System.Guid}},System.Nullable{System.Guid},System.Nullable{System.Boolean})">
             <summary>
             Get info mail Pre Alert shipment/housebill of Air Export
             </summary>
-            <param name="hblId">Housebill ID</param>
+            <param name="hblIds">Housebill ID</param>
             <param name="jobId"></param>
+            <param name="isFromShipment">Button send mail is from shipment or Hbl detail</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetMailProofOfDeliveryHBLAir(System.Guid)">
@@ -944,13 +945,14 @@
             <param name="hblId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Nullable{System.Guid},System.Nullable{System.Guid},System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLPreAlerSeaExport(System.Collections.Generic.List{System.Nullable{System.Guid}},System.Nullable{System.Guid},System.String,System.Nullable{System.Boolean})">
             <summary>
             Get info mail housebill of Air Export
             </summary>
-            <param name="hblId">Housebill ID</param>
+            <param name="hblIds">Housebill ID</param>
             <param name="jobId"></param>
             <param name="serviceId"></param>
+            <param name="isFromShipment">Button send mail is from shipment or Hbl detail</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailSISeaExport(System.Guid)">
@@ -1010,7 +1012,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Common.Globals.Menu)">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ICheckPointService,eFMS.API.Common.Globals.Menu)">
             <summary>
             
             </summary>
@@ -1106,6 +1108,14 @@
             </summary>
             <param name="jobId"></param>
             <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.AutoRateReplicate(System.String,System.String)">
+            <summary>
+            Calling AutoRateReplicate
+            </summary>
+            <param name="settleNo">Settlement Code</param>
+            <param name="jobNo">Job No</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.GetOutsourcingRegcognising(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">

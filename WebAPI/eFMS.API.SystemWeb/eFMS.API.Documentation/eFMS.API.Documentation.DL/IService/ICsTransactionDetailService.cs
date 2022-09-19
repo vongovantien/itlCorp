@@ -10,6 +10,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -66,7 +67,7 @@ namespace eFMS.API.Documentation.DL.IService
         int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
 
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
-        IQueryable<CsTransactionDetail> GetHAWBListOfShipment(Guid jobId);
-        HandleState UpdateFlightInfo(Guid Id);
+        Task<HandleState> UpdateFlightInfo(Guid Id);
+        List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
     }
 }

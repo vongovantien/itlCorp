@@ -16,6 +16,8 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -213,6 +215,36 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.selectedTab = tabName;
     }
 
+    sendMail(type: string){
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    if (!!err.error.message) {
+                        this._toastService.error("Can not Send mail. " + err.error.message + ". Please recheck again.");
+                    }
+                    return throwError(err.error.message);
+                })
+            ).subscribe(
+                (res: any) => {
+                    if(res.status){
+                        switch (type) {
+                            case 'ArrivalNotice':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/arrivalnotice`]);
+                                break;
+                            case 'DO':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/deliveryorder`]);
+                                break;
+                            case 'POD':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/proofofdelivery`]);
+                                break;
+                            case 'HBL':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/sendhbl`]);
+                                break;
+                        }
+                    }
+                },
+            );
+    }
     // onPreview(type: string) {
     //     this.isClickSubMenu = false;
 

@@ -9,7 +9,7 @@ import { CsTransaction } from '@models';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
-import { RoutingConstants} from '@constants';
+import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
@@ -416,7 +416,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             pod: modelAdd.pod,
             bookingNo: modelAdd.bookingNo,
             voyNo: modelAdd.voyNo,
-            mblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb,
+            polDescription: modelAdd.polDescription,
+            podDescription: modelAdd.podDescription
 
         };
 
