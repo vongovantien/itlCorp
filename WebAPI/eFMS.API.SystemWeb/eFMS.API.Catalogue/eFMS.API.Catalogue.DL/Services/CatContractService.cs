@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1750,58 +1751,58 @@ namespace eFMS.API.Catalogue.DL.Services
             return emailBCCs;
         }
 
-        public SysImage GetFileContract(string partnerId, string contractId)
-        {
-            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
-            return result;
-        }
+        //public SysImage GetFileContract(string partnerId, string contractId)
+        //{
+        //    var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
+        //    return result;
+        //}
 
-        public HandleState UpdateFileToContract(List<SysImage> files)
-        {
+        //public HandleState UpdateFileToContract(List<SysImage> files)
+        //{
 
-            var isUpdateDone = new HandleState();
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var item in files)
-                    {
-                        item.IsTemp = null;
-                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
-                        isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
-                    }
-                    trans.Commit();
-                    return isUpdateDone;
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
-            }
-        }
+        //    var isUpdateDone = new HandleState();
+        //    using (var trans = DataContext.DC.Database.BeginTransaction())
+        //    {
+        //        try
+        //        {
+        //            foreach (var item in files)
+        //            {
+        //                item.IsTemp = null;
+        //                item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+        //                isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
+        //            }
+        //            trans.Commit();
+        //            return isUpdateDone;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            trans.Rollback();
+        //            return new HandleState(ex.Message);
+        //        }
+        //        finally
+        //        {
+        //            trans.Dispose();
+        //        }
+        //    }
+        //}
 
-        public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
-        {
-            var result = new ResultHandle();
-            foreach (var item in model)
-            {
-                if (item.Files != null)
-                {
-                    result = await WriteFile(item);
-                }
-            }
-            return result;
-        }
+        //public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
+        //{
+        //    var result = new ResultHandle();
+        //    foreach (var item in model)
+        //    {
+        //        if (item.Files != null)
+        //        {
+        //            result = await WriteFile(item);
+        //        }
+        //    }
+        //    return result;
+        //}
 
-        public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
-        {
-            return await WriteFile(model);
-        }
+        //public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
+        //{
+        //    return await WriteFile(model);
+        //}
 
         private async Task<ResultHandle> WriteFile(ContractFileUploadModel model)
         {
@@ -1853,17 +1854,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-        public async Task<HandleState> DeleteFileContract(Guid id)
-        {
-            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
-            if (item == null) return new HandleState("Not found data");
-            var result = sysImageRepository.Delete(x => x.Id == id);
-            if (result.Success)
-            {
-                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
-            }
-            return result;
-        }
+        //public async Task<HandleState> DeleteFileContract(Guid id)
+        //{
+        //    var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+        //    if (item == null) return new HandleState("Not found data");
+        //    var result = sysImageRepository.Delete(x => x.Id == id);
+        //    if (result.Success)
+        //    {
+        //        var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
+        //    }
+        //    return result;
+        //}
 
         public IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria)
         {
@@ -1878,8 +1879,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (partnerAcRef != null)
                 {
                     var partnerId = criteria.IsGetChild == true ? partnerAcRef.Id : partnerAcRef.ParentId;
-                    IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
-
+                    // IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
+                    Expression<Func<CatContract, bool>> queryContract = x => x.PartnerId == partnerId;
+                    if(criteria.Status != null)
+                    {
+                        queryContract = queryContract.And(x => x.Active == criteria.Status);
+                    }
+                    if(!string.IsNullOrEmpty(criteria.SalesmanId))
+                    {
+                        queryContract = queryContract.And(x => x.SaleManId == criteria.SalesmanId);
+                    }
+                    if (criteria.Office != null && criteria.Office != Guid.Empty)
+                    {
+                        queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office.ToString()));
+                    }
+                    if (!string.IsNullOrEmpty(criteria.Service))
+                    {
+                        queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
+                    }
+                    IQueryable<CatContract> catContracts = DataContext.Get(queryContract);
                     var queryContracts = from contract in catContracts
                                          join users in sysUser on contract.SaleManId equals users.Id
                                          join employee in employees on users.EmployeeId equals employee.Id
@@ -1913,6 +1931,38 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatContract GetContractById(Guid Id)
         {
             return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+        }
+
+        private bool IsMatchService(string saleService, string serviceTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(saleService) && !string.IsNullOrEmpty(serviceTerm))
+            {
+                var serviceList = saleService.ToLower().Split(";").ToList();
+                if (serviceList.Count > 0)
+                {
+                    isMatch = serviceList.Any(z => z == serviceTerm.ToLower());
+                }
+            }
+
+            return isMatch;
+        }
+
+        private bool IsMatchOffice(string saleOffice, string officeTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(saleOffice) && !string.IsNullOrEmpty(officeTerm))
+            {
+                var officeList = saleOffice.ToLower().Split(";").ToList();
+                if (officeList.Count > 0)
+                {
+                    isMatch = officeList.Any(z => z == officeTerm.ToLower());
+                }
+            }
+
+            return isMatch;
         }
     }
 }

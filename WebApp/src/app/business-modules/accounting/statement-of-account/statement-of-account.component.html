@@ -28,8 +28,6 @@
                                         </th>
                                     </thead>
                                     <tbody>
-                                        <tr *ngIf="!isLoading && !SOAs.length | async" app-table-none-record>
-                                        </tr>
                                         <tr *ngFor="let soa of SOAs; let i = index; trackBy: trackByFn"
                                             [class.invalid-row]="soa.syncStatus === 'Rejected'">
                                             <td class="table-actions-col">
@@ -107,6 +105,8 @@
                                                     {{soa.lastSyncDate | date:'dd/MM/yyyy HH:mm'}}
                                                 </span>
                                             </td>
+                                        </tr>
+                                        <tr *ngIf="!SOAs.length " app-table-none-record>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading|async" app-table-row-loading>
                                         </tr>

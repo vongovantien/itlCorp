@@ -62,12 +62,12 @@
 
 <ul class="m-nav-sticky fms-shipment-sidebar">
     <li class="m-nav-sticky__item">
-        <a title="Send Pre Alert" [routerLink]="['./manifest']">Send P.A</a>
+        <a title="Send Pre Alert" (click)="sendMail('Pre-Alert')">Send P.A</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send Proof Of Delivery" [routerLink]="['./proofofdelivery']">Send POD</a>
+        <a title="Send Proof Of Delivery" (click)="sendMail('POD')">Send POD</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send HAWB" [routerLink]="['./houseairwaybill']">Send HAWB</a>
+        <a title="Send HAWB" (click)="sendMail('HAWB')">Send HAWB</a>
     </li>
 </ul>

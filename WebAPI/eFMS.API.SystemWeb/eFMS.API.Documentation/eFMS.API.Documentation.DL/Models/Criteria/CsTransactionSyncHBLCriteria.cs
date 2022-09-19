@@ -21,7 +21,11 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public int? PackageQty;
         public decimal? ChargeWeight;
         public decimal? GrossWeight;
+        public decimal? Cbm;
         public decimal? Hw;
+        public string PodDescription;
+        public string PolDescription;
+
 
 
     }
