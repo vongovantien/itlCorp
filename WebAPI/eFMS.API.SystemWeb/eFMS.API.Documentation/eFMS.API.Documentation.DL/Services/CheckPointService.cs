@@ -179,66 +179,33 @@ namespace eFMS.API.Documentation.DL.Services
                     valid = false;
                 }
             }
+           
+            return valid;
+        }
 
-            /*
-            // Tạm thời pending check issue debit
-            if (valid == false && checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+        private bool ValidateCheckPointPrepaidContractPartner(Guid HblId, string partnerId, string transactionType)
+        {
+            bool valid = true;
+            var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
+            if (surcharges.Count() == 0)
             {
-                IQueryable<object> groupHblIdCs = Enumerable.Empty<object>().AsQueryable();
-                IQueryable<object> groupHblIdOps = Enumerable.Empty<object>().AsQueryable();
-
-                var hblidShipments = GetHblIdShipmentSameSaleman(HblId, salemanCurrent);
-                // K check cùng service, có thể dính lô khác service
-                groupHblIdOps = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
-                   .Where(x => x.TransactionType == DocumentConstants.LG_SHIPMENT)
-                   .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
-                   .SelectMany(j => j, (j, r) => new CsShipmentSurcharge() { JobNo = r.JobNo, Hblid = r.Hblid });
-
-                groupHblIdCs = csSurchargeRepository.Get(x => x.PaymentObjectId == partnerId && hblidShipments.Contains(x.Hblid))
-                    .Where(x => x.TransactionType != DocumentConstants.LG_SHIPMENT)
-                    .GroupBy(x => new { x.JobNo, x.Hblid, x.TransactionType })
-                    .SelectMany(x => x, (x, y) => new CsShipmentSurcharge() { JobNo = y.JobNo, Hblid = y.Hblid });
-
-                var qGrServiceDateShipmentOps = Enumerable.Empty<object>().AsQueryable();
-                var qGrServiceDateShipmentCs = Enumerable.Empty<object>().AsQueryable();
-                object oldestShipment = null;
-
-                if (groupHblIdCs.Count() > 0)
-                {
-                    qGrServiceDateShipmentCs = from sur in groupHblIdCs
-                                               join cs in csTransactions on ObjectUtility.GetValue(sur, "JobNo") equals cs.JobNo // make sur jobNo k dup, đúng vs hblId
-                                               orderby cs.ServiceDate ascending
-                                               select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), cs.ServiceDate };
-
-                    if (qGrServiceDateShipmentCs.Count() > 0)
-                    {
-                        oldestShipment = qGrServiceDateShipmentCs.FirstOrDefault();
-
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
-                else if (groupHblIdOps.Count() > 0)
-                {
-                    qGrServiceDateShipmentOps = from sur in groupHblIdOps
-                                                join ops in opsTransactions on ObjectUtility.GetValue(sur, "Hblid") equals ops.Hblid
-                                                orderby ops.ServiceDate ascending
-                                                select new { Hblid = ObjectUtility.GetValue(sur, "Hblid"), ops.ServiceDate };
-
-                    if (qGrServiceDateShipmentOps.Count() > 0)
-                    {
-                        oldestShipment = qGrServiceDateShipmentOps.FirstOrDefault();
-
-                        if (HblId.ToString() == ObjectUtility.GetValue(oldestShipment, "Hblid").ToString())
-                        {
-                            valid = true;
-                        }
-                    }
-                }
+                return false;
             }
-            */
+
+            var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
+            if (hasIssuedDebit)
+            {
+                return false;
+            }
+            var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
+            var debitNotes = DC.AcctCdnote.Where(x => debitCodes.Contains(x.Code)
+                            && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE));
+            var hasConfirm = debitNotes.Any(x => x.Status != DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+            if (hasConfirm)
+            {
+                valid = false;
+            }
+
             return valid;
         }
 
@@ -440,6 +407,17 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else isValid = true;
                     break;
+                case "Prepaid":
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                    {
+                        isValid = ValidateCheckPointPrepaidContractPartner(HblId, partnerId, transactionType);
+                    } else
+                    {
+                        isValid = true;
+                    }
+                    if (!isValid) errorCode = 5;
+
+                    break;
                 default:
                     isValid = true;
                     break;
@@ -465,6 +443,10 @@ namespace eFMS.API.Documentation.DL.Services
                     case 4:
                         messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please you check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
+                        break;
+                    case 5:
+                        messError = string.Format(@"Contract of {0} is Prepaid. Please issue Prepaid Debit and wait AR confirm",
+                            partner?.ShortName);
                         break;
                     default:
                         break;

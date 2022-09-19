@@ -31,7 +31,7 @@ export class DocumentationRepo {
     }
 
     updateFlightInfo(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/UpdateFlightInfo?id=${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -519,23 +519,23 @@ export class DocumentationRepo {
         );
     }
 
-    uploadFileProofOfDelivery(hblId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/uploadFileProofOfDelivery/${hblId}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileProofOfDelivery(hblId: string, body: any) {
+    //     return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/uploadFileProofOfDelivery/${hblId}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    getPODFilesAttach(hblid: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/GetFileAttachsProofOfDelivery`, { hblId: hblid }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getPODFilesAttach(hblid: string) {
+    //     return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/GetFileAttachsProofOfDelivery`, { hblId: hblid }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deletePODFilesAttach(fileId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/DeletePODAttachedFile/${fileId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deletePODFilesAttach(fileId: string) {
+    //     return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/DeletePODAttachedFile/${fileId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     setDefaultHeaderFooterDeliveryOrder(body: any = {}) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/SetDeliveryOrderHeaderFooterDefault`, body).pipe(
@@ -805,35 +805,35 @@ export class DocumentationRepo {
         );
     }
 
-    uploadFileShipment(jobId: string, isTemp: boolean = null, body: any) {
-        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}/${isTemp}`, body, 'files').pipe(
-            map((data: any) => data)
-        );
-    }
+    // uploadFileShipment(jobId: string, isTemp: boolean = null, body: any) {
+    //     return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}/${isTemp}`, body, 'files').pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    getShipmentFilesAttach(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getShipmentFilesAttach(jobId: string) {
+    //     return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    getShipmentFilesAttachPreAlert(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachsPreAlert`, { jobId: jobId }).pipe(
-            map((data: any) => data)
-        );
-    }
+    // getShipmentFilesAttachPreAlert(jobId: string) {
+    //     return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachsPreAlert`, { jobId: jobId }).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    updateFilesToShipment(files: any[] = []) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UpdateFilesToShipment`, files).pipe(
-            map((data: any) => data)
-        );
-    }
+    // updateFilesToShipment(files: any[] = []) {
+    //     return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UpdateFilesToShipment`, files).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
-    deleteShipmentFilesAttach(fileId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteShipmentFilesAttach(fileId: string) {
+    //     return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     getShipmentToUnlock(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentToUnLock`, body).pipe(
@@ -1018,11 +1018,11 @@ export class DocumentationRepo {
         );
     }
 
-    deleteFileTempPreAlert(jobId: string) {
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteFileTempPreAlert/${jobId}`).pipe(
-            map((data: any) => data)
-        );
-    }
+    // deleteFileTempPreAlert(jobId: string) {
+    //     return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteFileTempPreAlert/${jobId}`).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     generateHBLSeaExport(podCode: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLSeaExport`, { podCode }).pipe(
@@ -1210,12 +1210,12 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body: any) {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
+    // dowloadallAttach(body: any) {
+    //     return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`, body).pipe(
+    //         catchError((error) => throwError(error)),
+    //         map((data: any) => data)
+    //     );
+    // }
 
     updateShipmentLinkFee(data: any[]) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsLinkCharge/LinkFeeJob`, data).pipe(

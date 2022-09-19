@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -394,22 +395,27 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateFlightInfo(Guid Id)
+        public async Task<HandleState> UpdateFlightInfo(Guid Id)
         {
             var job = csTransactionRepo.Get(x => x.Id == Id).FirstOrDefault();
-            var jobDetails = DataContext.Get(x => x.JobId == Id).ToList();
+            var jobDetails = DataContext.Get(x => x.JobId == Id);
+            
             try
             {
-                jobDetails.ForEach(x =>
+                if (jobDetails.Count() > 0)
                 {
-                    x.FlightNo = job.FlightVesselName;
-                    x.FlightDate = job.FlightDate;
-                    x.Eta = job.Eta;
-                    x.Etd = job.Etd;
-                    var hsUpdateFlightInfo = DataContext.Update(x, z => x.Id == z.Id, false);
-                });
+                    foreach (var x in jobDetails)
+                    {
+                        x.FlightNo = job.FlightVesselName;
+                        x.FlightDate = job.FlightDate;
+                        x.Eta = job.Eta;
+                        x.Etd = job.Etd;
+                        var hsUpdateFlightInfo = await DataContext.UpdateAsync(x, z => x.Id == z.Id, false);
+                    }
+                }
+                
                 var sm = DataContext.SubmitChanges();
-                return new HandleState();
+                return sm;
             }
             catch (Exception ex)
             {

@@ -116,10 +116,13 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             let containerNotes = '';
             let gw = 0;
             let volumn = 0;
+            let goodsDescription = '';
             this.houseBills.forEach(x => {
                 gw += x.gw;
                 volumn += x.cbm;
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
+                goodsDescription += x.desOfGoods + "\n"
+
                 if (!!x.packages) {
                     const a = x.packages.split(", ");
                     if (a.length > 0) {
@@ -134,13 +137,16 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             });
             const packages = this.getPackages(lstPackages);
             this.billSIComponent.shippingInstruction.packagesNote = packages;
-            this.setFormRefresh({
-                containerSealNo: "",
-                containerNote: "A PART Of CONTAINER",
-                packagesNote: packages,
-                grossWeight: gw,
-                volume: volumn,
-            });
+            this.billSIComponent.shippingInstruction.grossWeight = gw;
+            this.billSIComponent.shippingInstruction.volume = volumn;
+            this.billSIComponent.shippingInstruction.goodsDescription = goodsDescription;
+            // this.setFormRefresh({
+            //     containerSealNo: "",
+            //     containerNote: "A PART Of CONTAINER",
+            //     packagesNote: packages,
+            //     grossWeight: gw,
+            //     volume: volumn,
+            // });
         }
     }
 
@@ -182,6 +188,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
         this.billSIComponent.shippingInstruction.consigneeId = res.agentId;
         this.billSIComponent.shippingInstruction.pol = res.pol;
         this.billSIComponent.shippingInstruction.pod = res.pod;
+        this.billSIComponent.shippingInstruction.poDelivery = res.podDescription;
         this.billSIComponent.shippingInstruction.loadingDate = res.etd;
         this.billSIComponent.shippingInstruction.voyNo = (!!res.flightVesselName ? res.flightVesselName : '') + " - " + (!!res.voyNo ? res.voyNo : '');
         this.billSIComponent.shippingInstruction.remark = res.mbltype;

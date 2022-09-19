@@ -98,8 +98,8 @@ export class RoutingConstants {
 
     public static mappingRouteDocumentWithTransactionType(transactionType: string) {
         return new Map([
-            ['AI', this.DOCUMENTATION.AIR_EXPORT],
-            ['AE', this.DOCUMENTATION.AIR_IMPORT],
+            ['AI', this.DOCUMENTATION.AIR_IMPORT],
+            ['AE', this.DOCUMENTATION.AIR_EXPORT],
             ['SCE', this.DOCUMENTATION.SEA_CONSOL_EXPORT],
             ['SCI', this.DOCUMENTATION.SEA_CONSOL_IMPORT],
             ['SFE', this.DOCUMENTATION.SEA_FCL_EXPORT],

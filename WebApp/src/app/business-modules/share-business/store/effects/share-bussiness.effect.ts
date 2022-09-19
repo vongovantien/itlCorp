@@ -205,7 +205,7 @@ export class ShareBussinessEffects {
     getListPartnerForKeyInSurchargeEffect$: Observable<Action> = createEffect(() => this.actions$.pipe(
         ofType(ShareBussinessCatalogueActionTypes.LOAD_PARTNER_KEYIN_CHARGE),
         switchMap(
-            (param: ISearchPartnerForKeyInSurcharge) => this._catalogueRepo.getPartnerForKeyingCharge(true, param.service, param.office, param.salemanId)
+            (param: ISearchPartnerForKeyInSurcharge) => this._catalogueRepo.getPartnerForKeyingCharge(param)
                 .pipe(
                     catchError(() => EMPTY),
                     map((data: any[]) => LoadListPartnerForKeyInSurchargeSuccess({ data })),

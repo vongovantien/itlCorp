@@ -124,6 +124,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
             importStatus: data.imPorted !== null ? data.imPorted : this.status[0].value,
             type: !!data.cusType ? data.cusType : this.types[0].value,
         });
+        // console.log('data', data);
     }
 
     getUserLogged() {
@@ -154,8 +155,8 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     searchCustomClearance() {
         const body: ISearchCustomClearance = {
             clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item => item.trim()).join(';') : null,
-            fromClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toClearanceDate: !!this.clearanceDate.value ? formatDate(this.clearanceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            fromClearanceDate: !!this.clearanceDate?.value?.startDate ? formatDate(this.clearanceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toClearanceDate: !!this.clearanceDate?.value?.endDate ? formatDate(this.clearanceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             imPorted: (this.importStatus.value === null || this.importStatus.value === this.status[0].value) ? null : this.importStatus.value,
             fromImportDate: !!this.importDate.value?.startDate ? formatDate(this.importDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toImportDate: !!this.importDate.value?.startDate ? formatDate(this.importDate.value.endDate, 'yyyy-MM-dd', 'en') : null,

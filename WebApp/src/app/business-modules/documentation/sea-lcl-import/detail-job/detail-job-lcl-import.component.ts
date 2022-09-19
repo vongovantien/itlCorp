@@ -403,7 +403,9 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             pod: modelAdd.pod,
             bookingNo: modelAdd.bookingNo,
             voyNo: modelAdd.voyNo,
-            mblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb,
+            polDescription: modelAdd.polDescription,
+            podDescription: modelAdd.podDescription
 
         };
 

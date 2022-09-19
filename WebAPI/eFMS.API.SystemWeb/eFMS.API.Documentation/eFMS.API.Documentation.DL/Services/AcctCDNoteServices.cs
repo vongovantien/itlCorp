@@ -327,7 +327,11 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
+                && x.SaleService.Contains(_transactionType)).FirstOrDefault();
+
                 if (!string.IsNullOrEmpty(_contractAcRef?.CurrencyId))
                 {
                     model.CurrencyId = _contractAcRef.CurrencyId;
@@ -337,6 +341,69 @@ namespace eFMS.API.Documentation.DL.Services
                     model.CurrencyId = (_partnerAcRef?.PartnerLocation == DocumentConstants.PARTNER_LOCATION_OVERSEA) ? DocumentConstants.CURRENCY_USD : DocumentConstants.CURRENCY_LOCAL;
                 }
                 #endregion  --- Set Currency For CD Note ---
+                if (model.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || model.Type == DocumentConstants.CDNOTE_TYPE_INVOICE)
+                {
+                    var chargeFirst = model.listShipmentSurcharge.First();
+                    var _customerId = string.Empty;
+                    var _salesmanId = string.Empty;
+                    if (chargeFirst.TransactionType == "CL")
+                    {
+                        // kiểm tra prepaid trên shipment trước
+                        var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
+                        _salesmanId = opsJob?.SalemanId;
+                        _customerId = opsJob?.CustomerId;
+
+                        if (_salesmanId != null && _customerId != null)
+                        {
+                            model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+                        }
+
+                        if(model.Status == "New")
+                        {
+                            _customerId = chargeFirst.PaymentObjectId;
+                            model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+                        }
+                    }
+                    else
+                    {
+                        var dataGrpPartners = model.listShipmentSurcharge.GroupBy(x => new { x.Hblid, x.PaymentObjectId }).Select(x => x.Key).Distinct().ToList();
+                        var hasPrepaid = false;
+                        foreach (var item in dataGrpPartners)
+                        {
+                            var hbl = trandetailRepositoty.First(x => x.Id == item.Hblid);
+                            _salesmanId = hbl?.SaleManId;
+                            _customerId = hbl?.CustomerId;
+
+                            string _status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+
+                            if (_status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                            {
+                                hasPrepaid = true;
+                                break;
+                            }
+                        }
+
+                        if (hasPrepaid)
+                        {
+                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                        } else
+                        {
+                            foreach (var item in dataGrpPartners)
+                            {
+                                var hbl = trandetailRepositoty.First(x => x.Id == item.Hblid);
+                                _salesmanId = hbl?.SaleManId;
+                                _customerId = item.PaymentObjectId;
+                                string _status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
+
+                                if (_status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                                {
+                                    hasPrepaid = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
 
                 //Quy đổi tỉ giá currency CD Note về currency Local
                 var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
@@ -415,7 +482,7 @@ namespace eFMS.API.Documentation.DL.Services
                         hs = DataContext.Add(model, false);
                         var sc = DataContext.SubmitChanges();
 
-                        UpdateJobModifyTime(model.JobId);
+                        // UpdateJobModifyTime(model.JobId);
 
                         if (hs.Success)
                         {
@@ -446,6 +513,20 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        private string GenerateDebitStatus(string _customerId, string _salesmanId, string _service)
+        {
+            CatContract contract = catContractRepo.Get(x => x.Active == true && x.PartnerId == _customerId
+                             && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                             && x.SaleManId == _salesmanId
+                             && x.SaleService.Contains(_service)).FirstOrDefault();
+            if (contract?.ContractType == "Prepaid")
+            {
+                return DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            }
+
+            return "New";
         }
 
         public HandleState UpdateCDNote(AcctCdnoteModel model)
@@ -1776,8 +1857,15 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = criteria.ExportFormatType;
             result.SetParameter(parameter);
             return result;
         }
@@ -1819,7 +1907,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2087,17 +2175,17 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }
 
-        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency)
+        public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
             var _currentUser = currentUser.UserName;
@@ -2385,12 +2473,12 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
-            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.FormatType = format;
             result.SetParameter(parameter);
             return result;
         }
