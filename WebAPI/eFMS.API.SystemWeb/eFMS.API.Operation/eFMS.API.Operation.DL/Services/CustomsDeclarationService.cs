@@ -460,6 +460,40 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
+        private string GetOldestCleranceNo(List<CustomsDeclarationModel> clearances, string JobNo, bool isDelete)
+        {
+            var cleranceLastGrp = clearances.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+            var clearanceContextGrp = DataContext.Get(x => x.JobNo == JobNo).OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+            var cleranceLastInput = new CustomsDeclarationModel();
+            var cleranceContextInput = new CustomsDeclaration();
+            if(isDelete)
+            {
+                if (clearanceContextGrp.Count() == 0)
+                {
+                    return null;
+                }
+                return clearanceContextGrp.Count()==1? clearanceContextGrp.FirstOrDefault().ClearanceNo:clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
+            else
+            {
+                cleranceLastInput = cleranceLastGrp.Count()==1? cleranceLastGrp.FirstOrDefault():cleranceLastGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
+                cleranceContextInput = clearanceContextGrp.Count()==1? clearanceContextGrp.FirstOrDefault():clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
+
+                if (cleranceLastInput.ClearanceDate > cleranceContextInput.ClearanceDate)
+                {
+                    return cleranceContextInput.ClearanceNo;
+                }
+                else if (cleranceLastInput.ClearanceDate == cleranceContextInput.ClearanceDate)
+                {
+                    if (cleranceLastInput.DatetimeModified > cleranceContextInput.DatetimeModified)
+                    {
+                        return cleranceContextInput.ClearanceNo;
+                    }
+                }
+                return cleranceLastInput.ClearanceNo;
+            }
+        }
+
         public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
@@ -480,96 +514,22 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
-                if(opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault() == null)
-                {
-                    return result;
-                }
-                var HblId=opsTransactionRepo.Get(x=>x.Id==clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
-                if(csShipmentSurchargeRepo.Get(x => x.Hblid == HblId).FirstOrDefault() == null)
+                var HblId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
+                if (opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault() == null)
                 {
                     return result;
                 }
                 string clearanceNo = "";
-                var mainClearanceNo = csShipmentSurchargeRepo.Get(x => x.Hblid == HblId).FirstOrDefault().ClearanceNo;
                 var jobNo = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().JobNo;
-                if (!string.IsNullOrEmpty(mainClearanceNo))
+                if(clearances.Any(x => x.isDelete == true))
                 {
-                    if(clearances.Any(x => x.isDelete == true))
-                    {
-                        if (DataContext.Get(x => x.JobNo == jobNo).Count() == 0)
-                        {
-                            clearanceNo = null;
-                        }
-                        else
-                        {
-                            if (clearances.Any(x => x.ClearanceNo == mainClearanceNo))
-                            {
-                                var mainClearance = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault();
-                                //clearances.Add(new CustomsDeclarationModel()
-                                //{
-                                //    ClearanceNo = mainClearance.ClearanceNo,
-                                //    DatetimeModified = mainClearance.DatetimeModified,
-                                //    ClearanceDate = mainClearance.ClearanceDate
-                                //});
-                                var lstCleranceNo = DataContext.Get(x => x.JobNo == jobNo).ToList();
-                                //lstCleranceNo.RemoveAll(x => clearances.Any(z => z.Hblid == x.Hblid));
-                                clearanceNo = lstCleranceNo.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().ClearanceNo;
-                            }
-                            else
-                            {
-
-                                isUpdate = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-
-                        var clearaceDateMain = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault().ClearanceDate;
-                        var clearanceLast = clearances.OrderBy(x => x.ClearanceDate).FirstOrDefault();
-                        if (clearaceDateMain.HasValue && clearaceDateMain > clearanceLast.ClearanceDate)
-                        {
-                            clearanceNo=clearanceLast.ClearanceNo;
-                        }
-                    }
+                    clearanceNo = GetOldestCleranceNo(clearances, jobNo, true);
                 }
                 else
                 {
-                    if (DataContext.Get(x => x.JobNo == jobNo).Count() > 0&& clearances.Any(x => x.isDelete == true))
-                    {
-                        if (clearances.Any(z => z.ClearanceNo == mainClearanceNo))
-                        {
-                            var mainClearance = DataContext.Get(x => x.ClearanceNo == mainClearanceNo).FirstOrDefault();
-                            //clearances.Add(new CustomsDeclarationModel()
-                            //{
-                            //    ClearanceNo = mainClearance.ClearanceNo,
-                            //    DatetimeModified = mainClearance.DatetimeModified,
-                            //    ClearanceDate = mainClearance.ClearanceDate
-                            //});
-                            var lstCleranceNo = DataContext.Get(x => x.JobNo == jobNo).ToList();
-                            //lstCleranceNo.RemoveAll(x => clearances.Any(z => z.Hblid == x.Hblid));
-                            clearanceNo = lstCleranceNo.OrderBy(y => y.ClearanceDate).OrderBy(y => y.DatetimeModified).FirstOrDefault().ClearanceNo;
-                        }
-                        else
-                        {
-
-                            isUpdate = false;
-                        }
-                    }
-                    else if (mainClearanceNo == null)
-                    {
-                        clearanceNo = DataContext.Get(x => x.JobNo == jobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
-                    }
-                    else
-                    {
-                        isUpdate = false;
-                    }
+                clearanceNo = GetOldestCleranceNo(clearances, jobNo, false);
                 }
-                if (isUpdate)
-                {
-                    updateChargeAndAdvReq(HblId, clearanceNo);
-                }
-                
+                updateChargeAndAdvReq(HblId, clearanceNo);
             }
             catch (Exception ex)
             {
