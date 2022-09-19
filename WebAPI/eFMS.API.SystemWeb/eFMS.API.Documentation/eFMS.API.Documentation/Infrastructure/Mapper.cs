@@ -45,7 +45,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsBookingNote, CsBookingNoteModel>();
             CreateMap<CsShippingInstruction, CsShippingInstructionReportConstModel>();
             CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
-            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
+            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeModel>(); 
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
             CreateMap<CsDimensionDetailModel, CsDimensionDetail>();
             CreateMap<AcctCdnoteModel, AcctCdnote>();
