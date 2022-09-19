@@ -106,7 +106,8 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr *ngIf="!SOAs.length " app-table-none-record>
+                                        <tr *ngIf="!SOAs.length && !(isLoading
+                                        |async)" app-table-none-record>
                                         </tr>
                                         <tr class="loading-wrapper" *ngIf="isLoading|async" app-table-row-loading>
                                         </tr>
