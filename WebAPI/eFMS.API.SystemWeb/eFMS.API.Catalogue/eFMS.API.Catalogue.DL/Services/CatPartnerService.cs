@@ -26,6 +26,11 @@ using eFMS.API.Common.Helpers;
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.Service.Contexts;
 using ITL.NetCore.Connection;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -2599,6 +2604,39 @@ namespace eFMS.API.Catalogue.DL.Services
                                         PartnerType = p.PartnerType,
                                     };
             return queryAgentForKeyIn.Union(queryICustomerForKeyIn).Union(queryInternalForKeyIn);
+        }
+
+        public async Task<CatContractModel> GetPartnerByTaxCode(string taxCode)
+        {
+            string baseUrl = "http://localhost:9000/";
+            CatContractModel contract = new CatContractModel();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUrl);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+ 
+                    HttpResponseMessage res = await client.GetAsync("api/ProjectA/GetDepartments");
+ 
+                    if (res.IsSuccessStatusCode)
+                    {
+                        var objResponse = res.Content.ReadAsStringAsync().Result;
+                        contract = JsonConvert.DeserializeObject<CatContractModel>(objResponse);
+                    }
+                    return contract;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        Task<CatPartnerModel> ICatPartnerService.GetPartnerByTaxCode(string taxCode)
+        {
+            throw new NotImplementedException();
         }
     }
 }
