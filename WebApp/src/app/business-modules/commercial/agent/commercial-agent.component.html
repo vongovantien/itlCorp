@@ -73,14 +73,21 @@
                                             </ng-container>
                                         </div>
                                     </td>
-                                    <td>{{agent.accountNo}}</td>
-                                    <td>{{agent.shortName}}</td>
+                                    <td>{{agent.accountNo}}
+                                    </td>
+                                    <td>
+                                        {{agent.shortName}}
+                                    </td>
                                     <td>{{agent.taxCode}}</td>
                                     <td> <span class="text-success">{{agent.userCreatedName}}</span> </td>
-                                    <td>{{agent.datetimeModified | date:'dd/MM/yyyy' }}</td>
-                                    <td [ngClass]="agent.active ? 'text-success' : 'text-danger'">
-                                        {{agent.active ? 'Active' : 'Inactive'}}</td>
-                                    <td>{{agent.addressVn}}</td>
+                                    <td>{{agent.datetimeModified | date:'dd/MM/yyyy' }}
+                                        <span [ngClass]="agent.active ? 'badge badge-success m--margin-left-5 m--margin-right-10' : 'badge badge-danger m--margin-left-5 m--margin-right-10'">
+                                            {{agent.active ? 'Active' : 'Inactive'}}
+                                        </span>
+                                    </td>
+                                    <!-- <td [ngClass]="agent.active ? 'text-success' : 'text-danger'">
+                                        {{agent.active ? 'Active' : 'Inactive'}}</td>-->
+                                    <td>{{agent.addressVn}}</td> 
 
                                 </tr>
                                 <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
