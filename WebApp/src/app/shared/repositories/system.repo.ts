@@ -381,7 +381,7 @@ export class SystemRepo {
     }
 
     getPermissionSample(id: string) {
-        /* 
+        /*
         * Create id = null
         * Detail id = GUID
         */
@@ -734,6 +734,14 @@ export class SystemRepo {
             .put(
                 `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/Update`,
                 body
+            )
+            .pipe(map((data: any) => data));
+    }
+
+    getInForCompanyByTaxCode(taxCode: string) {
+        return this._api
+            .get(
+                `thongtindoanhnghiep.co/api/company/${taxCode}`
             )
             .pipe(map((data: any) => data));
     }
