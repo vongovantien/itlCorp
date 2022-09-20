@@ -11,5 +11,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string Service { get; set; }
         public string Office { get; set; }
         public string SalemanId { get; set; }
+        public string ContractType { get; set; }
     }
 }

@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
@@ -26,9 +26,10 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
         protected _store: Store<IShareBussinessState>,
         protected _activedRoute: ActivatedRoute,
         protected _spinner: NgxSpinnerService,
+        protected _catalogueRepo: CatalogueRepo
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
 
     onSelectTab(tabName: string) {

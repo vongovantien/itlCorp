@@ -27,9 +27,9 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria);
         ProofOfDeliveryViewModel GetProofOfDelivery(Guid hblid);
         HandleState UpdateProofOfDelivery(ProofOfDeliveryViewModel model);
-        Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model);
-        SysImage GetFileProofOfDelivery(Guid hblId);
-        Task<HandleState> DeleteFilePOD(Guid id);
+        //Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model);
+        //SysImage GetFileProofOfDelivery(Guid hblId);
+        //Task<HandleState> DeleteFilePOD(Guid id);
 
     }
 }

@@ -19,12 +19,12 @@ namespace eFMS.API.Documentation.DL.IService
         EmailContentModel GetMailProofOfDeliveryHBLSea(Guid hblId, string serviceId);
         EmailContentModel GetMailSendHBLSeaServices(Guid hblId, string serviceId);
         EmailContentModel GetInfoMailHBLAirExport(Guid? hblId);
-        EmailContentModel GetInfoMailAEPreAlert(Guid? jobId);
+        EmailContentModel GetInfoMailAEPreAlert(List<Guid?> hblIds, Guid? jobId);
         EmailContentModel GetInfoMailSISeaExport(Guid jobId);
         EmailContentModel GetInfoMailHBLSeaImport(Guid jobId, string serviceId);
         EmailContentModel GetMailDOHBLSeaImport(Guid jobId, string serviceId);
         EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid? hblId, string serviceId);
-        EmailContentModel GetInfoMailPreAlerSeaExport(Guid? jobId, string serviceId);
+        EmailContentModel GetInfoMailPreAlerSeaExport(List<Guid?> hblIds, Guid? jobId, string serviceId);
         bool SendMailContractCashWithOutstandingDebit();
         List<sp_GetShipmentDataWithOutstandingDebit> GetDataOustandingDebit(string salemanId);
     }

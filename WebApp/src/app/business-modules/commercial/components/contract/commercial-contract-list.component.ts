@@ -214,7 +214,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         //             console.log(this.formContractPopup.files);
         //         }
         //     );
-        this._systemfileManageRepo.getContractFilesAttach(this.formContractPopup.selectedContract.id).
+        this._systemfileManageRepo.getFile('Catalogue', 'CatContract', this.formContractPopup.selectedContract.id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.formContractPopup.isLoading = false;

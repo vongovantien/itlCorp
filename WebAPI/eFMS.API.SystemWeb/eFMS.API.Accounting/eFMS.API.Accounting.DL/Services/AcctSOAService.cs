@@ -18,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,7 @@ namespace eFMS.API.Accounting.DL.Services
     public class AcctSOAService : RepositoryBase<AcctSoa, AcctSoaModel>, IAcctSOAService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly IContextBase<OpsTransaction> opsTransactionRepo;
@@ -64,6 +66,7 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
             ICurrentUser user,
+            IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
             IContextBase<OpsTransaction> opsTransaction,
@@ -93,6 +96,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
+            stringLocalizer = localizer;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             catCurrencyExchangeRepo = catCurrencyExchange;
             opsTransactionRepo = opsTransaction;
@@ -3665,14 +3669,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState ValidateCheckPointPartnerSOA(AcctSoa soa)
+        public HandleState ValidateCheckPointPartnerSOA(AcctSoaModel soa)
         {
             HandleState result = new HandleState();
             bool isValid = true;
 
             if (soa.Type == AccountingConstants.TYPE_SOA_DEBIT)
             {
-                CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer && x.Active == true && (x.IsExpired == false || x.IsExpired == null))
+                var office = officeRepo.First(x => x.Id == currentUser.OfficeID);
+                if(office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
+                {
+                    return result;
+                }
+                CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer 
+                && x.Active == true && (x.IsExpired == false || x.IsExpired == null)
+                && (string.IsNullOrEmpty(soa.SalemanId) ? true : x.SaleManId == soa.SalemanId))
                    .OrderBy(x => x.ContractType)
                    .FirstOrDefault();
                 CatPartner partner = catPartnerRepo.Get(x => x.Id == soa.Customer)?.FirstOrDefault();
@@ -3684,6 +3695,7 @@ namespace eFMS.API.Accounting.DL.Services
                 string salemanBOD = sysUserRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Id;
 
                 if (contract.SaleManId == salemanBOD) return result;
+                var error = 0;
                 switch (contract.ContractType)
                 {
                     case "Cash":
@@ -3692,6 +3704,24 @@ namespace eFMS.API.Accounting.DL.Services
                             isValid = false;
                         }
                         break;
+                    case "Prepaid":
+                        var surchargeIds = soa.Surcharges.Select(x => x.surchargeId);
+                        var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_BUY && surchargeIds.Contains(x.Id));
+                        bool hasIssuedDebit = surcharges.All(x => !string.IsNullOrEmpty(x.DebitNo));
+                        if(!hasIssuedDebit)
+                        {
+                            isValid = false;
+                            error = 1;
+                        }
+                        var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
+                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID );
+                        if(!hasConfirm)
+                        {
+                            isValid = false;
+                            error = 2;
+                        }
+                        break; 
                     //case "Official":
                     //case "Trial":
                     // isValid = ValidateCheckPointOfficialTrialContractPartner(Id, HblId);
@@ -3704,9 +3734,20 @@ namespace eFMS.API.Accounting.DL.Services
                 if (isValid == false)
                 {
                     SysUser saleman = sysUserRepo.Get(x => x.Id == contract.SaleManId)?.FirstOrDefault();
-
-                    string messError = string.Format(@"{0} - {1} - {2} has an invalid contract, You cannot issued soa debit with Cash contract",
-                        partner?.TaxCode, partner?.ShortName, saleman.Username);
+                    string messError = string.Empty;
+                    if (error == 0)
+                    {
+                       messError = string.Format(@"{0} - {1} - {2} has an invalid contract, You cannot issued soa debit with Cash contract",
+                       partner?.TaxCode, partner?.ShortName, saleman.Username);
+                    }
+                    if(error == 1)
+                    {
+                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_ISSUED_DEBIT, partner.ShortName];
+                    }
+                    if (error == 2)
+                    {
+                        messError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED];
+                    }
 
                     return new HandleState((object)messError);
                 }
