@@ -3676,6 +3676,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (soa.Type == AccountingConstants.TYPE_SOA_DEBIT)
             {
+                var office = officeRepo.First(x => x.Id == currentUser.OfficeID);
+                if(office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
+                {
+                    return result;
+                }
                 CatContract contract = contractRepository.Get(x => x.PartnerId == soa.Customer 
                 && x.Active == true && (x.IsExpired == false || x.IsExpired == null)
                 && (string.IsNullOrEmpty(soa.SalemanId) ? true : x.SaleManId == soa.SalemanId))
