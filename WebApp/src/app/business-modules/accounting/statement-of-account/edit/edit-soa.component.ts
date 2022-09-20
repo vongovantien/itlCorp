@@ -243,7 +243,12 @@ export class StatementOfAccountEditComponent extends AppList {
     getCurrentUser(data: any) {
         this.users = (data || []).map((item: any) => ({ id: item.userId, text: item.userName })).filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct Users
         this.users.unshift({ id: 'All', text: 'All' });
-        this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
+        const numOfCreator = this.creatorShipment.split(',').map((item: any) => item.trim()).length;
+        if (numOfCreator === (this.users.length - 1)) {
+            this.selectedUser = this.users.filter(item => item.id === 'All').map(x => x.id);
+        } else {
+            this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
+        }
     }
     
     onSelectDataFormInfo(data: { id: any; }, type: string) {
