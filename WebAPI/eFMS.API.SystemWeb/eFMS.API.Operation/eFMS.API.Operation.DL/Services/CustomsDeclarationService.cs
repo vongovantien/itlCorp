@@ -1469,7 +1469,7 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           );
-            if (query.Any())
+            if (query.Any() || accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
             {
                 if (accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
                 {
