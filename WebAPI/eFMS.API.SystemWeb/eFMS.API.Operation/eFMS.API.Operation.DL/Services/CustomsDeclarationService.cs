@@ -1470,15 +1470,17 @@ namespace eFMS.API.Operation.DL.Services
                           );
             if (query.Any())
             {
+                if (accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
+                {
+                    var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
+                    if (!clearanceNos.Any(x => cleanceNoRequet.Any(y => y.CustomNo == x)))
+                    {
+                        return true;
+                    }
+                }
                 return false;
             }
-            if (accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
-            {
-                var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
-                if(clearanceNos.Any(x=> cleanceNoRequet.Any(y => y.CustomNo == x))){
-                    return false;
-                }
-            }
+           
             return true;
         }
 
