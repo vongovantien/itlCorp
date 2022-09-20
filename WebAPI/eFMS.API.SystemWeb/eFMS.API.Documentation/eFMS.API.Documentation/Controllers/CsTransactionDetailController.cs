@@ -41,8 +41,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
-        private readonly ICsStageAssignedService stageAssignedService;
-        private readonly IStageService stageService;
+        private readonly ICsStageAssignedService csStageAssignedService;
 
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
             ICsTransactionDetailService service,
@@ -51,8 +50,8 @@ namespace eFMS.API.Documentation.Controllers
             ICsTransactionService csTransaction,
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
-            ICsStageAssignedService csStageAssignedService,
-            IStageService catstageService
+            ICsStageAssignedService stageAssignedService
+
             )
         {
             stringLocalizer = localizer;
@@ -62,9 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             csTransactionService = csTransaction;
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
-            stageAssignedService = csStageAssignedService;
-            stageService = catstageService;
-
+            csStageAssignedService = stageAssignedService;
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -236,7 +233,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleState = await AddMutipleStageAssigned(currentHBL, model.Id);
+                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
                 }
 
             });
@@ -644,32 +641,6 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(hs);
             }
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" });
-        }
-
-        private async Task<HandleState> AddMutipleStageAssigned(CsTransactionDetailModel currentHBL, Guid id)
-        {
-            var listStageAssigned = new List<CsStageAssignedModel>();
-            var listStages = new List<CatStage>();
-            var stage = new CatStage();
-            var hs = new HandleState();
-
-            var updatedHBL = csTransactionDetailService.First(x => x.Id == id);
-            if (currentHBL.ArrivalDate != updatedHBL.ArrivalDate)
-            {
-                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_ATA);
-                listStages.Add(stage);
-            }
-            
-            if (currentHBL.IncotermId != updatedHBL.IncotermId)
-            {
-                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM);
-                listStages.Add(stage);
-            }
-
-            listStageAssigned = await stageAssignedService.SetMutipleStageAssigned(listStages, currentHBL.JobId, id);
-
-            hs = await stageAssignedService.AddMutipleStageAssigned(listStageAssigned);
-            return hs;
         }
     }
 }

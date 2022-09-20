@@ -48,8 +48,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
-        private readonly ICsStageAssignedService stageAssignedService;
-        private readonly IStageService stageService;
+        private readonly ICsStageAssignedService csStageAssignedService;
+
         /// <summary>
         /// constructor
         /// </summary>
@@ -61,8 +61,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="serviceUrl"></param>
         /// <param name="checkPoint"></param>
         /// <param name="imageService"></param>
-        /// <param name="csStageAssignedService"></param>
-        /// <param name="catStageService"></param>
+        /// <param name="stageAssignedService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,
@@ -71,8 +70,7 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-            ICsStageAssignedService csStageAssignedService,
-            IStageService catStageService)
+            ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -82,8 +80,7 @@ namespace eFMS.API.Documentation.Controllers
             AccAccountReceivableService = AccAccountReceivaService;
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
-            stageAssignedService = csStageAssignedService;
-            stageService = catStageService;
+            csStageAssignedService = stageAssignedService;
         }
 
         /// <summary>
@@ -321,7 +318,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await AddMutipleStageAssigned(currentJob, model.Id);
+                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
                 }
 
             });
@@ -881,36 +878,5 @@ namespace eFMS.API.Documentation.Controllers
             return errorMsg;
         }
         #endregion -- METHOD PRIVATE --
-
-        private async Task<HandleState> AddMutipleStageAssigned(CsTransaction currentJob, Guid id)
-        {
-            var listStageAssigned = new List<CsStageAssignedModel>();
-            var listStages = new List<CatStage>();
-            var stage = new CatStage();
-            var hs = new HandleState();
-
-            var updatedJob = csTransactionService.First(x => x.Id == id);
-            if (currentJob.Ata != updatedJob.Ata)
-            {
-                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_ATA);
-                listStages.Add(stage);
-            }
-
-            if (currentJob.Atd != updatedJob.Atd)
-            {
-                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_ATD);
-                listStages.Add(stage);
-            }
-
-            if (currentJob.IncotermId != updatedJob.IncotermId)
-            {
-                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM);
-                listStages.Add(stage);
-            }
-
-            listStageAssigned = await stageAssignedService.SetMutipleStageAssigned(listStages, id, Guid.Empty);
-            hs = await stageAssignedService.AddMutipleStageAssigned(listStageAssigned);
-            return hs;
-        }
     }
 }

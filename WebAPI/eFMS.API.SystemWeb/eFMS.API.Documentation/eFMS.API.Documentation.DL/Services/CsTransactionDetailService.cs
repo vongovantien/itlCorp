@@ -339,7 +339,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    // var listAssignedStages = SetMutipleStageAssigned(hb, model);
                     var houseBill = mapper.Map<CsTransactionDetail>(model);
                     var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
