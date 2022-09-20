@@ -33,16 +33,16 @@
 
 <ul class="m-nav-sticky fms-shipment-sidebar">
     <li class="m-nav-sticky__item">
-        <a title="Send Arrival Notice" [routerLink]="['./arrivalnotice']">Send A.N</a>
+        <a title="Send Arrival Notice" (click)="sendMail('ArrivalNotice')">Send A.N</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send Delivery Order" [routerLink]="['./deliveryorder']">Send D.O</a>
+        <a title="Send Delivery Order" (click)="sendMail('DO')">Send D.O</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send Proof Of Delivery" [routerLink]="['./proofofdelivery']">Send POD</a>
+        <a title="Send Proof Of Delivery" (click)="sendMail('POD')">Send POD</a>
     </li>
     <li class="m-nav-sticky__item">
-        <a title="Send HBL" [routerLink]="['./sendhbl']">Send HBL</a>
+        <a title="Send HBL" (click)="sendMail('HBL')">Send HBL</a>
     </li>
 </ul>
 <ng-template inject></ng-template>

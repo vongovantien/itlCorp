@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { CsTransactionDetail } from '@models';
-import { ChargeConstants } from '@constants';
+import { ChargeConstants, RoutingConstants } from '@constants';
 
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
@@ -15,6 +15,8 @@ import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
@@ -161,6 +163,33 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             );
     }
 
+    sendMail(type: any){
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    if (!!err.error.message) {
+                        this._toastService.error("Can not Send mail. " + err.error.message + ". Please recheck again.");
+                    }
+                    return throwError(err.error.message);
+                })
+            ).subscribe(
+                (res: any) => {
+                    if(res.status){
+                        switch(type){
+                            case 'Pre-Alert':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
+                                break;
+                            case 'POD':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/proofofdelivery`]);
+                                break;
+                                case 'HBL':
+                                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/sendhbl`]);
+                                break;
+                        }
+                    }
+                },
+            );
+    }
     // preview(reportType: string) {
     //     this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
     //         .pipe(

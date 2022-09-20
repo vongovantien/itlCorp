@@ -114,7 +114,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         //             }
         //         }
         //     );
-        this._systemFileManageRepo.uploadFileShipment(hblId, this.fileList)
+        this._systemFileManageRepo.uploadFile('Document', 'Shipment', hblId, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -146,7 +146,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         //             }
         //         }
         //     );
-        this._systemFileManageRepo.deleteShipmentFilesAttach(hblId, fileName)
+        this._systemFileManageRepo.deleteFile('Document', 'Shipment', hblId, fileName)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -154,8 +154,8 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     console.log(res);
-                    
-                    if (res.status===true) {
+
+                    if (res.status === true) {
                         //this.uploadFilePOD();
                         this._toastService.success("Delete Success");
                         this.getFilePOD();
@@ -178,7 +178,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         //             this.files = res;
         //         }
         //     );
-        this._systemFileManageRepo.getShipmentFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
+        this._systemFileManageRepo.getFile('Document', 'Shipment', this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -26,11 +26,12 @@ export class SeaLCLImportHBLComponent extends AppShareHBLBase implements OnInit 
         protected _sortService: SortService,
         protected _spinner: NgxSpinnerService,
         protected _progressService: NgProgress,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _catalogueRepo: CatalogueRepo
 
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
     configHBL() {
         this.headers = [

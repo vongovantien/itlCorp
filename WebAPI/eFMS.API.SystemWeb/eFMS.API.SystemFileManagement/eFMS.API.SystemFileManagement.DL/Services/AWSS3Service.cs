@@ -93,7 +93,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string RenameFileS3(string fileName)
         {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%-@$]+", "") + "_" + StringHelper.RandomString(5);
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$-]+", "") + "_" + StringHelper.RandomString(5);
         }
 
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
@@ -105,10 +105,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName));
-                    var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
-                    if (fileExe != null)
-                        fileName = RenameFileS3(fileName);
+                    string fileName = RenameFileS3(Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName)));
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;

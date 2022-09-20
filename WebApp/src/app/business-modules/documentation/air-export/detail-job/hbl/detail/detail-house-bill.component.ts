@@ -15,12 +15,12 @@ import { delayTime } from '@decorators';
 import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { merge, of } from 'rxjs';
+import { merge, of, throwError } from 'rxjs';
 import { catchError, takeUntil, skip, tap, switchMap, filter } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { getCurrentUserState } from '@store';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -316,5 +316,33 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+    }
+
+    sendMail(type: string){
+        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+            .pipe(
+                catchError((err: HttpErrorResponse) => {
+                    if (!!err.error.message) {
+                        this._toastService.error("Can not Send mail. " + err.error.message + ". Please recheck again.");
+                    }
+                    return throwError(err.error.message);
+                })
+            ).subscribe(
+                (res: any) => {
+                    if(res.status){
+                        switch (type) {
+                            case 'Pre-Alert':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
+                                break;
+                            case 'POD':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/proofofdelivery`]);
+                                break;
+                            case 'HAWB':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/houseairwaybill`]);
+                                break;
+                        }
+                    }
+                },
+            );
     }
 }

@@ -239,6 +239,17 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
 
+                    this.formCreate.get('dimensionDetails')
+                        .valueChanges
+                        .pipe(
+                            debounceTime(500),
+                            distinctUntilChanged(),
+                        )
+                        .subscribe(changes => {
+                            if (!!changes[0].height && !!changes[0].width && !!changes[0].length && !!changes[0].package) {
+                                this.updateHeightWeight(changes);
+                            }
+                        });
                 }
             );
     }
@@ -621,7 +632,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 dimItem.hw = this.utility.calculateHeightWeight(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
                 dimItem.cbm = this.utility.calculateCBM(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
             });
-            // this.totalHeightWeight = this.updateTotalHeightWeight(dims);
+            this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
             this.totalPCS = this.updatePCS(dims);
         }else{
