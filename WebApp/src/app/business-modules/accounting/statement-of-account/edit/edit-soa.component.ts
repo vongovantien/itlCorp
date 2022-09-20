@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { AccountingRepo, CatalogueRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge, SoaCharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +11,8 @@ import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
+import { getMenuUserPermissionState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
@@ -41,16 +43,29 @@ export class StatementOfAccountEditComponent extends AppList {
         selectedDisplayFields: [],
     };
 
+    userLogged: any;
+    users: any = [];
+    selectedUser: any = [];
+    currentSelectedUsers: any = [];
+    creatorShipment: string = '';
+    staffTypeName: string = '';
+    staffTypes = [
+        { value: 'PersonInCharge', title: 'Person In Charge' },
+        { value: 'Salesman', title: 'Salesman' },
+        { value: 'Creator', title: 'Creator' }
+    ];
+
     constructor(
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
         private _sysRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private _sortService: SortService,
         private _router: Router,
         private _dataService: DataService,
         private _progressService: NgProgress,
-
+        private _store: Store<IAppState>
 
     ) {
         super();
@@ -75,6 +90,7 @@ export class StatementOfAccountEditComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._activedRoute.queryParams.subscribe((params: any) => {
             if (!!params.no && !!params.currency) {
                 this.soaNO = params.no;
@@ -140,6 +156,11 @@ export class StatementOfAccountEditComponent extends AppList {
                         salemanId: ''
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
+                    if(!!this.soa){
+                        this.creatorShipment = this.soa.creatorShipment;
+                        this.staffTypeName = this.staffTypes.filter(item => item.value === this.soa.staffType)[0].title;
+                        this.getUserLevel();
+                    }
                 },
             );
     }
@@ -182,6 +203,75 @@ export class StatementOfAccountEditComponent extends AppList {
             { field: 'chargeNameEn', label: 'Charge Name EN ' },
         ];
         this.configCharge.selectedDisplayFields = ['code'];
+    }
+
+    getUserLevel() {
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((menuPermission: SystemInterface.IUserPermission) => {
+                if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
+                    console.log(menuPermission);
+                    if (menuPermission.detail !== 'None') {
+                        if (menuPermission.detail === 'All') {
+                            this.getUserLevelByType({});
+                        } else if (menuPermission.detail === 'Company') {
+                            this.getUserLevelByType({ type: 'company', companyId: this.userLogged.companyId });
+                        } else if (menuPermission.detail === 'Office') {
+                            this.getUserLevelByType({ type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId });
+                        } else if (menuPermission.detail === 'Department') {
+                            this.getUserLevelByType({ type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId });
+                        } else if (menuPermission.detail === 'Group') {
+                            this.getUserLevelByType({ type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId });
+                        } else {
+                            this.getUserLevelByType({ type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id });
+                        }
+                    }
+                }
+            });
+    }
+
+    getUserLevelByType(body: any) {
+        this._systemRepo.getUserLevelByType(body).pipe(catchError(this.catchError))
+            .subscribe(
+                (dataUser: any) => {
+                    this.getCurrentUser(dataUser);
+                    console.log(dataUser)
+                },
+            );
+    }
+
+    getCurrentUser(data: any) {
+        this.users = (data || []).map((item: any) => ({ id: item.userId, text: item.userName })).filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct Users
+        this.users.unshift({ id: 'All', text: 'All' });
+        this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
+    }
+    
+    onSelectDataFormInfo(data: { id: any; }, type: string) {
+        switch (type) {
+            case 'staffInfo':
+                if (data.id === 'All') {
+                    this.selectedUser.length = 0;
+                    this.selectedUser = [...this.selectedUser, 'All'];
+                } else {
+                    if (!this.selectedUser.every((value) => value !== 'All')) {
+                        this.selectedUser.splice(this.selectedUser.findIndex((item) => item === 'All'), 1);
+                        this.selectedUser = [];
+                        this.selectedUser.push(data.id);
+                    }
+                }
+                this.currentSelectedUsers = this.selectedUser;
+                break;
+            default:
+                break;
+        }
+    }
+
+    onRemoveDataFormInfo(data: any, type: string) {
+        if (this.creatorShipment.includes(data.value.id)) {
+            const remainUser = this.currentSelectedUsers.filter(item => !this.creatorShipment.includes(item));
+            this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
+            this.selectedUser = [...this.selectedUser, ...remainUser];
+        }
     }
 
     sortChargeList(sortField?: string, order?: boolean) {
@@ -258,7 +348,7 @@ export class StatementOfAccountEditComponent extends AppList {
                 dateType: this.soa.dateType,
                 type: this.soa.type,
                 obh: this.soa.obh,
-                creatorShipment: this.soa.creatorShipment,
+                creatorShipment: this.mapObject(this.selectedUser, this.users),
                 customer: this.soa.customer,
                 commodityGroupId: this.soa.commodityGroupId,
                 staffType: this.soa.staffType,
@@ -288,6 +378,19 @@ export class StatementOfAccountEditComponent extends AppList {
         }
     }
 
+    mapObject(dataSelected: any[], dataList: any[]) {
+        let result = '';
+        if (dataSelected.length > 0) {
+            if (dataSelected[0] === 'All') {
+                const list = dataList.filter(f => f.id !== 'All');
+                result = list.map((item: any) => item.id).toString().replace(/(?:,)/g, ',');
+            } else {
+                result = dataSelected.toString().replace(/(?:,)/g, ',');
+            }
+        }
+        return result;
+    }
+
     addMoreCharge() {
         const body = {
             currency: this.soa.currency,
@@ -298,7 +401,7 @@ export class StatementOfAccountEditComponent extends AppList {
             type: this.soa.type,
             isOBH: this.soa.obh,
             strServices: this.soa.serviceTypeId.replace(';', ','),
-            strCreators: this.soa.creatorShipment.replace(';', ','),
+            strCreators: this.mapObject(this.selectedUser, this.users),//this.soa.creatorShipment.replace(';', ','),
             staffType: this.soa.staffType,
             salemanId: this.soa.salemanId
         };
