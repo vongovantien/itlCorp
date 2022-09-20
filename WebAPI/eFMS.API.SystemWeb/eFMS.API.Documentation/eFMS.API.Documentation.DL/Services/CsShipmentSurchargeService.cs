@@ -1940,7 +1940,7 @@ namespace eFMS.API.Documentation.DL.Services
         private string GetCustomNoOldOfShipment(string jobNo)
         {
             var customNos = "";
-            var mainClaranceNo = DataContext.Get(x => x.JobNo == jobNo && !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault();
+            var mainClaranceNo = customsDeclarationRepository.Get(x => x.JobNo == jobNo && x.ConvertTime!=null).FirstOrDefault();
             if (mainClaranceNo != null)
             {
                 customNos = mainClaranceNo.ClearanceNo;
