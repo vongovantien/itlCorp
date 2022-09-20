@@ -544,7 +544,7 @@ namespace eFMS.API.Operation.DL.Services
 
         private void updateChargeAndAdvReq(Guid hblId,string clearanceNo)
         {
-            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId);
+            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.ClearanceNo));
             if (charges.Count() > 0)
             {
                 charges.ToList().ForEach(sur =>
@@ -554,7 +554,7 @@ namespace eFMS.API.Operation.DL.Services
                 });
                 csShipmentSurchargeRepo.SubmitChanges();
             }
-            var advRQs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId);
+            var advRQs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.CustomNo));
             if (advRQs.Count() > 0)
             {
                 advRQs.ToList().ForEach(rq =>
