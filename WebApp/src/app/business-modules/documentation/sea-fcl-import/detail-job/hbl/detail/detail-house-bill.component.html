@@ -5,7 +5,8 @@
             <app-menu-preview-hbl-sea-import [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-import>
 
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'"></app-default-button>
+                *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'">
+            </app-default-button>
 
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
@@ -16,6 +17,7 @@
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
                     <app-form-create-hbl-sea-import [isUpdate]="true" [type]="'SFI'"></app-form-create-hbl-sea-import>
                     <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
+                    <hbl-proof-of-delivery></hbl-proof-of-delivery>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                     <hbl-arrival-note-sea></hbl-arrival-note-sea>
@@ -23,9 +25,9 @@
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
                     <hbl-delivery-order></hbl-delivery-order>
                 </tab>
-                <tab heading="Proof Of Delivery" (selectTab)="onSelectTab('PROOF')">
+                <!-- <tab heading="Proof Of Delivery" (selectTab)="onSelectTab('PROOF')">
                     <hbl-proof-of-delivery></hbl-proof-of-delivery>
-                </tab>
+                </tab> -->
             </tabset>
         </div>
     </div>
