@@ -463,10 +463,14 @@ namespace eFMS.API.Operation.DL.Services
         private string GetOldestCleranceNo(List<CustomsDeclarationModel> clearances, string JobNo, bool isDelete)
         {
             var cleranceLastGrp = clearances.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
-            var clearanceContextGrp = DataContext.Get(x => x.JobNo == JobNo).OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+            var clearanceContextGrp = DataContext.Get(x => x.JobNo == JobNo).FirstOrDefault()!=null ? DataContext.Get(x => x.JobNo == JobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.ClearanceDate).GroupBy(x=>x.ClearanceDate).FirstOrDefault():null;
             var cleranceLastInput = new CustomsDeclarationModel();
             var cleranceContextInput = new CustomsDeclaration();
-            if(isDelete)
+            if (clearanceContextGrp == null)
+            {
+                return null;
+            }
+            else if(isDelete)
             {
                 if (clearanceContextGrp.Count() == 0)
                 {
@@ -1464,9 +1468,16 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           );
-            if (query.Any() || clearanceNos.Any(x => x == accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault()?.CustomNo))
+            if (query.Any())
             {
+                return false;
+            }
+            if (accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
+            {
+                var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
+                if(clearanceNos.Any(x=> cleanceNoRequet.Any(y => y.CustomNo == x))){
                     return false;
+                }
             }
             return true;
         }

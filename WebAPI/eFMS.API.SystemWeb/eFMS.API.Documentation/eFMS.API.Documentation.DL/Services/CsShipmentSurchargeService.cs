@@ -1941,7 +1941,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo);
             var customNos = "";
-            if(customLastGrp != null&& customLastGrp.Count() > 0)
+            if(customLastGrp != null)
             {
                 var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
                 if (CustomLastOrder.Count() > 1)
