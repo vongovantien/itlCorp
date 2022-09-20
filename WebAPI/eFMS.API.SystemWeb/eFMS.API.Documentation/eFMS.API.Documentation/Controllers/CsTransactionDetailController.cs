@@ -13,6 +13,8 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Services;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -39,14 +41,18 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+        private readonly ICsStageAssignedService stageAssignedService;
+        private readonly IStageService stageService;
 
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
-            ICsTransactionDetailService service, 
-            ICurrentUser user, 
-            ICsMawbcontainerService mawbcontainerService, 
+            ICsTransactionDetailService service,
+            ICurrentUser user,
+            ICsMawbcontainerService mawbcontainerService,
             ICsTransactionService csTransaction,
             IAccAccountReceivableService AccAccountReceivable,
-            IOptions<ApiServiceUrl> serviceUrl
+            IOptions<ApiServiceUrl> serviceUrl,
+            ICsStageAssignedService csStageAssignedService,
+            IStageService catstageService
             )
         {
             stringLocalizer = localizer;
@@ -56,6 +62,8 @@ namespace eFMS.API.Documentation.Controllers
             csTransactionService = csTransaction;
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
+            stageAssignedService = csStageAssignedService;
+            stageService = catstageService;
 
         }
 
@@ -195,8 +203,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
+            var currentHBL = csTransactionDetailService.First(x => x.Id == model.Id);
             currentUser.Action = "UpdateCSTransactionDetail";
-
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model, out int typeExisted, out List<Guid> data);
             if (checkExistMessage.Length > 0)
@@ -223,6 +231,15 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+
+            Response.OnCompleted(async () =>
+            {
+                if (hs.Success)
+                {
+                    var handleState = await AddMutipleStageAssigned(currentHBL, model.Id);
+                }
+
+            });
             return Ok(result);
         }
 
@@ -375,7 +392,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
-                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED,model.Mawb].Value;
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mawb].Value;
                             data = houseBills.Where(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id)
                               .Select(x => x.JobId)
                               .Distinct()
@@ -629,5 +646,30 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" });
         }
 
+        private async Task<HandleState> AddMutipleStageAssigned(CsTransactionDetailModel currentHBL, Guid id)
+        {
+            var listStageAssigned = new List<CsStageAssignedModel>();
+            var listStages = new List<CatStage>();
+            var stage = new CatStage();
+            var hs = new HandleState();
+
+            var updatedHBL = csTransactionDetailService.First(x => x.Id == id);
+            if (currentHBL.ArrivalDate != updatedHBL.ArrivalDate)
+            {
+                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_ATA);
+                listStages.Add(stage);
+            }
+            
+            if (currentHBL.IncotermId != updatedHBL.IncotermId)
+            {
+                stage = await stageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM);
+                listStages.Add(stage);
+            }
+
+            listStageAssigned = await stageAssignedService.SetMutipleStageAssigned(listStages, currentHBL.JobId, id);
+
+            hs = await stageAssignedService.AddMutipleStageAssigned(listStageAssigned);
+            return hs;
+        }
     }
 }

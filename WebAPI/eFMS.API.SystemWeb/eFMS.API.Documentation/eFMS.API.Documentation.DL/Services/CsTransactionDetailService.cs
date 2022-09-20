@@ -339,12 +339,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-
-                    var listAssignedStages = SetMutipleStageAssigned(hb, model);
+                    // var listAssignedStages = SetMutipleStageAssigned(hb, model);
                     var houseBill = mapper.Map<CsTransactionDetail>(model);
                     var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
+
                         if (model.CsMawbcontainers != null)
                         {
                             var hscontainers = containerService.UpdateHouseBill(model.CsMawbcontainers, model.Id);
@@ -365,7 +365,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges, model.Id);
                         }
-                       
+
                         //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
                         var hsSurcharge = UpdateSurchargeOfHousebill(model);
 
@@ -392,7 +392,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         SendEmailNewHouseToSales(houseBill);
                     }
-                    var hs = csStageAssignedService.AddMutipleStageAssigned(listAssignedStages, hb.JobId);
                     return isUpdateDone;
                 }
                 catch (Exception ex)
@@ -2635,43 +2634,6 @@ namespace eFMS.API.Documentation.DL.Services
                 result.Add(new { hbl, ErrorMessage = hs.Message?.ToString() });
             }
             return result;
-        }
-
-        public List<CsStageAssignedModel> SetMutipleStageAssigned(CsTransactionDetail currentHBL, CsTransactionDetail updatedHBL)
-        {
-            List<CatStage> listStages = new List<CatStage>();
-            List<CsStageAssignedModel> listAssignedStages = new List<CsStageAssignedModel>();
-
-            CatStage stage = new CatStage();
-
-            if (currentHBL.ArrivalDate != updatedHBL.ArrivalDate)
-            {
-                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_ATA);
-                listStages.Add(stage);
-            }
-
-            if (currentHBL.IncotermId != updatedHBL.IncotermId)
-            {
-                stage = catStageService.GetStageByType(DocumentConstants.UPDATE_INCOTERM);
-                listStages.Add(stage);
-            }
-            foreach (var item in listStages)
-            {
-                CsStageAssignedModel assignedStage = new CsStageAssignedModel();
-
-                assignedStage.Id = Guid.NewGuid();
-                assignedStage.StageId = item.Id;
-                assignedStage.Status = TermData.Done;
-                assignedStage.DatetimeCreated = assignedStage.DatetimeModified = DateTime.Now;
-                assignedStage.Deadline = DateTime.Now;
-                assignedStage.Hblid = currentHBL.Id;
-                assignedStage.MainPersonInCharge = assignedStage.RealPersonInCharge = currentUser.UserID;
-                assignedStage.JobId = currentHBL.JobId;
-
-                listAssignedStages.Add(assignedStage);
-            }
-
-            return listAssignedStages;
         }
     }
 }

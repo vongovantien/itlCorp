@@ -18,45 +18,42 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>, ICsStageAssignedService 
     {
         private readonly ICurrentUser currentUser;
-        private readonly IContextBase<OpsTransaction> opsTransRepository;
         private readonly IContextBase<CsTransaction> csTransRepository;
-        private readonly IStageService _stageService;
+        private readonly IStageService stageService;
+
         public CsStageAssignedService(
             ICurrentUser user,
             IContextBase<OpsTransaction> opsTransRepo,
             IContextBase<CsTransaction> csTransRepo,
-            IContextBase<CatStage> catStageRepo,
-            IStageService stageService,
             IContextBase<OpsStageAssigned> repository,
-            IMapper mapper
+            IMapper mapper,
+            IStageService catstageService
             ) : base(repository, mapper)
         {
             currentUser = user;
-            opsTransRepository = opsTransRepo;
             csTransRepository = csTransRepo;
-            _stageService = stageService;
+            stageService = catstageService;
         }
 
-        public async Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listStages, Guid jobId)
+        public async Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listStageAssigned)
         {
-            int orderNumberProcess = DataContext.Count(x => x.JobId == jobId);
             var result = new HandleState();
 
-            foreach (var stage in listStages)
+            foreach (var stage in listStageAssigned)
             {
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
                 assignedItem.Id = Guid.NewGuid();
-                assignedItem.JobId = jobId;
-                assignedItem.Deadline = stage.Deadline ?? null;
+                assignedItem.JobId = stage.JobId;
+                assignedItem.Deadline = DateTime.Now;
                 assignedItem.Status = TermData.Done;
                 assignedItem.Hblid = stage.Hblid;
-                assignedItem.JobId = stage.JobId;
+                assignedItem.StageId = stage.StageId;
                 assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
                 assignedItem.UserCreated = currentUser.UserID;
-                assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
-                DataContext.Add(assignedItem, false);
-
-                orderNumberProcess++;
+                assignedItem.MainPersonInCharge = stage.MainPersonInCharge;
+                assignedItem.RealPersonInCharge = stage.RealPersonInCharge;
+                assignedItem.OrderNumberProcessed = stage.OrderNumberProcessed;
+                await DataContext.AddAsync(assignedItem, false);
             }
 
             try
@@ -70,11 +67,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-
         public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
         {
             var stageAssigned = mapper.Map<OpsStageAssigned>(model);
-            DataContext.Add(stageAssigned, false);
+            await DataContext.AddAsync(stageAssigned, false);
 
             HandleState hs = DataContext.SubmitChanges();
             return hs;
@@ -82,8 +78,8 @@ namespace eFMS.API.Documentation.DL.Services
 
         public async Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria)
         {
-            var currentJob = csTransRepository.First(x => x.Id == criteria.JobId);
-            var stage = _stageService.GetStageByType(criteria.StageType);
+            var currentJob = await csTransRepository.FirstAsync(x => x.Id == criteria.JobId);
+            var stage = await stageService.GetStageByType(criteria.StageType);
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -95,11 +91,38 @@ namespace eFMS.API.Documentation.DL.Services
             newItem.MainPersonInCharge = newItem.RealPersonInCharge = currentUser.UserID;
             newItem.Hblid = criteria.HblId;
             newItem.JobId = criteria.JobId;
-            var orderNumberProcess = DataContext.Count(x => x.JobId == criteria.JobId);
+            var orderNumberProcess = await DataContext.CountAsync(x => x.JobId == criteria.JobId);
             newItem.OrderNumberProcessed = orderNumberProcess + 1;
 
             var result = await AddNewStageAssigned(newItem);
             return result;
+        }
+
+        public async Task<List<CsStageAssignedModel>> SetMutipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
+        {
+            List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
+            int orderNumberProcess = await DataContext.CountAsync(x => x.JobId == jobId);
+            var result = new HandleState();
+
+            foreach (var stage in listStages)
+            {
+                var stageAssigned = new CsStageAssignedModel();
+                stageAssigned.Id = Guid.NewGuid();
+                stageAssigned.JobId = jobId;
+                stageAssigned.Deadline = DateTime.Now;
+                stageAssigned.Status = TermData.Done;
+                stageAssigned.Hblid = hblId;
+                stageAssigned.StageId = stage.Id;
+                stageAssigned.DatetimeCreated = stageAssigned.DatetimeModified = DateTime.Now;
+                stageAssigned.UserCreated = currentUser.UserID;
+                stageAssigned.MainPersonInCharge = currentUser.UserID;
+                stageAssigned.RealPersonInCharge = currentUser.UserID;
+                stageAssigned.OrderNumberProcessed = orderNumberProcess + 1;
+                listStageAssigned.Add(stageAssigned);
+
+                orderNumberProcess++;
+            }
+            return listStageAssigned;
         }
     }
 }
