@@ -18,7 +18,7 @@ namespace eFMS.IdentityServer.DL.UserManager
             IUserPermissionService userPermission)
         {
             httpContext = contextAccessor;
-            currentUser = httpContext.HttpContext.User.Claims;
+            currentUser = httpContext?.HttpContext?.User?.Claims;
             userPermissionService = userPermission;
         }
 
