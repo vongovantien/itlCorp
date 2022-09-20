@@ -1,17 +1,13 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Documentation.DL.IService;
-using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
+using eFMS.API.Documentation.Service.ViewModels;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -20,6 +16,7 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private IContextBase<CsTransaction> csTransactionRepository;
         private IContextBase<SysUser> userRepository;
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)csTransactionRepository.DC;
         public ScopedProcessingAlertATDService(IContextBase<CsTransaction> csTransaction) 
         {
             csTransactionRepository = csTransaction;
@@ -27,27 +24,52 @@ namespace eFMS.API.Documentation.DL.Services
 
         public async Task AlertATD()
         {
-            var transactionTypeExport = new List<string> {
-                DocumentConstants.AE_SHIPMENT,
-                DocumentConstants.SEC_SHIPMENT,
-                DocumentConstants.SEF_SHIPMENT,
-                DocumentConstants.SEL_SHIPMENT,
-            };
+            var dtData = DC.GetViewData<vw_GetShipmentAlertATD>();
+            if(dtData.Count > 0)
+            {
+                var emailTemplate = DC.SysEmailTemplate.Where(x => x.Code == "OPEX-ALERT-ATD").FirstOrDefault();
+                
+                var mailTo = new List<string> { };
+                var mailCC = new List<string> { };
+                List<string> emailBCCs = new List<string>();
+                var emailBcc = DC.ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+                if (emailBcc != null)
+                {
+                    emailBCCs = emailBcc.ToString().Split(";").ToList();
+                }
+                string subject = emailTemplate.Subject;
+                string footer = emailTemplate.Footer;
 
-            Expression<Func<CsTransaction, bool>> query = x => (
-                    transactionTypeExport.Contains(x.TransactionType)
-                    && x.Etd.Value.Date >= DateTime.Now.Date
-                    && x.Atd == null
-                    && x.ServiceDate.Value.Year == 2022
-                    && x.ServiceDate.Value.Month >= 9
-            );
+                var grpPic = dtData.GroupBy(x => new { x.PIC }).ToList();
+                int number = 0;
+                foreach (var item in grpPic)
+                {
+                    string body = emailTemplate.Body;
+                    body = body.Replace("{{PIC}}", item.FirstOrDefault().PIC);
 
-            var jobs = csTransactionRepository.Get(query);
+                    string content = string.Empty;
 
-            var grpPic = jobs.GroupBy(x => new { x.PersonIncharge }).ToList();
+                    string table = emailTemplate.Content;
+                    table = table.Replace("{{STT}}", (number + 1).ToString());
+                    table = table.Replace("{{JOBNO}}", item.FirstOrDefault().JobNo);
+                    table = table.Replace("{{ETD}}", item.FirstOrDefault().ETD.ToString("dd/MM/yyyy"));
 
-            Console.WriteLine(JsonConvert.SerializeObject(grpPic));
-            await Task.Delay(3000);
+                    content += table;
+                    number++;
+
+                    body = body.Replace("{{CONTENT}}", content);
+
+                    mailTo = new List<string> { item.FirstOrDefault().Email };
+                    mailCC = item.FirstOrDefault().EmailCC.Split(";").ToList();
+                    
+
+                    string email = body + footer;
+                    var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
+                }
+            }
+
+            Console.WriteLine(JsonConvert.SerializeObject(dtData));
+            await Task.Delay(10000);
         }
     }
 }
