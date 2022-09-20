@@ -19,8 +19,9 @@ namespace eFMS.API.Documentation.DL.Services
             csTransactionRepository = csTransaction;
         }
 
-        public async Task AlertATD()
+        public Task AlertATD()
         {
+            
             var dtData = DC.GetViewData<vw_GetShipmentAlertATD>();
             if(dtData.Count > 0)
             {
@@ -65,6 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
                 }
             }
+            return Task.CompletedTask;
         }
     }
 }
