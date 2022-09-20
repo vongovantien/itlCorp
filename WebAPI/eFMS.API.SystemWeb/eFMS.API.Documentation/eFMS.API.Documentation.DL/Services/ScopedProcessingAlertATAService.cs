@@ -4,8 +4,6 @@ using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +13,6 @@ namespace eFMS.API.Documentation.DL.Services
     public class ScopedProcessingAlertATDService: IScopedProcessingAlertATDService
     {
         private IContextBase<CsTransaction> csTransactionRepository;
-        private IContextBase<SysUser> userRepository;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)csTransactionRepository.DC;
         public ScopedProcessingAlertATDService(IContextBase<CsTransaction> csTransaction) 
         {
@@ -41,35 +38,33 @@ namespace eFMS.API.Documentation.DL.Services
                 string footer = emailTemplate.Footer;
 
                 var grpPic = dtData.GroupBy(x => new { x.PIC }).ToList();
-                int number = 0;
-                foreach (var item in grpPic)
+                foreach (var grp in grpPic)
                 {
                     string body = emailTemplate.Body;
-                    body = body.Replace("{{PIC}}", item.FirstOrDefault().PIC);
+                    body = body.Replace("{{PIC}}", grp.FirstOrDefault().PIC);
 
-                    string content = string.Empty;
+                    string tBody = string.Empty;
 
-                    string table = emailTemplate.Content;
-                    table = table.Replace("{{STT}}", (number + 1).ToString());
-                    table = table.Replace("{{JOBNO}}", item.FirstOrDefault().JobNo);
-                    table = table.Replace("{{ETD}}", item.FirstOrDefault().ETD.ToString("dd/MM/yyyy"));
+                    var listData = grp.Select(x => x).ToList();
+                    int number = 0;
+                    foreach (var item in listData)
+                    {
+                        string tr = emailTemplate.Content;
+                        tr = tr.Replace("{{STT}}", (number + 1).ToString());
+                        tr = tr.Replace("{{JOBNO}}", item.JobNo);
+                        tr = tr.Replace("{{ETD}}", item.ETD.ToString("dd/MM/yyyy"));
 
-                    content += table;
-                    number++;
-
-                    body = body.Replace("{{CONTENT}}", content);
-
-                    mailTo = new List<string> { item.FirstOrDefault().Email };
-                    mailCC = item.FirstOrDefault().EmailCC.Split(";").ToList();
-                    
+                        tBody += tr;
+                        number++;
+                    }
+                    mailTo = new List<string> { grp.FirstOrDefault().Email };
+                    mailCC = grp.FirstOrDefault().EmailCC.Split(";").ToList();
+                    body = body.Replace("{{CONTENT}}", tBody);
 
                     string email = body + footer;
                     var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
                 }
             }
-
-            Console.WriteLine(JsonConvert.SerializeObject(dtData));
-            await Task.Delay(10000);
         }
     }
 }

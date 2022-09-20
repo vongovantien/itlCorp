@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.IService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,6 +25,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                //int currentHour = 25 - DateTime.Now.Hour;
+                //int numberHours = currentHour;
+                //if(numberHours == 8)
                 using (var scope = services.CreateScope())
                 {
                     var scopedProcessingService =
@@ -31,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
                             .GetRequiredService<IScopedProcessingAlertATDService>();
                     await scopedProcessingService.AlertATD();
                 }
+                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
         }
 
