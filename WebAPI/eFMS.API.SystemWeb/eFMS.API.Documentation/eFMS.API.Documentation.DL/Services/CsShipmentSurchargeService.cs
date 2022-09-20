@@ -917,7 +917,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var surcharges = DataContext.Get(x => x.JobNo == csTransaction.JobNo && x.Type != DocumentConstants.CHARGE_OBH_TYPE);
-                if (chargesResult.FirstOrDefault().Type == DocumentConstants.CHARGE_BUY_TYPE)
+                if (chargesResult.FirstOrDefault().Type != DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     var chargeBuyings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
                     var remainSellings = surcharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid != hblId);
