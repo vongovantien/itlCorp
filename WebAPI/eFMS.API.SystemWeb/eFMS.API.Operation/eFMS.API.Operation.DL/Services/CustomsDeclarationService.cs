@@ -503,7 +503,6 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                bool isUpdate = true;
                 var clearanceList=clearances.OrderBy(x => x.ClearanceDate);
                 foreach (var item in clearanceList)
                 {
@@ -533,7 +532,7 @@ namespace eFMS.API.Operation.DL.Services
                 {
                 clearanceNo = GetOldestCleranceNo(clearances, jobNo, false);
                 }
-                updateChargeAndAdvReq(HblId, clearanceNo);
+                updateChargeAndAdvReq(HblId, clearanceNo,clearances.Any(x=>x.isDelete==true));
             }
             catch (Exception ex)
             {
@@ -542,9 +541,9 @@ namespace eFMS.API.Operation.DL.Services
             return result;
         }
 
-        private void updateChargeAndAdvReq(Guid hblId,string clearanceNo)
+        private void updateChargeAndAdvReq(Guid hblId,string clearanceNo,bool isDelete)
         {
-            var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.ClearanceNo));
+            var charges = isDelete? csShipmentSurchargeRepo.Get(x => x.Hblid == hblId):csShipmentSurchargeRepo.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.ClearanceNo));
             if (charges.Count() > 0)
             {
                 charges.ToList().ForEach(sur =>
@@ -554,7 +553,7 @@ namespace eFMS.API.Operation.DL.Services
                 });
                 csShipmentSurchargeRepo.SubmitChanges();
             }
-            var advRQs = accAdvanceRequestRepository.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.CustomNo));
+            var advRQs = isDelete? accAdvanceRequestRepository.Get(x => x.Hblid == hblId): accAdvanceRequestRepository.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.CustomNo));
             if (advRQs.Count() > 0)
             {
                 advRQs.ToList().ForEach(rq =>
