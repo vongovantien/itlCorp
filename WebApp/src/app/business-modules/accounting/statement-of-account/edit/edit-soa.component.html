@@ -48,18 +48,6 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Currency
-                            </label>
-                            <select [(ngModel)]="selectedCurrency" class="form-control" name="currency" [disabled]="soa.type === 'Debit'">
-                                <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
-                                </option>
-                            </select>
-
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
                                 Date
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -76,26 +64,28 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Exc USD
-                            </label>
-                            <input type="text" class="form-control text-right" [(ngModel)]="excRateUsdToLocal" name="excRateUsdToLocal"
-                            min="0" numeric [decimals]="digitDecimal" autoFormatCurrency>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                {{staffTypeName}}
-                            </label>
-                            <ng-select [multiple]="true" [items]="users"
-                            (remove)="onRemoveDataFormInfo($event, 'staffInfo')" [(ngModel)]="selectedUser"
-                            (add)="onSelectDataFormInfo($event, 'staffInfo')" placeholder="" class="custom"
-                            bindLabel="text" bindValue="id">
-                        </ng-select>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Currency
+                                    </label>
+                                    <select [(ngModel)]="selectedCurrency" class="form-control" name="currency" [disabled]="soa.type === 'Debit'">
+                                        <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
+                                        </option>
+                                    </select>
+        
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exc USD
+                                    </label>
+                                    <input type="text" class="form-control text-right" [(ngModel)]="excRateUsdToLocal" name="excRateUsdToLocal"
+                                    min="0" numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -107,6 +97,21 @@
                                 [(ngModel)]="soa.note"></textarea>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                {{staffTypeName}}
+                            </label>
+                            <ng-select [multiple]="true" [items]="users"
+                            (remove)="onRemoveDataFormInfo($event, 'staffInfo')" [(ngModel)]="selectedUser"
+                            (add)="onSelectDataFormInfo($event, 'staffInfo')" placeholder="" class="custom"
+                            bindLabel="text" bindValue="id">
+                        </ng-select>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
