@@ -1939,16 +1939,24 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
             var customNos = "";
-            if(customLastGrp.Count()>0)
+            var mainClaranceNo = DataContext.Get(x => x.JobNo == jobNo && !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault();
+            if (mainClaranceNo != null)
             {
-                var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
-                if (CustomLastOrder.Count() > 1)
+                customNos = mainClaranceNo.ClearanceNo;
+            }
+            else
+            {
+                var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
+                if (customLastGrp.Count() > 0)
                 {
-                    CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+                    if (CustomLastOrder.Count() > 1)
+                    {
+                        CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    }
+                    customNos = CustomLastOrder.FirstOrDefault().ClearanceNo;
                 }
-                customNos= CustomLastOrder.FirstOrDefault().ClearanceNo;
             }
             return customNos;
         }
