@@ -183,6 +183,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
 
                     } else {
                         this._toastService.error(res.message);
@@ -222,7 +223,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this.selectedTab = tabName;
     }
 
-    sendMail(type: string){
+    sendMail(type: string) {
         this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
@@ -233,7 +234,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         switch (type) {
                             case 'ArrivalNotice':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/arrivalnotice`]);
@@ -252,7 +253,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 },
             );
     }
-    
+
     // onPreview(type: string) {
     //     this.isClickSubMenu = false;
 
