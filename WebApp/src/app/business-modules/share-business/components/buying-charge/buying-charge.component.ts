@@ -229,13 +229,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getPartner() {
         this.isShowLoadingPartner = true;
-        this._spinner.show(this.spinnerpartner);
+        //this._spinner.show(this.spinnerpartner);
 
         this._catalogueRepo.getListPartner(null, null, { active: true })
             .pipe(
                 shareReplay(),
                 catchError(this.catchError), finalize(() => {
-                    this._spinner.hide(this.spinnerpartner);
+                    // /this._spinner.hide(this.spinnerpartner);
                     this.isShowLoadingPartner = false;
                 }))
             .subscribe(
@@ -1552,13 +1552,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     detailLinkFee(selectedCs: CsShipmentSurcharge) {
         if (!selectedCs)
             this._toastService.error("Please Select Charge");
-        this._spinner.show(this.spinnerpartner);
+        //this._spinner.show(this.spinnerpartner);
         this._documentRepo.detailLinkFee(selectedCs.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (result: any) => {
                     if (result) {
-                        this._spinner.hide(this.spinnerpartner);
+                        //this._spinner.hide(this.spinnerpartner);
                         let strBody = "<div class=detail-linkfee > <b>Link from Job Ops:</b><a> " + result.jobNoOrg + "</a>"
                             + "</br><b>Link to Job Service:</b><a> " + result.jobNoLink + "</a>"
                             + "</br><b>Partner Name Selling :</b><a> " + result.partnerNameOrg + "</a>"
