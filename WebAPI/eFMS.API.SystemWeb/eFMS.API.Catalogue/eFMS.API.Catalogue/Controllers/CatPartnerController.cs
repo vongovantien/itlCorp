@@ -642,11 +642,11 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet]
-        [Route("GetPartnerByTaxCode")]
+        [Route("GetPartnerByTaxCode/{taxCode}")]
         [Authorize]
-        public IActionResult GetPartnerByTaxCode(string taxCode)
+        public async Task<IActionResult> GetPartnerByTaxCode(string taxCode)
         {
-            var results = catPartnerService.GetPartnerByTaxCode(taxCode);
+            var results = await catPartnerService.GetPartnerByTaxCode(taxCode);
             return Ok(results);
         }
     }

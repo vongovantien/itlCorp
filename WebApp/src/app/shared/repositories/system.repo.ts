@@ -737,14 +737,5 @@ export class SystemRepo {
             )
             .pipe(map((data: any) => data));
     }
-
-    getInForCompanyByTaxCode(taxCode: string) {
-        return this._api
-            .get(
-                `thongtindoanhnghiep.co/api/company/${taxCode}`
-            )
-            .pipe(map((data: any) => data));
-    }
-
 }
 

@@ -26,7 +26,6 @@ using eFMS.API.Common.Helpers;
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.Service.Contexts;
 using ITL.NetCore.Connection;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -2606,10 +2605,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return queryAgentForKeyIn.Union(queryICustomerForKeyIn).Union(queryInternalForKeyIn);
         }
 
-        public async Task<CatContractModel> GetPartnerByTaxCode(string taxCode)
+
+        public async Task<CatPartnerModel> GetPartnerByTaxCode(string taxCode)
         {
-            string baseUrl = "http://localhost:9000/";
-            CatContractModel contract = new CatContractModel();
+            string baseUrl = $"https://thongtindoanhnghiep.co/api/company/{taxCode}";
+            object partner = new object();
             try
             {
                 using (var client = new HttpClient())
@@ -2618,25 +2618,27 @@ namespace eFMS.API.Catalogue.DL.Services
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
  
-                    HttpResponseMessage res = await client.GetAsync("api/ProjectA/GetDepartments");
- 
+                    HttpResponseMessage res = await client.GetAsync(baseUrl);
+                    var item = new CatPartnerModel();
+
                     if (res.IsSuccessStatusCode)
                     {
                         var objResponse = res.Content.ReadAsStringAsync().Result;
-                        contract = JsonConvert.DeserializeObject<CatContractModel>(objResponse);
+                        partner = JsonConvert.DeserializeObject<object>(objResponse);
+
+                        item.PartnerNameVn = partner.GetValueBy("Root")["Title"];
+                        item.PartnerNameEn = partner.GetValueBy("Root")["TitleEn"];
+                        item.AddressEn = item.AddressShippingEn = partner.GetValueBy("Root")["DiaChiCongTy"];
+                        item.AddressVn = item.AddressShippingVn = partner.GetValueBy("Root")["DiaChiCongTy"];
                     }
-                    return contract;
+
+                    return item;
                 }
             }
             catch (Exception e)
             {
                 throw e;
             }
-        }
-
-        Task<CatPartnerModel> ICatPartnerService.GetPartnerByTaxCode(string taxCode)
-        {
-            throw new NotImplementedException();
         }
     }
 }

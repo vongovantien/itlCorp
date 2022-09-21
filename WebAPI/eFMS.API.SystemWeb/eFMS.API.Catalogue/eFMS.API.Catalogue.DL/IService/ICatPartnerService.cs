@@ -7,6 +7,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService

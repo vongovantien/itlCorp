@@ -130,7 +130,6 @@ export class FormAddPartnerComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _systemRepo: SystemRepo,
         private _store: Store<IAppState>
     ) {
         super();
@@ -611,11 +610,15 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     getInforCompanyByTaxCode(taxCode: string) {
-        this._systemRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
+        this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        console.log(res)
+                        this.partnerForm.get("partnerNameVn").setValue(res.partnerNameVn);
+                        this.partnerForm.get("partnerNameEn").setValue(res.partnerNameEn);
+                        this.partnerForm.get("addressShippingEn").setValue(res.addressShippingEn);
+                        this.partnerForm.get("addressShippingVn").setValue(res.addressShippingVn);
+                        this.copyShippingAddress();
                     }
                 }
             );
