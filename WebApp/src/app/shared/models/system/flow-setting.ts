@@ -22,7 +22,7 @@ export class FlowSetting {
     replicatePrefix: string = null;
     approvalAdvance: boolean = false;
     approvalSettlement: boolean = false;
-    AlertATD: boolean = false;
+    alertAtd: boolean = false;
 
     constructor(data?: any) {
         const self = this;

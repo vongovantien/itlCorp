@@ -19,7 +19,7 @@ export class OfficeFormApproveSettingComponent
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
     accountPayable: FlowSetting = new FlowSetting();
-    officeOpex: FlowSetting = new FlowSetting();
+    opex: FlowSetting = new FlowSetting();
 
     initRepilicate = new FlowSetting({ type: 'Other', flow: 'Replicate' });
     replicateOffice: FlowSetting = this.initRepilicate;
@@ -124,7 +124,7 @@ export class OfficeFormApproveSettingComponent
                     account: FlowSetting,
                     replicateOffice: FlowSetting,
                     accountPayable: FlowSetting,
-                    officeOpex: FlowSetting,
+                    opex: FlowSetting,
                 }) => {
                     console.log(res);
 
@@ -157,11 +157,11 @@ export class OfficeFormApproveSettingComponent
                     } else {
                         this.accountPayable = res.accountPayable;
                     }
-                    if (!res.officeOpex) {
-                        this.officeOpex = new FlowSetting();
-                        this.officeOpex.type = "officeOpex";
+                    if (!res.opex) {
+                        // this.opex = new FlowSetting();
+                        this.opex.type = "Opex";
                     } else {
-                        this.officeOpex = res.officeOpex;
+                        this.opex = res.opex;
                     }
                     if (!res.account.applyPartner) {
                         this.accountReceivable.applyPartner = "None";
@@ -190,7 +190,7 @@ export class OfficeFormApproveSettingComponent
             accountReceivable: this.accountReceivable,
             replicateOffice: this.replicateOffice,
             accountPayable: this.accountPayable,
-            officeOpex: this.officeOpex,
+            opex: this.opex,
         };
 
         this._systemRepo
@@ -227,5 +227,5 @@ interface ISettingFlowEditModel {
     accountReceivable: FlowSetting;
     replicateOffice: FlowSetting;
     accountPayable: FlowSetting;
-    officeOpex: FlowSetting;
+    opex: FlowSetting;
 }
