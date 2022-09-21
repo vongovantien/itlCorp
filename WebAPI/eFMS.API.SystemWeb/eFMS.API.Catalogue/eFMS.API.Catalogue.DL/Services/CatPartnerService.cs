@@ -2637,7 +2637,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             catch (Exception e)
             {
-                throw e;
+                return null;
             }
         }
     }
