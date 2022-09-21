@@ -12,6 +12,8 @@
         public static readonly string SEND_AN_CODE = "S_AN";
         public static readonly string SEND_DO_CODE = "S_DO";
         public static readonly string SEND_AL_CODE = "S_AL";
+        public static readonly string SEND_HB_CODE = "S_HB";
+
 
         //stage constants
         public const string UPDATE_ATA = "UPDATE_ATA";
@@ -23,6 +25,7 @@
         public const string SEND_AL = "SEND_AL";
         public const string SEND_AN = "SEND_AN";
         public const string SEND_DO = "SEND_DO";
+        public const string SEND_HB = "SEND_HB";
 
 
         public static readonly string LG_SHIPMENT = "CL";// Custom Logistic

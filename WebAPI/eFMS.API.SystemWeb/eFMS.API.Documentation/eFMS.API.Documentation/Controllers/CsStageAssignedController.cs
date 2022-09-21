@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -29,9 +30,9 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         [Route("AddNewStageByEventType")]
         [Authorize]
-        public IActionResult AddNewStageByType(CsStageAssignedCriteria criteria)
+        public async Task<IActionResult> AddNewStageByType(CsStageAssignedCriteria criteria)
         {
-            var status = csStageAssignedService.AddNewStageAssignedByType(criteria);
+            var status = await csStageAssignedService.AddNewStageAssignedByType(criteria);
             return Ok(status);
         }
     }

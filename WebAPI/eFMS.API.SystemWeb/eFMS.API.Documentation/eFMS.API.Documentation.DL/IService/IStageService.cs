@@ -4,11 +4,12 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
     public interface IStageService: IRepositoryBase<CatStage, CatStageModel>
     {
-        CatStage GetStageByType(string stageType);
+        Task<CatStage> GetStageByType(string stageType);
     }
 }
