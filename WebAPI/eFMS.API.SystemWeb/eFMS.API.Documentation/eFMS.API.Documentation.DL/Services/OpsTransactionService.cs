@@ -555,7 +555,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 data.ToList().ForEach(x =>
                 {
-                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
+                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo&&cus.ConvertTime!=null).FirstOrDefault()!=null? customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo && cus.ConvertTime != null).FirstOrDefault().ClearanceNo :customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
                     .Select(cus => cus.ClearanceNo).FirstOrDefault();
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;

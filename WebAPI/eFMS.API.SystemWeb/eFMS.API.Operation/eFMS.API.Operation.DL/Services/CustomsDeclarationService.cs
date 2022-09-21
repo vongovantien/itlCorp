@@ -1468,16 +1468,15 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           );
-            if (query.Any() || accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
+            if (query.Any())
             {
-                if (accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).FirstOrDefault() != null)
+                var cleaNoExist = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid).Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.ClearanceNo);
+                var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
+                if (!clearanceNos.Any(x => cleanceNoRequet.Any(y => y.CustomNo == x)||cleaNoExist.Any(z=>z==x)))
                 {
-                    var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
-                    if (!clearanceNos.Any(x => cleanceNoRequet.Any(y => y.CustomNo == x)))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
+                
                 return false;
             }
            
