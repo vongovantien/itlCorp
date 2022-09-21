@@ -1,8 +1,9 @@
+import { SystemRepo } from '@repositories';
 import { Component, ViewChild, Output, EventEmitter, Input, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
 import { Partner, CountryModel, ProviceModel, Bank } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
@@ -173,7 +174,7 @@ export class FormAddPartnerComponent extends AppForm {
                     } else {
                         // check partnerGroup existed yet.
                         const checkExistAll = [...this.partnerGroup.value].filter(e => e.id === 'ALL');
-                        // 
+                        //
                         if (checkExistAll.length <= 0) {
                             // don't anything at here
                         } else {
@@ -607,5 +608,21 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
+
+    getInforCompanyByTaxCode(taxCode: string) {
+        this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.partnerForm.get("partnerNameVn").setValue(res.partnerNameVn);
+                        this.partnerForm.get("partnerNameEn").setValue(res.partnerNameEn);
+                        this.partnerForm.get("addressShippingEn").setValue(res.addressShippingEn);
+                        this.partnerForm.get("addressShippingVn").setValue(res.addressShippingVn);
+                        this.copyShippingAddress();
+                    }
+                }
+            );
+    }
+
 
 }
