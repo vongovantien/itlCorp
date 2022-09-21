@@ -1929,7 +1929,7 @@ namespace eFMS.API.Documentation.DL.Services
             var jobNoProfits = InvalidShipmentNoProfitImport(validList);
             list.ForEach(item =>
             {
-                if (item.IsValid)
+                if (item.IsValid && item.Type.ToLower() == "selling") // Check import fee is valid with no profit and noti to selling charges
                 {
                     if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
                     {
