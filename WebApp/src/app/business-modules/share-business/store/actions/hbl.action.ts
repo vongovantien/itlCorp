@@ -1,6 +1,7 @@
 import { Action } from '@ngrx/store';
 
 export enum HBLActionTypes {
+    INIT_LIST = '[HBL] Init List',
     GET_LIST = '[HBL] Get List',
     GET_LIST_SUCCESS = '[HBL] Get List Success',
     GET_LIST_FAIL = '[HBL] Get List Fail',
@@ -34,6 +35,12 @@ export class GetDetailHBLSuccessAction implements Action {
 
 export class GetDetailHBLFailAction implements Action {
     readonly type = HBLActionTypes.GET_DETAIL_FAIL;
+
+    constructor(public payload: any) { }
+}
+
+export class InitListHBLAction implements Action {
+    readonly type = HBLActionTypes.INIT_LIST;
 
     constructor(public payload: any) { }
 }
@@ -99,7 +106,8 @@ export class GetContainersHBLFailAction implements Action {
 }
 
 export type HBLActions =
-    GetListHBLAction
+    InitListHBLAction
+    | GetListHBLAction
     | GetListHBLSuccessAction
     | GetListHBLFailAction
     | GetDetailHBLAction
