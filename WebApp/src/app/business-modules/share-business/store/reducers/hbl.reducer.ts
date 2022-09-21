@@ -22,6 +22,7 @@ export interface IHBLState {
     containers: Container[];
     isLoading: boolean;
     isLoaded: boolean;
+    jobId: string;
 }
 
 export const initHBlState: IHBLState = {
@@ -30,12 +31,18 @@ export const initHBlState: IHBLState = {
     isLoading: false,
     isLoaded: false,
     profit: null,
-    containers: []
+    containers: [],
+    jobId: null
 };
 
 export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState {
     switch (action.type) {
-
+        case HBLActionTypes.INIT_LIST: {
+            if (!state.jobId || !action.payload?.jobId || state.jobId !== action.payload.jobId) {
+                return { ...state, isLoaded: false, hbls: [] };
+            }
+            return { ...state, isLoaded: true, isLoading: false };
+        }
         case HBLActionTypes.GET_DETAIL: {
             return { ...state, isLoaded: false };
         }
@@ -44,7 +51,11 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
         }
 
         case HBLActionTypes.GET_LIST: {
-            return { ...state, isLoaded: false, isLoading: true };
+            if (!state.jobId || !action.payload?.jobId || state.jobId !== action.payload.jobId) {
+                return { ...state, isLoaded: false, isLoading: true, jobId: action.payload?.jobId };
+            }
+            return { ...state, jobId: action.payload?.jobId };
+
         }
 
         case HBLActionTypes.GET_LIST_SUCCESS: {
