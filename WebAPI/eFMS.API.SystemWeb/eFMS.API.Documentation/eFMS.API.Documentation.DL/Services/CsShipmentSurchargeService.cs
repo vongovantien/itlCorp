@@ -1927,18 +1927,25 @@ namespace eFMS.API.Documentation.DL.Services
             });
             var validList = list.Where(x => x.IsValid && x.Type.ToLower() != "obh").ToList();
             var jobNoProfits = InvalidShipmentNoProfitImport(validList);
-            list.ForEach(item =>
+            if (jobNoProfits.Count > 0)
             {
-                if (item.IsValid && item.Type.ToLower() == "selling") // Check import fee is valid with no profit and noti to selling charges
+                var notSellingCharges = list.Where(x => !x.IsValid || x.Type.ToLower() != "sell").ToList();
+                var sellingCharges = list.Where(x => x.IsValid && x.Type.ToLower() == "sell").ToList();
+                sellingCharges.ForEach(item =>
                 {
-                    if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
+                    //if (item.IsValid && item.Type.ToLower() == "sell") Check import fee is valid with no profit and noti to selling charges
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "hbl " + item.Hblno);
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "mbl " + item.Mblno);
-                        item.IsValid = false;
+                        if (jobNoProfits.Any(x => x.Hwbno == item.Hblno && x.Mblno == item.Mblno))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "hbl " + item.Hblno);
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_INVALID_NO_PROFIT], "mbl " + item.Mblno);
+                            item.IsValid = false;
+                        }
                     }
-                }
-            });
+                });
+                list = notSellingCharges;
+                list.AddRange(sellingCharges);
+            }
 
             if (list.Count > 1)
             {
