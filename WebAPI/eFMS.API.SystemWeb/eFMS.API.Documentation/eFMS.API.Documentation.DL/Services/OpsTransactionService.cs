@@ -707,7 +707,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.ClearanceNo))
             {
-                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower()==(criteria.ClearanceNo.ToLower()));
                 if (listCustomsDeclaration.Count() > 0)
                 {
                     datajoin = from custom in listCustomsDeclaration
