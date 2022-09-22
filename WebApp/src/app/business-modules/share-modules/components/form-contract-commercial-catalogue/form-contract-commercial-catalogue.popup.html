@@ -144,7 +144,8 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
-                                            <ng-container *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
+                                            <ng-container
+                                                *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
                                                 <span class="m-input-icon_clear"
                                                     (click)="resetFormControl('expiredDate')"><i
                                                         class="la la-times"></i></span>
@@ -583,30 +584,16 @@
                         </span>
                     </button>
 
+                    <button (click)="onARConfirmed()"
+                        *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
+                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span> AR Confirmed </span>
+                        </span>
+                    </button>
                     <ng-container
-                        *ngIf="contractType.value !=='Cash' && contractType.value !=='Guarantee' && currentUser.userType !== 'Super Admin'; else template">
-                        <button (click)="onARConfirmed()"
-                            *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
-                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-check"></i>
-                                <span> AR Confirmed </span>
-                            </span>
-                        </button>
-                    </ng-container>
-                    <ng-template #template>
-                        <button (click)="onARConfirmed()"
-                            *ngIf="(contractType.value ==='Cash' || contractType.value ==='Guarantee') && (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)"
-                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-check"></i>
-                                <span> AR Confirmed </span>
-                            </span>
-                        </button>
-                    </ng-template>
-
-                    <ng-container
-                        *ngIf="currentUser.userType !== 'Super Admin' && contractType.value !=='Cash' && contractType.value !=='Guarantee' ; else elseBlock">
+                        *ngIf="currentUser?.userType === 'Super Admin' || contractType.value ==='Cash' || contractType.value ==='Guarantee' || selectedContract?.arconfirmed === true">
                         <button (click)="activeInactiveContract(selectedContract.id)"
                             *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -624,24 +611,6 @@
                             </span>
                         </button>
                     </ng-container>
-                    <ng-template #elseBlock>
-                        <button (click)="activeInactiveContract(selectedContract.id)"
-                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-check-square-o"></i>
-                                <span> Active </span>
-                        </span>
-                    </button>
-                    <button (click)="activeInactiveContract(selectedContract.id)"
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-remove"></i>
-                            <span> Inactive </span>
-                            </span>
-                        </button>
-                    </ng-template>
 
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
