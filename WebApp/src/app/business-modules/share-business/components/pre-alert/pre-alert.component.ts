@@ -259,8 +259,10 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isExitsDO = true;
                 }
                 if (this.isDO) {
-                    this.isCheckedDO = true;
-                    this.isExitsDO = true;
+                    if(this.hawbDetails[0].deliveryOrderNo){
+                        this.isCheckedDO = true;
+                        this.isExitsDO = true;
+                    }
                 }
                 if(this.isPOD){
                     this.isCheckedDO = true;

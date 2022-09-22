@@ -57,6 +57,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysFileRepository;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
+        private readonly IContextBase<CsTransaction> csTransactionRepository;
+        private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
    
         #endregion --Dependencies--
@@ -111,6 +113,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysImage> sysFileRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
+            IContextBase<CsTransaction> csTransactionRepo,
+            IContextBase<OpsTransaction> opsTransactionRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -151,6 +155,8 @@ namespace eFMS.API.Accounting.DL.Services
             settlementPaymentService = settlementService;
             databaseUpdateService = _databaseUpdateService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
+            csTransactionRepository = csTransactionRepo;
+            opsTransactionRepository = opsTransactionRepo;
             // ---
 
             users = UserRepository.Get();
@@ -262,6 +268,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         // Ds surcharge của voucher
                         IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == item.Stt);
+                        surcharges = GetShipmentSurchargesData(surcharges);
 
                         IQueryable<BravoVoucherChargeModel> queryChargesVoucher = from surcharge in surcharges
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id
@@ -357,6 +364,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // Ds Surcharge của settlement.
                             IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
+                            surcharges = GetShipmentSurchargesData(surcharges);
                             //*Note: Nếu charge là OBH thì OriginalAmount = Thành tiền trước thuế + Tiền thuế; OriginalAmount3 = 0; 
                             //Ngược lại OriginalAmount = Thành tiền trước thuế, OriginalAmount3 = Tiền thuế
 
@@ -596,6 +604,7 @@ namespace eFMS.API.Accounting.DL.Services
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                surcharges = GetShipmentSurchargesData(surcharges);
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
                 var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
 
@@ -789,6 +798,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    surcharges = GetShipmentSurchargesData(surcharges);
                     string hblId = string.Empty;
 
                     foreach (var surcharge in surcharges)
@@ -944,6 +954,7 @@ namespace eFMS.API.Accounting.DL.Services
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                surcharges = GetShipmentSurchargesData(surcharges);
                 var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
                 var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
 
@@ -1113,6 +1124,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                    surcharges = GetShipmentSurchargesData(surcharges);
 
                     foreach (var surcharge in surcharges)
                     {
@@ -3474,6 +3486,48 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// Update shipment info for surcharges
+        /// </summary>
+        /// <param name="surcharges">origin surcharges</param>
+        /// <returns></returns>
+        private IQueryable<CsShipmentSurcharge> GetShipmentSurchargesData(IQueryable<CsShipmentSurcharge> surcharges)
+        {
+            var opsTransaction = opsTransactionRepository.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
+            var csTransaction = csTransactionRepository.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
+            var csTransactionDetail = csTransactionDetailRepository.Get();
+            var transactionData = from trans in csTransaction
+                                  join tranDetail in csTransactionDetail on trans.Id equals tranDetail.JobId
+                                  select new
+                                  {
+                                      JobNo = trans.JobNo,
+                                      HblId = tranDetail.Id,
+                                      Mawb = !string.IsNullOrEmpty(trans.Mawb) ? trans.Mawb : tranDetail.Mawb,
+                                      HblNo = tranDetail.Hwbno
+                                  };
+
+            foreach (var item in surcharges)
+            {
+                var opsDetail = opsTransaction.First(x => x.Hblid == item.Hblid);
+                if (opsDetail == null)
+                {
+                    var shipment = transactionData.First(x => x.HblId == item.Hblid);
+                    item.Hblid = shipment.HblId;
+                    item.JobNo = shipment.JobNo;
+                    item.Mblno = shipment.Mawb;
+                    item.Hblno = shipment.HblNo;
+                }
+                else
+                {
+                    item.Hblid = opsDetail.Hblid;
+                    item.JobNo = opsDetail.JobNo;
+                    item.Mblno = opsDetail.Mblno;
+                    item.Hblno = opsDetail.Hwbno;
+                }
+            }
+            return surcharges;
         }
     }
 }
