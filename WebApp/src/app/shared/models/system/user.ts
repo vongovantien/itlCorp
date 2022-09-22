@@ -23,7 +23,6 @@ export class User {
     SysEmployeeModel: Employee = null;
     employeeNameEn: string = '';
     employeeNameVn: string = '';
-
     userCreatedName: string = null;
     userModifiedName: string = null;
 

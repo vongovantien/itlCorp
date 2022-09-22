@@ -1,3 +1,4 @@
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
@@ -9,7 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
@@ -64,6 +65,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialCreditLimit: AbstractControl;
     autoExtendDays: AbstractControl;
     noDue: AbstractControl;
+    emailAddress: AbstractControl;
+    paymentTermObh: AbstractControl;
+    firstShipmentDate: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -154,6 +158,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+            if (!!res) {
+                this.currentUser = res;
+            }
+        })
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -235,7 +244,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditUnlimited: [],
             autoExtendDays: [],
             noDue: [],
-            shipmentType: []
+            shipmentType: [],
+            emailAddress: [null, Validators.email],
+            firstShipmentDate: [null],
+            paymentTermObh: [null]
         });
         // this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -258,6 +270,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
         this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
         this.noDue = this.formGroup.controls['noDue'];
+        this.emailAddress = this.formGroup.controls['emailAddress'];
+        this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
+        this.paymentTermObh = this.formGroup.controls['paymentTermObh'];
     }
 
     initDataForm() {
@@ -276,6 +291,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 },
             );
+        console.log(this.users)
     }
 
     getCompanies() {
@@ -457,6 +473,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         return true;
     }
 
+
     onSubmit(isRequestApproval: boolean = false) {
         console.log(this.isSubmitted);
         this.setError(this.vas);
@@ -580,7 +597,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.selectedContract.fileList = this.fileList;
                 this.onRequest.emit(this.selectedContract);
             }
-
         }
     }
 
@@ -697,7 +713,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditCurrency: this.selectedContract.creditCurrency,
             autoExtendDays: this.selectedContract.autoExtendDays,
             noDue: this.selectedContract.noDue,
-            shipmentType: this.selectedContract.shipmentType
+            shipmentType: this.selectedContract.shipmentType,
+            emailAddress: this.selectedContract.emailAddress,
+            firstShipmentDate: !!this.selectedContract.firstShipmentDate ? { startDate: new Date(this.selectedContract.firstShipmentDate), endDate: new Date(this.selectedContract.firstShipmentDate) } : null,
+            paymentTermObh: this.selectedContract.paymentTermObh
         });
         this.contractTypeDetail = this.selectedContract.contractType;
 
@@ -787,6 +806,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.salesOfficeId = this.selectedSalesmanData?.userOfficeId;
         this.selectedContract.salesCompanyId = this.selectedSalesmanData?.userCompanyId;
         this.selectedContract.shipmentType = this.formGroup.controls['shipmentType'].value;
+        this.selectedContract.emailAddress = this.formGroup.controls['emailAddress'].value;
+        this.selectedContract.firstShipmentDate = !!this.firstShipmentDate.value && this.firstShipmentDate.value.startDate ? formatDate(this.firstShipmentDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
     }
 
     onSubmitActiveContract() {
@@ -820,8 +842,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         else {
             this.processActiveInActiveContract(id);
         }
-
-
     }
 
     onSalesmanCreditRequest($event: any) {
@@ -988,6 +1008,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
+                        this.selectedContract.arconfirmed = false;
+                        this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error('something went wrong!');
                     }
@@ -1057,6 +1079,4 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
             );
     }
-
-
 }
