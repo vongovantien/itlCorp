@@ -3612,7 +3612,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && (havActiveContract(x, model.TransactionType) ? y.Active == true : y.Active == false)
                             && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3632,7 +3632,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && (havActiveContract(x,model.TransactionType)?y.Active==true:y.Active==false)
                             && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3644,6 +3644,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
            
             return errorMsg;
+        }
+
+        private bool havActiveContract(CsTransactionDetail tranDes,string transactionType)
+        {
+            return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
+                           && y.SaleManId == tranDes.SaleManId && y.Active==true
+                           && y.SaleService.Contains(transactionType)&&y.ShipmentType == "Nominated");
         }
         
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
