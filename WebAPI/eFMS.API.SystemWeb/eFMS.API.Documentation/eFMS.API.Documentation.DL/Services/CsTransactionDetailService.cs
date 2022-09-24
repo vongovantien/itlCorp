@@ -277,6 +277,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState("Housebill not found !");
             }
+            model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
             model.OfficeId = hb.OfficeId;
