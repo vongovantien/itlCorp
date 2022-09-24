@@ -93,7 +93,8 @@
                         <input [attr.disabled]="this.active.value === true ? 'disabled' : null" type="text" min="0"
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
-                            [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
+                            [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required
+                            (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                         <div class="form-control-feedback"
                             *ngIf="(isSubmitted &&
                             ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
@@ -114,7 +115,7 @@
                         <input #focusInput type="text" name="internalReferenceNo"
                             [attr.disabled]="isDisabled === true ? 'disabeld' : null" class="form-control" minlength="3"
                             formControlName="internalReferenceNo" />
-                        <div class="form-control-feedback" *ngIf="isSubmitted && 
+                        <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">
                             Internal Reference include 3 - 10 characters!
@@ -440,7 +441,7 @@
                                 <div class="col-lg-4">
                                     <!--Bank account no-->
                                     <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
+                                        [ngClass]="{'m-form__group has-danger':(bankAccountNo.dirty) && !bankAccountNo.valid }">
                                         <label class="form-control-label" for="">
                                             Bank Account No
                                         </label>

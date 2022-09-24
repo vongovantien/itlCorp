@@ -264,23 +264,23 @@ namespace eFMS.API.Catalogue.Controllers
                 model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
                 idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
                 model.idsContract = idsContract;
-                
+
             }
             var partner = mapper.Map<CatPartnerModel>(model);
             partner.idsContract = model.idsContract;
-            foreach(var item in partner.Contracts)
+            foreach (var item in partner.Contracts)
             {
-               foreach(var it in model.Contracts)
-               {
-                    if(item.Id == it.Id)
+                foreach (var it in model.Contracts)
+                {
+                    if (item.Id == it.Id)
                     {
                         item.IsRequestApproval = it.IsRequestApproval;
                     }
-               }
+                }
             }
-            
+
             var result = catPartnerService.Add(partner);
-            
+
             return Ok(result);
         }
 
@@ -407,9 +407,9 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("importCustomerAgent/{type}")]
         [Authorize]
-        public IActionResult ImportCustomerAgent([FromBody] List<CatPartnerImportModel> data,string type)
+        public IActionResult ImportCustomerAgent([FromBody] List<CatPartnerImportModel> data, string type)
         {
-            var hs = catPartnerService.ImportCustomerAgent(data,type);
+            var hs = catPartnerService.ImportCustomerAgent(data, type);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
             if (!hs.Success)
             {
@@ -641,5 +641,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpGet]
+        [Route("GetPartnerByTaxCode/{taxCode}")]
+        [Authorize]
+        public async Task<IActionResult> GetPartnerByTaxCode(string taxCode)
+        {
+            var results = await catPartnerService.GetPartnerByTaxCode(taxCode);
+            return Ok(results);
+        }
     }
 }
