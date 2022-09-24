@@ -235,7 +235,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isExitsArrivalNotice = true;
                     this.isCheckedArrivalNotice = true;
 
-                    if(this.hawbDetails[0].deliveryOrderNo){
+                    if (this.hawbDetails[0].deliveryOrderNo) {
                         this.isCheckedDO = true;
                         this.isExitsDO = true;
                     }
@@ -260,13 +260,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isArrivalNotice) {
                     this.isExitsArrivalNotice = true;
                     this.isCheckedArrivalNotice = true;
-                    if(this.hawbDetails[0].deliveryOrderNo){
+                    if (this.hawbDetails[0].deliveryOrderNo) {
                         this.isCheckedDO = true;
                         this.isExitsDO = true;
                     }
                 }
                 if (this.isDO) {
-                    if(this.hawbDetails[0].deliveryOrderNo){
+                    if (this.hawbDetails[0].deliveryOrderNo) {
                         this.isCheckedDO = true;
                         this.isExitsDO = true;
                     }

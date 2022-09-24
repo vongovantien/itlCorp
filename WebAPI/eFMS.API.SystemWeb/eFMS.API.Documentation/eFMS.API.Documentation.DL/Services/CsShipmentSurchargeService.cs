@@ -848,13 +848,8 @@ namespace eFMS.API.Documentation.DL.Services
                 //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                 item.FinalExchangeRate = null;
                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
-                item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
                 item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                 item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
             }
             foreach (var item in updateSurcharges)
             {
@@ -872,13 +867,8 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeMapper.ExchangeDate = item.ExchangeDate;
 
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surchargeMapper, kickBackExcRate);
-                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
                     item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                     item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                 }
             }
 

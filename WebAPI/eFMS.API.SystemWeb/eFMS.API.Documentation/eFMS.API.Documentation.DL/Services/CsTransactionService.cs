@@ -3240,6 +3240,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             if (model.Etd != null)
                             {
+                                hbl.SailingDate = model.Etd;
                                 hbl.Etd = model.Etd;
                             }
                             if (model.Pod != null)
