@@ -176,6 +176,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
 
                     } else {
                         this._toastService.error(res.message);
@@ -215,7 +216,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.selectedTab = tabName;
     }
 
-    sendMail(type: string){
+    sendMail(type: string) {
         this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
@@ -226,7 +227,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         switch (type) {
                             case 'ArrivalNotice':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/arrivalnotice`]);

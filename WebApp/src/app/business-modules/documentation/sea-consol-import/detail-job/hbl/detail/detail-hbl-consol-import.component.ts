@@ -115,10 +115,10 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 break;
             }
             // * Update Proof Of Delivery.
-            case HBL_TAB.PROOF: {
-                this.proofOfDeliveryComponent.saveProofOfDelivery();
-                break;
-            }
+            // case HBL_TAB.PROOF: {
+            //     this.proofOfDeliveryComponent.saveProofOfDelivery();
+            //     break;
+            // }
             default:
                 break;
         }
@@ -178,7 +178,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
-
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -218,7 +218,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this.selectedTab = tabName;
     }
 
-    sendMail(type: string){
+    sendMail(type: string) {
         this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
@@ -229,7 +229,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         switch (type) {
                             case 'ArrivalNotice':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.hblDetail.jobId}/hbl/${this.hblId}/arrivalnotice`]);
