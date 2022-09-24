@@ -31,21 +31,21 @@ namespace eFMS.API.Documentation.DL.Services
             logger.LogInformation("Alert Service Hosted Service is working.");
             while (!stoppingToken.IsCancellationRequested)
             {
-                // DateTime date1 = new DateTime(2022, 09, 20, 08, 0, 0);
                 int hourCurrent = 25 - DateTime.Now.Hour;
                 int numerOfHours = hourCurrent;
-                if(numerOfHours == 17)
+                if(numerOfHours == 24)
                 {
                     using (var scope = services.CreateScope())
                     {
+                        new LogHelper("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now);
                         var scopedProcessingService =
                             scope.ServiceProvider
                                 .GetRequiredService<IScopedProcessingAlertATDService>();
                         await scopedProcessingService.AlertATD();
                     }
-                    numerOfHours = 17;
+                    numerOfHours = 24;
                 }
-                await Task.Delay(TimeSpan.FromHours(numerOfHours));
+                await Task.Delay(TimeSpan.FromHours(numerOfHours), stoppingToken);
             }
         }
 
