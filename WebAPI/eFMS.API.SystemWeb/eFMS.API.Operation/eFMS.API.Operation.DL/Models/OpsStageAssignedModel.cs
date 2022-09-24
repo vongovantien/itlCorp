@@ -9,5 +9,6 @@ namespace eFMS.API.Operation.DL.Models
         public string StageNameEN { get; set; }
         public string DepartmentName { get; set; }
         public DateTime? DoneDate { get; set; }
+        public string HblNo { get; set; }
     }
 }

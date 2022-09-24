@@ -21,6 +21,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICatDepartmentApiService catDepartmentApi;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
         private readonly IContextBase<CsTransaction> csTransactionReporsitory;
+        private readonly IContextBase<CsTransactionDetail> csTransactionDetailReporsitory;
 
         private readonly IContextBase<SysUser> userRepository;
 
@@ -29,7 +30,9 @@ namespace eFMS.API.Operation.DL.Services
             ICurrentUser user,
             ICatDepartmentApiService departmentApi,
             IContextBase<OpsTransaction> opsTransRepo,
-            IContextBase<SysUser> userRepo, IContextBase<CsTransaction> csTransactionRepo) : base(repository, mapper)
+            IContextBase<SysUser> userRepo, 
+            IContextBase<CsTransaction> csTransactionRepo,
+            IContextBase<CsTransactionDetail> csTransactionDetailRepo) : base(repository, mapper)
         {
             catStageApi = stageApi;
             currentUser = user;
@@ -37,6 +40,7 @@ namespace eFMS.API.Operation.DL.Services
             opsTransRepository = opsTransRepo;
             userRepository = userRepo;
             csTransactionReporsitory = csTransactionRepo;
+            csTransactionDetailReporsitory = csTransactionDetailRepo;
         }
 
         public HandleState Add(OpsStageAssignedEditModel model)
@@ -131,6 +135,7 @@ namespace eFMS.API.Operation.DL.Services
                 result.StageNameEN = stages.FirstOrDefault(x => x.Id == result.StageId).StageNameEn;
                 result.DepartmentName = departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
                 result.Description = result.Description != null ? result.Description : stages.FirstOrDefault(x => x.Id == result.StageId).DescriptionEn;
+                result.HblNo = (data.Hblid != null && data.Hblid != Guid.Empty) ? csTransactionDetailReporsitory.First(x => x.Id == data.Hblid).Hwbno : null;
             }
             return result;
         }
@@ -248,6 +253,7 @@ namespace eFMS.API.Operation.DL.Services
             var stages = catStageApi.GetAll().Result;
             var departments = catDepartmentApi.GetAll().Result;
             var users = userRepository.Get();
+            var hbls = csTransactionDetailReporsitory.Get();
             var results = new List<OpsStageAssignedModel>();
             foreach (var item in data)
             {
@@ -261,6 +267,8 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.Description = assignedItem.Description ?? stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
                 assignedItem.MainPersonInCharge = assignedItem.MainPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.MainPersonInCharge)?.Username : assignedItem.MainPersonInCharge;
                 assignedItem.RealPersonInCharge = assignedItem.RealPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.RealPersonInCharge)?.Username : assignedItem.RealPersonInCharge;
+                assignedItem.HblNo = (item.Hblid != null && item.Hblid != Guid.Empty) ? hbls.First(x => x.Id == item.Hblid).Hwbno : null;
+
                 results.Add(assignedItem);
             }
             return results;
