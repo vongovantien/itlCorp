@@ -139,7 +139,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.headerPartner = [
             { title: 'Name Abbr', field: 'shortName' },
             { title: 'Name', field: 'partnerNameEn' },
-            { title: 'Partner Code', field: 'taxCode' },
+            { title: 'Partner Code', field: 'accountNo' },
         ];
 
         this.configComboGridCharge = Object.assign({}, this.configComoBoGrid, {
