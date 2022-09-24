@@ -2766,7 +2766,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.VoucherIdredate = null;
                     item.CombineBillingNo = null;
                     item.ObhcombineBillingNo = null;
-                    
+
                     if (item.IsRefundFee == true)
                     {
                         item.PaymentObjectId = shipment.ColoaderId;
@@ -3200,7 +3200,7 @@ namespace eFMS.API.Documentation.DL.Services
 
 
                             // CR 14501 -> 18083
-                            if(!isManyHBls)
+                            if (!isManyHBls)
                             {
                                 hbl.PackageQty = model.PackageQty;
                                 hbl.GrossWeight = model.GrossWeight;
@@ -3208,11 +3208,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 hbl.ChargeWeight = model.ChargeWeight;
                                 hbl.Cbm = model.Cbm;
                             }
-                           
+
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
-                        if(hs.Success)
+                        if (hs.Success)
                         {
                             return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
                         }
@@ -3278,7 +3278,7 @@ namespace eFMS.API.Documentation.DL.Services
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
-                        if(hs.Success)
+                        if (hs.Success)
                         {
                             return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
                         }
@@ -3613,7 +3613,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && y.Active == havActiveContract(x, model.TransactionType)
                             && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3633,7 +3633,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && y.Active == havActiveContract(x, model.TransactionType)
                             && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3643,8 +3643,15 @@ namespace eFMS.API.Documentation.DL.Services
 
                 }
             }
-           
+
             return errorMsg;
+        }
+
+        private bool havActiveContract(CsTransactionDetail tranDes, string transactionType)
+        {
+            return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
+                           && y.SaleManId == tranDes.SaleManId && y.Active == true
+                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated"||y.ShipmentType== "Freehand & Nominated"));
         }
         
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
