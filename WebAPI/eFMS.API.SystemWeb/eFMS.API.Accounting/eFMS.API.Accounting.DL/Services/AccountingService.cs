@@ -3510,21 +3510,27 @@ namespace eFMS.API.Accounting.DL.Services
 
             foreach (var item in surcharges)
             {
-                var opsDetail = opsTransaction.First(x => x.Hblid == item.Hblid);
-                if (opsDetail == null)
+                if(item.TransactionType == "CL")
                 {
-                    var shipment = transactionData.First(x => x.HblId == item.Hblid);
-                    item.Hblid = shipment.HblId;
-                    item.JobNo = shipment.JobNo;
-                    item.Mblno = shipment.Mawb;
-                    item.Hblno = shipment.HblNo;
+                    var opsDetail = opsTransaction.FirstOrDefault(x => x.Hblid == item.Hblid);
+                    if(opsDetail != null)
+                    {
+                        item.Hblid = opsDetail.Hblid;
+                        item.JobNo = opsDetail.JobNo;
+                        item.Mblno = opsDetail.Mblno;
+                        item.Hblno = opsDetail.Hwbno;
+                    }
                 }
                 else
                 {
-                    item.Hblid = opsDetail.Hblid;
-                    item.JobNo = opsDetail.JobNo;
-                    item.Mblno = opsDetail.Mblno;
-                    item.Hblno = opsDetail.Hwbno;
+                    var shipment = transactionData.FirstOrDefault(x => x.HblId == item.Hblid);
+                    if(shipment != null)
+                    {
+                        item.Hblid = shipment.HblId;
+                        item.JobNo = shipment.JobNo;
+                        item.Mblno = shipment.Mawb;
+                        item.Hblno = shipment.HblNo;
+                    }
                 }
             }
             return surcharges;
