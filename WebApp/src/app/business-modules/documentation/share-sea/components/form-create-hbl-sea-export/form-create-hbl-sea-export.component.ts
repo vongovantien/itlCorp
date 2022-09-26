@@ -55,8 +55,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     country: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
+    finalPod:AbstractControl;
     polDescription: AbstractControl;
     podDescription: AbstractControl;
+    finalDestinationPlace: AbstractControl;
     // freightCharge: AbstractControl;
     goodsDelivery: AbstractControl;
     goodsDeliveryDescription: AbstractControl;
@@ -194,6 +196,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
                             pod: this.shipmmentDetail.pod,
                             pol: this.shipmmentDetail.pol,
+                            finalPod: this.shipmmentDetail.finalPod,
                             serviceType: !!this.shipmmentDetail.typeOfService ? this.shipmmentDetail.typeOfService : null,
                             issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
                             sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
@@ -207,7 +210,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             placeReceipt: this.shipmmentDetail.polName,
                             podDescription: !!this.shipmmentDetail.podDescription ? this.shipmmentDetail.podDescription : this.shipmmentDetail.podName,
                             polDescription: !!this.shipmmentDetail.polDescription ? this.shipmmentDetail.polDescription : this.shipmmentDetail.polName,
-
+                            finalDestinationPlace: !!this.shipmmentDetail.finalDestinationPlace ? this.shipmmentDetail.finalDestinationPlace : this.shipmmentDetail.finalPodName,
                             incotermId: this.shipmmentDetail.incotermId
                         });
 
@@ -291,8 +294,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             country: [],
             pol: [null, Validators.required],
             pod: [null, Validators.required],
+            finalPod: [],
             polDescription: [null, Validators.required],
             podDescription: [null, Validators.required],
+            finalDestinationPlace: [],
             forwardingAgent: [],
             goodsDelivery: [],
 
@@ -316,7 +321,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 FormValidators.validateSpecialChar
             ])],
             localVoyNo: [],
-            finalDestinationPlace: [],
+            // finalDestinationPlace: [],
             oceanVoyNo: [null, Validators.required],
             shipperDescription: [],
             consigneeDescription: [null, this.type === ChargeConstants.SFE_CODE ? Validators.required : null],
@@ -355,6 +360,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.country = this.formCreate.controls["country"];
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];
+        this.finalPod = this.formCreate.controls["finalPod"];
         this.forwardingAgent = this.formCreate.controls["forwardingAgent"];
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
         this.goodsDeliveryDescription = this.formCreate.controls["goodsDeliveryDescription"];
@@ -370,6 +376,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
+        this.finalDestinationPlace = this.formCreate.controls["finalDestinationPlace"];
         this.incotermId = this.formCreate.controls["incotermId"];
         this.hwbno.valueChanges
             .pipe(startWith(this.hwbno.value), takeUntil(this.ngUnsubscribe))
@@ -399,7 +406,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             forwardingAgent: data.forwardingAgentId,
             goodsDelivery: data.goodsDeliveryId,
             podDescription: !!data.podDescription ? data.podDescription : data.podName,
-            polDescription: !!data.polDescription ? data.polDescription : data.polName
+            polDescription: !!data.polDescription ? data.polDescription : data.polName,
+            finalDestinationPlace: !!data.finalDestinationPlace? data.finalDestinationPlace: data.finalPodName,
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
@@ -443,6 +451,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             pickupPlace: data.pickupPlace,
             pol: data.pol,
             pod: data.pod,
+            finalPod: data.finalPod,
             placeDelivery: data.deliveryPlace,
             finalDestinationPlace: data.finalDestinationPlace,
             forwardingAgent: data.forwardingAgentId,
@@ -552,6 +561,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             case 'sale':
                 this.saleMan.setValue(data.id);
                 break;
+            case 'finalPod':
+                this.finalPod.setValue(data.id);
+                this.finalDestinationPlace.setValue((data as PortIndex).nameEn);
+                break;    
             default:
                 break;
         }
