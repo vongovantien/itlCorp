@@ -503,8 +503,8 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                var clearanceList=clearances.OrderBy(x => x.ClearanceDate);
-                foreach (var item in clearanceList)
+                var clearanceAdd=clearances.OrderBy(x => x.ClearanceDate);
+                foreach (var item in clearanceAdd)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
@@ -517,22 +517,12 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
-                var HblId = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().Hblid;
                 if (opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault() == null)
                 {
                     return result;
                 }
-                string clearanceNo = "";
                 var jobNo = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().JobNo;
-                if(clearances.Any(x => x.isDelete == true))
-                {
-                    clearanceNo = GetOldestCleranceNo(clearances, jobNo, true);
-                }
-                else
-                {
-                clearanceNo = GetOldestCleranceNo(clearances, jobNo, false);
-                }
-                updateChargeAndAdvReq(HblId, clearanceNo,clearances.Any(x=>x.isDelete==true));
+                UpdateChargeAndAdvReq(jobNo);
             }
             catch (Exception ex)
             {
@@ -541,27 +531,36 @@ namespace eFMS.API.Operation.DL.Services
             return result;
         }
 
-        private void updateChargeAndAdvReq(Guid hblId,string clearanceNo,bool isDelete)
+        private void UpdateChargeAndAdvReq(string jobNo)
         {
-            var charges = isDelete? csShipmentSurchargeRepo.Get(x => x.Hblid == hblId):csShipmentSurchargeRepo.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.ClearanceNo));
-            if (charges.Count() > 0)
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo && x.AcctManagementId == null & x.PayerAcctManagementId == null && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
+            var advRQs = accAdvanceRequestRepository.Get(x => x.JobId == jobNo);
+            var clearanceData = DataContext.Get(x=>x.JobNo==jobNo);
+            if (surcharges.Count() > 0 | advRQs.Count() > 0)
             {
-                charges.ToList().ForEach(sur =>
+                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo;
+                if (clearanceNo.Count() <= 0)
                 {
-                    sur.ClearanceNo = clearanceNo;
-                    csShipmentSurchargeRepo.Update(sur, x => x.Id == sur.Id, false);
-                });
+                    clearanceNo = null;
+                }else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
+                {
+                    clearanceNo = advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault().CustomNo;
+                }
+                if (string.IsNullOrEmpty(clearanceNo))
+                {
+                    clearanceNo = clearanceData.OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+                }
+                foreach(var item in surcharges)
+                {
+                    item.ClearanceNo = clearanceNo;
+                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
+                }
                 csShipmentSurchargeRepo.SubmitChanges();
-            }
-            var advRQs = isDelete? accAdvanceRequestRepository.Get(x => x.Hblid == hblId): accAdvanceRequestRepository.Get(x => x.Hblid == hblId&&string.IsNullOrEmpty(x.CustomNo));
-            if (advRQs.Count() > 0)
-            {
-                advRQs.ToList().ForEach(rq =>
+                foreach(var item in advRQs)
                 {
-                    rq.CustomNo = clearanceNo;
-                    accAdvanceRequestRepository.Update(rq, x => x.Id == rq.Id);
-                });
-                accAdvanceRequestRepository.SubmitChanges();
+                    item.CustomNo = clearanceNo;
+                    accAdvanceRequestRepository.Update(item, x => x.Id == item.Id);
+                }
             }
         }
 
@@ -1454,32 +1453,25 @@ namespace eFMS.API.Operation.DL.Services
             return new List<CustomsDeclarationModel>();
         }
 
-        public bool CheckAllowUpdate(Guid? jobId,List<string> clearanceNos)
+        public bool CheckAllowUpdate(Guid? jobId, List<string> clearanceNos)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
             var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
                           (!string.IsNullOrEmpty(x.CreditNo)
                           || !string.IsNullOrEmpty(x.DebitNo)
                           || !string.IsNullOrEmpty(x.Soano)
-                          || !string.IsNullOrEmpty( x.PaymentRefNo)
+                          || !string.IsNullOrEmpty(x.PaymentRefNo)
                           || !string.IsNullOrEmpty(x.AdvanceNo)
                           || !string.IsNullOrEmpty(x.VoucherId)
                           || !string.IsNullOrEmpty(x.PaySoano)
                           || !string.IsNullOrEmpty(x.SettlementCode)
                           || !string.IsNullOrEmpty(x.SyncedFrom))
-                          );
-            if (query.Any())
+                          ).Select(x => x.ClearanceNo);
+            var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo && !string.IsNullOrEmpty(y.CustomNo)).Select(x => x.CustomNo).ToList();
+            if (!clearanceNos.Any(x => query.Any(y => y == x) || cleanceNoRequet.Any(z => z == x)))
             {
-                var cleaNoExist = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid).Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.ClearanceNo);
-                var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo).ToList();
-                if (!clearanceNos.Any(x => cleanceNoRequet.Any(y => y.CustomNo == x)||cleaNoExist.Any(z=>z==x)))
-                {
-                    return true;
-                }
-                
                 return false;
             }
-           
             return true;
         }
 
