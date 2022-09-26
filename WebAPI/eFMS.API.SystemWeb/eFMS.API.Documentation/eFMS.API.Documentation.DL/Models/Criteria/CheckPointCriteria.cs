@@ -17,4 +17,14 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string PartnerId { get; set; }
         public Guid? HblId { get; set; }
     }
+
+    public class CheckPoint
+    {
+        public string PartnerId { get; set; }
+        public Guid HblId { get; set; }
+        public string TransactionType { get; set; }
+        public CHECK_POINT_TYPE CheckPointType { get; set; }
+        public string SettlementCode { get; set; }
+        public string SalesmanId { get; set; }
+    }
 }

@@ -225,7 +225,13 @@ namespace eFMS.API.Documentation.Controllers
             if(partnersNeedValidate.Count() > 0)
             {
                 string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
-                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[0].PaymentObjectId, partnersNeedValidate[0].Hblid, transactionTypeToCheckPoint, CHECK_POINT_TYPE.SURCHARGE, null);
+                var checkPoint = new CheckPoint {
+                    PartnerId = partnersNeedValidate[0].PaymentObjectId,
+                    TransactionType = transactionTypeToCheckPoint,
+                    CheckPointType = CHECK_POINT_TYPE.SURCHARGE,
+                    HblId = partnersNeedValidate[0].Hblid
+                };
+                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
                 if (!hsCheckpoint.Success)
                 {
                     return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
@@ -756,17 +762,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpGet("ValidateCheckPointPartner")]
+        [HttpPost("ValidateCheckPointPartner")]
         [Authorize]
-        public IActionResult ValidateCheckPointPartner(string partnerId, string Hblid, string transactionType, CHECK_POINT_TYPE type, string settlementCode)
+        public IActionResult ValidateCheckPointPartner(CheckPoint criteria)
         {
             Guid _hblId = Guid.Empty;
-            if(!string.IsNullOrEmpty(Hblid))
+            if(!string.IsNullOrEmpty(criteria.HblId.ToString()))
             {
-                _hblId = Guid.Parse(Hblid);
+                _hblId = Guid.Parse(criteria.HblId.ToString());
             }
 
-            HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(partnerId, _hblId, transactionType, type, settlementCode);
+            HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(criteria);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
 
             if (!hs.Success)
