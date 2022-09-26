@@ -6,7 +6,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
-import { IShareBussinessState, AppShareHBLBase, MassUpdatePodComponent } from '@share-bussiness';
+import { IShareBussinessState, AppShareHBLBase } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
@@ -19,7 +19,6 @@ import { RoutingConstants } from '@constants';
 export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
 
     serviceType: CommonType.SERVICE_TYPE = 'air';
-    @ViewChild(MassUpdatePodComponent) massUpdatePODComponent: MassUpdatePodComponent;
 
     constructor(
         protected _router: Router,
@@ -87,18 +86,5 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
     //     });
     // }
 
-    showMassUpdatePOD() {
-        if (!!this.houseBills) {
-            this.massUpdatePODComponent.show();
-            console.log(this.houseBills);
-        }
-    }
-
-    closeMassUpdate($event) {
-        if ($event) {
-            this.massUpdatePODComponent.hide();
-            this._progressRef.complete();
-        }
-    }
 
 }

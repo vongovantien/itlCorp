@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { AppShareHBLBase, IShareBussinessState, MassUpdatePodComponent } from '@share-bussiness';
+import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
@@ -31,7 +31,7 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
     ) {
         super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
-    @ViewChild(MassUpdatePodComponent) massUpdatePODComponent: MassUpdatePodComponent;
+
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
@@ -88,19 +88,6 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
 
     gotoList() {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}`]);
-    }
-    showMassUpdatePOD() {
-        if (!!this.houseBills) {
-            this.massUpdatePODComponent.show();
-            console.log(this.houseBills);
-        }
-    }
-
-    closeMassUpdate($event) {
-        if ($event) {
-            this.massUpdatePODComponent.hide();
-            this._progressRef.complete();
-        }
     }
 
 }

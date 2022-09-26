@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
-import { AppShareHBLBase, IShareBussinessState, MassUpdatePodComponent } from '@share-bussiness';
+import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -20,7 +20,6 @@ import { HouseBill } from '@models';
 
 export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
 
-    @ViewChild(MassUpdatePodComponent) massUpdatePODComponent: MassUpdatePodComponent;
 
     serviceType: CommonType.SERVICE_TYPE = 'air';
 
@@ -91,17 +90,4 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit5'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('files'); });
     }
 
-    showMassUpdatePOD() {
-        if (!!this.houseBills) {
-            this.massUpdatePODComponent.show();
-            console.log(this.houseBills);
-        }
-    }
-
-    closeMassUpdate($event) {
-        if ($event) {
-            this.massUpdatePODComponent.hide();
-            this._progressRef.complete();
-        }
-    }
 }

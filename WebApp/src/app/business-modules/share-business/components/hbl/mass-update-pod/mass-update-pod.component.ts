@@ -16,7 +16,7 @@ import { Store } from '@ngrx/store';
   selector: 'app-mass-update-pod',
   templateUrl: './mass-update-pod.component.html',
 })
-export class MassUpdatePodComponent extends PopupBase implements OnInit {
+export class ShareBussinessMassUpdatePodComponent extends PopupBase implements OnInit {
 
   @Input() jobId: string = '';
   @Output() isUpdated: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -109,6 +109,9 @@ export class MassUpdatePodComponent extends PopupBase implements OnInit {
             let errorIndex = res.findIndex(x => x.status === false);
             if (errorIndex === -1) {
               this._toast.success(res[0].message);
+              this.isUpdated.emit(true);
+              this.isSubmitted = false;
+              this.formGroup.reset();
             } else {
               this._toast.error(res[errorIndex].message);
             }
@@ -116,9 +119,6 @@ export class MassUpdatePodComponent extends PopupBase implements OnInit {
           }
         }
       )
-    this.isUpdated.emit(true);
-    this.isSubmitted = false;
-    this.formGroup.reset();
   }
 
   resetDeliveryDate() { this.deliveryDate.setValue(null); }
