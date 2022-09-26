@@ -210,7 +210,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     createHbl(houseBill: HouseBill) {
         if (this.formCreateHBLComponent.formCreate.valid) {
-            this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
+            this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6, null, houseBill.saleManId)
                 .pipe(
                     switchMap((res: CommonInterface.IResult) => {
                         if (!res.status) {

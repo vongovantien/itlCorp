@@ -190,7 +190,7 @@ export class CreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
+            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6, null, body.saleManId)
                 .pipe(
                     switchMap((res: CommonInterface.IResult) => {
                         if (!res.status) {

@@ -275,7 +275,13 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.Data.Count == 0) return result;
             foreach (var partner in criteria.Data)
             {
-                var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
+                CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
+                    HblId = partner.HblId ?? Guid.Empty,
+                    TransactionType = criteria.TransactionType,
+                    CheckPointType = criteria.Type,
+                    SettlementCode = criteria.SettlementCode,
+                };
+                var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
                 if (!isValid.Success)
                 {
                     return isValid;
@@ -284,33 +290,33 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode)
+        public HandleState ValidateCheckPointPartnerSurcharge(CheckPoint criteria)
         {
             HandleState result = new HandleState();
             bool isValid = false;
             string currentSaleman = string.Empty;
-            CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
+            CatPartner partner = catPartnerRepository.First(x => x.Id == criteria.PartnerId);
             CatContract contract;
             if (partner.PartnerMode == "Internal")
             {
                 return result;
             }
-            if (HblId == Guid.Empty)
+            if (criteria.HblId == Guid.Empty)
             {
-                contract = GetContractByPartnerId(partnerId);
+                contract = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
                 currentSaleman = contract?.SaleManId;
             }
             else
             {
-                if (transactionType == "CL")
+                if (criteria.TransactionType == "CL")
                 {
-                    currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
-                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                    currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
+                    contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
                 }
                 else
                 {
-                    currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
-                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                    currentSaleman = csTransactionDetail.First(x => x.Id == criteria.HblId)?.SaleManId;
+                    contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
                 }
             }
 
@@ -326,6 +332,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             int errorCode = -1;
+            CHECK_POINT_TYPE checkPointType = criteria.CheckPointType;
             switch (contract.ContractType)
             {
                 case "Cash":
@@ -336,7 +343,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
                     else isValid = true;
                     if (!isValid) errorCode = 1;
@@ -410,7 +417,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Prepaid":
                     if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
                     {
-                        isValid = ValidateCheckPointPrepaidContractPartner(HblId, partnerId, transactionType);
+                        isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
                     } else
                     {
                         isValid = true;

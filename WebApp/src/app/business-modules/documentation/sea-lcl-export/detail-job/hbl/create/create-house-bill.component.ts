@@ -260,7 +260,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
 
-        this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
+        this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6, null, body.saleManId)
             .pipe(
                 switchMap(
                     (res: CommonInterface.IResult) => {

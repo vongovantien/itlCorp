@@ -1261,7 +1261,7 @@ export class DocumentationRepo {
     }
 
     validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5
-        , showErrMessage: string = 'true') {
+        , showErrMessage: string = 'true', salesmanId: string = null) {
         /*
             1 - SHIPMENT
             2 - SOA
@@ -1271,8 +1271,8 @@ export class DocumentationRepo {
             6 - HBL
             7 - Preview HBL
         */
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
-            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type }, { "showErrMessage": showErrMessage });
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
+            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type, salesmanId: salesmanId }, null, { "showErrMessage": !showErrMessage ? "true" : 'false' });
     }
 
     detailLinkFee(id: any) {
