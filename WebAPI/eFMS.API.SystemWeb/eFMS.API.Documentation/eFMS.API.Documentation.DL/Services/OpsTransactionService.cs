@@ -30,6 +30,7 @@ using Newtonsoft.Json;
 using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.Authorizations;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -553,10 +554,16 @@ namespace eFMS.API.Documentation.DL.Services
                 IQueryable<CatPartner> customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
                 IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
 
+                var surcharge = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.ClearanceNo));
+                var clearanceData = customDeclarationRepository.Get(x => !string.IsNullOrEmpty(x.JobNo));
+
                 data.ToList().ForEach(x =>
                 {
-                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo&&cus.ConvertTime!=null).FirstOrDefault()!=null? customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo && cus.ConvertTime != null).FirstOrDefault().ClearanceNo :customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
-                    .Select(cus => cus.ClearanceNo).FirstOrDefault();
+                    //x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo&&cus.ConvertTime!=null).FirstOrDefault()!=null? 
+                    //customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo && cus.ConvertTime != null).FirstOrDefault().ClearanceNo :
+                    //customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
+                    //.Select(cus => cus.ClearanceNo).FirstOrDefault();
+                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).FirstOrDefault() == null ? string.Empty : GetClearanceNoOfShipment(x.JobNo, surcharge, clearanceData);
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
@@ -583,6 +590,25 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalCanceled = totalCanceled
             };
             return results;
+        }
+        private string GetClearanceNoOfShipment(string jobNo,IQueryable<CsShipmentSurcharge>surcharge,IQueryable<CustomsDeclaration> clearances)
+        {
+            var surchargeShipment = surcharge.Where(x => x.JobNo == jobNo);
+            var clearanceNos = surchargeShipment.Select(x => x.ClearanceNo).ToList();
+            var clearanceShipments = clearances.Where(x => x.JobNo == jobNo && clearanceNos.Contains(x.ClearanceNo))?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).ToList();
+            var clearanceShipment = clearanceShipments.FirstOrDefault();
+            if (clearanceShipments.Any(x => x.ConvertTime != null))
+            {
+               clearanceShipment= clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
+            }
+            if (surchargeShipment.Count() > 0 && clearanceShipment != null)
+            {
+                return clearanceShipment.ClearanceNo;
+            }
+            else
+            {
+                return clearances.Where(x => x.JobNo == jobNo)?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
         }
         public bool CheckAllowDelete(Guid jobId)
         {
