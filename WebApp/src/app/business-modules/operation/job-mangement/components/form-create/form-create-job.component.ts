@@ -56,7 +56,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
     salesmans: User[]; // * Load động theo Partner được chọn.
-    customerName: string; 
+    customerName: string;
 
     jobLinkAirSeaNo: string = '';
     jobLinkAirSeaInfo: LinkAirSeaModel;
@@ -127,7 +127,12 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             case 'customer':
                 this._toaster.clear();
                 this.customerName = data.shortName;
-                this._documentRepo.validateCheckPointContractPartner(data.id, '', 'CL', null, 1)
+                this._documentRepo.validateCheckPointContractPartner({
+                    partnerId: data.id,
+                    type: 1,
+                    hblId: SystemConstants.EMPTY_GUID,
+                    transactionType: 'CL'
+                })
                     .pipe(
                         switchMap(
                             (res: CommonInterface.IResult) => {
@@ -251,9 +256,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         }
     }
 
-    getSalesmanList(selectedShipmentType: any){
-        this.shipmentType.setValue(selectedShipmentType); 
-        if(!!this.customerId.value){
+    getSalesmanList(selectedShipmentType: any) {
+        this.shipmentType.setValue(selectedShipmentType);
+        if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe(
                     (res: any) => {
@@ -272,6 +277,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                         }
                     }
                 );
-            }
-        }  
+        }
+    }
 }

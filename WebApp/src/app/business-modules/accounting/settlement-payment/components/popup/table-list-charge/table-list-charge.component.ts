@@ -492,7 +492,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
             case 'obh':
                 const transactionType: string = this.utility.getServiceType(chargeItem.jobId) === 'CL' ? 'CL' : 'DOC';
-                this._documentRepo.validateCheckPointContractPartner(data.id, chargeItem.hblid, transactionType, this.settlementCode)
+                const checkPoint = { partnerId: data.id, hblId: chargeItem.hblid, transactionType: transactionType, settlementCode: this.settlementCode };
+                this._documentRepo.validateCheckPointContractPartner(checkPoint)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
@@ -544,7 +545,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         partner = this.getPartnerById(this.selectedShipment.customerId);
 
                         const transactionType: string = this.utility.getServiceType(this.selectedShipment.jobId) === 'CL' ? 'CL' : 'DOC';
-                        this._documentRepo.validateCheckPointContractPartner(partner.id, this.selectedShipment.hblid, transactionType, this.settlementCode)
+                        const checkPoint = { partnerId: partner.id, hblId: this.selectedShipment.hblid, transactionType: transactionType, settlementCode: this.settlementCode };
+                        this._documentRepo.validateCheckPointContractPartner(checkPoint)
                             .subscribe(
                                 (res: CommonInterface.IResult) => {
                                     if (res.status) {

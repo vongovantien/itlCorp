@@ -163,8 +163,14 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
             );
     }
 
-    sendMail(type: any){
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+    sendMail(type: any) {
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7,
+            salesmanId: this.hblDetail.saleManId
+        }, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -174,16 +180,16 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
-                        switch(type){
+                    if (res.status) {
+                        switch (type) {
                             case 'Pre-Alert':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
                                 break;
                             case 'POD':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/proofofdelivery`]);
                                 break;
-                                case 'HBL':
-                                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/sendhbl`]);
+                            case 'HBL':
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/sendhbl`]);
                                 break;
                         }
                     }

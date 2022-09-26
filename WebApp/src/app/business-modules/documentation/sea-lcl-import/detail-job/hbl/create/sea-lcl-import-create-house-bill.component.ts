@@ -193,8 +193,14 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-
-            this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6, null, body.saleManId)
+            const checkPointCreate = {
+                partnerId: body.customerId,
+                hblId: SystemConstants.EMPTY_GUID,
+                transactionType: 'DOC',
+                type: 6,
+                salesmanId: body.saleManId
+            }
+            this._documentationRepo.validateCheckPointContractPartner(checkPointCreate)
                 .pipe(
                     switchMap((res: CommonInterface.IResult) => {
                         if (!res.status) {
