@@ -174,11 +174,12 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Final Destination</label>
-                        <input type="text" class="form-control" formControlName="finalDestinationPlace">
-                        <!-- <app-combo-grid-virtual-scroll 
-                        (itemSelected)="onSelectDataFormInfo($event, 'finalDestination')"
-                        (remove)="resetFormControl(finalDestinationPlace);resetFormControl(finalDestinationPlace)">
-                        </app-combo-grid-virtual-scroll> -->
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'finalPod')"
+                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
+                            [displayFields]="displayFieldPort"
+                            (remove)="resetFormControl(finalPod); resetFormControl(finalDestinationPlace)"
+                            placeholder = "Select final destination" allowFreeText formControlName="finalDestinationPlace">
+                        </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-md-4">
