@@ -217,7 +217,13 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     sendMail(type: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7,
+            salesmanId: this.hblDetail.saleManId
+        }, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {

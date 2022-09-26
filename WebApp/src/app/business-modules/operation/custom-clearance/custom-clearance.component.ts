@@ -208,7 +208,13 @@ export class CustomClearanceComponent extends AppList {
                 partnerIdsToCheckPoint = [...new Set(partnerIdsToCheckPoint)];
                 const sourceCheckPoint: any = [];
                 for (let i = 0; i < partnerIdsToCheckPoint.length; i++) {
-                    sourceCheckPoint.push(this._documentRepo.validateCheckPointContractPartner(partnerIdsToCheckPoint[i], '', 'CL', null, 1));
+                    sourceCheckPoint.push(
+                        this._documentRepo.validateCheckPointContractPartner({
+                            partnerId: partnerIdsToCheckPoint[i],
+                            transactionType: 'CL',
+                            type: 1,
+                            hblId: SystemConstants.EMPTY_GUID,
+                        }));
                 }
 
                 forkJoin([...sourceCheckPoint])

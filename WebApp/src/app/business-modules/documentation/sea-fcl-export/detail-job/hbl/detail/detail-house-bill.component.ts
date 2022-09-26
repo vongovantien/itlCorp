@@ -168,8 +168,14 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         }, () => { this.onSaveHBL() });
     }
 
-    sendMail(type: any){
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+    sendMail(type: any) {
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7,
+            salesmanId: this.hblDetail.saleManId
+        }, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -179,8 +185,8 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
-                        switch(type){
+                    if (res.status) {
+                        switch (type) {
                             case 'Pre-Alert':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
                                 break;
@@ -195,43 +201,4 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 },
             );
     }
-    // preview(reportType: string) {
-    //     this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
-    //         .pipe(
-    //             catchError(this.catchError),
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 this.dataReport = res;
-    //                 if (this.dataReport.dataSource.length > 0) {
-    //                     this.showReport();
-    //                 } else {
-    //                     this._toastService.warning('There is no data to display preview');
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // previewAttachList() {
-    //     this._documentationRepo.previewAirAttachList(this.hblId)
-    //         .pipe(
-    //             catchError(this.catchError),
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 this.dataReport = res;
-    //                 if (this.dataReport.dataSource.length > 0) {
-    //                     this.showReport();
-    //                 } else {
-    //                     this._toastService.warning('There is no data to display preview');
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // @delayTime(1000)
-    // showReport(): void {
-    //     this.reportPopup.frm.nativeElement.submit();
-    //     this.reportPopup.show();
-    // }
 }

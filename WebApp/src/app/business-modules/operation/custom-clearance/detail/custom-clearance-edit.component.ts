@@ -8,6 +8,7 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { ToastrService } from 'ngx-toastr';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { SystemConstants } from '@constants';
 
 
 @Component({
@@ -93,7 +94,12 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     }
 
     updateAndConvertClearance(body: CustomClearance) {
-        this._documentation.validateCheckPointContractPartner(body.customerId, '', 'CL', null, 1)
+        this._documentation.validateCheckPointContractPartner({
+            partnerId: body.customerId,
+            transactionType: 'CL',
+            type: 1,
+            hblId: SystemConstants.EMPTY_GUID,
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (!res.status) {

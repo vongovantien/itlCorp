@@ -158,23 +158,26 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
-                        this._documentRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id, transactionType)
-                            .subscribe(
-                                (res: CommonInterface.IResult) => {
-                                    if (res.status) {
-                                        const customer = this.listPartner.find(p => p.id === this.hbl.customerId);
-                                        if (!!customer) {
-                                            chargeItem.receiverName = customer.partnerNameEn;
-                                            chargeItem.paymentObjectId = customer.id;
-                                        } else {
-                                            chargeItem.receiverName = chargeItem.paymentObjectId = null;
-                                        }
-                                        this._cd.markForCheck();
+                        this._documentRepo.validateCheckPointContractPartner(this._documentRepo.validateCheckPointContractPartner({
+                            partnerId: this.hbl.customerId,
+                            transactionType: transactionType,
+                            hblId: this.hbl.id
+                        })).subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    const customer = this.listPartner.find(p => p.id === this.hbl.customerId);
+                                    if (!!customer) {
+                                        chargeItem.receiverName = customer.partnerNameEn;
+                                        chargeItem.paymentObjectId = customer.id;
                                     } else {
-                                        this._toastService.warning(res.message);
+                                        chargeItem.receiverName = chargeItem.paymentObjectId = null;
                                     }
+                                    this._cd.markForCheck();
+                                } else {
+                                    this._toastService.warning(res.message);
                                 }
-                            )
+                            }
+                        )
 
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
@@ -230,24 +233,27 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 this._toastService.clear();
                 if (!!partnerData && !!this.hbl) {
                     const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
-                    this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    chargeItem.receiverName = partnerData.partnerNameEn;
-                                    chargeItem.paymentObjectId = partnerData.id;
-                                    chargeItem.receiverShortName = partnerData.shortName;
+                    this._documentRepo.validateCheckPointContractPartner(this._documentRepo.validateCheckPointContractPartner({
+                        partnerId: partnerData.id,
+                        transactionType: transactionType,
+                        hblId: this.hbl.id
+                    })).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem.receiverName = partnerData.partnerNameEn;
+                                chargeItem.paymentObjectId = partnerData.id;
+                                chargeItem.receiverShortName = partnerData.shortName;
 
-                                } else {
-                                    chargeItem.receiverName = null;
-                                    chargeItem.paymentObjectId = null;
-                                    chargeItem.receiverShortName = null;
-                                    this._toastService.warning(res.message);
-                                }
-                                this._cd.markForCheck();
-
+                            } else {
+                                chargeItem.receiverName = null;
+                                chargeItem.paymentObjectId = null;
+                                chargeItem.receiverShortName = null;
+                                this._toastService.warning(res.message);
                             }
-                        )
+                            this._cd.markForCheck();
+
+                        }
+                    )
                 }
                 break;
             case 'payer':
