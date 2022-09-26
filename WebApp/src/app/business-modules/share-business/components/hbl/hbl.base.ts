@@ -421,12 +421,5 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         }
     }
 
-    closeMassUpdate($event) {
-        if ($event) {
-            this.massUpdatePODComponent.hide();
-            this._progressRef.complete();
-        }
-    }
-
 }
 

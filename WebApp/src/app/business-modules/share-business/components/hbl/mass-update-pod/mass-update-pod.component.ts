@@ -82,10 +82,10 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
   updatePOD() {
     this._progressRef.start();
     this.isSubmitted = true;
-    console.log(this.HAWBNo.value);
+    console.log(this.HAWBNo);
 
-    const deliveryDate = formatDate(this.deliveryDate.value.startDate, 'yyyy-MM-dd', 'en')
-    const mapV: ProofOfDelivery[] = this.HAWBNo?.value[0]?.id === 'All' ?
+    const deliveryDate = this.deliveryDate.value !== null ? formatDate(this.deliveryDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+    const mapV: ProofOfDelivery[] = this.HAWBNo.value !== null ? (this.HAWBNo.value[0]?.id === 'All' ?
       this.housebillList.filter(x => x.id != 'All').map((x: any) =>
         new ProofOfDelivery({
           deliveryDate: deliveryDate,
@@ -98,7 +98,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
           deliveryDate: deliveryDate,
           deliveryPerson: this.deliveryPerson.value,
           hblid: x.id,
-        }));
+        }))) : [];
 
     const source = mapV.map((x: ProofOfDelivery) => this._documentRepo.updateProofOfDelivery(Object.assign({}, x)));
     forkJoin(source)
@@ -112,6 +112,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
               this.isUpdated.emit(true);
               this.isSubmitted = false;
               this.formGroup.reset();
+              this.hide();
             } else {
               this._toast.error(res[errorIndex].message);
             }
