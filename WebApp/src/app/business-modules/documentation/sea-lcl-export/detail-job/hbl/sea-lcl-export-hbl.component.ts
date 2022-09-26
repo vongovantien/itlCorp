@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
+import { AppShareHBLBase, IShareBussinessState, MassUpdatePodComponent } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
@@ -31,6 +31,7 @@ export class SeaLCLExportHBLComponent extends AppShareHBLBase implements OnInit 
     ) {
         super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
+    @ViewChild(MassUpdatePodComponent) massUpdatePODComponent: MassUpdatePodComponent;
 
     configHBL() {
         this.headers = [
@@ -85,6 +86,19 @@ export class SeaLCLExportHBLComponent extends AppShareHBLBase implements OnInit 
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
+        }
+    }
+    showMassUpdatePOD() {
+        if (!!this.houseBills) {
+            this.massUpdatePODComponent.show();
+            console.log(this.houseBills);
+        }
+    }
+
+    closeMassUpdate($event) {
+        if ($event) {
+            this.massUpdatePODComponent.hide();
+            this._progressRef.complete();
         }
     }
 }
