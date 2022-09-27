@@ -22,5 +22,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public bool? GenFromSystem { get; set; }
     }
 }
