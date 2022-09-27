@@ -22,7 +22,7 @@ export class Stage {
     isSelected?: boolean = false;
     doneDate: string = '';
     hblNo: string = '';
-    genFromSystem: boolean = true;
+    type: string = '';
 
     constructor(object?: any) {
         const self = this;

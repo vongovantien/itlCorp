@@ -20,6 +20,6 @@ namespace eFMS.API.Operation.DL.Models
         public DateTime? Deadline { get; set; }
         public string Status { get; set; }
         public bool IsUseReplicate { get; set; }
-        public bool GenFromSystem { get; set; }
+        public string Type { get; set; }
     }
 }

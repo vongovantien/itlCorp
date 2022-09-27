@@ -70,7 +70,7 @@
                 <tbody class="tbody-group">
                     <tr *ngFor="let stage of stages; let i = index">
                         <td class="table-actions-col no-sorting">
-                            <span *ngIf="stage.genFromSystem===false">
+                            <span *ngIf="stage.type==='User'">
                                 <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                     [state]="!!data && data.isLocked"
                                     class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
