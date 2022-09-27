@@ -52,7 +52,7 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
             int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
-
+            assignedItem.GenFromSystem = model.GenFromSystem == false ? false : true;
             DataContext.Add(assignedItem, false);
             if(model.IsUseReplicate)
             {

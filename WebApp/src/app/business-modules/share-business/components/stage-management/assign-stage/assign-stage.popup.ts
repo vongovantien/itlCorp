@@ -112,7 +112,8 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             jobId: this.jobId,
             stageId: this.selectedStageData.id,
             mainPersonInCharge: this.selectedUserData.id,
-            description: this.description
+            description: this.description,
+            genFromSystem: false
         };
         this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
             .subscribe(
@@ -165,4 +166,5 @@ interface IAssignStage {
     stageId: number;
     mainPersonInCharge: string;
     description: string;
+    genFromSystem: boolean;
 }

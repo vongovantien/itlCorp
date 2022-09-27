@@ -110,7 +110,8 @@ export class AssignStagePopupComponent extends PopupBase {
             stageId: this.selectedStageData.id,
             mainPersonInCharge: this.selectedUserData.id,
             description: this.description,
-            isUseReplicate: this.isAssignReplicateJob
+            isUseReplicate: this.isAssignReplicateJob,
+            genfromSystem: false
         };
         this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
             .subscribe(
@@ -163,4 +164,5 @@ interface IAssignStage {
     mainPersonInCharge: string;
     description: string;
     isUseReplicate: boolean;
+    genfromSystem: boolean;
 }
