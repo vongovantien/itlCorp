@@ -20,5 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ValidateContainerList(List<CsMawbcontainerModel> csMawbcontainers, Guid? mblId, Guid? hblId);
         HandleState UpdateMasterBill(List<CsMawbcontainerModel> containers, Guid masterId);
         HandleState UpdateHouseBill(List<CsMawbcontainerModel> containers, Guid housebillId);
+        IQueryable<CsMawbcontainerModel> GetContainerListByJobId(Guid jobId);
     }
+
 }

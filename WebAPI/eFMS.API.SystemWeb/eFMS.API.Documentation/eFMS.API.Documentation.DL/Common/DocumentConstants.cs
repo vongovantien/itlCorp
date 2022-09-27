@@ -14,7 +14,6 @@
         public static readonly string SEND_AL_CODE = "S_AL";
         public static readonly string SEND_HB_CODE = "S_HB";
 
-
         //stage constants
         public const string UPDATE_ATA = "UPDATE_ATA";
         public const string UPDATE_ATD = "UPDATE_ATD";
@@ -27,6 +26,8 @@
         public const string SEND_DO = "SEND_DO";
         public const string SEND_HB = "SEND_HB";
 
+        //container constants
+        public static readonly string NO_CONTAINER = "No cont";
 
         public static readonly string LG_SHIPMENT = "CL";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export
