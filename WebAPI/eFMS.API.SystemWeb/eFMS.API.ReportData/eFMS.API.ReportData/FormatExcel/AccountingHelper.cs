@@ -2157,7 +2157,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 7].Value = item.HwbNo;
                     workSheet.Cells[i + addressStartContent, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 7].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 8].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
+                    workSheet.Cells[i + addressStartContent, 8].Value = DistinctInvoice(string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)));
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 7, i + addressStartContent, 7].Style.WrapText = true;
