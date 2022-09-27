@@ -82,6 +82,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
   updatePOD() {
     this._progressRef.start();
     this.isSubmitted = true;
+    if (this.formGroup.invalid) {
+      return;
+    }
     console.log(this.HAWBNo);
 
     const deliveryDate = this.deliveryDate.value !== null ? formatDate(this.deliveryDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
