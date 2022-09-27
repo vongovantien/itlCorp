@@ -47,7 +47,7 @@
                 </ul>
             </div>
 
-            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'" [buttonSetting]="saveButtonSetting"
+            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
                 (onClick)="showCreatepoup()">
             </app-default-button>
 

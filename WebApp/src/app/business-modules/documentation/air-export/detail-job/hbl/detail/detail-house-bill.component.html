@@ -3,7 +3,7 @@
         <div class="c-button-actions">
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <ng-container *ngIf="(isLocked | async) === false">
-                    <button *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'"
+                    <button *ngIf="(permissionHblDetail | async)?.allowUpdate"
                         class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="gotoSeparate()">
                         <span>
                             <i class="la la-plus"></i>
@@ -30,7 +30,7 @@
                 </div>
             </div>
 
-            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'" [buttonSetting]="saveButtonSetting"
+            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
                 (onClick)="confirmSaveHBL()">
             </app-default-button>
 
