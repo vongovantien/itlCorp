@@ -1355,6 +1355,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.Status).HasMaxLength(20);
 
+                entity.Property(e => e.Type).HasMaxLength(50);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
