@@ -1683,6 +1683,12 @@ namespace eFMS.API.Documentation.DL.Services
                     model.DateCreatedLinkJob = DateTime.Now;
                 }
 
+                // Khi không link job nhưng trước đó đã có ServiceHblId thì giữ ServiceHblId trước đó
+                if (!string.IsNullOrEmpty(model.ServiceNo) && model.ServiceHblId == null && detail.ServiceHblId != null)
+                {
+                    model.ServiceHblId = detail.ServiceHblId;
+                }
+
                 OpsTransaction entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)

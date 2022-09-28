@@ -146,21 +146,17 @@ namespace eFMS.API.Documentation.DL.Services
                     CsShipmentSurcharge chargeUpdate = mapperSurcharge(charge);
 
                     //Nếu HBL từ link nội bộ null
-                    if (shipment.ServiceHblId == null)
+                    //if (shipment.ServiceHblId == null)
                     {
                         if (jobTrans != null)
                         {
-                            //if (hbl == null)
-                            //    return new HandleState("There is no hbl job service");
                             if (jobTrans.TransactionType != rule.ServiceBuying)
                                 return new HandleState("There is no service type");
-
-                            chargeBuy.Hblid = hbl != null ? hbl.Id : new Guid();
-                            chargeBuy.Hblno = hbl != null ? hbl.Hwbno : null;
                         }
                     }
-                    else
-                        chargeBuy.Hblid = shipment.ServiceHblId ?? new Guid();
+
+                    chargeBuy.Hblid = hbl.Id;
+                    chargeBuy.Hblno = hbl.Hwbno;
 
                     //Update shipment
                     shipment.DateCreatedLinkJob = DateTime.Now;
@@ -206,6 +202,7 @@ namespace eFMS.API.Documentation.DL.Services
                     chargeBuy.PaymentRefNo = null;
                     chargeBuy.CombineBillingNo = null;
                     chargeBuy.ObhcombineBillingNo = null;
+                    chargeBuy.ClearanceNo = null;
                     chargeBuy.IsRefundFee = false;
 
                     surchargesAddBuy.Add(chargeBuy);
