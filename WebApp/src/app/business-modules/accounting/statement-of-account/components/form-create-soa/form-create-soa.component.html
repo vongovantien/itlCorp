@@ -63,10 +63,12 @@
                         <label class="form-control-label">
                             Type
                         </label>
-                        <select [(ngModel)]="selectedType" class="form-control"
+                        <ng-select [(ngModel)]="selectedType" [items]="types" bindLabel="title" bindValue="value" 
+                        (onchange)="onSelectDataFormInfo($event , 'type')" [clearable]="false"></ng-select>
+                        <!-- <select [(ngModel)]="selectedType" class="form-control"
                             (ngModelChange)="onSelectDataFormInfo($event , 'type')">
                             <option *ngFor="let type of types" [ngValue]="type">{{type.title}}</option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -74,10 +76,12 @@
                         <label class="form-control-label">
                             OBH
                         </label>
-                        <select [(ngModel)]="selectedObh" class="form-control"
+                        <ng-select [(ngModel)]="selectedObh" [items]="obhs"  [ngValue]="item" bindLabel="value" bindValue="id" 
+                        (change)="onSelectDataFormInfo($event , 'obh')" [clearable]="false"></ng-select>
+                        <!-- <select [(ngModel)]="selectedObh" class="form-control"
                             (ngModelChange)="onSelectDataFormInfo($event , 'obh')">
                             <option *ngFor="let item of obhs" [ngValue]="item">{{item.title}}</option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -85,11 +89,14 @@
                         <label class="form-control-label">
                             Currency
                         </label>
-                        <select [(ngModel)]="selectedCurrency" class="form-control" [disabled]="selectedType.value === this.types[0].value"
+                        <ng-select [(ngModel)]="selectedCurrency" [items]="currencyList" 
+                        [disabled]="selectedType.value === this.types[0].value" [ngValue]="currency" bindlabel="currency" bindvalue="currency.id"
+                        (onchange)="onSelectDataFormInfo($event , 'currency')" [clearable]="false"></ng-select>
+                        <!-- <select [(ngModel)]="selectedCurrency" class="form-control" [disabled]="selectedType.value === this.types[0].value"
                             (ngModelChange)="onSelectDataFormInfo($event , 'currency')">
                             <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
                             </option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
             </div>
@@ -120,11 +127,13 @@
                         <label class="form-control-label" for="">
                             Staff Type
                         </label>
-                        <select [(ngModel)]="selectedStaffType" class="form-control"
+                        <ng-select [(ngModel)]="selectedStaffType" [items]="staffTypes" bindLabel="value" bindValue="value" 
+                        (onchange)="onSelectDataFormInfo($event , 'staff-type')" [clearable]="false"></ng-select>
+                        <!-- <select [(ngModel)]="selectedStaffType" class="form-control"
                             (ngModelChange)="onSelectDataFormInfo($event , 'staff-type')">
                             <option *ngFor="let staffType of staffTypes" [ngValue]="staffType">{{staffType.title}}
                             </option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
             </div>
@@ -191,7 +200,7 @@
                                 <label required *ngIf="selectedType.value === this.types[0].value"></label>
                                 <ng-select class="custom" [(ngModel)]="salemanDisplay" [items]="saleMans" bindLabel="value" bindValue="value"
                                 [clearable]="false" (change)="onSelectDataFormInfo($event, 'saleman')" 
-                                [disabled]="selectedType.value !== this.types[0].value" placeholder="">
+                                [disabled]="selectedType.value !== this.types[0].value" placeholder="">                           
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="isApplied && (selectedType.value === this.types[0].value) && !salemanDisplay">
                                     Saleman is required!
