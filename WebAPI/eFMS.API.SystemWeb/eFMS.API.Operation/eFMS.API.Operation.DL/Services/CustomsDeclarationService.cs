@@ -1468,7 +1468,7 @@ namespace eFMS.API.Operation.DL.Services
                           || !string.IsNullOrEmpty(x.SyncedFrom))
                           ).Select(x => x.ClearanceNo);
             var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo && !string.IsNullOrEmpty(y.CustomNo)).Select(x => x.CustomNo).ToList();
-            if (!clearanceNos.Any(x => query.Any(y => y == x) || cleanceNoRequet.Any(z => z == x)))
+            if (clearanceNos.Any(x => query.Any(y => y == x) || cleanceNoRequet.Any(z => z == x)))
             {
                 return false;
             }
