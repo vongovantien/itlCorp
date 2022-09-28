@@ -127,6 +127,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
       )
   }
 
-  resetDeliveryDate() { this.deliveryDate.setValue(null); }
+  resetDeliveryDate() {
+    this.deliveryDate.setValue(null);
+    console.log(this.deliveryDate);
+  }
 
 }
