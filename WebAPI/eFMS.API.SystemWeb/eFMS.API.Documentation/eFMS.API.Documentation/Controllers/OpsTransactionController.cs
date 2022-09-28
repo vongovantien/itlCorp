@@ -205,6 +205,13 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
 
+            var checkLinkInternalJob = transactionService.CheckLinkedInteralShipment(model);
+            if (!checkLinkInternalJob.Success && !string.IsNullOrEmpty(checkLinkInternalJob.Message?.ToString()))
+            {
+                return BadRequest(new ResultHandle { Status = checkLinkInternalJob.Success, Message = checkLinkInternalJob.Message.ToString() });
+            }
+
+            // Check No Profit
             if (model.NoProfit == true)
             {
                 var allowCheckNoProfit = checkPointService.AllowCheckNoProfitShipment(model.JobNo, model.NoProfit);

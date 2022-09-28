@@ -155,7 +155,7 @@ namespace eFMS.API.Documentation.DL.Services
             groupRepository = groupRepo;
             databaseUpdateService = _databaseUpdateService;
             accAccountReceivableService = accAccountReceivable;
-            surChargeRepository= surChargeRepo;
+            surChargeRepository = surChargeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -2601,7 +2601,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (surchargeSells.Count > 0 || surchargesAddHis.Count > 0)
                     {
                         var resultUpd = databaseUpdateService.InsertChargesAutoRateToDB(surchargeSells, surchargesAddHis);
-                        if(resultUpd.TotalRowAffected > 0)
+                        if (resultUpd.TotalRowAffected > 0)
                         {
                             result = new HandleState(resultUpd.Status, (object)"AUTORATEREPLICATE SCCUESS");
                         }
@@ -2771,7 +2771,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if (item.ReplicatedId != null)
                 {
-                    lstJobNo.Add("R"+item.JobNo);
+                    lstJobNo.Add("R" + item.JobNo);
                 }
             }
             var lstJobNoDistinct = lstJobNo.Distinct().ToList();
@@ -2793,10 +2793,10 @@ namespace eFMS.API.Documentation.DL.Services
                 result[i].ReplicateJob = new List<sp_GetOutsourcingRegcognising>();
                 result[i].OriginalJob = new List<sp_GetOutsourcingRegcognising>();
                 result[i].ReplicateJob.AddRange(jobrep);
-                result[i].OriginalJob.AddRange(SortChargeOrn(jobrep,joborn));
+                result[i].OriginalJob.AddRange(SortChargeOrn(jobrep, joborn));
             }
 
-            return result.Where(x=>x.ReplicateJob.Count()>0).ToList();
+            return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
@@ -2816,6 +2816,39 @@ namespace eFMS.API.Documentation.DL.Services
                 chargeOrnsChanged.Add(chargeOrns.Where(x => x.ChargeId.ToString().ToLower() == chargeReps[i].LinkChargeId).FirstOrDefault());
             }
             return chargeOrnsChanged;
+        }
+
+        /// <summary>
+        /// Check update job link internal
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public HandleState CheckLinkedInteralShipment(OpsTransactionModel model)
+        {
+            var currentShipment = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            if (!string.IsNullOrEmpty(currentShipment.ServiceNo) && (currentShipment.ServiceNo != model.ServiceNo || currentShipment.ServiceHblId != model.ServiceHblId || model.ShipmentMode != "Internal"))
+            {
+                var surchargesOrg = surChargeRepository.Get(x => x.Hblid == currentShipment.Hblid);
+                var surchargesLink = surChargeRepository.Get(x => x.JobNo == currentShipment.ServiceNo);
+                var linkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
+                var hasLinkCharges = from org in surchargesOrg
+                                     join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
+                                     join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
+                                     select new
+                                     {
+                                         linkCharge,
+                                         hblNoLink = link.Hblno
+                                     };
+                if (hasLinkCharges != null && hasLinkCharges.Any())
+                {
+                    var item = hasLinkCharges.FirstOrDefault();
+                    if (model.ServiceNo != item.linkCharge.JobNoLink || model.ServiceHblId?.ToString() != item.linkCharge.HbllinkId || model.ShipmentMode != "Internal")
+                    {
+                        return new HandleState(false, (object)("Update fail. Shipment has charges link to " + currentShipment.ServiceNo + "-" + item.hblNoLink));
+                    }
+                }
+            }
+            return new HandleState();
         }
     }
 }
