@@ -206,6 +206,7 @@ namespace eFMS.API.Documentation.DL.Services
                     chargeBuy.PaymentRefNo = null;
                     chargeBuy.CombineBillingNo = null;
                     chargeBuy.ObhcombineBillingNo = null;
+                    chargeBuy.ClearanceNo = null;
                     chargeBuy.IsRefundFee = false;
 
                     surchargesAddBuy.Add(chargeBuy);
