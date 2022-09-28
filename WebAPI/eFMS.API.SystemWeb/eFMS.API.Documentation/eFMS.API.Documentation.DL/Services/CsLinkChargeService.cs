@@ -54,10 +54,8 @@ namespace eFMS.API.Documentation.DL.Services
             var surchargesUpdate = new List<CsShipmentSurcharge>();
             var surchargesAddBuy = new List<CsShipmentSurcharge>();
             var csLinkCharges = new List<CsLinkCharge>();
-            var csLinkCharge = new CsLinkCharge();
-            var lstShipment = new List<OpsTransaction>();
 
-            var hblId = "";
+            var lstShipment = new List<OpsTransaction>();
 
             var myDict = new Dictionary<string, string>();
 
@@ -72,125 +70,169 @@ namespace eFMS.API.Documentation.DL.Services
             myDict.Add("Sea Import", "SCI");
             myDict.Add("Custom Logistic", "CL");
 
-            var rules = _csRuleLinkFeeRepository.Get().ToList();
+            var rules = _csRuleLinkFeeRepository.Get(x => x.Status == true);
             var catPartners = _catPartnerRepository.Get();
+            var linkCharges = DataContext.Get(x => x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
 
-            foreach (var item in list)
+            var shipmentGrp = list.GroupBy(x => x.Hblid).Select(x => new { x.Key, surcharges = x.Select(z => z) });
+
+            foreach (var data in shipmentGrp)
             {
-                var shipment = _opsTransRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
-                if (shipment != null)
-                    shipment.IsLinkFee = true;
-                if (shipment.ShipmentMode == "External")
-                    return new HandleState("There job shipment mode External");
-
-                //Map transtype
-                var proSerVe = myDict[shipment.ProductService + " " + shipment.ServiceMode];
-
-                var rule = rules.Where(x =>
-                x.ServiceBuying == proSerVe
-                && x.ServiceSelling == item.TransactionType
-                && x.ChargeSelling.ToLower() == item.ChargeId.ToString().ToLower()
-                && x.Status == true).OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-
-                if (rule == null)
-                    return new HandleState("There is no link fee rule ");
-                if (rule.PartnerSelling != "All" && rule.PartnerSelling != null && rule.PartnerSelling != item.PaymentObjectId)
-                    return new HandleState("There is no link fee rule Partner Selling");
-
-                var charge = _csSurchargeRepository.Get(x => x.Id == item.Id).FirstOrDefault();
-
-                CsShipmentSurcharge chargeBuy = mapperSurcharge(item);
-                CsShipmentSurcharge chargeUpdate = mapperSurcharge(charge);
-
-                //Nếu HBL từ link nội bộ null
-                if (shipment.ServiceHblId == null)
+                var shipment = _opsTransRepository.Get(x => x.JobNo == list.FirstOrDefault().JobNo).FirstOrDefault();
+                if (shipment == null)
                 {
-                    var jobTrans = _csTransactionRepository.Get(x => x.JobNo == shipment.ServiceNo).FirstOrDefault();
-                    if (jobTrans != null)
-                    {
-                        var hbl = _tranDetailRepository.Get(x => x.JobId == jobTrans.Id).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        if (hbl == null)
-                            return new HandleState("There is no hbl job service");
-                        if (jobTrans.TransactionType != rule.ServiceBuying)
-                            return new HandleState("There is no service type");
-
-                        chargeBuy.Hblid = hbl != null ? hbl.Id : new Guid();
-                        chargeBuy.Hblno = hbl != null ? hbl.Hwbno : null;
-                    }
+                    return new HandleState("This shipment has been deleted.");
                 }
                 else
-                    chargeBuy.Hblid = shipment.ServiceHblId ?? new Guid();
+                {
+                    shipment.IsLinkFee = true;
+                }
+                if (shipment.ShipmentMode == "External")
+                    return new HandleState("The shipment has mode External");
 
-                //Update shipment 
-                shipment.DateCreatedLinkJob = DateTime.Now;
-                shipment.UserCreatedLinkJob = currentUser.UserID;
+                var surchargesOrg = _csSurchargeRepository.Get(x => x.Hblid == shipment.Hblid);
+                var surchargesLink = _csSurchargeRepository.Get(x => x.JobNo == shipment.ServiceNo);
+                var hasLinkCharges = from org in surchargesOrg
+                                     join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
+                                     join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
+                                     select linkCharge;
 
-                if (!lstShipment.Any(x => x.Id == shipment.Id))
-                    lstShipment.Add(shipment);
+                var jobTrans = _csTransactionRepository.Get(x => x.JobNo == shipment.ServiceNo).FirstOrDefault();
+                //Nếu HBL từ link nội bộ null
+                var hbl = new CsTransactionDetail();
+                if (hasLinkCharges != null && hasLinkCharges.Any())
+                {
+                    var _hbllinkId = new Guid(hasLinkCharges.FirstOrDefault().HbllinkId);
+                    hbl = _tranDetailRepository.Get(x => x.Id == _hbllinkId).FirstOrDefault();
+                }
+                else
+                {
+                    if (shipment.ServiceHblId == null)
+                    {
+                        hbl = _tranDetailRepository.Get(x => x.JobId == jobTrans.Id).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    }
+                    else
+                    {
+                        hbl = _tranDetailRepository.Get(x => x.Id == shipment.ServiceHblId).FirstOrDefault();
+                        if (hbl == null)
+                        {
+                            hbl = _tranDetailRepository.Get(x => x.JobId == jobTrans.Id).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        }
+                    }
+                }
 
-                //Update charge selling 
-                chargeUpdate.LinkFee = true;
-                chargeUpdate.ModifiedDateLinkFee = DateTime.Now;
-                chargeUpdate.UserIdLinkFee = new Guid(currentUser.UserID);
-                chargeUpdate.UserNameLinkFee = currentUser.UserName;
+                if (hbl == null)
+                    return new HandleState("There is no hbl job service");
+                shipment.ServiceHblId = hbl.Id;
 
-                surchargesUpdate.Add(chargeUpdate);
+                //Map transtype
+                var service = myDict[shipment.ProductService + " " + shipment.ServiceMode];
 
-                //Add charge type buy
-                chargeBuy.Id = Guid.NewGuid();
-                chargeBuy.Type = DocumentConstants.CHARGE_BUY_TYPE;
-                chargeBuy.TransactionType = rule.ServiceBuying;
-                chargeBuy.ChargeId = Guid.Parse(rule.ChargeBuying);
-                chargeBuy.JobNo = shipment.ServiceNo;
-                chargeBuy.LinkFee = true;
-                chargeBuy.PaymentObjectId = rule.PartnerBuying;
-                chargeBuy.Soano = null;
-                chargeBuy.PaySoano = null;
-                chargeBuy.CreditNo = null;
-                chargeBuy.DebitNo = null;
-                chargeBuy.SettlementCode = null;
-                chargeBuy.VoucherId = null;
-                chargeBuy.VoucherIddate = null;
-                chargeBuy.VoucherIdre = null;
-                chargeBuy.VoucherIdredate = null;
-                chargeBuy.AcctManagementId = null;
-                chargeBuy.InvoiceNo = null;
-                chargeBuy.InvoiceDate = null;
-                chargeBuy.LinkChargeId = null;
-                chargeBuy.Notes = null;
-                chargeBuy.IsFromShipment = true;
-                chargeBuy.SyncedFrom = null;
-                chargeBuy.PaySyncedFrom = null;
-                chargeBuy.PaySoano = null;
-                chargeBuy.PaymentRefNo = null;
-                chargeBuy.CombineBillingNo = null;
-                chargeBuy.ObhcombineBillingNo = null;
-                chargeBuy.IsRefundFee = false;
+                foreach (var item in data.surcharges)
+                {
+                    var rule = rules.Where(x =>
+                    x.ServiceBuying == service
+                    && x.ServiceSelling == item.TransactionType
+                    && x.ChargeSelling.ToLower() == item.ChargeId.ToString().ToLower()).OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
 
-                surchargesAddBuy.Add(chargeBuy);
+                    if (rule == null)
+                        return new HandleState("There is no link fee rule");
+                    if (rule.PartnerSelling != "All" && rule.PartnerSelling != null && rule.PartnerSelling != item.PaymentObjectId)
+                        return new HandleState("There is no link fee rule Partner Selling");
 
-                //Add charge csLinkCharge
-                csLinkCharge = new CsLinkCharge();
-                csLinkCharge.Id = Guid.NewGuid();
-                csLinkCharge.JobNoOrg = chargeUpdate.JobNo;
-                csLinkCharge.ChargeOrgId = chargeUpdate.Id.ToString();
-                csLinkCharge.HblorgId = chargeUpdate.Hblid.ToString();
-                csLinkCharge.HblnoOrg = chargeUpdate.Hblno;
-                csLinkCharge.MblnoOrg = chargeUpdate.Mblno;
-                csLinkCharge.PartnerOrgId = item.PaymentObjectId;
+                    var charge = _csSurchargeRepository.Get(x => x.Id == item.Id).FirstOrDefault();
 
-                csLinkCharge.JobNoLink = chargeBuy.JobNo;
-                csLinkCharge.ChargeLinkId = chargeBuy.Id.ToString();
-                csLinkCharge.HbllinkId = chargeBuy.Hblid.ToString();
-                csLinkCharge.HblnoLink = chargeBuy.Hblno;
-                csLinkCharge.MblnoLink = chargeBuy.Mblno;
+                    CsShipmentSurcharge chargeBuy = mapperSurcharge(item);
+                    CsShipmentSurcharge chargeUpdate = mapperSurcharge(charge);
 
-                csLinkCharge.DatetimeCreated = DateTime.Now;
-                csLinkCharge.UserCreated = currentUser.UserID;
-                csLinkCharge.PartnerLinkId = chargeBuy.PaymentObjectId;
-                csLinkCharge.LinkChargeType = "LINK_FEE";
+                    //Nếu HBL từ link nội bộ null
+                    if (shipment.ServiceHblId == null)
+                    {
+                        if (jobTrans != null)
+                        {
+                            //if (hbl == null)
+                            //    return new HandleState("There is no hbl job service");
+                            if (jobTrans.TransactionType != rule.ServiceBuying)
+                                return new HandleState("There is no service type");
 
-                csLinkCharges.Add(csLinkCharge);
+                            chargeBuy.Hblid = hbl != null ? hbl.Id : new Guid();
+                            chargeBuy.Hblno = hbl != null ? hbl.Hwbno : null;
+                        }
+                    }
+                    else
+                        chargeBuy.Hblid = shipment.ServiceHblId ?? new Guid();
+
+                    //Update shipment
+                    shipment.DateCreatedLinkJob = DateTime.Now;
+                    shipment.UserCreatedLinkJob = currentUser.UserID;
+
+                    if (!lstShipment.Any(x => x.Id == shipment.Id))
+                        lstShipment.Add(shipment);
+
+                    //Update charge selling
+                    chargeUpdate.LinkFee = true;
+                    chargeUpdate.ModifiedDateLinkFee = DateTime.Now;
+                    chargeUpdate.UserIdLinkFee = new Guid(currentUser.UserID);
+                    chargeUpdate.UserNameLinkFee = currentUser.UserName;
+
+                    surchargesUpdate.Add(chargeUpdate);
+
+                    //Add charge type buy
+                    chargeBuy.Id = Guid.NewGuid();
+                    chargeBuy.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                    chargeBuy.TransactionType = rule.ServiceBuying;
+                    chargeBuy.ChargeId = Guid.Parse(rule.ChargeBuying);
+                    chargeBuy.JobNo = shipment.ServiceNo;
+                    chargeBuy.LinkFee = true;
+                    chargeBuy.PaymentObjectId = rule.PartnerBuying;
+                    chargeBuy.Soano = null;
+                    chargeBuy.PaySoano = null;
+                    chargeBuy.CreditNo = null;
+                    chargeBuy.DebitNo = null;
+                    chargeBuy.SettlementCode = null;
+                    chargeBuy.VoucherId = null;
+                    chargeBuy.VoucherIddate = null;
+                    chargeBuy.VoucherIdre = null;
+                    chargeBuy.VoucherIdredate = null;
+                    chargeBuy.AcctManagementId = null;
+                    chargeBuy.InvoiceNo = null;
+                    chargeBuy.InvoiceDate = null;
+                    chargeBuy.LinkChargeId = null;
+                    chargeBuy.Notes = null;
+                    chargeBuy.IsFromShipment = true;
+                    chargeBuy.SyncedFrom = null;
+                    chargeBuy.PaySyncedFrom = null;
+                    chargeBuy.PaySoano = null;
+                    chargeBuy.PaymentRefNo = null;
+                    chargeBuy.CombineBillingNo = null;
+                    chargeBuy.ObhcombineBillingNo = null;
+                    chargeBuy.IsRefundFee = false;
+
+                    surchargesAddBuy.Add(chargeBuy);
+
+                    //Add charge csLinkCharge
+                    var csLinkCharge = new CsLinkCharge();
+                    csLinkCharge.Id = Guid.NewGuid();
+                    csLinkCharge.JobNoOrg = chargeUpdate.JobNo;
+                    csLinkCharge.ChargeOrgId = chargeUpdate.Id.ToString();
+                    csLinkCharge.HblorgId = chargeUpdate.Hblid.ToString();
+                    csLinkCharge.HblnoOrg = chargeUpdate.Hblno;
+                    csLinkCharge.MblnoOrg = chargeUpdate.Mblno;
+                    csLinkCharge.PartnerOrgId = item.PaymentObjectId;
+
+                    csLinkCharge.JobNoLink = chargeBuy.JobNo;
+                    csLinkCharge.ChargeLinkId = chargeBuy.Id.ToString();
+                    csLinkCharge.HbllinkId = chargeBuy.Hblid.ToString();
+                    csLinkCharge.HblnoLink = chargeBuy.Hblno;
+                    csLinkCharge.MblnoLink = chargeBuy.Mblno;
+
+                    csLinkCharge.DatetimeCreated = DateTime.Now;
+                    csLinkCharge.UserCreated = currentUser.UserID;
+                    csLinkCharge.PartnerLinkId = chargeBuy.PaymentObjectId;
+                    csLinkCharge.LinkChargeType = DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE;
+
+                    csLinkCharges.Add(csLinkCharge);
+                }
             }
 
             if (!result.Success)
@@ -237,6 +279,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return result;
             }
         }
+
         public HandleState RevertChargeLinkFee(List<CsShipmentSurchargeModel> list)
         {
             var result = new HandleState();
@@ -247,23 +290,35 @@ namespace eFMS.API.Documentation.DL.Services
             var shipment = new OpsTransaction();
 
             var listID = list.Select(x => x.Id.ToString());
-            var ls = Get(x=>listID.Contains(x.ChargeLinkId)||listID.Contains(x.ChargeOrgId)).FirstOrDefault();
-         
+            var ls = DataContext.Get(x => listID.Contains(x.ChargeLinkId) || listID.Contains(x.ChargeOrgId)).FirstOrDefault();
+
             if (ls != null)
             {
-                shipment = _opsTransRepository.Get(x=>x.JobNo == ls.JobNoOrg).FirstOrDefault();
+                shipment = _opsTransRepository.Get(x => x.JobNo == ls.JobNoOrg).FirstOrDefault();
                 if (shipment != null)
                 {
-                    shipment.IsLinkFee = Get(x => x.JobNoOrg == shipment.JobNo).Count() > 1 ? true : false;
-                    shipment.UserCreatedLinkJob = null;
-                    shipment.DateCreatedLinkJob = null;
-                    shipment.DatetimeModified = DateTime.Now;
+                    if (DataContext.Get(x => x.JobNoOrg == shipment.JobNo).Count() > 1)
+                    {
+                        shipment.IsLinkFee = true;
+                        shipment.DatetimeModified = DateTime.Now;
+                    }
+                    else
+                    {
+                        shipment.IsLinkFee = false;
+                        shipment.UserCreatedLinkJob = null;
+                        shipment.DateCreatedLinkJob = null;
+                        shipment.DatetimeModified = DateTime.Now;
+                    }
                 }
+            }
+            else
+            {
+                return result;
             }
 
             foreach (var i in list)
             {
-                if (i.Type == "BUY")
+                if (i.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     if (!string.IsNullOrEmpty(i.Soano)
                         || !string.IsNullOrEmpty(i.PaySoano)
@@ -272,7 +327,7 @@ namespace eFMS.API.Documentation.DL.Services
                         || !string.IsNullOrEmpty(i.CreditNo)
                         || !string.IsNullOrEmpty(i.DebitNo))
                     {
-                        return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+                        return new HandleState("Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
                     }
 
                     var his = DataContext.Get(x => x.ChargeLinkId == i.Id.ToString()).FirstOrDefault();
@@ -287,7 +342,7 @@ namespace eFMS.API.Documentation.DL.Services
                         surchargesUpdate.Add(sell);
                     }
                 }
-                else if (i.Type == "SELL")
+                else if (i.Type == DocumentConstants.CHARGE_SELL_TYPE)
                 {
                     var his = DataContext.Get(x => x.JobNoOrg == i.JobNo && x.ChargeOrgId == i.Id.ToString()).FirstOrDefault();
 
@@ -302,7 +357,7 @@ namespace eFMS.API.Documentation.DL.Services
                           || !string.IsNullOrEmpty(buy.CreditNo)
                           || !string.IsNullOrEmpty(buy.DebitNo)))
                         {
-                            return new HandleState("Please recheck ! Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
+                            return new HandleState("Some Fee's you've choosed have issue CD note,SOA,Voucher,Settlement");
                         }
                         surchargeDelIds.Add(his.ChargeLinkId);
                         hisLinkFees.Add(his);
@@ -327,9 +382,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if (surchargeDelIds.Count > 0)
                     {
-                        foreach (var item in surchargeDelIds)
+                        //foreach (var item in surchargeDelIds)
                         {
-                            _csSurchargeRepository.Delete(x => x.Id == new Guid(item));
+                            var deleteIds = surchargeDelIds.Select(x => Guid.Parse(x));
+                            _csSurchargeRepository.DeleteAsync(x => deleteIds.Contains(x.Id), false);
                         }
                     }
 
@@ -337,12 +393,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         foreach (var item in hisLinkFees)
                         {
-                            DataContext.Delete(x => x.Id == item.Id);
+                            DataContext.Delete(x => x.Id == item.Id, false);
                         }
                     }
 
-                    _opsTransRepository.Update(shipment, x => x.Id == shipment.Id, false);
-                    _opsTransRepository.SubmitChanges();
+                    _opsTransRepository.Update(shipment, x => x.Id == shipment.Id);
                     _csSurchargeRepository.SubmitChanges();
                     result = DataContext.SubmitChanges();
                     trans.Commit();
@@ -360,6 +415,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return result;
             }
         }
+
         public CsLinkChargeModel DetailByChargeOrgId(Guid chargeId)
         {
             var csLinkCharge = Get(x => x.ChargeOrgId == chargeId.ToString()
@@ -375,6 +431,12 @@ namespace eFMS.API.Documentation.DL.Services
             csLinkCharge.PartnerNameLink = partLink != null ? partLink.PartnerNameEn : "";
             return csLinkCharge;
         }
+
+        /// <summary>
+        /// Link fee with shipments
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public HandleState LinkFeeJob(List<OpsTransactionModel> list)
         {
             var result = new HandleState();
@@ -408,6 +470,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState("No charge Link Fee");
             return result;
         }
+
         CsShipmentSurcharge mapperSurcharge(CsShipmentSurcharge modelMap)
         {
             var model = new CsShipmentSurcharge();

@@ -40,5 +40,6 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle AutoRateReplicate(string settleNo, string jobNo);
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
         List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria);
+        HandleState CheckLinkedInteralShipment(OpsTransactionModel model);
     }
 }

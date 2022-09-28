@@ -326,10 +326,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 .pipe(
                     catchError(this.catchError),
                     concatMap((res: ILinkAirSeaInfoModel) => {
-                        this.opsTransaction.serviceNo = res.jobNo;
-                        this.opsTransaction.serviceHblId = res.hblId;
-                        this.opsTransaction.isLinkJob = true;
-
+                        if (!!res) {
+                            this.opsTransaction.serviceNo = res.jobNo;
+                            this.opsTransaction.serviceHblId = res.hblId;
+                            this.opsTransaction.isLinkJob = true;
+                        }else{
+                            this.opsTransaction.serviceNo = null;
+                            this.opsTransaction.serviceHblId = null;
+                            this.opsTransaction.isLinkJob = false;
+                        }
                         return this._documentRepo.updateShipment(this.opsTransaction);
                     })
                 ).subscribe(

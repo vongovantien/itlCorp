@@ -36,7 +36,7 @@ export class JobManagementLinkFeeComponent extends AppList implements OnInit {
         createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
-    messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs ?";
+    messageConfirmLinkFee: string = "Do you want to Link Fee these Jobs?";
 
     constructor(
         private sortService: SortService,
