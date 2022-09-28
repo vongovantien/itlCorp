@@ -2832,7 +2832,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState CheckLinkedInteralShipment(OpsTransactionModel model)
         {
             var currentShipment = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            if (!string.IsNullOrEmpty(currentShipment.ServiceNo) && (currentShipment.ServiceNo != model.ServiceNo || currentShipment.ServiceHblId != model.ServiceHblId || model.ShipmentMode != "Internal"))
+            if (!string.IsNullOrEmpty(currentShipment.ServiceNo) && (currentShipment.ServiceNo != model.ServiceNo || model.ShipmentMode != "Internal"))
             {
                 var surchargesOrg = surChargeRepository.Get(x => x.Hblid == currentShipment.Hblid);
                 var surchargesLink = surChargeRepository.Get(x => x.JobNo == currentShipment.ServiceNo);
@@ -2848,7 +2848,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (hasLinkCharges != null && hasLinkCharges.Any())
                 {
                     var item = hasLinkCharges.FirstOrDefault();
-                    if (model.ServiceNo != item.linkCharge.JobNoLink || model.ServiceHblId?.ToString() != item.linkCharge.HbllinkId || model.ShipmentMode != "Internal")
+                    if (model.ServiceNo != item.linkCharge.JobNoLink || model.ShipmentMode != "Internal")
                     {
                         return new HandleState(false, (object)("Update fail. Shipment has charges link to " + currentShipment.ServiceNo + "-" + item.hblNoLink));
                     }
