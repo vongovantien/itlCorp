@@ -311,7 +311,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.shipmentType = form.shipmentType;
         this.opsTransaction.noProfit = form.noProfit;
 
-        if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
+        if (!!this.editForm.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
