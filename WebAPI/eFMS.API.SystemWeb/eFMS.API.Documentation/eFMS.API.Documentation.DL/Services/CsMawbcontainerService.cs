@@ -737,25 +737,5 @@ namespace eFMS.API.Documentation.DL.Services
             });
             return list;
         }
-
-        public IQueryable<CsMawbcontainerModel> GetContainerListByJobId(Guid jobId)
-        {
-            var houseBills = detailRepository.Get(x => x.JobId == jobId);
-
-            IQueryable<CsMawbcontainerModel> resultList = (
-                 from hbl in detailRepository.Get(x => x.JobId == jobId)
-                 join cont in DataContext.Get() on hbl.Id equals cont.Hblid
-                 join catType in catUnitRepository.Get() on cont.ContainerTypeId equals catType.Id
-                 select new CsMawbcontainerModel
-                 {
-                     Id = cont.Id,
-                     ContainerTypeId = cont.ContainerTypeId,
-                     ContainerTypeName = catType.UnitNameEn,
-                     Quantity = cont.Quantity
-                 }
-                );
-
-            return resultList;
-        }
     }
 }
