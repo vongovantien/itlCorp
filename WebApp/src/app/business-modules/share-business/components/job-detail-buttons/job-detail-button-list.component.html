@@ -21,8 +21,7 @@
         </button>
     </ng-container>
 
-    <ng-container *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowReopen && shipmentDetail?.currentStatus === 'Finish'
-        && !shipmentDetail.isLocked && !isDuplicate ">
+    <ng-container *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowReopen && shipmentDetail?.currentStatus === 'Finish' && !isDuplicate ">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
