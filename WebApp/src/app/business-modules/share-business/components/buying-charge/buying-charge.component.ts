@@ -808,21 +808,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                 if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                    this._documentRepo.validateCheckPointContractPartner(this._documentRepo.validateCheckPointContractPartner({
+                    this._documentRepo.validateCheckPointContractPartner({
                         partnerId: this.hbl.customerId,
                         transactionType: transactionType,
                         hblId: this.hbl.id
-                    }))
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
-                                } else {
-                                    this._toastService.warning(res.message);
-                                }
-                                this._cd.markForCheck();
+                    }).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                            } else {
+                                this._toastService.warning(res.message);
                             }
-                        )
+                            this._cd.markForCheck();
+                        }
+                    )
                 } else {
                     chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
                 }
