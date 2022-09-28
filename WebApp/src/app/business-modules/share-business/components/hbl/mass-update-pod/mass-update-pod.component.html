@@ -12,21 +12,22 @@
                 <form [formGroup]="formGroup">
                     <div class="form">
                         <div class="form-group"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !deliveryDate.valid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !deliveryDate.valid || this.deliveryDate===null }">
                             <label required>Delivery Date</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Please Select" readonly [singleDatePicker]="true"
                                     formControlName="deliveryDate"
-                                    [allowRemove]="!!deliveryDate.value && !!deliveryDate.value.startDate"
+                                    [allowRemove]="!!deliveryDate.value && !!deliveryDate.value?.startDate"
                                     (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true" [autoApply]="true" />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !deliveryDate.valid">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && !deliveryDate.valid || !!deliveryDate.value?.startDate">
                                     Delivery Date is Required
                                 </div>
                             </div>
