@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -30,7 +30,6 @@ import { forkJoin } from 'rxjs';
     templateUrl: './sea-lcl-export-shipping-instruction.component.html'
 })
 export class SeaLclExportShippingInstructionComponent extends AppList implements ICrystalReport {
-
     @ViewChild(ShareSeaServiceFormSISeaExportComponent) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
@@ -39,6 +38,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
     houseBills: any[] = [];
 
     displayPreview: boolean = false;
+    containerList: any[] = [];
 
     constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
@@ -135,8 +135,20 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                     }
                 }
             });
-            const packages = this.getPackages(lstPackages);
-            this.billSIComponent.shippingInstruction.packagesNote = packages;
+
+            let shippingMark = '';
+            let packagesNote: string | Number = 0;
+            this.getListContainersOfJob();
+            if (this.containerList.length === 0 && this.billSIComponent.type === 'lcl') {
+                this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => packagesNote += s.packageQty)
+            }
+            else {
+                packagesNote = this.getPackages(lstPackages);
+            }
+            this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ")
+            this.billSIComponent.shippingInstruction.shippingMark = shippingMark.trim();
+            this.billSIComponent.shippingInstruction.packagesType = this.houseBills[0].packageType || "";
+            this.billSIComponent.shippingInstruction.packagesNote = packagesNote.toString() || ""
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
             this.billSIComponent.shippingInstruction.goodsDescription = goodsDescription;
@@ -344,6 +356,17 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                     }
                 },
             );
+    }
+
+    getListContainersOfJob() {
+        this._documentRepo.getListContainersOfJob({ mblid: this.jobId }).pipe(
+        ).subscribe(
+            (res: any) => {
+                if (!!res) {
+                    this.containerList = res;
+                }
+            }
+        );
     }
 
     @delayTime(1000)
