@@ -2824,7 +2824,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var item = hasLinkCharges.FirstOrDefault();
                     if (model.ServiceNo != item.linkCharge.JobNoLink || model.ShipmentMode != "Internal")
                     {
-                        return new HandleState(false, (object)("Update fail. Shipment has charges link to " + currentShipment.ServiceNo + "-" + item.hblNoLink));
+                        return new HandleState(false, (object)("Update fail. Shipment has charges link to " + currentShipment.ServiceNo));
                     }
                 }
             }
