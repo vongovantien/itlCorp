@@ -108,7 +108,8 @@
                                         Shipment Type
                                     </label>
                                     <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
-                                        [clearable]="false" formControlName="shipmentType" (change)="getSalesmanList($event)">
+                                        [clearable]="false" formControlName="shipmentType"
+                                        (change)="getSalesmanList($event)">
                                     </ng-select>
                                 </div>
                             </div>
@@ -277,5 +278,4 @@
         </div>
     </div>
 </form>
-<info-popup #comfirmCusAgreement [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
+<ng-template inject></ng-template>
