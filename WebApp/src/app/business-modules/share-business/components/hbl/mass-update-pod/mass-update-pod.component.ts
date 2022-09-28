@@ -5,7 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, forkJoin } from 'rxjs';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, ignoreElements, map, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { HouseBill } from '@models';
@@ -25,7 +25,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
   deliveryDate: AbstractControl;
   deliveryPerson: AbstractControl;
   HAWBNo: AbstractControl;
-  housebillList: HouseBill[] = [new HouseBill({ id: 'All', hwbno: 'All' })];
+  housebillList: HouseBill[] = [];
   constructor(
     private _fb: FormBuilder,
     private _toast: ToastrService,
@@ -60,7 +60,10 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(
         (hbls: any[]) => {
-          this.housebillList = this.housebillList.concat(hbls) || [];
+          if (hbls.length > 1) {
+            this.housebillList = [new HouseBill({ id: 'All', hwbno: 'All' })];
+            this.housebillList = this.housebillList.concat(hbls) || [];
+          }
         }
       );
   }
@@ -80,25 +83,25 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
   }
 
   updatePOD() {
-    this._progressRef.start();
     this.isSubmitted = true;
-    if (this.formGroup.invalid) {
-      return;
-    }
+
     console.log(this.HAWBNo);
 
-    const deliveryDate = this.deliveryDate.value !== null ? formatDate(this.deliveryDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+    const deliveryDateInput = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null;
+    if (this.formGroup.invalid || deliveryDateInput === null) {
+      return;
+    }
     const mapV: ProofOfDelivery[] = this.HAWBNo.value !== null ? (this.HAWBNo.value[0]?.id === 'All' ?
       this.housebillList.filter(x => x.id != 'All').map((x: any) =>
         new ProofOfDelivery({
-          deliveryDate: deliveryDate,
+          deliveryDate: deliveryDateInput,
           deliveryPerson: this.deliveryPerson.value,
           hblid: x.id,
         }))
       :
       this.HAWBNo.value.map((x: any) =>
         new ProofOfDelivery({
-          deliveryDate: deliveryDate,
+          deliveryDate: deliveryDateInput,
           deliveryPerson: this.deliveryPerson.value,
           hblid: x.id,
         }))) : [];
@@ -119,7 +122,6 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             } else {
               this._toast.error(res[errorIndex].message);
             }
-            this._progressRef.complete();
           }
         }
       )
