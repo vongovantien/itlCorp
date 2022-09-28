@@ -3510,10 +3510,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             foreach (var item in surcharges)
             {
-                var opsDetail = opsTransaction.First(x => x.Hblid == item.Hblid);
+                var opsDetail = opsTransaction.Where(x => x.Hblid == item.Hblid).FirstOrDefault();
                 if (opsDetail == null)
                 {
-                    var shipment = transactionData.First(x => x.HblId == item.Hblid);
+                    var shipment = transactionData.Where(x => x.HblId == item.Hblid).FirstOrDefault();
                     item.Hblid = shipment.HblId;
                     item.JobNo = shipment.JobNo;
                     item.Mblno = shipment.Mawb;
