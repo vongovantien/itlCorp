@@ -76,7 +76,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("PreviewLCLContShippingInstruction/{JobId}")]
-        public IActionResult PreviewLCLContShippingInstruction(Guid JobId)
+        public IActionResult    PreviewLCLContShippingInstruction(Guid JobId)
         {
             var result = shippingInstructionService.PreviewLCLContShippingInstruction(JobId);
             return Ok(result);

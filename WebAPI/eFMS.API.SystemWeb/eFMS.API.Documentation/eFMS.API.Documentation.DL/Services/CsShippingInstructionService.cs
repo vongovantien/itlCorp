@@ -79,7 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
         public CsShippingInstructionModel GetById(Guid jobId)
         {
             var transDetail = transactionDetailService.Get(x => x.JobId == jobId);
-            var listCont = csMawbcontainerService.ListContOfHB(jobId);
+            CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Mblid = jobId };
+            var listCont = csMawbcontainerService.Query(criteriaMaw);
             var jobDetail = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
             var result = Get(x => x.JobId == jobId).FirstOrDefault();
 
@@ -95,16 +96,12 @@ namespace eFMS.API.Documentation.DL.Services
             result.ActualShipperName = partners?.FirstOrDefault(x => x.Id == result.ActualShipperId)?.PartnerNameEn;
             result.ActualConsigneeName = partners?.FirstOrDefault(x => x.Id == result.ActualConsigneeId)?.PartnerNameEn;
             result.PackagesNote = jobDetail.TransactionType == "SLE" && listCont.Any() == false ? transDetail.Sum(x => x.PackageQty).ToString() : result.PackagesNote;
-            result.PackagesType = result.PackagesType ?? transDetail?.FirstOrDefault()?.PackageType;
-            result.ShippingMark = result.ShippingMark ?? String.Join(" ", transDetail.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Select(x => x.ShippingMark));
-
 
             return result;
         }
         public Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
         {
             Crystal result = new Crystal();
-
             var instructions = new List<SeaShippingInstruction>();
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
@@ -126,11 +123,6 @@ namespace eFMS.API.Documentation.DL.Services
             string jobNo = opsTrans?.JobNo;
             string noPieces = string.Empty;
 
-            var listCont = csMawbcontainerService.GetContainerListByJobId(model.JobId);
-            var shippingMarkSI = model.ShippingMark ?? (model.CsTransactionDetails.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Any() ? string.Join(" ", model.CsTransactionDetails.Select(x => x.ShippingMark)) : null);
-            var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + " x " + x.Key)) : DocumentConstants.NO_CONTAINER;
-            var packagesType = model.PackagesType ?? model.CsTransactionDetails?.FirstOrDefault()?.PackageType;
-
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
@@ -141,6 +133,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.Quantity) + x.Sum(c => c.ContainerTypeId));
                 noPieces = string.Join(", ", packages);
 
+                CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = item.Id };
+                var listCont = csMawbcontainerService.Query(criteriaMaw);
+                var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
+                
                 var instruction = new SeaShippingInstruction
                 {
                     TRANSID = jobNo,
@@ -167,9 +163,9 @@ namespace eFMS.API.Documentation.DL.Services
                     Payment = model.PaymenType,
                     ShippingMarkImport = string.Empty,
                     MaskNos = item.ContSealNo,
-                    ShippingMarkSI = shippingMarkSI,
-                    PKGType = packagesType,
-                    TotalCont = totalCont,
+                    ShippingMarkSI = model.ShippingMark,
+                    PKGType = model.PackagesType,
+                    TotalCont = totalCont
                 };
                 instructions.Add(instruction);
             }
@@ -301,18 +297,12 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewLCLContShippingInstruction(Guid id)
         {
             var dataShippingIntruction = DataContext.Get(x => x.JobId == id).FirstOrDefault();
-
             if (dataShippingIntruction == null) return null;
             var model = mapper.Map<CsShippingInstructionReportConstModel>(dataShippingIntruction);
             model.CsTransactionDetails = transactionDetailService.Get(x => x.JobId == id).ToList();
-            var listCont = csMawbcontainerService.GetContainerListByJobId(model.JobId);
 
             if (model.CsTransactionDetails.Any())
             {
-                var shippingMarkSI = model.ShippingMark ?? (model.CsTransactionDetails.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Any() ? string.Join(" ", model.CsTransactionDetails.Select(x => x.ShippingMark)) : null);
-                var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + " x " + x.Key)) : DocumentConstants.NO_CONTAINER;
-                var packagesType = model.PackagesType ?? model.CsTransactionDetails?.FirstOrDefault()?.PackageType;
-
                 var partners = partnerRepository.Get();
                 var places = placeRepository.Get();
                 var users = userRepository.Get();
@@ -323,8 +313,8 @@ namespace eFMS.API.Documentation.DL.Services
                 model.PodName = places?.FirstOrDefault(x => x.Id == model.Pod)?.NameEn;
                 var Conts = containerRepository.Get();
                 var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString())).GroupBy(x => x.PackageTypeId);
-                if (!listConts.Any()) return null;
                 Crystal result = new Crystal();
+                if (!listConts.Any()) return null;
                 var instructions = new List<SeaShippingInstruction>();
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
@@ -344,7 +334,7 @@ namespace eFMS.API.Documentation.DL.Services
                 int? totalPackages = 0;
                 foreach (var item in listConts)
                 {
-                    var PackageType = catUnitRepository.Get(x => x.Id == item.Key).Select(t => t.UnitNameEn).FirstOrDefault();
+                    var PackageType = catUnitRepository.Get(x => x.Id == item.Key).Select(t => t.UnitNameEn).FirstOrDefault();             
                     var instruction = new SeaShippingInstruction
                     {
                         TRANSID = jobNo,
@@ -371,9 +361,8 @@ namespace eFMS.API.Documentation.DL.Services
                         Payment = model.PaymenType,
                         ShippingMarkImport = string.Empty,
                         MaskNos = string.Empty,
-                        TotalCont = totalCont,
-                        ShippingMarkSI = shippingMarkSI,
-                        PKGType = packagesType,
+                        ShippingMarkSI = model.ShippingMark,
+                        PKGType = model.PackagesType,
                     };
                     totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
@@ -604,14 +593,11 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewSISummary(CsShippingInstructionReportModel model)
         {
             Crystal result = new Crystal();
-
-            var listCont = csMawbcontainerService.GetContainerListByJobId(model.JobId);
             var instructions = new List<SeaShippingInstruction>();
 
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
-
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             string Tel = GetTelPersonalIncharge(model.JobId);
             var parameter = new SeaShippingInstructionParameter
@@ -627,6 +613,8 @@ namespace eFMS.API.Documentation.DL.Services
             };
             int totalPackage = 0;
             string jobNo = opsTrans?.JobNo;
+
+            var listCont = Enumerable.Empty<CsMawbcontainerModel>().AsQueryable();
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
@@ -634,7 +622,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                 int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
                 totalPackage += (int)(totalPack ?? 0);
+
+                CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = item .Id};
+                listCont = listCont.Union(csMawbcontainerService.Query(criteriaMaw));
             }
+
+            var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
+
             var instruction = new SeaShippingInstruction
             {
                 TRANSID = jobNo,
@@ -661,9 +655,9 @@ namespace eFMS.API.Documentation.DL.Services
                 Payment = model.PaymenType,
                 ShippingMarkImport = string.Empty,
                 MaskNos = model.ContainerSealNo,
-                ShippingMarkSI = model.ShippingMark ?? (model.CsTransactionDetails.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Any() ? string.Join(" ", model.CsTransactionDetails.Select(x => x.ShippingMark)) : null),
-                TotalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + " x " + x.Key)) : DocumentConstants.NO_CONTAINER,
-                PKGType = model.PackagesType ?? model.CsTransactionDetails?.FirstOrDefault()?.PackageType
+                ShippingMarkSI = model.ShippingMark,
+                PKGType = model.PackagesType,
+                TotalCont = totalCont
             };
 
             instructions.Add(instruction);
