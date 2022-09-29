@@ -50,12 +50,10 @@
                                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                     formControlName="clearanceDate" [ranges]="ranges"
                                                     [alwaysShowCalendars]="true" name="daterange"
-                                                    placeholder="From date - to date" readonly />
-                                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                    <span>
-                                                        <i class="la la-calendar"></i>
-                                                    </span>
-                                                </span>
+                                                    placeholder="From date - to date" readonly
+                                                    [allowRemove]="!!clearanceDate.value && !!clearanceDate.value.endDate && !!clearanceDate.value.startDate"
+                                                    (remove)="resetFormControl(clearanceDate)" calendar />
+                                                    
                                             </div>
                                         </div>
                                     </div>
@@ -66,17 +64,15 @@
                                     <label class="form-control-label">
                                         Import Date
                                     </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-ltr">
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            formControlName="importDate" [ranges]="ranges" [maxDate]="maxDate"
-                                            [alwaysShowCalendars]="true" name="daterange"
-                                            placeholder="From date - to date" readonly />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
+                                            ngxDaterangepickerMd 
+                                            [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
+                                            formControlName="importDate" placeholder="From date - to date" readonly calendar
+                                            [allowRemove]="!!importDate.value && !!importDate.value.startDate"
+                                            (remove)="resetFormControl(importDate)" /> 
+
                                     </div>
                                 </div>
                             </div>

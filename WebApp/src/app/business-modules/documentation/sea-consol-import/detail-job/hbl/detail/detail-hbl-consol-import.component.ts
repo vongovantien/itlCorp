@@ -115,10 +115,10 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 break;
             }
             // * Update Proof Of Delivery.
-            case HBL_TAB.PROOF: {
-                this.proofOfDeliveryComponent.saveProofOfDelivery();
-                break;
-            }
+            // case HBL_TAB.PROOF: {
+            //     this.proofOfDeliveryComponent.saveProofOfDelivery();
+            //     break;
+            // }
             default:
                 break;
         }
@@ -178,7 +178,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
-
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
                     } else {
                         this._toastService.error(res.message);
                     }

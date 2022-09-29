@@ -47,11 +47,14 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? IsExpired { get; set; }
         public bool? IsOverLimit { get; set; }
         public bool? IsOverDue { get; set; }
-        public bool? NoDue { get; set; }
         public short? SalesGroup { get; set; }
         public int? SalesDepartment { get; set; }
         public string SalesOfficeId { get; set; }
         public string SalesCompanyId { get; set; }
+        public bool? NoDue { get; set; }
         public string ShipmentType { get; set; }
+        public string EmailAddress { get; set; }
+        public DateTime? FirstShipmentDate { get; set; }
+        public int? PaymentTermObh { get; set; }
     }
 }

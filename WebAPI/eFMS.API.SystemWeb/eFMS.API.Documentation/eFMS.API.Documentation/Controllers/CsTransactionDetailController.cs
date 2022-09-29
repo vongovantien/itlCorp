@@ -13,6 +13,8 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Services;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -39,14 +41,17 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+        private readonly ICsStageAssignedService csStageAssignedService;
 
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
-            ICsTransactionDetailService service, 
-            ICurrentUser user, 
-            ICsMawbcontainerService mawbcontainerService, 
+            ICsTransactionDetailService service,
+            ICurrentUser user,
+            ICsMawbcontainerService mawbcontainerService,
             ICsTransactionService csTransaction,
             IAccAccountReceivableService AccAccountReceivable,
-            IOptions<ApiServiceUrl> serviceUrl
+            IOptions<ApiServiceUrl> serviceUrl,
+            ICsStageAssignedService stageAssignedService
+
             )
         {
             stringLocalizer = localizer;
@@ -56,7 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             csTransactionService = csTransaction;
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
-
+            csStageAssignedService = stageAssignedService;
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -195,8 +200,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
+            var currentHBL = csTransactionDetailService.First(x => x.Id == model.Id);
             currentUser.Action = "UpdateCSTransactionDetail";
-
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model, out int typeExisted, out List<Guid> data);
             if (checkExistMessage.Length > 0)
@@ -223,6 +228,15 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+
+            Response.OnCompleted(async () =>
+            {
+                if (hs.Success)
+                {
+                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
+                }
+
+            });
             return Ok(result);
         }
 
@@ -375,7 +389,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
-                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED,model.Mawb].Value;
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mawb].Value;
                             data = houseBills.Where(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id)
                               .Select(x => x.JobId)
                               .Distinct()
@@ -628,6 +642,5 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Fight Info From Job Success" });
         }
-
     }
 }

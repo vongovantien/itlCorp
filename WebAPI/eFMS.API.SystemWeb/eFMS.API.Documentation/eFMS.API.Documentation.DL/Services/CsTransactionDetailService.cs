@@ -63,6 +63,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysGroup> sysGroupRepository;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly ICheckPointService checkPointService;
+        private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly IStageService catStageService;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -97,7 +99,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysGroup> sysGroupRepo,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
-            ICheckPointService checkPoint) : base(repository, mapper)
+            ICheckPointService checkPoint,
+            ICsStageAssignedService stageAssigned, IStageService stageService
+            ) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -131,6 +135,8 @@ namespace eFMS.API.Documentation.DL.Services
             sysGroupRepository = sysGroupRepo;
             accAccountReceivableService = accAccountReceivable;
             checkPointService = checkPoint;
+            csStageAssignedService = stageAssigned;
+            catStageService = stageService;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -149,29 +155,30 @@ namespace eFMS.API.Documentation.DL.Services
             string SalesDepartmentId = string.Empty;
             string SalesOfficeId = string.Empty;
             string SalesCompanyId = string.Empty;
-            if (dataUserLevels.Select(t=>t.GroupId).Count() >= 1)
+            if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
             {
-                var dataGroup = dataUserLevels.Where(x=>x.OfficeId == currentUser.OfficeID).ToList();
-                if (dataGroup.Any()) {
+                var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                if (dataGroup.Any())
+                {
                     SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataGroup.Where(x=>x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataGroup.Where(x=>x.OfficeId != null).Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataGroup.Where(x=>x.CompanyId != null).Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataGroup.Where(x => x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataGroup.Where(x => x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataGroup.Where(x => x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
                 else
                 {
                     SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataUserLevels.Where(x=>x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataUserLevels.Where(x=>x.OfficeId != null).Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataUserLevels.Where(x=>x.CompanyId != null).Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataUserLevels.Where(x => x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataUserLevels.Where(x => x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataUserLevels.Where(x => x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
-         
+
             }
 
-            model.SalesGroupId = !string.IsNullOrEmpty(SalesGroupId) ? SalesGroupId : null ;
-            model.SalesDepartmentId =  !string.IsNullOrEmpty( SalesDepartmentId) ? SalesDepartmentId : null;
+            model.SalesGroupId = !string.IsNullOrEmpty(SalesGroupId) ? SalesGroupId : null;
+            model.SalesDepartmentId = !string.IsNullOrEmpty(SalesDepartmentId) ? SalesDepartmentId : null;
             model.SalesOfficeId = !string.IsNullOrEmpty(SalesOfficeId) ? SalesOfficeId : null;
-            model.SalesCompanyId = !string.IsNullOrEmpty(SalesCompanyId) ?  SalesCompanyId : null;
+            model.SalesCompanyId = !string.IsNullOrEmpty(SalesCompanyId) ? SalesCompanyId : null;
 
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
@@ -277,6 +284,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new HandleState("Housebill not found !");
             }
+            model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
             model.OfficeId = hb.OfficeId;
@@ -316,7 +324,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            int code = checkOwnerPermission(model)?200: GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+            int code = checkOwnerPermission(model) ? 200 : GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
             if (code == 403) return new HandleState(403, "");
             model.DatetimeModified = DateTime.Now;
             model.Active = true;
@@ -335,6 +343,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
+
                         if (model.CsMawbcontainers != null)
                         {
                             var hscontainers = containerService.UpdateHouseBill(model.CsMawbcontainers, model.Id);
@@ -355,6 +364,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges, model.Id);
                         }
+
                         //Cập nhật JobNo, Mbl, Hbl cho các charge của housebill
                         var hsSurcharge = UpdateSurchargeOfHousebill(model);
 
@@ -374,6 +384,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         acctCdnoteRepository.SubmitChanges();
                     }
+
                     trans.Commit();
                     //Send email to salesman
                     if (changedSalesman && !string.IsNullOrEmpty(houseBill.SaleManId))
@@ -399,7 +410,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var job = csTransactionRepo.Get(x => x.Id == Id).FirstOrDefault();
             var jobDetails = DataContext.Get(x => x.JobId == Id);
-            
+
             try
             {
                 if (jobDetails.Count() > 0)
@@ -413,7 +424,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsUpdateFlightInfo = await DataContext.UpdateAsync(x, z => x.Id == z.Id, false);
                     }
                 }
-                
+
                 var sm = DataContext.SubmitChanges();
                 return sm;
             }
@@ -617,7 +628,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 code = GetPermissionToUpdate(new ModelUpdate { SaleManId = detail.SaleManId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId, Groups = lstGroups, Departments = lstDepartments }, permissionRange, detail.TransactionType);
             }
-            
+
             return code;
         }
 
@@ -631,12 +642,12 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-       
+
             detail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = checkOwnerPermission (detail)? true: GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
+                AllowUpdate = checkOwnerPermission(detail) ? true : GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail)
             };
-                 
+
             var specialActions = _currentUser.UserMenuPermission.SpecialActions;
             if (specialActions.Count > 0)
             {
@@ -658,7 +669,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var trans = csTransactionRepo.Get(x => x.Id == transDe.JobId).FirstOrDefault();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(transDe.TransactionType, currentUser);
-            if (trans.UserCreated==_currentUser.UserID)
+            if (trans.UserCreated == _currentUser.UserID)
             {
                 return true;
             }
@@ -938,7 +949,7 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceTo1 = detail.TransitPlaceTo1,
                           TransitPlaceBy2 = detail.TransitPlaceBy2,
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
-                          Total = detail.Total, 
+                          Total = detail.Total,
                           Notify = detail.Notify,
                           Group = gr.ShortName,
                           Department = dept.DeptNameAbbr,
@@ -977,14 +988,15 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.All:
                     break;
                 case PermissionRange.Owner:
-                    if(shipment == null)
+                    if (shipment == null)
                     {
                         houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.UserCreated)
                                                 || x.UserCreated == currentUser.UserID
                                                 || x.SaleManId == currentUser.UserID
                                                 );
-                    } else
+                    }
+                    else
                     {
                         houseBills = houseBills.Where(x => x.SaleManId == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.UserCreated)
@@ -993,7 +1005,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                 || (shipment.PersonIncharge == currentUser.UserID && x.JobId == shipment.Id)
                                                 );
                     }
-                    
+
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
@@ -1083,7 +1095,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var houseBillData = query.Select(s => s.detail).GroupBy(g => g.Id).Select(s => s.FirstOrDefault());
             var res = from detail in houseBillData//DataContext.Get()
-                      //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                                                  //join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -1162,8 +1174,8 @@ namespace eFMS.API.Documentation.DL.Services
                           PackageType = detail.PackageType,
                           CW = detail.ChargeWeight,
                           DatetimeCreated = detail.DatetimeCreated,
-                          Department=dept.DeptNameAbbr,
-                          Group=gr.ShortName
+                          Department = dept.DeptNameAbbr,
+                          Group = gr.ShortName
                       };
             //Order tăng dần theo số House
             var results = res.ToArray().OrderBy(o => o.Hwbno).ToList();
@@ -2045,7 +2057,7 @@ namespace eFMS.API.Documentation.DL.Services
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     Notify = data.NotifyPartyDescription?.ToUpper(),
                     SignPath = printSign ? "Department" : string.Empty
-            };
+                };
                 authorizeLetters.Add(authorizeLetter);
             }
 
@@ -2476,7 +2488,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         acctAdvanceRequestRepository.Update(item, x => x.Id == item.Id, false);
                     }
-                    
+
                     hs = acctAdvanceRequestRepository.SubmitChanges();
                 }
                 return hs;
@@ -2484,7 +2496,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                string logErr = String.Format("Có lỗi khi cập nhật HBLNo {0} trong acctAdvanceRequest by {1} at {2} \n {3}",model.Hwbno, currentUser.UserName, DateTime.Now, ex.ToString());
+                string logErr = String.Format("Có lỗi khi cập nhật HBLNo {0} trong acctAdvanceRequest by {1} at {2} \n {3}", model.Hwbno, currentUser.UserName, DateTime.Now, ex.ToString());
                 new LogHelper("eFMS_Update_Advance_Log", logErr);
                 return new HandleState(ex.Message);
             }
@@ -2498,7 +2510,7 @@ namespace eFMS.API.Documentation.DL.Services
             bool hasChargeSynced = false;
             bool hasAdvanceRequest = false;
 
-            if (DataContext.Any(x => x.Id == model.Id  && (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? "")))
+            if (DataContext.Any(x => x.Id == model.Id && (x.Hwbno ?? "").ToLower() != (model.Hwbno ?? "")))
             {
                 CsTransactionDetail houseBill = DataContext.Get(x => x.Id == model.Id)?.FirstOrDefault();
                 if (houseBill != null)
@@ -2602,7 +2614,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId)
         {
             var shipment = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault();
-            if(shipment == null)
+            if (shipment == null)
             {
                 return null;
             }
@@ -2614,7 +2626,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result.Add(new { hbl, ErrorMessage = string.Empty });
                 return result;
             }
-            
+
             foreach (var hbl in transDetails)
             {
                 var checkPoint = new CheckPoint {

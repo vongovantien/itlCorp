@@ -668,13 +668,13 @@ namespace eFMS.API.Documentation.DL.Services
                     return true;
                 }
                 var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
-                var shipmentNoProfit = false;
+                //var shipmentNoProfit = false;
                 if (transaction == "CL")
                 {
                     var opstraction = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
-                    shipmentNoProfit = opstraction?.NoProfit ?? false;
+                    //shipmentNoProfit = opstraction?.NoProfit ?? false;
                     surcharges = surcharges.Where(x => string.IsNullOrEmpty(x.LinkChargeId));
-                    if (isReplicate && !shipmentNoProfit)
+                    if (isReplicate)
                     {
                         // Không lấy phí đã AutoRate
                         var jobRepNo = opsTransactionRepository.Get(x => x.Id == opstraction.ReplicatedId).FirstOrDefault()?.JobNo;
@@ -694,8 +694,7 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     var cstransaction = csTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault();
-                    shipmentNoProfit = cstransaction?.NoProfit ?? false;
-                    if (!shipmentNoProfit)
+                    //shipmentNoProfit = cstransaction?.NoProfit ?? false;
                     {
                         //[01/03/2022] Không lấy những phí đã linkFee
                         List<CsLinkCharge> csLinkFee = csLinkChargeRepository.Get(x => x.JobNoLink == cstransaction.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).ToList();
@@ -707,7 +706,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
 
-                if (surcharges.Count() > 0 && !shipmentNoProfit)
+                if (surcharges.Count() > 0)
                 {
                     // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
                     var jobNos = surcharges.Select(x => x.JobNo).Distinct().ToList();

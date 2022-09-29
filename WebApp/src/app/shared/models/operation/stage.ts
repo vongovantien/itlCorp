@@ -21,6 +21,7 @@ export class Stage {
     userModified: string = '';
     isSelected?: boolean = false;
     doneDate: string = '';
+    hblNo: string = '';
 
     constructor(object?: any) {
         const self = this;

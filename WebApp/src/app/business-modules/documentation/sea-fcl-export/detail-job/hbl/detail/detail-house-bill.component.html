@@ -4,7 +4,8 @@
             <app-menu-preview-hbl-sea-export [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-export>
 
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
-                *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'"></app-default-button>
+                *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'">
+            </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>
         </div>
@@ -15,13 +16,14 @@
                 <tab heading="HAWB Detail">
                     <app-form-create-hbl-sea-export [isUpdate]="true"></app-form-create-hbl-sea-export>
                     <hbl-goods-summary-fcl type="export">HBL Goods Summary</hbl-goods-summary-fcl>
+                    <hbl-proof-of-delivery></hbl-proof-of-delivery>
                 </tab>
                 <tab heading="Attach List">
                     <attach-list-house-bill action="UPDATE"></attach-list-house-bill>
                 </tab>
-                <tab heading="Proof Of Delivery">
+                <!-- <tab heading="Proof Of Delivery">
                     <hbl-proof-of-delivery></hbl-proof-of-delivery>
-                </tab>
+                </tab> -->
             </tabset>
         </div>
     </div>

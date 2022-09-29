@@ -239,6 +239,14 @@ namespace eFMS.API.Documentation.Controllers
             }
             currentUser.Action = "AddAndUpdate";
 
+            // Check shipment with no profit
+            var isValid = true;
+            var chargesCheckNoProfit = csShipmentSurchargeService.CheckAddAndUpdateSellingsShipmentNoProfit(list, out isValid);
+            if (!isValid)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "NoProfit shipment is not applicable to profit bigger than 0" });
+            }
+
             var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

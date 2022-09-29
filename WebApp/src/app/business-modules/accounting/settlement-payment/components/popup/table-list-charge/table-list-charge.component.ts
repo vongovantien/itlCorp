@@ -133,7 +133,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         this.headerPartner = [
             { title: 'Name', field: 'partnerNameEn' },
-            { title: 'Partner Code', field: 'taxCode' },
+            { title: 'Partner Code', field: 'accountNo' },
             { title: 'Name ABBR', field: 'shortName' },
         ];
 
@@ -341,7 +341,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     charge.clearanceNo = data.clearanceNo;
                     charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
                 }
-                
+
                 this.charges = [...selectedCharges, ...notSelectedCharges]
             }
 
@@ -353,7 +353,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     onSelectDataFormInfo(data: OperationInteface.IShipment | IAdvanceShipment | any, type: string) {
-        if (this.charges.length > 0 && this.charges.filter((chg: Surcharge) => chg.isSelected).length === 0){
+        if (this.charges.length > 0 && this.charges.filter((chg: Surcharge) => chg.isSelected).length === 0) {
             return;
         }
         this.isSubmitted = false;
@@ -361,37 +361,37 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         switch (type) {
             case 'shipment':
             case 'cd':
-                if(this.charges.length > 0){
-                let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
-                let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
-                selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
-                this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
-                    .subscribe(
-                        (res: any) => {
-                            if (!!res.data) {
-                                this._toastService.warning(res.message);
-                                res.data.forEach(element => {
-                                    selectedCharges.filter((chg: Surcharge)=> chg.id === element.id).map((chg: Surcharge)=> {
-                                        chg.creditNo = element.creditNo;
-                                        chg.debitNo = element.debitNo;
-                                        chg.soano = element.soano;
-                                        chg.paySoano = element.paySoano;
-                                        chg.linkChargeId = element.linkChargeId;
-                                        chg.voucherId = element.voucherId;
-                                        chg.voucherIdre = element.voucherIdre;
-                                        chg.syncedFrom = element.syncedFrom;
-                                        chg.paySyncedFrom = element.syncedFrom;
-                                    })
-                                });
-                                this.charges = [...selectedCharges, ...notSelectedCharges]
-                                type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
-                            } 
-                            else {
-                                type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
+                if (this.charges.length > 0) {
+                    let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
+                    let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
+                    selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
+                    this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
+                        .subscribe(
+                            (res: any) => {
+                                if (!!res.data) {
+                                    this._toastService.warning(res.message);
+                                    res.data.forEach(element => {
+                                        selectedCharges.filter((chg: Surcharge) => chg.id === element.id).map((chg: Surcharge) => {
+                                            chg.creditNo = element.creditNo;
+                                            chg.debitNo = element.debitNo;
+                                            chg.soano = element.soano;
+                                            chg.paySoano = element.paySoano;
+                                            chg.linkChargeId = element.linkChargeId;
+                                            chg.voucherId = element.voucherId;
+                                            chg.voucherIdre = element.voucherIdre;
+                                            chg.syncedFrom = element.syncedFrom;
+                                            chg.paySyncedFrom = element.syncedFrom;
+                                        })
+                                    });
+                                    this.charges = [...selectedCharges, ...notSelectedCharges]
+                                    type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
+                                }
+                                else {
+                                    type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
+                                }
                             }
-                        }
-                    );
-                }else{
+                        );
+                } else {
                     type === "shipment" ? this.onSelectShipmentData(data) : this.onSelectClearanceData(data);
                 }
                 break;
@@ -516,7 +516,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':
@@ -646,10 +646,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     deleteCharge(index: number) {
         this.isSubmitted = false;
         const chargeDelete = this.charges[index];
-        if(chargeDelete.hadIssued){
+        if (chargeDelete.hadIssued) {
             this._toastService.warning('Charge already issued CDNote/Soa/Voucher cannot be delete.');
             return;
-        } else{
+        } else {
             this.charges.splice(index, 1);
         }
     }
@@ -718,7 +718,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
 
         // Error if total > 100,000usd
-        if(this.charges.some((chargeItem: Surcharge) => chargeItem.currencyId === 'USD' && chargeItem.total > 100000)){
+        if (this.charges.some((chargeItem: Surcharge) => chargeItem.currencyId === 'USD' && chargeItem.total > 100000)) {
             this._toastService.error('Amount is too large, please check again.');
             return;
         }
@@ -748,7 +748,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 charge.payerId = charge.paymentObjectId;
                 charge.paymentObjectId = charge.obhId;
             }
-            if (!charge.isSelected || charge.linkChargeId || charge.hadIssued) {continue;}
+            if (!charge.isSelected || charge.linkChargeId || charge.hadIssued) { continue; }
             // *start: cập nhật shipment charges
             charge.clearanceNo = formData.customNo;
             // charge.advanceNo = formData.advanceNo;

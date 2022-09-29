@@ -1389,4 +1389,8 @@ export class CatalogueRepo {
 
     }
 
+    getInForCompanyByTaxCode(taxCode: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetPartnerByTaxCode/${taxCode}`);
+
+    }
 }

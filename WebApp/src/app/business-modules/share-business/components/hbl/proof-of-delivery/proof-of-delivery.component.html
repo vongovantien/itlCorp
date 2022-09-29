@@ -1,5 +1,14 @@
 <div class="proof-of-delivery-wrapper m-animate-fade-in">
     <div class="m-portlet">
+        <div class="m-portlet__head alert-block__heading pointer">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#data-summary">
+                        Proof Of Delivery
+                    </h3>
+                </div>
+            </div>
+        </div>
         <div class="m-portlet__body">
             <div class="row proof-of-delivery m-form m-form--state m--margin-bottom-20">
                 <div class="col-md-6">
@@ -48,10 +57,11 @@
                         <span class="text-primary">
                             {{ !!fileList ? fileList[0].name : null}}
                         </span>
-                        <br/><br/>
+                        <br /><br />
                         <ng-container *ngIf="!isLoading && !!files && !!hblid">
                             <!-- <a [href]="files.url" target="_blank" [title]="files.name" download>{{files.name}}</a> -->
-                            <li *ngFor="let file of files"><a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
+                            <li *ngFor="let file of files"><a [href]="file.url" target="_blank" [title]="file.name"
+                                    download>{{file.name}}</a>
                                 <span class="pointer text-center" *ngIf="!readonly">
                                     <a title="Delete" (click)="deleteFilePOD(file.name)">
                                         <i class="la la-times fa-lg text-danger"></i>
