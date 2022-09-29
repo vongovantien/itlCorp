@@ -21,7 +21,9 @@ export const ReceiptTypeState = createSelector(customerPaymentState, (state: ICu
 export const ReceiptPartnerCurrentState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.partnerId);
 export const ReceiptDateState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.date);
 export const ReceiptAgreementCreditCurrencyState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.creditCurrency);
-export const ReceiptAgreementCusAdvanceState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.cusAdvanceAmount);
+export const ReceiptAgreementCusAdvanceVNDState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.customerAdvanceAmountVnd);
+export const ReceiptAgreementCusAdvanceUSDState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.customerAdvanceAmountUsd);
+export const ReceiptAgreementState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement);
 export const ReceiptIsAutoConvertPaidState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.isAutoConvertPaid);
 export const ReceiptClassState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.class);
 export const ReceiptExchangeRate = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.exchangeRate);

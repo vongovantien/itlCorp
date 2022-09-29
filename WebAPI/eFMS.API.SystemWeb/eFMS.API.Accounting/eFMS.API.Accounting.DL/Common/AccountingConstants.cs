@@ -200,6 +200,7 @@
         public static readonly string RECEIPT_CLASS_CLEAR_DEBIT = "Clear Debit";
         public static readonly string RECEIPT_CLASS_ADVANCE = "Advance";
         public static readonly string RECEIPT_CLASS_COLLECT_OBH = "Collect OBH";
+        public static readonly string RECEIPT_CLASS_COLLECT_OBH_OTHER = "Collect OBH - Other";
         public static readonly string RECEIPT_CLASS_PAY_OBH = "Pay OBH";
         public static readonly string RECEIPT_CLASS_NET_OFF = "Net Off";
 
