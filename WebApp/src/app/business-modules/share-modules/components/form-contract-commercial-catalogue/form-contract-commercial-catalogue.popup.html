@@ -380,22 +380,23 @@
                             <ng-container
                                 *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
-                                            autoFormatCurrency class="form-control" formControlName="paymentTerm">
+                                        <input type="number" min="0" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                        'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
+                                            class="form-control" formControlName="paymentTerm">
                                     </div>
                                 </div>
-
                                 <div class="col-lg-2">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTermObh.valid }">
                                         <label>Payment Term OBH</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="number" min="0" numeric [decimals]="digitDecimal"
-                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
-                                                autoFormatCurrency class="form-control"
-                                                formControlName="paymentTermObh">
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                            'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
+                                                class="form-control" formControlName="paymentTermObh">
                                         </div>
                                     </div>
                                 </div>
