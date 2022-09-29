@@ -91,6 +91,10 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
+
+        // this.selectedType = this.types;
+        // this.selectedOBH = this.obhs;
+        this.selectedInSOA = this.inSOAs[1].value;
     }
 
     ngOnChanges() {
