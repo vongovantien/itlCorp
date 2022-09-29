@@ -60,7 +60,7 @@
     <div class="c-button-actions">
         <ng-container *ngIf="(shipmentDetail?.isLocked === false || isDuplicate)">
             <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
-                *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowDelete && !isDuplicate && !shipmentDetail.isLocked && shipmentDetail?.currentStatus !== 'Finish'">
+                *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowDelete && !isDuplicate && !shipmentDetail.isLocked">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
