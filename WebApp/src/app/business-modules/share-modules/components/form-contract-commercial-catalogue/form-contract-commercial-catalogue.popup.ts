@@ -451,7 +451,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     checkSubmitData() {
         if ((this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) ||
-            (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
+            (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
@@ -475,6 +475,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
 
     onSubmit(isRequestApproval: boolean = false) {
+        console.log(this.isSubmitted);
         this.setError(this.vas);
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
@@ -718,11 +719,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             paymentTermObh: this.selectedContract.paymentTermObh
         });
         this.contractTypeDetail = this.selectedContract.contractType;
-        if (this.selectedContract.contractType === 'Trial') {
-            this.isDisabledExpiredDateField = true;
-        } else {
-            this.isDisabledExpiredDateField = false;
-        }
 
         this.formatAutoExtendDays();
     }
@@ -952,7 +948,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     selectedAgreementType($event: any) {
         switch ($event) {
             case 'Trial':
-                this.isDisabledExpiredDateField = true;
                 if (!!this.effectiveDate.value.startDate) {
                     this.expiredDate.setValue({
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),

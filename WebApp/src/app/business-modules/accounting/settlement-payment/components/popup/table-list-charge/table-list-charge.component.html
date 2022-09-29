@@ -56,7 +56,8 @@
                                 (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                 <th class="first table-actions-col fixed-side">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" [(ngModel)]="isSelected" (change)="checkUncheckAllCharge()">
+                                        <input type="checkbox" [(ngModel)]="isSelected"
+                                            (change)="checkUncheckAllCharge()">
                                         <span></span>
                                     </label>
                                 </th>
@@ -68,7 +69,9 @@
                                             <td class="table-actions-col fixed-side">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">
-                                                        <input type="checkbox" value="{{charge}}" [(ngModel)]="charge.isSelected" (change)="onChangeCheckBoxCharge()">
+                                                        <input type="checkbox" value="{{charge}}"
+                                                            [(ngModel)]="charge.isSelected"
+                                                            (change)="onChangeCheckBoxCharge()">
                                                         <span></span>
                                                     </label>
                                                     <button
@@ -95,19 +98,21 @@
                                                             [selectedDisplayFields]="['chargeNameEn']"
                                                             [dataSources]="listCharges"
                                                             [displayFields]="configChargeDisplayFields" [height]="150"
-                                                            placeholder="Please Select" (remove)="charge.chargeId = null"
+                                                            placeholder="Please Select"
+                                                            (remove)="charge.chargeId = null"
                                                             [disabled]="!!charge.syncedFromBy || charge.hadIssued">
                                                         </app-combo-grid-virtual-scroll>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group col-md-12 dropdown-partner e--combogrid " dropdown
-                                                    [isDisabled]="!!charge.syncedFromBy || charge.payeeIssued"
+                                                <div class="form-group col-md-12 dropdown-partner e--combogrid "
+                                                    dropdown [isDisabled]="!!charge.syncedFromBy || charge.payeeIssued"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted
                                                     && (!charge.paymentObjectId || charge.type === 'OBH' && charge.obhId === charge.paymentObjectId)}">
-                                                    <input type="text" class="dropdown-toggle form-control" dropdownToggle
-                                                        readonly placeholder="Please Select" [(ngModel)]="charge.payer">
+                                                    <input type="text" class="dropdown-toggle form-control"
+                                                        dropdownToggle readonly placeholder="Please Select"
+                                                        [(ngModel)]="charge.payer">
                                                     <ng-container>
                                                         <div class="e--combogrid_icon">
                                                             <span class="e--combogrid_icon__dropdown">
@@ -116,14 +121,15 @@
                                                         </div>
                                                     </ng-container>
                                                     <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
-                                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                                        <div
+                                                            class="d-flex justify-content-end dropdown-partner__header">
                                                             <a class="text-primary text-underline m--margin-right-20 pointer"
                                                                 *ngFor="let type of partnerType; trackBy: trackByFn"
                                                                 [title]="type.displayName"
                                                                 (click)="onSelectPartnerType(type, charge, 'partner-type')">{{type.displayName}}</a>
                                                         </div>
                                                         <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                                            [fields]="['taxCode','partnerNameEn']"
+                                                            [fields]="['taxCode','partnerNameEn', 'shortName']"
                                                             [active]="charge.paymentObjectId"
                                                             (onClick)="onSelectDataTableInfo($event, charge ,'payer')">
                                                         </app-combo-grid>
@@ -135,8 +141,7 @@
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.quantity < 0 || charge.quantity === null)}">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else qtyTpl ">
                                                         <input type="number" class="form-control"
-                                                            [(ngModel)]="charge.quantity"
-                                                            [disabled]="charge.hadIssued"
+                                                            [(ngModel)]="charge.quantity" [disabled]="charge.hadIssued"
                                                             (ngModelChange)="calculateTotal(charge.vatrate,$event,charge.unitPrice, charge)"
                                                             placeholder="Quantity" min="0" autoFormatCurrency>
                                                     </ng-container>
@@ -166,8 +171,7 @@
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null}">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else unitPriceTpl ">
                                                         <input type="number" class="form-control"
-                                                            [(ngModel)]="charge.unitPrice"
-                                                            [disabled]="charge.hadIssued"
+                                                            [(ngModel)]="charge.unitPrice" [disabled]="charge.hadIssued"
                                                             (ngModelChange)="calculateTotal(charge.vatrate,charge.quantity,$event, charge)"
                                                             placeholder="Unit Price" autoFormatCurrency>
                                                     </ng-container>
@@ -181,8 +185,9 @@
                                             </td>
                                             <td class="disabled">
                                                 <div class="form-group ">
-                                                    <input type="text" class="form-control" [(ngModel)]="charge.currencyId"
-                                                        placeholder="Unit Price" disabled>
+                                                    <input type="text" class="form-control"
+                                                        [(ngModel)]="charge.currencyId" placeholder="Unit Price"
+                                                        disabled>
                                                 </div>
                                             </td>
                                             <td>
@@ -190,8 +195,7 @@
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else vatTpl ">
                                                         <input type="number" class="form-control"
-                                                            [(ngModel)]="charge.vatrate"
-                                                            [disabled]="charge.hadIssued"
+                                                            [(ngModel)]="charge.vatrate" [disabled]="charge.hadIssued"
                                                             (ngModelChange)="calculateTotal($event,charge.quantity,charge.unitPrice, charge)"
                                                             placeholder="%">
                                                     </ng-container>
@@ -206,13 +210,14 @@
                                             <td>
                                                 <div class="form-group"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
-                                                    <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
-                                                        currencyMask placeholder="Total">
+                                                    <input type="text" class="form-control" [(ngModel)]="charge.total"
+                                                        readonly disabled currencyMask placeholder="Total">
                                                 </div>
                                             </td>
                                             <td>
                                                 <ng-container *ngIf="!charge.syncedFromBy;else obhPartnerTpl ">
-                                                    <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown
+                                                    <div class="form-group col-md-12 dropdown-partner e--combogrid"
+                                                        dropdown
                                                         [ngClass]="{'m-form__group has-danger': isSubmitted
                                                 && (charge.type === 'OBH' && !charge.obhId
                                                 || charge.type === 'OBH' && charge.obhId === charge.paymentObjectId)  }">
@@ -232,7 +237,8 @@
                                                                 </span>
                                                             </div>
                                                         </ng-container>
-                                                        <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                                        <div *dropdownMenu
+                                                            class="dropdown-menu dropdown-partner__content">
                                                             <div
                                                                 class="d-flex justify-content-end dropdown-partner__header">
                                                                 <a class="text-primary text-underline m--margin-right-20 pointer"
@@ -240,8 +246,9 @@
                                                                     [title]="type.displayName"
                                                                     (click)="onSelectPartnerType(type, charge, 'obh-type')">{{type.displayName}}</a>
                                                             </div>
-                                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                                                [fields]="['taxCode','partnerNameEn']"
+                                                            <app-combo-grid [headers]="headerPartner"
+                                                                [data]="listPartner"
+                                                                [fields]="['taxCode','partnerNameEn','shortName']"
                                                                 [active]="charge.obhId"
                                                                 (onClick)="onSelectDataTableInfo($event, charge ,'obh')">
                                                             </app-combo-grid>
@@ -284,12 +291,13 @@
                                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                                         <input type="text" class="form-control m-input m-input--square"
                                                             ngxDaterangepickerMd
-                                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" readonly
-                                                            [autoApply]="true" [singleDatePicker]="true"
-                                                            [alwaysShowCalendars]="true" [(ngModel)]="charge.invoiceDate"
-                                                            calendar
+                                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                            readonly [autoApply]="true" [singleDatePicker]="true"
+                                                            [alwaysShowCalendars]="true"
+                                                            [(ngModel)]="charge.invoiceDate" calendar
                                                             [allowRemove]="!!charge.invoiceDate && !!charge.invoiceDate.startDate"
-                                                            (remove)="charge.invoiceDate = null" placeholder="DD/MM/YYYY"
+                                                            (remove)="charge.invoiceDate = null"
+                                                            placeholder="DD/MM/YYYY"
                                                             [disabled]="!!charge.syncedFromBy" />
                                                     </div>
                                                 </div>
@@ -303,8 +311,8 @@
                                                             [selectedDisplayFields]="['shortName']"
                                                             [dataSources]="listPartner"
                                                             [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
-                                                            (remove)="charge.vatPartnerId = null" placeholder="VAT Partner"
-                                                            [clearable]="false" size="15"
+                                                            (remove)="charge.vatPartnerId = null"
+                                                            placeholder="VAT Partner" [clearable]="false" size="15"
                                                             [disabled]="!!charge.syncedFromBy">
                                                         </app-combo-grid-virtual-scroll>
                                                     </div>
@@ -318,7 +326,8 @@
                                             <td>
                                                 <div class="form-group ">
                                                     <ng-container *ngIf="!charge.syncedFromBy;else contNoTpl ">
-                                                        <input type="text" class="form-control" [(ngModel)]="charge.contNo">
+                                                        <input type="text" class="form-control"
+                                                            [(ngModel)]="charge.contNo">
                                                     </ng-container>
                                                     <ng-template #contNoTpl>
                                                         {{charge.contNo}}

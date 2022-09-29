@@ -17,6 +17,7 @@
         <tabset class="custom-class-tab">
             <tab heading="HAWB Detail" [active]="activeTab === 'hawb'">
                 <air-import-hbl-form-create></air-import-hbl-form-create>
+                <hbl-proof-of-delivery></hbl-proof-of-delivery>
             </tab>
             <tab heading="Arrival Notice" [active]="activeTab === 'arrival'">
                 <arrival-note-air></arrival-note-air>
@@ -24,9 +25,9 @@
             <tab heading="Authorize Letter" [active]="activeTab === 'authorize'">
                 <hbl-delivery-order [isAir]="true"> </hbl-delivery-order>
             </tab>
-            <tab heading="Proof Of Delivery" [active]="activeTab === 'proof'">
+            <!-- <tab heading="Proof Of Delivery" [active]="activeTab === 'proof'">
                 <hbl-proof-of-delivery></hbl-proof-of-delivery>
-            </tab>
+            </tab> -->
         </tabset>
     </div>
 </div>

@@ -7,6 +7,8 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -36,6 +38,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria);
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType);
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
+        Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
 
     }
 }
