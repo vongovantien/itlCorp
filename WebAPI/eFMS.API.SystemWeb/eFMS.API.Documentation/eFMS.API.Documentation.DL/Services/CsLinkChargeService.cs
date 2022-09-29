@@ -88,28 +88,31 @@ namespace eFMS.API.Documentation.DL.Services
                     shipment.IsLinkFee = true;
                 }
                 if (shipment.ShipmentMode == "External")
-                    return new HandleState("The shipment has mode External");
-
-                var surchargesOrg = _csSurchargeRepository.Get(x => x.Hblid == shipment.Hblid);
-                var surchargesLink = _csSurchargeRepository.Get(x => x.JobNo == shipment.ServiceNo);
-                var hasLinkCharges = from org in surchargesOrg
-                                     join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
-                                     join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
-                                     select linkCharge;
+                    return new HandleState("The shipment mode is External, you can not link fee");
 
                 var jobTrans = _csTransactionRepository.Get(x => x.JobNo == shipment.ServiceNo).FirstOrDefault();
                 //Nếu HBL từ link nội bộ null
                 var hbl = new CsTransactionDetail();
-                if (hasLinkCharges != null && hasLinkCharges.Any())
-                {
-                    var _hbllinkId = new Guid(hasLinkCharges.FirstOrDefault().HbllinkId);
-                    hbl = _tranDetailRepository.Get(x => x.Id == _hbllinkId).FirstOrDefault();
-                }
-                else
                 {
                     if (shipment.ServiceHblId == null)
                     {
-                        hbl = _tranDetailRepository.Get(x => x.JobId == jobTrans.Id).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var surchargesOrg = _csSurchargeRepository.Get(x => x.Hblid == shipment.Hblid);
+                        var surchargesLink = _csSurchargeRepository.Get(x => x.JobNo == shipment.ServiceNo);
+                        var hasLinkCharges = from org in surchargesOrg
+                                             join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
+                                             join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
+                                             select linkCharge;
+                        if (hasLinkCharges != null && hasLinkCharges.Any())
+                        {
+
+                            var _hbllinkId = new Guid(hasLinkCharges.FirstOrDefault().HbllinkId);
+                            hbl = _tranDetailRepository.Get(x => x.Id == _hbllinkId).FirstOrDefault();
+                        }
+                        else
+                        {
+                            hbl = _tranDetailRepository.Get(x => x.JobId == jobTrans.Id).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        }
+                        
                     }
                     else
                     {
@@ -122,7 +125,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 if (hbl == null)
-                    return new HandleState("There is no hbl job service");
+                    return new HandleState("There is no house bill of shipment to link");
                 shipment.ServiceHblId = hbl.Id;
 
                 //Map transtype
