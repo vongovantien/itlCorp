@@ -902,7 +902,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.SaleService.Contains("CL")
                 && x.Active == true
                 && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                && (x.IsExpired != true || x.IsOverDue != true || x.IsOverLimit != true)
+                && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
                 )?.FirstOrDefault();
                 if (customerContract == null)
                 {
@@ -1152,7 +1152,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && x.SaleService.Contains("CL")
                     && x.Active == true
                     && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && (x.IsExpired != true || x.IsOverDue != true || x.IsOverLimit != true)
+                    && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
                     )?.FirstOrDefault();
                     if (customerContract == null)
                     {

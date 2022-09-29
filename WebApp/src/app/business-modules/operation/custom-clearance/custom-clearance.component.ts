@@ -206,52 +206,25 @@ export class CustomClearanceComponent extends AppList {
                 });
 
                 partnerIdsToCheckPoint = [...new Set(partnerIdsToCheckPoint)];
-                const sourceCheckPoint: any = [];
-                for (let i = 0; i < partnerIdsToCheckPoint.length; i++) {
-                    sourceCheckPoint.push(
-                        this._documentRepo.validateCheckPointContractPartner({
-                            partnerId: partnerIdsToCheckPoint[i],
-                            transactionType: 'CL',
-                            type: 1,
-                            hblId: SystemConstants.EMPTY_GUID,
-                        }));
-                }
-
-                forkJoin([...sourceCheckPoint])
-                    .pipe()
-                    .subscribe((res: CommonInterface.IResult[]) => {
-                        if (!!res.length) {
-                            const isValid = res.some(x => x.status == false);
-                            if (isValid) {
-                                const messages = res.filter((i) => i.status === false).map(x => x.message);
-                                console.log(messages);
-                                messages.forEach(message => {
-                                    this._toastrService.warning(message);
-                                });
+                this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
+                    .subscribe(
+                        (res: any) => {
+                            if (res.status) {
+                                this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    title: 'Warning',
+                                    body: 'Do you want to convert selected Clearance No to shipment',
+                                    labelConfirm: 'Ok',
+                                    labelCancel: 'No'
+                                }, () => { this.onComfirmConvertToJobs(); });
                             } else {
-                                this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
-                                    .subscribe(
-                                        (res: any) => {
-                                            if (res.status) {
-                                                this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-                                                    title: 'Warning',
-                                                    body: 'Do you want to convert selected Clearance No to shipment',
-                                                    labelConfirm: 'Ok',
-                                                    labelCancel: 'No'
-                                                }, () => { this.onComfirmConvertToJobs(); });
-                                            } else {
-                                                if (res.data === 403) {
-                                                    this._toastrService.error(res.message, '', { enableHtml: true });
-                                                } else {
-                                                    this.canNotAllowActionPopup.show();
-                                                }
-                                            }
-                                        },
-                                    );
+                                if (res.data === 403) {
+                                    this._toastrService.error(res.message, '', { enableHtml: true });
+                                } else {
+                                    this.canNotAllowActionPopup.show();
+                                }
                             }
-                        }
-                    });
-
+                        },
+                    );
             }
         } else {
             this._toastrService.warning("Chưa chọn clearance để Convert", '', { enableHtml: true });
