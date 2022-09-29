@@ -75,21 +75,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     saveAndConvertClearance(body: CustomClearance) {
-        this._documentation.validateCheckPointContractPartner({
-            partnerId: body.customerId,
-            transactionType: 'CL',
-            type: 1,
-            hblId: SystemConstants.EMPTY_GUID,
-        })
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        this._toastr.warning(res.message);
-                        return of(false);
-                    }
-                    return this._documentation.convertClearanceToJob(body);
-                })
-            )
+        this._documentation.convertClearanceToJob(body)
             .subscribe(
                 (response: any) => {
                     if (!!response && response.status) {
