@@ -201,7 +201,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     getCurrencyData(data: any) {
         this.currencyList = (data || []);
         this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
-        this.updateDataSearch('currency', 'VND');
+        this.updateDataSearch('currency', this.selectedCurrency.id);
         this.updateDataSearch('currencyLocal', 'VND');
     }
 
