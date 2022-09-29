@@ -71,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly IContextBase<SysGroup> groupRepository;
         private readonly IContextBase<CsShipmentSurcharge> surChargeRepository;
+        private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
         private readonly ICsTransactionService csTransactionServe;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -114,7 +115,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surChargeRepo,
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
-            IAccAccountReceivableService accAccountReceivable
+            IAccAccountReceivableService accAccountReceivable,
+            IContextBase<CsTransactionDetail> transactionDetail
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -155,6 +157,7 @@ namespace eFMS.API.Documentation.DL.Services
             databaseUpdateService = _databaseUpdateService;
             accAccountReceivableService = accAccountReceivable;
             surChargeRepository = surChargeRepo;
+            transactionDetailRepository = transactionDetail;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1657,10 +1660,14 @@ namespace eFMS.API.Documentation.DL.Services
                     model.DateCreatedLinkJob = DateTime.Now;
                 }
 
-                // Khi không link job nhưng trước đó đã có ServiceHblId thì giữ ServiceHblId trước đó
+                // Cập nhật ServiceHblId nếu null thì giữ ServiceHblId trước đó
                 if (!string.IsNullOrEmpty(model.ServiceNo) && model.ServiceHblId == null && detail.ServiceHblId != null)
                 {
-                    model.ServiceHblId = detail.ServiceHblId;
+                    var transaction = transactionRepository.Get(x => x.JobNo == model.ServiceNo).FirstOrDefault();
+                    model.ServiceHblId = transactionDetailRepository.Any(x => x.JobId == transaction.Id && x.Id == detail.ServiceHblId) ?
+                        transactionDetailRepository.Get(x => x.JobId == transaction.Id && x.Id == detail.ServiceHblId).FirstOrDefault()?.Id
+                        : transactionDetailRepository.Get(x => x.JobId == transaction.Id)?.OrderBy(x => x.DatetimeModified).FirstOrDefault()?.Id;
+
                 }
 
                 OpsTransaction entity = mapper.Map<OpsTransaction>(model);
