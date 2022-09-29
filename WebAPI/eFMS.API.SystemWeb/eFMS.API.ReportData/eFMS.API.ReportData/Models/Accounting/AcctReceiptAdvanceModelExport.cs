@@ -22,6 +22,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal CusAdvanceAmountUsd { get; set; }
         public decimal AgreementCusAdvanceVnd { get; set; }
         public decimal AgreementCusAdvanceUsd { get; set; }
+        public string Office { get; set; }
 
 
     }

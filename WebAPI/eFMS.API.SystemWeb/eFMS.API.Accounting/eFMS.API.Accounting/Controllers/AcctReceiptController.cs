@@ -488,9 +488,9 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPost("GetDataExportReceiptAdvance")]
         [Authorize]
-        public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
+        public async Task<IActionResult> GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria);
+            var result = await acctReceiptService.GetDataExportReceiptAdvance(criteria);
 
             return Ok(result);
         }

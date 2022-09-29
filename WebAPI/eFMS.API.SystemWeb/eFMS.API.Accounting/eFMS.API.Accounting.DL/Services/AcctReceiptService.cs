@@ -338,10 +338,15 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
+        private SysOffice GetOffice(Guid Id)
+        {
+            return officeRepository.Get(x => x.Id == Id).FirstOrDefault();
+        }
+
         public string GenerateReceiptNo()
         {
             string prefix = "PT";
-            var userCurrentOffice = officeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var userCurrentOffice = GetOffice(currentUser.OfficeID);
             if (userCurrentOffice != null)
             {
                 if (userCurrentOffice.Code == "ITLHAN")
@@ -3846,7 +3851,7 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
 
-        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
+        public async Task<AcctReceiptAdvanceModelExport> GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
             List<string> methodsAdv = new List<string> {
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
@@ -3863,9 +3868,9 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
             }
 
-            IQueryable<AcctReceipt> receiptExpre = DataContext.Get(query);
+            var receiptExpre = await DataContext.GetAsync(query);
 
-            IQueryable<AcctReceipt> receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
+            var receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
             List<Guid> receiptWithoutPaymentMethodIds = receiptExpre.Where(x => !methodsAdv.Contains(x.PaymentMethod)).Select(x => x.Id).ToList();
 
             List<Guid?> queryPayment = acctPaymentRepository.Get(x => receiptWithoutPaymentMethodIds.Contains(x.ReceiptId ?? Guid.Empty)
@@ -3874,9 +3879,9 @@ namespace eFMS.API.Accounting.DL.Services
             .Distinct()
             .ToList();
 
-            IQueryable<AcctReceipt> receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
+            var receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
 
-            IQueryable<AcctReceipt> receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
+            var receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
 
             if (receipts.Count() == 0)
             {
@@ -3895,18 +3900,22 @@ namespace eFMS.API.Accounting.DL.Services
             result.PartnerNameEn = partner.PartnerNameEn;
             result.UserExport = currentUser.UserName;
 
-            result.Details = receipts.OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated).Select(receipt => new AcctReceiptAdvanceRowModel
-            {
-                Description = receipt.Description,
-                ReceiptNo = receipt.PaymentRefNo,
-                PaidDate = receipt.PaymentDate,
-                CusAdvanceAmountVnd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountVnd ?? 0) : (receipt.CusAdvanceAmountVnd ?? 0), // Trừ ứng trước
-                CusAdvanceAmountUsd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountUsd ?? 0) : (receipt.CusAdvanceAmountUsd ?? 0),
-                AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0, // Số dư ứng trước
-                AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
-                TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD), // tổng tiền ứng trước
-                TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
-            });
+            result.Details = receipts.AsQueryable()
+                .OrderBy(x => x.PaymentDate)
+                .ThenBy(x => x.DatetimeCreated)
+                .Select(receipt => new AcctReceiptAdvanceRowModel
+                {
+                    Description = receipt.Description,
+                    ReceiptNo = receipt.PaymentRefNo,
+                    PaidDate = receipt.PaymentDate,
+                    CusAdvanceAmountVnd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountVnd ?? 0) : (receipt.CusAdvanceAmountVnd ?? 0), // Trừ ứng trước
+                    CusAdvanceAmountUsd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountUsd ?? 0) : (receipt.CusAdvanceAmountUsd ?? 0),
+                    AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0, // Số dư ứng trước
+                    AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
+                    TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD), // tổng tiền ứng trước
+                    TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
+                    Office = GetOffice(receipt.OfficeId ?? Guid.Empty).Code
+                });
 
             return result;
         }

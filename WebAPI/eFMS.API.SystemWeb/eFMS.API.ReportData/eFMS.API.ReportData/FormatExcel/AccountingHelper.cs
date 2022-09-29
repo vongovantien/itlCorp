@@ -5592,6 +5592,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("cusAdvAmountUsd",item.CusAdvanceAmountUsd);
                     mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
                     mappingKeyValue.Add("agreementAdvAmountUsd", item.AgreementCusAdvanceUsd);
+                    mappingKeyValue.Add("hub", item.Office);
                     mappingKeyValue.Add("description", item.Description);
 
                     excel.SetData(mappingKeyValue);
