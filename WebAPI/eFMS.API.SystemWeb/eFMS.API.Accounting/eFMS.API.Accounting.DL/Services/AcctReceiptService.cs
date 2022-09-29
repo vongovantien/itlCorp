@@ -1690,7 +1690,8 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
             IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id
-            && (x.Type == "ADV" || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH));
+            && (x.Type == "ADV" || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
+            && receipt.Class != AccountingConstants.RECEIPT_CLASS_COLLECT_OBH_OTHER);
 
             decimal? totalAdvPaymentVnd = payments
               .Select(s => s.PaymentAmountVnd)
@@ -2346,27 +2347,15 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CustomerDebitCreditModel> obhs = null;
             IQueryable<CustomerDebitCreditModel> soaCredits = null;
 
-            //if (criteria.SearchType.Equals("Credit Note"))
-            //{
-            //    creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
-            //}
-            //else
-            //{
-            //    debits = GetDebitForIssueCustomerPayment(criteria);
-            //    obhs = GetObhForIssueCustomerPayment(criteria);
-            //    //soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
-            //    //creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
-            //}
-
             debits = GetDebitForIssueCustomerPayment(criteria);
             obhs = GetObhForIssueCustomerPayment(criteria);
 
 
-            if (debits != null && debits.Count() > 0)
+            if (debits != null)
             {
                 data.AddRange(debits);
             }
-            if (obhs != null && obhs.Count() > 0)
+            if (obhs != null)
             {
                 data.AddRange(obhs);
             }
@@ -2877,122 +2866,16 @@ namespace eFMS.API.Accounting.DL.Services
                             break;
                     }
                 }
+            } else
+            {
+                query = query = query.And(x => x.Date.Value.Date >= DateTime.Now.Date);
             }
 
-            //if (criteria.Service != null && criteria.Service.Count > 0)
-            //{
-            //     query = query.And(x => IsMatchService(x.ServiceType, criteria.Service));
-            //}
 
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
                 query = query.And(x => criteria.Office.Contains(x.OfficeId.ToString()));
             }
-
-
-            //if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
-            //{
-            //    var acctManagementIds = new List<Guid?>();
-            //    if (criteria.SearchType.Equals("SOA"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("Debit/Credit/Invoice"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => (criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase))
-            //        || (criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)
-            //        || (criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase))
-            //        )).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("VAT Invoice"))
-            //    {
-            //        query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
-            //    }
-            //    else if (criteria.SearchType.Equals("JOB NO"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("HBL"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("MBL"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("Customs No"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-
-            //    if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //    {
-            //        query = query.And(x => acctManagementIds.Contains(x.Id));
-            //    }
-            //}
-
-            //if (criteria.FromDate != null && criteria.ToDate != null)
-            //{
-            //    if (!string.IsNullOrEmpty(criteria.DateType))
-            //    {
-            //        if (criteria.DateType == "Invoice Date")
-            //        {
-            //            query = query.And(x => x.Date.Value.Date >= criteria.FromDate.Value.Date && x.Date.Value.Date <= criteria.ToDate.Value.Date);
-            //        }
-            //        else if (criteria.DateType == "Billing Date")
-            //        {
-            //            query = query.And(x => x.ConfirmBillingDate.Value.Date >= criteria.FromDate.Value.Date && x.ConfirmBillingDate.Value.Date <= criteria.ToDate.Value.Date);
-            //        }
-            //        else if (criteria.DateType == "Service Date")
-            //        {
-            //            IQueryable<OpsTransaction> operations = null;
-            //            IQueryable<CsTransaction> transactions = null;
-            //            if (!string.IsNullOrEmpty(criteria.Service))
-            //            {
-            //                if (criteria.Service.Contains("CL"))
-            //                {
-            //                    operations = opsTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Value.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date : false));
-            //                }
-            //                if (criteria.Service.Contains("I") || criteria.Service.Contains("A"))
-            //                {
-            //                    transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? (criteria.FromDate.Value.Date <= x.ServiceDate.Value.Date &&
-            //                                                                                                        x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date) : false));
-            //                }
-            //            }
-
-            //            var dateModeJobNos = new List<string>();
-            //            if (operations != null)
-            //            {
-            //                dateModeJobNos = operations.Select(s => s.JobNo).ToList();
-            //            }
-            //            if (transactions != null)
-            //            {
-            //                dateModeJobNos.AddRange(transactions.Select(s => s.JobNo).ToList());
-            //            }
-            //            if (dateModeJobNos.Count > 0)
-            //            {
-            //                var acctManagementIds = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.AcctManagementId).Distinct().ToList();
-            //                if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //                {
-            //                    query = query.And(x => acctManagementIds.Contains(x.Id));
-            //                }
-            //            }
-            //            else
-            //            {
-            //                query = query.And(x => false);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //if (!string.IsNullOrEmpty(criteria.Service))
-            //{
-            //    var acctManagementIds = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //    {
-            //        query = query.And(x => acctManagementIds.Contains(x.Id));
-            //    }
-            //}
 
             return query;
         }
@@ -3252,15 +3135,15 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
             var invoices = acctMngtRepository.Get(expQuery);
-            var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
 
             if (invoices.Count() == 0)
             {
                 return null;
             }
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
@@ -3411,15 +3294,15 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
             var invoiceTemps = acctMngtRepository.Get(expQuery);
-            var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
 
             if (invoiceTemps.Count() == 0)
             {
                 return null;
             }
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
 
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId

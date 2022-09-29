@@ -13,8 +13,8 @@ import {
     ReceiptCreditListState,
     ReceiptDebitListState,
     ReceiptPartnerCurrentState,
-    ReceiptAgreementCreditCurrencyState,
-    ReceiptClassState
+    ReceiptClassState,
+    ReceiptAgreementState
 } from '../../store/reducers';
 import {
     InsertAdvance,
@@ -31,6 +31,7 @@ import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-l
 import { takeUntil, switchMap, switchMapTo, take, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { IAgreementReceipt } from '../form-create-receipt/form-create-receipt.component';
 @Component({
     selector: 'customer-payment-list-receipt',
     templateUrl: './receipt-payment-list.component.html',
@@ -213,11 +214,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     listenAgreementData() {
-        this._store.select(ReceiptAgreementCreditCurrencyState)
+        this._store.select(ReceiptAgreementState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (currency: string) => {
-                    currency !== undefined && !this.currencyId.value && (this.currencyId.setValue(currency));
+                (agreement: IAgreementReceipt) => {
+                    if (!!agreement) {
+                        if (!this.currencyId.value) {
+                            this.currencyId.setValue(agreement.creditCurrency);
+                        }
+                        this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
+                        this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
+                    }
                 }
             );
     }
