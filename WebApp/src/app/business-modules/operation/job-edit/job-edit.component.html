@@ -21,8 +21,7 @@
         </button>
     </ng-container>
 
-    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish'
-        && !opsTransaction.isLocked && !isDuplicate">
+    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish' && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
