@@ -901,7 +901,9 @@ namespace eFMS.API.Documentation.DL.Services
                 customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                 && x.SaleService.Contains("CL")
                 && x.Active == true
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                && (x.IsExpired != true || x.IsOverDue != true || x.IsOverLimit != true)
+                )?.FirstOrDefault();
                 if (customerContract == null)
                 {
                     string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
@@ -1150,7 +1152,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && x.SaleService.Contains("CL")
                     && x.Active == true
                     && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && (x.IsExpired == null || x.IsExpired == false)
+                    && (x.IsExpired != true || x.IsOverDue != true || x.IsOverLimit != true)
                     )?.FirstOrDefault();
                     if (customerContract == null)
                     {
