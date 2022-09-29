@@ -75,7 +75,7 @@
 
         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveJob()"
             [disabled]="selectedTab !== 'SHIPMENT'"
-            *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowUpdate && !isDuplicate && shipmentDetail?.currentStatus !== 'Finish'">
+            *ngIf="!!shipmentDetail && shipmentDetail?.permission?.allowUpdate && !isDuplicate">
         </app-default-button>
 
         <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="handleCancelForm()">

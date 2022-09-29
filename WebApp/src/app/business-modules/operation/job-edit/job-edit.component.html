@@ -78,7 +78,7 @@
     </ng-container>
 
     <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate && opsTransaction?.currentStatus !== 'Finish'"
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate"
         (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
         <span>
             <i class="la la la-save"></i>
