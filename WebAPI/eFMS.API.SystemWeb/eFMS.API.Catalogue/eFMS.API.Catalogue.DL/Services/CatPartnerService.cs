@@ -532,7 +532,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
-            if (partner.ContractType == "Cash")
+            if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE)
             {
                 lstTo = listEmailViewModel.ListAccountant;
                 if(listEmailViewModel.ListCCAccountant != null)
