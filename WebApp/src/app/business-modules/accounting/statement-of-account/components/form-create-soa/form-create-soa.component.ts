@@ -347,8 +347,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('dateType', this.selectedDateMode.value);
                 break;
             case 'type':
-                this.selectedType = data;
-                this.updateDataSearch('type', this.selectedType.value);
+                this.selectedType = data.value;
+                this.updateDataSearch('type', this.selectedType);
                 this.getInfoAgreement();
                 break;
             case 'obh':

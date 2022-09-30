@@ -30,10 +30,10 @@
                                 <label class="form-control-label">
                                     Debit/Credit Note
                                 </label>
-                                <ng-select class="custom" [(ngModel)]="selectedCDNote" name="selectedCDNote">
+                                <ng-select class="custom" [(ngModel)]="selectedCDNote" name="selectedCDNote" [items]="cdNotes" placeholder="Choose Debit/Credit Note">
                                     <ng-option [value]="null" [disabled]="true">Choose Debit/Credit Note</ng-option>
-                                    <ng-option *ngFor="let cdNote of cdNotes; let i = index" [ngValue]="cdNote"> {{cdNote.creditDebitNo}}</ng-option>
                                 </ng-select>
+                                
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -41,8 +41,8 @@
                                 <label class="form-control-label">
                                     Type
                                 </label>
-                                <ng-select [(ngModel)]="selectedType" class="custom" [items]="types" [disabled]="this.selectedType"
-                                    bindLabel="text" bindValue="id" [disabled]="true">
+                                <ng-select [(ngModel)]="selectedType" name="selectedType" class="custom" [items]="types"
+                                    bindLabel="text" bindValue="id" [clearable]="false" [disabled]="true">
                                 </ng-select>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                                             OBH
                                         </label>
                                         <ng-select [(ngModel)]="selectedOBH" name="selectedOBH" class="custom" [items]="obhs"
-                                             bindLabel="text" bindValue="id">
+                                             bindLabel="text" bindValue="id" [clearable]="false" >
                                         </ng-select>
                                     </div>
                                 </div>
@@ -66,7 +66,7 @@
                                             In SOA
                                         </label>
                                         <ng-select [(ngModel)]="selectedInSOA" name="selectedInSOA" class="custom" [items]="inSOAs"
-                                             bindLabel="text" bindValue="id">
+                                             bindLabel="text" bindValue="id" [clearable]="false">
                                         </ng-select>
                                     </div>
                                 </div>

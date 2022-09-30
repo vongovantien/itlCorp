@@ -8,7 +8,7 @@ import _uniq from 'lodash/uniq';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
-
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
     selector: 'soa-add-charge-popup',
@@ -63,6 +63,10 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     commodity: any = null;
     commodityGroup: any[] = [];
 
+    form: FormGroup;
+    type: AbstractControl;
+    obh : AbstractControl;
+
     constructor(
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -91,10 +95,12 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
-
-        // this.selectedType = this.types;
-        // this.selectedOBH = this.obhs;
+        // this.selectedCDNote.creditDebitNo = "Choose Debit/Credit Note";
+        // this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
+        this.selectedType = this.form.controls['type'].value;
+        this.selectedOBH = this.form.controls['obh'].value;
         this.selectedInSOA = this.inSOAs[1].value;
+
     }
 
     ngOnChanges() {
@@ -120,7 +126,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedInSOA = this.inSOAs[1];
 
     }
-
     setSortBy(sort?: string, order?: boolean): void {
         this.sort = sort ? sort : 'code';
         this.order = order;
@@ -178,8 +183,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
 
     updateDefaultValue(dataSearch: SOASearchCharge) {
-        this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0];
-        this.selectedOBH = this.obhs.filter((i: any) => i.id === dataSearch.isOBH)[0];
+        this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0].id;
+        this.selectedOBH = this.obhs.filter((i: any) => i.id === dataSearch.isOBH)[0].id;
 
         if (dataSearch.serviceTypeId === '') {
             this.configCharge.dataSource = this.charges;

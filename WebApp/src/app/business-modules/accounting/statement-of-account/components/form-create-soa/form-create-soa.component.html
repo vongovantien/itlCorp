@@ -51,7 +51,7 @@
                             Date Mode
                         </label>
                         <ng-select [(ngModel)]="selectedDateMode" class="custom" [items]="dateModes" bindLabel="title"
-                            bindValue="value" (onchange)="onSelectDataFormInfo($event , 'date-mode')"
+                            bindValue="value" (change)="onSelectDataFormInfo($event , 'date-mode')"
                             [clearable]="false">
                         </ng-select>
                     </div>
@@ -64,7 +64,7 @@
                             Type
                         </label>
                         <ng-select [(ngModel)]="selectedType" class="custom" [items]="types" bindLabel="title"
-                            bindValue="value" (onchange)="onSelectDataFormInfo($event , 'type')" [clearable]="false">
+                            bindValue="value" (change)="onSelectDataFormInfo($event , 'type')" [clearable]="false">
                         </ng-select>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                         </label>
                         <ng-select [(ngModel)]="selectedCurrency" class="custom" [items]="currencyList"
                             [disabled]="this.selectedType === this.types[0].value" bindLabel="id" bindValue="id"
-                            (onchange)="onSelectDataFormInfo($event , 'currency')" [clearable]="false">
+                            (change)="onSelectDataFormInfo($event , 'currency')" [clearable]="false">
                         </ng-select>
                     </div>
                 </div>
