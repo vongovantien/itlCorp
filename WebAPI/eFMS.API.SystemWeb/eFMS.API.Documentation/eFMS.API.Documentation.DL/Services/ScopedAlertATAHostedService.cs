@@ -33,7 +33,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 int hourCurrent = 25 - DateTime.Now.Hour;
                 int numerOfHours = hourCurrent;
-                if(numerOfHours == 24)
+                if(hourCurrent == 24)
                 {
                     using (var scope = services.CreateScope())
                     {
