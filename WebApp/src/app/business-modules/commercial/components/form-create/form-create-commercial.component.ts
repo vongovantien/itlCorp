@@ -1,14 +1,15 @@
-import { Component, OnInit, Input, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { takeUntil } from 'rxjs/operators';
 
-import { AppForm } from 'src/app/app.form';
-import { CatalogueRepo } from '@repositories';
-import { CountryModel, ProviceModel, Partner } from '@models';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { CountryModel, Partner, ProviceModel } from '@models';
+import { CatalogueRepo } from '@repositories';
+import { AppForm } from 'src/app/app.form';
 
 import { Observable } from 'rxjs';
-import { shareReplay, catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, shareReplay } from 'rxjs/operators';
 
 @Component({
     selector: 'form-create-commercial',
@@ -66,6 +67,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     provinceShippingIdName: string;
     partnerId: string = '';
     active: boolean = false;
+    inforCompany: Partner;
     //
     @ViewChild('focusInput') internalReferenceRef: ElementRef;
 
@@ -333,4 +335,24 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.partnerLocationString.emit(value);
     }
 
+    getInforCompanyByTaxCode(taxCode: string) {
+        this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: Partner) => {
+                    if (!!res) {
+                        this.inforCompany = res;
+                        this.setValueInforCompany();
+                    }
+                }
+            );
+    }
+
+    setValueInforCompany() {
+        this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
+        this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
+        this.formGroup.controls['addressVn'].setValue(this.inforCompany.addressVn);
+        this.formGroup.controls['addressEn'].setValue(this.inforCompany.addressEn);
+        this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
+        this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
+    }
 }

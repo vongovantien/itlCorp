@@ -1,16 +1,16 @@
-import { Component, ViewChild, Output, EventEmitter, Input, ElementRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { JobConstants, SystemConstants } from '@constants';
+import { Store } from '@ngrx/store';
+import { GetCatalogueBankAction, getCatalogueBankState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { Observable } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { Bank, CountryModel, Partner, ProviceModel } from 'src/app/shared/models';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
-import { SalemanPopupComponent } from '../saleman-popup.component';
-import { Partner, CountryModel, ProviceModel, Bank } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
-import { JobConstants, SystemConstants } from '@constants';
-import { Observable } from 'rxjs';
-import { GetCatalogueBankAction, getCatalogueBankState, getMenuUserSpecialPermissionState, IAppState } from '@store';
-import { Store } from '@ngrx/store';
+import { SalemanPopupComponent } from '../saleman-popup.component';
 
 @Component({
     selector: 'form-add-partner',
@@ -125,7 +125,7 @@ export class FormAddPartnerComponent extends AppForm {
         { field: 'bankNameEn', label: 'Bank Name EN' },
     ];
     bankCode: AbstractControl;
-
+    inforCompany: Partner;
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -173,7 +173,7 @@ export class FormAddPartnerComponent extends AppForm {
                     } else {
                         // check partnerGroup existed yet.
                         const checkExistAll = [...this.partnerGroup.value].filter(e => e.id === 'ALL');
-                        // 
+                        //
                         if (checkExistAll.length <= 0) {
                             // don't anything at here
                         } else {
@@ -607,5 +607,24 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
+    getInforCompanyByTaxCode(taxCode: string) {
+        this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: Partner) => {
+                    if (!!res) {
+                        this.inforCompany = res;
+                        this.setValueInforCompany();
+                    }
+                }
+            );
+    }
 
+    setValueInforCompany() {
+        this.partnerForm.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
+        this.partnerForm.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
+        this.partnerForm.controls['addressVn'].setValue(this.inforCompany.addressVn);
+        this.partnerForm.controls['addressEn'].setValue(this.inforCompany.addressEn);
+        this.partnerForm.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
+        this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
+    }
 }

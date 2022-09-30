@@ -125,13 +125,13 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' }">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' && contractType.value !=='Prepaid'}">
                                         <label
-                                            *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee'"
-                                            required for="">Expired Date</label>
+                                            *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid'"
+                                            required for=""><strong>Expired Date</strong></label>
                                         <label
-                                            *ngIf="contractType.value === 'Cash' || contractType.value === 'Guarantee'"
-                                            for="">Expired Date</label>
+                                            *ngIf="contractType.value === 'Cash' || contractType.value === 'Guarantee' || contractType.value === 'Prepaid'"
+                                            for=""><strong>Expired Date</strong></label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
@@ -144,7 +144,8 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
-                                            <ng-container *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
+                                            <ng-container
+                                                *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
                                                 <span class="m-input-icon_clear"
                                                     (click)="resetFormControl('expiredDate')"><i
                                                         class="la la-times"></i></span>

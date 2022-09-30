@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AppList } from 'src/app/app.list';
@@ -6,21 +6,22 @@ import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { Customer, Contract } from '@models';
+import { ConfirmPopupComponent, Permission403PopupComponent, SearchOptionsComponent } from '@common';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { Contract, Customer } from '@models';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { CommonEnum } from '@enums';
-import { RoutingConstants, SystemConstants } from '@constants';
-import { Permission403PopupComponent, ConfirmPopupComponent, SearchOptionsComponent } from '@common';
 
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+
 import { Store } from '@ngrx/store';
-import { LoadListCustomer, SearchList } from './store/actions/customer.action';
-import { ICustomerState, getCustomerSearchParamsState, getCustomerListState, getCustomerLoadingState } from './store';
-import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
+import { Observable } from 'rxjs';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
+import { getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState, ICustomerState } from './store';
+import { LoadListCustomer, SearchList } from './store/actions/customer.action';
 
 
 @Component({

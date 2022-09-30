@@ -1,4 +1,4 @@
-import { InitProfitHBLAction, GetDetailHBLAction } from './../../store/actions/hbl.action';
+import { InitProfitHBLAction, GetDetailHBLAction, InitListHBLAction } from './../../store/actions/hbl.action';
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
@@ -84,7 +84,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                     if (param.serviceId) {
                         this.transactionType = param.serviceId;
                     }
-
+                    this._store.dispatch(new InitListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new GetListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
