@@ -45,10 +45,8 @@ export class FormAddUserComponent extends AppList {
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
     userRole: AbstractControl;
-    //
+    currentUser: any;
     selectedCompanyId: any;
-    infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims(); //Get info of current ser.
-    infoCurrentUserId: string = this.infoCurrentUser.id;
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -178,8 +176,8 @@ export class FormAddUserComponent extends AppList {
         ];
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((currentUser) => {
-                this.selectedCompanyId = currentUser.companyId;
+            .subscribe((res) => {
+                this.currentUser = res;
             });
     }
 
@@ -213,7 +211,7 @@ export class FormAddUserComponent extends AppList {
         this._oauthService.loadDiscoveryDocument().then((a) => {
             this._oauthService.tryLogin().then((b) => {
                 let header: HttpHeaders = new HttpHeaders({
-                    companyId: this.selectedCompanyId,
+                    companyId: this.currentUser.companyId,
                     userType: 'Super Admin',
                 });
                 const Username = user.username;
