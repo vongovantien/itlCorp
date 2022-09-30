@@ -28,6 +28,7 @@ namespace eFMS.API.Documentation.Controllers
             shippingInstructionService = service;
             currentUser = user;
         }
+
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
@@ -57,6 +58,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = shippingInstructionService.PreviewSISummary(model);
             return Ok(result);
         }
+        
         [HttpPost]
         [Route("PreviewFCLShippingInstruction")]
         public IActionResult PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)

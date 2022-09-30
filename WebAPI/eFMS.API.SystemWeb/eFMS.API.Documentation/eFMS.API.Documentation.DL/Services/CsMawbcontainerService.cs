@@ -740,8 +740,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<CsMawbcontainerModel> GetContainerListByJobId(Guid jobId)
         {
-            var houseBills = detailRepository.Get(x => x.JobId == jobId);
-
             IQueryable<CsMawbcontainerModel> resultList = (
                  from hbl in detailRepository.Get(x => x.JobId == jobId)
                  join cont in DataContext.Get() on hbl.Id equals cont.Hblid
