@@ -146,6 +146,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             description: form.value.description,
             deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
             status: form.value.status,
+            type: 'User'
         };
         this._operationRepo.updateStageToJob(body).pipe(
             takeUntil(this.ngUnsubscribe),
