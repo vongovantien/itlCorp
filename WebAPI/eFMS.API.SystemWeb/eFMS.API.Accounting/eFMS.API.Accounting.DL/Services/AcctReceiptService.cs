@@ -2869,9 +2869,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             } else
             {
-                query = query = query.And(x => x.Date.Value.Date >= DateTime.Now.Date);
+                query = query = query.And(x => x.Date.Value.Date <= DateTime.Now.Date);
             }
-
 
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
@@ -3142,9 +3141,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
             var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
+           
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
@@ -3208,6 +3205,10 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = new List<string> { se.Invoice.Id.ToString() },
                 ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo),
             });
+
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
@@ -3300,11 +3301,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return null;
             }
-            var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
-
+            var surcharges = surchargeRepository.Get();     
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
@@ -3367,8 +3364,12 @@ namespace eFMS.API.Accounting.DL.Services
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
                 RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList(),
                 ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo)
-
             });
+
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
