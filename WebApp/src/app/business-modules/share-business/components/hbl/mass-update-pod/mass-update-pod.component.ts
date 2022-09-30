@@ -39,7 +39,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
   proofOfDelievey: ProofOfDelivery = new ProofOfDelivery();
 
   ngOnInit() {
-    this.getHouseBills(this.jobId);
+    this.getHouseBills();
     this.formGroup = this._fb.group({
       deliveryPerson: [null, Validators.compose([
         Validators.required
@@ -55,12 +55,13 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     this.HAWBNo = this.formGroup.controls['HAWBNo'];
   }
 
-  getHouseBills(id: string) {
+  getHouseBills() {
+
     this._store.select(getHBLSState)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(
         (hbls: any[]) => {
-          if (hbls.length > 1) {
+          if (hbls.length >= 1) {
             this.housebillList = [new HouseBill({ id: 'All', hwbno: 'All' })];
             this.housebillList = this.housebillList.concat(hbls) || [];
           }
