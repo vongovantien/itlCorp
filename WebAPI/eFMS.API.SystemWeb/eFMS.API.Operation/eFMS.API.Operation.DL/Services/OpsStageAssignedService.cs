@@ -271,7 +271,7 @@ namespace eFMS.API.Operation.DL.Services
 
                 results.Add(assignedItem);
             }
-            return results;
+            return results.OrderBy(x=>x.Deadline).ToList();
         }
     }
 }
