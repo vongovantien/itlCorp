@@ -493,6 +493,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE;
                 break;
             case AccountingConstants.RECEIPT_CLASS.COLLECT_OBH:
+            case AccountingConstants.RECEIPT_CLASS.COLLECT_OBH_OTHER:
                 otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.COLLECT_OBH;
                 break;
             case AccountingConstants.RECEIPT_CLASS.PAY_OBH:
