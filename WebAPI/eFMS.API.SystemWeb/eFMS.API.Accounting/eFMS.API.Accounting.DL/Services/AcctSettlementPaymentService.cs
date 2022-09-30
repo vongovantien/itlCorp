@@ -1884,6 +1884,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
                 entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
+                entity.BankAccountName = entity.BankName = null;
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -1912,7 +1913,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
                             }
                         }
-
+                        settlement.BankAccountName = model.Settlement.BankAccountName;
+                        settlement.BankName = model.Settlement.BankName;
                         hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
                     }
