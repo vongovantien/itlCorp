@@ -381,7 +381,7 @@ export class SystemRepo {
     }
 
     getPermissionSample(id: string) {
-        /* 
+        /*
         * Create id = null
         * Detail id = GUID
         */
@@ -737,6 +737,5 @@ export class SystemRepo {
             )
             .pipe(map((data: any) => data));
     }
-
 }
 

@@ -56,18 +56,16 @@ namespace eFMS.API.Documentation.DL.Common
     public static class TermData
     {
 
-        public const string Finish = "Finish";
-        public const string Reopen = "Reopen";
-
         public const string OpsTransaction = "OpsTransaction";
         public const string CsTransaction = "CsTransaction";
 
+        public const string Finish = "Finish";
+        public const string Reopen = "Reopen";
 
         public static readonly string FinishCode = "FINISHED";
         public static readonly string ReopenCode = "REOPEN";
 
         public static readonly string Canceled = "Canceled";
-
         public static readonly string InSchedule = "InSchedule";
         public static readonly string Processing = "Processing";
         public static readonly string Done = "Done";

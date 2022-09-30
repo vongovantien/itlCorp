@@ -289,6 +289,15 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.ReasonReject = soaCurrent.ReasonReject;
                 soa.ExcRateUsdToLocal = soa.ExcRateUsdToLocal != null ? soa.ExcRateUsdToLocal : soaCurrent.ExcRateUsdToLocal;
                 soa.NetOff = soaCurrent.NetOff;
+                if (string.IsNullOrEmpty(model.CreatorShipment))
+                {
+                    soa.CreatorShipment = model.CreatorShipment;
+                }
+                else
+                {
+                    var _creatorShipment = (soaCurrent.CreatorShipment + ";" + model.CreatorShipment)?.Trim().Split(new Char[] { ',', ';' }).Distinct();
+                    soa.CreatorShipment = (_creatorShipment == null || _creatorShipment.Count() == 0) ? null : string.Join(',', _creatorShipment);
+                }
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
