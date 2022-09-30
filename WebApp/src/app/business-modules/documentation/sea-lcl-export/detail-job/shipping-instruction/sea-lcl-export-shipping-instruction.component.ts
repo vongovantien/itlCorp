@@ -1,29 +1,26 @@
-import { Component, Input, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { Component, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { ActivatedRoute } from '@angular/router';
+import { AppList } from 'src/app/app.list';
 
 import { ReportPreviewComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
-import { CsTransaction, CsShippingInstruction } from '@models';
 import { SystemConstants } from '@constants';
+import { CsShippingInstruction, CsTransaction } from '@models';
+import { DocumentationRepo } from '@repositories';
 
-import {
-    ShareBussinessBillInstructionHousebillsSeaExportComponent,
-    TransactionActions,
-    TransactionGetDetailAction,
-    getTransactionPermission,
-    getTransactionLocked,
-    getTransactionDetailCsTransactionState
-} from '@share-bussiness';
 import { delayTime } from '@decorators';
 import { ICrystalReport } from '@interfaces';
+import {
+    getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission, ShareBussinessBillInstructionHousebillsSeaExportComponent,
+    TransactionActions,
+    TransactionGetDetailAction
+} from '@share-bussiness';
 import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
-import { catchError, finalize, takeUntil, take, pluck, concatMap } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 import { forkJoin } from 'rxjs';
+import { catchError, concatMap, finalize, pluck, take, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
@@ -57,7 +54,8 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     return forkJoin([
                         this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }),
-                        this._documentRepo.getShippingInstruction(jobId)
+                        this._documentRepo.getShippingInstruction(jobId),
+                        this._documentRepo.getContainerListByJobId(jobId),
                     ]);
                 })
             ).subscribe(
@@ -67,7 +65,9 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                             this.billDetail.housebills = this.houseBills = res[0] || [];
                         }
                         this.displayPreview = !!res[1];
+                        this.containerList = res[2];
                         this.setDataBillInstructionComponent(res[1]);
+
                     }
                 }
             );
@@ -117,6 +117,9 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             let gw = 0;
             let volumn = 0;
             let goodsDescription = '';
+            let shippingMark = '';
+            let packagesNote = '';
+
             this.houseBills.forEach(x => {
                 gw += x.gw;
                 volumn += x.cbm;
@@ -136,29 +139,21 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                 }
             });
 
-            let shippingMark = '';
-            let packagesNote: string | Number = 0;
-            this.getListContainersOfJob();
-            if (this.containerList.length === 0 && this.billSIComponent.type === 'lcl') {
-                this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => packagesNote += s.packageQty)
+            if (this.containerList.length === 0) {
+                console.log(this.houseBills)
+                this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => packagesNote += s.packageQty + " " + s.packageTypeName + "\n");
             }
             else {
                 packagesNote = this.getPackages(lstPackages);
             }
-            this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ")
+
+            this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ");
             this.billSIComponent.shippingInstruction.shippingMark = shippingMark.trim();
-            this.billSIComponent.shippingInstruction.packagesType = this.houseBills[0].packageType || "";
-            this.billSIComponent.shippingInstruction.packagesNote = packagesNote.toString() || ""
+            this.billSIComponent.shippingInstruction.packagesType = this.houseBills.length !== 0 && this.houseBills[0].packageType != null ? this.houseBills[0].packageType : "";
+            this.billSIComponent.shippingInstruction.packagesNote = packagesNote
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
             this.billSIComponent.shippingInstruction.goodsDescription = goodsDescription;
-            // this.setFormRefresh({
-            //     containerSealNo: "",
-            //     containerNote: "A PART Of CONTAINER",
-            //     packagesNote: packages,
-            //     grossWeight: gw,
-            //     volume: volumn,
-            // });
         }
     }
 
@@ -356,17 +351,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
                     }
                 },
             );
-    }
-
-    getListContainersOfJob() {
-        this._documentRepo.getListContainersOfJob({ mblid: this.jobId }).pipe(
-        ).subscribe(
-            (res: any) => {
-                if (!!res) {
-                    this.containerList = res;
-                }
-            }
-        );
     }
 
     @delayTime(1000)

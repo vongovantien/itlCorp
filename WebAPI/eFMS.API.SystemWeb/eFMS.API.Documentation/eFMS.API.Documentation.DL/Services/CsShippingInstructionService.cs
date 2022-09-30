@@ -95,7 +95,6 @@ namespace eFMS.API.Documentation.DL.Services
             result.PodName = places?.FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
             result.ActualShipperName = partners?.FirstOrDefault(x => x.Id == result.ActualShipperId)?.PartnerNameEn;
             result.ActualConsigneeName = partners?.FirstOrDefault(x => x.Id == result.ActualConsigneeId)?.PartnerNameEn;
-            result.PackagesNote = jobDetail.TransactionType == "SLE" && listCont.Any() == false ? transDetail.Sum(x => x.PackageQty).ToString() : result.PackagesNote;
 
             return result;
         }
@@ -219,11 +218,6 @@ namespace eFMS.API.Documentation.DL.Services
                 string jobNo = opsTrans?.JobNo;
                 var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
                 string Tel = GetTelPersonalIncharge(id);
-
-                var listCont = csMawbcontainerService.GetContainerListByJobId(model.JobId);
-                var shippingMarkSI = model.CsTransactionDetails.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Any() ? string.Join(" ", model.CsTransactionDetails.Select(x => x.ShippingMark)) : null;
-                var packagesType = model.CsTransactionDetails?.FirstOrDefault()?.PackageType;
-                var totalCont = listCont.Any() ? String.Join("\n", listCont.Select(x => x.Quantity + "x" + x.ContainerTypeName + " CONT")) : DocumentConstants.NO_CONTAINER;
 
                 var parameter = new SeaShippingInstructionParameter
                 {
@@ -516,11 +510,6 @@ namespace eFMS.API.Documentation.DL.Services
             var total = 0;
             int totalPackage = 0;
             string noPieces = string.Empty;
-            var listCont = csMawbcontainerService.GetContainerListByJobId(jobId);
-            var shippingMarkSI = housebills.Where(x => x.ShippingMark != null && x.ShippingMark != String.Empty).Any() ? string.Join(" ", housebills.Select(x => x.ShippingMark)) : null;
-            var packagesType = housebills?.FirstOrDefault()?.PackageType;
-            var totalCont = listCont.Any() ? String.Join("\n", listCont.Select(x => x.Quantity + "x" + x.ContainerTypeName + " CONT")) : DocumentConstants.NO_CONTAINER;
-
             foreach (var item in housebills)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
