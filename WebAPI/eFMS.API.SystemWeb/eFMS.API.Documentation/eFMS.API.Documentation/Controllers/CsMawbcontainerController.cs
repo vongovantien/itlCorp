@@ -157,7 +157,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UploadFile")]
-        public IActionResult UploadFileContainer(IFormFile uploadedFile, [Required]Guid id, bool isHouseBill = false)
+        public IActionResult UploadFileContainer(IFormFile uploadedFile, [Required] Guid id, bool isHouseBill = false)
         {
             Guid? hblid = null;
             Guid? mblid = null;
@@ -214,7 +214,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UploadGoodsFile")]
-        public IActionResult UploadGoodsFile(IFormFile uploadedFile, [Required]Guid id, bool isHouseBill = false)
+        public IActionResult UploadGoodsFile(IFormFile uploadedFile, [Required] Guid id, bool isHouseBill = false)
         {
             Guid? hblid = null;
             Guid? mblid = null;
@@ -258,6 +258,14 @@ namespace eFMS.API.Documentation.Controllers
                 return Ok(results);
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+
+        [HttpPost]
+        [Route("GetContainerListByJobId/{jobId}")]
+        public IActionResult GetContainerListByJobId(Guid jobId)
+        {
+            return Ok(csContainerService.GetContainerListByJobId(jobId));
         }
     }
 }

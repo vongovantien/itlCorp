@@ -857,6 +857,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var res = from detail in query.Select(s => s.detail)
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                      join catUnit in catUnitRepo.Get() on detail.PackageType equals catUnit.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
                       join shipper in catPartnerRepo.Get() on detail.ShipperId equals shipper.Id into shippers
@@ -956,7 +957,8 @@ namespace eFMS.API.Documentation.DL.Services
                           WareHouseAnDate = detail.WareHouseAnDate,
                           OfficeId = detail.OfficeId,
                           CompanyId = detail.CompanyId,
-                          TransactionType = tran.TransactionType
+                          TransactionType = tran.TransactionType,
+                          PackageTypeName = catUnit.Code,
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();

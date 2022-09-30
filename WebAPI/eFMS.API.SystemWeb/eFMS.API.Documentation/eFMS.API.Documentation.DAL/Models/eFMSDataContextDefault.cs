@@ -899,7 +899,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.BalanceAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.BankAccountName).HasMaxLength(150);
+                entity.Property(e => e.BankAccountName).HasMaxLength(250);
 
                 entity.Property(e => e.BankAccountNo).HasMaxLength(150);
 
@@ -907,7 +907,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.BankName).HasMaxLength(150);
+                entity.Property(e => e.BankName).HasMaxLength(250);
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
@@ -3127,6 +3127,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);
 
+                entity.Property(e => e.ShippingMark).HasMaxLength(500);
+
                 entity.Property(e => e.Supplier).HasMaxLength(250);
 
                 entity.Property(e => e.UserCreated)
@@ -3899,6 +3901,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.StageId).HasColumnName("StageID");
 
                 entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
