@@ -281,6 +281,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.emailAddress = this.formGroup.controls['emailAddress'];
         this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
         this.paymentTermObh = this.formGroup.controls['paymentTermObh'];
+        this.paymentTerm = this.formGroup.controls['paymentTerm'];
     }
 
     initDataForm() {
@@ -724,7 +725,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             shipmentType: this.selectedContract.shipmentType,
             emailAddress: this.selectedContract.emailAddress,
             firstShipmentDate: !!this.selectedContract.firstShipmentDate ? { startDate: new Date(this.selectedContract.firstShipmentDate), endDate: new Date(this.selectedContract.firstShipmentDate) } : null,
-            paymentTermObh: this.selectedContract.paymentTermObh
+            paymentTermObh: this.selectedContract.paymentTermObh,
         });
         this.contractTypeDetail = this.selectedContract.contractType;
 
