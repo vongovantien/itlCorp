@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -89,4 +89,5 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
     gotoList() {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}`]);
     }
+
 }
