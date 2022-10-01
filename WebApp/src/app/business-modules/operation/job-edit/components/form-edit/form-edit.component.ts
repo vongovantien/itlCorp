@@ -338,7 +338,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':    
+            case 'fieldOps':
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -399,10 +399,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
-    
-    getSalesmanList(data: any){
-        this.shipmentType.setValue(data); 
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+
+    getSalesmanList(data: any) {
+        this.shipmentType.setValue(data);
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
@@ -423,7 +423,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                         this.salemansId.setValue(null);
                     }
                 }
-            );          
+            );
     }
 }
 export interface ILinkAirSeaInfoModel {
