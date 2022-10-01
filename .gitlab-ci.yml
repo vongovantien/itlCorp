@@ -33,7 +33,7 @@ build_uat:
     - npm run build:uat:en
     - echo "end job_build"
   only:
-    - dev
+    - feature-itl
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
