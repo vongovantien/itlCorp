@@ -29,11 +29,13 @@ namespace eFMS.API.Documentation.DL.Services
         private async Task DoWork(CancellationToken stoppingToken)
         {
             logger.LogInformation("Alert Service Hosted Service is working.");
+            new LogHelper("ScopedAlertATAHostedService", "WORKING\n");
             while (!stoppingToken.IsCancellationRequested)
             {
                 int hourCurrent = 25 - DateTime.Now.Hour;
                 int numerOfHours = hourCurrent;
-                if(hourCurrent == 24)
+                new LogHelper("ScopedAlertATAHostedService", "hourCurrent: " + numerOfHours);
+                if (hourCurrent == 24)
                 {
                     using (var scope = services.CreateScope())
                     {
