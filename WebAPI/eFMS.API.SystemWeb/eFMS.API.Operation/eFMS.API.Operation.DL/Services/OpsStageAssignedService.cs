@@ -52,7 +52,7 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
             int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
-
+            assignedItem.Type = model.Type == "User" ? "User":"System" ;
             DataContext.Add(assignedItem, false);
             if(model.IsUseReplicate)
             {
@@ -271,7 +271,7 @@ namespace eFMS.API.Operation.DL.Services
 
                 results.Add(assignedItem);
             }
-            return results;
+            return results.OrderBy(x=>x.Deadline).ToList();
         }
     }
 }

@@ -154,7 +154,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
-                _cCode = currentUser.FirstOrDefault(x => x.Type == "CompanyCode").Value;
+                _cCode = currentUser.FirstOrDefault(x => x.Type == "companyCode").Value;
                 return _cCode;
             }
             set
@@ -168,7 +168,7 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
-                _oCode = currentUser.FirstOrDefault(x => x.Type == "OfficeCode").Value;
+                _oCode = currentUser.FirstOrDefault(x => x.Type == "officeCode").Value;
                 return _oCode;
             }
             set

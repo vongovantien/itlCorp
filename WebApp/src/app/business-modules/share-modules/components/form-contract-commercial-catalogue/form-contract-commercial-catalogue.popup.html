@@ -277,6 +277,32 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mb-5">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !emailAddress.valid}">
+                                <label>Email Address</label>
+                                <input type="text" class="form-control" formControlName="emailAddress">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="">First Shipment Date</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input (datesUpdated)="onUpdateEffectiveDate($event)" type="text"
+                                        class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                        name="daterange" [autoApply]="true" formControlName="firstShipmentDate"
+                                        readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <ng-container>
                         <div class="row"
                             *ngIf=" isUpdate ||  (!isUpdate && (contractType.value ==='Official' || contractType.value ==='Trial'))">
@@ -354,20 +380,24 @@
                             <ng-container
                                 *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
-                                            autoFormatCurrency class="form-control" formControlName="paymentTerm">
+                                        <input type="number" min="0" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                        'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
+                                            class="form-control" formControlName="paymentTerm">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="form-group">
-                                        <label>Base On</label>
-                                        <ng-select [items]="basesOn" [clearable]="false" class="custom"
-                                            [readonly]="contractType.value === 'Guarantee'" formControlName="baseOn"
-                                            placeholder="Please select">
-                                        </ng-select>
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTermObh.valid }">
+                                        <label>Payment Term OBH</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                            'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
+                                                class="form-control" formControlName="paymentTermObh">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -379,12 +409,21 @@
                                             formControlName="creditLimit">
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Credit Limited Rate</label>
                                         <input min="0"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             type="number" class="form-control" formControlName="creditLimitRate">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Base On</label>
+                                        <ng-select [items]="basesOn" [clearable]="false" class="custom"
+                                            [readonly]="contractType.value === 'Guarantee'" formControlName="baseOn"
+                                            placeholder="Please select">
+                                        </ng-select>
                                     </div>
                                 </div>
                             </ng-container>
@@ -545,22 +584,35 @@
                             <span> Request Approval </span>
                         </span>
                     </button>
+
                     <button (click)="onARConfirmed()"
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
+                        *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)   "
                         class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-check"></i>
                             <span> AR Confirmed </span>
                         </span>
                     </button>
-                    <button (click)="activeInactiveContract(selectedContract.id)"
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-check-square-o"></i>
-                            <span> Active </span>
-                        </span>
-                    </button>
+                    <ng-container
+                        *ngIf="currentUser?.userType === 'Super Admin' || contractType.value ==='Cash' || contractType.value ==='Guarantee' || selectedContract?.arconfirmed === true">
+                        <button (click)="activeInactiveContract(selectedContract.id)"
+                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-check-square-o"></i>
+                                <span> Active </span>
+                            </span>
+                        </button>
+                        <button (click)="activeInactiveContract(selectedContract.id)"
+                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                            class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
+                            <span>
+                                <i class="la la-remove"></i>
+                                <span> Inactive </span>
+                            </span>
+                        </button>
+                    </ng-container>
+
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
@@ -570,14 +622,6 @@
                             <span>
                                 Reject
                             </span>
-                        </span>
-                    </button>
-                    <button (click)="activeInactiveContract(selectedContract.id)"
-                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
-                        <span>
-                            <i class="la la-remove"></i>
-                            <span> Inactive </span>
                         </span>
                     </button>
                 </ng-container>

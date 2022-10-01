@@ -63,11 +63,13 @@
                     <tr
                         *ngFor="let stage of stages | filter : keyword : ['orderNumberProcessed','mainPersonInCharge','stageCode','stageNameEN','description','departmentName','status','processTime','deadline','doneDate']; let i = index; trackBy: trackByFn">
                         <td class="table-actions-col no-sorting">
-                            <button (click)="getDetail(stage.id)" type="button" appLoadingButton
-                                [state]="!!data && data.isLocked"
-                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
-                                <i class="la la-edit"></i>
-                            </button>
+                            <span *ngIf="stage.type==='User'">
+                                <button (click)="getDetail(stage.id)" type="button" appLoadingButton
+                                    [state]="!!data && data.isLocked"
+                                    class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
+                                    <i class="la la-edit"></i>
+                                </button>
+                            </span>
                             <!-- <button type="button" *ngIf="!!data && !data.isLocked"
                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove"
                                 (click)="showDeletePopup(stage)">

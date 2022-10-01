@@ -3146,6 +3146,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (it.VATRate > 0)
                     {
                         it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
+                        
                     }
                     else
                     {

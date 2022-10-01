@@ -31,6 +31,8 @@ export class CsTransaction extends BaseModel {
     warehouseId: string = null;
     podName: string = null;
     deliveryPlace: string = null;
+    finalPod: string = null;
+    finalPodName: string = null;
     paymentTerm: string = null;
     flightVesselName: string = null;
     voyNo: string = null;
@@ -107,6 +109,7 @@ export class CsTransaction extends BaseModel {
     noProfit: boolean = false;
     polDescription: string = null;
     podDescription: string = null;
+    finalDestinationPlace: string = null;
 
     replicatedId: string = null;
     isLinkFee: boolean = false;
