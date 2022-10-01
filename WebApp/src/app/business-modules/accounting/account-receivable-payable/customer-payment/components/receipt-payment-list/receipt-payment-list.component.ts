@@ -179,6 +179,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.calculateCreditAmount(data);
                 }
             )
+
+        this._actionStoreSubject
+            .pipe(
+                filter(x => x.type === ReceiptActionTypes.SELECT_AGREEMENT),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (agreement: any) => {
+                    if (!!agreement) {
+                        this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
+                        this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
+                    }
+                }
+            )
     }
 
     calculateCreditAmount(credits: ReceiptInvoiceModel[]) {
@@ -222,8 +236,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                         if (!this.currencyId.value) {
                             this.currencyId.setValue(agreement.creditCurrency);
                         }
-                        this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
-                        this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
+                        //this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
+                        //this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
                     }
                 }
             );
