@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>, ICsStageAssignedService 
+    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, OpsStageAssignedModel>, ICsStageAssignedService 
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CsTransaction> csTransRepository;
