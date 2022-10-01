@@ -8,14 +8,14 @@ import { Container } from '@models';
 import { DataService } from '@services';
 import { ChargeConstants, RoutingConstants } from '@constants';
 
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
 import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-create-house-bill.component';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import { InfoPopupComponent } from '@common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -174,11 +174,24 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     updateHbl(body: any) {
         body.transactionType = ChargeConstants.SLI_CODE;
-        this._documentationRepo.updateHbl(body)
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(body);
+                    })
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);

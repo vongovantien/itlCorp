@@ -228,11 +228,24 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     updateHbl(body: any) {
-        this._documentationRepo.updateHbl(body)
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(body);
+                    })
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
