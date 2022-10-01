@@ -4,8 +4,7 @@
             <app-menu-preview-hbl-sea-import [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-import>
 
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf=" (permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'">
-            </app-default-button>
+                *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>

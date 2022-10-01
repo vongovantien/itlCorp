@@ -25,7 +25,7 @@
 
             <ng-container *ngIf="(isLocked | async) === false">
                 <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
-                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete && shipmentDetail.currentStatus !== 'Finish'">
+                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete  ">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -69,12 +69,26 @@
                                         <div class="col-lg-8">
                                             <div class="form-group">
                                                 <div class="float-right">
-                                                    <ng-container *ngIf="(isLocked | async) === false">
-                                                        <app-permission-button title="Add New House Bill"
-                                                            (onClick)="gotoCreate()"
-                                                            *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate && shipmentDetail.currentStatus !== 'Finish'">
-                                                        </app-permission-button>
-                                                    </ng-container>
+                                                    <div class="c-button-actions">
+                                                        <ng-container *ngIf="(houseBills.length>0  )">
+                                                            <button type="button"
+                                                                class="btn btn-primary  m-btn--icon m-btn--uppercase"
+                                                                (click)="showMassUpdatePOD()">
+                                                                <span>
+                                                                    <i class="la la-refresh"></i>
+                                                                    <span>
+                                                                        Mass Update POD
+                                                                    </span>
+                                                                </span>
+                                                            </button>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="(isLocked | async) === false">
+                                                            <app-permission-button title="Add New House Bill"
+                                                                (onClick)="gotoCreate()"
+                                                                *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate  ">
+                                                            </app-permission-button>
+                                                        </ng-container>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,7 +114,7 @@
                                                                 </app-permission-button>
                                                                 <ng-container *ngIf="(isLocked | async) === false">
                                                                     <ng-container
-                                                                        *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate && shipmentDetail.currentStatus !== 'Finish'">
+                                                                        *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                                         <app-permission-button
                                                                             (onClick)="showDeletePopup(house, $event,i)"
                                                                             type="delete">
@@ -214,3 +228,4 @@
 
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
 <permission-403-popup></permission-403-popup>
+<app-mass-update-pod [jobId]="jobId"></app-mass-update-pod>

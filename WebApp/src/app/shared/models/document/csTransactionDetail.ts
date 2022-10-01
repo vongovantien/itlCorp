@@ -32,6 +32,8 @@ export class CsTransactionDetail {
     pod: string = null;
     polDescription: string = null;
     podDescription: string = null;
+    finalPod: string = null;
+    finalPodName: string = null;
     deliveryPlace: string = null;
     finalDestinationPlace: string = null;
     coloaderId: string = null;
