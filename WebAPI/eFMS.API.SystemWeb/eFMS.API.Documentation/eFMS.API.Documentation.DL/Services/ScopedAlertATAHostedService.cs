@@ -11,9 +11,9 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class ScopedAlertATDHostedService : BackgroundService
     {
-        public IServiceScopeFactory services { get; }
+        public IServiceProvider services { get; }
         private readonly ILogger<IScopedProcessingAlertATDService> logger;
-        public ScopedAlertATDHostedService(IServiceScopeFactory _service, ILogger<IScopedProcessingAlertATDService> _log)
+        public ScopedAlertATDHostedService(IServiceProvider _service, ILogger<IScopedProcessingAlertATDService> _log)
         {
             services = _service;
             logger = _log;
@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
             new LogHelper("ScopedAlertATAHostedService", "WORKING\n");
             while (!stoppingToken.IsCancellationRequested)
             {
+                new LogHelper("ScopedAlertATAHostedService", "now is: " + DateTime.Now.Hour);
                 int hourCurrent = 25 - DateTime.Now.Hour;
                 int numerOfHours = hourCurrent;
                 new LogHelper("ScopedAlertATAHostedService", "hourCurrent: " + numerOfHours);
@@ -47,7 +48,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     numerOfHours = 24;
                 }
-                await Task.Delay(TimeSpan.FromHours(numerOfHours), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(numerOfHours));
             }
         }
 
