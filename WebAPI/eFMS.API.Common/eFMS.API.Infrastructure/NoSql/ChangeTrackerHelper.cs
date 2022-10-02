@@ -50,10 +50,10 @@ namespace eFMS.API.Infrastructure.NoSql
                                     NewValue = currentValue
                                 };
                                 changedProperties.Add(addObject);
-                                userModified = prop.GetValueBy("UserModified");
                             }
                         }
-                        if (changedProperties != null)
+                        userModified = change.Entity.GetValueBy("UserModified");
+                        if (changedProperties.Count > 0)
                         {
                             var log = new ItemLog { Id = Guid.NewGuid(),
                                 PrimaryKeyValue = change.OriginalValues[primaryKey.Name].ToString(),
