@@ -12,12 +12,12 @@ import { DataService } from '@services';
 import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { InfoPopupComponent } from '@common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -169,11 +169,24 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         const deliveryDate = {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
-        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+                    })
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);

@@ -12,9 +12,10 @@ import { ChargeConstants } from '@constants';
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
+import { catchError, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-consol-export',
@@ -133,16 +134,34 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                tap(() => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+                            .pipe(
+                                tap(() => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            )
-            .subscribe(
+                )
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);

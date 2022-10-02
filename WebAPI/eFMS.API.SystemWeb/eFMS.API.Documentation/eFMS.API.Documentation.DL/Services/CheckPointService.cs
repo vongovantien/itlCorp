@@ -278,7 +278,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
                     HblId = partner.HblId ?? Guid.Empty,
                     TransactionType = criteria.TransactionType,
-                    CheckPointType = criteria.Type,
+                    type = criteria.Type,
                     SettlementCode = criteria.SettlementCode,
                 };
                 var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
@@ -301,6 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return result;
             }
+            CHECK_POINT_TYPE checkPointType = criteria.type;
             if (criteria.HblId == Guid.Empty)
             {
                 contract = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
@@ -308,16 +309,22 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                if (criteria.TransactionType == "CL")
+                if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
-                    currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
-                    contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
-                }
-                else
+                    currentSaleman = criteria.SalesmanId;
+                } else
                 {
-                    currentSaleman = csTransactionDetail.First(x => x.Id == criteria.HblId)?.SaleManId;
-                    contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
+                    if (criteria.TransactionType == "CL")
+                    {
+                        currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
+                    }
+                    else
+                    {
+                        currentSaleman = csTransactionDetail.First(x => x.Id == criteria.HblId)?.SaleManId;
+                    }
                 }
+
+                contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
             }
 
             if (currentSaleman == salemanBOD)
@@ -332,7 +339,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             int errorCode = -1;
-            CHECK_POINT_TYPE checkPointType = criteria.CheckPointType;
             switch (contract.ContractType)
             {
                 case "Cash":

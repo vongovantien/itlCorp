@@ -2636,7 +2636,7 @@ namespace eFMS.API.Documentation.DL.Services
                     PartnerId = hbl.CustomerId,
                     HblId = hbl.Id,
                     TransactionType = "DOC",
-                    CheckPointType = CHECK_POINT_TYPE.PREVIEW_HBL
+                    type = CHECK_POINT_TYPE.PREVIEW_HBL
                 };
                 HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
                 result.Add(new { hbl, ErrorMessage = hs.Message?.ToString() });
