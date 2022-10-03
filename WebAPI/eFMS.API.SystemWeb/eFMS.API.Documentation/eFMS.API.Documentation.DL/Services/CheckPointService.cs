@@ -421,7 +421,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else isValid = true;
                     break;
                 case "Prepaid":
-                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL || checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                     {
                         isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
                     } else
