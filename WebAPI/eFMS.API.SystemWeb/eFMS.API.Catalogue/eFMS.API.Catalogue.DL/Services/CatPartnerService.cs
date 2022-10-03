@@ -517,7 +517,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Body
             var body = new StringBuilder(emailTemplate.Body);
             string urlToSend = UrlClone.Replace("Catalogue", "");
-            body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
+            body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE) ? "Accountant Team" : "AR Team");
             body.Replace("{{title}}", title);
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{accountNo}}", partner.AccountNo);
