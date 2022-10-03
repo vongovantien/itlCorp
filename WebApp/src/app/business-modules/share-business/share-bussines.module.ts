@@ -75,6 +75,7 @@ import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attac
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareBusinessProofOfDelieveyComponent } from './components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { ShareModulesModule } from '../share-modules/share-modules.module';
+import { ShareBussinessMassUpdatePodComponent } from './components/hbl/mass-update-pod/mass-update-pod.component';
 
 
 
@@ -124,7 +125,8 @@ const COMPONENTS = [
     ShareBussinessInputDailyExportPopupComponent,
     ShareBussinessPaymentMethodPopupComponent,
     ShareBussinessJobDetailButtonListComponent,
-    ShareBusinessProofOfDelieveyComponent
+    ShareBusinessProofOfDelieveyComponent,
+    ShareBussinessMassUpdatePodComponent,
 ];
 
 
@@ -143,7 +145,7 @@ const customCurrencyMaskConfig = {
 
 @NgModule({
     declarations: [
-        ...COMPONENTS
+        ...COMPONENTS,
     ],
     imports: [
         CommonModule,

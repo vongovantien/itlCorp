@@ -1,3 +1,4 @@
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
@@ -9,7 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
@@ -64,6 +65,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialCreditLimit: AbstractControl;
     autoExtendDays: AbstractControl;
     noDue: AbstractControl;
+    emailAddress: AbstractControl;
+    paymentTermObh: AbstractControl;
+    paymentTerm: AbstractControl;
+    firstShipmentDate: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -154,6 +159,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+            if (!!res) {
+                this.currentUser = res;
+            }
+        })
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -218,7 +228,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialExpiredDate: [],
             trialCreditLimit: [],
             trialCreditDays: [],
-            paymentTerm: [],
+            paymentTerm: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(365)
+            ])],
             baseOn: [null],
             creditLimit: [],
             creditLimitRate: [],
@@ -235,9 +248,16 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditUnlimited: [],
             autoExtendDays: [],
             noDue: [],
-            shipmentType: []
+            shipmentType: [],
+            emailAddress: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.EMAIL),
+            ])],
+            firstShipmentDate: [null],
+            paymentTermObh: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(365)
+            ])]
         });
-        // this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
         this.officeId = this.formGroup.controls['officeId'];
         this.effectiveDate = this.formGroup.controls['effectiveDate'];
@@ -258,6 +278,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
         this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
         this.noDue = this.formGroup.controls['noDue'];
+        this.emailAddress = this.formGroup.controls['emailAddress'];
+        this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
+        this.paymentTermObh = this.formGroup.controls['paymentTermObh'];
+        this.paymentTerm = this.formGroup.controls['paymentTerm'];
     }
 
     initDataForm() {
@@ -276,6 +300,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 },
             );
+        console.log(this.users)
     }
 
     getCompanies() {
@@ -435,7 +460,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     checkSubmitData() {
         if ((this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) ||
-            (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
+            (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
@@ -457,7 +482,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         return true;
     }
 
+
     onSubmit(isRequestApproval: boolean = false) {
+        console.log(this.isSubmitted);
         this.setError(this.vas);
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
@@ -579,7 +606,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.selectedContract.fileList = this.fileList;
                 this.onRequest.emit(this.selectedContract);
             }
-
         }
     }
 
@@ -696,14 +722,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditCurrency: this.selectedContract.creditCurrency,
             autoExtendDays: this.selectedContract.autoExtendDays,
             noDue: this.selectedContract.noDue,
-            shipmentType: this.selectedContract.shipmentType
+            shipmentType: this.selectedContract.shipmentType,
+            emailAddress: this.selectedContract.emailAddress,
+            firstShipmentDate: !!this.selectedContract.firstShipmentDate ? { startDate: new Date(this.selectedContract.firstShipmentDate), endDate: new Date(this.selectedContract.firstShipmentDate) } : null,
+            paymentTermObh: this.selectedContract.paymentTermObh,
         });
         this.contractTypeDetail = this.selectedContract.contractType;
-        if (this.selectedContract.contractType === 'Trial') {
-            this.isDisabledExpiredDateField = true;
-        } else {
-            this.isDisabledExpiredDateField = false;
-        }
 
         this.formatAutoExtendDays();
     }
@@ -791,6 +815,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.salesOfficeId = this.selectedSalesmanData?.userOfficeId;
         this.selectedContract.salesCompanyId = this.selectedSalesmanData?.userCompanyId;
         this.selectedContract.shipmentType = this.formGroup.controls['shipmentType'].value;
+        this.selectedContract.emailAddress = this.formGroup.controls['emailAddress'].value;
+        this.selectedContract.firstShipmentDate = !!this.firstShipmentDate.value && this.firstShipmentDate.value.startDate ? formatDate(this.firstShipmentDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
     }
 
     onSubmitActiveContract() {
@@ -824,8 +851,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         else {
             this.processActiveInActiveContract(id);
         }
-
-
     }
 
     onSalesmanCreditRequest($event: any) {
@@ -932,7 +957,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     selectedAgreementType($event: any) {
         switch ($event) {
             case 'Trial':
-                this.isDisabledExpiredDateField = true;
                 if (!!this.effectiveDate.value.startDate) {
                     this.expiredDate.setValue({
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
@@ -993,6 +1017,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
+                        this.selectedContract.arconfirmed = false;
+                        this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error('something went wrong!');
                     }
@@ -1062,6 +1088,4 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
             );
     }
-
-
 }

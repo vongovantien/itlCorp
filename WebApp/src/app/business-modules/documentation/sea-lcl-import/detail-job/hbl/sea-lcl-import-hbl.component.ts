@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -33,6 +33,8 @@ export class SeaLCLImportHBLComponent extends AppShareHBLBase implements OnInit 
     ) {
         super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
     }
+
+
     configHBL() {
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
@@ -88,4 +90,5 @@ export class SeaLCLImportHBLComponent extends AppShareHBLBase implements OnInit 
                 break;
         }
     }
+
 }

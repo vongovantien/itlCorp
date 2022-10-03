@@ -47,7 +47,7 @@
                 </ul>
             </div>
 
-            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'" [buttonSetting]="saveButtonSetting"
+            <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate" [buttonSetting]="saveButtonSetting"
                 (onClick)="showCreatepoup()">
             </app-default-button>
 
@@ -61,6 +61,7 @@
         <tabset class="custom-class-tab">
             <tab heading="HAWB Detail" (selectTab)="onSelectTab('DETAIL')">
                 <air-import-hbl-form-create [isUpdate]="true"> </air-import-hbl-form-create>
+                <hbl-proof-of-delivery></hbl-proof-of-delivery>
             </tab>
             <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                 <arrival-note-air></arrival-note-air>
@@ -68,9 +69,9 @@
             <tab heading="Authorize Letter" (selectTab)="onSelectTab('AUTHORIZE')">
                 <hbl-delivery-order [isAir]="true"></hbl-delivery-order>
             </tab>
-            <tab heading="Proof Of Delivery" (selectTab)="onSelectTab('PROOF')">
+            <!-- <tab heading="Proof Of Delivery" (selectTab)="onSelectTab('PROOF')">
                 <hbl-proof-of-delivery></hbl-proof-of-delivery>
-            </tab>
+            </tab> -->
         </tabset>
     </div>
 </div>

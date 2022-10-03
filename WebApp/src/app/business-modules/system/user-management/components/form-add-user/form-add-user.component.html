@@ -207,7 +207,7 @@
                                             Password</button>
                                     </div>
                                     <div class="form-group m--align-right"
-                                        *ngIf="(currentUserType == 'Super Admin') && (infoCurrentUserId != SelectedUser.id)">
+                                        *ngIf="(currentUser?.userType === 'Super Admin') && (currentUser?.id !== SelectedUser.id)">
                                         <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
                                             (click)="switchUser(SelectedUser)">
                                             <span>

@@ -1,4 +1,4 @@
-import { InitProfitHBLAction, GetDetailHBLAction } from './../../store/actions/hbl.action';
+import { InitProfitHBLAction, GetDetailHBLAction, InitListHBLAction } from './../../store/actions/hbl.action';
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
@@ -18,6 +18,7 @@ import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
 import { RoutingConstants } from '@constants';
+import { ShareBussinessMassUpdatePodComponent } from './mass-update-pod/mass-update-pod.component';
 
 
 @Directive()
@@ -27,6 +28,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(ShareBussinessMassUpdatePodComponent) massUpdatePODComponent: ShareBussinessMassUpdatePodComponent;
 
     houseBills: HouseBill[] = [];
 
@@ -84,7 +86,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                     if (param.serviceId) {
                         this.transactionType = param.serviceId;
                     }
-
+                    this._store.dispatch(new InitListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new GetListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
@@ -412,7 +414,12 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
 
     public listenShortcutMovingTab(): void { }
 
-
+    showMassUpdatePOD() {
+        if (!!this.houseBills) {
+            this.massUpdatePODComponent.show();
+            console.log(this.houseBills);
+        }
+    }
 
 }
 

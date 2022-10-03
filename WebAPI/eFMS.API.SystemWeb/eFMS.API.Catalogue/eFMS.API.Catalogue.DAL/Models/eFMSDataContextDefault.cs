@@ -71,7 +71,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -544,11 +544,15 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.Description).HasColumnType("text");
-
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
+                entity.Property(e => e.EmailAddress)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
@@ -564,6 +568,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(20)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PaymentTermObh).HasColumnName("PaymentTermOBH");
 
                 entity.Property(e => e.SaleManId)
                     .HasMaxLength(50)
@@ -607,10 +613,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("VAS")
                     .HasMaxLength(100)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ShipmentType)
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCountry>(entity =>
@@ -2548,6 +2550,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Deadline).HasColumnType("datetime");
 
                 entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
