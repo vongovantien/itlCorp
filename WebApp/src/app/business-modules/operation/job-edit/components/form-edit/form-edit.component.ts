@@ -385,9 +385,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                             this._store.dispatch(new GetContainerSuccessAction(res.containers));
                         }
                     } else {
+                        this.shipmentNo = null;
                         this.shipmentInfo = null;
-                        this.opsTransaction.serviceNo = null;
-                        this.opsTransaction.serviceHblId = null;
                         this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                     }
                 });
