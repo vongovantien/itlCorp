@@ -8,7 +8,6 @@ import _uniq from 'lodash/uniq';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
     selector: 'soa-add-charge-popup',
@@ -63,10 +62,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     commodity: any = null;
     commodityGroup: any[] = [];
 
-    form: FormGroup;
-    type: AbstractControl;
-    obh : AbstractControl;
-
     constructor(
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -95,11 +90,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
-        // this.selectedCDNote.creditDebitNo = "Choose Debit/Credit Note";
-        // this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
-        this.selectedType = this.form.controls['type'].value;
-        this.selectedOBH = this.form.controls['obh'].value;
-        this.selectedInSOA = this.inSOAs[1].value;
+        this.selectedInSOA = false;
+
 
     }
 

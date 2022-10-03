@@ -30,8 +30,8 @@
                                 <label class="form-control-label">
                                     Debit/Credit Note
                                 </label>
-                                <ng-select class="custom" [(ngModel)]="selectedCDNote" name="selectedCDNote" [items]="cdNotes" placeholder="Choose Debit/Credit Note">
-                                    <ng-option [value]="null" [disabled]="true">Choose Debit/Credit Note</ng-option>
+                                <ng-select class="custom" [(ngModel)]="selectedCDNote" name="selectedCDNote" [items]="cdNotes" 
+                                bindLabel="jobId" bindValue="jobId" [clearable]="false" placeholder="Choose Debit/Credit Note">
                                 </ng-select>
                                 
                             </div>
@@ -66,7 +66,7 @@
                                             In SOA
                                         </label>
                                         <ng-select [(ngModel)]="selectedInSOA" name="selectedInSOA" class="custom" [items]="inSOAs"
-                                             bindLabel="text" bindValue="id" [clearable]="false">
+                                             selected="true" bindLabel="text" bindValue="id" [clearable]="false">
                                         </ng-select>
                                     </div>
                                 </div>
