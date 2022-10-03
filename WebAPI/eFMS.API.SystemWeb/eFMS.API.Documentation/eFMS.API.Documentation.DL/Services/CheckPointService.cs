@@ -192,19 +192,19 @@ namespace eFMS.API.Documentation.DL.Services
                 return false;
             }
 
-            var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
+            var hasIssuedDebit = surcharges.Any(x => !string.IsNullOrEmpty(x.DebitNo));
             if (hasIssuedDebit)
             {
                 return false;
             }
-            var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
-            var debitNotes = DC.AcctCdnote.Where(x => debitCodes.Contains(x.Code)
-                            && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE));
-            var hasConfirm = debitNotes.Any(x => x.Status != DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-            if (hasConfirm)
-            {
-                valid = false;
-            }
+            //var debitCodes = surcharges.GroupBy(x => x.DebitNo).Select(x => x.FirstOrDefault().DebitNo).ToList();
+            //var debitNotes = DC.AcctCdnote.Where(x => debitCodes.Contains(x.Code)
+            //                && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE));
+            //var hasConfirm = debitNotes.Any(x => x.Status != DocumentConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+            //if (hasConfirm)
+            //{
+            //    valid = false;
+            //}
 
             return valid;
         }
@@ -297,6 +297,8 @@ namespace eFMS.API.Documentation.DL.Services
             string currentSaleman = string.Empty;
             CatPartner partner = catPartnerRepository.First(x => x.Id == criteria.PartnerId);
             CatContract contract;
+            int errorCode = -1;
+
             if (partner.PartnerMode == "Internal")
             {
                 return result;
@@ -311,7 +313,39 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
-                    currentSaleman = criteria.SalesmanId;
+                    if (criteria.TransactionType == "CL")
+                    {
+                        currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
+                    }
+                    else
+                    {
+                        currentSaleman = csTransactionDetail.First(x => x.Id == criteria.HblId)?.SaleManId;
+                    }
+
+                    if (currentSaleman == salemanBOD)
+                    {
+                        isValid = true;
+                        return result;
+                    }
+                    contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
+
+                    if (contract == null)
+                    {
+                        return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                    }
+
+                    if(contract.ContractType == "Prepaid")
+                    {
+                        isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
+                        if (!isValid)
+                        {
+                            return new HandleState((object)string.Format(@"Contract of {0} is Prepaid. Please issue Prepaid Debit and wait AR confirm",
+                            partner?.ShortName));
+                        }
+                    } else
+                    {
+                        currentSaleman = criteria.SalesmanId;
+                    }
                 } else
                 {
                     if (criteria.TransactionType == "CL")
@@ -338,7 +372,6 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
 
-            int errorCode = -1;
             switch (contract.ContractType)
             {
                 case "Cash":
