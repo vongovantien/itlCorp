@@ -11,7 +11,5 @@ namespace eFMS.API.Documentation.DL.Models
         public string ActualShipperName { get; set; }
         public string PolName { get; set; }
         public string PodName { get; set; }
-        public string ShippingMark { get; set; }
-        public short? PackagesType { get; set; }
     }
 }
