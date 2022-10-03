@@ -111,6 +111,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
     }
 
     calculateGoodInfo() {
+        console.log(this.houseBills)
         if (this.houseBills != null) {
             const lstPackages = [];
             let containerNotes = '';
@@ -119,6 +120,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             let goodsDescription = '';
             let shippingMark = '';
             let packagesNote = '';
+            let pnTemp = 0;
 
             this.houseBills.forEach(x => {
                 gw += x.gw;
@@ -140,8 +142,8 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             });
 
             if (this.containerList.length === 0) {
-                console.log(this.houseBills)
-                this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => packagesNote += s.packageQty + " " + s.packageTypeName + "\n");
+                this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => pnTemp += s.packageQty);
+                packagesNote = pnTemp.toString();
             }
             else {
                 packagesNote = this.getPackages(lstPackages);
@@ -149,7 +151,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
 
             this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ");
             this.billSIComponent.shippingInstruction.shippingMark = shippingMark.trim();
-            this.billSIComponent.shippingInstruction.packagesType = this.houseBills.length !== 0 && this.houseBills[0].packageType != null ? this.houseBills[0].packageType : "";
+            this.billSIComponent.shippingInstruction.packagesType = this.houseBills.length !== 0 && this.houseBills[0].packageTypeName != null ? this.houseBills[0].packageTypeName : "";
             this.billSIComponent.shippingInstruction.packagesNote = packagesNote
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
