@@ -743,12 +743,12 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsMawbcontainerModel> resultList = (
                  from hbl in detailRepository.Get(x => x.JobId == jobId)
                  join cont in DataContext.Get() on hbl.Id equals cont.Hblid
-                 join catType in catUnitRepository.Get() on cont.ContainerTypeId equals catType.Id
+                 join catUnit in catUnitRepository.Get() on cont.PackageTypeId equals catUnit.Id
                  select new CsMawbcontainerModel
                  {
                      Id = cont.Id,
-                     ContainerTypeId = cont.ContainerTypeId,
-                     ContainerTypeName = catType.UnitNameEn,
+                     PackageTypeId = cont.PackageTypeId,
+                     PackageTypeName = catUnit.Code,
                      Quantity = cont.Quantity
                  }
                 );
