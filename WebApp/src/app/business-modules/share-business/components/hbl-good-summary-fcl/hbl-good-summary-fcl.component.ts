@@ -99,6 +99,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                             this.selectedPackage = res.packageType;
                             this.packageQty = res.packageQty;
                             this.containerDescription = res.contSealNo;
+                            this.containers = res.csMawbcontainers;
                         }
                     }
                 );
@@ -219,6 +220,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
         this.description = '';
         this.commodities = '';
+        // console.log(this.containers)
         this.updateData(this.containers);
     }
 
