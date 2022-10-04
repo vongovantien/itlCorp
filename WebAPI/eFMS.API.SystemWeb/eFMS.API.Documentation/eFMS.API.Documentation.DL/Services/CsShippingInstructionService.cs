@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -355,8 +356,6 @@ namespace eFMS.API.Documentation.DL.Services
                         Payment = model.PaymenType,
                         ShippingMarkImport = string.Empty,
                         MaskNos = string.Empty,
-                        ShippingMarkSI = model.ShippingMark,
-                        PKGType = model.PackagesType,
                     };
                     totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
@@ -603,7 +602,8 @@ namespace eFMS.API.Documentation.DL.Services
             int totalPackage = 0;
             string jobNo = opsTrans?.JobNo;
 
-            var listCont = csMawbcontainerService.GetContainerListByJobId(model.JobId);
+            var listCont = Enumerable.Empty<CsMawbcontainerModel>().AsQueryable();
+
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
@@ -612,6 +612,8 @@ namespace eFMS.API.Documentation.DL.Services
                 int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
                 totalPackage += (int)(totalPack ?? 0);
 
+                CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Hblid = item.Id};
+                listCont = listCont.Union(csMawbcontainerService.Query(criteria));
             }
 
             var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
