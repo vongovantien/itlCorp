@@ -27,7 +27,7 @@ namespace eFMS.API.System.DL.IService
         HandleState Import(List<SysUserViewModel> data);
         HandleState Delete(string id);
         IQueryable<SysUser> GetListUserWithPermission(string menuID, string action);
-
+        IQueryable<UserInfoViewModel> GetPersonInchargeByCurrentUser(int? groupId);
 
     }
 }

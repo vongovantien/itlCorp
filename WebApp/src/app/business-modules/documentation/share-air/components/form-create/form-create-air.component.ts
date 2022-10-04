@@ -24,7 +24,7 @@ import {
 } from '@share-bussiness';
 import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, shareReplay, catchError } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 
@@ -37,6 +37,7 @@ import _merge from 'lodash/merge';
 export class ShareAirServiceFormCreateComponent extends AppForm implements OnInit {
 
     @Input() type: string = 'import';
+    @Input() isDetail: boolean = false;
     @ViewChild(ShareAirServiceDIMVolumePopupComponent) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
 
     formGroup: FormGroup;
@@ -45,7 +46,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     mawb: AbstractControl;
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
-    personalIncharge: AbstractControl;
+    personIncharge: AbstractControl;
     isCheckedActive: boolean = false;
     coloaderId: AbstractControl; // * Airline/Coloader
     supplierName: string = null;
@@ -82,7 +83,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     ports: Observable<PortIndex[]>;
     units: Observable<Unit[]>;
     commodities: Observable<Commodity[]>;
-    listUsers: Observable<User[]>;
+    listUsers: any[] = [];
     warehouses: Warehouse[];
     incoterms: Observable<Incoterm[]>;
     // ? initWarehouses: Warehouse[];
@@ -114,7 +115,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     roundUp: string;
 
     currentFormValue: any;
-
+    defaultUserName: string = null;
 
     constructor(
         private _fb: FormBuilder,
@@ -165,7 +166,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this.units = this._store.select(getCatalogueUnitState);
         this.commodities = this._store.select(getCatalogueCommodityState);
 
-        this.listUsers = this._systemRepo.getSystemUsers();
+        //this.listUsers = this._systemRepo.getSystemUsers();
+
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR })
             .pipe(shareReplay());
         this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
@@ -181,9 +183,12 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [service] });
 
         this.initForm();
-        this.getUserLogged();
+        //this.getUserLogged();
         this.getAgents();
-
+        if (!this.isDetail) {
+            this.getPIC(null);
+            this.getUserLogged();
+        }
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -212,6 +217,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                             }
                         });
                         try {
+                            this.getPIC(res.groupId);
+                            this.getUserDefault(res.personIncharge, res.personInChargeName)
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
                             const formData = {
@@ -244,7 +251,6 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     initForm() {
         this.formGroup = this._fb.group({
             jobNo: [{ value: null, disabled: true }],
-            personIncharge: [],
             notes: [],
             mawb: ['', Validators.compose([
                 // Validators.required,
@@ -299,7 +305,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             noProfit: [false],
             incotermId: [null, Validators.required],
             ata: [],
-            atd: []
+            atd: [],
+            personIncharge: ['', Validators.compose([
+                Validators.required
+            ])],
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
 
         this.mawb = this.formGroup.controls["mawb"];
@@ -324,7 +333,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
         this.agentId = this.formGroup.controls["agentId"];
         this.warehouseId = this.formGroup.controls["warehouseId"];
-        this.personalIncharge = this.formGroup.controls["personIncharge"];
+        this.personIncharge = this.formGroup.controls["personIncharge"];
         //
         this.airlineInfo = this.formGroup.controls["airlineInfo"];
         this.ata = this.formGroup.controls["ata"];
@@ -367,13 +376,18 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
         this.handleValidatorChange();
     }
+    getUserDefault(id: string, userName: string) {
+        this.defaultUserName = userName;
+        this.personIncharge.setValue(id);
+        //this.personIncharge.disable();
+    }
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        console.log(this.userLogged);
 
-        this.personalIncharge.setValue(this.userLogged.id);
-        this.personalIncharge.disable();
+        this.personIncharge.setValue(this.userLogged.id);
+        //this.personIncharge.disable();
     }
-
     getAgents() {
         this.agents = this._store.select(getCatalogueAgentState).pipe(
             takeUntil(this.ngUnsubscribe)
@@ -428,6 +442,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 break;
             case 'warehouse':
                 this.warehouseId.setValue(data.id);
+                break;
+            case 'personIncharge':
+                this.defaultUserName = null;
+                this.personIncharge.setValue(data.id);
                 break;
             default:
                 break;
@@ -584,4 +602,18 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 this.formGroup.get('mawb').updateValueAndValidity();
             })
     }
+
+    getPIC(groupId: number) {
+        this._systemRepo.getPersonInchargeByCurrentUser(groupId, this.isDetail)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.listUsers = res;
+                    }
+                },
+            );
+    }
+
+
 }
