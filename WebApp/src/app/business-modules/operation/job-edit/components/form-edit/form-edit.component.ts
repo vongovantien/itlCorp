@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { takeUntil } from 'rxjs/operators';
 
 import { AppForm } from '@app';
-import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
-import { CommonEnum } from '@enums';
-import { FormValidators } from '@validators';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, DocumentationRepo, OperationRepo, SystemRepo } from '@repositories';
+import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { FormValidators } from '@validators';
 
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -104,6 +105,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _operationRepo: OperationRepo,
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
@@ -141,7 +143,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.warehouses = this._store.select(getCatalogueWarehouseState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
-
         this.containers = this._store.select(getContainerSaveState);
         this.initForm();
     }
@@ -338,7 +339,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':    
+            case 'fieldOps':
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -399,9 +400,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
-    
-    getSalesmanList(data: any){
-        this.shipmentType.setValue(data); 
+
+    getSalesmanList(data: any) {
+        this.shipmentType.setValue(data);
         this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
             .subscribe(
                 (res: any) => {
@@ -423,7 +424,46 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                         this.salemansId.setValue(null);
                     }
                 }
-            );          
+            );
+    }
+
+    setGoodsInForValue(res: CustomDeclaration[]) {
+        console.log(this.packageTypes)
+        let gw = 0;
+        let nw = 0;
+        let containerQty = 0;
+        let packagesQty = 0;
+        let sumCbm = 0;
+        console.log(res)
+        console.log(this.opsTransaction)
+        if (!!res) {
+            res.forEach(s => {
+                sumCbm += s.cbm;
+                nw += s.netWeight;
+                containerQty += s.qtyCont;
+                gw += s.grossWeight;
+                packagesQty += s.pcs;
+            });
+            this.formEdit.patchValue({
+                sumCbm: sumCbm,
+                sumNetWeight: nw,
+                sumContainers: containerQty,
+                sumPackages: packagesQty,
+                sumGrossWeight: gw,
+                packageTypeId: res[0].unitCode,
+            });
+        }
+    }
+
+    syncFromDeclaration() {
+        this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe(
+            (res: CustomDeclaration[]) => {
+                this.setGoodsInForValue(res)
+            }
+        );
     }
 }
 export interface ILinkAirSeaInfoModel {
