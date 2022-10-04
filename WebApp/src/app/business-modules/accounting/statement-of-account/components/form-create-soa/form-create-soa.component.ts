@@ -51,7 +51,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     saleMans: any[] = [];
     itlBOD: any = [];
     salemanDisplay: string = '';
-    
+
     dateModes: any[] = [];
     selectedDateMode: any = null;
 
@@ -111,6 +111,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCharge();
         this.getService();
         this.getCommondity();
+
+        this.selectedDateMode = this.dateModes[1].value;
+        this.selectedStaffType = this.staffTypes[0].value;
+        this.selectedObh = this.obhs[0].value;
+        this.selectedType = this.types[0].value;
+
     }
 
     getUserLevel() {
@@ -193,8 +199,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrencyData(data: any) {
-        this.currencyList = (data).map((item: any) => ({ id: item.id, text: item.id }));
-        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+        this.currencyList = (data || []);
+        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
         this.updateDataSearch('currency', this.selectedCurrency.id);
         this.updateDataSearch('currencyLocal', 'VND');
     }
@@ -341,8 +347,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('dateType', this.selectedDateMode.value);
                 break;
             case 'type':
-                this.selectedType = data;
-                this.updateDataSearch('type', this.selectedType.value);
+                this.selectedType = data.value;
+                this.updateDataSearch('type', this.selectedType);
                 this.getInfoAgreement();
                 break;
             case 'obh':
@@ -623,9 +629,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         }
                     }
                 );
-            }
-            else{
-                this.onSelectDataFormInfo(null, 'saleman');
-            }
+        }
+        else{
+            this.onSelectDataFormInfo(null, 'saleman');
+        }
     }
 }
