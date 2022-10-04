@@ -85,6 +85,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
                         this.containerDescription = res.contSealNo;
+                        this.containers = res.csMawbcontainers;
                     }
                 }
             );
@@ -198,5 +199,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {
         return `${!!contNo ? contNo : '_'}/${!!contType ? contType : '_'}/${!!sealNo ? sealNo : '_'} \n`;
+    }
+
+    onRefresh() {
+        this.confirmRefresh.hide();
+
+        this.description = '';
+        this.commodities = '';
+        // console.log(this.containers)
+        this.updateData(this.containers);
     }
 }
