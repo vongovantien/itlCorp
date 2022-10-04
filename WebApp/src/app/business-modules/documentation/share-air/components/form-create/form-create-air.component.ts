@@ -115,7 +115,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     roundUp: string;
 
     currentFormValue: any;
-    defaultUserName: string = '';
+    defaultUserName: string = null;
 
     constructor(
         private _fb: FormBuilder,

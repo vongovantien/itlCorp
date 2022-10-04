@@ -13,7 +13,7 @@ import { AppComboGridComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { DataService } from '@services';
 
-import { takeUntil, skip, distinctUntilChanged, shareReplay } from 'rxjs/operators';
+import { takeUntil, skip, distinctUntilChanged, shareReplay, catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../../share-business/store';
@@ -27,7 +27,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
     @ViewChild(InjectViewContainerRefDirective) private bookingNoteContainerRef: InjectViewContainerRefDirective;
     @Input() set type(t: string) { this._type = t; }
-
+    @Input() isDetail: boolean = false;
     get type() { return this._type; }
 
     private _type: string = ChargeConstants.SLI_CODE;
@@ -42,7 +42,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
     typeOfService: AbstractControl;
-    personalIncharge: AbstractControl;
+    personIncharge: AbstractControl;
     term: AbstractControl;
     incotermId: AbstractControl;
     serviceDate: AbstractControl;
@@ -59,12 +59,12 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     agentName: string = null;
 
     carries: Observable<Customer[]>;
-    agents: Observable<Customer[]>; 
+    agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
     csBookingNotes: csBookingNote[] = [];
     incoterms: Observable<Incoterm[]>;
-
+    defaultUserName: string = null;
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -115,12 +115,15 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         this.listUsers = this._systemRepo.getListSystemUser();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
 
-        this.getUserLogged();
+        //this.getUserLogged();
 
         if (this.type === ChargeConstants.SLE_CODE) {
             this.getBookingNotes();
         }
-
+        if (!this.isDetail) {
+            this.getPIC(null);
+            this.getUserLogged();
+        }
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
@@ -141,6 +144,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                     res.ata = null;
                                 }
                             });
+                            this.getPIC(res.groupId);
+                            this.getUserDefault(res.personIncharge, res.personInChargeName)
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
                             this.formGroup.patchValue({
@@ -218,6 +223,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             personalIncharge: [],  // * select
             incotermId: [],
             noProfit: [false],
+            personIncharge: ['', Validators.compose([
+                Validators.required
+            ])],
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formGroup.controls["etd"];
@@ -227,9 +235,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         this.shipmentType = this.formGroup.controls["shipmentType"];
         this.typeOfService = this.formGroup.controls["typeOfService"];
         this.term = this.formGroup.controls["term"];
-        this.personalIncharge = this.formGroup.controls["personalIncharge"];
+        //this.personalIncharge = this.formGroup.controls["personalIncharge"];
         this.serviceDate = this.formGroup.controls["serviceDate"];
-
+        this.personIncharge = this.formGroup.controls["personIncharge"];
 
         this.coloader = this.formGroup.controls["coloader"];
         this.pol = this.formGroup.controls["pol"];
@@ -262,12 +270,17 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             });
 
     }
-
+    getUserDefault(id: string, userName: string) {
+        this.defaultUserName = userName;
+        this.personIncharge.setValue(id);
+        //this.personIncharge.disable();
+    }
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        console.log(this.userLogged);
 
-        this.personalIncharge.setValue(this.userLogged.id);
-        this.personalIncharge.disable();
+        this.personIncharge.setValue(this.userLogged.id);
+        //this.personIncharge.disable();
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -287,6 +300,10 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             case 'agent':
                 this.agentName = data.shortName;
                 this.agent.setValue(data.id);
+                break;
+            case 'personIncharge':
+                this.defaultUserName = null;
+                this.personIncharge.setValue(data.id);
                 break;
             default:
                 break;
@@ -341,6 +358,17 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                     }
                 );
         }
+    }
+    getPIC(groupId: number) {
+        this._systemRepo.getPersonInchargeByCurrentUser(groupId, this.isDetail)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.listUsers = res;
+                    }
+                },
+            );
     }
 }
 

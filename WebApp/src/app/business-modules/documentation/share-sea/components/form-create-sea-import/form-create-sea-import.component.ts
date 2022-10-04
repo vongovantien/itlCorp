@@ -15,7 +15,7 @@ import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAct
 
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, shareReplay, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-form-create-sea-import',
@@ -27,6 +27,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     @Input() set service(s: string) {
         this._service = s;
     }
+    @Input() isDetail = false;
 
     get service() { return this._service; }
 
@@ -75,6 +76,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     fclImportDetail: CsTransaction;
 
     commonData: any;
+    defaultUserName: string = null;
 
     constructor(
         protected _documentRepo: DocumentationRepo,
@@ -102,7 +104,10 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.service == 'lcl' ? 'SLI' : this.service] });
 
         this.initForm();
-        this.getUserLogged();
+        if (!this.isDetail) {
+            this.getPIC(null);
+            this.getUserLogged();
+        }
 
         // * Subscribe state to update form.
         this._store.select(getTransactionDetailCsTransactionState)
@@ -123,6 +128,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                             }
                         });
                         try {
+                            this.getPIC(res.groupId);
+                            this.getUserDefault(res.personIncharge, res.personInChargeName)
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
 
@@ -256,7 +263,11 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                 }
             });
     }
-
+    getUserDefault(id: string, userName: string) {
+        this.defaultUserName = userName;
+        this.personIncharge.setValue(id);
+        //this.personIncharge.disable();
+    }
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
@@ -285,9 +296,24 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             case 'port-delivery':
                 this.deliveryPlace.setValue(data.id);
                 break;
+            case 'personIncharge':
+                this.defaultUserName = null;
+                this.personIncharge.setValue(data.id);
+                break;
             default:
                 break;
         }
+    }
+    getPIC(groupId: number) {
+        this._systemRepo.getPersonInchargeByCurrentUser(groupId, this.isDetail)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.listUsers = res;
+                    }
+                },
+            );
     }
 }
 

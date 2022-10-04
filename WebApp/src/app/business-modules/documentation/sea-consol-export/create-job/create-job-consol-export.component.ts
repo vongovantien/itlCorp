@@ -73,6 +73,7 @@ export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent i
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formGroup.getRawValue();
+        console.log(form);
 
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -81,7 +82,7 @@ export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent i
             ata: !!form.ata && !!form.ata.startDate ? formatDate(form.ata.startDate, 'yyyy-MM-dd', 'en') : null,
             atd: !!form.atd && !!form.atd.startDate ? formatDate(form.atd.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            personIncharge: form.personalIncharge,
+            //personIncharge: form.personalIncharge,
             agentId: form.agent,
             coloaderId: form.coloader,
             paymentTerm: form.term,
@@ -97,7 +98,7 @@ export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent i
             chargeWeight: this.shipmentGoodSummaryComponent.totalChargeWeight,
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
         };
-
+        console.log(formData);
         const seaConsolExportModel: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         seaConsolExportModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaConsolExport;
 
