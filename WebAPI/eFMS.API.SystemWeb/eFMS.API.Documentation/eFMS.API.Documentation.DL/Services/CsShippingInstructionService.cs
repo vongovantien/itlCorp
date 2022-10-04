@@ -260,7 +260,9 @@ namespace eFMS.API.Documentation.DL.Services
                         RateRequest = model.Remark,
                         Payment = model.PaymenType,
                         ShippingMarkImport = string.Empty,
-                        MaskNos = string.Empty
+                        MaskNos = string.Empty,
+                        PKGType = model.PackagesType,
+                        ShippingMarkSI = model.ShippingMark
                     };
                     instructions.Add(instruction);
                 }
@@ -356,6 +358,8 @@ namespace eFMS.API.Documentation.DL.Services
                         Payment = model.PaymenType,
                         ShippingMarkImport = string.Empty,
                         MaskNos = string.Empty,
+                        ShippingMarkSI = model.ShippingMark,
+                        PKGType = model.PackagesType
                     };
                     totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
@@ -545,7 +549,9 @@ namespace eFMS.API.Documentation.DL.Services
                     RateRequest = si.Remark,
                     Payment = si.PaymenType,
                     ShippingMarkImport = string.Empty,
-                    MaskNos = item.ContSealNo
+                    MaskNos = item.ContSealNo,
+                    PKGType = si.PaymenType,
+                    ShippingMarkSI =  si.ShippingMark
                 };
                 instructions.Add(instruction);
             }
@@ -729,7 +735,9 @@ namespace eFMS.API.Documentation.DL.Services
                 RateRequest = si.Remark,
                 Payment = si.PaymenType,
                 ShippingMarkImport = string.Empty,
-                MaskNos = si.ContainerSealNo
+                MaskNos = si.ContainerSealNo,
+                PKGType = si.PaymenType,
+                ShippingMarkSI = si.ShippingMark
             };
             instructions.Add(instruction);
             parameter.TotalPackages = totalPackage + " PKG(S)";

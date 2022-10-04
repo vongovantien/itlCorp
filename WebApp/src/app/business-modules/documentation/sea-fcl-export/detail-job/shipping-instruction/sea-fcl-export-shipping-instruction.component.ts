@@ -121,6 +121,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
             // let packages = '';
             let containerNotes = '';
             let contSealNos = '';
+            let shippingMark = '';
+            let packagesType = '';
             let gw = 0;
             let volumn = 0;
             this.houseBills.forEach(x => {
@@ -143,6 +145,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
                 }
             });
             const packages = this.getPackages(lstPackages);
+            this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ");
+            this.billSIComponent.shippingInstruction.shippingMark = shippingMark.trim();
+            this.billSIComponent.shippingInstruction.packagesType = this.houseBills.length !== 0 && this.houseBills[0].packageTypeName != null ? this.houseBills[0].packageTypeName : "";
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
             this.billSIComponent.shippingInstruction.packagesNote = packages;
