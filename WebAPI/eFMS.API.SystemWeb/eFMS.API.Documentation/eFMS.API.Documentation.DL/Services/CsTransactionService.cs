@@ -856,6 +856,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var check = csLinkChargeRepository.Get(x => x.JobNoLink == detail.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).FirstOrDefault();
                 detail.Permission.AllowDelete = check != null ? false : true;
             }
+            detail.PersonInChargeName = sysUserRepo.Get(x => x.Id == detail.PersonIncharge).FirstOrDefault().Username;
             return detail;
         }
 

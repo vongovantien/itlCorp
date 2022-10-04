@@ -55,6 +55,7 @@ export class CsTransaction extends BaseModel {
     datetimeModified: string = null;
     active: boolean = true;
     inactiveOn: string = null;
+    groupId: number = null;
 
     csMawbcontainers: Container[] = new Array<Container>();
     csTransactionDetails: CsTransactionDetail[] = new Array<CsTransactionDetail>();
