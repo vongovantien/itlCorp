@@ -198,7 +198,10 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             mbltype: [null],
             shipmentType: [this.shipmentTypes[0], Validators.required],
             typeOfService: [null, Validators.required],
-            personIncharge: [],
+            //personIncharge: [],
+            personIncharge: ['', Validators.compose([
+                Validators.required
+            ])],
             incotermId: [],
             notes: [],
             // * Combogrid.
@@ -272,7 +275,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.personIncharge.setValue(this.userLogged.id);
-        this.personIncharge.disable();
+        //this.personIncharge.disable();
     }
 
     onSelectDataFormInfo(data: any, key: string | any) {
