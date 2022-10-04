@@ -256,7 +256,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 salesmanId: this.opsTransaction.salemanId,
                 transactionType: 'CL',
                 type: 8,
-                HBL: this.opsTransaction.hblid
+                hblId: this.opsTransaction.hblid
             };
             this._documentRepo.validateCheckPointContractPartner(checkPoint)
                 .subscribe(
