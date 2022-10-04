@@ -181,7 +181,7 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!string.IsNullOrEmpty(receiptModel.PaymentRefNo))
             {
-                if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+                if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo, receiptModel.PaymentDate))
                 {
                     string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
                     var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
@@ -380,16 +380,29 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(acctReceiptService.CheckAllowPermissionAction(id, permissionRange));
         }
 
-        private bool ValidateReceiptNo(Guid Id, string receiptNo)
+        [HttpGet("CheckExistedReceiptNo")]
+        public IActionResult CheckExistedReceiptNo(Guid Id, string receiptNo, DateTime paymentDate)
+        {
+            var isExisted = ValidateReceiptNo(Id, receiptNo, paymentDate);
+            return Ok(!isExisted ? "Duplicated" : "not Duplicated");
+        }
+
+        private bool ValidateReceiptNo(Guid Id, string receiptNo, DateTime? paymentDate)
         {
             bool valid = true;
             if (Id == Guid.Empty)
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo 
+                && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
+                && x.PaymentDate.Value.Year == (paymentDate ?? DateTime.Now).Year
+                );
             }
             else
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo 
+                && x.Id != Id 
+                && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
+                && x.PaymentDate.Value.Year == (paymentDate ?? DateTime.Now).Year);
             }
 
             return valid;
@@ -501,7 +514,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (!ValidateReceiptNo(Id, model.PaymentRefNo))
+            if (!ValidateReceiptNo(Id, model.PaymentRefNo, model.PaymentDate))
             {
                 string mess = String.Format("Receipt {0} have existed", model.PaymentRefNo);
                 var _result = new { Status = false, Message = mess, Data = model, Code = 409 };
