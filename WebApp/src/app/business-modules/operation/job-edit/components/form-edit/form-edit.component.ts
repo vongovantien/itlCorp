@@ -428,15 +428,13 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     setGoodsInForValue(res: CustomDeclaration[]) {
-        console.log(this.packageTypes)
-        let gw = 0;
-        let nw = 0;
-        let containerQty = 0;
-        let packagesQty = 0;
-        let sumCbm = 0;
-        console.log(res)
-        console.log(this.opsTransaction)
         if (!!res) {
+            console.log(res);
+            let gw = 0;
+            let nw = 0;
+            let containerQty = 0;
+            let packagesQty = 0;
+            let sumCbm = 0;
             res.forEach(s => {
                 sumCbm += s.cbm;
                 nw += s.netWeight;
@@ -450,7 +448,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 sumContainers: containerQty,
                 sumPackages: packagesQty,
                 sumGrossWeight: gw,
-                packageTypeId: res[0].unitCode,
+                packageTypeId: res[0].unitCodeId,
             });
         }
     }
