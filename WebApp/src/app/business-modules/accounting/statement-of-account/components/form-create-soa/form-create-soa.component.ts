@@ -111,11 +111,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCharge();
         this.getService();
         this.getCommondity();
-
-        this.selectedDateMode = this.dateModes[1].value;
-        this.selectedStaffType = this.staffTypes[0].value;
-        this.selectedObh = this.obhs[0].value;
-        this.selectedType = this.types[0].value;
  
     }
 
@@ -299,27 +294,27 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'Service Date', value: 'ServiceDate' },
             //{ title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' }, //Bỏ ra [20/01/2021]
         ];
-        this.selectedDateMode = this.dateModes[1];
+        this.selectedDateMode = this.dateModes[1].value;
 
         this.types = [
             // { title: 'All', value: 'All' }, Đã confirm không cần type All [13/10/2020]
             { title: 'Debit', value: 'Debit' },
             { title: 'Credit', value: 'Credit' },
         ];
-        this.selectedType = this.types[0];
+        this.selectedType = this.types[0].value;
 
         this.obhs = [
             { title: 'Yes', value: true },
             { title: 'No', value: false }
         ];
-        this.selectedObh = this.obhs[0];
+        this.selectedObh = this.obhs[0].value;
 
         this.staffTypes = [
             { value: 'PersonInCharge', title: 'Person In Charge' },
             { value: 'Salesman', title: 'Salesman' },
             { value: 'Creator', title: 'Creator' }
         ];
-        this.selectedStaffType = this.staffTypes[0];
+        this.selectedStaffType = this.staffTypes[0].value;
 
         this.updateDataSearch('isOBH', this.selectedObh.value);
         this.updateDataSearch('dateType', this.selectedDateMode.value);
