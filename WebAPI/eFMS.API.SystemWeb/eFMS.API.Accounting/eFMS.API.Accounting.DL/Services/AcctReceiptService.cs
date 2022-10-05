@@ -507,7 +507,7 @@ namespace eFMS.API.Accounting.DL.Services
             Regex regex = new Regex(pattern);
 
             IQueryable<AcctReceipt> acctReceipts = DataContext.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) 
-            && regex.IsMatch(x.PaymentRefNo) && x.PaymentDate.Value.Month == receipt.PaymentDate.Value.Month).OrderByDescending(x => x.DatetimeCreated);
+            && regex.IsMatch(x.PaymentRefNo) && x.PaymentDate.Value.Month == receipt.PaymentDate.Value.Month && x.PaymentDate.Value.Year == receipt.PaymentDate.Value.Year).OrderByDescending(x => x.DatetimeCreated);
             if (acctReceipts.Count() > 0)
             {
                 // remove /MM
