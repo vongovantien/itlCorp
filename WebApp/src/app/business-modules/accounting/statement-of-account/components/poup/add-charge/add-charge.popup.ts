@@ -308,9 +308,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedShipment = {};
         this.selectedCDNote = null;
         this.selectedCharges = [];
-        this.selectedType = this.types[0];
-        this.selectedOBH = this.obhs[1];
-        this.selectedInSOA = false;
+        this.selectedType = this.types[0].id;
+        this.selectedOBH = this.obhs[1].id;
+        this.selectedInSOA = this.inSOAs[1].id;
 
         this.isCheckAllCharge = false;
 
