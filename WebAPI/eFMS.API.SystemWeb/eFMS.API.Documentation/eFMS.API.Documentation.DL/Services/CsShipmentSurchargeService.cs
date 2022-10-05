@@ -761,8 +761,10 @@ namespace eFMS.API.Documentation.DL.Services
                         if (surcharge.TransactionType == "CL")
                         {
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
-                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SyncedFrom)||!string.IsNullOrEmpty(surcharge.PaySyncedFrom)
-                            ||surcharge.AcctManagementId!=null||surcharge.PayerAcctManagementId!=null? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            //surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                            //|| surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            surcharge.ClearanceNo = (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                           || surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                         }
 
                         surcharge.IsRefundFee = item.IsRefundFee;
