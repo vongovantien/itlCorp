@@ -51,7 +51,7 @@
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
                             [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
                             <ng-container
-                                *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'; else tempEmpty">
+                                *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
                                     <div class="table-actions" *ngIf="allowSaving">
