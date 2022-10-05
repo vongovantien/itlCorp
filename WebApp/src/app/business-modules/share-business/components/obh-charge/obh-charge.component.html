@@ -50,7 +50,8 @@
                         <tr *ngFor="let charge of charges  | filter: keyword: ['receiverName','payerName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
                             [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
-                            <ng-container *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
+                            <ng-container
+                                *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'; else tempEmpty">
                                 <td class="table-actions-col fixed-side"
                                     *ngIf="(permissionShipments | async).allowUpdateCharge">
                                     <div class="table-actions" *ngIf="allowSaving">
@@ -78,6 +79,10 @@
                                     </div>
                                 </td>
                             </ng-container>
+                            <ng-template #tempEmpty>
+                                <td></td>
+                            </ng-template>
+
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown [tooltip]="charge.payerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.payerShortName ||charge.paymentObjectId === charge.payerId )}">

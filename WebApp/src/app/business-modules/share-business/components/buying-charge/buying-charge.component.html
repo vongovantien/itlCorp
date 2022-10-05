@@ -58,7 +58,8 @@
                             class="m-form m-form--state"
                             [ngClass]="!charge.isFromShipment ? 'bg-warning' : (charge.linkFee ? 'bg-green' : '')"
                             [contextMenu]="linkFeeContextMenu" (onTouch)="onSelectSurcharge(i,charge)">
-                            <ng-container *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'">
+                            <ng-container
+                                *ngIf="(isLocked | async) === false && shipment?.currentStatus !== 'Finish'; else tempEmpty">
                                 <td class="table-actions-col fixed-side" [ngClass]="charge.linkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge === true">
                                     <div class="table-actions" *ngIf="allowSaving">
@@ -83,6 +84,11 @@
                                     </div>
                                 </td>
                             </ng-container>
+
+                            <ng-template #tempEmpty>
+                                <td></td>
+                            </ng-template>
+
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" [ngClass]="{'m-form__group has-danger': isSubmitted &&
                                     !charge.partnerShortName
