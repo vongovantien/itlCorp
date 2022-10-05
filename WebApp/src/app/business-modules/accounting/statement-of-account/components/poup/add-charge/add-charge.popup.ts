@@ -90,7 +90,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
-        this.selectedInSOA = false;
+        // this.selectedInSOA = false;
 
 
     }
@@ -103,19 +103,19 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             { text: 'Debit', id: 1 },
             { text: 'Credit', id: 2 },
         ];
-        this.selectedType = this.types[0];
+        this.selectedType = this.types[0].id;
 
         this.obhs = [
             { text: 'Yes', id: true },
             { text: 'No', id: false }
         ];
-        this.selectedOBH = this.obhs[1];
+        this.selectedOBH = this.obhs[1].id;
 
         this.inSOAs = [
             { text: 'Yes', id: true },
             { text: 'No', id: false }
         ];
-        this.selectedInSOA = this.inSOAs[1];
+        this.selectedInSOA = this.inSOAs[1].id;
 
     }
     setSortBy(sort?: string, order?: boolean): void {
@@ -308,9 +308,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedShipment = {};
         this.selectedCDNote = null;
         this.selectedCharges = [];
-        this.selectedType = this.types[0];
-        this.selectedOBH = this.obhs[1];
-        this.selectedInSOA = false;
+        this.selectedType = this.types[0].id;
+        this.selectedOBH = this.obhs[1].id;
+        this.selectedInSOA = this.inSOAs[1].id;
 
         this.isCheckAllCharge = false;
 
