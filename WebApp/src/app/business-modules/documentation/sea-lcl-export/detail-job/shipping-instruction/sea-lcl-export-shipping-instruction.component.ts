@@ -145,12 +145,13 @@ export class SeaLclExportShippingInstructionComponent extends AppList implements
             if (this.containerList.length === 0) {
                 this.houseBills.filter(s => s.packageQty !== null && s.packageQty !== '').forEach(s => pnTemp += s.packageQty);
                 packagesNote = pnTemp.toString();
-                packagesType = this.houseBills[0].packageTypeName;
+                packagesType = this.houseBills.length !== 0 ? this.houseBills[0].packageTypeName : "";
             }
             else {
                 packagesNote = this.getPackages(lstPackages);
-                packagesType = this.containerList[0].packageTypeName;
+                packagesType = this.houseBills.length !== 0 ? this.containerList[0].packageTypeName : "";
             }
+
             this.houseBills.filter(s => s.shippingMark !== null && s.shippingMark !== '').forEach(s => shippingMark += s.shippingMark + " ");
             this.billSIComponent.shippingInstruction.shippingMark = shippingMark.trim();
             this.billSIComponent.shippingInstruction.packagesType = packagesType;
