@@ -118,7 +118,7 @@
                             Staff Type
                         </label>
                         <ng-select [(ngModel)]="selectedStaffType" class="custom" [items]="staffTypes" bindLabel="title"
-                            bindValue="value" (onchange)="onSelectDataFormInfo($event , 'staff-type')"
+                            bindValue="value" (change)="onSelectDataFormInfo($event , 'staff-type')"
                             [clearable]="false">
                         </ng-select>
                     </div>

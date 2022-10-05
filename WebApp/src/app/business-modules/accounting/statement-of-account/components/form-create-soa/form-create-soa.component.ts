@@ -116,7 +116,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.selectedStaffType = this.staffTypes[0].value;
         this.selectedObh = this.obhs[0].value;
         this.selectedType = this.types[0].value;
-
+ 
     }
 
     getUserLevel() {
@@ -343,8 +343,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('customerShipmentId', this.selectedCustomerShipment.value);
                 break;
             case 'date-mode':
-                this.selectedDateMode = data;
-                this.updateDataSearch('dateType', this.selectedDateMode.value);
+                this.selectedDateMode = data.value;
+                this.updateDataSearch('dateType', this.selectedDateMode);
                 break;
             case 'type':
                 this.selectedType = data.value;
@@ -352,16 +352,16 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.getInfoAgreement();
                 break;
             case 'obh':
-                this.selectedObh = data;
-                this.updateDataSearch('isOBH', this.selectedObh.value);
+                this.selectedObh = data.value;
+                this.updateDataSearch('isOBH', this.selectedObh);
                 break;
             case 'staff-style':
                 this.selectedStaffType = data;
                 this.updateDataSearch('staffType', this.selectedStaffType.value);
                 break;
             case 'currency':
-                this.selectedCurrency = data;
-                this.updateDataSearch('currency', this.selectedCurrency.id);
+                this.selectedCurrency = data.id;
+                this.updateDataSearch('currency', this.selectedCurrency);
                 break;
             case 'service':
                 // * reset selected charges & dataSource.
