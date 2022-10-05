@@ -134,7 +134,7 @@ namespace eFMS.API.Documentation.DL.Services
                 int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
                 totalPackage += (int)(totalPack ?? 0);
 
-                var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.Quantity) + x.Sum(c => c.ContainerTypeId));
+                var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
                 noPieces = string.Join(", ", packages);
 
                 CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Hblid = item.Id };
