@@ -124,10 +124,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             string jobNo = opsTrans?.JobNo;
             string noPieces = string.Empty;
-            var listCont = csMawbcontainerService.Get().Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
 
-            var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
-                
+            var listCont = Enumerable.Empty<CsMawbcontainerModel>().AsQueryable();
+  
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
@@ -137,6 +136,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.Quantity) + x.Sum(c => c.ContainerTypeId));
                 noPieces = string.Join(", ", packages);
+
+                CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Hblid = item.Id };
+                listCont = listCont.Union(csMawbcontainerService.Query(criteria));
 
                 var instruction = new SeaShippingInstruction
                 {
@@ -166,10 +168,17 @@ namespace eFMS.API.Documentation.DL.Services
                     MaskNos = item.ContSealNo,
                     ShippingMarkSI = model.ShippingMark,
                     PKGType = model.PackagesType,
-                    TotalCont = totalCont
                 };
                 instructions.Add(instruction);
             }
+
+            var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
+
+            foreach (var ins in instructions)
+            {
+                ins.TotalCont = totalCont;
+            }
+
             if (model.CsTransactionDetails.Count > 1)
             {
                 parameter.TotalPackages = totalPackage.ToString();// + " PKG(S)"; CR: 15585 [31/03/2021] 
@@ -207,16 +216,21 @@ namespace eFMS.API.Documentation.DL.Services
                 model.PolName = places?.FirstOrDefault(x => x.Id == model.Pol)?.NameEn;
                 model.PodName = places?.FirstOrDefault(x => x.Id == model.Pod)?.NameEn;
 
-                var Conts = csMawbcontainerService.Get();
-                var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
-                var totalCont = listConts.Any() ? String.Join("\n", listConts.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
-                if (!listConts.Any())
+                var listCont = Enumerable.Empty<CsMawbcontainerModel>().AsQueryable();;
+                foreach (var hbl in model.CsTransactionDetails)
                 {
-                    listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.JobId.ToString()).Contains(x.Mblid.ToString()));
+                    CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Hblid = hbl.Id };
+                    listCont = listCont.Union(csMawbcontainerService.Query(criteria));
                 }
 
-                if (!listConts.Any()) return null;
+                var totalCont = listCont.Any() ? String.Join("\n", listCont.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER; ;
+                if (!listCont.Any())
+                {
+                    CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Mblid = id };
+                    listCont = csMawbcontainerService.Query(criteria);
+                }
 
+                if (!listCont.Any()) return null;
 
                 Crystal result = new Crystal();
                 var instructions = new List<SeaShippingInstruction>();
@@ -236,7 +250,8 @@ namespace eFMS.API.Documentation.DL.Services
                     Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
-                foreach (var item in listConts)
+
+                foreach (var item in listCont)
                 {
                     var Contype = catUnitRepository.Get(x => x.Id == item.ContainerTypeId).Select(t => t.UnitNameEn)?.FirstOrDefault();
                     var PackageType = catUnitRepository.Get(x => x.Id == item.PackageTypeId).Select(t => t.UnitNameEn)?.FirstOrDefault();
@@ -272,7 +287,7 @@ namespace eFMS.API.Documentation.DL.Services
                     };
                     instructions.Add(instruction);
                 }
-                parameter.TotalPackages = listConts.Sum(t => t.PackageQuantity)?.ToString();//+ " PKG(S)"; CR: 15585 [31/03/2021]
+                parameter.TotalPackages = listCont.Sum(t => t.PackageQuantity)?.ToString();//+ " PKG(S)"; CR: 15585 [31/03/2021]
                 result = new Crystal
                 {
                     ReportName = "SeaShippingInstructionCont.rpt",
@@ -316,10 +331,16 @@ namespace eFMS.API.Documentation.DL.Services
                 model.PodName = places?.FirstOrDefault(x => x.Id == model.Pod)?.NameEn;
 
                 Crystal result = new Crystal();
-                var Conts = csMawbcontainerService.Get().Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
-                var listConts = Conts.GroupBy(x => x.PackageTypeId);
-                var totalCont = Conts.Any() ? String.Join("\n", Conts.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER;
+               
+                var conts = Enumerable.Empty<CsMawbcontainerModel>().AsQueryable(); ;
+                foreach (var hbl in model.CsTransactionDetails)
+                {
+                    CsMawbcontainerCriteria criteria = new CsMawbcontainerCriteria { Hblid = hbl.Id };
+                    conts = conts.Union(csMawbcontainerService.Query(criteria));
+                }
 
+                var listConts = conts.GroupBy(x => x.ContainerTypeId);
+                var totalCont = conts.Any() ? String.Join("\n", conts.GroupBy(x => x.ContainerTypeName).Select(x => x.Count() + "x" + x.Key + " CONT")) : DocumentConstants.NO_CONTAINER; ;
                 if (!listConts.Any()) return null;
 
                 var instructions = new List<SeaShippingInstruction>();
