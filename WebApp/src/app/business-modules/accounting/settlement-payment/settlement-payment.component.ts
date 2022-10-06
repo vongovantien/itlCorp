@@ -2,7 +2,7 @@ import { LoadListSettlePayment } from './components/store/actions/settlement-pay
 import { takeUntil, withLatestFrom, concatMap, switchAll } from 'rxjs/operators';
 import { getSettlementPaymentListState, getSettlementPaymentSearchParamsState, getSettlementPaymentListPagingState, getSettlementPaymentListLoadingState } from './components/store/reducers/index';
 import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
-import { Component, ViewChild, QueryList, ViewChildren } from '@angular/core';
+import { Component, ViewChild, QueryList, ViewChildren, TemplateRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
@@ -33,6 +33,7 @@ import { ContextMenuDirective } from '@directives';
 import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
 import { of, forkJoin } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -44,10 +45,13 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(SettlementPaymentsPopupComponent) settlementPaymentsPopup: SettlementPaymentsPopupComponent;
-
+    @ViewChild(InjectViewContainerRefDirective) public containerRef: InjectViewContainerRefDirective;
     @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @ViewChild(AccountingSelectAttachFilePopupComponent) selectAttachPopup: AccountingSelectAttachFilePopupComponent;
+    @ViewChild('modal_deny') templateModalDeny: TemplateRef<any>;
+
+    modalRef: BsModalRef;
 
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
@@ -58,6 +62,9 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     userLogged: User;
 
     settleSyncIds: any[] = [];
+    comment: string = '';
+
+    isSettles: boolean;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -67,6 +74,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         private _router: Router,
         private _exportRepo: ExportRepo,
         private _store: Store<IAppState>,
+        private _modalService: BsModalService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -570,13 +578,29 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             )
     }
 
+    showCommentPopup(isSettles: boolean) {
+        this.isSettles = isSettles;
+        this.modalRef = this._modalService.show(this.templateModalDeny, { backdrop: 'static' });
+    }
+
+    onConfirmDenied() {
+        if (this.isSettles === true) {
+            this.modalRef.hide();
+            this.denySettle();
+        } else {
+            this.modalRef.hide();
+            this.denySettleItem();
+        }
+    }
+
     onDenySettlePayments(settleIds: string[]) {
-        this._accoutingRepo.denySettlePayments(settleIds)
+        this._accoutingRepo.denySettlePayments(settleIds, this.comment)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success("Deny Successful");
                         this.requestSettlePaymentList();
+                        this.comment = null;
                     }
                 },
                 (error) => {

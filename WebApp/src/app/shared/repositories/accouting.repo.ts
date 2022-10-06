@@ -886,8 +886,8 @@ export class AccountingRepo {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/DenyAdvancePayments`, Ids);
     }
 
-    denySettlePayments(Ids: string[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
+    denySettlePayments(Ids: string[], comment: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments?comment=${comment}`, Ids);
     }
 
     getPartnerForSettlement(body: any = {}) {
