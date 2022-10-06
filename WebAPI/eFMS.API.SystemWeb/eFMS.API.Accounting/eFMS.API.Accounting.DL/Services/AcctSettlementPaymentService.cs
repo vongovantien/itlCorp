@@ -5274,10 +5274,6 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var settleNo = DataContext.Where(x => x.Id == Id).FirstOrDefault().SettlementNo;
                         var sendMailDeny = SendMailDeniedApproval(settleNo, null, DateTime.Now);
-                        if (!sendMailDeny)
-                        {
-                            return new HandleState("Send mail denied failed");
-                        }
                     }
                     return result;
                 }
