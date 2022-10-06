@@ -115,6 +115,7 @@ export class OperationRepo {
             map((data: any) => data)
         );
     }
+    
     getClearanceType() {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/GetClearanceTypes`)
             .pipe(
