@@ -5173,7 +5173,7 @@ namespace eFMS.API.Accounting.DL.Services
             return transactionType;
         }
 
-        public HandleState DenySettlePayments(List<Guid> Ids)
+        public HandleState DenySettlePayments(List<Guid> Ids,string comment)
         {
             HandleState result = new HandleState();
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -5205,7 +5205,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         approve.IsDeny = true;
                                         approve.UserModified = currentUser.UserID;
                                         approve.DateModified = DateTime.Now;
-
+                                        approve.Comment = comment;
                                         acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
 
@@ -5272,6 +5272,11 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     trans.Commit();
+                    foreach(Guid Id in Ids)
+                    {
+                        var settleNo = DataContext.Where(x => x.Id == Id).FirstOrDefault().SettlementNo;
+                        var sendMailDeny = SendMailDeniedApproval(settleNo, comment, DateTime.Now);
+                    }
                     return result;
                 }
                 catch (Exception ex)

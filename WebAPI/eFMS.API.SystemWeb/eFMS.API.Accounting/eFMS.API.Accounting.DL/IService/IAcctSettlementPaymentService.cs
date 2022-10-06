@@ -89,7 +89,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
 
-        HandleState DenySettlePayments(List<Guid> Ids);
+        HandleState DenySettlePayments(List<Guid> Ids,string comment);
 
         bool CheckValidateDeleteSettle(string settlementNo);
 
