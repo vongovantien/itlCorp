@@ -665,7 +665,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
                             item.ClearanceNo = (!string.IsNullOrEmpty(item.SyncedFrom) || !string.IsNullOrEmpty(item.PaySyncedFrom)
-                            || item.AcctManagementId != null || item.PayerAcctManagementId != null) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
+                            || item.AcctManagementId != null || item.PayerAcctManagementId != null||item.SettlementCode!=null) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
                     }
 
@@ -766,7 +766,7 @@ namespace eFMS.API.Documentation.DL.Services
                             //surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
                             //|| surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                             surcharge.ClearanceNo = (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
-                           || surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                           || surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null || surcharge.SettlementCode!=null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                         }
 
                         surcharge.IsRefundFee = item.IsRefundFee;
