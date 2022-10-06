@@ -55,7 +55,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
-
+    selectedSettle: SettlementPayment;
     shipments: SettleRequestsPayment[] = [];
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
@@ -545,11 +545,11 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     }
 
     denySettleItem() {
-        if (!this.selectedSettlement) {
+        if (!this.selectedSettle) {
             return;
         }
 
-        const currentSm: SettlementPayment = Object.assign({}, this.selectedSettlement);
+        const currentSm: SettlementPayment = Object.assign({}, this.selectedSettle);
         if (currentSm.statusApproval === 'Denied') {
             this._toastService.warning(`${currentSm.settlementNo} had denied, Please recheck!`);
             return;
@@ -580,10 +580,12 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     showCommentPopup(isSettles: boolean) {
         this.isSettles = isSettles;
+        console.log(this.selectedSettlement);
         this.modalRef = this._modalService.show(this.templateModalDeny, { backdrop: 'static' });
     }
 
     onConfirmDenied() {
+        console.log(this.selectedSettlement);
         if (this.isSettles === true) {
             this.modalRef.hide();
             this.denySettle();
@@ -611,7 +613,8 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     onSelectSM(sm: SettlementPayment) {
         this.selectedSettlement = sm;
-
+        this.selectedSettle = sm;
+        console.log(this.selectedSettlement);
         this.clearMenuContext(this.queryListMenuContext);
     }
 
