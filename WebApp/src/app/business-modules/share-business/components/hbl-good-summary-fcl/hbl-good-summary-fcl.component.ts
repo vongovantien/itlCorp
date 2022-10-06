@@ -4,7 +4,7 @@ import { Params, ActivatedRoute } from '@angular/router';
 
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { Unit } from 'src/app/shared/models';
+import { CsTransaction, Unit } from 'src/app/shared/models';
 
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -99,7 +99,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                             this.selectedPackage = res.packageType;
                             this.packageQty = res.packageQty;
                             this.containerDescription = res.contSealNo;
-                            this.containers = res.csMawbcontainers;
+                            // this.containers = res.csMawbcontainers;
                         }
                     }
                 );
@@ -116,13 +116,15 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description) {
+        if (!!this.description  && containers.length>0) {
+            this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!this.commodities) {
+        if (!!this.commodities && containers.length>0) {
+            this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -148,10 +150,9 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         // * Container
-        this.containerDetail = '';
-        this.containerDescription = '';
-
-        if (!!containers) {
+        if (this.containers.length>0) {
+            this.containerDetail = '';
+            this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
                 containerLst.forEach((c: Container) => {
@@ -186,6 +187,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
+        
     }
 
     initContainer() {
@@ -218,9 +220,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
     onRefresh() {
         this.confirmRefresh.hide();
 
-        this.description = '';
-        this.commodities = '';
-        // console.log(this.containers)
+        // this.description = '';
+        // this.commodities = '';
         this.updateData(this.containers);
     }
 
