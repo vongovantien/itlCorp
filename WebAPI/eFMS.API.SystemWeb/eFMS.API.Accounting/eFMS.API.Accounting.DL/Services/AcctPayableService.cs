@@ -610,7 +610,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (payableType == "OutRange")
                     {
                         var outRangePM = paymentGrp.Where(x => (DateTime.Parse(criteria.FromPaymentDate).Date > x.PaymentDate.Value.Date)).OrderByDescending(x => x.PaymentDate).ThenByDescending(x => x.PaymentDatetimeCreated).FirstOrDefault();
-                        if (outRangePM != null) // nếu có payment gần cận dưới from date thì lấy remain của payment đó
+                        if (outRangePM != null && outRangePM.OriginRemainAmount != null) // nếu có payment gần cận dưới from date thì lấy remain của payment đó
                         {
                             payable.BeginAmount = outRangePM.OriginRemainAmount;
                             payable.BeginAmountVND = outRangePM.RemainAmountVND;
@@ -696,7 +696,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (payableItm.FirstOrDefault().InRangeType == "OutRange")
                         {
                             var outRangePM = paymentGrp.Where(x => string.IsNullOrEmpty(x.pm.FirstOrDefault().PaymentNo) || (DateTime.Parse(criteria.FromPaymentDate).Date > x.pm.FirstOrDefault().PaymentDate.Value.Date)).OrderByDescending(x => x.pm.FirstOrDefault().PaymentDate).ThenByDescending(x => x.pm.FirstOrDefault().PaymentDatetimeCreated).FirstOrDefault();
-                            if (outRangePM != null)
+                            if (outRangePM != null && outRangePM.pm.FirstOrDefault()?.PaymentRemainAmount != null)
                             {
                                 detail.BeginAmount = outRangePM.pm.FirstOrDefault().PaymentRemainAmount;
                                 detail.BeginAmountVND = outRangePM.pm.FirstOrDefault().PaymentRemainAmountVnd;
@@ -704,7 +704,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            if (paymentGrp != null &&  paymentGrp.FirstOrDefault() != null)
+                            if (paymentGrp != null &&  paymentGrp.FirstOrDefault() != null && paymentGrp.FirstOrDefault().pm.FirstOrDefault()?.PaymentAmount != null)
                             {
                                 detail.OrgAmountGiam = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmount ?? 0));
                                 detail.OrgAmountGiamVND = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmountVnd ?? 0));
@@ -722,7 +722,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (payableItm.FirstOrDefault().InRangeType == "OutRange")
                         {
                             var outRangePM = paymentGrp.Where(x => string.IsNullOrEmpty(x.pm.FirstOrDefault().PaymentNo) || (DateTime.Parse(criteria.FromPaymentDate).Date > x.pm.FirstOrDefault().PaymentDate.Value.Date)).OrderByDescending(x => x.pm.FirstOrDefault().PaymentDate).ThenByDescending(x => x.pm.FirstOrDefault().PaymentDatetimeCreated).FirstOrDefault();
-                            if (outRangePM != null)
+                            if (outRangePM != null && outRangePM.pm.FirstOrDefault()?.PaymentRemainAmount != null)
                             {
                                 detail.BeginAmount = outRangePM.pm.FirstOrDefault().PaymentRemainAmount * (-1);
                                 detail.BeginAmountVND = outRangePM.pm.FirstOrDefault().PaymentRemainAmountVnd * (-1);
@@ -730,7 +730,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         else
                         {
-                            if (paymentGrp != null && paymentGrp.FirstOrDefault() != null)
+                            if (paymentGrp != null && paymentGrp.FirstOrDefault() != null && paymentGrp.FirstOrDefault().pm.FirstOrDefault()?.PaymentAmount != null)
                             {
                                 detail.OrgAmountGiam = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmount ?? 0)) * (-1);
                                 detail.OrgAmountGiamVND = paymentGrp.Sum(x => x.pm.Sum(z => z.PaymentAmountVnd ?? 0)) * (-1);
