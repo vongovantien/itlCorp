@@ -5273,7 +5273,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach(Guid Id in Ids)
                     {
                         var settleNo = DataContext.Where(x => x.Id == Id).FirstOrDefault().SettlementNo;
-                        var sendMailDeny = SendMailDeniedApproval(settleNo, null, DateTime.Now);
+                        var sendMailDeny = SendMailDeniedApproval(settleNo, comment, DateTime.Now);
                     }
                     return result;
                 }
