@@ -427,7 +427,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
             {
-                body: `Are you sure you want to sync : <span class="font-weight-bold">${_.chunk(settlementSyncList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>to accountant system ?`,   // ? Config confirm popup
+                body: `Are you sure you want to sync :<br/> <span class="font-weight-bold">${_.chunk(settlementSyncList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
                 labelConfirm: 'Yes',
                 center: true
@@ -535,7 +535,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                             this.showPopupDynamicRender<ConfirmPopupComponent>(
                                 ConfirmPopupComponent,
                                 this.confirmPopupContainerRef.viewContainerRef,
-                                { body: `Are you sure you want to deny settlement of payments with following : <span class="font-weight-bold">${_.chunk(settleDenyList.map(x => x.settlementNo), 3).join('<br/>')}</span> ?` },
+                                { body: `Are you sure you want to deny settlement of payments with following :<br/> <span class="font-weight-bold">${_.chunk(settleDenyList.map(x => x.settlementNo), 3).join('<br/>')}</span> ?` },
                                 (v: boolean) => {
                                     this.onDenySettlePayments(smIds);
                                 });
