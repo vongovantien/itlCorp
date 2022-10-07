@@ -535,7 +535,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                             this.showPopupDynamicRender<ConfirmPopupComponent>(
                                 ConfirmPopupComponent,
                                 this.confirmPopupContainerRef.viewContainerRef,
-                                { body: `Are you sure you want to deny settlement : <span class="font-weight-bold">${_.chunk(settleDenyList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>payments ?` },
+                                { body: `Are you sure you want to deny settlement of payments with following : <span class="font-weight-bold">${_.chunk(settleDenyList.map(x => x.settlementNo), 3).join('<br/>')}</span> ?` },
                                 (v: boolean) => {
                                     this.onDenySettlePayments(smIds);
                                 });
