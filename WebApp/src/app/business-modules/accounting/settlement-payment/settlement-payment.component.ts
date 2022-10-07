@@ -34,6 +34,7 @@ import { AccountingSelectAttachFilePopupComponent } from '../components/select-a
 import { of, forkJoin } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import _ from 'lodash';
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -426,7 +427,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
             {
-                body: `Are you sure you want to sync <span class="font-weight-bold">${settlementSyncList.map(x => x.settlementNo).join()}</span> to accountant system ?`,   // ? Config confirm popup
+                body: `Are you sure you want to sync : <span class="font-weight-bold">${_.chunk(settlementSyncList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',
                 labelConfirm: 'Yes',
                 center: true
@@ -534,7 +535,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                             this.showPopupDynamicRender<ConfirmPopupComponent>(
                                 ConfirmPopupComponent,
                                 this.confirmPopupContainerRef.viewContainerRef,
-                                { body: `Are you sure you want to deny settlement <span class="font-weight-bold">${settleDenyList.map(x => x.settlementNo).join()}</span> payments ?` },
+                                { body: `Are you sure you want to deny settlement : <span class="font-weight-bold">${_.chunk(settleDenyList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>payments ?` },
                                 (v: boolean) => {
                                     this.onDenySettlePayments(smIds);
                                 });
