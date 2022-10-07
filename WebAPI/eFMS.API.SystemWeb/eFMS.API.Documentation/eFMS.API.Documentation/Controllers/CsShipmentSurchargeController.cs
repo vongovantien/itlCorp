@@ -225,10 +225,14 @@ namespace eFMS.API.Documentation.Controllers
             if(partnersNeedValidate.Count() > 0)
             {
                 string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
-                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partnersNeedValidate[0].PaymentObjectId, partnersNeedValidate[0].Hblid, transactionTypeToCheckPoint, CHECK_POINT_TYPE.SURCHARGE, null);
-                if (!hsCheckpoint.Success)
+                var partnerGrp = partnersNeedValidate.GroupBy(x => x.PaymentObjectId).Select(x => x.Key);
+                foreach (var partner in partnerGrp)
                 {
-                    return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
+                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(partner, partnersNeedValidate[0].Hblid, transactionTypeToCheckPoint, CHECK_POINT_TYPE.SURCHARGE, null);
+                    if (!hsCheckpoint.Success)
+                    {
+                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
+                    }
                 }
             }
             currentUser.Action = "AddAndUpdate";
