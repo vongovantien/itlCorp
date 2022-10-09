@@ -988,7 +988,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = "Freehand",
+                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
