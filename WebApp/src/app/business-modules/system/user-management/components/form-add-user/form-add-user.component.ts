@@ -176,8 +176,8 @@ export class FormAddUserComponent extends AppList {
         ];
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((res) => {
-                this.currentUser = res;
+            .subscribe((currentUser) => {
+                this.selectedCompanyId = currentUser.companyId;
             });
     }
 
