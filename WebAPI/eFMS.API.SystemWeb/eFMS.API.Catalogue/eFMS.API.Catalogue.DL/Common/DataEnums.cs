@@ -64,6 +64,7 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string CONTRACT_TRIAL = "Trial";
         public static readonly string CONTRACT_OFFICIAL = "Official";
         public static readonly string CONTRACT_CASH = "Cash";
+        public static readonly string CONTRACT_GUARANTEE = "Guarantee";
         public static readonly string PARTNER_TYPE_CUSTOMER = "Customer";
         public static readonly string PARTNER_TYPE_AGENT = "Agent";
         public static readonly string PARTNER_TYPE_SUPPLIER = "Supplier";
