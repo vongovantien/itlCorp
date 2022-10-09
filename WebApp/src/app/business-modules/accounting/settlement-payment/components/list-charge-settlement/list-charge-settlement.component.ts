@@ -372,7 +372,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     returnChargeFromShipment(groupShipment: any) {
-        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected && surcharge.chargeAutoRated);
+        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected);
     }
 
     sortSurcharge(sortData: any) {
