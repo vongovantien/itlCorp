@@ -27,7 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IContextBase<CsTransaction> cstransRepository;
         private readonly IContextBase<CatUnit> catUnitRepository;
-        private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<SysCompany> companyRepository;
         private readonly IContextBase<SysEmployee> employeeRepository;
         private readonly IOptions<ApiUrl> apiUrl;
         readonly ICsTransactionDetailService transactionDetailService;
@@ -42,7 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             IContextBase<CsTransaction> cstransRepo,
             IContextBase<CatUnit> catUnitRepo,
-            IContextBase<SysOffice> officeRepo,
+            IContextBase<SysCompany> companyRepo,
             IContextBase<SysEmployee> employeeRepo,
             ICsTransactionDetailService transDetailService,
             ICsMawbcontainerService mawbcontainerService,
@@ -55,7 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             cstransRepository = cstransRepo;
             catUnitRepository = catUnitRepo;
-            officeRepository = officeRepo;
+            companyRepository = companyRepo;
             transactionDetailService = transDetailService;
             employeeRepository = employeeRepo;
             apiUrl = url;
@@ -107,18 +107,18 @@ namespace eFMS.API.Documentation.DL.Services
             var total = 0;
             int totalPackage = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             string Tel = GetTelPersonalIncharge(model.JobId);
 
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = model.IssuedUserName ?? string.Empty,
                 Tel = Tel ?? string.Empty,
-                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
 
@@ -236,18 +236,18 @@ namespace eFMS.API.Documentation.DL.Services
                 var instructions = new List<SeaShippingInstruction>();
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
-                var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
                 string Tel = GetTelPersonalIncharge(id);
 
                 var parameter = new SeaShippingInstructionParameter
                 {
-                    CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                    CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                    CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                    CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                    CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                    CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                     CompanyDescription = string.Empty,
                     Contact = model.IssuedUserName ?? string.Empty,
                     Tel = Tel ?? string.Empty,
-                    Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                    Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
 
@@ -346,17 +346,17 @@ namespace eFMS.API.Documentation.DL.Services
                 var instructions = new List<SeaShippingInstruction>();
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
-                var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
                 string Tel = GetTelPersonalIncharge(id);
                 var parameter = new SeaShippingInstructionParameter
                 {
-                    CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                    CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                    CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                    CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                    CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                    CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                     CompanyDescription = string.Empty,
                     Contact = model.IssuedUserName ?? string.Empty,
                     Tel = Tel ?? string.Empty,
-                    Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                    Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
                 int? totalPackages = 0;
@@ -435,16 +435,16 @@ namespace eFMS.API.Documentation.DL.Services
             var shippingInstructions = new List<OnBoardContainerReportResult>();
 
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty, //office?.DescriptionEn ?? string.Empty,
                 Contact = model.IssuedUserName,
-                Tel = office?.Tel ?? string.Empty,
-                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                Tel = company?.Tel ?? string.Empty,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2,
                 TotalPackages = string.Empty
             };
@@ -522,18 +522,18 @@ namespace eFMS.API.Documentation.DL.Services
 
             var instructions = new List<SeaShippingInstruction>();
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
             string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = issueBy ?? string.Empty,
                 Tel = Tel ?? string.Empty,
-                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
@@ -632,17 +632,17 @@ namespace eFMS.API.Documentation.DL.Services
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             string Tel = GetTelPersonalIncharge(model.JobId);
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = model.IssuedUserName ?? string.Empty,
                 Tel = Tel ?? string.Empty,
-                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             int totalPackage = 0;
@@ -724,18 +724,18 @@ namespace eFMS.API.Documentation.DL.Services
             var total = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
 
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
             string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = issueBy ?? string.Empty,
                 Tel = Tel ?? string.Empty,
-                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             int totalPackage = 0;
