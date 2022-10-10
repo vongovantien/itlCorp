@@ -20,6 +20,8 @@ export class CommercialBankListComponent extends AppList {
     partnerId: string = '';
     isUpdate: Boolean = false;
     id: string = '';
+    indexLstBank: number = null;
+
     constructor(
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
@@ -38,7 +40,6 @@ export class CommercialBankListComponent extends AppList {
             { title: 'Swift Code', field: '', sortable: false },
             { title: 'Bank Name', field: '', sortable: false },
             { title: 'Bank Code', field: '', sortable: false },
-            { title: 'Source ', field: '', sortable: false },
             { title: 'Note', field: '', sortable: false },
         ];
     }
@@ -56,28 +57,24 @@ export class CommercialBankListComponent extends AppList {
             );
     }
 
-    sortLocal(sort: string): void {
-        //this.partnerEmails = this._sortService.sort(this.bankAccountNo, sort, this.order);
-    }
-
     showPopupUpdateBank() {
         console.log(this.formUpdateBankPopup)
         this.formUpdateBankPopup.isUpdate = false;
         this.formUpdateBankPopup.partnerId = this.partnerId;
+        console.log(this.formUpdateBankPopup.isUpdate);
         if (!this.formUpdateBankPopup.isUpdate) {
             this.formUpdateBankPopup.formGroup.reset();
-            //this.formUpdateBankPopup.type.setValue("Billing");
         }
         this.formUpdateBankPopup.show();
     }
 
-    gotoDetailBank() {
+    gotoDetailBank(id: string, index: number = null) {
         this.formUpdateBankPopup.isUpdate = true;
-        this.formUpdateBankPopup.id = this.id;
+        this.formUpdateBankPopup.id = id;
         this.formUpdateBankPopup.partnerId = this.partnerId;
-        //!!this.formUpdateBankPopup.partnerId ? this.indexLstEmail = null : this.indexLstEmail = index;
+        !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;
         if (!!this.formUpdateBankPopup.partnerId) {
-            this._catalogueRepo.getDetailPartnerEmail(this.id)
+            this._catalogueRepo.getDetailBankById(id)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: Bank) => {
@@ -87,6 +84,19 @@ export class CommercialBankListComponent extends AppList {
                         }
                     }
                 );
+        }
+    }
+
+    sortLocal(sort: string): void {
+        this.partnerBanks = this._sortService.sort(this.partnerBanks, sort, this.order);
+    }
+
+    showConfirmDelete(id: string, index: number) {
+        this.id = id;
+        if (!!this.id) {
+            this.confirmDeletePopup.show();
+        } else {
+            this.partnerBanks = [...this.partnerBanks.slice(0, index), ...this.partnerBanks.slice(index + 1)];
         }
     }
 

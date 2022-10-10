@@ -69,7 +69,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getById/{id}")]
+        [Route("GetDetailById/{id}")]
         public IActionResult Get(Guid id)
         {
             var data = catBankService.GetDetail(id);
@@ -142,11 +142,16 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model.Id.ToString(), model);
-            if (checkExistMessage.Length > 0)
+
+            if(model.PartnerId == null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                var checkExistMessage = CheckExist(model.Id.ToString(), model);
+                if (checkExistMessage.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                }
             }
+           
             var hs = catBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

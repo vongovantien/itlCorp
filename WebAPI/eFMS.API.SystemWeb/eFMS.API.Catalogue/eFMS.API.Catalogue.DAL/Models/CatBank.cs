@@ -21,5 +21,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string BankAccountNo { get; set; }
         public Guid? PartnerId { get; set; }
         public string Source { get; set; }
+        public Guid? BankId { get; set; }
     }
 }

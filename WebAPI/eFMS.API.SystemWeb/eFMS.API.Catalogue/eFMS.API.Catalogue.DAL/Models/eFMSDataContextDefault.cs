@@ -130,6 +130,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
                 entity.Property(e => e.BankNameEn)
                     .IsRequired()
                     .HasColumnName("BankName_EN")

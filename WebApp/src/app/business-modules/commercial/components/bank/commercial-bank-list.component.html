@@ -34,7 +34,7 @@
                     <tbody>
                         <ng-container *ngIf="!!partnerBanks.length">
                             <tr
-                                *ngFor="let item of partnerBanks | filter : keyword :['bankNameVn', 'datetimeCreated','code'] ; let i = index;">
+                                *ngFor="let item of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
@@ -50,10 +50,11 @@
                                     </div>
                                 </td>
                                 <td>{{item.bankAccountNo}}</td>
-                                <td>{{item.bankNameEn}}</td>
+                                <td>{{item.bankAccountName}}</td>
                                 <td>{{item.bankAddress}}</td>
                                 <td>{{item.swiftCode}}</td>
-                                <td>{{item.source}}</td>
+                                <td>{{item.bankNameEn}}</td>
+                                <td>{{item.code}}</td>
                                 <td>{{item.note}}</td>
                             </tr>
                         </ng-container>

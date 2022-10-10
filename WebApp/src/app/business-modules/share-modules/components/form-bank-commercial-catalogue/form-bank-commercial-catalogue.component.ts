@@ -61,7 +61,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             swiftCode: [null, Validators.required],
             bankName: [null, Validators.required],
             bankCode: [null],
-            note: [null]
+            note: [null],
+            bankId: [null]
         });
 
         this.bankAccountNo = this.formGroup.controls['bankAccountNo'];
@@ -110,6 +111,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     updateFormValue(data: Bank) {
         const formValue = {
+            //bankId: !!data.bankId ? { id: data.officeId, text: this.offices.find(x => x.id === data.officeId).text } : null,
             bankAccountNo: !!data.bankAccountNo ? data.bankAccountNo : null,
             bankAccountName: !!data.bankAccountName ? data.bankAccountName : null,
             bankAddress: !!data.bankAddress ? data.bankAddress : null,
@@ -141,8 +143,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                             }
                         );
                 } else {
-                    //mergeObj.id = this.id;
-                    this._catalogueRepo.updateEmailPartner(mergeObj)
+                    mergeObj.id = this.id;
+                    this._catalogueRepo.updateBank(mergeObj)
                         .pipe(catchError(this.catchError))
                         .subscribe(
                             (res: any) => {
@@ -158,7 +160,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                 }
             }
             else {
-                //mergeObj.index = this.indexDetailEmail;
+                //mergeObj.index = this.indexDetailBank;
                 this.onRequest.emit(mergeObj);
             }
         }

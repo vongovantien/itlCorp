@@ -16,6 +16,7 @@ export class Bank {
     bankAccountNo: string = '';
     bankAddress: string = '';
     partnerId: string = '';
+    bankId: string = '';
     note: string = '';
     source: string = '';
     bankAccountName: string = '';
