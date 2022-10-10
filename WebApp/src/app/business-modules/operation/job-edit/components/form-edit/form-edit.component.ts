@@ -186,7 +186,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         });
 
         this.customerName = this.opsTransaction.customerName;
-        this.shipmentInfo = this.opsTransaction.serviceNo;
+        this.shipmentInfo = this.isJobCopy ? '' : this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
         this.salesmanName = this.opsTransaction.salesmanName;
 
