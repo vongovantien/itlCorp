@@ -1,0 +1,97 @@
+import { Component, ViewChild } from '@angular/core';
+import { ConfirmPopupComponent } from '@common';
+import { NgProgress } from '@ngx-progressbar/core';
+import { CatalogueRepo } from '@repositories';
+import { SortService } from '@services';
+import { catchError, finalize } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { FormBankCommercialCatalogueComponent } from '../../../share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
+import { Bank } from './../../../../shared/models/catalogue/catBank.model';
+
+@Component({
+    selector: 'app-commercial-bank-list',
+    templateUrl: './commercial-bank-list.component.html',
+})
+export class CommercialBankListComponent extends AppList {
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(FormBankCommercialCatalogueComponent) formUpdateBankPopup: FormBankCommercialCatalogueComponent;
+
+    partnerBanks: Bank[] = [];
+    partnerId: string = '';
+    isUpdate: Boolean = false;
+    id: string = '';
+    constructor(
+        private _ngProgressService: NgProgress,
+        private _sortService: SortService,
+        private _catalogueRepo: CatalogueRepo
+    ) {
+        super();
+        this._progressRef = this._ngProgressService.ref();
+        this.requestSort = this.sortLocal;
+    }
+
+    ngOnInit() {
+        this.headers = [
+            { title: 'Bank Account No', field: 'bankAccountNo', sortable: true },
+            { title: 'Bank Account Name', field: 'bankAccountName', sortable: true },
+            { title: 'Bank Address', field: 'bankAddress', sortable: true },
+            { title: 'Swift Code', field: '', sortable: false },
+            { title: 'Bank Name', field: '', sortable: false },
+            { title: 'Bank Code', field: '', sortable: false },
+            { title: 'Source ', field: '', sortable: false },
+            { title: 'Note', field: '', sortable: false },
+        ];
+    }
+
+    getListBankAccount(partnerId: string) {
+        this.isLoading = true;
+        this._catalogueRepo.getListBankByPartnerById(partnerId)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            })).subscribe(
+                (res: Bank[]) => {
+                    console.log(res)
+                    this.partnerBanks = res || [];
+                }
+            );
+    }
+
+    sortLocal(sort: string): void {
+        //this.partnerEmails = this._sortService.sort(this.bankAccountNo, sort, this.order);
+    }
+
+    showPopupUpdateBank() {
+        console.log(this.formUpdateBankPopup)
+        this.formUpdateBankPopup.isUpdate = false;
+        this.formUpdateBankPopup.partnerId = this.partnerId;
+        if (!this.formUpdateBankPopup.isUpdate) {
+            this.formUpdateBankPopup.formGroup.reset();
+            //this.formUpdateBankPopup.type.setValue("Billing");
+        }
+        this.formUpdateBankPopup.show();
+    }
+
+    gotoDetailBank() {
+        this.formUpdateBankPopup.isUpdate = true;
+        this.formUpdateBankPopup.id = this.id;
+        this.formUpdateBankPopup.partnerId = this.partnerId;
+        //!!this.formUpdateBankPopup.partnerId ? this.indexLstEmail = null : this.indexLstEmail = index;
+        if (!!this.formUpdateBankPopup.partnerId) {
+            this._catalogueRepo.getDetailPartnerEmail(this.id)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: Bank) => {
+                        if (!!res) {
+                            this.formUpdateBankPopup.updateFormValue(res);
+                            this.formUpdateBankPopup.show();
+                        }
+                    }
+                );
+        }
+    }
+
+    onRequestEmail(event: any) { }
+    onDelete() {
+
+    }
+}

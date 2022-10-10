@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -23,17 +24,19 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IMapper mapper;
 
         public CatBankService(IContextBase<CatBank> repository,
             ICacheServiceBase<CatBank> cacheService,
-            IMapper mapper,
+            IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser currUser) : base(repository, cacheService, mapper)
+            ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
+            mapper = imapper;
         }
 
         #region CRUD
@@ -285,6 +288,36 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public IQueryable<CatBankModel> GetDetailByPartnerId(Guid id)
+        {
+            var data = DataContext.Where(x => x.PartnerId == id);
+
+            if(data.Count() == 0)
+            {
+                return Enumerable.Empty<CatBankModel>().AsQueryable();
+            }
+            var result = data.Select(x => new CatBankModel
+            {
+                Id = x.Id,
+                Code = x.Code,
+                BankNameEn = x.BankNameEn,
+                BankNameVn = x.BankNameVn,
+                UserCreated = x.UserCreated,
+                DatetimeCreated = x.DatetimeCreated,
+                UserModified = x.UserModified,
+                DatetimeModified = x.DatetimeModified,
+                Active = x.Active,
+                InactiveOn = x.InactiveOn,
+                BankAccountNo = x.BankAccountNo,
+                BankAddress = x.BankAddress,
+                Note = x.Note,
+                Source = x.Source,
+                SwiftCode = x.SwiftCode
+            });
+
+            return result;
         }
     }
 }

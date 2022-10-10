@@ -300,7 +300,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 },
             );
-        console.log(this.users)
     }
 
     getCompanies() {

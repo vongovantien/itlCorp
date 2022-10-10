@@ -43,6 +43,7 @@ export class CommercialEmailListComponent extends AppList {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Update', field: '', sortable: false },
         ];
+        console.log(this.partnerId)
     }
 
     getEmailPartner(partnerId: string) {

@@ -15,5 +15,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public string SwiftCode { get; set; }
+        public string BankAddress { get; set; }
+        public string Note { get; set; }
+        public string BankAccountNo { get; set; }
+        public Guid? PartnerId { get; set; }
+        public string Source { get; set; }
     }
 }
