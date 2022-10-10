@@ -111,7 +111,7 @@ namespace eFMS.API.Documentation.DL.Services
             int totalPackage = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
             string Tel = GetTelPersonalIncharge(model.JobId);
 
             var parameter = new SeaShippingInstructionParameter
@@ -241,7 +241,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
                 var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-                var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
                 string Tel = GetTelPersonalIncharge(id);
 
                 var parameter = new SeaShippingInstructionParameter
@@ -352,7 +352,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
                 var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-                var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
                 string Tel = GetTelPersonalIncharge(id);
                 var parameter = new SeaShippingInstructionParameter
                 {
@@ -441,7 +441,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shippingInstructions = new List<OnBoardContainerReportResult>();
 
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
-            var company = companyRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
 
             var parameter = new SeaShippingInstructionParameter
@@ -531,7 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
             var instructions = new List<SeaShippingInstruction>();
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
             string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
@@ -642,7 +642,7 @@ namespace eFMS.API.Documentation.DL.Services
             var total = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
             string Tel = GetTelPersonalIncharge(model.JobId);
             var parameter = new SeaShippingInstructionParameter
             {
@@ -735,7 +735,7 @@ namespace eFMS.API.Documentation.DL.Services
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
 
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
-            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var office = officeRepository.Get(x => x.Id == opsTrans.OfficeId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
             string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
