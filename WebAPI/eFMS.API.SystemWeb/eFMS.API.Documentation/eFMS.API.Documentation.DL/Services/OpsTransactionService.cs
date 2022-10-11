@@ -1,35 +1,33 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
-using ITL.NetCore.Connection;
-using System.Linq.Expressions;
-using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
-using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2784,6 +2782,40 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
+        }
+
+        public HandleState SyncFromCustomsDeclaration(string jobNo)
+        {
+            var hs = new HandleState();
+            var opsJobs = opsTransactionRepository.Get(x => x.JobNo.Contains(jobNo));
+            var lstCus = customDeclarationRepository.Get(x => x.JobNo.Contains(jobNo));
+            int? sumCont = 0; decimal? sumGW = 0; decimal? sumNW = 0; decimal? sumCBM = 0; int? sumPackages = 0; string packageType = "" ;
+             
+            foreach (var job in opsJobs)
+            {
+                var cus = lstCus.Where(x => x.JobNo == job.JobNo);
+
+                if (cus.Count() > 0)
+                {
+                    packageType = cus.FirstOrDefault()?.UnitCode;
+                    sumGW = cus.Sum(x => x.GrossWeight);
+                    sumNW = cus.Sum(x => x.NetWeight);
+                    sumCBM = cus.Sum(x => x.Cbm);
+                    sumCont = cus.Sum(x => x.QtyCont);
+                    sumPackages = cus.Sum(x => x.Pcs);
+                }
+                job.SumCbm = sumCBM != 0 ? sumCBM : null;
+                job.SumGrossWeight = sumGW != 0 ? sumGW : null;
+                job.SumNetWeight = sumNW != 0 ? sumNW : null;
+                job.SumPackages = sumPackages != 0 ? sumPackages : null;
+                job.SumContainers = sumCont != 0 ? sumCont : null;
+                job.PackageTypeId = packageType != "" ? unitRepository.Get(x => x.Code == packageType).FirstOrDefault()?.Id : null;
+
+                opsTransactionRepository.Update(job, x => x.Id == job.Id, false);
+            }
+
+            hs = opsTransactionRepository.SubmitChanges();
+            return hs;
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)

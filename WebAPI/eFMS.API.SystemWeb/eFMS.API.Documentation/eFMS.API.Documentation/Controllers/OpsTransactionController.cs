@@ -11,6 +11,7 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Services;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -538,6 +539,23 @@ namespace eFMS.API.Documentation.Controllers
         {
             var results = transactionService.GetOutsourcingRegcognising(criteria);
             return Ok(results);
+        }
+
+
+        [Authorize]
+        [HttpPost("SyncFromCustomerDeclaration")]
+        public IActionResult SyncFromCustomerDeclaration([FromBody] SyncFromCusCriteria criteria)
+        {
+            HandleState hs = transactionService.SyncFromCustomsDeclaration(criteria.JobNo);
+                
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

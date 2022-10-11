@@ -1,14 +1,16 @@
+import { getOperationTransationState } from './../../../store/reducers/index';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { takeUntil } from 'rxjs/operators';
+import { OPSTransactionGetDetailAction } from './../../../store/actions/operation.action';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { CommodityGroup, Container, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
 import { Store } from '@ngrx/store';
-import { CatalogueRepo, DocumentationRepo, OperationRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from '@validators';
@@ -105,7 +107,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _operationRepo: OperationRepo,
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
@@ -426,44 +427,21 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 }
             );
     }
-
-    setGoodsInForValue(res: CustomDeclaration[]) {
-        if (!!res) {
-            console.log(res);
-            let gw = 0;
-            let nw = 0;
-            let containerQty = 0;
-            let packagesQty = 0;
-            let sumCbm = 0;
-            res.forEach(s => {
-                sumCbm += s.cbm;
-                nw += s.netWeight;
-                containerQty += s.qtyCont;
-                gw += s.grossWeight;
-                packagesQty += s.pcs;
-            });
-            this.formEdit.patchValue({
-                sumCbm: sumCbm,
-                sumNetWeight: nw,
-                sumContainers: containerQty,
-                sumPackages: packagesQty,
-                sumGrossWeight: gw,
-                packageTypeId: res[0].unitCodeId,
-            });
-        }
-    }
-
     syncFromDeclaration() {
-        this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
+        this._documentRepo.syncFromCustomerDeclaration({ jobNo: this.opsTransaction.jobNo }).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-        ).subscribe(
-            (res: CustomDeclaration[]) => {
-                this.setGoodsInForValue(res)
+        ).subscribe((res: any) => {
+            if (res.status) {
+                this._store.dispatch(new OPSTransactionGetDetailAction(this.opsTransaction.id));
+                this._store.select(getOperationTransationState);
+                this.setFormValue();
+                console.log(this.opsTransaction)
             }
-        );
+        });
     }
 }
+
 export interface ILinkAirSeaInfoModel {
     hblId: string;
     jobId: string;

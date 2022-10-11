@@ -1303,4 +1303,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    syncFromCustomerDeclaration(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncFromCustomerDeclaration`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
