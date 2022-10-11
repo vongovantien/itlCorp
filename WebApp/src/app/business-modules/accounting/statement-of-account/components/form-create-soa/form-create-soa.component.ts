@@ -476,11 +476,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 currencyLocal: 'VND',
                 currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
-                dateType: this.selectedDateMode.value,
+                dateType: this.selectedDateMode,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'en'),
                 toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'en'),
-                type: this.selectedType.value,
-                isOBH: this.selectedObh.value,
+                type: this.selectedType,
+                isOBH: this.selectedObh,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
                 note: this.note,
@@ -492,7 +492,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 mbls: this.mapShipment("MBL"),
                 customNo: this.mapShipment("CustomNo"),
                 airlineCode: this.airlineCode,
-                staffType: this.selectedStaffType.value,
+                staffType: this.selectedStaffType,
                 customerShipmentId: !!this.selectedCustomerShipment ? this.selectedCustomerShipment.value : null,
                 salemanId: !!this.salemanDisplay ? this.selectedSaleman.id : null
             };
