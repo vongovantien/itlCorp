@@ -3,7 +3,8 @@
         <job-detail-button-list [shipmentDetail]="fclImportDetail" [isDuplicate]="isDuplicate"
             [selectedTab]="selectedTab" (onCancel)="onCancelDeactivate()" (onDelete)="prepareDeleteJob()"
             (onDuplicate)="showDuplicateConfirm()" (onSave)="onUpdateShipmentDetail()"
-            (onPreviewPL)="previewPLsheet($event)" (onLock)="lockShipment()" (onFinish)="onFinishJob()" (onReopen)="onReopenJob()">
+            (onPreviewPL)="previewPLsheet($event)" (onLock)="lockShipment()" (onFinish)="onFinishJob()"
+            (onReopen)="onReopenJob()">
         </job-detail-button-list>
     </app-sub-header>
     <div class="m-content">
@@ -11,7 +12,7 @@
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
-                    <app-form-create-sea-import service='SCI'>
+                    <app-form-create-sea-import service='SCI' [isDetail]="true">
                         <ng-container *ngIf="!!fclImportDetail">
                             <date-time-modified [timeCreated]="fclImportDetail.datetimeCreated"
                                 [userCreated]="fclImportDetail.userNameCreated"

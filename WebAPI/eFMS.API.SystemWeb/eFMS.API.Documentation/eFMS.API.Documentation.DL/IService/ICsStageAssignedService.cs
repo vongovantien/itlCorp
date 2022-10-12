@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, CsStageAssignedCriteria>
+    public interface ICsStageAssignedService : IRepositoryBase<OpsStageAssigned, OpsStageAssignedModel>
     {
         Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model);
         Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria);

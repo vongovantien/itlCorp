@@ -311,7 +311,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.shipmentType = form.shipmentType;
         this.opsTransaction.noProfit = form.noProfit;
 
-        if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
+        if ((!!this.editForm.shipmentNo || !!this.opsTransaction.serviceNo) && form.shipmentMode === 'Internal' 
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
@@ -326,10 +326,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 .pipe(
                     catchError(this.catchError),
                     concatMap((res: ILinkAirSeaInfoModel) => {
-                        this.opsTransaction.serviceNo = res.jobNo;
-                        this.opsTransaction.serviceHblId = res.hblId;
-                        this.opsTransaction.isLinkJob = true;
-
+                        if (!!res) {
+                            this.opsTransaction.serviceNo = res.jobNo;
+                            this.opsTransaction.serviceHblId = res.hblId;
+                            this.opsTransaction.isLinkJob = true;
+                        }else{
+                            this.opsTransaction.serviceNo = null;
+                            this.opsTransaction.serviceHblId = null;
+                            this.opsTransaction.isLinkJob = false;
+                        }
                         return this._documentRepo.updateShipment(this.opsTransaction);
                     })
                 ).subscribe(

@@ -36,6 +36,9 @@ namespace eFMS.API.System.DL.Services
         private readonly ISysOfficeService sysOfficeRepository;
         private readonly IContextBase<SysImage> imageRepository;
         private readonly ISysImageService sysImageService;
+        private readonly IContextBase<SysGroup> groupRepository;
+        private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<CatDepartment> departmentRepository;
 
 
 
@@ -50,6 +53,9 @@ namespace eFMS.API.System.DL.Services
             ISysOfficeService sysOfficeRepo,
             ISysImageService sysImageRepo,
             IContextBase<SysUserPermission> userpermissionRepo,
+            IContextBase<SysGroup> groupRepo,
+            IContextBase<SysOffice> officeRepo,
+            IContextBase<CatDepartment> departmentRepo,
             IContextBase<SysUserPermissionGeneral> permissionGeneralRepo
             ) : base(repository, mapper)
         {
@@ -66,6 +72,9 @@ namespace eFMS.API.System.DL.Services
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
             sysMenuRepository = sysMenuRepo;
+            groupRepository = groupRepo;
+            officeRepository = officeRepo;
+            departmentRepository = departmentRepo;
         }
 
         public IQueryable<SysUserViewModel> GetAll()
@@ -753,5 +762,42 @@ namespace eFMS.API.System.DL.Services
             return usersResult.AsQueryable();
 
         }
+
+        /// <summary>
+        /// Ger Data User Info
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<UserInfoViewModel> GetPersonInchargeByCurrentUser(int? groupId)
+        {
+            var users = DataContext.Get(x => x.Active == true);
+            var employees = employeeRepository.Get();
+            //var companies = companyRepository.Get();
+            var departments = departmentRepository.Get();
+            var datas = from u in users
+                        join e in employees on u.EmployeeId equals e.Id into em
+                        from e in em.DefaultIfEmpty()
+                        join uLv in userlevelRepository.Get() on u.Id equals uLv.UserId
+                        join grp in groupRepository.Get() on uLv.GroupId equals grp.Id
+                        join dept in departmentRepository.Get() on uLv.DepartmentId equals dept.Id
+                        join off in officeRepository.Get() on uLv.OfficeId equals off.Id
+                        where groupId == null ? currentUser.GroupId == grp.Id : uLv.GroupId == groupId
+                        select new UserInfoViewModel
+                        {
+                            Id = u.Id,
+                            UserName = u.Username,
+                            UserGroupId = uLv.GroupId,
+                            UserGroupName = grp.ShortName,
+                            UserDeparmentId = uLv.DepartmentId,
+                            UserDeparmentName = dept.DeptNameAbbr,
+                            UserOfficeId = uLv.OfficeId,
+                            UserCompanyId = uLv.CompanyId,
+                            EmployeeNameEn = e.EmployeeNameEn,
+                            EmployeeNameVn = e.EmployeeNameVn,
+                            UserOfficeName = off.ShortName,
+                        };
+            datas = datas.OrderBy(x => x.UserName).ThenBy(x => x.UserGroupName);
+            return datas;
+        }
+
     }
 }

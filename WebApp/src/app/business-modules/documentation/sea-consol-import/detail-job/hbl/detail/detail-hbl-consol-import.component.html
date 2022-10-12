@@ -4,8 +4,7 @@
             <app-menu-preview-hbl-sea-import [hblDetail]="hblDetail"></app-menu-preview-hbl-sea-import>
 
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf=" (permissionHblDetail | async)?.allowUpdate && hblDetail?.jobStatus !== 'Finish'">
-            </app-default-button>
+                *ngIf=" (permissionHblDetail | async)?.allowUpdate"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>
@@ -18,7 +17,7 @@
                     <hbl-proof-of-delivery></hbl-proof-of-delivery>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
-                    <hbl-arrival-note-sea></hbl-arrival-note-sea>
+                    <hbl-arrival-note-sea type="SCI"></hbl-arrival-note-sea>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
                     <hbl-delivery-order></hbl-delivery-order>

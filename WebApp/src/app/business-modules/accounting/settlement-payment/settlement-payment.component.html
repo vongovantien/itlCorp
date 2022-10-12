@@ -54,7 +54,7 @@
 
                                         <button class="btn btn-danger  m-btn--icon m-btn--uppercase" title="Deny"
                                             *ngIf="menuSpecialPermission | async | specialPermission:'DenySettlement'"
-                                            (click)="denySettle()">
+                                            (click)="showCommentPopup(true)">
                                             <span>
                                                 <i class="la la-times"></i>
                                                 <span>
@@ -292,7 +292,7 @@
         <ng-container
             *ngIf="selectedSettlement?.statusApproval === 'Done' && selectedSettlement?.syncStatus !== 'Synced' ">
             <hr />
-            <div class="menu-context__item text-danger" (click)="denySettleItem()">
+            <div class="menu-context__item text-danger" (click)="showCommentPopup(false)">
                 <span><i class="la la-times "></i><span> Deny</span></span>
             </div>
         </ng-container>
@@ -320,3 +320,35 @@
 </app-dropdown>
 
 <select-attach-file-popup type="SM"></select-attach-file-popup>
+
+<ng-template #modal_deny>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Comment</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <textarea class="form-control" name="comment" id="" cols="30" rows="10" [(ngModel)]="comment"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer m--align-center c-button-actions">
+        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onConfirmDenied()">
+            <span>
+                <i class="la la-save"></i>
+                <span>
+                    Continue
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="modalRef.hide()">
+            <span>
+                <i class="la la-ban"></i>
+                <span>
+                    Cancel
+                </span>
+            </span>
+        </button>
+    </div>
+</ng-template>

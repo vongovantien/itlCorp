@@ -856,6 +856,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var check = csLinkChargeRepository.Get(x => x.JobNoLink == detail.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).FirstOrDefault();
                 detail.Permission.AllowDelete = check != null ? false : true;
             }
+            detail.PersonInChargeName = sysUserRepo.Get(x => x.Id == detail.PersonIncharge).FirstOrDefault().Username;
             return detail;
         }
 
@@ -1067,6 +1068,20 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                     }
                     result.Containers = containers;
+                }
+            }
+            if(result != null && result.JobNo != null && result.HblId == null)
+            {
+                var surchargesOrg = csShipmentSurchargeRepo.Get(x => x.JobNo == jobOps);
+                var surchargesLink = csShipmentSurchargeRepo.Get(x => x.JobNo == result.JobNo);
+                var linkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
+                var hasLinkCharges = from org in surchargesOrg
+                                     join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
+                                     join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
+                                     select linkCharge;
+                if (hasLinkCharges != null && hasLinkCharges.Any())
+                {
+                    result.HblId = hasLinkCharges.FirstOrDefault().HbllinkId;
                 }
             }
             return result;

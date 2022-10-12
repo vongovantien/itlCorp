@@ -1884,6 +1884,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
                 entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
+                entity.BankAccountName = entity.BankName = null;
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -1912,7 +1913,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
                             }
                         }
-
+                        settlement.BankAccountName = model.Settlement.BankAccountName;
+                        settlement.BankName = model.Settlement.BankName;
                         hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
                     }
@@ -5171,7 +5173,7 @@ namespace eFMS.API.Accounting.DL.Services
             return transactionType;
         }
 
-        public HandleState DenySettlePayments(List<Guid> Ids)
+        public HandleState DenySettlePayments(List<Guid> Ids,string comment)
         {
             HandleState result = new HandleState();
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -5203,7 +5205,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         approve.IsDeny = true;
                                         approve.UserModified = currentUser.UserID;
                                         approve.DateModified = DateTime.Now;
-
+                                        approve.Comment = comment;
                                         acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
 
@@ -5270,6 +5272,11 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     trans.Commit();
+                    foreach(Guid Id in Ids)
+                    {
+                        var settleNo = DataContext.Where(x => x.Id == Id).FirstOrDefault().SettlementNo;
+                        var sendMailDeny = SendMailDeniedApproval(settleNo, comment, DateTime.Now);
+                    }
                     return result;
                 }
                 catch (Exception ex)

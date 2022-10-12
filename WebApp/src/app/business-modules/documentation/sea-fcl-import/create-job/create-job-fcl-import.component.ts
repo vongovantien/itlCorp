@@ -44,7 +44,7 @@ export class SeaFCLImportCreateJobComponent extends ShareJobDetailComponent {
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef
     ) {
-        super(_toastService , _documenRepo, _store);
+        super(_toastService, _documenRepo, _store);
         this.requestCancel = this.gotoList;
     }
 
@@ -78,7 +78,7 @@ export class SeaFCLImportCreateJobComponent extends ShareJobDetailComponent {
             ata: !!form.ata && !!form.ata.startDate ? formatDate(form.ata.startDate, 'yyyy-MM-dd', 'en') : null,
             atd: !!form.atd && !!form.atd.startDate ? formatDate(form.atd.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            personIncharge: this.formCreateComponent.personIncharge.value,
+            //personIncharge: this.formCreateComponent.personIncharge.value,
             pod: this.formCreateComponent.pod.value,
             coloaderId: form.coloader,
             polDescription: form.polDescription,

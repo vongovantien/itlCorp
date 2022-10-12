@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { merge } from 'rxjs';
+import { HouseBill } from '@models';
 
 @Component({
     selector: 'app-air-export-hbl',
@@ -18,6 +19,8 @@ import { merge } from 'rxjs';
 })
 
 export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
+
+
     serviceType: CommonType.SERVICE_TYPE = 'air';
 
     constructor(
@@ -86,4 +89,5 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit4'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('assignment'); });
         merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit5'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('files'); });
     }
+
 }
