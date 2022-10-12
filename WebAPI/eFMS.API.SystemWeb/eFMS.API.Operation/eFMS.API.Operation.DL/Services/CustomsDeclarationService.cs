@@ -536,19 +536,32 @@ namespace eFMS.API.Operation.DL.Services
             var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo && x.AcctManagementId == null & x.PayerAcctManagementId == null && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
             var advRQs = accAdvanceRequestRepository.Get(x => x.JobId == jobNo);
             var clearanceData = DataContext.Get(x=>x.JobNo==jobNo);
-            if (surcharges.Count() > 0 | advRQs.Count() > 0)
+            string oldestyCleNo = null;
+            if (clearanceData.Count() > 0)
             {
-                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo;
-                if (clearanceNo.Count() <= 0)
+                oldestyCleNo = clearanceData.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault().OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
+            if (surcharges.Count() > 0 || advRQs.Count() > 0)
+            {
+                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault() != null ? surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo : null ;
+                if (clearanceNo==null)
                 {
-                    clearanceNo = null;
+                    if (clearanceData.Count()>0)
+                    {
+                        clearanceNo = oldestyCleNo;
+                    }
+                    else
+                    {
+                        clearanceNo = null; 
+                    }
+                    
                 }else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
                 {
                     clearanceNo = advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault().CustomNo;
                 }
-                if (string.IsNullOrEmpty(clearanceNo))
+                else if(!clearanceData.Any(x=>x.ClearanceNo==clearanceNo))
                 {
-                    clearanceNo = clearanceData.OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+                    clearanceNo=oldestyCleNo;
                 }
                 foreach(var item in surcharges)
                 {

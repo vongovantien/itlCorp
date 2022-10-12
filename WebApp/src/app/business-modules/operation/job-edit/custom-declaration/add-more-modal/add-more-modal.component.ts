@@ -142,7 +142,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                         if (responses.success === true) {
                             this.updateShipmentVolumn(dataToUpdate);
                             this.isCloseModal.emit(true);
-                            this._toastService.success("CustomDeclaration Added")
                         }
                     }
                 );
