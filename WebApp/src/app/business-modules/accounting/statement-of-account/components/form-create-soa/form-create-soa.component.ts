@@ -196,7 +196,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     getCurrencyData(data: any) {
         this.currencyList = (data || []);
         this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
-        this.updateDataSearch('currency', this.selectedCurrency.id);
+        this.updateDataSearch('currency', this.selectedCurrency);
         this.updateDataSearch('currencyLocal', 'VND');
     }
 
@@ -316,9 +316,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         ];
         this.selectedStaffType = this.staffTypes[0].value;
 
-        this.updateDataSearch('isOBH', this.selectedObh.value);
-        this.updateDataSearch('dateType', this.selectedDateMode.value);
-        this.updateDataSearch('type', this.selectedType.value);
+        this.updateDataSearch('isOBH', this.selectedObh);
+        this.updateDataSearch('dateType', this.selectedDateMode);
+        this.updateDataSearch('type', this.selectedType);
     }
 
     updateDataSearch(key: string, data: any) {
@@ -351,8 +351,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('isOBH', this.selectedObh);
                 break;
             case 'staff-style':
-                this.selectedStaffType = data;
-                this.updateDataSearch('staffType', this.selectedStaffType.value);
+                this.selectedStaffType = data.value;
+                this.updateDataSearch('staffType', this.selectedStaffType);
                 break;
             case 'currency':
                 this.selectedCurrency = data.id;
@@ -474,7 +474,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         } else {
             const body = {
                 currencyLocal: 'VND',
-                currency: this.selectedCurrency.id,
+                currency: this.selectedCurrency,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'en'),
