@@ -2784,38 +2784,24 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public HandleState SyncFromCustomsDeclaration(string jobNo)
+        public HandleState SyncToReplicate(string jobNo)
         {
             var hs = new HandleState();
-            var opsJobs = opsTransactionRepository.Get(x => x.JobNo.Contains(jobNo));
-            var lstCus = customDeclarationRepository.Get(x => x.JobNo.Contains(jobNo));
-            int? sumCont = 0; decimal? sumGW = 0; decimal? sumNW = 0; decimal? sumCBM = 0; int? sumPackages = 0; string packageType = "" ;
-             
-            foreach (var job in opsJobs)
-            {
-                var cus = lstCus.Where(x => x.JobNo == job.JobNo);
+            var listJob = opsTransactionRepository.Get(x => x.JobNo.Contains(jobNo));
 
-                if (cus.Count() > 0)
-                {
-                    packageType = cus.FirstOrDefault()?.UnitCode;
-                    sumGW = cus.Sum(x => x.GrossWeight);
-                    sumNW = cus.Sum(x => x.NetWeight);
-                    sumCBM = cus.Sum(x => x.Cbm);
-                    sumCont = cus.Sum(x => x.QtyCont);
-                    sumPackages = cus.Sum(x => x.Pcs);
-                }
-                job.SumCbm = sumCBM != 0 ? sumCBM : null;
-                job.SumGrossWeight = sumGW != 0 ? sumGW : null;
-                job.SumNetWeight = sumNW != 0 ? sumNW : null;
-                job.SumPackages = sumPackages != 0 ? sumPackages : null;
-                job.SumContainers = sumCont != 0 ? sumCont : null;
-                job.PackageTypeId = packageType != "" ? unitRepository.Get(x => x.Code == packageType).FirstOrDefault()?.Id : null;
+            var jobRep = listJob.Where(x => x.JobNo != jobNo).FirstOrDefault();
+            var job = listJob.Where(x => x.JobNo == jobNo).FirstOrDefault();
 
-                opsTransactionRepository.Update(job, x => x.Id == job.Id, false);
-            }
+            jobRep.SumNetWeight = job.SumNetWeight;
+            jobRep.SumPackages = job.SumPackages;
+            jobRep.SumCbm = job.SumCbm;
+            jobRep.SumContainers = job.SumContainers;
+            jobRep.SumGrossWeight = job.SumGrossWeight;
+            jobRep.PackageTypeId = job.PackageTypeId;
 
+            opsTransactionRepository.Update(jobRep, x => x.Id == jobRep.Id, false);
             hs = opsTransactionRepository.SubmitChanges();
-            return hs;
+            return hs;  
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)

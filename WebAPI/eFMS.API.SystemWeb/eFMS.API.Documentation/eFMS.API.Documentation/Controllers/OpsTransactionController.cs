@@ -541,13 +541,12 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
-
         [Authorize]
-        [HttpPost("SyncFromCustomerDeclaration")]
-        public IActionResult SyncFromCustomerDeclaration([FromBody] SyncFromCusCriteria criteria)
+        [HttpPut("SyncToReplicate")]
+        public IActionResult SyncToReplicate(SyncToRepModel model)
         {
-            HandleState hs = transactionService.SyncFromCustomsDeclaration(criteria.JobNo);
-                
+            HandleState hs = transactionService.SyncToReplicate(model.JobNo);
+
             string message = HandleError.GetMessage(hs, Crud.Update);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };

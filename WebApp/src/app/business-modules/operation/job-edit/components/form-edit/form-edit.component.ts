@@ -1,14 +1,13 @@
-import { getOperationTransationState } from './../../../store/reducers/index';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OperationRepo } from '@repositories';
 import { takeUntil } from 'rxjs/operators';
-import { OPSTransactionGetDetailAction } from './../../../store/actions/operation.action';
 
 import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { CommodityGroup, Container, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
@@ -107,9 +106,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _operationRepo: OperationRepo,
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
         private _toaster: ToastrService) {
         super();
     }
@@ -427,18 +428,55 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 }
             );
     }
-    syncFromDeclaration() {
-        this._documentRepo.syncFromCustomerDeclaration({ jobNo: this.opsTransaction.jobNo }).pipe(
+
+    syncToReplicate() {
+        this._documentRepo.syncToReplicate({ jobNo: this.opsTransaction.jobNo }).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
         ).subscribe((res: any) => {
             if (res.status) {
-                this._store.dispatch(new OPSTransactionGetDetailAction(this.opsTransaction.id));
-                this._store.select(getOperationTransationState);
-                this.setFormValue();
-                console.log(this.opsTransaction)
+                this._toastService.success(res.message);
+
+            } else {
+                this._toastService.error(res.message);
             }
         });
+    }
+
+    setGoodsInForValue(res: CustomDeclaration[]) {
+        if (!!res) {
+            let gw = 0;
+            let nw = 0;
+            let containerQty = 0;
+            let packagesQty = 0;
+            let sumCbm = 0;
+            res.forEach(s => {
+                sumCbm += s.cbm;
+                nw += s.netWeight;
+                containerQty += s.qtyCont;
+                gw += s.grossWeight;
+                packagesQty += s.pcs;
+            });
+            this.formEdit.patchValue({
+                sumCbm: sumCbm !== 0 ? sumCbm : null,
+                sumNetWeight: nw !== 0 ? nw : null,
+                sumContainers: containerQty !== 0 ? containerQty : null,
+                sumPackages: packagesQty !== 0 ? packagesQty : null,
+                sumGrossWeight: gw !== 0 ? gw : null,
+                packageTypeId: res[0].unitCodeId !== 0 ? res[0].unitCodeId : null,
+            });
+        }
+    }
+
+    getDataFromDeclaration() {
+        this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe(
+            (res: CustomDeclaration[]) => {
+                this.setGoodsInForValue(res)
+            }
+        );
     }
 }
 
