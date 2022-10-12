@@ -90,7 +90,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
                     this.formBankList.partnerId = res.partnerId;
-                    this.formBankList.getListBankAccount(res.partnerId);
+                    this.formBankList.getListBank(res.partnerId);
                     this.payableComponent.partnerId = res.partnerId;
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {

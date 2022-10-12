@@ -55,6 +55,7 @@
                                 <td>{{item.swiftCode}}</td>
                                 <td>{{item.bankNameEn}}</td>
                                 <td>{{item.code}}</td>
+                                <td>{{item.source}}</td>
                                 <td>{{item.note}}</td>
                             </tr>
                         </ng-container>
@@ -66,5 +67,5 @@
         </div>
     </div>
 </div>
-<popup-form-bank-commercial-catalogue></popup-form-bank-commercial-catalogue>
-<confirm-popup body="You want to delete this email ?" (onSubmit)="onDelete()"></confirm-popup>
+<popup-form-bank-commercial-catalogue (onRequest)="onRequestBank($event)"></popup-form-bank-commercial-catalogue>
+<confirm-popup body="You want to delete this bank ?" (onSubmit)="onDelete()"></confirm-popup>

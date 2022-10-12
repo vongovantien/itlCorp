@@ -61,11 +61,9 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankCode.valid || !bankCode.value)}">
+                                    <div class="form-group">
                                         <label required>Bank Code</label>
-                                        <input type="text" class="form-control" formControlName="bankCode"
-                                            (blur)="onSelectDataFormInfo($event.target.value, 'Code Input')">
+                                        <input disabled type="text" class="form-control" formControlName="bankCode">
                                     </div>
                                 </div>
                             </div>

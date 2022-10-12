@@ -122,6 +122,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("('(1)')");
 
+                entity.Property(e => e.BankAccountName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankAccountNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);

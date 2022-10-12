@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
 import { Bank } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -20,6 +20,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
 
     formGroup: FormGroup;
+    formDirective: FormGroupDirective;
     bankAccountNo: AbstractControl;
     bankAccountName: AbstractControl;
     bankAddress: AbstractControl;
@@ -30,8 +31,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     banks: Observable<Bank[]>;
     partnerId: string = '';
+    bankId: any = null;
     isUpdate: boolean = false;
-    id: string = '';
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name EN' },
@@ -79,6 +80,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         if (this.formGroup.valid) {
             const formBody = this.formGroup.getRawValue();
             const cloneObject = {
+                bankId: !!this.bankId ? this.bankId : null,
                 bankAccountNo: !!formBody.bankAccountNo ? formBody.bankAccountNo : null,
                 bankAccountName: !!formBody.bankAccountName ? formBody.bankAccountName : null,
                 bankAddress: !!formBody.bankAddress ? formBody.bankAddress : null,
@@ -99,19 +101,18 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
 
-    onSelectDataFormInfo(data: any, type: string = "") {
+    onSelectDataFormInfo(data: any) {
         if (data) {
-            if (type === "Code Input") {
-            }
             this.bankName.setValue(data.bankNameEn);
             this.bankCode.setValue(data.code);
+            this.bankId = data.id
         }
 
     }
 
     updateFormValue(data: Bank) {
         const formValue = {
-            //bankId: !!data.bankId ? { id: data.officeId, text: this.offices.find(x => x.id === data.officeId).text } : null,
+            bankId: !!data.bankId ? data.bankId : null,
             bankAccountNo: !!data.bankAccountNo ? data.bankAccountNo : null,
             bankAccountName: !!data.bankAccountName ? data.bankAccountName : null,
             bankAddress: !!data.bankAddress ? data.bankAddress : null,
@@ -143,7 +144,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                             }
                         );
                 } else {
-                    mergeObj.id = this.id;
                     this._catalogueRepo.updateBank(mergeObj)
                         .pipe(catchError(this.catchError))
                         .subscribe(

@@ -1,3 +1,4 @@
+import { ToastrService } from 'ngx-toastr';
 import { Component, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -25,7 +26,8 @@ export class CommercialBankListComponent extends AppList {
     constructor(
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -40,11 +42,12 @@ export class CommercialBankListComponent extends AppList {
             { title: 'Swift Code', field: '', sortable: false },
             { title: 'Bank Name', field: '', sortable: false },
             { title: 'Bank Code', field: '', sortable: false },
+            { title: 'Source', field: '', sortable: false },
             { title: 'Note', field: '', sortable: false },
         ];
     }
 
-    getListBankAccount(partnerId: string) {
+    getListBank(partnerId: string) {
         this.isLoading = true;
         this._catalogueRepo.getListBankByPartnerById(partnerId)
             .pipe(catchError(this.catchError), finalize(() => {
@@ -58,10 +61,9 @@ export class CommercialBankListComponent extends AppList {
     }
 
     showPopupUpdateBank() {
-        console.log(this.formUpdateBankPopup)
         this.formUpdateBankPopup.isUpdate = false;
+        console.log(this.formUpdateBankPopup.isUpdate)
         this.formUpdateBankPopup.partnerId = this.partnerId;
-        console.log(this.formUpdateBankPopup.isUpdate);
         if (!this.formUpdateBankPopup.isUpdate) {
             this.formUpdateBankPopup.formGroup.reset();
         }
@@ -70,7 +72,6 @@ export class CommercialBankListComponent extends AppList {
 
     gotoDetailBank(id: string, index: number = null) {
         this.formUpdateBankPopup.isUpdate = true;
-        this.formUpdateBankPopup.id = id;
         this.formUpdateBankPopup.partnerId = this.partnerId;
         !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;
         if (!!this.formUpdateBankPopup.partnerId) {
@@ -100,8 +101,27 @@ export class CommercialBankListComponent extends AppList {
         }
     }
 
-    onRequestEmail(event: any) { }
     onDelete() {
+        this.confirmDeletePopup.hide();
+        this._catalogueRepo.deleteBank(this.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.getListBank(this.partnerId);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
 
+    onRequestBank($event: any) {
+        const data = $event;
+        if (data === true) {
+            this.formUpdateBankPopup.hide();
+            this.getListBank(this.partnerId);
+        }
     }
 }

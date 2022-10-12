@@ -309,9 +309,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 UserModified = x.UserModified,
                 DatetimeModified = x.DatetimeModified,
                 Active = x.Active,
+                BankId = x.BankId,
                 InactiveOn = x.InactiveOn,
                 BankAccountNo = x.BankAccountNo,
                 BankAddress = x.BankAddress,
+                BankAccountName = x.BankAccountName,
                 Note = x.Note,
                 Source = x.Source,
                 SwiftCode = x.SwiftCode
