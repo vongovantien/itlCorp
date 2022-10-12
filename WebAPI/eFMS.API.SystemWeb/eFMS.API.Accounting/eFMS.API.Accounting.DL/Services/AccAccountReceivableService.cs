@@ -153,7 +153,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                 {
-                    _creditRate = DataTypeEx.IsNullOrValue(agreement.TrialCreditLimited, 0) ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount - CusAdv)/CreditLimit)*100
+                    _creditRate = DataTypeEx.IsNullOrValue(agreement.CreditLimit, 0) ? 0 : (((agreement.DebitAmount ?? 0) - (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount - CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT)
                 {
