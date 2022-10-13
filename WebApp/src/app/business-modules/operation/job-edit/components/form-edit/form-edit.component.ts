@@ -429,8 +429,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             );
     }
 
-    syncToReplicate() {
-        this._documentRepo.syncToReplicate({ jobNo: this.opsTransaction.jobNo }).pipe(
+    syncGoodInforToReplicateJob() {
+        this._documentRepo.syncGoodInforToReplicateJob({ jobNo: this.opsTransaction.jobNo }).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
         ).subscribe((res: any) => {

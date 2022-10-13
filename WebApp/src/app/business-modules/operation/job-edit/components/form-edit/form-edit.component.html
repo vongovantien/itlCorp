@@ -405,13 +405,15 @@
                         <span> Get From Declaration </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="syncToReplicate()">
-                    <span>
-                        <i class="la la-exchange"></i>
-                        <span> Sync To Replicate </span>
-                    </span>
-                </button>
+                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate'">
+                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10"
+                        (click)="syncGoodInforToReplicateJob()">
+                        <span>
+                            <i class="la la-exchange"></i>
+                            <span> Sync To Replicate </span>
+                        </span>
+                    </button>
+                </ng-container>
             </div>
         </div>
         <hr>

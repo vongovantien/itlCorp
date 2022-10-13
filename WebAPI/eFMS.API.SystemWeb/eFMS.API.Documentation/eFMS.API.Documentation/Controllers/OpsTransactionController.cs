@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -11,7 +6,6 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Services;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -21,6 +15,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -280,7 +279,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -326,7 +325,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 Response.OnCompleted(async () =>
                 {
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -348,7 +347,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost("CheckAllowConvertJob")]
         [Authorize]
-        public IActionResult CheckAllowConvertJob([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult CheckAllowConvertJob([FromBody] List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var result = transactionService.CheckAllowConvertJob(list);
@@ -388,7 +387,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("ConvertExistedClearancesToJobs")]
         [Authorize]
-        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult ConvertExistedClearancesToJobs([FromBody] List<CustomsDeclarationModel> list)
         {
 
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
@@ -454,7 +453,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -542,10 +541,10 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [Authorize]
-        [HttpPut("SyncToReplicate")]
-        public async Task<IActionResult> SyncToReplicate(SyncToRepModel model)
+        [HttpPut("SyncGoodInforToReplicateJob")]
+        public async Task<IActionResult> SyncGoodInforToReplicateJob(SyncToRepModel model)
         {
-            HandleState hs = await transactionService.SyncToReplicate(model.JobNo);
+            HandleState hs = await transactionService.SyncGoodInforToReplicateJob(model.JobNo);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
 
