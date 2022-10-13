@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models.Criteria
 {
-    public class SyncFromCusCriteria
+    public class SyncGoodToReplicateModel
     {
         public string JobNo { get; set; }
     }

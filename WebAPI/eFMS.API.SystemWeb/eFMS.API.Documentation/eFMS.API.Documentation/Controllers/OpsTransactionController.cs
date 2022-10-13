@@ -542,7 +542,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpPut("SyncGoodInforToReplicateJob")]
-        public async Task<IActionResult> SyncGoodInforToReplicateJob(SyncToRepModel model)
+        public async Task<IActionResult> SyncGoodInforToReplicateJob(SyncGoodToReplicateModel model)
         {
             HandleState hs = await transactionService.SyncGoodInforToReplicateJob(model.JobNo);
 
