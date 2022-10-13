@@ -331,6 +331,17 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 dynamic hblData = null;
+                if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                {
+                    var hasRefund = csSurchargeRepository.Any(x => x.Hblid == HblId
+                       && x.Type != DocumentConstants.CHARGE_BUY_TYPE
+                       && x.PaymentObjectId == partnerId
+                       && x.IsRefundFee == true);
+                    if (hasRefund)
+                    {
+                        return result;
+                    }
+                }
                 if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
                     if (criteria.TransactionType == "CL")
