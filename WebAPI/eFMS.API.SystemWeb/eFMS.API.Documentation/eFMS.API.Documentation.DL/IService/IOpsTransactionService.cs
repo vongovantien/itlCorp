@@ -41,6 +41,6 @@ namespace eFMS.API.Documentation.DL.IService
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
         List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria);
         HandleState CheckLinkedInteralShipment(OpsTransactionModel model);
-        HandleState SyncToReplicate(string jobNo);
+        Task<HandleState> SyncToReplicate(string jobNo);
     }
 }

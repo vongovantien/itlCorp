@@ -543,9 +543,9 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpPut("SyncToReplicate")]
-        public IActionResult SyncToReplicate(SyncToRepModel model)
+        public async Task<IActionResult> SyncToReplicate(SyncToRepModel model)
         {
-            HandleState hs = transactionService.SyncToReplicate(model.JobNo);
+            HandleState hs = await transactionService.SyncToReplicate(model.JobNo);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
 

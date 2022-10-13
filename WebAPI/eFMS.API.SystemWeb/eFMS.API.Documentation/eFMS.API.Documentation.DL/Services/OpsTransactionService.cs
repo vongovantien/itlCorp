@@ -2784,23 +2784,34 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public HandleState SyncToReplicate(string jobNo)
+        public async Task<HandleState> SyncToReplicate(string jobNo)
         {
             var hs = new HandleState();
-            var listJob = opsTransactionRepository.Get(x => x.JobNo.Contains(jobNo));
+            var listJob = await opsTransactionRepository.GetAsync(x => x.JobNo.Contains(jobNo));
 
             var jobRep = listJob.Where(x => x.JobNo != jobNo).FirstOrDefault();
             var job = listJob.Where(x => x.JobNo == jobNo).FirstOrDefault();
+            if(jobNo.Substring(1) == "R")
+            {
+                jobRep.SumNetWeight = job.SumNetWeight;
+                jobRep.SumPackages = job.SumPackages;
+                jobRep.SumCbm = job.SumCbm;
+                jobRep.SumContainers = job.SumContainers;
+                jobRep.SumGrossWeight = job.SumGrossWeight;
+                jobRep.PackageTypeId = job.PackageTypeId;
+            }
+            else
+            {
+                job.SumNetWeight = jobRep.SumNetWeight;
+                job.SumPackages = jobRep.SumPackages;
+                job.SumCbm = jobRep.SumCbm;
+                job.SumContainers = jobRep.SumContainers;
+                job.SumGrossWeight = jobRep.SumGrossWeight;
+                job.PackageTypeId = jobRep.PackageTypeId;
+            }
+           
 
-            jobRep.SumNetWeight = job.SumNetWeight;
-            jobRep.SumPackages = job.SumPackages;
-            jobRep.SumCbm = job.SumCbm;
-            jobRep.SumContainers = job.SumContainers;
-            jobRep.SumGrossWeight = job.SumGrossWeight;
-            jobRep.PackageTypeId = job.PackageTypeId;
-
-            opsTransactionRepository.Update(jobRep, x => x.Id == jobRep.Id, false);
-            hs = opsTransactionRepository.SubmitChanges();
+            hs = await opsTransactionRepository.UpdateAsync(jobRep, x => x.Id == jobRep.Id, false);
             return hs;  
         }
 
