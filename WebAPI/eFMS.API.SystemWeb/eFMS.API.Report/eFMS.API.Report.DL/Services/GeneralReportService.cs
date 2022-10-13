@@ -106,14 +106,9 @@ namespace eFMS.API.Report.DL.Services
             var dataShipment = GetDataGeneralReport(criteria);
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var LstSurcharge = surCharge.Get();
-            //  LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
             var PartnerList = catPartnerRepo.Get();
-           //  var LookupPartner = PartnerList.ToLookup(x => x.Id);
-            // var PlaceLookup = catPlaceRepo.Get().ToLookup(q => q.Id);
             var PlaceLookup = catPlaceRepo.Get();
-            // var lookupUser = sysUserRepo.Get().ToLookup(q => q.Id);
             var lookupUser = sysUserRepo.Get();
-            //var lookupEmployee = sysEmployeeRepo.Get().ToLookup(q => q.Id);
             var lookupEmployee = sysEmployeeRepo.Get();
             int _no = 1;
 
@@ -235,62 +230,19 @@ namespace eFMS.API.Report.DL.Services
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
             var lstSurchage = surCharge.Get();
-            // var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var PlaceList = catPlaceRepo.Get();
             var PartnerList = catPartnerRepo.Get();
-            // var LookupPartner = PartnerList.ToLookup(x => x.Id);
-            // var LookupPlace = PlaceList.ToLookup(x => x.Id);
             var ChargeList = catChargeRepo.Get();
-            // var LookupCharge = ChargeList.ToLookup(x => x.Id);
             var UserList = sysUserRepo.Get();
-            // var LookupUser = UserList.ToLookup(x => x.Id);
             var ChargeGroupList = catChargeGroupRepo.Get();
-            // var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
             var OfficeList = sysOfficeRepo.Get();
-            // var LookupOffice = OfficeList.ToLookup(x => x.Id);
             var UserLevelList = sysUserLevelRepo.Get();
-            // var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
             var UnitList = catUnitRepo.Get();
-            // var LookupUnitList = UnitList.ToLookup(x => x.Id);
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
-                switch (item.TransactionType)
-                {
-                    case "IT":
-                        data.ServiceName = "Inland Trucking ";
-                        break;
-                    case "AE":
-                        data.ServiceName = "Export (Air) ";
-                        break;
-                    case "AI":
-                        data.ServiceName = "Import (Air) ";
-                        break;
-                    case "SCE":
-                        data.ServiceName = "Export (Sea Consol) ";
-                        break;
-                    case "SCI":
-                        data.ServiceName = "Import (Sea Consol) ";
-                        break;
-                    case "SFE":
-                        data.ServiceName = "Export (Sea FCL) ";
-                        break;
-                    case "SFI":
-                        data.ServiceName = "Import (Sea FCL) ";
-                        break;
-                    case "SLE":
-                        data.ServiceName = "Export (Sea LCL) ";
-                        break;
-                    case "SLI":
-                        data.ServiceName = "Import (Sea LCL) ";
-                        break;
-                    case "CL":
-                        data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
-                        break;
-                    default:
-                        break;
-                }
-             
+
+                data.ServiceName = GetServiceNameReport(item.TransactionType);
                 data.JobNo = item.JobNo;
                 data.etd = item.Etd;
                 data.eta = item.Eta;
@@ -567,5 +519,461 @@ namespace eFMS.API.Report.DL.Services
             var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
             return customNos.FirstOrDefault();
         }
+        private string GetServiceNameReport(string transactionType)
+        {
+            string _serviceName = string.Empty;
+            switch (transactionType)
+            {
+                case "IT":
+                    _serviceName = "Inland Trucking ";
+                    break;
+                case "AE":
+                    _serviceName = "Export (Air) ";
+                    break;
+                case "AI":
+                    _serviceName = "Import (Air) ";
+                    break;
+                case "SCE":
+                    _serviceName = "Export (Sea Consol) ";
+                    break;
+                case "SCI":
+                    _serviceName = "Import (Sea Consol) ";
+                    break;
+                case "SFE":
+                    _serviceName = "Export (Sea FCL) ";
+                    break;
+                case "SFI":
+                    _serviceName = "Import (Sea FCL) ";
+                    break;
+                case "SLE":
+                    _serviceName = "Export (Sea LCL) ";
+                    break;
+                case "SLI":
+                    _serviceName = "Import (Sea LCL) ";
+                    break;
+                case "CL":
+                    _serviceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                    break;
+                default:
+                    break;
+            }
+
+            return _serviceName;
+        }
+        public IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        {
+            var dataShipment = GeneralExportShipmentOverviewFCL(criteria);
+            return dataShipment;
+        }
+
+        private IQueryable<GeneralExportShipmentOverviewFCLResult> GeneralExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        {
+            List<GeneralExportShipmentOverviewFCLResult> lstShipment = new List<GeneralExportShipmentOverviewFCLResult>();
+            var dataShipment = GetDataGeneralReport(criteria);
+            if (!dataShipment.Any()) return lstShipment.AsQueryable();
+            var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var PlaceList = catPlaceRepo.Get();
+            var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var LookupPlace = PlaceList.ToLookup(x => x.Id);
+            var ChargeList = catChargeRepo.Get();
+            var LookupCharge = ChargeList.ToLookup(x => x.Id);
+            var UserList = sysUserRepo.Get();
+            var LookupUser = UserList.ToLookup(x => x.Id);
+            var ChargeGroupList = catChargeGroupRepo.Get();
+            var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
+            var OfficeList = sysOfficeRepo.Get();
+            var LookupOffice = OfficeList.ToLookup(x => x.Id);
+            var UserLevelList = sysUserLevelRepo.Get();
+            var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
+            var UnitList = catUnitRepo.Get();
+            var LookupUnitList = UnitList.ToLookup(x => x.Id);
+            foreach (var item in dataShipment)
+            {
+                GeneralExportShipmentOverviewFCLResult data = new GeneralExportShipmentOverviewFCLResult();
+
+                data.ServiceName = GetServiceNameReport(item.TransactionType);
+                data.JobNo = item.JobNo;
+                data.ServiceDate = item.ServiceDate;
+                data.etd = item.Etd;
+                data.eta = item.Eta;
+                data.FlightNo = item.FlightNo;
+                data.MblMawb = item.Mawb;
+                data.HblHawb = item.HwbNo;
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
+                data.Carrier = !string.IsNullOrEmpty(item.ColoaderId) ? LookupPartner[item.ColoaderId].FirstOrDefault()?.ShortName : string.Empty;
+                data.Agent = LookupPartner[item.AgentId].FirstOrDefault()?.ShortName;
+                var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
+                data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
+                var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
+                data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
+                data.ShipmentType = item.ServiceType;
+                data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
+
+                var ArrNotifyPartyDesc = item.NotifyPartyDescription?.Split("\n").ToArray();
+                data.AgentName = ArrNotifyPartyDesc != null && ArrNotifyPartyDesc.Length > 0 ? ArrNotifyPartyDesc[0] : string.Empty;
+
+                data.GW = item.GrossWeight;
+                data.CW = item.ChargeWeight;
+                data.CBM = item.Cbm;
+
+                data.Cont20 = item.Cont20 ?? 0;
+                data.Cont40 = item.Cont40 ?? 0;
+                data.Cont40HC = item.Cont40HC ?? 0;
+                data.Cont45 = item.Cont45 ?? 0;
+
+                data.QTy = item.PackageQty.ToString();
+                #region -- Phí Selling trước thuế --
+                decimal? _totalSellAmountFreight = 0;
+                decimal? _totalSellAmountTermial = 0;
+                decimal? _totalSellAmountBillFee = 0;
+                decimal? _totalSellAmountSealFee = 0;
+                decimal? _totalSellAmountTelex = 0;
+                decimal? _totalSellAmountAutomated = 0;
+                decimal? _totalSellAmountVGM = 0;
+                decimal? _totalSellAmountBooking = 0;
+                decimal? _totalSellAmountOther = 0;
+
+                if (item.HblId != null && item.HblId != Guid.Empty)
+                {
+                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    foreach (var charge in _chargeSell)
+                    {
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
+                        CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
+                        bool isOtherSell = true;
+                        if (ChargeGroupModel == null)
+                        {
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
+                        }
+                        // tinh total phi chargeGroup freight
+                        if (ChargeGroupModel?.Name == "Freight")
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountFreight += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains Terminal
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling") || chargeObj.ChargeNameEn.ToLower().Equals("THC"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountTermial += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountTermial += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains bill fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("bill fee"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountBillFee += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountBillFee += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains seal fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("seal fee"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountSealFee += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountSealFee += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains telex release
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("telex release"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountTelex += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountTelex += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains automated manifest
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest") || chargeObj.ChargeNameEn.ToLower().Equals("AMS"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountAutomated += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountAutomated += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains vgm admin
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("vgm admin"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountVGM += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountVGM += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains booking fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("booking fee"))
+                        {
+                            isOtherSell = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountBooking += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountBooking += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        if (isOtherSell == true)
+                        {
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        //END SEL
+                    }
+                }
+                data.TotalSellFreight = _totalSellAmountFreight;
+                data.TotalSellTerminal = _totalSellAmountTermial;
+                data.TotalSellContainerSealFee = _totalSellAmountSealFee;
+                data.TotalSellTelexRelease = _totalSellAmountTelex;
+                data.TotalSellAutomated = _totalSellAmountAutomated;
+                data.TotalSellVGM = _totalSellAmountVGM;
+                data.TotalSellBookingFee = _totalSellAmountBooking;
+                data.TotalSellOthers = _totalSellAmountOther;
+                data.TotalSell = data.TotalSellFreight + data.TotalSellTerminal + data.TotalSellContainerSealFee + data.TotalSellTelexRelease + data.TotalSellAutomated + data.TotalSellVGM + data.TotalSellBookingFee + data.TotalSellOthers;
+                #endregion
+                #region -- Phí Buying trước thuế --
+                decimal? _totalBuyAmountFreight = 0;
+                decimal? _totalBuyAmountTermial = 0;
+                decimal? _totalBuyAmountBillFee = 0;
+                decimal? _totalBuyAmountSealFee = 0;
+                decimal? _totalBuyAmountTelex = 0;
+                decimal? _totalBuyAmountAutomated = 0;
+                decimal? _totalBuyAmountVGM = 0;
+                decimal? _totalBuyAmountBooking = 0;
+                decimal? _totalBuyAmountOther = 0;
+                if (item.HblId != null && item.HblId != Guid.Empty)
+                {
+                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    foreach (var charge in _chargeBuy)
+                    {
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
+                        CatChargeGroup ChargeGroupModel = new CatChargeGroup();
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
+                        bool isOther = true;
+                        if (ChargeGroupModel == null)
+                        {
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
+                        }
+                        // tinh total phi chargeGroup freight
+                        if (ChargeGroupModel?.Name == "Freight")
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountFreight += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains Terminal
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling") || chargeObj.ChargeNameEn.ToLower().Equals("THC"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountTermial += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountTermial += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains bill fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("bill fee"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountBillFee += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountBillFee += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains seal fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("seal fee"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountSealFee += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountSealFee += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains telex release
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("telex release"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountTelex += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountTelex += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains automated manifest
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest") || chargeObj.ChargeNameEn.ToLower().Equals("AMS"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountAutomated += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountAutomated += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains vgm admin
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("vgm admin"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountVGM += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountVGM += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        // ChargeName contains booking fee
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("booking fee"))
+                        {
+                            isOther = false;
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountBooking += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountBooking += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        if (isOther == true)
+                        {
+                            if (criteria.Currency != ReportConstants.CURRENCY_LOCAL)
+                            {
+                                _totalBuyAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        //END BUY
+                    }
+                }
+
+                data.TotalBuyFreight = _totalBuyAmountFreight;
+                data.TotalBuyTerminal = _totalBuyAmountTermial;
+                data.TotalBuyContainerSealFee = _totalBuyAmountSealFee;
+                data.TotalBuyTelexRelease = _totalBuyAmountTelex;
+                data.TotalBuyAutomated = _totalBuyAmountAutomated;
+                data.TotalBuyVGM = _totalBuyAmountVGM;
+                data.TotalBuyBookingFee = _totalBuyAmountBooking;
+                data.TotalBuyOthers = _totalBuyAmountOther;
+                data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTerminal + data.TotalBuyContainerSealFee + data.TotalBuyTelexRelease + data.TotalBuyAutomated + data.TotalBuyVGM + data.TotalBuyBookingFee + data.TotalBuyOthers;
+                data.Profit = data.TotalSell - data.TotalBuy;
+                #endregion -- Phí Buying trước thuế --
+
+                #region -- Phí OBH sau thuế --
+                decimal? _obh = 0;
+                if (item.HblId != null && item.HblId != Guid.Empty)
+                {
+                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    foreach (var charge in _chargeObh)
+                    {
+                        _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
+                    }
+                }
+
+                data.AmountOBH = _obh;
+                #endregion -- Phí OBH sau thuế --
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.NameVn).FirstOrDefault() : string.Empty;
+                data.RalatedHblHawb = string.Empty;// tạm thời để trống
+                data.RalatedJobNo = string.Empty;// tạm thời để trống
+                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var OfficeSaleman = LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.Creator = item.TransactionType == "CL" ? LookupUser[item.PersonInCharge].Select(t => t.Username).FirstOrDefault() : LookupUser[item.UserCreated].Select(t => t.Username).FirstOrDefault();
+                data.POINV = item.Pono;
+                data.Commodity = item.Commodity;
+                data.ProductService = item.ProductService;
+                data.ServiceMode = string.Empty;//chua co thong tin
+                data.PMTerm = item.PaymentTerm;
+                data.ShipmentNotes = item.Notes;
+                data.Created = item.DatetimeCreated;
+                data.CustomerId = LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault();
+                data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
+                string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.QTy = item.PackageQty.ToString() + " " + Code;
+                data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
+                data.BKRefNo = item.ReferenceNo;
+                data.ReferenceNo = item.ReferenceNo;
+                data.FinalDestination = item.FinalDestination;
+                lstShipment.Add(data);
+            }
+
+
+            return lstShipment.AsQueryable();
+        }
+
     }
 }
