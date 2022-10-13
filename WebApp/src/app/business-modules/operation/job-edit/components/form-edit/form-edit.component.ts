@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OperationRepo } from '@repositories';
 import { takeUntil } from 'rxjs/operators';
 
 import { AppForm } from '@app';
@@ -8,7 +9,7 @@ import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
 import { Store } from '@ngrx/store';
-import { CatalogueRepo, DocumentationRepo, OperationRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from '@validators';
@@ -109,6 +110,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
         private _toaster: ToastrService) {
         super();
     }
@@ -236,8 +238,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: [null, Validators.required],
             sumGrossWeight: [null],
             sumNetWeight: [null],
-            sumContainers: [null],
-            sumPackages: [null],
+            sumContainers: [null, Validators.max(5000000)],
+            sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
             containerDescription: [null],
             packageTypeId: [null],
@@ -426,9 +428,22 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             );
     }
 
+    syncGoodInforToReplicateJob() {
+        this._documentRepo.syncGoodInforToReplicateJob({ jobNo: this.opsTransaction.jobNo }).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe((res: any) => {
+            if (res.status) {
+                this._toastService.success(res.message);
+
+            } else {
+                this._toastService.error(res.message);
+            }
+        });
+    }
+
     setGoodsInForValue(res: CustomDeclaration[]) {
         if (!!res) {
-            console.log(res);
             let gw = 0;
             let nw = 0;
             let containerQty = 0;
@@ -442,17 +457,17 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 packagesQty += s.pcs;
             });
             this.formEdit.patchValue({
-                sumCbm: sumCbm,
-                sumNetWeight: nw,
-                sumContainers: containerQty,
-                sumPackages: packagesQty,
-                sumGrossWeight: gw,
-                packageTypeId: res[0].unitCodeId,
+                sumCbm: sumCbm !== 0 ? sumCbm : null,
+                sumNetWeight: nw !== 0 ? nw : null,
+                sumContainers: containerQty !== 0 ? containerQty : null,
+                sumPackages: packagesQty !== 0 ? packagesQty : null,
+                sumGrossWeight: gw !== 0 ? gw : null,
+                packageTypeId: res[0].unitCodeId !== 0 ? res[0].unitCodeId : null,
             });
         }
     }
 
-    syncFromDeclaration() {
+    getDataFromDeclaration() {
         this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
@@ -463,6 +478,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         );
     }
 }
+
 export interface ILinkAirSeaInfoModel {
     hblId: string;
     jobId: string;

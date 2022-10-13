@@ -1304,7 +1304,11 @@ export class DocumentationRepo {
     }
 
     getContainerListByJobId(jobId: string) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/GetContainerListByJobId/${jobId}`).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/GetContainerListByJobId/${jobId}`);
+    }
+
+    syncGoodInforToReplicateJob(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

@@ -1,36 +1,34 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
-using ITL.NetCore.Connection;
-using System.Linq.Expressions;
-using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Authorizations;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2812,6 +2810,24 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
+        }
+
+        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        {
+            var hs = new HandleState();
+            var listJob = await DataContext.GetAsync(x => x.JobNo.Contains(jobNo));
+            var jobRep = listJob.FirstOrDefault(x => x.JobNo != jobNo);
+            var job = listJob.FirstOrDefault(x => x.JobNo == jobNo);
+
+            jobRep.SumNetWeight = job.SumNetWeight;
+            jobRep.SumPackages = job.SumPackages;
+            jobRep.SumCbm = job.SumCbm;
+            jobRep.SumContainers = job.SumContainers;
+            jobRep.SumGrossWeight = job.SumGrossWeight;
+            jobRep.PackageTypeId = job.PackageTypeId;
+
+            hs = DataContext.Update(jobRep, x => x.Id == jobRep.Id);
+            return hs;
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
