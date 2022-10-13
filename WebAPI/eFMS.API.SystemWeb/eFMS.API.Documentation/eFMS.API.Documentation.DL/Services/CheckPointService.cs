@@ -302,6 +302,17 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
+                if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                {
+                    var hasRefund = csSurchargeRepository.Any(x => x.Hblid == HblId
+                       && x.Type != DocumentConstants.CHARGE_BUY_TYPE
+                       && x.PaymentObjectId == partnerId
+                       && x.IsRefundFee == true);
+                    if (hasRefund)
+                    {
+                        return result;
+                    }
+                }
                 if (transactionType == "CL")
                 {
                     currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
