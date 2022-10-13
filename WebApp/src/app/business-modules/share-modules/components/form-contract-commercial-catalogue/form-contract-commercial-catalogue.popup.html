@@ -249,20 +249,27 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
                                 <label required>Invoice Currency</label>
-                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="currencyId" placeholder="Select Currency"
-                                    [clearable]="false">
+                                <ng-select *ngIf="contractType.value !== 'Guarantee'; else tmp"
+                                    [items]="listCurrency | async" [clearable]="true" bindLabel="id" class="custom"
+                                    formControlName="currencyId" placeholder="Select Currency" [clearable]="false">
                                 </ng-select>
+                                <ng-template #tmp>
+                                    <input disabled type="text" class="form-control" formControlName="creditCurrency">
+                                </ng-template>
                             </div>
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
                                 <label required>AR Currency</label>
-                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="creditCurrency" placeholder="Select Credit Currency"
+                                <ng-select *ngIf="contractType.value !== 'Guarantee'; else tmp"
+                                    [items]="listCurrency | async" [clearable]="true" bindLabel="id" class="custom"
+                                    formControlName="creditCurrency" placeholder="Select Credit Currency"
                                     [clearable]="false">
                                 </ng-select>
+                                <ng-template #tmp>
+                                    <input disabled type="text" class="form-control" formControlName="creditCurrency">
+                                </ng-template>
                             </div>
                         </div>
                         <div class="col-lg-4">
