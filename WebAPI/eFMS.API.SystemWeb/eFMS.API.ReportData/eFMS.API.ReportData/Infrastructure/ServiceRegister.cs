@@ -24,6 +24,7 @@ namespace eFMS.API.ReportData.Infrastructure
                 options.AccountingAPI = configuration.GetSection("APIs:AccountingAPI").Value;
                 options.SettingAPI = configuration.GetSection("APIs:SettingAPI").Value;
                 options.FileManagementAPI = configuration.GetSection("APIs:FileManagementAPI").Value;
+                options.ReportAPI = configuration.GetSection("APIs:ReportAPI").Value;
             });
             return service;
         }
