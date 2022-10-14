@@ -81,6 +81,7 @@ export class CommercialBankListComponent extends AppList {
                     (res: Bank) => {
                         if (!!res) {
                             this.formUpdateBankPopup.updateFormValue(res);
+                            this.formUpdateBankPopup.id = res.id
                             this.formUpdateBankPopup.show();
                         }
                     }

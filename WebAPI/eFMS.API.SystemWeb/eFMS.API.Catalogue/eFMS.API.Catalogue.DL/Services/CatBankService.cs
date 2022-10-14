@@ -67,6 +67,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.DatetimeModified = DateTime.Now;
                 entity.BankNameEn = model.BankNameEn;
                 entity.BankNameVn = model.BankNameVn;
+                entity.BankAccountName = model.BankAccountName;
+                entity.BankAccountNo = model.BankAccountNo;
+                entity.BankAddress = model.BankAddress;
+                entity.Source = model.Source;
+                entity.SwiftCode = model.SwiftCode;
+                entity.Code = model.Code;
+                entity.Note = model.Note;
                 entity.Active = model.Active;
 
                 if (entity.Active == false)
@@ -290,14 +297,15 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatBankModel> GetDetailByPartnerId(Guid id)
+        public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
         {
-            var data = DataContext.Where(x => x.PartnerId == id);
+            var data = await DataContext.WhereAsync(x => x.PartnerId == id);
 
             if(data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
             }
+
             var result = data.Select(x => new CatBankModel
             {
                 Id = x.Id,
@@ -310,6 +318,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 DatetimeModified = x.DatetimeModified,
                 Active = x.Active,
                 BankId = x.BankId,
+                PartnerId = x.PartnerId,
                 InactiveOn = x.InactiveOn,
                 BankAccountNo = x.BankAccountNo,
                 BankAddress = x.BankAddress,
@@ -319,7 +328,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 SwiftCode = x.SwiftCode
             });
 
-            return result;
+            return result.AsQueryable();
         }
     }
 }

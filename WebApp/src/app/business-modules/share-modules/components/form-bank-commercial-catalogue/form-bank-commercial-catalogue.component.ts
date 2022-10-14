@@ -25,10 +25,10 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     bankAccountName: AbstractControl;
     bankAddress: AbstractControl;
     swiftCode: AbstractControl;
-    bankName: AbstractControl;
+    bankNameEn: AbstractControl;
     bankCode: AbstractControl;
     note: AbstractControl;
-
+    id: string = '';
     banks: Observable<Bank[]>;
     partnerId: string = '';
     bankId: any = null;
@@ -60,7 +60,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             bankAccountName: [null, Validators.required],
             bankAddress: [null, Validators.required],
             swiftCode: [null, Validators.required],
-            bankName: [null, Validators.required],
+            bankNameEn: [null, Validators.required],
             bankCode: [null],
             note: [null],
             bankId: [null]
@@ -70,7 +70,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.bankAccountName = this.formGroup.controls['bankAccountName'];
         this.bankAddress = this.formGroup.controls['bankAddress'];
         this.swiftCode = this.formGroup.controls['swiftCode'];
-        this.bankName = this.formGroup.controls['bankName'];
+        this.bankNameEn = this.formGroup.controls['bankNameEn'];
         this.bankCode = this.formGroup.controls['bankCode'];
         this.note = this.formGroup.controls['note'];
     }
@@ -85,12 +85,12 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                 bankAccountName: !!formBody.bankAccountName ? formBody.bankAccountName : null,
                 bankAddress: !!formBody.bankAddress ? formBody.bankAddress : null,
                 swiftCode: !!formBody.swiftCode ? formBody.swiftCode : null,
-                bankNameVn: !!formBody.bankName ? formBody.bankName : null,
-                bankNameEn: !!formBody.bankName ? formBody.bankName : null,
+                bankNameVn: !!formBody.bankNameEn ? formBody.bankNameEn : null,
+                bankNameEn: !!formBody.bankNameEn ? formBody.bankNameEn : null,
                 code: !!formBody.bankCode ? formBody.bankCode : null,
             };
             const mergeObj = Object.assign(_merge(formBody, cloneObject));
-
+            mergeObj.id = this.id;
             mergeObj.partnerId = this.partnerId;
             return mergeObj;
         }
@@ -103,7 +103,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     onSelectDataFormInfo(data: any) {
         if (data) {
-            this.bankName.setValue(data.bankNameEn);
+            this.bankNameEn.setValue(data.bankNameEn);
             this.bankCode.setValue(data.code);
             this.bankId = data.id
         }
@@ -111,6 +111,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     updateFormValue(data: Bank) {
+        console.log(data)
         const formValue = {
             bankId: !!data.bankId ? data.bankId : null,
             bankAccountNo: !!data.bankAccountNo ? data.bankAccountNo : null,

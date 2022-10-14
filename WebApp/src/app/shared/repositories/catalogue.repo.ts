@@ -1395,7 +1395,7 @@ export class CatalogueRepo {
     }
 
     getListBankByPartnerById(id: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetDetailByPartnerId/${id}`);
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetBankByPartnerId/${id}`);
 
     }
 

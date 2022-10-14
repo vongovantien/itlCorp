@@ -20,6 +20,6 @@ namespace eFMS.API.Catalogue.DL.IService
         CatBankModel GetDetail(Guid id);
         List<CatBankImportModel> CheckValidImport(List<CatBankImportModel> list);
         HandleState Import(List<CatBankImportModel> data);
-        IQueryable<CatBankModel> GetDetailByPartnerId(Guid id);
+        Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id);
     }
 }

@@ -50,13 +50,12 @@
                             <div class="row">
                                 <div class="col-lg-8">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankName.valid || !bankName.value)}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
                                         <label required>Bank Name</label>
                                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
                                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
                                             [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
-                                            placeholder="Please Select Bank Name" allowFreeText
-                                            formControlName="bankName">
+                                            placeholder="Please Select Bank Name" formControlName="bankNameEn">
                                         </app-combo-grid-virtual-scroll>
                                     </div>
                                 </div>

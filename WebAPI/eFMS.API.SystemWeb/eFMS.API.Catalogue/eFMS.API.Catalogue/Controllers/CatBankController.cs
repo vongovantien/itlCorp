@@ -116,11 +116,11 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            //var checkExistMessage = CheckExist(string.Empty, model);
-            //if (checkExistMessage.Length > 0)
-            //{
-            //    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
-            //}
+            var checkExistMessage = CheckExist(string.Empty, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             var hs = catBankService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -143,14 +143,12 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if(model.PartnerId == null)
+            var checkExistMessage = CheckExist(model.Id.ToString(), model);
+            if (checkExistMessage.Length > 0)
             {
-                var checkExistMessage = CheckExist(model.Id.ToString(), model);
-                if (checkExistMessage.Length > 0)
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
-                }
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+     
            
             var hs = catBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -271,11 +269,11 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         [HttpGet]
-        [Route("GetDetailByPartnerId/{id}")]
+        [Route("GetBankByPartnerId/{id}")]
         [Authorize]
-        public IActionResult GetDetailByPartnerId(Guid id)
+        public async Task<IActionResult> GetBankByPartnerId(Guid id)
         {
-            var data = catBankService.GetDetailByPartnerId(id);
+            var data = await catBankService.GetBankByPartnerId(id);
             return Ok(data);
         }
 
