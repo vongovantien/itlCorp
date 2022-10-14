@@ -73,7 +73,7 @@ export class SeaLCLImportCreateJobComponent extends ShareJobDetailComponent impl
             ata: !!form.ata && !!form.ata.startDate ? formatDate(form.ata.startDate, 'yyyy-MM-dd', 'en') : null,
             atd: !!form.atd && !!form.atd.startDate ? formatDate(form.atd.startDate, 'yyyy-MM-dd', 'en') : null,
 
-            personIncharge: this.formCreateComponent.personIncharge.value,
+            //personIncharge: this.formCreateComponent.personIncharge.value,
             coloaderId: form.coloader,
             polDescription: form.polDescription,
             podDescription: form.podDescription,

@@ -338,10 +338,15 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
+        private SysOffice GetOffice(Guid Id)
+        {
+            return officeRepository.Get(x => x.Id == Id).FirstOrDefault();
+        }
+
         public string GenerateReceiptNo()
         {
             string prefix = "PT";
-            var userCurrentOffice = officeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var userCurrentOffice = GetOffice(currentUser.OfficeID);
             if (userCurrentOffice != null)
             {
                 if (userCurrentOffice.Code == "ITLHAN")
@@ -507,7 +512,7 @@ namespace eFMS.API.Accounting.DL.Services
             Regex regex = new Regex(pattern);
 
             IQueryable<AcctReceipt> acctReceipts = DataContext.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) 
-            && regex.IsMatch(x.PaymentRefNo) && x.PaymentDate.Value.Month == receipt.PaymentDate.Value.Month).OrderByDescending(x => x.DatetimeCreated);
+            && regex.IsMatch(x.PaymentRefNo) && x.PaymentDate.Value.Month == receipt.PaymentDate.Value.Month && x.PaymentDate.Value.Year == receipt.PaymentDate.Value.Year).OrderByDescending(x => x.DatetimeCreated);
             if (acctReceipts.Count() > 0)
             {
                 // remove /MM
@@ -1686,7 +1691,8 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
             IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id
-            && (x.Type == "ADV" || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH));
+            && (x.Type == "ADV" || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
+            && receipt.Class != AccountingConstants.RECEIPT_CLASS_COLLECT_OBH_OTHER);
 
             decimal? totalAdvPaymentVnd = payments
               .Select(s => s.PaymentAmountVnd)
@@ -2342,27 +2348,15 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CustomerDebitCreditModel> obhs = null;
             IQueryable<CustomerDebitCreditModel> soaCredits = null;
 
-            //if (criteria.SearchType.Equals("Credit Note"))
-            //{
-            //    creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
-            //}
-            //else
-            //{
-            //    debits = GetDebitForIssueCustomerPayment(criteria);
-            //    obhs = GetObhForIssueCustomerPayment(criteria);
-            //    //soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
-            //    //creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
-            //}
-
             debits = GetDebitForIssueCustomerPayment(criteria);
             obhs = GetObhForIssueCustomerPayment(criteria);
 
 
-            if (debits != null && debits.Count() > 0)
+            if (debits != null)
             {
                 data.AddRange(debits);
             }
-            if (obhs != null && obhs.Count() > 0)
+            if (obhs != null)
             {
                 data.AddRange(obhs);
             }
@@ -2873,122 +2867,15 @@ namespace eFMS.API.Accounting.DL.Services
                             break;
                     }
                 }
+            } else
+            {
+                query = query = query.And(x => x.Date.Value.Date <= DateTime.Now.Date);
             }
-
-            //if (criteria.Service != null && criteria.Service.Count > 0)
-            //{
-            //     query = query.And(x => IsMatchService(x.ServiceType, criteria.Service));
-            //}
 
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
                 query = query.And(x => criteria.Office.Contains(x.OfficeId.ToString()));
             }
-
-
-            //if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
-            //{
-            //    var acctManagementIds = new List<Guid?>();
-            //    if (criteria.SearchType.Equals("SOA"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("Debit/Credit/Invoice"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => (criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase))
-            //        || (criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)
-            //        || (criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase))
-            //        )).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("VAT Invoice"))
-            //    {
-            //        query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
-            //    }
-            //    else if (criteria.SearchType.Equals("JOB NO"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("HBL"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("MBL"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-            //    else if (criteria.SearchType.Equals("Customs No"))
-            //    {
-            //        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    }
-
-            //    if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //    {
-            //        query = query.And(x => acctManagementIds.Contains(x.Id));
-            //    }
-            //}
-
-            //if (criteria.FromDate != null && criteria.ToDate != null)
-            //{
-            //    if (!string.IsNullOrEmpty(criteria.DateType))
-            //    {
-            //        if (criteria.DateType == "Invoice Date")
-            //        {
-            //            query = query.And(x => x.Date.Value.Date >= criteria.FromDate.Value.Date && x.Date.Value.Date <= criteria.ToDate.Value.Date);
-            //        }
-            //        else if (criteria.DateType == "Billing Date")
-            //        {
-            //            query = query.And(x => x.ConfirmBillingDate.Value.Date >= criteria.FromDate.Value.Date && x.ConfirmBillingDate.Value.Date <= criteria.ToDate.Value.Date);
-            //        }
-            //        else if (criteria.DateType == "Service Date")
-            //        {
-            //            IQueryable<OpsTransaction> operations = null;
-            //            IQueryable<CsTransaction> transactions = null;
-            //            if (!string.IsNullOrEmpty(criteria.Service))
-            //            {
-            //                if (criteria.Service.Contains("CL"))
-            //                {
-            //                    operations = opsTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Value.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date : false));
-            //                }
-            //                if (criteria.Service.Contains("I") || criteria.Service.Contains("A"))
-            //                {
-            //                    transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? (criteria.FromDate.Value.Date <= x.ServiceDate.Value.Date &&
-            //                                                                                                        x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date) : false));
-            //                }
-            //            }
-
-            //            var dateModeJobNos = new List<string>();
-            //            if (operations != null)
-            //            {
-            //                dateModeJobNos = operations.Select(s => s.JobNo).ToList();
-            //            }
-            //            if (transactions != null)
-            //            {
-            //                dateModeJobNos.AddRange(transactions.Select(s => s.JobNo).ToList());
-            //            }
-            //            if (dateModeJobNos.Count > 0)
-            //            {
-            //                var acctManagementIds = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.AcctManagementId).Distinct().ToList();
-            //                if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //                {
-            //                    query = query.And(x => acctManagementIds.Contains(x.Id));
-            //                }
-            //            }
-            //            else
-            //            {
-            //                query = query.And(x => false);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //if (!string.IsNullOrEmpty(criteria.Service))
-            //{
-            //    var acctManagementIds = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
-            //    if (acctManagementIds != null && acctManagementIds.Count > 0)
-            //    {
-            //        query = query.And(x => acctManagementIds.Contains(x.Id));
-            //    }
-            //}
 
             return query;
         }
@@ -3248,15 +3135,13 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
             var invoices = acctMngtRepository.Get(expQuery);
-            var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
 
             if (invoices.Count() == 0)
             {
                 return null;
             }
+            var surcharges = surchargeRepository.Get();
+           
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
@@ -3320,6 +3205,10 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = new List<string> { se.Invoice.Id.ToString() },
                 ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo),
             });
+
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
@@ -3407,16 +3296,12 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
             var invoiceTemps = acctMngtRepository.Get(expQuery);
-            var surcharges = surchargeRepository.Get();
-            var partners = catPartnerRepository.Get();
-            var departments = departmentRepository.Get();
-            var offices = officeRepository.Get();
 
             if (invoiceTemps.Count() == 0)
             {
                 return null;
             }
-
+            var surcharges = surchargeRepository.Get();     
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
@@ -3479,8 +3364,12 @@ namespace eFMS.API.Accounting.DL.Services
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
                 RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList(),
                 ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo)
-
             });
+
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
@@ -3847,7 +3736,7 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
 
-        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
+        public async Task<AcctReceiptAdvanceModelExport> GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
             List<string> methodsAdv = new List<string> {
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
@@ -3864,9 +3753,9 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
             }
 
-            IQueryable<AcctReceipt> receiptExpre = DataContext.Get(query);
+            var receiptExpre = await DataContext.GetAsync(query);
 
-            IQueryable<AcctReceipt> receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
+            var receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
             List<Guid> receiptWithoutPaymentMethodIds = receiptExpre.Where(x => !methodsAdv.Contains(x.PaymentMethod)).Select(x => x.Id).ToList();
 
             List<Guid?> queryPayment = acctPaymentRepository.Get(x => receiptWithoutPaymentMethodIds.Contains(x.ReceiptId ?? Guid.Empty)
@@ -3875,9 +3764,9 @@ namespace eFMS.API.Accounting.DL.Services
             .Distinct()
             .ToList();
 
-            IQueryable<AcctReceipt> receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
+            var receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
 
-            IQueryable<AcctReceipt> receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
+            var receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
 
             if (receipts.Count() == 0)
             {
@@ -3896,18 +3785,22 @@ namespace eFMS.API.Accounting.DL.Services
             result.PartnerNameEn = partner.PartnerNameEn;
             result.UserExport = currentUser.UserName;
 
-            result.Details = receipts.OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated).Select(receipt => new AcctReceiptAdvanceRowModel
-            {
-                Description = receipt.Description,
-                ReceiptNo = receipt.PaymentRefNo,
-                PaidDate = receipt.PaymentDate,
-                CusAdvanceAmountVnd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountVnd ?? 0) : (receipt.CusAdvanceAmountVnd ?? 0), // Trừ ứng trước
-                CusAdvanceAmountUsd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountUsd ?? 0) : (receipt.CusAdvanceAmountUsd ?? 0),
-                AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0, // Số dư ứng trước
-                AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
-                TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD), // tổng tiền ứng trước
-                TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
-            });
+            result.Details = receipts.AsQueryable()
+                .OrderBy(x => x.PaymentDate)
+                .ThenBy(x => x.DatetimeCreated)
+                .Select(receipt => new AcctReceiptAdvanceRowModel
+                {
+                    Description = receipt.Description,
+                    ReceiptNo = receipt.PaymentRefNo,
+                    PaidDate = receipt.PaymentDate,
+                    CusAdvanceAmountVnd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountVnd ?? 0) : (receipt.CusAdvanceAmountVnd ?? 0), // Trừ ứng trước
+                    CusAdvanceAmountUsd = receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountUsd ?? 0) : (receipt.CusAdvanceAmountUsd ?? 0),
+                    AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0, // Số dư ứng trước
+                    AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
+                    TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD), // tổng tiền ứng trước
+                    TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
+                    Office = GetOffice(receipt.OfficeId ?? Guid.Empty).Code
+                });
 
             return result;
         }

@@ -133,10 +133,12 @@
                             <label>A.O.L - Departure
                                 <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll allowFreeText (itemSelected)="onSelectDataFormInfo($event, 'pol')"
+                            <app-combo-grid-virtual-scroll allowFreeText
+                                (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Select A.O.L"
-                                (remove)="resetFormControl(pol); resetFormControl(polDescription)" [loading]="isLoadingPort | async" formControlName="polDescription" >
+                                (remove)="resetFormControl(pol); resetFormControl(polDescription)"
+                                [loading]="isLoadingPort | async" formControlName="polDescription">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -147,10 +149,12 @@
                             <label>A.O.D - Destination
                                 <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll allowFreeText (itemSelected)="onSelectDataFormInfo($event, 'pod')"
+                            <app-combo-grid-virtual-scroll allowFreeText
+                                (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort" placeholder="Please select A.O.D"
-                                (remove)="resetFormControl(pod); resetFormControl(podDescription)" [loading]="isLoadingPort | async" formControlName="podDescription" >
+                                (remove)="resetFormControl(pod); resetFormControl(podDescription)"
+                                [loading]="isLoadingPort | async" formControlName="podDescription">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">Port of
@@ -200,12 +204,34 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label required>Person In Charge</label>
-                            <select formControlName="personIncharge" disabled class="form-control">
+                            <select formControlName="personIncharge" class="form-control">
                                 <option *ngFor="let item of (listUsers | async)" [value]="item.id">{{item.username}}
                                 </option>
                             </select>
+                        </div> -->
+
+                        <div class="form-group "
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !personIncharge.valid}">
+                            <label required>
+                                Personal In Charge
+                            </label>
+                            <app-combo-grid-virtual-scroll
+                                (itemSelected)="onSelectDataFormInfo($event,'personIncharge')"
+                                [currentActiveItemId]="{ field: 'id', value: personIncharge.value,hardValue:this.defaultUserName}"
+                                [selectedDisplayFields]="['userName']" [dataSources]="listUsers" [displayFields]="[
+                                    { field: 'userName', label: 'User Name' },
+                                    { field: 'employeeNameVn', label: 'Full Name' },
+                                    { field: 'userGroupName', label: 'Group' },
+                                    { field: 'userDeparmentName', label: 'Department' },
+                                    { field: 'userOfficeName', label: 'Office' }
+                                ]
+                            " [height]="150" [clearable]="false">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !personIncharge.valid">
+                                Person In Charge is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

@@ -14,7 +14,7 @@ namespace eFMS.API.Accounting.DL.IService
     public interface IAcctPayableService : IRepositoryBase<AccAccountPayable, AccAccountPayableModel>
     {
         IQueryable<AccAccountPayableModel> Paging(AccountPayableCriteria criteria, int page, int size, out int rowsCount);
-        List<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria);
+        IQueryable<AcctPayablePaymentExport> GetDataExportPayablePaymentDetail(AccountPayableCriteria criteria);
         List<AccountingTemplateExport> GetDataExportAccountingTemplate(AccountPayableCriteria criteria);
         IQueryable<AccAccountPayablePaymentModel> GetBy(AcctPayableViewDetailCriteria criteria);
         GeneralAccPayableModel GetGeneralPayable(string partnerId,string currency);
