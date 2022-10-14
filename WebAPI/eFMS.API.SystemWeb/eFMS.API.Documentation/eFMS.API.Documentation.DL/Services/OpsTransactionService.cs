@@ -19,6 +19,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System;
@@ -1014,7 +1015,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
+                ShipmentType = customerContract.ShipmentType == "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -2815,19 +2816,24 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
         {
             var hs = new HandleState();
-            var listJob = await DataContext.GetAsync(x => x.JobNo.Contains(jobNo));
-            var jobRep = listJob.FirstOrDefault(x => x.JobNo != jobNo);
-            var job = listJob.FirstOrDefault(x => x.JobNo == jobNo);
 
-            jobRep.SumNetWeight = job.SumNetWeight;
-            jobRep.SumPackages = job.SumPackages;
-            jobRep.SumCbm = job.SumCbm;
-            jobRep.SumContainers = job.SumContainers;
-            jobRep.SumGrossWeight = job.SumGrossWeight;
-            jobRep.PackageTypeId = job.PackageTypeId;
+            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
 
-            hs = DataContext.Update(jobRep, x => x.Id == jobRep.Id);
-            return hs;
+            if (job != null && repJob != null)
+            {
+                repJob.SumNetWeight = job.SumNetWeight;
+                repJob.SumPackages = job.SumPackages;
+                repJob.SumCbm = job.SumCbm;
+                repJob.SumContainers = job.SumContainers;
+                repJob.SumGrossWeight = job.SumGrossWeight;
+                repJob.PackageTypeId = job.PackageTypeId;
+
+                hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                return hs;
+            }
+
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT_COPY, "R" + job.JobNo].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
