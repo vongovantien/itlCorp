@@ -116,27 +116,28 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!!this.description  && containers.length>0) {
-            this.description = '';
+        if (!!this.description  && containers.length>0 && this.description==="") {
+            //this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!!this.commodities && containers.length>0) {
-            this.commodities = '';
+        if (!!this.commodities && containers.length>0 && this.commodities==="") {
+            // this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
         }
 
         // * GW, Nw, CW, CBM
-        this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
-        this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
-        this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
-        this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
-        this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
-
+        if (!!containers.length) {
+            this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
+            this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
+            this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
+            this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
+            this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
+        }   
         this.grossWeight = +this.grossWeight.toFixed(3);
         this.netWeight = +this.netWeight.toFixed(3);
         this.totalChargeWeight = +this.totalChargeWeight.toFixed(3);
@@ -151,8 +152,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
         // * Container
         if (this.containers.length>0) {
-            this.containerDetail = '';
-            this.containerDescription = '';
+            // this.containerDetail = '';
+            // this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
                 containerLst.forEach((c: Container) => {
