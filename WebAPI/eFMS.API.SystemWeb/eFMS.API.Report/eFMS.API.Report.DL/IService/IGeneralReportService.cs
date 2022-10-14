@@ -11,5 +11,6 @@ namespace eFMS.API.Report.DL.IService
         IQueryable<GeneralReportResult> QueryDataGeneralReport(GeneralReportCriteria criteria);
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
         IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewFCL(GeneralReportCriteria criteria);
+        IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewLCL(GeneralReportCriteria criteria);
     }
 }

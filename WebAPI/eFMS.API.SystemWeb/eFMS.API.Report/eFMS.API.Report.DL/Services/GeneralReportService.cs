@@ -16,23 +16,23 @@ namespace eFMS.API.Report.DL.Services
 {
     public class GeneralReportService : IGeneralReportService
     {
-        readonly IContextBase<OpsTransaction> opsRepository;
-        readonly IContextBase<CsTransactionDetail> detailRepository;
-        readonly IContextBase<CsShipmentSurcharge> surCharge;
-        readonly IContextBase<CatPartner> catPartnerRepo;
+        private readonly IContextBase<OpsTransaction> opsRepository;
+        private readonly IContextBase<CsTransactionDetail> detailRepository;
+        private readonly IContextBase<CsShipmentSurcharge> surCharge;
+        private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly ICurrentUser currentUser;
-        readonly IContextBase<SysUser> sysUserRepo;
-        readonly IContextBase<SysEmployee> sysEmployeeRepo;
-        readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
-        readonly IContextBase<CatPlace> catPlaceRepo;
-        readonly IContextBase<CatUnit> catUnitRepo;
-        readonly IContextBase<CatCharge> catChargeRepo;
-        readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
-        readonly IContextBase<SysOffice> sysOfficeRepo;
-        readonly IContextBase<SysUserLevel> sysUserLevelRepo;
-        readonly IContextBase<CustomsDeclaration> customsDeclarationRepo;
+        private readonly IContextBase<SysUser> sysUserRepo;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepo;
+        private readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
+        private readonly IContextBase<CatPlace> catPlaceRepo;
+        private readonly IContextBase<CatUnit> catUnitRepo;
+        private readonly IContextBase<CatCharge> catChargeRepo;
+        private readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
+        private readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepo; 
         private readonly ICurrencyExchangeService currencyExchangeService;
-
+        private readonly IContextBase<CatIncoterm> catIncotermRepository;
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
@@ -57,6 +57,7 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<CatChargeGroup> ChargeGroup,
             IContextBase<SysOffice> Office,
             IContextBase<CustomsDeclaration> customsDeclaration,
+            IContextBase<CatIncoterm> catIncoterm,
             IContextBase<SysUserLevel> UserLevel)
         {
             opsRepository = ops;
@@ -75,6 +76,7 @@ namespace eFMS.API.Report.DL.Services
             customsDeclarationRepo = customsDeclaration;
             currencyExchangeService = currencyExchange;
             catUnitRepo = catUnit;
+            catIncotermRepository = catIncoterm;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
@@ -571,24 +573,14 @@ namespace eFMS.API.Report.DL.Services
             List<GeneralExportShipmentOverviewFCLResult> lstShipment = new List<GeneralExportShipmentOverviewFCLResult>();
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
-            var lstSurchage = surCharge.Get();
-            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var PlaceList = catPlaceRepo.Get();
             var PartnerList = catPartnerRepo.Get();
-            var LookupPartner = PartnerList.ToLookup(x => x.Id);
-            var LookupPlace = PlaceList.ToLookup(x => x.Id);
             var ChargeList = catChargeRepo.Get();
-            var LookupCharge = ChargeList.ToLookup(x => x.Id);
             var UserList = sysUserRepo.Get();
-            var LookupUser = UserList.ToLookup(x => x.Id);
             var ChargeGroupList = catChargeGroupRepo.Get();
-            var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
             var OfficeList = sysOfficeRepo.Get();
-            var LookupOffice = OfficeList.ToLookup(x => x.Id);
             var UserLevelList = sysUserLevelRepo.Get();
-            var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
             var UnitList = catUnitRepo.Get();
-            var LookupUnitList = UnitList.ToLookup(x => x.Id);
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewFCLResult data = new GeneralExportShipmentOverviewFCLResult();
@@ -601,18 +593,18 @@ namespace eFMS.API.Report.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.Mawb;
                 data.HblHawb = item.HwbNo;
-                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
-                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
-                data.Carrier = !string.IsNullOrEmpty(item.ColoaderId) ? LookupPartner[item.ColoaderId].FirstOrDefault()?.ShortName : string.Empty;
-                data.Agent = LookupPartner[item.AgentId].FirstOrDefault()?.ShortName;
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? PlaceList.Where(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + PlaceList.Where(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault() : pol;
+                data.Carrier = !string.IsNullOrEmpty(item.ColoaderId) ? PartnerList.Where(x => x.Id == item.ColoaderId)?.FirstOrDefault()?.ShortName : string.Empty;
+                data.Agent = PartnerList.Where(x => x.Id == item.AgentId)?.FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
                 var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
-                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
-                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : PartnerList.Where(x => x.Id == item.ConsigneeId)?.FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : PartnerList.Where(x => x.Id == item.Shipper)?.FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ServiceType;
-                data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
+                data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? UserList.Where(x => x.Id == item.SalemanId).FirstOrDefault()?.Username : string.Empty;
 
                 var ArrNotifyPartyDesc = item.NotifyPartyDescription?.Split("\n").ToArray();
                 data.AgentName = ArrNotifyPartyDesc != null && ArrNotifyPartyDesc.Length > 0 ? ArrNotifyPartyDesc[0] : string.Empty;
@@ -640,16 +632,16 @@ namespace eFMS.API.Report.DL.Services
 
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = surCharge.Get(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
-                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
+                        var chargeObj = ChargeList.Where(x => x.Id == charge.ChargeId).Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
                         bool isOtherSell = true;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
                         }
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
@@ -791,16 +783,16 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalBuyAmountOther = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = surCharge.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
-                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
+                        var chargeObj = ChargeList.Where(x => x.Id == charge.ChargeId).Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
                         bool isOther = true;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
                         }
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
@@ -937,7 +929,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = surCharge.Get(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
                         _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
@@ -946,13 +938,13 @@ namespace eFMS.API.Report.DL.Services
 
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
-                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.NameVn).FirstOrDefault() : string.Empty;
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? PlaceList.Where(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault() : string.Empty;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
-                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
-                var OfficeSaleman = LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
-                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
-                data.Creator = item.TransactionType == "CL" ? LookupUser[item.PersonInCharge].Select(t => t.Username).FirstOrDefault() : LookupUser[item.UserCreated].Select(t => t.Username).FirstOrDefault();
+                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? OfficeList.Where(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var OfficeSaleman = UserLevelList.Where(x => x.UserId == item.SalemanId).Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? OfficeList.Where(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.Creator = item.TransactionType == "CL" ? UserList.Where(x => x.Id == item.PersonInCharge).Select(t => t.Username).FirstOrDefault() : UserList.Where(x => x.Id == item.UserCreated).Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.Pono;
                 data.Commodity = item.Commodity;
                 data.ProductService = item.ProductService;
@@ -960,9 +952,11 @@ namespace eFMS.API.Report.DL.Services
                 data.PMTerm = item.PaymentTerm;
                 data.ShipmentNotes = item.Notes;
                 data.Created = item.DatetimeCreated;
-                data.CustomerId = LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault();
-                data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
-                string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var customer = PartnerList.Where(x => x.Id == item.CustomerId)?.FirstOrDefault();
+
+                data.CustomerId = customer.AccountNo;
+                data.CustomerName = customer.ShortName;
+                string Code = item.PackageType != null ? UnitList.Where(x => x.Id == item.PackageType).Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.PackageQty.ToString() + " " + Code;
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
                 data.BKRefNo = item.ReferenceNo;
@@ -975,5 +969,311 @@ namespace eFMS.API.Report.DL.Services
             return lstShipment.AsQueryable();
         }
 
+        public IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewLCL(GeneralReportCriteria criteria)
+        {
+            List<GeneralExportShipmentOverviewFCLResult> lstShipment = new List<GeneralExportShipmentOverviewFCLResult>();
+            var dataShipment = GetDataGeneralReport(criteria);
+            if (!dataShipment.Any()) return null;
+            var shipments = dataShipment.OrderBy(x => x.TransactionType).ThenBy(x => x.JobNo);
+            var placesData = catPlaceRepo.Get().ToLookup(x => x.Id);
+            var partnersData = catPartnerRepo.Get().ToLookup(x => x.Id);
+            var usersData = sysUserRepo.Get().ToLookup(u => u.Id);
+            var chargesData = surCharge.Get().ToLookup(u => u.Hblid);
+            // Get id charges with filter
+            var freightChargeId = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("FREIGHT"))?.Select(x => x.Id).FirstOrDefault();
+            var terminalHandling = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TERMINAL HANDLING") || x.ChargeNameEn.ToUpper().Contains("THC"))?.Select(x => x.Id).ToList();
+            var billFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("BILL FEE"))?.Select(x => x.Id).ToList();
+            var telexRelease = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TELEX RELEASE"))?.Select(x => x.Id).ToList();
+            var cfsCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("CFS"))?.Select(x => x.Id).ToList();
+            var securityCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("SECURITY") || x.ChargeNameEn.ToUpper().Contains("EBS"))?.Select(x => x.Id).ToList();
+            var autoManCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("AUTOMATED MANIFEST") || x.ChargeNameEn.ToUpper().Contains("AMS"))?.Select(x => x.Id).ToList();
+            var vgmCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("VGM"))?.Select(x => x.Id).ToList();
+            var lclBookingFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("LCL BOOKING FEE"))?.Select(x => x.Id).ToList();
+            var customFeeName = new string[] { "PICK-UP CHARGE", "CUSTOMS CLEARANCE", "CUSTOMS INSPECTION" };
+            var customFee = catChargeRepo.Get(x => Array.Exists(customFeeName, element => x.ChargeNameEn.ToUpper().Contains(element)))?.Select(x => x.Id).ToList();
+
+            foreach (var shipment in shipments)
+            {
+                var data = new GeneralExportShipmentOverviewFCLResult();
+                data.ReferenceNo = shipment.ReferenceNo;
+                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == shipment.TransactionType).Select(x => x.DisplayName).FirstOrDefault();
+                data.JobNo = shipment.JobNo;
+                data.ServiceDate = shipment.ServiceDate;
+                data.etd = shipment.Etd;
+                data.eta = shipment.Eta;
+                data.FlightNo = shipment.FlightNo;
+                data.MblMawb = shipment.Mawb;
+                data.HblHawb = shipment.HwbNo;
+                data.Incoterm = shipment.IncotermId == null ? string.Empty : catIncotermRepository.Get(x => x.Id == shipment.IncotermId).Select(x => x.Code).FirstOrDefault();
+                if (shipment.Pol != null && shipment.Pod != null)
+                {
+                    data.PolPod = placesData[(Guid)shipment.Pol]?.Select(x => x.Code).FirstOrDefault() + "/" + placesData[(Guid)shipment.Pod]?.Select(x => x.Code).FirstOrDefault();
+                }
+                else
+                {
+                    if (!(shipment.Pol == null && shipment.Pod == null))
+                    {
+                        data.PolPod = shipment.Pol == null ? placesData[(Guid)shipment.Pod]?.Select(x => x.Code).FirstOrDefault() :
+                                                                            placesData[(Guid)shipment.Pol]?.Select(x => x.Code).FirstOrDefault();
+                    }
+                }
+                data.FinalDestination = shipment.FinalDestination;
+                data.Carrier = partnersData[shipment.ColoaderId]?.Select(x => x.ShortName).FirstOrDefault();
+                data.AgentName = partnersData[shipment.AgentId]?.Select(x => x.PartnerNameEn).FirstOrDefault();
+                data.Shipper = shipment.ShipperDescription?.Split('\n').FirstOrDefault();
+                data.Consignee = shipment.ConsigneeDescription?.Split('\n').FirstOrDefault();
+                data.ShipmentType = shipment.ShipmentType;
+                data.Salesman = usersData[shipment.SalemanId]?.Select(x => x.Username).FirstOrDefault();
+                data.NotifyParty = shipment.NotifyPartyDescription?.Split('\n').FirstOrDefault();
+                data.PackageQty = shipment.PackageQty;
+                data.Cont20 = shipment.Cont20 ?? 0;
+                data.Cont40 = shipment.Cont40 ?? 0;
+                data.Cont40HC = shipment.Cont40HC ?? 0;
+                data.Cont45 = shipment.Cont45 ?? 0;
+                data.GW = shipment.GrossWeight;
+                data.CW = shipment.ChargeWeight;
+                data.CBM = shipment.Cbm;
+                var surChargesShipment = chargesData[(Guid)shipment.HblId];
+                data.TotalBuy = 0;
+                data.TotalSell = 0;
+                data.Profit = 0;
+                if (criteria.Currency == ReportConstants.CURRENCY_LOCAL)
+                {
+                    #region -- currency = VND
+                    // Freight
+                    var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
+                    if (_freightCharges?.Count() > 0)
+                    {
+                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyFreight;
+                        data.TotalSell += data.TotalSellFreight;
+                    }
+                    // Terminal Handling (THC)
+                    var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
+                    if (_terminalHandlingCharges?.Count() > 0)
+                    {
+                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyTerminal;
+                        data.TotalSell += data.TotalSellTerminal;
+                    }
+                    // Origin Doc Fee (B/L)
+                    var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
+                    if (_billFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyBillFee;
+                        data.TotalSell += data.TotalSellBillFee;
+                    }
+                    // Telex release Fee
+                    var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
+                    if (_telexReleaseCharges?.Count() > 0)
+                    {
+                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyTelexRelease;
+                        data.TotalSell += data.TotalSellTelexRelease;
+                    }
+                    // Origin Container Freight Station Fee (CFS)
+                    var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
+                    if (_cfsCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyCFSFee;
+                        data.TotalSell += data.TotalSellCFSFee;
+                    }
+                    // Security (EBS)
+                    var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
+                    if (_securityCharges?.Count() > 0)
+                    {
+                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyEBSFee;
+                        data.TotalSell += data.TotalSellEBSFee;
+                    }
+                    // Automated Manifest System (AMS)
+                    var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
+                    if (_autoManCharges?.Count() > 0)
+                    {
+                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyAutomated;
+                        data.TotalSell += data.TotalSellAutomated;
+                    }
+                    // VGM admin Fee
+                    var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
+                    if (_vgmCharges?.Count() > 0)
+                    {
+                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyVGM;
+                        data.TotalSell += data.TotalSellVGM;
+                    }
+                    // Booking fee - LCL
+                    var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
+                    if (_lclBookingFeeCharges?.Count() > 0)
+                    {
+                        data.TotalSellBookingFee = _lclBookingFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSell += data.TotalSellBookingFee;
+                    }
+                    // Pick up charge + Customs fee
+                    var _customFeeCharges = surChargesShipment.Where(x => customFee.Contains(x.ChargeId));
+                    if (_customFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCustomFee = _customFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellCustomFee = _customFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyCustomFee;
+                        data.TotalSell += data.TotalSellCustomFee;
+                    }
+                    // OTHERS Fee
+                    var _lclOtherCharges = surChargesShipment.Except(_freightCharges)
+                                                                            .Except(_terminalHandlingCharges)
+                                                                            .Except(_billFeeCharges)
+                                                                            .Except(_telexReleaseCharges)
+                                                                            .Except(_cfsCharges)
+                                                                            .Except(_securityCharges)
+                                                                            .Except(_autoManCharges)
+                                                                            .Except(_vgmCharges)
+                                                                            .Except(_customFeeCharges);
+                    // Total Others Fee Of Buying
+                    data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                    // Total Others Fee Of Selling
+                    _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
+                    data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                    // TOTAL
+                    data.TotalBuy += data.TotalBuyOthers;
+                    data.TotalSell += data.TotalSellOthers;
+                    data.Profit = data.TotalSell - data.TotalBuy;
+                    #endregion
+                }
+                else
+                {
+                    #region -- currency = USD
+                    // Freight
+                    var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
+                    if (_freightCharges?.Count() > 0)
+                    {
+                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyFreight;
+                        data.TotalSell += data.TotalSellFreight;
+                    }
+                    // Terminal Handling (THC)
+                    var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
+                    if (_terminalHandlingCharges?.Count() > 0)
+                    {
+                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyTerminal;
+                        data.TotalSell += data.TotalSellTerminal;
+                    }
+                    // Origin Doc Fee (B/L)
+                    var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
+                    if (_billFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyBillFee;
+                        data.TotalSell += data.TotalSellBillFee;
+                    }
+                    // Telex release Fee
+                    var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
+                    if (_telexReleaseCharges?.Count() > 0)
+                    {
+                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyTelexRelease;
+                        data.TotalSell += data.TotalSellTelexRelease;
+                    }
+                    // Origin Container Freight Station Fee (CFS)
+                    var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
+                    if (_cfsCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyCFSFee;
+                        data.TotalSell += data.TotalSellCFSFee;
+                    }
+                    // Security (EBS)
+                    var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
+                    if (_securityCharges?.Count() > 0)
+                    {
+                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyEBSFee;
+                        data.TotalSell += data.TotalSellEBSFee;
+                    }
+                    // Automated Manifest System (AMS)
+                    var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
+                    if (_autoManCharges?.Count() > 0)
+                    {
+                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyAutomated;
+                        data.TotalSell += data.TotalSellAutomated;
+                    }
+                    // VGM admin Fee
+                    var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
+                    if (_vgmCharges?.Count() > 0)
+                    {
+                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyVGM;
+                        data.TotalSell += data.TotalSellVGM;
+                    }
+                    // Booking fee - LCL
+                    var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
+                    if (_lclBookingFeeCharges?.Count() > 0)
+                    {
+                        data.TotalSellBookingFee = _lclBookingFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSell += data.TotalSellBookingFee;
+                    }
+                    // Pick up charge + Customs fee
+                    var _customFeeCharges = surChargesShipment.Where(x => customFee.Contains(x.ChargeId));
+                    if (_customFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCustomFee = _customFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellCustomFee = _customFeeCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyCustomFee;
+                        data.TotalSell += data.TotalSellCustomFee;
+                    }
+                    // OTHERS Fee
+                    var _lclOtherCharges = surChargesShipment.Except(_freightCharges)
+                                                                            .Except(_terminalHandlingCharges)
+                                                                            .Except(_billFeeCharges)
+                                                                            .Except(_telexReleaseCharges)
+                                                                            .Except(_cfsCharges)
+                                                                            .Except(_securityCharges)
+                                                                            .Except(_autoManCharges)
+                                                                            .Except(_vgmCharges)
+                                                                            .Except(_customFeeCharges);
+                    // Total Others Fee Of Buying
+                    data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                    // Total Others Fee Of Selling
+                    _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
+                    data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                    // TOTAL
+                    data.TotalBuy += data.TotalBuyOthers;
+                    data.TotalSell += data.TotalSellOthers;
+                    data.Profit = data.TotalSell - data.TotalBuy;
+                    #endregion
+                }
+                #region -- Phí OBH sau thuế --
+                decimal? _obh = 0;
+                var surChargesObh = surChargesShipment.Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                foreach (var charge in surChargesObh)
+                {
+                    _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
+                }
+
+                data.AmountOBH = _obh;
+                #endregion -- Phí OBH sau thuế --
+                lstShipment.Add(data);
+            }
+            return lstShipment.AsQueryable();
+        }
     }
 }

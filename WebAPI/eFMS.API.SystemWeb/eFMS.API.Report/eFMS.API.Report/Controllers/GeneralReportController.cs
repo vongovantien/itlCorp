@@ -52,5 +52,13 @@ namespace eFMS.API.Report.Controllers
             var result = data;
             return Ok(result);
         }
+
+        [HttpPost("GetDataExportShipmentOverviewLCL")]
+        public IActionResult GetDataExportShipmentOverviewLCL(GeneralReportCriteria criteria)
+        {
+            var data = generalReportService.GetDataGeneralExportShipmentOverviewLCL(criteria);
+            var result = data;
+            return Ok(result);
+        }
     }
 }
