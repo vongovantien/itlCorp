@@ -22,7 +22,6 @@ export const environment = {
         FILE_SYSTEM: "tefms-demo-api.logtechub.com/File",
         REPORT_MANAGEMENT: "efms-demo-api.logtechub.com/Report"
 
-
     },
     AUTHORIZATION:
     {

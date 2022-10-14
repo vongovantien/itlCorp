@@ -276,6 +276,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     checkValidateForm() {
         let valid: boolean = true;
+        this.removeValidators(this.listInvoice.paymentMethod);
         if (!this.formCreate.formSearchInvoice.valid
             || !this.listInvoice.form.valid
             || this.listInvoice.paidAmountVnd.value === null

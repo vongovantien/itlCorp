@@ -45,11 +45,8 @@ export class FormAddUserComponent extends AppList {
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
     userRole: AbstractControl;
-    //
-    currentUserType: string = '';
+    currentUser: any;
     selectedCompanyId: any;
-    infoCurrentUser: SystemInterface.IClaimUser = <any>this._oauthService.getIdentityClaims(); //Get info of current ser.
-    infoCurrentUserId: string = this.infoCurrentUser.id;
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -177,15 +174,14 @@ export class FormAddUserComponent extends AppList {
             { title: 'Department', field: 'departmentName' },
             { title: 'Position', field: 'position' },
         ];
-        this.getCurrentUserType();
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((currentUser) => {
-                this.selectedCompanyId = currentUser.companyId; 
+                this.selectedCompanyId = currentUser.companyId;
             });
     }
 
-    updateCookies(username: string, password: string){
+    updateCookies(username: string, password: string) {
         const username_encrypt = crypto_js.AES.encrypt(username, SystemConstants.SECRET_KEY).toString();
         this.cookieService.set("__u", username_encrypt, 1, "/", window.location.hostname);
 
@@ -211,24 +207,11 @@ export class FormAddUserComponent extends AppList {
             );
     }
 
-
-    getCurrentUserType() {
-        this._systemRepo.getDetailUser(this.infoCurrentUser.id)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (!!res) {
-                        this.currentUserType = res.data.userType;
-                    }
-                }
-            );
-    }
-
     switchUser(user: any) {
         this._oauthService.loadDiscoveryDocument().then((a) => {
             this._oauthService.tryLogin().then((b) => {
                 let header: HttpHeaders = new HttpHeaders({
-                    companyId: this.selectedCompanyId,
+                    companyId: this.currentUser.companyId,
                     userType: 'Super Admin',
                 });
                 const Username = user.username;

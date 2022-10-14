@@ -182,6 +182,24 @@ export class SystemRepo {
         );
     }
 
+    getPersonInchargeByCurrentUser(groupId: number, isDetail: boolean = false) {
+        if (isDetail) {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/GetPersonInchargeByCurrentUser?groupId=${groupId}`).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+        }
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/GetPersonInchargeByCurrentUser`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
+
     getCompany(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/paging`, body, {
             page: '' + page || 1,
@@ -381,7 +399,7 @@ export class SystemRepo {
     }
 
     getPermissionSample(id: string) {
-        /* 
+        /*
         * Create id = null
         * Detail id = GUID
         */
@@ -737,6 +755,5 @@ export class SystemRepo {
             )
             .pipe(map((data: any) => data));
     }
-
 }
 

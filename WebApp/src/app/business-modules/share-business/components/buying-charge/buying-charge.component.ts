@@ -85,7 +85,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isSelectedPartnerDynamicCombogrid: boolean = false;
     userLogged: any;
     selectedCs: CsShipmentSurcharge;
-    messageConfirmRevertLinkFee: string = "Do you want to Revert Fee these Jobs ?";
+    messageConfirmRevertLinkFee: string = "Do you want to Revert these Fees?";
     noProfit: boolean | any = false;
 
     constructor(
@@ -139,7 +139,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.headerPartner = [
             { title: 'Name Abbr', field: 'shortName' },
             { title: 'Name', field: 'partnerNameEn' },
-            { title: 'Partner Code', field: 'taxCode' },
+            { title: 'Partner Code', field: 'accountNo' },
         ];
 
         this.configComboGridCharge = Object.assign({}, this.configComoBoGrid, {

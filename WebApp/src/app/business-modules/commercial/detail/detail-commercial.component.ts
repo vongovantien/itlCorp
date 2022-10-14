@@ -113,8 +113,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (!!res) {
                         this.partner = res;
                         this.formCommercialComponent.active = this.partner.active;
-                        console.log(this.formCommercialComponent.active);
-                        console.log("detail partner:", this.partner);
                         this.formCreate.isBranchSub = this.isAddSubPartner;
                         this.setDataForm(this.partner);
                         if (this.isAddSubPartner) {

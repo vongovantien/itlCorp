@@ -36,7 +36,11 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string NotitfyParty { get; set; }
         public string CTNS { get; set; }
         public string Measurement { get; set; }
-        public string Qty { get; set; }	
+        public string Qty { get; set; }
+        public string TotalCont { get; set; }
+        public string ShippingMarkSI { get; set; }
+        public string PKGType { get; set; }
+        public string ContainerList { get; set; }
     }
     public class SeaShippingInstructionParameter
     {

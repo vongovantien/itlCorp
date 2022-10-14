@@ -85,6 +85,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
                         this.containerDescription = res.contSealNo;
+                        // this.containers = res.csMawbcontainers;
                     }
                 }
             );
@@ -122,13 +123,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description) {
+        if (!!this.description && containers.length>0 ) {
+            this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
-
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
-
-        if (!this.commodities) {
+        console.log(!!this.commodities && containers.length>0)
+        if (!!this.commodities && containers.length>0) {
+            this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -153,9 +155,9 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        this.containerDetail = '';
-        this.containerDescription = '';
-        if (!!containers) {
+        if (containers.length>0) {
+            this.containerDetail = '';
+            this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
                 containerLst.forEach((c: Container) => {
@@ -198,5 +200,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {
         return `${!!contNo ? contNo : '_'}/${!!contType ? contType : '_'}/${!!sealNo ? sealNo : '_'} \n`;
+    }
+
+    onRefresh() {
+        this.confirmRefresh.hide();
+
+        this.updateData(this.containers);
     }
 }

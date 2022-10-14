@@ -177,13 +177,34 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
+                        <!-- <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':  isSubmitted && !personalIncharge.value}">
                             <label required>Personal In Charge</label>
                             <select formControlName="personalIncharge" disabled class="form-control">
                                 <option *ngFor="let item of (listUsers | async)" [value]="item.id">{{item.username}}
                                 </option>
                             </select>
+                        </div> -->
+                        <div class="form-group "
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !personIncharge.valid}">
+                            <label required>
+                                Person In Charge
+                            </label>
+                            <app-combo-grid-virtual-scroll
+                                (itemSelected)="onSelectDataFormInfo($event,'personIncharge')"
+                                [currentActiveItemId]="{ field: 'id', value: personIncharge.value,hardValue:this.defaultUserName}"
+                                [selectedDisplayFields]="['userName']" [dataSources]="listUsers" [displayFields]="[
+                                { field: 'userName', label: 'User Name' },
+                                { field: 'employeeNameVn', label: 'Full Name' },
+                                { field: 'userGroupName', label: 'Group' },
+                                { field: 'userDeparmentName', label: 'Department' },
+                                { field: 'userOfficeName', label: 'Office' }
+                            ]
+                        " [height]="150" [clearable]="false">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !personIncharge.valid">
+                                Person In Charge is required
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -216,8 +237,9 @@
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Incoterm</label>
-                                    <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id" [clearable]="true"
-                                        formControlName="incotermId" placeholder="Select Incoterm">
+                                    <ng-select class="custom" [items]="incoterms | async" bindLabel="code"
+                                        bindValue="id" [clearable]="true" formControlName="incotermId"
+                                        placeholder="Select Incoterm">
                                     </ng-select>
                                 </div>
                             </div>

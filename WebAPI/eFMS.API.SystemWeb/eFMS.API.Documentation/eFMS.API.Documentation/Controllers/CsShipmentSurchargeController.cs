@@ -221,7 +221,7 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             // validate checkpoint
-            var partnersNeedValidate = list.Where(x => x.Id == Guid.Empty && (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.IsRefundFee != true).ToList();
+            var partnersNeedValidate = list.Where(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.IsRefundFee != true).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
                 string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
@@ -232,6 +232,14 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
             currentUser.Action = "AddAndUpdate";
+
+            // Check shipment with no profit
+            var isValid = true;
+            var chargesCheckNoProfit = csShipmentSurchargeService.CheckAddAndUpdateSellingsShipmentNoProfit(list, out isValid);
+            if (!isValid)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "NoProfit shipment is not applicable to profit bigger than 0" });
+            }
 
             var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
             var message = HandleError.GetMessage(hs, Crud.Update);

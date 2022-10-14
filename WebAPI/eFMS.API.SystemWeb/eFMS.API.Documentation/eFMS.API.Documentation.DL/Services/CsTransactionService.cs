@@ -24,6 +24,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -71,7 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
 
         private readonly ICsStageAssignedService csStageAssignedService;
-        private readonly IContextBase<CatStage> csStageRepository;
+        private readonly IStageService catStageService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -113,7 +114,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
-            IContextBase<CatStage> stageRepo) : base(repository, mapper)
+            IStageService stageService
+            ) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -153,7 +155,7 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepo = catContractRepository;
             opsTransactionRepository = opsTransactionRepo;
             csStageAssignedService = csStageAssigned;
-            csStageRepository = stageRepo;
+            catStageService = stageService;
         }
 
         #region -- INSERT & UPDATE --
@@ -854,6 +856,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var check = csLinkChargeRepository.Get(x => x.JobNoLink == detail.JobNo && x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE).FirstOrDefault();
                 detail.Permission.AllowDelete = check != null ? false : true;
             }
+            detail.PersonInChargeName = sysUserRepo.Get(x => x.Id == detail.PersonIncharge).FirstOrDefault().Username;
             return detail;
         }
 
@@ -1065,6 +1068,20 @@ namespace eFMS.API.Documentation.DL.Services
                         });
                     }
                     result.Containers = containers;
+                }
+            }
+            if(result != null && result.JobNo != null && result.HblId == null)
+            {
+                var surchargesOrg = csShipmentSurchargeRepo.Get(x => x.JobNo == jobOps);
+                var surchargesLink = csShipmentSurchargeRepo.Get(x => x.JobNo == result.JobNo);
+                var linkCharges = csLinkChargeRepository.Get(x => x.LinkChargeType == DocumentConstants.LINK_CHARGE_TYPE_LINK_FEE);
+                var hasLinkCharges = from org in surchargesOrg
+                                     join linkCharge in linkCharges on org.Id.ToString() equals linkCharge.ChargeOrgId
+                                     join link in surchargesLink on linkCharge.ChargeLinkId equals link.Id.ToString()
+                                     select linkCharge;
+                if (hasLinkCharges != null && hasLinkCharges.Any())
+                {
+                    result.HblId = hasLinkCharges.FirstOrDefault().HbllinkId;
                 }
             }
             return result;
@@ -2766,7 +2783,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.VoucherIdredate = null;
                     item.CombineBillingNo = null;
                     item.ObhcombineBillingNo = null;
-                    
+
                     if (item.IsRefundFee == true)
                     {
                         item.PaymentObjectId = shipment.ColoaderId;
@@ -3200,7 +3217,7 @@ namespace eFMS.API.Documentation.DL.Services
 
 
                             // CR 14501 -> 18083
-                            if(!isManyHBls)
+                            if (!isManyHBls)
                             {
                                 hbl.PackageQty = model.PackageQty;
                                 hbl.GrossWeight = model.GrossWeight;
@@ -3208,11 +3225,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 hbl.ChargeWeight = model.ChargeWeight;
                                 hbl.Cbm = model.Cbm;
                             }
-                           
+
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
-                        if(hs.Success)
+                        if (hs.Success)
                         {
                             return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
                         }
@@ -3238,6 +3255,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             if (model.Etd != null)
                             {
+                                hbl.SailingDate = model.Etd;
                                 hbl.Etd = model.Etd;
                             }
                             if (model.Pod != null)
@@ -3277,7 +3295,7 @@ namespace eFMS.API.Documentation.DL.Services
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
-                        if(hs.Success)
+                        if (hs.Success)
                         {
                             return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
                         }
@@ -3612,7 +3630,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && y.Active == havActiveContract(x, model.TransactionType)
                             && y.SaleService.Contains(currentJob.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3632,7 +3650,7 @@ namespace eFMS.API.Documentation.DL.Services
                         tranDes.ForEach(x =>
                         {
                             if (catContractRepo.Get(y => y.PartnerId == x.CustomerId
-                            && y.SaleManId == x.SaleManId
+                            && y.SaleManId == x.SaleManId && y.Active == havActiveContract(x, model.TransactionType)
                             && y.SaleService.Contains(model.TransactionType)).FirstOrDefault()?.ShipmentType == "Nominated")
                             {
                                 errorMsg += x.Hwbno + "; ";
@@ -3642,8 +3660,15 @@ namespace eFMS.API.Documentation.DL.Services
 
                 }
             }
-           
+
             return errorMsg;
+        }
+
+        private bool havActiveContract(CsTransactionDetail tranDes, string transactionType)
+        {
+            return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
+                           && y.SaleManId == tranDes.SaleManId && y.Active == true
+                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated"||y.ShipmentType== "Freehand & Nominated"));
         }
         
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
@@ -3658,12 +3683,12 @@ namespace eFMS.API.Documentation.DL.Services
                     csJob = DataContext.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
                         csJob.CurrentStatus = TermData.Finish;
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         csJob.CurrentStatus = TermData.Processing;
                     }
                     break;
@@ -3671,12 +3696,12 @@ namespace eFMS.API.Documentation.DL.Services
                     opsJob = opsTransactionRepository.First(x => x.Id == model.JobId && x.CurrentStatus != TermData.Canceled);
                     if (model.Status.ToString().Trim() == TermData.Finish)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.FinishCode).FirstOrDefault();
                         opsJob.CurrentStatus = TermData.Finish;
                     }
                     if (model.Status.ToString().Trim() == TermData.Reopen)
                     {
-                        stage = csStageRepository.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
+                        stage = catStageService.Get(x => x.Code == TermData.ReopenCode).FirstOrDefault();
                         opsJob.CurrentStatus = TermData.Processing;
                     }
                     break;

@@ -51,6 +51,7 @@ export class AccountingConstants {
         CLEAR_DEBIT: 'Clear Debit',
         ADVANCE: 'Advance',
         COLLECT_OBH: 'Collect OBH',
+        COLLECT_OBH_OTHER: 'Collect OBH - OTHER',
         PAY_OBH: 'Pay OBH',
         NET_OFF: 'Net Off',
     }

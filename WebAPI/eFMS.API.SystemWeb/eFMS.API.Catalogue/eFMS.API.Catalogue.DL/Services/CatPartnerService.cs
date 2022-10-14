@@ -26,6 +26,10 @@ using eFMS.API.Common.Helpers;
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.Service.Contexts;
 using ITL.NetCore.Connection;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -513,7 +517,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Body
             var body = new StringBuilder(emailTemplate.Body);
             string urlToSend = UrlClone.Replace("Catalogue", "");
-            body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
+            body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE) ? "Accountant Team" : "AR Team");
             body.Replace("{{title}}", title);
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{accountNo}}", partner.AccountNo);
@@ -528,7 +532,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
-            if (partner.ContractType == "Cash")
+            if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE)
             {
                 lstTo = listEmailViewModel.ListAccountant;
                 if(listEmailViewModel.ListCCAccountant != null)
@@ -2599,6 +2603,42 @@ namespace eFMS.API.Catalogue.DL.Services
                                         PartnerType = p.PartnerType,
                                     };
             return queryAgentForKeyIn.Union(queryICustomerForKeyIn).Union(queryInternalForKeyIn);
+        }
+
+
+        public async Task<CatPartnerModel> GetPartnerByTaxCode(string taxCode)
+        {
+            string baseUrl = $"https://thongtindoanhnghiep.co/api/company/{taxCode}";
+            object partner = new object();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseUrl);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+ 
+                    HttpResponseMessage res = await client.GetAsync(baseUrl);
+                    var item = new CatPartnerModel();
+
+                    if (res.IsSuccessStatusCode)
+                    {
+                        var objResponse = res.Content.ReadAsStringAsync().Result;
+                        partner = JsonConvert.DeserializeObject<object>(objResponse);
+
+                        item.PartnerNameVn = partner.GetValueBy("Root")["Title"];
+                        item.PartnerNameEn = partner.GetValueBy("Root")["TitleEn"];
+                        item.AddressEn = item.AddressShippingEn = partner.GetValueBy("Root")["DiaChiCongTy"];
+                        item.AddressVn = item.AddressShippingVn = partner.GetValueBy("Root")["DiaChiCongTy"];
+                    }
+
+                    return item;
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
     }
 }

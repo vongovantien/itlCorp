@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ApplyDim { get; set; }
         public string MawbShipper { get; set; }
         public bool IsLinkFee { get; set; }
+        public string PersonInChargeName { get; set; }
     }
 
     public class AgentData

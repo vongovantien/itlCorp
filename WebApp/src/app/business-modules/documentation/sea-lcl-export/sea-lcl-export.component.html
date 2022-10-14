@@ -41,7 +41,7 @@
                                                 <i class="fa fa-lock"></i>
                                             </button>
                                             <ng-container
-                                                *ngIf="!shipment.isLocked && !shipment.isLinkFee && shipment.currentStatus !== 'Finish'">
+                                                *ngIf="!shipment.isLocked && !shipment.isLinkFee">
                                                 <app-permission-button (onClick)="prepareDeleteShipment(shipment)"
                                                     type="delete" [user]="shipment.userCreated">
                                                 </app-permission-button>

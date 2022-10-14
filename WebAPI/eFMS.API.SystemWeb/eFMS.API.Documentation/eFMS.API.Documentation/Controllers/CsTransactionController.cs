@@ -13,6 +13,8 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Services;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -46,6 +48,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
+        private readonly ICsStageAssignedService csStageAssignedService;
+
         /// <summary>
         /// constructor
         /// </summary>
@@ -54,7 +58,10 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
         /// <param name="AccAccountReceivaService"></param>
+        /// <param name="serviceUrl"></param>
+        /// <param name="checkPoint"></param>
         /// <param name="imageService"></param>
+        /// <param name="stageAssignedService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,
@@ -62,7 +69,8 @@ namespace eFMS.API.Documentation.Controllers
             IAccAccountReceivableService AccAccountReceivaService,
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
-            ISysImageService imageService)
+            ISysImageService imageService,
+            ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -72,6 +80,7 @@ namespace eFMS.API.Documentation.Controllers
             AccAccountReceivableService = AccAccountReceivaService;
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
+            csStageAssignedService = stageAssignedService;
         }
 
         /// <summary>
@@ -304,6 +313,16 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+
+            Response.OnCompleted(async () =>
+            {
+                if (hs.Success)
+                {
+                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
+                }
+
+            });
+
             return Ok(result);
         }
 

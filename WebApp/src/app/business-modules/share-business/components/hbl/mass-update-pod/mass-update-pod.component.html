@@ -1,0 +1,69 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mass Update POD</h5>
+                <button type="button" class="close" aria-label="Close"
+                    (click)="formGroup.reset(); hide(); isSubmitted = false">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="formGroup">
+                    <div class="form">
+                        <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && deliveryDate.value?.startDate===null}">
+                            <label required>Delivery Date</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                    placeholder="Please Select" readonly [singleDatePicker]="true"
+                                    formControlName="deliveryDate"
+                                    [allowRemove]="!!deliveryDate.value && !!deliveryDate.value?.startDate"
+                                    (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true" [autoApply]="true" />
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && deliveryDate.value?.startDate===null">
+                                    Delivery Date is Required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !deliveryPerson.valid }">
+                            <label required>Delivery Person</label>
+                            <input type="text" class="form-control" placeholder="Delivery Person"
+                                formControlName="deliveryPerson">
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !deliveryPerson.valid">
+                                Delivery Person is required !
+                            </div>
+
+                        </div>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted &&  !HAWBNo.valid }">
+                            <label required>HAWB No</label>
+                            <div class="pos-rel">
+                                <ng-select [items]="housebillList" class="custom" [clearable]="true" bindLabel="hwbno"
+                                    formControlName="HAWBNo" [multiple]="true" (change)="selectedHAWBNo($event)">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <ng-container>
+                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="updatePOD()">
+                    </app-default-button>
+                </ng-container>
+
+                <app-default-button [buttonSetting]="cancelButtonSetting"
+                    (onClick)="isSubmitted = false; formGroup.reset(); hide()">
+                </app-default-button>
+            </div>
+        </div>
+    </div>
+</div>
