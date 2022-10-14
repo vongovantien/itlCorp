@@ -123,12 +123,12 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!!this.description && containers.length>0 && this.description==="") {
+        if (!this.description && containers.length>0) {
             // this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
-        if (!!this.commodities && containers.length>0 && this.commodities==="") {
+        if (!this.commodities && containers.length>0) {
             // this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
