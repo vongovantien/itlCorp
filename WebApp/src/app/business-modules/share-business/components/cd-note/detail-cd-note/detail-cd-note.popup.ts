@@ -260,20 +260,21 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
     previewSeaCdNote(data: string) {
         let sourcePreview$;
         if (this.CdNoteDetail.cdNote.type === "DEBIT") {
-            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner(this.CdNoteDetail.partnerId,
-                this.CdNoteDetail.listSurcharges[0].hblid,
-                'DOC',
-                null,
-                3).pipe(
-                    switchMap((res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            return this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
-                        }
-                        this._toastService.warning(res.message);
-                        return of(false);
-                    })
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.CdNoteDetail.partnerId,
+                hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+                transactionType: 'DOC',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
 
-                )
+            )
         } else {
             sourcePreview$ = this._documentationRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: this.cdNote, currency: data });
         }

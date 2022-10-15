@@ -226,8 +226,14 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
         house.deliveryDate = deliveryDate;
-
-        this._documentationRepo.validateCheckPointContractPartner(houseBill.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
+        const checkPointCreate = {
+            partnerId: houseBill.customerId,
+            hblId: SystemConstants.EMPTY_GUID,
+            transactionType: 'DOC',
+            type: 6,
+            salesmanId: houseBill.saleManId
+        }
+        this._documentationRepo.validateCheckPointContractPartner(checkPointCreate)
             .pipe(
                 switchMap(
                     (res: CommonInterface.IResult) => {

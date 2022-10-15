@@ -7,11 +7,12 @@ import { InfoPopupComponent } from "@common";
 import { OpsTransaction, LinkAirSeaModel } from "@models";
 import { AppForm } from "@app";
 import { DocumentationRepo } from "@repositories";
-import { RoutingConstants } from "@constants";
+import { RoutingConstants, SystemConstants } from "@constants";
 import { JobManagementFormCreateComponent } from "../components/form-create/form-create-job.component";
 
-import { takeUntil, catchError, mergeMap } from "rxjs/operators";
+import { takeUntil, catchError, mergeMap, switchMap } from "rxjs/operators";
 import _merge from 'lodash/merge';
+import { of } from "rxjs";
 
 
 @Component({
@@ -21,7 +22,6 @@ import _merge from 'lodash/merge';
 export class JobManagementCreateJobComponent extends AppForm {
 
     @ViewChild(JobManagementFormCreateComponent) formCreateComponent: JobManagementFormCreateComponent;
-    @ViewChild(InfoPopupComponent) infoPoup: InfoPopupComponent;
 
     isSaveLink: boolean = false;
 
@@ -31,6 +31,7 @@ export class JobManagementCreateJobComponent extends AppForm {
         private _router: Router
     ) {
         super();
+        this.requestCancel = this.gotoList;
     }
 
     ngOnInit() {
@@ -71,7 +72,9 @@ export class JobManagementCreateJobComponent extends AppForm {
         this.formCreateComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPoup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot Create Job'
+            });
             return;
         }
 
@@ -83,16 +86,48 @@ export class JobManagementCreateJobComponent extends AppForm {
         let objUpdateData = null;
 
         if (this.isSaveLink) {
-            objUpdateData = this._documentRepo.getASTransactionInfo(null, model.mblno, model.hwbno, model.productService, model.serviceMode)
-                .pipe(
-                    mergeMap((res: LinkAirSeaModel) => {
-                        model.serviceNo = res?.jobNo;
-                        model.serviceHblId = res?.hblId;
-                        return this._documentRepo.addOPSJob(model);
-                    }),
+            objUpdateData = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: model.customerId,
+                salesmanId: model.salemanId,
+                hblId: SystemConstants.EMPTY_GUID,
+                transactionType: 'CL',
+                type: 1
+            }).pipe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            return this._documentRepo.getASTransactionInfo(null, model.mblno, model.hwbno, model.productService, model.serviceMode)
+                                .pipe(
+                                    mergeMap((res: LinkAirSeaModel) => {
+                                        model.serviceNo = res?.jobNo;
+                                        model.serviceHblId = res?.hblId;
+                                        return this._documentRepo.addOPSJob(model);
+                                    }),
+                                )
+                        }
+                        return of(res);
+                    }
                 )
+            )
+
         } else {
-            objUpdateData = this._documentRepo.addOPSJob(model)
+            objUpdateData = objUpdateData = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: model.customerId,
+                salesmanId: model.salemanId,
+                hblId: SystemConstants.EMPTY_GUID,
+                transactionType: 'CL',
+                type: 1
+            }).pipe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            return this._documentRepo.addOPSJob(model);
+                        }
+                        return of(res);
+                    }
+                )
+            )
+
         }
 
         if (objUpdateData != null) {

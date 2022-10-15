@@ -67,28 +67,32 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
             contactPerson: this.contactPerson.value,
             closingTime: this.closingTime.value
         };
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        return this._documentationRepo.previewBookingNote(body);
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7
+        }).pipe(
+            switchMap((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    return this._documentationRepo.previewBookingNote(body);
+                } else {
+                    this._toastService.warning(res.message);
+                    return of(false);
+                }
+            }),
+            concatMap((data: any) => {
+                if (!!data) {
+                    if (data !== null && data.dataSource.length > 0) {
+                        this.dataReport = data;
+                        this.renderAndShowReport();
+                        return this._documentationRepo.updateInputBookingNoteAirExport(body);
                     } else {
-                        this._toastService.warning(res.message);
-                        return of(false);
+                        this._toastService.warning('There is no data to display preview');
                     }
-                }),
-                concatMap((data: any) => {
-                    if (!!data) {
-                        if (data !== null && data.dataSource.length > 0) {
-                            this.dataReport = data;
-                            this.renderAndShowReport();
-                            return this._documentationRepo.updateInputBookingNoteAirExport(body);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
-                })
-            )
+                }
+            })
+        )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

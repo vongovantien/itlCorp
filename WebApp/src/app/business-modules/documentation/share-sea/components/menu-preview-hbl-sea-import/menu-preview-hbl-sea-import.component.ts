@@ -83,7 +83,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     }
 
     previewProofOfDelivery() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -102,7 +109,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             );
     }
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -126,7 +140,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     }
 
     previewDeliveryOrder() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -150,7 +171,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     }
 
     exportDangerousGoods() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -169,7 +197,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     }
 
     exportGoodsDeclare() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -188,7 +223,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     }
 
     exportEManifest() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        })
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
