@@ -889,39 +889,6 @@ export class DocumentationRepo {
         );
     }
 
-    getGeneralReport(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetDataGeneralReport`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleDepartmentReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/DepartSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleMonthlyReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleQuaterReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/QuaterSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleSummaryReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SummarySaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
     getHAWBListOfShipment(jobId: string, hblId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId, hblId: hblId }).pipe(
             map((data: any) => data)
@@ -1131,18 +1098,6 @@ export class DocumentationRepo {
 
     previewSISummaryByJobId(id: string) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewSISummaryByJobId/${id}`).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewCombinationSalesReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/CombinationSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleKickBackReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SaleKickBackReport`, body).pipe(
             map((data: any) => data)
         );
     }
