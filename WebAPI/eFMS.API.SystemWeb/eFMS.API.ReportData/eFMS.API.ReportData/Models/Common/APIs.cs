@@ -8,5 +8,6 @@ namespace eFMS.API.ReportData.Models
         public string AccountingAPI { get; set; }
         public string SettingAPI { get; set; }
         public string FileManagementAPI { get; set; }
+        public string ReportAPI { get; set; }
     }
 }
