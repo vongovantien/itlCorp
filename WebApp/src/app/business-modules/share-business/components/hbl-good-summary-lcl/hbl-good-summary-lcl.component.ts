@@ -123,13 +123,15 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description && containers.length>0) {
-            // this.description = '';
+        if (!this.description && this.containers.length>0) {
+            this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
+
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
-        if (!this.commodities && containers.length>0) {
-            // this.commodities = '';
+
+        if (!this.commodities && this.containers.length>0) {
+            this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -154,9 +156,9 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        if (containers.length>0) {
+        if (containers.length>0 && !this.containerDescription) {
             // this.containerDetail = '';
-            // this.containerDescription = '';
+            this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
                 containerLst.forEach((c: Container) => {
@@ -185,7 +187,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         // for (const item of contData) {
         //     this.containerDetail += this.handleStringCont(item);
         // }
-        this.containerDetail = 'A PART OF CONTAINER S.T.C';
+        // this.containerDetail = 'A PART OF CONTAINER S.T.C';
 
     }
 

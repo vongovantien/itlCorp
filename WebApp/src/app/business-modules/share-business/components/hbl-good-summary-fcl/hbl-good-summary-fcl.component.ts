@@ -116,15 +116,15 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description  && containers.length>0) {
-            //this.description = '';
+        if (!this.description && this.containers.length>0) {
+            this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!this.commodities && containers.length>0 ) {
-            // this.commodities = '';
+        if (!this.commodities && this.containers.length>0) {
+            this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -151,9 +151,9 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         // * Container
-        if (this.containers.length>0) {
+        if (this.containers.length>0 && !this.containerDescription) {
             // this.containerDetail = '';
-            // this.containerDescription = '';
+            this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
                 containerLst.forEach((c: Container) => {
@@ -165,30 +165,31 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                 });
             }
         }
-
-        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
-        const contObject1 = this.mapObjectData(objApartOf);
-        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
-        const contObject2 = this.mapObjectData(objNotApartOf);
-        const contDataNotAprtOf = [];
-        for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
-            contDataNotAprtOf.push({
-                cont: item,
-                quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-            });
-        }
-
-        for (const item of contDataNotAprtOf) {
-            this.containerDetail += this.handleStringCont(item);
-        }
-
-        for (const item of contObject1) {
-            this.containerDetail += "A Part Of ";
-            this.containerDetail += this.handleStringCont(item);
-        }
-
-        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
         
+        if (!!this.containers.length && !this.containerDetail){
+            const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+            const contObject1 = this.mapObjectData(objApartOf);
+            const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+            const contObject2 = this.mapObjectData(objNotApartOf);
+            const contDataNotAprtOf = [];
+            for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
+                contDataNotAprtOf.push({
+                    cont: item,
+                    quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+                });
+            }
+
+            for (const item of contDataNotAprtOf) {
+                this.containerDetail += this.handleStringCont(item);
+            }
+
+            for (const item of contObject1) {
+                this.containerDetail += "A Part Of ";
+                this.containerDetail += this.handleStringCont(item);
+            }
+
+            this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
+        } 
     }
 
     initContainer() {
