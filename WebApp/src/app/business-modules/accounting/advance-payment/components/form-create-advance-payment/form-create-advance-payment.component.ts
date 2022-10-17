@@ -242,7 +242,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     setBankInfoForPayee(payee: Partner) {
-        console.log(payee)
         this.bankAccountNo.setValue(payee.bankAccountNo);
         this.bankAccountName.setValue(payee.bankAccountName);
         this.bankName.setValue(payee.bankName);
@@ -253,6 +252,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         if (data) {
             this.bankName.setValue(data.bankNameEn);
             this.bankAccountName.setValue(data.bankAccountName)
+            this.bankAccountNo.setValue(data.bankAccountNo)
             this.mapBankCode(data.code);
         }
     }
