@@ -105,29 +105,31 @@ namespace eFMS.API.Report.DL.Services
 
         private IQueryable<GeneralReportResult> GeneralReportDocumentation(GeneralReportCriteria criteria)
         {
+            //var dataShipment = QueryDataDocumentation(criteria);
             var dataShipment = GetDataGeneralReport(criteria);
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var LstSurcharge = surCharge.Get();
+            var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
             var PartnerList = catPartnerRepo.Get();
-            var PlaceLookup = catPlaceRepo.Get();
-            var lookupUser = sysUserRepo.Get();
-            var lookupEmployee = sysEmployeeRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var PlaceLookup = catPlaceRepo.Get().ToLookup(q => q.Id);
+            var lookupUser = sysUserRepo.Get().ToLookup(q => q.Id);
+            var lookupEmployee = sysEmployeeRepo.Get().ToLookup(q => q.Id);
             int _no = 1;
-
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
                 data.JobId = item.JobNo;
                 data.Mawb = item.Mawb;
                 data.Hawb = item.HwbNo;
-                data.CustomerName = PartnerList.Where(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn;
-                data.CarrierName = PartnerList.Where(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn;
-                data.AgentName = PartnerList.Where(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn;
+                data.CustomerName = LookupPartner[item.CustomerId].FirstOrDefault()?.PartnerNameEn;
+                data.CarrierName = LookupPartner[item.ColoaderId].FirstOrDefault()?.PartnerNameEn;
+                data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameEn;
                 data.ServiceDate = item.ServiceDate;
                 data.VesselFlight = item.FlightNo;
 
-                var _polCode = item.Pol != null ? PlaceLookup.Where(x => x.Id == item.Pol).FirstOrDefault()?.Code : string.Empty;
-                var _podCode = item.Pod != null ? PlaceLookup.Where(x => x.Id == item.Pod).FirstOrDefault()?.Code : string.Empty;
+                var _polCode = item.Pol != null ? PlaceLookup[(Guid)item.Pol].FirstOrDefault()?.Code : string.Empty;
+                var _podCode = item.Pod != null ? PlaceLookup[(Guid)item.Pod].FirstOrDefault()?.Code : string.Empty;
                 data.Route = _polCode + (!string.IsNullOrEmpty(_polCode) || !string.IsNullOrEmpty(_podCode) ? "/" : "") + _podCode;
 
                 //Qty lấy theo Housebill
@@ -137,7 +139,7 @@ namespace eFMS.API.Report.DL.Services
                 #region -- Phí Selling trước thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = LstSurcharge.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     data.Revenue = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeSell.Sum(x => x.AmountVnd ?? 0) : _chargeSell.Sum(x => x.AmountUsd ?? 0);
                 }
 
@@ -146,7 +148,7 @@ namespace eFMS.API.Report.DL.Services
                 #region -- Phí Buying trước thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = LstSurcharge.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     data.Cost = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeBuy.Sum(x => x.AmountVnd ?? 0) : _chargeBuy.Sum(x => x.AmountUsd ?? 0);
                 }
 
@@ -157,22 +159,22 @@ namespace eFMS.API.Report.DL.Services
                 #region -- Phí OBH sau thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = LstSurcharge.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     data.Obh = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeObh.Sum(x => x.AmountVnd + x.VatAmountVnd ?? 0) : _chargeObh.Sum(x => x.AmountUsd + x.VatAmountUsd ?? 0);
                 }
 
                 #endregion -- Phí OBH sau thuế --
 
-                var _empPic = lookupUser.Where(x => x.Id == item.PersonInCharge).FirstOrDefault()?.EmployeeId;
+                var _empPic = lookupUser[item.PersonInCharge].FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(_empPic))
                 {
-                    data.PersonInCharge = lookupEmployee.Where(x => x.Id == _empPic).FirstOrDefault()?.EmployeeNameEn;
+                    data.PersonInCharge = lookupEmployee[_empPic].FirstOrDefault()?.EmployeeNameEn;
                 }
 
-                var _empSale = lookupUser.Where(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
+                var _empSale = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(_empSale))
                 {
-                    data.Salesman = lookupEmployee.Where(x => x.Id == _empSale).FirstOrDefault()?.EmployeeNameEn;
+                    data.Salesman = lookupEmployee[_empSale].FirstOrDefault()?.EmployeeNameEn;
                 }
 
                 data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.TransactionType).FirstOrDefault()?.DisplayName;
@@ -232,19 +234,66 @@ namespace eFMS.API.Report.DL.Services
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
             var lstSurchage = surCharge.Get();
+            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
             var PlaceList = catPlaceRepo.Get();
             var PartnerList = catPartnerRepo.Get();
+            var LookupPartner = PartnerList.ToLookup(x => x.Id);
+            var LookupPlace = PlaceList.ToLookup(x => x.Id);
             var ChargeList = catChargeRepo.Get();
+            var LookupCharge = ChargeList.ToLookup(x => x.Id);
             var UserList = sysUserRepo.Get();
+            var LookupUser = UserList.ToLookup(x => x.Id);
             var ChargeGroupList = catChargeGroupRepo.Get();
+            var ChargeGroupLookup = ChargeGroupList.ToLookup(x => x.Id);
             var OfficeList = sysOfficeRepo.Get();
+            var LookupOffice = OfficeList.ToLookup(x => x.Id);
             var UserLevelList = sysUserLevelRepo.Get();
+            var LookupUserLevelList = UserLevelList.ToLookup(x => x.UserId);
             var UnitList = catUnitRepo.Get();
+            var LookupUnitList = UnitList.ToLookup(x => x.Id);
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
-
-                data.ServiceName = GetServiceNameReport(item.TransactionType);
+                if (item.TransactionType == TermData.InlandTrucking)
+                {
+                    data.ServiceName = "Inland Trucking ";
+                }
+                if (item.TransactionType == TermData.AirExport)
+                {
+                    data.ServiceName = "Export (Air) ";
+                }
+                if (item.TransactionType == TermData.AirImport)
+                {
+                    data.ServiceName = "Import (Air) ";
+                }
+                if (item.TransactionType == TermData.SeaConsolExport)
+                {
+                    data.ServiceName = "Export (Sea Consol) ";
+                }
+                if (item.TransactionType == TermData.SeaConsolImport)
+                {
+                    data.ServiceName = "Import (Sea Consol) ";
+                }
+                if (item.TransactionType == TermData.SeaFCLExport)
+                {
+                    data.ServiceName = "Export (Sea FCL) ";
+                }
+                if (item.TransactionType == TermData.SeaFCLImport)
+                {
+                    data.ServiceName = "Import (Sea FCL) ";
+                }
+                if (item.TransactionType == TermData.SeaLCLExport)
+                {
+                    data.ServiceName = "Export (Sea LCL) ";
+                }
+                if (item.TransactionType == TermData.SeaLCLImport)
+                {
+                    data.ServiceName = "Import (Sea LCL) ";
+                }
+                if (item.TransactionType == "CL")
+                {
+                    data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                }
                 data.JobNo = item.JobNo;
                 data.etd = item.Etd;
                 data.eta = item.Eta;
@@ -252,19 +301,19 @@ namespace eFMS.API.Report.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.Mawb;
                 data.HblHawb = item.HwbNo;
-                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? PlaceList.Where(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() : string.Empty;
-                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + PlaceList.Where(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault() : pol;
-                data.Carrier = !string.IsNullOrEmpty(item.ColoaderId) ? PartnerList.Where(x => x.Id == item.ColoaderId).FirstOrDefault()?.ShortName : string.Empty;
-                data.Agent = PartnerList.Where(x => x.Id == item.AgentId).FirstOrDefault()?.ShortName;
+                string pol = (item.Pol != null && item.Pol != Guid.Empty) ? LookupPlace[(Guid)item.Pol].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.PolPod = (item.Pod != null && item.Pod != Guid.Empty) ? pol + "/" + LookupPlace[(Guid)item.Pod].Select(t => t.Code).FirstOrDefault() : pol;
+                data.Carrier = !string.IsNullOrEmpty(item.ColoaderId) ? LookupPartner[item.ColoaderId].FirstOrDefault()?.ShortName : string.Empty;
+                data.Agent = LookupPartner[item.AgentId].FirstOrDefault()?.ShortName;
                 var ArrayShipperDesc = item.ShipperDescription?.Split("\n").ToArray();
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
                 var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
-                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : PartnerList.Where(x => x.Id == item.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
-                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : PartnerList.Where(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
+                data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
-                data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? UserList.Where(x => x.Id == item.SalemanId).FirstOrDefault()?.Username : string.Empty;
-                data.AgentName = PartnerList.Where(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameVn;
+                data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
+                data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameVn;
                 data.GW = item.GrossWeight;
                 data.CW = item.ChargeWeight;
                 data.CBM = item.Cbm;
@@ -283,15 +332,15 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalSellCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = lstSurchage.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
-                        var chargeObj = ChargeList.Where(x => x.Id == charge.ChargeId).Select(t => t).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault() : null;
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
@@ -376,15 +425,15 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalBuyCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = lstSurchage.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
-                        var chargeObj = ChargeList.Where(x => x.Id == charge.ChargeId).Select(t => t).FirstOrDefault();
+                        var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
                         CatChargeGroup ChargeGroupModel = new CatChargeGroup();
-                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == charge.ChargeGroup).FirstOrDefault() : null;
+                        ChargeGroupModel = charge.ChargeGroup != null && charge.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)charge.ChargeGroup].FirstOrDefault() : null;
                         if (ChargeGroupModel == null)
                         {
-                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupList.Where(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault() : null;
+                            ChargeGroupModel = chargeObj.ChargeGroup != null && chargeObj.ChargeGroup != Guid.Empty ? ChargeGroupLookup[(Guid)chargeObj.ChargeGroup].FirstOrDefault() : null;
                         }
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
@@ -480,7 +529,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = lstSurchage.Where(x => x.Hblid == item.HblId && x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
                         _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
@@ -489,13 +538,13 @@ namespace eFMS.API.Report.DL.Services
 
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
-                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? PlaceList.Where(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault() : string.Empty;
+                data.Destination = item.Pod != null && item.Pod != Guid.Empty ? LookupPlace[(Guid)item.Pod].Select(t => t.NameVn).FirstOrDefault() : string.Empty;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
-                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? OfficeList.Where(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault() : string.Empty;
-                var OfficeSaleman = UserLevelList.Where(x => x.UserId == item.SalemanId).Select(t => t.OfficeId).FirstOrDefault();
-                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? OfficeList.Where(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault() : string.Empty;
-                data.Creator = item.TransactionType == "CL" ? UserList.Where(x => x.Id == item.PersonInCharge).Select(t => t.Username).FirstOrDefault() : UserList.Where(x => x.Id == item.UserCreated).Select(t => t.Username).FirstOrDefault();
+                data.HandleOffice = item.OfficeId != null && item.OfficeId != Guid.Empty ? LookupOffice[(Guid)item.OfficeId].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                var OfficeSaleman = LookupUserLevelList[item.SalemanId].Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.Creator = item.TransactionType == "CL" ? LookupUser[item.PersonInCharge].Select(t => t.Username).FirstOrDefault() : LookupUser[item.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.Pono;
                 data.Commodity = item.Commodity;
                 data.ProductService = item.ProductService;
@@ -503,10 +552,9 @@ namespace eFMS.API.Report.DL.Services
                 data.PMTerm = item.PaymentTerm;
                 data.ShipmentNotes = item.Notes;
                 data.Created = item.DatetimeCreated;
-                var customer = PartnerList.Where(x => x.Id == item.CustomerId)?.FirstOrDefault();
-                data.CustomerId = customer.AccountNo;
-                data.CustomerName = customer.ShortName;
-                string Code = item.PackageType != null ? UnitList.Where(x => x.Id == item.PackageType).Select(t => t.Code).FirstOrDefault() : string.Empty;
+                data.CustomerId = LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault();
+                data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
+                string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.PackageQty.ToString() + " " + Code;
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
                 data.BKRefNo = item.BookingNo;
