@@ -127,14 +127,14 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
         if (!this.description && this.containers.length>0) {
-            // this.description = '';
+            this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
         if (!this.commodities && this.containers.length>0) {
-            // this.commodities = '';
+            this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
                 .reduce((acc: string, curr: any) => acc += curr + "\n", '');
@@ -152,26 +152,27 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalCBM = +this.totalCBM.toFixed(3);
 
         // * Container, Package.
-        if (this.containers.length>0) {
+        if (this.containers.length>0 && !this.containerDetail) {
             this.containerDetail = '';
-        }
-        const contObject: any[] = (containers || []).map((container: Container | any) => ({
-            cont: container.containerTypeName,
-            quantity: container.quantity
-        }));
+        
+            const contObject: any[] = (containers || []).map((container: Container | any) => ({
+                cont: container.containerTypeName,
+                quantity: container.quantity
+            }));
 
-        const contData = [];
-        for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
-            contData.push({
-                cont: item,
-                quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
-            });
-        }
+            const contData = [];
+            for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
+                contData.push({
+                    cont: item,
+                    quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+                });
+            }
 
-        for (const item of contData) {
-            this.containerDetail += this.handleStringCont(item);
+            for (const item of contData) {
+                this.containerDetail += this.handleStringCont(item);
+            }
+            this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
         }
-        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
     }
 
     onRefresh() {
