@@ -2632,7 +2632,13 @@ namespace eFMS.API.Documentation.DL.Services
 
             foreach (var hbl in transDetails)
             {
-                HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(hbl.CustomerId, hbl.Id, "DOC", CHECK_POINT_TYPE.PREVIEW_HBL, "");
+                var checkPoint = new CheckPoint {
+                    PartnerId = hbl.CustomerId,
+                    HblId = hbl.Id,
+                    TransactionType = "DOC",
+                    type = CHECK_POINT_TYPE.PREVIEW_HBL
+                };
+                HandleState hs = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
                 result.Add(new { hbl, ErrorMessage = hs.Message?.ToString() });
             }
             return result;

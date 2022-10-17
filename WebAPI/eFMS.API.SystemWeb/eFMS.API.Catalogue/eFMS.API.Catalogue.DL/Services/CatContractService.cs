@@ -1501,7 +1501,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
             string _saleService = GetContractServicesName(contract.SaleService);
-            contract.Arconfirmed = false;
             contract.DatetimeModified = DateTime.Now;
             DataContext.Update(contract, x => x.Id.ToString() == contractId);
 

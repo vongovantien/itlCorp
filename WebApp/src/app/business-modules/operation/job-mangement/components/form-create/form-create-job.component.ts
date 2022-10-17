@@ -10,10 +10,10 @@ import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { FormValidators } from '@validators';
 import { AppForm } from '@app';
 
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -21,7 +21,6 @@ import { catchError, switchMap } from 'rxjs/operators';
 })
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
-    @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
     @ViewChild('comboGridCustomerCpn') comboGridCustomerCpn: ComboGridVirtualScrollComponent;
 
     formCreate: FormGroup;
@@ -56,7 +55,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
     salesmans: User[]; // * Load động theo Partner được chọn.
-    customerName: string; 
+    customerName: string;
 
     jobLinkAirSeaNo: string = '';
     jobLinkAirSeaInfo: LinkAirSeaModel;
@@ -127,20 +126,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             case 'customer':
                 this._toaster.clear();
                 this.customerName = data.shortName;
-                this._documentRepo.validateCheckPointContractPartner(data.id, '', 'CL', null, 1)
-                    .pipe(
-                        switchMap(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    this.customerId.setValue(data.id);
-                                    return this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value);
-                                }
-                                this.customerId.setValue(null);
-                                this._toaster.warning(res.message);
-                                return of(false);
-                            }
-                        )
-                    )
+                this.customerId.setValue(data.id);
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -148,8 +135,11 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                                 if (!!this.salesmans.length) {
                                     this.salemansId.setValue(res[0].id);
                                 } else {
-                                    this.infoPopup.body = `${data.shortName} not have any agreement for service in this office <br/> please check again!`;
-                                    this.infoPopup.show();
+                                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                        title: 'Notification',
+                                        label: 'Ok',
+                                        body: `<strong>${data.shortName}</strong> not have any agreement for service in this office <br/> Please check again!`
+                                    });
                                     this.salemansId.setValue(null);
                                 }
                             } else {
@@ -251,9 +241,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         }
     }
 
-    getSalesmanList(selectedShipmentType: any){
-        this.shipmentType.setValue(selectedShipmentType); 
-        if(!!this.customerId.value){
+    getSalesmanList(selectedShipmentType: any) {
+        this.shipmentType.setValue(selectedShipmentType);
+        if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe(
                     (res: any) => {
@@ -263,8 +253,11 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                                 this.salemansId.setValue(res[0].id);
                             } else {
                                 this.salemansId.setValue(null);
-                                this.infoPopup.body = `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`;
-                                this.infoPopup.show();
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    title: 'Notification',
+                                    label: 'Ok',
+                                    body: `<strong>${this.customerName}</strong> not have any agreement for service in this office <br/> please check again!`
+                                });
                             }
                         } else {
                             this.salesmans = [];
@@ -272,6 +265,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                         }
                     }
                 );
-            }
-        }  
+        }
+    }
 }

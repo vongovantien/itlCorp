@@ -1,4 +1,3 @@
-import { CsTransaction } from '@models';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -31,7 +30,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     hblId: string;
     hblDetail: CsTransactionDetail;
-
+    checkPointPreview;
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -100,6 +99,13 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        this.checkPointPreview = {
+                            partnerId: this.hblDetail.customerId,
+                            hblId: this.hblId,
+                            transactionType: 'DOC',
+                            type: 7,
+                            salesmanId: this.hblDetail.saleManId
+                        };
                     }
                 },
             );
@@ -182,16 +188,33 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate == null ? null : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate,
         };
         house.deliveryDate = deliveryDate;
-        this._documentationRepo.updateHbl(Object.assign({}, house, deliveryDate))
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                tap(() => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, house, deliveryDate))
+                            .pipe(
+                                tap(() => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            )
-            .subscribe(
+                )
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
@@ -205,7 +228,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     preview(reportType: string, separateId?: string) {
         const id = !separateId ? this.hblId : separateId;
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -230,7 +253,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     previewAttachList() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -255,7 +278,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     exportNeutralHawb() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -318,8 +341,8 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             });
     }
 
-    sendMail(type: string){
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+    sendMail(type: string) {
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -329,7 +352,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         switch (type) {
                             case 'Pre-Alert':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
