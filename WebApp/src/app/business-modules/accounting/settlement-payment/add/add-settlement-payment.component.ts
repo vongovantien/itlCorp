@@ -27,7 +27,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
-    
+
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -77,7 +77,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
             return false;
         }
-        if(!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate){
+        if (!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate) {
             return false;
         }
         return true;
@@ -95,7 +95,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         //     }
         // });
 
-        if(!this.checkValidSettle()){
+        if (!this.checkValidSettle()) {
             return;
         }
 
@@ -108,18 +108,18 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
         this._accountingRepo.checkIfInvalidFeeShipmentSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
-            concatMap((res: CommonInterface.IResult) => {
-                if (!res.status) {
-                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                        title: 'Warning',
-                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
-                        class: 'bg-danger'
-                    });
-                    return EMPTY;
-                } else {
-                    return this._accountingRepo.addNewSettlement(body);
-                }
-            }))
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return EMPTY;
+                    } else {
+                        return this._accountingRepo.addNewSettlement(body);
+                    }
+                }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -146,7 +146,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-        if(!this.checkValidSettle()){
+        if (!this.checkValidSettle()) {
             return;
         }
 
@@ -186,8 +186,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                                                 settlementResult = res.data.settlement;
                                                 let approve: any = {
                                                     settlementNo: settlementResult.settlementNo,
-                                                    requester: settlementResult.requester,
-                                                    requesterAprDate: new Date()
+                                                    requester: settlementResult.requester
                                                 }
                                                 return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
                                             }
