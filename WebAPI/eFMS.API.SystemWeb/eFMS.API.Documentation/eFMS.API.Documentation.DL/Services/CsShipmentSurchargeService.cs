@@ -151,7 +151,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return string.Empty;
             }
             var hblId = charge.Hblid;
-            var opsTrans = opsTransRepository.First(x => x.Hblid == hblId);
+            var opsTrans = opsTransRepository.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (opsTrans != null)
             {
                 if (opsTrans.NoProfit != true)
@@ -818,7 +818,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var hblId = list.Where(x => x.Hblid != Guid.Empty).FirstOrDefault().Hblid;
-            var opsTrans = opsTransRepository.First(x => x.Hblid == hblId);
+            var opsTrans = opsTransRepository.Get(x => x.Hblid == hblId).FirstOrDefault();
             CsTransaction csTransaction = null;
             if (opsTrans != null)
             {

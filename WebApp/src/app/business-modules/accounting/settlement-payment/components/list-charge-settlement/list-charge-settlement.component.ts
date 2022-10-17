@@ -212,7 +212,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  && !x.isFromShipment && x.hasNotSynce);
+                const chargesDiffShipment = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  && !x.isFromShipment && x.hasNotSynce);
+                const chargesSameShipment = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) !== -1 && chargeIds.indexOf(x.id) === -1)  && !x.isFromShipment && x.hasNotSynce);
+                this.surcharges = [...chargesSameShipment, ...chargesDiffShipment];
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];

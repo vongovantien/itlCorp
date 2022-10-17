@@ -1884,7 +1884,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
                 entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
-                entity.BankAccountName = entity.BankName = null;
+                entity.BankAccountName = entity.BankName = entity.Note = null;
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -1915,6 +1915,8 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         settlement.BankAccountName = model.Settlement.BankAccountName;
                         settlement.BankName = model.Settlement.BankName;
+                        settlement.Note = model.Settlement.Note;
+
                         hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
                     }
@@ -5869,7 +5871,8 @@ namespace eFMS.API.Accounting.DL.Services
         public void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action)
         {
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-            if(action == "Add")
+            new LogHelper("EFMS_LOG_UPD_SETTLEMENT", "Settle :" + settleCode + " - Action: " + action + " User: " + currentUser.UserName + " - " + currentUser.UserID + " - Department: "+ currentUser.DepartmentId);
+            if (action == "Add")
             {
                 #region Add
                 //Lấy các phí chứng từ IsFromShipment = true
