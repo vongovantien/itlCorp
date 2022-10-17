@@ -969,7 +969,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                 }
 
-                else if (item.ContractType != "Trial" && item.ContractType != "Official" && item.ContractType != "Guaranteed" && item.ContractType != "Cash")
+                else if (item.ContractType != "Trial" && item.ContractType != "Official" && item.ContractType != "Guarantee" && item.ContractType != "Cash")
                 {
                     item.AgreementTypeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND], item.ContractType);
                     item.IsValid = false;

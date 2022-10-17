@@ -36,7 +36,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatBankService</param>
@@ -130,7 +130,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-        
+
         /// <summary>
         /// update an existed item
         /// </summary>
@@ -204,7 +204,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// read charge data from file excel 
+        /// read charge data from file excel
         /// </summary>
         /// <param name="uploadedFile">file to read data</param>
         /// <returns></returns>
@@ -226,7 +226,7 @@ namespace eFMS.API.Catalogue.Controllers
                     string status = worksheet.Cells[row, 4].Value?.ToString().Trim();
                     if (status.ToLower() != "active")
                         active = false;
-                    
+
                     var bank = new CatBankImportModel
                     {
                         IsValid = true,
@@ -283,6 +283,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
-        
+
     }
 }
