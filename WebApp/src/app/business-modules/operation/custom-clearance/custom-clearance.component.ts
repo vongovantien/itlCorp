@@ -90,6 +90,7 @@ export class CustomClearanceComponent extends AppList {
         this.getListSettlePayment();
         this.getListCustomsDeclaration();
         this.isLoading = this._store.select(getOperationClearanceLoadingState);
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     onSearchClearance(dataSearch?: any) {
