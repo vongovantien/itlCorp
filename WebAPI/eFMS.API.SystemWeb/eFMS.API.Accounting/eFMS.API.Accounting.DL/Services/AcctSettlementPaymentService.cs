@@ -5869,7 +5869,8 @@ namespace eFMS.API.Accounting.DL.Services
         public void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action)
         {
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-            if(action == "Add")
+            new LogHelper("EFMS_LOG_UPD_SETTLEMENT", "Settle :" + settleCode + " - Action: " + action + " User: " + currentUser.UserName + " - " + currentUser.UserID + " - Department: "+ currentUser.DepartmentId);
+            if (action == "Add")
             {
                 #region Add
                 //Lấy các phí chứng từ IsFromShipment = true
