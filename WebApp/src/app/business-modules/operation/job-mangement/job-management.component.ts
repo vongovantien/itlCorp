@@ -50,9 +50,8 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
     isSearchLinkFeea: boolean = false;
-    offices: Office[];
-    selectedOffice: Office;
-    isShowButton: boolean = true;
+  
+ 
     constructor(
         private sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -129,26 +128,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.currentUser$ = this._store.select(getCurrentUserState);
-        const isShowButton = localStorage.getItem(SystemConstants.CURRENT_OFFICE);
-        console.log(isShowButton)
     }
-    // showButton(currenUser: SystemInterface.IClaimUser){
-    //             this._systemRepo.getOfficePermission(currenUser.id, currenUser.companyId)
-    //         .pipe(tap((res: any) => {
-    //             this.offices = res[2] || [];
-    //             if (!!this.offices.length) {
-    //                 if (this.offices.length === 1) {
-    //                     this.selectedOffice = this.offices[0];
-    //                 } else {
-    //                     this.selectedOffice = this.offices;
-    //                 }
-    //             }
-    //         })).subscribe((offices: Office[]) => {
-    //             this.offices = offices;
-    //         })
-        
-    // }
-
     requestSearchShipment() {
         this._store.dispatch(new fromOperationStore.OPSTransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
