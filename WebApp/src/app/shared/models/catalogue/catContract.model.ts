@@ -62,6 +62,10 @@ export class Contract {
     emailAddress: string = null;
     firstShipmentDate: any = null;
     paymentTermObh: string = null;
+    isExpired: boolean = false;
+    isOverLimit: boolean = false;
+    isOverDue: boolean = false;
+
 
     constructor(data?: any) {
         const self = this;

@@ -105,7 +105,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
-            { title: 'Status', field: 'status', sortable: true },
+            // { title: 'Status', field: 'status', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true },
         ];
         this.headers = [
@@ -115,7 +115,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             { title: 'Creator', field: 'userCreatedName', sortable: true },
 
             { title: 'Modify', field: 'datetimeModified', sortable: true },
-            { title: 'Status', field: 'active', sortable: true },
+            // { title: 'Status', field: 'active', sortable: true },
             { title: 'Billing Address', field: 'addressVn', sortable: true },
         ];
 

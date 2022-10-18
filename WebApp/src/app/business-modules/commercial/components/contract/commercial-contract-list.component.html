@@ -51,7 +51,18 @@
                                 </td>
                                 <td>{{item.username}}</td>
                                 <td>{{item.contractNo}}</td>
-                                <td>{{item.contractType}}</td>
+                                <td>
+                                    {{item.contractType}}
+                                    <span *ngIf="!!item.isExpired" title="Contract is expired">
+                                        <i class="la la-history la-lg"></i>
+                                    </span>
+                                    <span *ngIf="!!item.isOverLimit" title="Contract is over credit limit">
+                                        <i class="la la-exclamation la-lg text-danger"></i>
+                                    </span> 
+                                    <span *ngIf="!!item.isOverDue && !item.noDue" title="Contract have overdued">
+                                        <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                    </span>
+                                </td>
                                 <td>{{item.saleServiceName}}</td>
                                 <td>{{item.effectiveDate | date: 'dd/MM/yyyy'}}</td>
                                 <td>{{item.expiredDate | date: 'dd/MM/yyyy'}}</td>
