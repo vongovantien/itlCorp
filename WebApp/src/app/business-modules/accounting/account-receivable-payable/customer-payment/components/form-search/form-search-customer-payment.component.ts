@@ -32,6 +32,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     syncStatus: AbstractControl;
     status: AbstractControl;
     typeReceipt: AbstractControl;
+    classReceipt: AbstractControl;
 
     customerIDs: Observable<Customer[]>;
     creators: Observable<User[]>;
@@ -75,7 +76,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: [],
             status: [],
             syncStatus: [],
-            typeReceipt: []
+            typeReceipt: [],
+            classReceipt: []
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -86,6 +88,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.syncStatus = this.formSearch.controls['syncStatus'];
         this.typeReceipt = this.formSearch.controls['typeReceipt'];
         this.status = this.formSearch.controls['status'];
+        this.classReceipt = this.formSearch.controls['classReceipt'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -112,7 +115,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: this.currency.value,
             syncStatus: this.syncStatus.value,
             status: this.status.value,
-            typeReceipt: this.typeReceipt.value
+            typeReceipt: this.typeReceipt.value,
+            classReceipt: this.classReceipt.value
         };
         //this._listReceipt.onSearchCPs(body);
         this._store.dispatch(SearchListCustomerPayment(body))
@@ -171,4 +175,5 @@ export interface IAcctReceiptCriteria {
     syncStatus: string;
     status: string;
     typeReceipt: string;
+    classReceipt: string;
 }
