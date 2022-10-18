@@ -78,7 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
-
+        private readonly IContextBase<AccAccountingManagement> accMngtRepo;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -116,7 +116,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
-            IContextBase<CsTransactionDetail> transactionDetail
+            IContextBase<CsTransactionDetail> transactionDetail,
+            IContextBase<AccAccountingManagement> accMngt
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -158,6 +159,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
+            accMngtRepo = accMngt;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1564,6 +1566,16 @@ namespace eFMS.API.Documentation.DL.Services
                         revenue = surcharge.Total;
                     }
 
+                    string _paymentStatus = string.Empty;
+                    if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                    {
+                        if (surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                        {
+                            var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
+                            _paymentStatus = acct?.PaymentStatus;
+                        }
+                    }
+
                     var surchargeRpt = new FormPLsheetReport();
 
                     surchargeRpt.COSTING = "COSTING";
@@ -1622,7 +1634,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //Đối với phí OBH thì NetAmountCurr gán bằng 0
                     surchargeRpt.NetAmountCurr = (surcharge.Type != DocumentConstants.CHARGE_OBH_TYPE ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber; //NetAmount quy đổi về currency preview
                     surchargeRpt.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber;  //GrossAmount quy đổi về currency preview
-
+                    surchargeRpt.PaymentStatus = _paymentStatus;
                     dataSources.Add(surchargeRpt);
                 }
             }
