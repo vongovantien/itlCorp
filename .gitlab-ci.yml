@@ -19,7 +19,7 @@ install_dependency:
     - npm install
     - npm install -g @angular/cli
   only:
-    - production
+    - feature-itl
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
