@@ -1736,6 +1736,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var userCurrent = currentUser.UserID;
                 var advanceApprove = mapper.Map<AcctApproveAdvance>(approve);
+                advanceApprove.RequesterAprDate = DateTime.Now;
                 var advancePayment = DataContext.Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
