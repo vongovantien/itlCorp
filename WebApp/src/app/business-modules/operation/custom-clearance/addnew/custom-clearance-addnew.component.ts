@@ -9,7 +9,8 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { SystemConstants } from '@constants';
+import { getCurrentUserState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -19,15 +20,17 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
 
     @ViewChild(CustomClearanceFormDetailComponent) detailComponent: CustomClearanceFormDetailComponent;
     customDeclaration: CustomClearance = new CustomClearance();
-
     constructor(private _location: Location,
         private _operationRepo: OperationRepo,
         private _documentation: DocumentationRepo,
+        private _store: Store<IAppState>,
         private _toastr: ToastrService) {
         super();
+        
     }
 
     ngOnInit() {
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     addClearance() {

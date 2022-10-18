@@ -8,7 +8,8 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { ToastrService } from 'ngx-toastr';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { SystemConstants } from '@constants';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState, IAppState } from '@store';
 
 
 @Component({
@@ -24,12 +25,14 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     constructor(private _operationRepo: OperationRepo,
         private route: ActivatedRoute,
         private _toart: ToastrService,
+        private _store: Store<IAppState>,
         private _documentation: DocumentationRepo) {
 
         super();
     }
 
     ngOnInit() {
+        this.currentUser$ = this._store.select(getCurrentUserState);
         this.route.params.subscribe(prams => {
             if (!!prams.id) {
                 this.getCustomCleanranceById(+prams.id);
