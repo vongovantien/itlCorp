@@ -873,15 +873,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
                     return new HandleState(notFoundPartnerTaxCodeMessages);
                 }
-                if(customer.PartnerMode != "Internal")
+                if (customer.PartnerMode == "Internal")
                 {
-                    // Check contract for that customer.
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                     && x.SaleService.Contains("CL")
                     && x.Active == true
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                    )?.FirstOrDefault();
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                }
+                else
+                {
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                   && x.SaleService.Contains("CL")
+                   && x.Active == true
+                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                   )?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
@@ -889,7 +895,7 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(errorContract);
                     }
                 }
-              
+
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
                 opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
 
@@ -1126,15 +1132,20 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    if(customer.PartnerMode != "Internal")
+                    if (customer.PartnerMode == "Internal")
                     {
-                        // Check contract for that customer. TODO: TÁCH FUNCTION
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                         && x.SaleService.Contains("CL")
                         && x.Active == true
-                        && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                        && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                        )?.FirstOrDefault();
+                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    } else
+                    {
+                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                       )?.FirstOrDefault();
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
@@ -1142,7 +1153,6 @@ namespace eFMS.API.Documentation.DL.Services
                             return new HandleState(errorContract);
                         }
                     }
-                    
 
                     string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
