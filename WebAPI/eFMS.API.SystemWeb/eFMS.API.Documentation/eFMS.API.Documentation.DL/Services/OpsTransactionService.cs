@@ -873,7 +873,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
                     return new HandleState(notFoundPartnerTaxCodeMessages);
                 }
-                if(customer.PartnerType != "Internal")
+                if(customer.PartnerMode != "Internal")
                 {
                     // Check contract for that customer.
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
@@ -1126,7 +1126,7 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    if(customer.PartnerType != "Internal")
+                    if(customer.PartnerMode != "Internal")
                     {
                         // Check contract for that customer. TODO: TÁCH FUNCTION
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
