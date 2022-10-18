@@ -280,8 +280,8 @@ namespace eFMS.API.Documentation.DL.Services
             entityReplicate.JobNo = GeneratePreFixReplicate() + originJob.JobNo;
             entityReplicate.Id = Guid.NewGuid();
             entityReplicate.Hblid = Guid.NewGuid();
-            entityReplicate.ServiceNo = originJob.JobNo;
-            entityReplicate.ServiceHblId = originJob.Hblid;
+            entityReplicate.ServiceNo = null;
+            entityReplicate.ServiceHblId = null;
             entityReplicate.OfficeId = dataUserLevel.OfficeId;
             entityReplicate.DepartmentId = dataUserLevel.DepartmentId;
             entityReplicate.GroupId = dataUserLevel.GroupId;
