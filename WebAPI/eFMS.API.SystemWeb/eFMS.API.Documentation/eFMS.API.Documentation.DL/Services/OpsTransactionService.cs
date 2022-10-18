@@ -873,19 +873,27 @@ namespace eFMS.API.Documentation.DL.Services
                     var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
                     return new HandleState(notFoundPartnerTaxCodeMessages);
                 }
-
-                // Check contract for that customer.
-                customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                && x.SaleService.Contains("CL")
-                && x.Active == true
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                )?.FirstOrDefault();
-                if (customerContract == null)
+                if (customer.PartnerMode == "Internal")
                 {
-                    string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                    string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
-                    return new HandleState(errorContract);
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                    && x.SaleService.Contains("CL")
+                    && x.Active == true
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                }
+                else
+                {
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                   && x.SaleService.Contains("CL")
+                   && x.Active == true
+                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                   )?.FirstOrDefault();
+                    if (customerContract == null)
+                    {
+                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
                 }
 
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
@@ -1124,18 +1132,26 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    // Check contract for that customer. TODO: TÁCH FUNCTION
-                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                    && x.SaleService.Contains("CL")
-                    && x.Active == true
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                    )?.FirstOrDefault();
-                    if (customerContract == null)
+                    if (customer.PartnerMode == "Internal")
                     {
-                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
-                        return new HandleState(errorContract);
+                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                        && x.SaleService.Contains("CL")
+                        && x.Active == true
+                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    } else
+                    {
+                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                       )?.FirstOrDefault();
+                        if (customerContract == null)
+                        {
+                            string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
                     }
 
                     string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
