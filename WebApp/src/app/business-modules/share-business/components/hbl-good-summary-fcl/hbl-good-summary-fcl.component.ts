@@ -99,7 +99,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                             this.selectedPackage = res.packageType;
                             this.packageQty = res.packageQty;
                             this.containerDescription = res.contSealNo;
-                            // this.containers = res.csMawbcontainers;
+                            this.containers = res.csMawbcontainers;
                         }
                     }
                 );
