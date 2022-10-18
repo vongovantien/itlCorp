@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IStageService catStageService;
-
+        private readonly IContextBase<AccAccountingManagement> accMngtRepo;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -114,7 +114,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatContract> catContractRepository,
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
-            IStageService stageService
+            IStageService stageService,
+            IContextBase<AccAccountingManagement> accMngt
             ) : base(repository, mapper)
         {
             currentUser = user;
@@ -156,6 +157,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransactionRepository = opsTransactionRepo;
             csStageAssignedService = csStageAssigned;
             catStageService = stageService;
+            accMngtRepo = accMngt;
         }
 
         #region -- INSERT & UPDATE --
@@ -2895,14 +2897,6 @@ namespace eFMS.API.Documentation.DL.Services
             var _polFull = pol?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty);
             var _podFull = pod?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty);
 
-            //CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
-            //var containerList = containerService.Query(contCriteria);
-            //var _containerNoList = string.Empty;
-            //if (containerList.Count() > 0)
-            //{
-            //    _containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
-            //}
-
             var _transDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
             var _etdDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
             var _etaDate = shipment.Eta != null ? shipment.Eta.Value.ToString("dd MMM yyyy") : string.Empty; //ETA
@@ -2974,7 +2968,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             revenue = surcharge.Total;
                         }
-
+                        string _paymentStatus = string.Empty;
+                        if(surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        {
+                            if(surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                            {
+                                var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
+                                _paymentStatus = acct?.PaymentStatus;
+                            }
+                        }
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo?.ToUpper(); //JobNo of shipment
@@ -3034,7 +3036,7 @@ namespace eFMS.API.Documentation.DL.Services
                         //Đối với phí OBH thì NetAmountCurr gán bằng 0
                         charge.NetAmountCurr = (surcharge.Type != DocumentConstants.CHARGE_OBH_TYPE ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber; //NetAmount quy đổi về currency preview
                         charge.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber; //GrossAmount quy đổi về currency preview
-
+                        charge.PaymentStatus = _paymentStatus;
                         listCharge.Add(charge);
                     }
                 }
