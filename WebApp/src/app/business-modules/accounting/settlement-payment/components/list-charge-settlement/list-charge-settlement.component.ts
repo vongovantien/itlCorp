@@ -204,7 +204,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
 
             const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
-            const surchargeHasSynced = this.surcharges.filter(x => !x.hasNotSynce);
+            const surchargeHasSynced = this.surcharges.filter(x => (!x.hasNotSynce || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
             const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
                 const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment && x.hasNotSynce);
@@ -212,9 +212,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-                const chargesDiffShipment = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  && !x.isFromShipment && x.hasNotSynce);
-                const chargesSameShipment = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) !== -1 && chargeIds.indexOf(x.id) === -1)  && !x.isFromShipment && x.hasNotSynce);
-                this.surcharges = [...chargesSameShipment, ...chargesDiffShipment];
+                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  && !x.isFromShipment && x.hasNotSynce);
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
@@ -523,7 +521,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued && !surcharge.chargeAutoRated);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued && !surcharge.chargeAutoRated && !surcharge.linkChargeId);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 
