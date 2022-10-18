@@ -2469,6 +2469,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
 
                 var settlementApprove = mapper.Map<AcctApproveSettlement>(approve);
+                settlementApprove.RequesterAprDate = DateTime.Now;
                 var settlementPayment = DataContext.Get(x => x.SettlementNo == approve.SettlementNo).FirstOrDefault();
                 approve.Id = settlementPayment.Id;
 
