@@ -25,38 +25,26 @@ namespace eFMS.API.SystemFileManagement.DL.Services
     public class EDocService : IEDocService
     {
         private ICurrentUser currentUser;
-        private AmazonS3Client _client;
+        private IS3Service _client;
         private IContextBase<SysImage> _sysImageRepo;
         private IContextBase<SysImageDetail> _sysImageDetailRepo;
-        private readonly string _awsAccessKeyId;
         private readonly string _bucketName;
-        private readonly string _awsSecretAccessKey;
-        private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
+        private readonly string _domainTest;
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
 
-        public EDocService(IContextBase<SysImage> SysImageRepo, IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl, IContextBase<SysImageDetail> sysImageDetailRepo)
+        public EDocService(IContextBase<SysImage> SysImageRepo, IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, IS3Service client, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl, IContextBase<SysImageDetail> sysImageDetailRepo)
         {
             this.currentUser = currentUser;
-
-            _awsAccessKeyId = DbHelper.DbHelper.AWSS3AccessKeyId;
-            _bucketName = DbHelper.DbHelper.AWSS3BucketName;
-            _awsSecretAccessKey = DbHelper.DbHelper.AWSS3SecretAccessKey;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
-            _attachFileTemplateRepo = attachFileTemplateRepo;
-            var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
-            _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
+            _bucketName = DbHelper.DbHelper.AWSS3BucketName;
             _sysImageRepo = SysImageRepo;
             _apiUrl = apiUrl;
             _sysImageDetailRepo = sysImageDetailRepo;
+            _client = client;
         }
 
-        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType)
-        {
-            var lst = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
-            return lst;
-        }
 
         private DateTime? ConvertExpiredDate(int TimeStorage, string TypeStorage)
         {
@@ -299,11 +287,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             if (item.Contains("LOG"))
                             {
                                 var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
-                                if(opsJob != null)
+                                if (opsJob != null)
                                 {
                                     jobIds.Add(opsJob.Id);
                                 }
-                            } else
+                            }
+                            else
                             {
                                 var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
@@ -339,14 +328,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     break;
                 case "SOA":
                     var soa = DC.AcctSoa.FirstOrDefault(x => x.Id.ToString() == billingId);
-                    if(soa != null)
+                    if (soa != null)
                     {
                         bilingNo = soa.Soano;
                         var surchargeSoa = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
-                        if(soa.Type == "Debit")
+                        if (soa.Type == "Debit")
                         {
                             surchargeSoa = DC.CsShipmentSurcharge.Where(x => x.Soano == bilingNo);
-                        } else
+                        }
+                        else
                         {
                             surchargeSoa = DC.CsShipmentSurcharge.Where(x => x.PaySoano == bilingNo);
                         }
@@ -377,7 +367,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     break;
             }
 
-            if(jobIds.Count > 0)
+            if (jobIds.Count > 0)
             {
                 var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
                 foreach (var Id in jobIds)

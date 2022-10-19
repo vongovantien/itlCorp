@@ -30,16 +30,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
             _edocService = edocService;
             _sysImageRepo = SysImageRepo;
         }
-        [HttpGet("GetDocumentType")]
-        public async Task<IActionResult> GetDocumentTypeAsync(string transactionType)
-        {
-            var result = await _edocService.GetDocumentType(transactionType);
-            if (result == null)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
+
 
         [HttpPut("UploadEdoc")]
         //[Authorize]

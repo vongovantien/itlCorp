@@ -438,7 +438,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     result = await _sysImageRepo.AddAsync(list);
 
-                    if(result.Success)
+                    if (result.Success)
                     {
                         foreach (var image in list)
                         {

@@ -27,5 +27,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return hs;
         }
+
+        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType)
+        {
+            var lst = await DataContext.GetAsync(x => x.TransactionType == transactionType);
+            return lst;
+        }
     }
 }

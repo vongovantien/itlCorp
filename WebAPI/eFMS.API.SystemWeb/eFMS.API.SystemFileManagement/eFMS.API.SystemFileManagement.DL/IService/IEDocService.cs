@@ -10,7 +10,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
 {
     public interface IEDocService
     {
-        Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType);
+        
         Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files);
         Task<List<EDocGroupByType>> GetEDocByJob(Guid jobId, string transactionType);
         Task<HandleState> DeleteEdoc(Guid edocId);
