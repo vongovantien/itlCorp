@@ -106,9 +106,17 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             this.isReadonly = this._store.select(checkShareSystemUserLevel);
         }
     }
-    onSelectDataFormInfo(data: any) {
-        this.company.setValue(data.id);
-
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'partner':
+                this.partnerMapping.setValue((data as Partner).id);
+                break;
+            case 'company':
+                this.company.setValue(data.id);
+                break;
+            default:
+                break;
+        }
     }
 
 
@@ -231,6 +239,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.bankName_Local = this.formGroup.controls['bankName_Local'];
         this.officeType = this.formGroup.controls['officeType'];
         this.partnerMapping = this.formGroup.controls['partnerMapping'];
+
         this.internalCode = this.formGroup.controls['internalCode'];
     }
 }

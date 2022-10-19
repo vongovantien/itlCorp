@@ -134,6 +134,7 @@ export class OfficeDetailsComponent extends AppList {
                 bankNameLocal: this.formAdd.bankName_Local.value,
                 officeType: this.formAdd.officeType.value,
                 internalCode: this.formAdd.internalCode.value,
+                partnerMapping: this.formAdd.partnerMapping.value,
             };
             this._systemRepo.updateOffice(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

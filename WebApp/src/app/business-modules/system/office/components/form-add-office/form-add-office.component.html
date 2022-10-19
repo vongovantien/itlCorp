@@ -93,7 +93,7 @@
                                 Company <span class="m--font-danger">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: company.value}"
-                                (itemSelected)="onSelectDataFormInfo($event)"
+                                (itemSelected)="onSelectDataFormInfo($event, 'company')"
                                 [selectedDisplayFields]="configOffice.selectedDisplayFields"
                                 [dataSources]="configOffice.dataSource" (remove)="resetFormControl(company)"
                                 [displayFields]="configOffice.displayFields" [height]="200" placeholder="Select Company"
@@ -111,7 +111,7 @@
                             <label for="">Partner Mapping</label>
                             <app-combo-grid-virtual-scroll
                                 [currentActiveItemId]="{ field: 'id', partnerMapping: partnerMapping.value}"
-                                (itemSelected)="onSelectDataFormInfo($event)"
+                                (itemSelected)="onSelectDataFormInfo($event,'partner')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                                 [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerMapping)"
                                 placeholder="Select Partner">
