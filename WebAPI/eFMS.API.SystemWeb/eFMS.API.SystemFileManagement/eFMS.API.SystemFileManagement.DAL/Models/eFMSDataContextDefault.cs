@@ -17,6 +17,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
+        public virtual DbSet<SysAttachFileTemplate> SysAttachFileTemplate { get; set; }
         public virtual DbSet<SysAuthorizedApproval> SysAuthorizedApproval { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmailSetting> SysEmailSetting { get; set; }
@@ -24,6 +25,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
+        public virtual DbSet<SysImageDetail> SysImageDetail { get; set; }
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
@@ -36,13 +38,13 @@ namespace eFMS.API.SystemFileManagement.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
+                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -126,6 +128,62 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysAttachFileTemplate>(entity =>
+            {
+                entity.ToTable("sysAttachFileTemplate");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Code).HasMaxLength(150);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.PreFix).HasMaxLength(150);
+
+                entity.Property(e => e.Service)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageFollowing)
+                    .HasColumnName("Storage Following")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageRule)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SubFix).HasMaxLength(150);
+
+                entity.Property(e => e.Tag).HasMaxLength(10);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type).HasMaxLength(10);
             });
 
             modelBuilder.Entity<SysAuthorizedApproval>(entity =>
@@ -397,6 +455,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.OfficeType).HasMaxLength(500);
+
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")
                     .HasMaxLength(50)
@@ -413,6 +473,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.SaleTarget).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Signature).HasColumnType("image");
+
+                entity.Property(e => e.SignatureImage).HasMaxLength(500);
 
                 entity.Property(e => e.StaffCode)
                     .HasMaxLength(50)
@@ -510,6 +572,57 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
                 entity.Property(e => e.UserModified).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<SysImageDetail>(entity =>
+            {
+                entity.ToTable("sysImageDetail");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.BillingNo).HasMaxLength(50);
+
+                entity.Property(e => e.BillingType).HasMaxLength(50);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.GroupId)
+                    .HasColumnName("GroupID")
+                    .HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Hblid)
+                    .HasColumnName("HBLID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SystemFileName)
+                    .HasColumnName("SystemFIleName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserFileName).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysNotifications>(entity =>
@@ -642,6 +755,10 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PartnerMapping)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShortName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -682,6 +799,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.Accountant)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.AlertAtd).HasColumnName("AlertATD");
 
                 entity.Property(e => e.ApplyPartner)
                     .HasMaxLength(50)
@@ -732,6 +851,10 @@ namespace eFMS.API.SystemFileManagement.Service.Models
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("sysUser");
+
+                entity.HasIndex(e => e.Username)
+                    .HasName("Index_SysUser_ID")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")

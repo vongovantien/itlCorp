@@ -1,0 +1,98 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Attachments Files</h5>
+                <button type="button" class="close" aria-label="Close"
+                    (click)="hide();resetForm(); isSubmitted = false">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-center">
+                            <div class="dropzone">
+                                <div class="dropzone__message">
+                                    <h3 class="dropzone__title">
+                                        Click to upload
+                                        <span>
+                                            <i class="fa fa-upload" aria-hidden="true"></i>
+                                        </span>
+                                    </h3>
+                                </div>
+                                <input type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload"
+                                    title="Upload files" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-brand">
+                            <thead app-table-header [headers]="headers">
+                                <th class="first">Action</th>
+                            </thead>
+                            <ng-container>
+                                <tbody>
+                                    <ng-container *ngFor="let file of listFile; let i = index">
+                                        <tr>
+                                            <td class="table-actions-col">
+                                                <app-permission-button type="delete" (onClick)="removeFile(i)">
+                                                </app-permission-button>
+                                            </td>
+                                            <td class="table-actions-col">{{i}}</td>
+                                            <td class="">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control text-primary"
+                                                        [ngModelChange]="" [ngModel]="file.aliasName">
+                                                </div>
+                                            </td>
+                                            <td class="disabled">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control text-primary"
+                                                        [ngModel]="file.name" disabled>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <div class="form-group ">
+                                                    <select class="form-control" [(ngModel)]="file.docType"
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i)">
+                                                        <option *ngFor="let docType of documentTypes"
+                                                            [ngValue]="docType.code">
+                                                            {{docType.nameEn}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="disabled">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control text-primary"
+                                                        [ngModel]="fileNo" disabled>
+                                                </div>
+                                            <td class="disabled">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control text-primary" disabled
+                                                        [ngModel]="source">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </ng-container>
+                            <tfoot>
+
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
+                </app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="hide();resetForm()">
+                </app-default-button>
+            </div>
+        </div>
+    </div>
+</div>

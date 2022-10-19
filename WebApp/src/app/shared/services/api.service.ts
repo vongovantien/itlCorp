@@ -1,6 +1,8 @@
+import { IEDocUploadFile, IEDocFile } from './../../business-modules/share-business/components/document-type-attach/document-type-attach.component';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { SystemConstants } from 'src/constants/system.const';
+import { F } from '@angular/cdk/keycodes';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -118,5 +120,53 @@ export class ApiService {
 
     delete(url: string, params?: any, headers?: any) {
         return this._http.delete(this.setUrl(url), { params, headers });
+    }
+
+    putEDocFile(url: string, edoc: IEDocUploadFile, files: any) {
+        if (edoc.EDocFiles.length === 0) {
+            return;
+        }
+        const formData = new FormData();
+        formData.append('edocUploadModel.ModuleName', edoc.ModuleName);
+        formData.append('edocUploadModel.FolderName', edoc.FolderName);
+        formData.append('edocUploadModel.Id', edoc.Id);
+        let edocFile: IEDocFile[] = [];
+        for (let i = 0; i < edoc.EDocFiles.length; i++) {
+            let edocFileItem: IEDocFile = ({
+                AliasName: edoc.EDocFiles[i].AliasName,
+                BillingNo: edoc.EDocFiles[i].BillingNo,
+                BillingType: edoc.EDocFiles[i].BillingType,
+                Code: edoc.EDocFiles[i].Code,
+                //FileInput: edoc.EDocFiles[i].FileInput,
+                HBL: edoc.EDocFiles[i].HBL,
+                JobId: edoc.EDocFiles[i].JobId,
+                TransactionType: edoc.EDocFiles[i].TransactionType,
+                FileName: edoc.EDocFiles[i].FileName
+            });
+            edocFile.push(edocFileItem);
+        }
+        console.log(edocFile);
+        for (let i = 0; i < edocFile.length; i++) {
+            formData.append(`edocUploadModel.EDocFiles[${i}][AliasName]`, edocFile[i].AliasName);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingNo]`, edocFile[i].BillingNo);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingType]`, edocFile[i].BillingType);
+            formData.append(`edocUploadModel.EDocFiles[${i}][Code]`, edocFile[i].Code);
+            //formData.append(`edocUploadModel.EDocFiles[${i}].[File]`, edocFile[i].FileInput);
+            formData.append(`edocUploadModel.EDocFiles[${i}][HBL]`, edocFile[i].HBL);
+            formData.append(`edocUploadModel.EDocFiles[${i}][JobId]`, edocFile[i].JobId);
+            formData.append(`edocUploadModel.EDocFiles[${i}][TransactionType]`, edocFile[i].TransactionType);
+            formData.append(`edocUploadModel.EDocFiles[${i}][FileName]`, edocFile[i].FileName);
+        }
+        for (const file of files) {
+            formData.append('files', file);
+        }
+        const options = {
+            params: null,
+            reportProgress: true,
+            headers: new HttpHeaders({
+                'accept': 'application/json'
+            })
+        };
+        return this._http.put(this.setUrl(url), formData, options);
     }
 }

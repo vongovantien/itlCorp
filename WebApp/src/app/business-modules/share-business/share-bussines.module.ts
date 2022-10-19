@@ -1,3 +1,4 @@
+import { ShareDocumentTypeAttachComponent } from './components/document-type-attach/document-type-attach.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -76,6 +77,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { ShareBusinessProofOfDelieveyComponent } from './components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { ShareModulesModule } from '../share-modules/share-modules.module';
 import { ShareBussinessMassUpdatePodComponent } from './components/hbl/mass-update-pod/mass-update-pod.component';
+import { ShareBussinessAttachFileV2Component } from './components/files-attach-v2/files-attach-v2.component';
 
 
 
@@ -127,6 +129,8 @@ const COMPONENTS = [
     ShareBussinessJobDetailButtonListComponent,
     ShareBusinessProofOfDelieveyComponent,
     ShareBussinessMassUpdatePodComponent,
+    ShareBussinessAttachFileV2Component,
+    ShareDocumentTypeAttachComponent
 ];
 
 

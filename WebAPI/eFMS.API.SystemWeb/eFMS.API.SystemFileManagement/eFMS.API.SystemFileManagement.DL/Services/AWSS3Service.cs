@@ -1,10 +1,14 @@
-﻿using eFMS.API.SystemFileManagement.DL.IService;
-using eFMS.API.SystemFileManagement.DL.Models;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
+using Amazon.S3.Model;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.SystemFileManagement.DL.IService;
+using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,16 +16,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Net;
-using eFMS.API.SystemFileManagement.Service.Models;
-using eFMS.API.SystemFileManagement.Service.Common;
-using Amazon.Runtime;
-using Amazon.S3;
-using Amazon;
-using Amazon.S3.Model;
+using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -35,8 +31,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly string _awsSecretAccessKey;
         private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
+        private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
 
-        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl)
+        public AWSS3Service(IContextBase<SysImage> SysImageRepo, IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl)
         {
             this.currentUser = currentUser;
 
@@ -44,7 +41,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _bucketName = DbHelper.DbHelper.AWSS3BucketName;
             _awsSecretAccessKey = DbHelper.DbHelper.AWSS3SecretAccessKey;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
-
+            _attachFileTemplateRepo = attachFileTemplateRepo;
             var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
             _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
             _sysImageRepo = SysImageRepo;
@@ -77,23 +74,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-        
+
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
             var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
             && x.ObjectId == id.ToString() && x.ChildId == child);
 
             return res.OrderByDescending(x => x.DateTimeCreated).ToList();
-        }
-
-        private string BeforeExtention(string fileName)
-        {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\\\/]+", "");
-        }
-
-        private string RenameFileS3(string fileName)
-        {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$-]+", "") + "_" + StringHelper.RandomString(5);
         }
 
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
@@ -105,7 +92,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
-                    string fileName = RenameFileS3(Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName)));
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -163,8 +150,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName));
-                    fileName = RenameFileS3(fileName);
+                    string fileName = Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName));
+                    fileName = FileHelper.RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -411,6 +398,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+
 
     }
 }

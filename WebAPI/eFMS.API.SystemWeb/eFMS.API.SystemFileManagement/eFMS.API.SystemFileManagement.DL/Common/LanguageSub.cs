@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.SystemFileManagement.DL.Common
+﻿namespace eFMS.API.SystemFileManagement.DL.Common
 {
     public partial class AccountingLanguageSub
     {
@@ -101,14 +97,14 @@ namespace eFMS.API.SystemFileManagement.DL.Common
         public static readonly string MSG_CHARGE_SERVICE_TYPE_EMPTY = "MSG_CHARGE_SERVICE_TYPE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EXISTED = "MSG_CHARGE_CODE_EXISTED";
-        public static readonly string MSG_CHARGE_CODE_DUPLICATED= "MSG_CHARGE_CODE_DUPLICATED";
+        public static readonly string MSG_CHARGE_CODE_DUPLICATED = "MSG_CHARGE_CODE_DUPLICATED";
         public static readonly string MSG_CHARGE_UNIT_EMPTY = "MSG_CHARGE_UNIT_EMPTY";
         public static readonly string MSG_CHARGE_UNIT_NOT_FOUND = "MSG_CHARGE_UNIT_NOT_FOUND";
         #endregion
 
         #region commodity group
         public static readonly string MSG_COMMOIDITY_CODE_EMPTY = "MSG_COMMOIDITY_CODE_EMPTY";
-        public static readonly string MSG_COMMOIDITY_CODE_EXISTED= "MSG_COMMOIDITY_CODE_EXISTED";
+        public static readonly string MSG_COMMOIDITY_CODE_EXISTED = "MSG_COMMOIDITY_CODE_EXISTED";
         public static readonly string MSG_COMMOIDITY_CODE_DUPLICATED = "MSG_COMMOIDITY_CODE_DUPLICATED";
         public static readonly string MSG_COMMOIDITY_NAME_EN_EMPTY = "MSG_COMMOIDITY_GROUP_NAME_EN_EMPTY";
         public static readonly string MSG_COMMOIDITY_NAME_LOCAL_EMPTY = "MSG_COMMOIDITY_GROUP_NAME_LOCAL_EMPTY";
