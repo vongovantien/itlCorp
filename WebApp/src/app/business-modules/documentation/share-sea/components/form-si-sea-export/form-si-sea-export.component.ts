@@ -1,13 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { CatalogueRepo, SystemRepo } from '@repositories';
-import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize } from 'rxjs/operators';
-import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
-import { AppForm } from 'src/app/app.form';
+import { Component, Input, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { catchError, finalize } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
+import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-form-si-sea-export',
@@ -52,6 +52,8 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
     packages: AbstractControl;
     gw: AbstractControl;
     cbm: AbstractControl;
+    shippingMark: AbstractControl;
+    packagesType: AbstractControl;
 
     displayFieldIsseBy: CommonInterface.IComboGridDisplayField[] = [
         { field: 'username', label: 'User Name' },
@@ -109,7 +111,9 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
                 sumContainers: res.containerNote,
                 packages: res.packagesNote,
                 gw: res.grossWeight,
-                cbm: res.volume
+                cbm: res.volume,
+                packagesType: res.packagesType,
+                shippingMark: res.shippingMark
             });
             if (res.issuedUser == null && res.shipper == null) {
                 const currentUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
@@ -154,7 +158,9 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
             sumContainers: [],
             packages: [],
             gw: [],
-            cbm: []
+            cbm: [],
+            packagesType: [],
+            shippingMark: []
         });
         this.siRefNo = this.formSI.controls["siRefNo"];
         this.issueDate = this.formSI.controls["issueDate"];
@@ -182,6 +188,8 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
         this.packages = this.formSI.controls["packages"];
         this.gw = this.formSI.controls["gw"];
         this.cbm = this.formSI.controls["cbm"];
+        this.shippingMark = this.formSI.controls["shippingMark"];
+        this.packagesType = this.formSI.controls["packagesType"];
     }
     getPorts() {
         this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA })
@@ -321,7 +329,9 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
             containerNote: form.sumContainers,
             packagesNote: form.packages,
             grossWeight: form.gw,
-            volume: form.cbm
+            volume: form.cbm,
+            shippingMark: form.shippingMark,
+            packagesType: form.packagesType,
         };
         const shippingModel: CsShippingInstruction = new CsShippingInstruction(formData);
         return shippingModel;

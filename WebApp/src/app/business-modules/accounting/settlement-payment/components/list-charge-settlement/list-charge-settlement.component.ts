@@ -204,7 +204,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
 
             const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
-            const surchargeHasSynced = this.surcharges.filter(x => !x.hasNotSynce);
+            const surchargeHasSynced = this.surcharges.filter(x => (!x.hasNotSynce || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
             const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
                 const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment && x.hasNotSynce);
@@ -372,7 +372,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     returnChargeFromShipment(groupShipment: any) {
-        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected && surcharge.chargeAutoRated);
+        return groupShipment.chargeSettlements.filter((surcharge: Surcharge) => !surcharge.isSelected);
     }
 
     sortSurcharge(sortData: any) {
@@ -521,7 +521,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued && !surcharge.chargeAutoRated);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment && surcharge.hasNotSynce && !surcharge.hadIssued && !surcharge.chargeAutoRated && !surcharge.linkChargeId);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 

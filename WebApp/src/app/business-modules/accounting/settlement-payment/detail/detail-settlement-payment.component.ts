@@ -36,7 +36,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    
+
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
@@ -118,8 +118,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         //     return;
         // }
 
-        
-        if(!this.checkValidSettle()){
+
+        if (!this.checkValidSettle()) {
             return;
         }
 
@@ -250,7 +250,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this._toastService.error("Settlement Payment don't have any charge in this period, Please check it again!");
             return false;
         }
-        if((!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateSurcharge.statusApproval.value) && !this.formCreateSurcharge.form.valid)){
+        if ((!this.formCreateSurcharge.dueDate.value || !this.formCreateSurcharge.dueDate.value.startDate) || (!['New', 'Denied'].includes(this.formCreateSurcharge.statusApproval.value) && !this.formCreateSurcharge.form.valid)) {
             return false;
         }
         return true;
@@ -261,7 +261,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
         // }
-        if(!this.checkValidSettle()){
+        if (!this.checkValidSettle()) {
             return;
         }
 
@@ -301,8 +301,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                                                 settlementResult = res.data.settlement;
                                                 let approve: any = {
                                                     settlementNo: settlementResult.settlementNo,
-                                                    requester: settlementResult.requester,
-                                                    requesterAprDate: new Date()
+                                                    requester: settlementResult.requester
                                                 }
                                                 return this._accoutingRepo.updateAndSendMailApprovalSettlement(approve);
                                             }

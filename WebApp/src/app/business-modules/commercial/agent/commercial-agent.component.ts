@@ -116,7 +116,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
-            { title: 'Status', field: 'active', sortable: true },
+            // { title: 'Status', field: 'active', sortable: true },
             { title: 'Billing Address', field: 'addressVn', sortable: true },
         ];
 

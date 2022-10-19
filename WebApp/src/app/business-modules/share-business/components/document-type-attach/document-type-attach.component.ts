@@ -1,18 +1,15 @@
-import { Currency } from './../../../../shared/models/catalogue/catCurrency.model';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
-import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
-import { Store } from '@ngrx/store';
-import { IAppState } from '@store';
-import { Params, ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
-import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
 import { CsTransaction } from '@models';
+import { Store } from '@ngrx/store';
+import { SystemFileManageRepo } from '@repositories';
+import { IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { PopupBase } from 'src/app/popup.base';
-import { FILE } from 'dns';
+import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
 
 
 @Component({
@@ -207,11 +204,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     resetForm() {
-        this.listFile.splice(0, this.listFile.length);
+        this.listFile?.splice(0, this.listFile.length);
     }
     removeFile(index: number) {
 
-        this.listFile.splice(index, 1);
+        this.listFile?.splice(index, 1);
 
 
     }

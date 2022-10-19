@@ -11,7 +11,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICheckPointService
     {
         HandleState ValidateCheckPointPartnerDebitNote(string partnerId, Guid HblId, string transactionType);
-        HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode);
+        HandleState ValidateCheckPointPartnerSurcharge(CheckPoint criteria);
         HandleState ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria criteria);
         HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
@@ -38,5 +38,7 @@ namespace eFMS.API.Documentation.DL.IService
         HBL = 6,
         [Description("PREVIEW_HBL")]
         PREVIEW_HBL = 7,
+        [Description("UPDATE_HBL")]
+        UPDATE_HBL = 8,
     }
 }

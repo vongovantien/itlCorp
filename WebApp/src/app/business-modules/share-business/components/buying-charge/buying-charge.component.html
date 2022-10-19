@@ -49,7 +49,7 @@
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="m--w-90 first table-actions-col fixed-side"
-                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true">
+                        *ngIf="(isLocked | async) === false && (permissionShipments | async)?.allowUpdateCharge === true && shipment?.currentStatus !== 'Finish'">
                     </th>
                 </thead>
                 <tbody>
@@ -417,7 +417,8 @@
                                             <app-combo-grid-virtual-scroll
                                                 [currentActiveItemId]="{field: 'id', value: charge.vatPartnerId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'vat-partner', charge)"
-                                                [selectedDisplayFields]="['shortName']" [dataSources]="listPartner"
+                                                [selectedDisplayFields]="['shortName']"
+                                                [dataSources]="listPartner"
                                                 [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
                                                 (remove)="charge.vatPartnerId = null" placeholder="VAT Partner"
                                                 size="15">

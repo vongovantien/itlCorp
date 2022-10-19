@@ -12,9 +12,10 @@ import { ChargeConstants } from '@constants';
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
+import { catchError, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-consol-export',
@@ -133,16 +134,34 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                tap(() => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+                            .pipe(
+                                tap(() => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            )
-            .subscribe(
+                )
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
@@ -163,55 +182,4 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
             labelConfirm: 'Yes'
         }, () => { this.onSaveHBL() });
     }
-
-    // preview(reportType: string) {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     if (res?.dataSource?.length > 0) {
-    //                         this.dataReport = res;
-    //                         this.showReport();
-    //                     } else {
-    //                         this._toastService.warning('There is no data to display preview');
-    //                     }
-    //                 }
-
-    //             },
-    //         );
-    // }
-
-    // previewAttachList() {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._documentationRepo.previewAirAttachList(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     if (res?.dataSource?.length > 0) {
-    //                         this.dataReport = res;
-    //                         this.showReport();
-    //                     } else {
-    //                         this._toastService.warning('There is no data to display preview');
-    //                     }
-    //                 }
-
-    //             },
-    //         );
-    // }
 }

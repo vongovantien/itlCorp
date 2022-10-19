@@ -11,12 +11,12 @@ import { ChargeConstants, RoutingConstants } from '@constants';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
+import { catchError, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ICrystalReport } from '@interfaces';
 import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
@@ -137,16 +137,33 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                tap(() => {
-                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
-                        this.proofOfDeliveryComponent.uploadFilePOD();
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+                            .pipe(
+                                tap(() => {
+                                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                                        this.proofOfDeliveryComponent.uploadFilePOD();
+                                    }
+                                }),
+                                catchError(this.catchError),
+                            )
                     }
-                }),
-                catchError(this.catchError),
-            )
-            .subscribe(
+                )
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
@@ -168,8 +185,14 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         }, () => { this.onSaveHBL() });
     }
 
-    sendMail(type: any){
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+    sendMail(type: any) {
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7,
+            salesmanId: this.hblDetail.saleManId
+        }, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -179,8 +202,8 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
-                        switch(type){
+                    if (res.status) {
+                        switch (type) {
                             case 'Pre-Alert':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}/manifest`]);
                                 break;
@@ -195,43 +218,4 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 },
             );
     }
-    // preview(reportType: string) {
-    //     this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
-    //         .pipe(
-    //             catchError(this.catchError),
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 this.dataReport = res;
-    //                 if (this.dataReport.dataSource.length > 0) {
-    //                     this.showReport();
-    //                 } else {
-    //                     this._toastService.warning('There is no data to display preview');
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // previewAttachList() {
-    //     this._documentationRepo.previewAirAttachList(this.hblId)
-    //         .pipe(
-    //             catchError(this.catchError),
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 this.dataReport = res;
-    //                 if (this.dataReport.dataSource.length > 0) {
-    //                     this.showReport();
-    //                 } else {
-    //                     this._toastService.warning('There is no data to display preview');
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // @delayTime(1000)
-    // showReport(): void {
-    //     this.reportPopup.frm.nativeElement.submit();
-    //     this.reportPopup.show();
-    // }
 }

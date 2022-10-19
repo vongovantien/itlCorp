@@ -1017,7 +1017,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this._toastService.success('Sent Successfully!');
-                        this.selectedContract.arconfirmed = false;
                         this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error('something went wrong!');
@@ -1043,6 +1042,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 }
             );
+        console.log(this.selectedContract)
     }
 
     showRejectCommentPopup() {

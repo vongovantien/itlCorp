@@ -12,6 +12,6 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> GetDocumentType(string transactionType);
         Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files);
         Task<HandleState> GetEDocByJob(Guid jobId, string transactionType);
-        Task<HandleState> DeleteEdoc(string moduleName, string folde,Guid edocId);
+        Task<HandleState> DeleteEdoc(Guid edocId);
     }
 }

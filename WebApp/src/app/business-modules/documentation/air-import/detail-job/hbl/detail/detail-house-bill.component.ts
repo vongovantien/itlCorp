@@ -39,6 +39,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
+    checkPointPreview;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -105,6 +106,13 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
+                        this.checkPointPreview = {
+                            partnerId: this.hblDetail.customerId,
+                            hblId: this.hblId,
+                            salesmanId: this.hblDetail.saleManId,
+                            transactionType: 'DOC',
+                            type: 7
+                        }
                     }
                 },
             );
@@ -201,7 +209,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         let deliveryOrder = this.deliveryComponent.deliveryOrder;
         let proofOfDelievey = this.proofOfDeliveryComponent.proofOfDelievey;
 
-        this.arrivalNoteComponent.saveArrivalNote();
         modelUpdate.arrivalNo = arrivalNote.arrivalNo;
         modelUpdate.arrivalFirstNotice = arrivalNote.arrivalFirstNotice.startDate ? formatDate(arrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null;
         modelUpdate.arrivalSecondNotice = arrivalNote.arrivalSecondNotice.startDate ? formatDate(arrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null;
@@ -220,15 +227,29 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     updateHbl(body: any) {
-        this._documentationRepo.updateHbl(body)
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(body);
+                    })
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                        this.arrivalNoteComponent.saveArrivalNote();
 
                     } else {
                         this._toastService.error(res.message);
@@ -238,7 +259,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     preview(reportType: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -269,7 +290,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewArrivalNotice(_currency: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -323,7 +344,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewAuthorizeLetter2(withSign: boolean) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -347,7 +368,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
     previewAuthorizeLetter1(withSign: boolean) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -371,7 +392,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewProofOfDelivery() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -395,7 +416,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     previewAirDocumentRelease() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7)
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -441,8 +462,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         }, () => { this.saveHBL() });
     }
 
-    sendMail(type: string){
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+    sendMail(type: string) {
+        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -452,7 +473,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 })
             ).subscribe(
                 (res: any) => {
-                    if(res.status){
+                    if (res.status) {
                         switch (type) {
                             case 'ArrivalNotice':
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}/arrivalnotice`]);

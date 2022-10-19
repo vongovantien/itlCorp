@@ -28,7 +28,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
     ngOnInit(): void { }
 
     preview(reportType: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        const checkPoint = {
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            transactionType: 'DOC',
+            type: 7
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -75,7 +82,15 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
     }
 
     previewAttachList() {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblDetail.id, 'DOC', null, 7)
+        const checkPoint = {
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblDetail.id,
+            salesmanId: this.hblDetail.saleManId,
+            settlementCode: null,
+            transactionType: 'DOC',
+            type: 7
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {

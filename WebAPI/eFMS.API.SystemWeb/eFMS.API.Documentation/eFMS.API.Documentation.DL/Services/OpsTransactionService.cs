@@ -78,7 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
-
+        private readonly IContextBase<AccAccountingManagement> accMngtRepo;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -116,7 +116,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
-            IContextBase<CsTransactionDetail> transactionDetail
+            IContextBase<CsTransactionDetail> transactionDetail,
+            IContextBase<AccAccountingManagement> accMngt
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -158,6 +159,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
+            accMngtRepo = accMngt;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -278,8 +280,8 @@ namespace eFMS.API.Documentation.DL.Services
             entityReplicate.JobNo = GeneratePreFixReplicate() + originJob.JobNo;
             entityReplicate.Id = Guid.NewGuid();
             entityReplicate.Hblid = Guid.NewGuid();
-            entityReplicate.ServiceNo = originJob.JobNo;
-            entityReplicate.ServiceHblId = originJob.Hblid;
+            entityReplicate.ServiceNo = null;
+            entityReplicate.ServiceHblId = null;
             entityReplicate.OfficeId = dataUserLevel.OfficeId;
             entityReplicate.DepartmentId = dataUserLevel.DepartmentId;
             entityReplicate.GroupId = dataUserLevel.GroupId;
@@ -873,17 +875,27 @@ namespace eFMS.API.Documentation.DL.Services
                     var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
                     return new HandleState(notFoundPartnerTaxCodeMessages);
                 }
-
-                // Check contract for that customer.
-                customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                && x.SaleService.Contains("CL")
-                && x.Active == true
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                if (customerContract == null)
+                if (customer.PartnerMode == "Internal")
                 {
-                    string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                    string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
-                    return new HandleState(errorContract);
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                    && x.SaleService.Contains("CL")
+                    && x.Active == true
+                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                }
+                else
+                {
+                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                   && x.SaleService.Contains("CL")
+                   && x.Active == true
+                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                   )?.FirstOrDefault();
+                    if (customerContract == null)
+                    {
+                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
                 }
 
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
@@ -988,7 +1000,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = "Freehand",
+                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -1122,18 +1134,26 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState(notFoundPartnerTaxCodeMessages);
                     }
 
-                    // Check contract for that customer. TODO: TÁCH FUNCTION
-                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                    && x.SaleService.Contains("CL")
-                    && x.Active == true
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                    && (x.IsExpired == null || x.IsExpired == false)
-                    )?.FirstOrDefault();
-                    if (customerContract == null)
+                    if (customer.PartnerMode == "Internal")
                     {
-                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
-                        return new HandleState(errorContract);
+                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                        && x.SaleService.Contains("CL")
+                        && x.Active == true
+                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                    } else
+                    {
+                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
+                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
+                       )?.FirstOrDefault();
+                        if (customerContract == null)
+                        {
+                            string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
                     }
 
                     string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
@@ -1546,6 +1566,16 @@ namespace eFMS.API.Documentation.DL.Services
                         revenue = surcharge.Total;
                     }
 
+                    string _paymentStatus = string.Empty;
+                    if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                    {
+                        if (surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                        {
+                            var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
+                            _paymentStatus = acct?.PaymentStatus;
+                        }
+                    }
+
                     var surchargeRpt = new FormPLsheetReport();
 
                     surchargeRpt.COSTING = "COSTING";
@@ -1604,7 +1634,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //Đối với phí OBH thì NetAmountCurr gán bằng 0
                     surchargeRpt.NetAmountCurr = (surcharge.Type != DocumentConstants.CHARGE_OBH_TYPE ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber; //NetAmount quy đổi về currency preview
                     surchargeRpt.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber;  //GrossAmount quy đổi về currency preview
-
+                    surchargeRpt.PaymentStatus = _paymentStatus;
                     dataSources.Add(surchargeRpt);
                 }
             }

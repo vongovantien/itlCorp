@@ -91,9 +91,15 @@ namespace eFMS.API.Common
                     foreach (string attachment in attachments)
                     {
                         fileName = Path.GetFileName(attachment);
-                        webClient.DownloadFile(attachment, fileName);
+                        var folderDownload = AppDomain.CurrentDomain.BaseDirectory + "\\DownLoadedFiles";
+                        if (!Directory.Exists(folderDownload))
+                        {
+                            Directory.CreateDirectory(folderDownload);
+                        }
+                        var fullFileName = folderDownload + "\\" + fileName;
+                        webClient.DownloadFile(attachment, fullFileName);
 
-                        Attachment attached = new Attachment(fileName, MediaTypeNames.Application.Octet);
+                        Attachment attached = new Attachment(fullFileName, MediaTypeNames.Application.Octet);
                         message.Attachments.Add(attached);
                     }
                 }

@@ -1,29 +1,29 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentRef, Input, QueryList, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 
-import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup, CsTransactionDetail } from '@models';
-import { AppList } from 'src/app/app.list';
-import { SortService } from '@services';
-import { SystemConstants } from '@constants';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
+import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { CatPartnerCharge, Charge, ChargeGroup, Container, CsShipmentSurcharge, CsTransaction, CsTransactionDetail, Currency, HouseBill, OpsTransaction, Partner, Unit } from '@models';
+import { AccountingRepo, CatalogueRepo, DocumentationRepo } from '@repositories';
+import { SortService } from '@services';
+import { AppList } from 'src/app/app.list';
+import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, skip, map, shareReplay } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, skip, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
-import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { AppComboGridComponent } from '@common';
 import { ActivatedRoute } from '@angular/router';
+import { AppComboGridComponent } from '@common';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
+import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'buying-charge',
@@ -721,7 +721,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._toastService.clear();
 
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
-                this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
+                this._documentRepo.validateCheckPointContractPartner({
+                    partnerId: partnerData.id,
+                    transactionType: transactionType,
+                    hblId: this.hbl.id
+                })
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
@@ -804,17 +808,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                 if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                    this._documentRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id, transactionType)
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
-                                } else {
-                                    this._toastService.warning(res.message);
-                                }
-                                this._cd.markForCheck();
+                    this._documentRepo.validateCheckPointContractPartner({
+                        partnerId: this.hbl.customerId,
+                        transactionType: transactionType,
+                        hblId: this.hbl.id
+                    }).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                            } else {
+                                this._toastService.warning(res.message);
                             }
-                        )
+                            this._cd.markForCheck();
+                        }
+                    )
                 } else {
                     chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
                 }

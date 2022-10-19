@@ -1884,6 +1884,7 @@ namespace eFMS.API.Accounting.DL.Services
                 entity.OfficeId = currentUser.OfficeID;
                 entity.CompanyId = currentUser.CompanyID;
                 entity.BankAccountNo = StringHelper.RemoveSpecialChars(entity.BankAccountNo, Constants.spaceCharacter);
+                entity.BankAccountName = entity.BankName = entity.Note = null;
 
                 var addResult = databaseUpdateService.InsertDataToDB(entity);
                 if (!addResult.Status)
@@ -1912,6 +1913,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
                             }
                         }
+                        settlement.BankAccountName = model.Settlement.BankAccountName;
+                        settlement.BankName = model.Settlement.BankName;
+                        settlement.Note = model.Settlement.Note;
 
                         hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                         trans.Commit();
@@ -2467,6 +2471,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
 
                 var settlementApprove = mapper.Map<AcctApproveSettlement>(approve);
+                settlementApprove.RequesterAprDate = DateTime.Now;
                 var settlementPayment = DataContext.Get(x => x.SettlementNo == approve.SettlementNo).FirstOrDefault();
                 approve.Id = settlementPayment.Id;
 
@@ -5171,7 +5176,7 @@ namespace eFMS.API.Accounting.DL.Services
             return transactionType;
         }
 
-        public HandleState DenySettlePayments(List<Guid> Ids)
+        public HandleState DenySettlePayments(List<Guid> Ids,string comment)
         {
             HandleState result = new HandleState();
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -5203,7 +5208,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         approve.IsDeny = true;
                                         approve.UserModified = currentUser.UserID;
                                         approve.DateModified = DateTime.Now;
-
+                                        approve.Comment = comment;
                                         acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
 
@@ -5270,6 +5275,11 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     trans.Commit();
+                    foreach(Guid Id in Ids)
+                    {
+                        var settleNo = DataContext.Where(x => x.Id == Id).FirstOrDefault().SettlementNo;
+                        var sendMailDeny = SendMailDeniedApproval(settleNo, comment, DateTime.Now);
+                    }
                     return result;
                 }
                 catch (Exception ex)
@@ -5862,7 +5872,8 @@ namespace eFMS.API.Accounting.DL.Services
         public void UpdateSurchargeSettle(List<ShipmentChargeSettlement> newSurcharges, string settleCode, string action)
         {
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-            if(action == "Add")
+            new LogHelper("EFMS_LOG_UPD_SETTLEMENT", "Settle :" + settleCode + " - Action: " + action + " User: " + currentUser.UserName + " - " + currentUser.UserID + " - Department: "+ currentUser.DepartmentId);
+            if (action == "Add")
             {
                 #region Add
                 //Lấy các phí chứng từ IsFromShipment = true
