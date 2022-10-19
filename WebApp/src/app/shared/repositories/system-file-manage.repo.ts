@@ -1,9 +1,8 @@
-import { transition } from '@angular/animations';
 import { Injectable } from "@angular/core";
 import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
 import { catchError, map } from "rxjs/operators";
-import { throwError, Observable } from "rxjs";
+import { throwError } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class SystemFileManageRepo {
@@ -29,42 +28,6 @@ export class SystemFileManageRepo {
         );
     }
 
-    // deleteFolder(moduleName: string, folder: string, id: string) {
-    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteAttachedFile/${moduleName}/${folder}/${id}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // uploadFileContract(id: string, files: any) {
-    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${id}`, files, 'files').pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // uploadFileContractPayable(partnerId: string, files: any) {
-    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Catalogue/CatContract/${partnerId}`, files, 'files').pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // uploadFileShipment(jobId: string, body: any) {
-    //     return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Document/Shipment/${jobId}`, body, 'files').pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // deleteShipmentFilesAttach(jobId: string, fileName: string) {
-    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Document/Shipment/${jobId}/${fileName}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // getShipmentFilesAttach(jobId: string) {
-    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Document/Shipment/${jobId}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
     dowloadallAttach(body: any) {
         return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
@@ -72,29 +35,6 @@ export class SystemFileManageRepo {
         );
     }
 
-    // getContractFilesAttach(contractId: string) {
-    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${contractId}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // getContractPayableFilesAttach(partnerId: string) {
-    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/GetAttachedFiles/Catalogue/CatContract/${partnerId}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // deleteContractFilesAttach(contractId: string, fileName: string) {
-    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${contractId}/${fileName}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
-
-    // deleteContractPayableFilesAttach(partnerId: string, fileName: string) {
-    //     return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/Catalogue/CatContract/${partnerId}/${fileName}`).pipe(
-    //         map((data: any) => data)
-    //     );
-    // }
     getDocumentType(transactionType: string) {
         return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetDocumentType?transactionType=${transactionType}`).pipe(
             map((data: any) => data)
@@ -109,6 +49,12 @@ export class SystemFileManageRepo {
 
     getEDocByJob(jobId: string, transitionType: string) {
         return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByJob?jobId=${jobId}&transactionType=${transitionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteEdoc(edocId: string) {
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DeleteEDoc/${edocId}`).pipe(
             map((data: any) => data)
         );
     }

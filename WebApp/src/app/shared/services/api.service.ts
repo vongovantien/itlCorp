@@ -1,8 +1,7 @@
 import { IEDocUploadFile, IEDocFile } from './../../business-modules/share-business/components/document-type-attach/document-type-attach.component';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { SystemConstants } from 'src/constants/system.const';
-import { F } from '@angular/cdk/keycodes';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {

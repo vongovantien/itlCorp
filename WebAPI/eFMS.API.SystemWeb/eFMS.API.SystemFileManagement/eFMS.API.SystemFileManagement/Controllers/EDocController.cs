@@ -60,10 +60,10 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(hs);
         }
 
-        [HttpDelete("DeleteEDoc/{moduleName}/{folder}/{imageId}/{fileName}/{edocId}")]
-        public async Task<IActionResult> DeleteEDoc(string moduleName, string folder, Guid edocId)
+        [HttpDelete("DeleteEDoc/{edocId}")]
+        public async Task<IActionResult> DeleteEDoc(Guid edocId)
         {
-            HandleState hs = await _edocService.DeleteEdoc(moduleName, folder,edocId);
+            HandleState hs = await _edocService.DeleteEdoc(edocId);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);

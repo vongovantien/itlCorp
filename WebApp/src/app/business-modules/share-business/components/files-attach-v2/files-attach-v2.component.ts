@@ -1,18 +1,17 @@
-import _find from 'lodash/find';
-import { Component, Input, ViewChild, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { catchError, finalize, map, skip, takeUntil } from 'rxjs/operators';
 
-import { SystemFileManageRepo } from '@repositories';
-import _ from 'lodash';
-import { ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 import { ActivatedRoute, Params } from '@angular/router';
-import { IAppState } from '@store';
-import { getTransactionDetailCsTransactionState } from '../../store';
 import { CsTransaction } from '@models';
+import { SystemFileManageRepo } from '@repositories';
+import { IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
+import { getTransactionDetailCsTransactionState } from '../../store';
+import { ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 
 
 @Component({
@@ -30,11 +29,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     isOps: boolean = false;
     edocByJob: any[] = [];
     selectedEdoc: any;
-
+    transationType: string;
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>,
+        private _toast: ToastrService,
     ) {
         super();
     }
@@ -58,6 +58,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .pipe(skip(1), takeUntil(this.ngUnsubscribe))
                 .subscribe(
                     (res: CsTransaction) => {
+                        this.transationType = res.transactionType;
                         this.getDocumentType(res.transactionType);
                         this.getEDocByJobID(res.transactionType);
                     }
@@ -67,6 +68,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                     (res: any) => {
+                        this.transationType = res.transactionType;
                         this.getDocumentType(res.transactionType);
                         this.getEDocByJobID(res.transactionType);
                     }
@@ -96,13 +98,28 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     downloadEdoc() {
         window.open(this.selectedEdoc.imageUrl, "_blank");
+        this._toast.success("Download Sucess")
     }
 
     editEdoc() {
-
+        this.documentAttach.resetForm();
+        this.documentAttach.listFile.push(this.selectedEdoc);
+        this.documentAttach.show();
     }
-    deleteEdoc() {
 
+    deleteEdoc() {
+        this._systemFileRepo.deleteEdoc(this.selectedEdoc.id)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toast.success("Delete Sucess")
+                        this.getEDocByJobID(this.transationType);
+                    }
+                },
+            );
     }
     getDocumentType(transactionType: string) {
         this._systemFileRepo.getDocumentType(transactionType)

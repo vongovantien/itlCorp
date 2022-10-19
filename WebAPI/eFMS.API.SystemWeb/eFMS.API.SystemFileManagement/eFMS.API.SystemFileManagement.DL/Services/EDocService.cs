@@ -178,7 +178,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             UserFileName = fileName,
                             UserModified = currentUser.UserName,
                             DocumentTypeId = attachTemplate.Id,
-                            SysImageId = imageID
+                            SysImageId = imageID,
+                            Source=model.FolderName
                         };
                         list.Add(sysImage);
                         listDetail.Add(sysImageDetail);
@@ -238,7 +239,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.UserCreated,
                         UserFileName = x.UserFileName,
                         UserModified = x.UserModified,
-                        ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url
+                        ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
                     };
                     lstImageMD.Add(imageModel);
                 });
@@ -254,18 +255,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public async Task<HandleState> DeleteEdoc(string moduleName, string folder,Guid edocId)
+        public async Task<HandleState> DeleteEdoc(Guid edocId)
         {
             HandleState result = new HandleState();
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
                 var lst = await _sysImageRepo.GetAsync(x => x.Id == edoc.SysImageId);
-                if (edoc.Source != "Job")
+                if (edoc.Source == "Job")
                 {
                     var it = lst.FirstOrDefault();
                     if (it == null) { return new HandleState("Not found data"); }
-                    var key = moduleName + "/" + folder + "/" + it.ObjectId + "/" + it.Name;
+                    var key = "Document/Shipment/" + it.ObjectId + "/" + it.Name;
                     DeleteObjectRequest request = new DeleteObjectRequest
                     {
                         BucketName = _bucketName,
