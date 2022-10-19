@@ -213,12 +213,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 ModuleName = moduleName
             };
 
-            HandleState hs = await _aWSS3Service.PostFileAttacheDoc(model);
-            if (hs.Success)
+            string fileUrl = await _aWSS3Service.PostFileAttacheDoc(model);
+            if (!string.IsNullOrEmpty(fileUrl))
             {
-                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
-            }
-            return BadRequest(hs);
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = fileUrl });
+            };
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
         }
 
     }

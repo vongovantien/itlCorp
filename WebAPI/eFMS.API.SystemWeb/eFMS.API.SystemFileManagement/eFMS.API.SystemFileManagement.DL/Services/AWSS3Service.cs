@@ -22,9 +22,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
     {
         private ICurrentUser currentUser;
         private IContextBase<SysImage> _sysImageRepo;
-        private readonly string _awsAccessKeyId;
         private readonly string _bucketName;
-        private readonly string _awsSecretAccessKey;
         private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
@@ -42,6 +40,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _client = s3;
             _bucketName = DbHelper.DbHelper.AWSS3BucketName;
             _attachFileTemplateRepo = attachFileTemplateRepo;
+            _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
             _sysImageRepo = SysImageRepo;
             _apiUrl = apiUrl;
             edocService = edoc;
@@ -388,16 +387,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-        public async Task<HandleState> PostFileAttacheDoc(FileUploadModel model)
+        public async Task<string> PostFileAttacheDoc(FileUploadModel model)
         {
-            HandleState result = new HandleState();
             try
             {
-                var key = "";
+                var urlImage = "";
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                    var key = "";
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -412,7 +411,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
                         if (extension == ".doc")
                         {
                             urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -436,7 +435,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
                 if (list.Count > 0)
                 {
-                    result = await _sysImageRepo.AddAsync(list);
+                    HandleState result = await _sysImageRepo.AddAsync(list);
 
                     if(result.Success)
                     {
@@ -446,11 +445,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                     }
                 }
-                return result;
+                return urlImage;
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.ToString());
+                return null;
             }
         }
     }

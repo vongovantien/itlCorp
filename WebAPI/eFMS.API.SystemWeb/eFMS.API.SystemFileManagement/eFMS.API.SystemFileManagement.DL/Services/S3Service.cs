@@ -13,13 +13,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly string _awsAccessKeyId;
         private readonly string _bucketName;
         private readonly string _awsSecretAccessKey;
-        private readonly string _domainTest;
         public S3Service()
         {
             _awsAccessKeyId = DbHelper.DbHelper.AWSS3AccessKeyId;
             _bucketName = DbHelper.DbHelper.AWSS3BucketName;
             _awsSecretAccessKey = DbHelper.DbHelper.AWSS3SecretAccessKey;
-            _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
 
             var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
             _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
