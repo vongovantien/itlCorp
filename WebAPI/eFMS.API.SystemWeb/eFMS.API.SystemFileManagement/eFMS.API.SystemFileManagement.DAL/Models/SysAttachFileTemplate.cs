@@ -5,7 +5,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 {
     public partial class SysAttachFileTemplate
     {
-        public int Id { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }
         public string Code { get; set; }
@@ -26,5 +25,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public Guid? UserModified { get; set; }
         public string StorageFollowing { get; set; }
         public string Tag { get; set; }
+        public int Id { get; set; }
     }
 }

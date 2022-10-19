@@ -34,6 +34,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
+        private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
 
         public EDocService(IContextBase<SysImage> SysImageRepo, IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl, IContextBase<SysImageDetail> sysImageDetailRepo)
         {
@@ -292,6 +293,132 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
+        }
+
+        public async Task<HandleState> MappingeDocToShipment(Guid imageId, string billingId, string billingType)
+        {
+            HandleState result = new HandleState();
+            string bilingNo = string.Empty;
+            var jobIds = new List<Guid>();
+            switch (billingType)
+            {
+                case "Advance":
+                    var adv = DC.AcctAdvancePayment.FirstOrDefault(x => x.Id.ToString() == billingId);
+                    bilingNo = adv.AdvanceNo;
+                    if (adv != null)
+                    {
+                        var advRquest = DC.AcctAdvanceRequest.Where(x => x.AdvanceNo == bilingNo);
+                        var grpJobsAdv = advRquest.GroupBy(x => x.JobId).Select(x => x.Key).ToList();
+                        foreach (var item in grpJobsAdv)
+                        {
+                            if (item.Contains("LOG"))
+                            {
+                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                if(opsJob != null)
+                                {
+                                    jobIds.Add(opsJob.Id);
+                                }
+                            } else
+                            {
+                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                if (csJob != null)
+                                {
+                                    jobIds.Add(csJob.Id);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "Settlement":
+                    bilingNo = DC.AcctSettlementPayment.FirstOrDefault(x => x.Id.ToString() == billingId).SettlementNo;
+                    var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => x.JobNo).Select(x => x.Key);
+                    foreach (var item in grpJobsSm)
+                    {
+                        if (item.Contains("LOG"))
+                        {
+                            var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                            if (opsJob != null)
+                            {
+                                jobIds.Add(opsJob.Id);
+                            }
+                        }
+                        else
+                        {
+                            var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                            if (csJob != null)
+                            {
+                                jobIds.Add(csJob.Id);
+                            }
+                        }
+                    }
+                    break;
+                case "SOA":
+                    var soa = DC.AcctSoa.FirstOrDefault(x => x.Id.ToString() == billingId);
+                    if(soa != null)
+                    {
+                        bilingNo = soa.Soano;
+                        var surchargeSoa = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+                        if(soa.Type == "Debit")
+                        {
+                            surchargeSoa = DC.CsShipmentSurcharge.Where(x => x.Soano == bilingNo);
+                        } else
+                        {
+                            surchargeSoa = DC.CsShipmentSurcharge.Where(x => x.PaySoano == bilingNo);
+                        }
+
+                        var grpJobsSOA = surchargeSoa.GroupBy(x => x.JobNo).Select(x => x.Key);
+                        foreach (var item in grpJobsSOA)
+                        {
+                            if (item.Contains("LOG"))
+                            {
+                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                if (opsJob != null)
+                                {
+                                    jobIds.Add(opsJob.Id);
+                                }
+                            }
+                            else
+                            {
+                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                if (csJob != null)
+                                {
+                                    jobIds.Add(csJob.Id);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if(jobIds.Count > 0)
+            {
+                var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
+                foreach (var Id in jobIds)
+                {
+                    var imageDetail = new SysImageDetail
+                    {
+                        SysImageId = imageId,
+                        BillingType = billingType,
+                        BillingNo = bilingNo,
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        Id = Guid.NewGuid(),
+                        JobId = Id,
+                        UserCreated = sysImage.UserCreated,
+                        SystemFileName = sysImage.Name,
+                        UserFileName = sysImage.Name,
+                        UserModified = sysImage.UserCreated,
+                        Source = billingType
+                    };
+
+                    await _sysImageDetailRepo.AddAsync(imageDetail, false);
+                }
+
+                result = _sysImageDetailRepo.SubmitChanges();
+            }
+            return result;
         }
     }
 }

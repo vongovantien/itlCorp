@@ -29,6 +29,7 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IUserBaseService, UserBaseService>();
+            services.AddTransient<IS3Service, S3Service>();
             services.AddTransient<IAWSS3Service, AWSS3Service>();
             services.AddTransient<IEDocService, EDocService>();
             services.AddTransient<IAttachFileTemplateService, AttachFilteTemplateService>();
