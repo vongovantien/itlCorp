@@ -102,6 +102,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     editEdoc() {
+        console.log(this.documentAttach.listFile);
+        console.log(this.selectedEdoc);
+        this.documentAttach.headers = [
+            { title: 'No', field: 'no' },
+            { title: 'Alias Name', field: 'aliasName' },
+            { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Document Type', field: 'docType' },
+            { title: 'Job Ref', field: 'jobRef' },
+            { title: 'Source', field: 'source' }
+        ];
         this.documentAttach.resetForm();
         this.documentAttach.listFile.push(this.selectedEdoc);
         this.documentAttach.show();
@@ -121,6 +131,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
+
     getDocumentType(transactionType: string) {
         this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
