@@ -134,9 +134,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
             {
                 entity.ToTable("sysAttachFileTemplate");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Code).HasMaxLength(150);
 
@@ -163,7 +161,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.StorageFollowing)
-                    .HasColumnName("Storage Following")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -177,7 +174,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.SubFix).HasMaxLength(150);
 
-                entity.Property(e => e.Tag).HasMaxLength(10);
+                entity.Property(e => e.Tag).HasMaxLength(150);
 
                 entity.Property(e => e.TransactionType)
                     .HasMaxLength(10)

@@ -28,22 +28,11 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            //services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
-            //services.AddTransient<IAcctSettlementPaymentService, AcctSettlementPaymentService>();
-            //services.AddTransient<IAcctSOAService, AcctSOAService>();
-            //services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             services.AddTransient<IUserBaseService, UserBaseService>();
             services.AddTransient<IAWSS3Service, AWSS3Service>();
             services.AddTransient<IEDocService, EDocService>();
-            //services.AddTransient<IAccountingManagementService, AccountingManagementService>();
-            //services.AddTransient<IAccAccountingPaymentService, AccAccountingPaymentService>();
-            //services.AddTransient<IAccAccountReceivableService, AccAccountReceivableService>();
-            //services.AddTransient<IAccountingService, AccountingService>();
-            //services.AddTransient<IActionFuncLogService, ActionFuncLogService>();
-            //services.AddTransient<IAcctReceiptService, AcctReceiptService>();
-            //services.AddTransient<ISysImageService, SysImageService>();
-            //services.AddTransient<IAcctDebitManagementARService, AcctDebitManagementArService>();
-            //services.AddTransient<IAcctCombineBillingService, AcctCombineBillingService>();
+            services.AddTransient<IAttachFileTemplateService, AttachFilteTemplateService>();
+
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
