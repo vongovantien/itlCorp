@@ -140,10 +140,6 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => criteria.Class == x.Class);
             }
 
-            if (!string.IsNullOrEmpty(criteria.PaymentMethod))
-            {
-                query = query.And(x => x.PaymentMethod == criteria.PaymentMethod);
-            }
 
             // Tìm theo ngày sync/ngày thu
             if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Last Sync")
