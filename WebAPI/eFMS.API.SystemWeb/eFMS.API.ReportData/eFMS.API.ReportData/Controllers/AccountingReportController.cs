@@ -235,7 +235,7 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoAdvance.AdvanceNo, stream, "Advance Form - eFMS");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + advanceId, accessToken);
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileEdoc + "Advance" + "/" + advanceId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
             return Ok(result);

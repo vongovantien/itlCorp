@@ -198,5 +198,28 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
         }
 
+        [HttpPut("UploadAttachedFileEdoc/{moduleName}/{folder}/{id}")]
+        public async Task<IActionResult> UploadAttachedFileEdoc(FileReportUpload files, string moduleName, string folder, Guid id, string child = null)
+        {
+            var stream = new MemoryStream(files.FileContent);
+            var fFile = new FormFile(stream, 0, stream.Length, null, files.FileName);
+            var fFiles = new List<IFormFile>() { fFile };
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = fFiles,
+                FolderName = folder,
+                Id = id,
+                Child = child,
+                ModuleName = moduleName
+            };
+
+            HandleState hs = await _aWSS3Service.PostFileAttacheDoc(model);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(hs);
+        }
+
     }
 }
