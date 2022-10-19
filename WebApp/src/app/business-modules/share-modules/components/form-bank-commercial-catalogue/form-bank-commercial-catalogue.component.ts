@@ -1,10 +1,11 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective } from '@angular/forms';
 import { Bank } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { GetCatalogueBankAction, getCatalogueBankState } from '@store';
+import { FormValidators } from '@validators';
 import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
@@ -56,12 +57,12 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     initForm() {
         this.formGroup = this._fb.group({
-            bankAccountNo: [null],
-            bankAccountName: [null, Validators.required],
-            bankAddress: [null, Validators.required],
-            swiftCode: [null, Validators.required],
-            bankNameEn: [null, Validators.required],
-            bankCode: [null],
+            bankAccountNo: [null, FormValidators.required],
+            bankAccountName: [null, FormValidators.required],
+            bankAddress: [null, FormValidators.required],
+            bankNameEn: [null, FormValidators.required],
+            bankCode: [null, FormValidators.required],
+            swiftCode: [null],
             note: [null],
             bankId: [null]
         });
@@ -90,7 +91,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                 code: !!formBody.bankCode ? formBody.bankCode : null,
             };
             const mergeObj = Object.assign(_merge(formBody, cloneObject));
-            mergeObj.id = this.id;
             mergeObj.partnerId = this.partnerId;
             return mergeObj;
         }
@@ -111,7 +111,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     updateFormValue(data: Bank) {
-        console.log(data)
         const formValue = {
             bankId: !!data.bankId ? data.bankId : null,
             bankAccountNo: !!data.bankAccountNo ? data.bankAccountNo : null,
@@ -145,6 +144,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                             }
                         );
                 } else {
+                    mergeObj.id = this.id
                     this._catalogueRepo.updateBank(mergeObj)
                         .pipe(catchError(this.catchError))
                         .subscribe(
@@ -153,15 +153,17 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                                     this._toastService.success(res.message);
                                     this.onRequest.emit(true);
                                     this.hide();
+
                                 } else {
                                     this._toastService.error("Opps", "Something getting error!");
                                 }
                             }
                         );
                 }
+                this.isSubmitted = false;
+                this.formGroup.reset()
             }
             else {
-                //mergeObj.index = this.indexDetailBank;
                 this.onRequest.emit(mergeObj);
             }
         }
@@ -169,5 +171,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     close() {
         this.hide();
+        this.isSubmitted = false;
     }
 }

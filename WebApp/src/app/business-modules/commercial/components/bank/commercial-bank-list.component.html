@@ -43,7 +43,7 @@
                                         </button>
                                         <ng-container>
                                             <button class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                (click)="showConfirmDelete(item.id,i)">
+                                                (click)="onDeleteBank(item.id)">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </ng-container>
@@ -68,4 +68,4 @@
     </div>
 </div>
 <popup-form-bank-commercial-catalogue (onRequest)="onRequestBank($event)"></popup-form-bank-commercial-catalogue>
-<confirm-popup body="You want to delete this bank ?" (onSubmit)="onDelete()"></confirm-popup>
+<ng-template inject></ng-template>

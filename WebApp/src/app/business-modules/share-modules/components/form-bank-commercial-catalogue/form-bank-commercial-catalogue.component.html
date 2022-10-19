@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h5 class="modal-title" style="margin-right:10px;">
-                        Create Partner Bank Infor
+                        Create Partner Bank Information
                     </h5>
 
                     <button type="button" class="close" aria-label="Close" (click)="close()">
@@ -20,6 +20,9 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAccountNo.valid || !bankAccountNo.value)} ">
                                 <label required>Bank Account No</label>
                                 <input type="text" class="form-control" formControlName="bankAccountNo">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAccountNo.invalid">
+                                    Bank Account No is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -27,6 +30,9 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAccountName.valid || !bankAccountName.value)}">
                                 <label required>Bank Account Name</label>
                                 <input type="text" class="form-control" formControlName="bankAccountName">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAccountName.invalid">
+                                    Bank Account Name is required
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -36,6 +42,9 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAddress.valid || !bankAddress.value)}">
                                 <label required>Bank Address</label>
                                 <input type="text" class="form-control" formControlName="bankAddress">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAddress.invalid">
+                                    Bank Address is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -57,6 +66,9 @@
                                             [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
                                             placeholder="Please Select Bank Name" formControlName="bankNameEn">
                                         </app-combo-grid-virtual-scroll>
+                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
+                                            Bank Name is required
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">

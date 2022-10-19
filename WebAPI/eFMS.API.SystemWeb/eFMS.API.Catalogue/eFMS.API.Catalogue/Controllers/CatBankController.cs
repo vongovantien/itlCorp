@@ -116,10 +116,13 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(string.Empty, model);
-            if (checkExistMessage.Length > 0)
+            if(model.PartnerId == null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                var checkExistMessage = CheckExist(string.Empty, model);
+                if (checkExistMessage.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                }
             }
             var hs = catBankService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -143,10 +146,13 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var checkExistMessage = CheckExist(model.Id.ToString(), model);
-            if (checkExistMessage.Length > 0)
+            if (model.PartnerId == null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                var checkExistMessage = CheckExist(model.Id.ToString(), model);
+                if (checkExistMessage.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                }
             }
      
            

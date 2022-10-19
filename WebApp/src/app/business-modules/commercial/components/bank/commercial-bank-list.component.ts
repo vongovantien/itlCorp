@@ -1,21 +1,24 @@
-import { ToastrService } from 'ngx-toastr';
 import { Component, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { Bank } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo } from '@repositories';
 import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { FormBankCommercialCatalogueComponent } from '../../../share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
-import { Bank } from './../../../../shared/models/catalogue/catBank.model';
+import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
 
 @Component({
     selector: 'app-commercial-bank-list',
     templateUrl: './commercial-bank-list.component.html',
 })
+
 export class CommercialBankListComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+
     @ViewChild(FormBankCommercialCatalogueComponent) formUpdateBankPopup: FormBankCommercialCatalogueComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     partnerBanks: Bank[] = [];
     partnerId: string = '';
@@ -54,7 +57,6 @@ export class CommercialBankListComponent extends AppList {
                 this.isLoading = false;
             })).subscribe(
                 (res: Bank[]) => {
-                    console.log(res)
                     this.partnerBanks = res || [];
                 }
             );
@@ -62,7 +64,6 @@ export class CommercialBankListComponent extends AppList {
 
     showPopupUpdateBank() {
         this.formUpdateBankPopup.isUpdate = false;
-        console.log(this.formUpdateBankPopup.isUpdate)
         this.formUpdateBankPopup.partnerId = this.partnerId;
         if (!this.formUpdateBankPopup.isUpdate) {
             this.formUpdateBankPopup.formGroup.reset();
@@ -93,18 +94,18 @@ export class CommercialBankListComponent extends AppList {
         this.partnerBanks = this._sortService.sort(this.partnerBanks, sort, this.order);
     }
 
-    showConfirmDelete(id: string, index: number) {
-        this.id = id;
-        if (!!this.id) {
-            this.confirmDeletePopup.show();
-        } else {
-            this.partnerBanks = [...this.partnerBanks.slice(0, index), ...this.partnerBanks.slice(index + 1)];
-        }
+
+    onDeleteBank(id: string) {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Confirm',
+            body: 'Do you want to delete this bank account',
+            labelConfirm: 'Ok'
+        }, () => { this.handleDeleteBank(id) });
     }
 
-    onDelete() {
-        this.confirmDeletePopup.hide();
-        this._catalogueRepo.deleteBank(this.id)
+
+    handleDeleteBank(id: string) {
+        this._catalogueRepo.deleteBank(id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
