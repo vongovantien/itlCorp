@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { SystemRepo } from '@repositories';
-import { Company, Department } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { Company, Department, Partner } from '@models';
 import { finalize, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -10,6 +10,8 @@ import { AppForm } from 'src/app/app.form';
 import { Store } from '@ngrx/store';
 import { checkShareSystemUserLevel, IShareSystemState } from './../../../store';
 import { RoutingConstants } from '@constants';
+import { Observable } from 'rxjs';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'form-add-office',
@@ -24,6 +26,13 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         selectedDisplayFields: [],
     };
     selectedCompany: Partial<CommonInterface.IComboGridData> = {};
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'accountNo', label: 'ID' },
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameVn', label: 'Name Local' },
+        { field: 'taxCode', label: 'Tax Code' },
+    ];
+
 
     userHeaders: CommonInterface.IHeaderTable[];
     companies: Company[] = [];
@@ -55,12 +64,15 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     bankName_En: AbstractControl;
     bankName_Local: AbstractControl;
     officeType: AbstractControl;
+    partnerMapping: AbstractControl;
     SelectedOffice: any = {};
+    
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
     ];
     isReadonly: any = false;
+    partners: Observable<Partner[]>;
 
     isSubmited: boolean = false;
     @Input() isDetail: boolean = false;
@@ -69,6 +81,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareSystemState>,
         private _router: Router
     ) {
@@ -76,6 +89,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        
         this.initForm();
         this.getDataComboBox();
 
@@ -186,7 +201,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             officeType: ['Branch', Validators.compose([
                 Validators.required
             ])],
-            internalCode: []
+            internalCode: [],
+            partnerMapping: [],
         });
 
         this.code = this.formGroup.controls['code'];
@@ -214,7 +230,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.bankName_En = this.formGroup.controls['bankName_En'];
         this.bankName_Local = this.formGroup.controls['bankName_Local'];
         this.officeType = this.formGroup.controls['officeType'];
-
+        this.partnerMapping = this.formGroup.controls['partnerMapping'];
         this.internalCode = this.formGroup.controls['internalCode'];
     }
 }
@@ -250,4 +266,5 @@ export interface IFormAddOffice {
     bankName_En: string;
     bankName_Local
     internalCode: string;
+    partnerMapping: string;
 }

@@ -54,7 +54,8 @@ export class OfficeDetailsComponent extends AppList {
         location: '',
         bankName_En: '',
         bankName_Local: '',
-        internalCode: ''
+        internalCode: '',
+        partnerMapping: ''
     };
     officeId: string = '';
 
@@ -190,6 +191,7 @@ export class OfficeDetailsComponent extends AppList {
                             this.formData.active = res.data.active;
                             this.formData.bankName_En = res.data.bankNameEn;
                             this.formData.bankName_Local = res.data.bankNameLocal;
+                            this.formData.partnerMapping = res.data.partnerMapping;
                             this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.office.buid, officeId: this.office.id, type: 'office' }));
                             setTimeout(() => {
                                 this.formAdd.update(this.formData, res.data.active);
