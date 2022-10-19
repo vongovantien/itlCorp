@@ -1,19 +1,19 @@
-﻿using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
+﻿using eFMS.API.SystemFileManagement.DL.IService;
+using eFMS.API.SystemFileManagement.DL.Services;
+using eFMS.API.SystemFileManagement.Infrastructure.Filters;
+using eFMS.API.SystemFileManagement.Service.Contexts;
+using ITL.NetCore.Connection.EF;
 using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.Collections.Generic;
-using eFMS.API.SystemFileManagement.Infrastructure.Filters;
 using System.IO;
 using System.Reflection;
-using System;
-using eFMS.API.SystemFileManagement.Service.Contexts;
-using eFMS.API.SystemFileManagement.DL.IService;
-using eFMS.API.SystemFileManagement.DL.Services;
 
 namespace eFMS.API.SystemFileManagement.Infrastructure
 {
@@ -34,6 +34,7 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
             //services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             services.AddTransient<IUserBaseService, UserBaseService>();
             services.AddTransient<IAWSS3Service, AWSS3Service>();
+            services.AddTransient<IEDocService, EDocService>();
             //services.AddTransient<IAccountingManagementService, AccountingManagementService>();
             //services.AddTransient<IAccAccountingPaymentService, AccAccountingPaymentService>();
             //services.AddTransient<IAccAccountReceivableService, AccAccountReceivableService>();

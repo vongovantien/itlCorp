@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.SystemFileManagement.Service.Contexts
 {
-    public class eFMSDataContext: eFMSDataContextDefault
+    public class eFMSDataContext : eFMSDataContextDefault
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -19,7 +19,7 @@ namespace eFMS.API.SystemFileManagement.Service.Contexts
         }
         public override int SaveChanges()
         {
-           var entities = ChangeTracker.Entries();
+            var entities = ChangeTracker.Entries();
             var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
             var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
             var addedList = ChangeTrackerHelper.GetAdded(entities);

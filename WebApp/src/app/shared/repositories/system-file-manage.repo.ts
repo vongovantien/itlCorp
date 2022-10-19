@@ -1,3 +1,4 @@
+import { transition } from '@angular/animations';
 import { Injectable } from "@angular/core";
 import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
@@ -65,7 +66,7 @@ export class SystemFileManageRepo {
     // }
 
     dowloadallAttach(body: any) {
-        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DowloadAllFileAttached`, body).pipe(
+        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -94,5 +95,21 @@ export class SystemFileManageRepo {
     //         map((data: any) => data)
     //     );
     // }
+    getDocumentType(transactionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetDocumentType?transactionType=${transactionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
+    uploadEDoc(body: any, files: any) {
+        return this._api.putEDocFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadEdoc`, body, files).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getEDocByJob(jobId: string, transitionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByJob?jobId=${jobId}&transactionType=${transitionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }

@@ -1,13 +1,13 @@
-﻿using System;
+﻿using eFMS.API.Common.Helpers;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using System.Net.Mime;
-using eFMS.API.Common.Helpers;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace eFMS.API.Common
 {
@@ -140,7 +140,7 @@ namespace eFMS.API.Common
             List<string> ToEmails = new List<string>() { ToEmail };
             emailBCC.Add("kenny.thuong@itlvn.com");
             return Send(Subject, Body, ToEmails, Attachments, EmailCCs, emailBCC);
-        }        
+        }
         public static bool IsValidEmail(string email)
         {
             try
