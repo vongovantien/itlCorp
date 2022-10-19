@@ -33,10 +33,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpGet("GetDocumentType")]
         public async Task<IActionResult> GetDocumentTypeAsync(string transactionType)
         {
-            HandleState hs = await _edocService.GetDocumentType(transactionType);
-            if (hs.Success)
-                return Ok(hs.Message);
-            return BadRequest(hs);
+            var result = await _edocService.GetDocumentType(transactionType);
+            if (result == null)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         [HttpPut("UploadEdoc")]
@@ -54,10 +56,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpGet("GetEDocByJob")]
         public async Task<IActionResult> GetEDocByJob(Guid jobId, string transactionType)
         {
-            HandleState hs = await _edocService.GetEDocByJob(jobId, transactionType);
-            if (hs.Success)
-                return Ok(hs.Message);
-            return BadRequest(hs);
+            var result = await _edocService.GetEDocByJob(jobId, transactionType);
+            if (result == null)
+            {
+                return BadRequest(result);
+            }
+                return Ok(result);
         }
 
         [HttpDelete("DeleteEDoc/{edocId}")]

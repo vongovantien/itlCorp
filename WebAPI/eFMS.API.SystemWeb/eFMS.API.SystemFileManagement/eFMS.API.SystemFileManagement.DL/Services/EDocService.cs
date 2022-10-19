@@ -51,21 +51,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _sysImageDetailRepo = sysImageDetailRepo;
         }
 
-        public async Task<HandleState> GetDocumentType(string transactionType)
+        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType)
         {
-            try
-            {
-                var lst = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
-                if (lst == null) { return new HandleState("Not found data"); }
-                return new HandleState(true, lst);
-            }
-            catch (Exception ex)
-            {
-                return new HandleState(ex.ToString());
-            }
+            var lst = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
+            return lst;
         }
 
-        private DateTime ConvertExpiredDate(int TimeStorage, string TypeStorage)
+        private DateTime? ConvertExpiredDate(int TimeStorage, string TypeStorage)
         {
             DateTime expiredDate = DateTime.Now;
             switch (TypeStorage)
@@ -168,7 +160,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             DatetimeCreated = DateTime.Now,
                             DatetimeModified = DateTime.Now,
                             DepartmentId = currentUser.DepartmentId,
-                            ExpiredDate = ConvertExpiredDate((int)attachTemplate.StorageTime, attachTemplate.StorageType),
+                            ExpiredDate = attachTemplate.StorageTime==null?null: ConvertExpiredDate((int)attachTemplate.StorageTime, attachTemplate.StorageType),
                             GroupId = currentUser.GroupId,
                             Hblid = edoc.HBL,
                             JobId = edoc.JobId,
@@ -200,59 +192,52 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-        public async Task<HandleState> GetEDocByJob(Guid jobID, string transactionType)
+        public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
-            try
+            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
+            var lst = await _sysImageDetailRepo.GetAsync(x => x.JobId == jobID);
+            if (lst == null) { return null; }
+            var result = new List<EDocGroupByType>();
+            lstTran.ForEach(x =>
             {
-                var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
-                var lst = await _sysImageDetailRepo.GetAsync(x => x.JobId == jobID);
-                if (lst == null) { return new HandleState("Not found data"); }
-                var result = new List<EDocGroupByType>();
-                lstTran.ForEach(x =>
+                var data = new EDocGroupByType()
                 {
-                    var data = new EDocGroupByType()
-                    {
-                        documentType = x
-                    };
-                    result.Add(data);
-                });
-                var lstImageMD = new List<SysImageDetailModel>();
-                lst.ForEach(x =>
-                {
-                    var imageModel = new SysImageDetailModel()
-                    {
-                        BillingNo = x.BillingNo,
-                        BillingType = x.BillingNo,
-                        DatetimeCreated = x.DatetimeCreated,
-                        DatetimeModified = x.DatetimeModified,
-                        DepartmentId = x.DepartmentId,
-                        DocumentTypeId = x.DocumentTypeId,
-                        ExpiredDate = x.ExpiredDate,
-                        GroupId = x.GroupId,
-                        Hblid = x.Hblid,
-                        Id = x.Id,
-                        JobId = x.JobId,
-                        OfficeId = x.OfficeId,
-                        Source = x.Source,
-                        SysImageId = x.SysImageId,
-                        SystemFileName = x.SystemFileName,
-                        UserCreated = x.UserCreated,
-                        UserFileName = x.UserFileName,
-                        UserModified = x.UserModified,
-                        ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
-                    };
-                    lstImageMD.Add(imageModel);
-                });
-                lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
-                {
-                    result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
-                });
-                return new HandleState(true, result);
-            }
-            catch (Exception ex)
+                    documentType = x
+                };
+                result.Add(data);
+            });
+            var lstImageMD = new List<SysImageDetailModel>();
+            lst.ForEach(x =>
             {
-                return new HandleState(ex.ToString());
-            }
+                var imageModel = new SysImageDetailModel()
+                {
+                    BillingNo = x.BillingNo,
+                    BillingType = x.BillingNo,
+                    DatetimeCreated = x.DatetimeCreated,
+                    DatetimeModified = x.DatetimeModified,
+                    DepartmentId = x.DepartmentId,
+                    DocumentTypeId = x.DocumentTypeId,
+                    ExpiredDate = x.ExpiredDate,
+                    GroupId = x.GroupId,
+                    Hblid = x.Hblid,
+                    Id = x.Id,
+                    JobId = x.JobId,
+                    OfficeId = x.OfficeId,
+                    Source = x.Source,
+                    SysImageId = x.SysImageId,
+                    SystemFileName = x.SystemFileName,
+                    UserCreated = x.UserCreated,
+                    UserFileName = x.UserFileName,
+                    UserModified = x.UserModified,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
+                };
+                lstImageMD.Add(imageModel);
+            });
+            lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
+            {
+                result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
+            });
+            return result;
         }
 
         public async Task<HandleState> DeleteEdoc(Guid edocId)

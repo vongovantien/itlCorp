@@ -134,9 +134,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
             {
                 entity.ToTable("sysAttachFileTemplate");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Code).HasMaxLength(150);
 
