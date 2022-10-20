@@ -110,10 +110,11 @@
                         <div class="form-group">
                             <label for="">Partner Mapping</label>
                             <app-combo-grid-virtual-scroll
-                                [currentActiveItemId]="{ field: 'id', partnerMapping: partnerMapping.value}"
+                                [currentActiveItemId]="{ field: 'id', value: partnerMapping.value}"
                                 (itemSelected)="onSelectDataFormInfo($event,'partner')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
-                                [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerMapping)"
+                                (remove)="resetFormControl(partnerMapping)"
+                                [displayFields]="displayFieldsPartner"
                                 placeholder="Select Partner">
                             </app-combo-grid-virtual-scroll>
                         </div>
