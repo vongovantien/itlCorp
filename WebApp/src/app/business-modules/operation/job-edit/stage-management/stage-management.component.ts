@@ -51,6 +51,7 @@ export class OpsModuleStageManagementComponent extends AppList {
             { title: 'Code', field: 'stageCode', sortable: true },
             { title: 'Name', field: 'stageNameEN', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
+            { title: 'House Bill', field: 'hblNo', sortable: true },
             { title: 'Role', field: 'departmentName', sortable: true },
             { title: 'OPS Incharge', field: 'mainPersonInCharge', sortable: true },
             { title: 'Process Time', field: 'processTime', sortable: true },

@@ -1,12 +1,13 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, SystemRepo, OperationRepo } from 'src/app/shared/repositories';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, map } from 'rxjs/operators';
+import { PopupBase } from 'src/app/popup.base';
 import { User } from 'src/app/shared/models';
+import { CatalogueRepo, DocumentationRepo, OperationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { ToastrService } from 'ngx-toastr';
-import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
     selector: 'share-asign-stage-popup',
@@ -42,13 +43,20 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     selectedUser: Partial<CommonInterface.IComboGridData> = {};
     selectedUserData: any;
 
-
+    configHbl: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'hwbno', label: 'HBL No' },
+            { field: 'customerName', label: 'Customer Name' },
+        ],
+        dataSource: [],
+        selectedDisplayFields: ['hwbno'],
+    };
+    selectedHbl: Partial<CommonInterface.IComboGridData> = {};
+    selectedHblData: any;
 
     users: User[] = [];
-    // selectedUser: any = null;
-
     description: string = '';
-
     isSubmitted: boolean = false;
     jobId: string = '';
     isAsignment: boolean = false;
@@ -59,14 +67,16 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
         private _toastService: ToastrService,
+        private _document: DocumentationRepo,
+        private route: ActivatedRoute
     ) {
         super();
     }
 
     ngOnInit(): void {
+        this.jobId = this.route.snapshot.paramMap.get('jobId');
         this.getStage();
         this.getListUser();
-
     }
 
     getStage() {
@@ -75,6 +85,18 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     this.configStage.dataSource = res;
+                },
+                () => { }
+            );
+    }
+
+    getHblList(jobId: string) {
+        this._document.getListHouseBillOfJob({ jobId: jobId })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.configHbl.dataSource = res;
+                    console.log(res)
                 },
                 () => { }
             );
@@ -104,12 +126,15 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser.value || !this.selectedStage.value) {
+        console.log(this.selectedHbl.value)
+        console.log(this.selectedHblData.id)
+        if (!this.selectedUser.value || !this.selectedStage.value || !this.selectedHblData.value) {
             return;
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
             jobId: this.jobId,
+            hblId: this.selectedHblData.id,
             stageId: this.selectedStageData.id,
             mainPersonInCharge: this.selectedUserData.id,
             description: this.description,
@@ -129,24 +154,38 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             );
     }
 
-    removeStage() {
-        this.selectedStage = {};
+    onRemoveData(type: string) {
+        switch (type) {
+            case "stage":
+                this.selectedStage = {};
+                break;
+            case "user":
+                this.selectedUser = {};
+                break;
+            case "hbl":
+                this.selectedHbl = {};
+                break;
+            default:
+                break;
+        }
     }
 
-    removeUser() {
-        this.selectedUser = {};
+    onSelectData(data: any, type: string) {
+        switch (type) {
+            case "stage":
+                this.selectedStageData = data;
+                this.selectedStage = { field: 'stageNameEn', value: data.stageNameEn };
+                break;
+            case "user":
+                this.selectedUserData = data;
+                this.selectedUser = { field: 'username', value: data.username };
+            case "hbl":
+                this.selectedHblData = data;
+                this.selectedHbl = { field: 'hwbno', value: data.hwbno };
+            default:
+                break;
+        }
     }
-
-    onSelectStage(stage: any) {
-        this.selectedStageData = stage;
-        this.selectedStage = { field: 'stageNameEn', value: stage.stageNameEn };
-    }
-
-    onSelectUser(user: any) {
-        this.selectedUserData = user;
-        this.selectedUser = { field: 'username', value: user.username };
-    }
-
 
     closePopup() {
         this.hide();
@@ -156,6 +195,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         // this.selectedUser = null;
         this.selectedStage = {};
         this.selectedUser = {};
+        this.selectedHbl = {};
         this.isSubmitted = false;
     }
 }
@@ -163,6 +203,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 interface IAssignStage {
     id: string;
     jobId: string;
+    hblId: string;
     stageId: number;
     mainPersonInCharge: string;
     description: string;
