@@ -200,6 +200,7 @@ export class AdvancePaymentDetailComponent
                         this.listAdvancePaymentCarrierComponent.advanceNo =
                             this.advancePayment.advanceNo;
                     }
+                    this.formCreateComponent.getBankAccountPayee(this.advancePayment.payee);
                 },
                 (error: any) => {
                     console.log(error);
@@ -354,7 +355,7 @@ export class AdvancePaymentDetailComponent
 
     checkInvalidListAdvanceRequest() {
         this.formCreateComponent.isSubmitted = true;
-        if((!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateComponent.statusApproval.value) && !this.formCreateComponent.formCreate.valid)){
+        if ((!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate) || (!['New', 'Denied'].includes(this.formCreateComponent.statusApproval.value) && !this.formCreateComponent.formCreate.valid)) {
             return true;
         }
         if (!this.isAdvCarrier) {

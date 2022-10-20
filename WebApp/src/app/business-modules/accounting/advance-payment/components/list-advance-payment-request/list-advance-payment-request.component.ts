@@ -104,7 +104,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     }
 
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
-        // * update advance no for new requestAdv and 
+        // * update advance no for new requestAdv and
         // * create or copy emit new item to $dataRequest and update amount, currency.
         this.$dataRequest.next(Object.assign({}, dataRequest, { advanceNo: !!this.selectedRequestAdvancePayment ? this.selectedRequestAdvancePayment.advanceNo : '' }));
 

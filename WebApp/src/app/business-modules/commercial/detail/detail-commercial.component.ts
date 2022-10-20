@@ -1,26 +1,24 @@
-import { Currency } from './../../../shared/models/catalogue/catCurrency.model';
-import { partnerState } from './../../catalogue/partner-data/store/reducers/index';
-import { PayableComponent } from '../components/payable/payable.component';
-import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ToastrService } from 'ngx-toastr';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import { PayableComponent } from '../components/payable/payable.component';
 
-import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { Partner } from '@models';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
-import { finalize, catchError, concatMap, map } from 'rxjs/operators';
-import { of, combineLatest, Observable } from 'rxjs';
 import { ConfirmPopupComponent } from '@common';
-import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
-import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommonEnum } from '@enums';
-import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
+import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
+import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -31,7 +29,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(CommercialFormCreateComponent) formCommercialComponent: CommercialFormCreateComponent;
     @ViewChild('internalReferenceConfirmPopup') confirmTaxcode: ConfirmPopupComponent;
     @ViewChild(CommercialBranchSubListComponent) formBranchSubList: CommercialBranchSubListComponent;
+    @ViewChild(CommercialBankListComponent) formBankList: CommercialBankListComponent
     @ViewChild(PayableComponent) payableComponent: PayableComponent;
+
     partnerId: string;
     partner: Partner;
     currency: string;
@@ -89,6 +89,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.contractList.getListContract(this.partnerId);
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
+                    this.formBankList.partnerId = res.partnerId;
+                    this.formBankList.getListBank(res.partnerId);
                     this.payableComponent.partnerId = res.partnerId;
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {

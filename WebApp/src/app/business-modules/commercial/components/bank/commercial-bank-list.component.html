@@ -1,3 +1,4 @@
+<span></span>
 <div class="m-portlet">
     <div class="m-portlet__body">
         <div class="collapse show" id="data-partner">
@@ -16,7 +17,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <app-default-button [buttonSetting]="addButtonSetting" (click)="showPopupUpdateEmail()"
+                        <app-default-button [buttonSetting]="addButtonSetting" (click)="showPopupUpdateBank()"
                             [dataTarget]="addButtonSetting.dataTarget">
                         </app-default-button>
                     </div>
@@ -31,32 +32,34 @@
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!partnerEmails.length">
+                        <ng-container *ngIf="!!partnerBanks.length">
                             <tr
-                                *ngFor="let item of partnerEmails | filter : keyword :['officeAbbrName', 'email','type'] ; let i = index;">
+                                *ngFor="let item of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
-                                            (click)="gotoDetailEmail(item.id, i)" title="Edit">
+                                            (click)="gotoDetailBank(item.id, i)" title="Edit">
                                             <i class="la la-edit"></i>
                                         </button>
                                         <ng-container>
                                             <button class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                (click)="showConfirmDelete(item.id,i)">
+                                                (click)="onDeleteBank(item.id)">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </ng-container>
                                     </div>
                                 </td>
-                                <td>{{item.officeAbbrName}}</td>
-                                <td>{{item.email}}</td>
-                                <td>{{item.type}}</td>
-                                <td>Updated: {{item.datetimeModified | date:
-                                    'dd/MM/yyyy HH:mm'}} By: <span class="text-success">{{item.userModfiedName}}</span>
-                                </td>
+                                <td>{{item.bankAccountNo}}</td>
+                                <td>{{item.bankAccountName}}</td>
+                                <td>{{item.bankAddress}}</td>
+                                <td>{{item.swiftCode}}</td>
+                                <td>{{item.bankNameEn}}</td>
+                                <td>{{item.code}}</td>
+                                <td>{{item.source}}</td>
+                                <td>{{item.note}}</td>
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!(isLoading) && !partnerEmails.length"></tr>
+                        <tr app-table-none-record *ngIf="!(isLoading) && !partnerBanks.length"></tr>
                         <tr app-table-row-loading *ngIf="isLoading "></tr>
                     </tbody>
                 </table>
@@ -64,5 +67,5 @@
         </div>
     </div>
 </div>
-<popup-update-email-commercial-catalogue (onRequest)="onRequestEmail($event)"></popup-update-email-commercial-catalogue>
-<confirm-popup body="You want to delete this email ?" (onSubmit)="onDelete()"></confirm-popup>
+<popup-form-bank-commercial-catalogue (onRequest)="onRequestBank($event)"></popup-form-bank-commercial-catalogue>
+<ng-template inject></ng-template>

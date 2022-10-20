@@ -1,17 +1,18 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { catchError, finalize } from 'rxjs/operators';
+import { Bank } from './../../../../../shared/models/catalogue/catBank.model';
 
 import { AppForm } from '@app';
-import { User, Currency, Partner } from '@models';
-import { CatalogueRepo, SystemRepo } from '@repositories';
-import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { Currency, Partner, User } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 
-import { map, takeUntil } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState, IAppState } from '@store';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { Observable } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html',
@@ -54,11 +55,19 @@ export class SettlementFormCreateComponent extends AppForm {
     bankCode: AbstractControl;
     dueDate: AbstractControl;
 
+    bankAccount: Observable<Bank[]>;
+
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name' }
     ];
+
+    displayFieldBankAccount: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'bankAccountNo', label: 'Bank Account No' },
+        { field: 'bankAccountName', label: 'Bank Account Name' },
+    ];
+
     methods: CommonInterface.ICommonTitleValue[];
 
     customers: any;
@@ -230,7 +239,27 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.bankName.setValue(data.code);
                 this.bankNameDescription.setValue(data.bankNameEn);
                 break;
+            case 'bankAccountNo':
+                this.bankName.setValue(data.bankNameEn);
+                this.bankAccountNo.setValue(data.bankAccountNo);
+                this.bankNameDescription.setValue(data.bankNameEn)
+                this.mapBankCode(data.code)
+                break;
+            case 'payee':
+                this.getBankAccountPayee(data.id)
+                break;
         }
+    }
+
+
+    getBankAccountPayee(id: string) {
+        this._catalogueRepo.getListBankByPartnerById(id)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            })).subscribe(
+                (res: any) => {
+                    this.bankAccount = res;
+                });
     }
 
     checkStaffPartner() {

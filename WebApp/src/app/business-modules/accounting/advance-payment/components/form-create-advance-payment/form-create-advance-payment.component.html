@@ -45,8 +45,8 @@
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                    name="dueDateRange" placeholder="Select due date" [autoApply]="true" formControlName="dueDate"
-                                    [minDate]="minDate" calendar />
+                                    name="dueDateRange" placeholder="Select due date" [autoApply]="true"
+                                    formControlName="dueDate" [minDate]="minDate" calendar />
                             </div>
                         </div>
                     </div>
@@ -93,8 +93,16 @@
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
-                    <input type="text" class="form-control m-input m-input--square text-success"
-                        placeholder="0123456789xxxx" formControlName="bankAccountNo">
+                    <ng-container *ngIf="paymentMethod.value === 'Bank'; else bankTpl">
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
+                            [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
+                            [displayFields]="displayFieldBankAccount" (remove)="resetFormControl(bankName)"
+                            placeholder="Please Select Bank Account No" allowFreeText formControlName="bankAccountNo">
+                        </app-combo-grid-virtual-scroll>
+                    </ng-container>
+                    <ng-template #bankTpl>
+                        <input type="text" class="form-control" formControlName="bankAccountNo">
+                    </ng-template>
                 </div>
             </div>
             <div class="col-lg-4">
@@ -170,8 +178,8 @@
                             <label class="form-control-label" for="">
                                 Advance For:
                             </label>
-                            <ng-select formControlName="advanceFor" [clearable]="false" [items]="advanceForDatas" placeholder=""
-                                class="custom" (ngModelChange)="changeAdvanceFor($event)">
+                            <ng-select formControlName="advanceFor" [clearable]="false" [items]="advanceForDatas"
+                                placeholder="" class="custom" (ngModelChange)="changeAdvanceFor($event)">
                             </ng-select>
                         </div>
                     </div>

@@ -65,8 +65,9 @@
                     <div class="bg-white box-shadow">
                         <div class="row">
                             <div class="col-lg-12 text-center py-3">
-                                <img #signature [src]="signatureUrl" onerror="this.src = 'assets/app/media/img/emptydata.png'"
-                                    class="" alt="Cinque Terre">
+                                <img #signature [src]="signatureUrl"
+                                    onerror="this.src = 'assets/app/media/img/emptydata.png'" class=""
+                                    alt="Cinque Terre">
                             </div>
                         </div>
                     </div>
@@ -136,79 +137,77 @@
                                     [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
                                     placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
                                 </app-combo-grid-virtual-scroll>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Bank Code: </label>
+                                    <input type="input" class="form-control m-input m-input--square"
+                                        formControlName="bankCode" placeholder="Please Enter Bank Code">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Phone Number: </label>
+                                    <input type="input" class="form-control" formControlName="tel"
+                                        placeholder="Please Enter Phone Number">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Personal ID: </label>
+                                    <input type="input" class="form-control" formControlName="personalId"
+                                        placeholder="Please Enter Personal ID">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Description: </label>
+                                    <textarea class="form-control" rows="5" formControlName="description"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <label>Default Office: </label>
+                                <div class="m-portlet__body">
 
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Bank Code: </label>
-                                <input type="input" class="form-control m-input m-input--square"
-                                    formControlName="bankCode" placeholder="Please Enter Bank Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Phone Number: </label>
-                                <input type="input" class="form-control" formControlName="tel"
-                                    placeholder="Please Enter Phone Number">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Personal ID: </label>
-                                <input type="input" class="form-control" formControlName="personalId"
-                                    placeholder="Please Enter Personal ID">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Description: </label>
-                                <textarea class="form-control" rows="5" formControlName="description"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <label>Default Office: </label>
-                            <div class="m-portlet__body">
-
-                                <div class="bg-white">
-                                    <div class="table-wrapper table-scrollabler" id="department-list-table">
-                                        <table class="table table-striped table-brand table-hover dataTable">
-                                            <thead app-table-header [headers]="headersuslv">
-                                            </thead>
-                                            <tbody class="tbody-group">
-                                                <ng-container *ngIf="!!this.userLevels.length">
-                                                    <tr (click)="onSelectUserLevel(lv)"
-                                                        *ngFor="let lv of userLevels; let i = index; trackBy: trackByFn">
-                                                        <td style="width: 70px">
-                                                            <!-- <app-switch size="md" [ngModel]="lv.isDefault"></app-switch> -->
-                                                            <div class="icon-check">
-                                                                <i class="la la-check-circle-o"
-                                                                    *ngIf="lv.isDefault"></i>
-                                                            </div>
-                                                        </td>
-                                                        <td>{{lv.groupAbbrName}}</td>
-                                                        <td>{{lv.companyAbbrName}}</td>
-                                                        <td>{{lv.officeAbbrName}}</td>
-                                                        <td>{{lv.departmentAbbrName}}</td>
-                                                        <td>{{lv.position}}</td>
+                                    <div class="bg-white">
+                                        <div class="table-wrapper table-scrollabler" id="department-list-table">
+                                            <table class="table table-striped table-brand table-hover dataTable">
+                                                <thead app-table-header [headers]="headersuslv">
+                                                </thead>
+                                                <tbody class="tbody-group">
+                                                    <ng-container *ngIf="!!this.userLevels.length">
+                                                        <tr (click)="onSelectUserLevel(lv)"
+                                                            *ngFor="let lv of userLevels; let i = index; trackBy: trackByFn">
+                                                            <td style="width: 70px">
+                                                                <!-- <app-switch size="md" [ngModel]="lv.isDefault"></app-switch> -->
+                                                                <div class="icon-check">
+                                                                    <i class="la la-check-circle-o"
+                                                                        *ngIf="lv.isDefault"></i>
+                                                                </div>
+                                                            </td>
+                                                            <td>{{lv.groupAbbrName}}</td>
+                                                            <td>{{lv.companyAbbrName}}</td>
+                                                            <td>{{lv.officeAbbrName}}</td>
+                                                            <td>{{lv.departmentAbbrName}}</td>
+                                                            <td>{{lv.position}}</td>
+                                                        </tr>
+                                                    </ng-container>
+                                                    <tr *ngIf="!this.userLevels.length" app-table-none-record
+                                                        [colspan]="headersuslv.length + 1">
                                                     </tr>
-                                                </ng-container>
-                                                <tr *ngIf="!this.userLevels.length" app-table-none-record
-                                                    [colspan]="headersuslv.length + 1">
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- <div class="col-lg-12 my-3 text-center">
+                        <!-- <div class="col-lg-12 my-3 text-center">
                         <button type="button" class="btn btn-success border-radius-15" (click)="handleUpdateUser()"
                             style="min-width: 100px;">UPDATE</button>
                     </div> -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
