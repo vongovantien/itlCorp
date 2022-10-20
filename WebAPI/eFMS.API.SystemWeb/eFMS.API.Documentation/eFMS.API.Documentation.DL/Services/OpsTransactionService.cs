@@ -2789,22 +2789,25 @@ namespace eFMS.API.Documentation.DL.Services
             var hs = new HandleState();
 
             var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
-            var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
-
-            if (job != null && repJob != null)
+            if (job != null)
             {
-                repJob.SumNetWeight = job.SumNetWeight;
-                repJob.SumPackages = job.SumPackages;
-                repJob.SumCbm = job.SumCbm;
-                repJob.SumContainers = job.SumContainers;
-                repJob.SumGrossWeight = job.SumGrossWeight;
-                repJob.PackageTypeId = job.PackageTypeId;
+                var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+                if (job != null && repJob != null)
+                {
+                    repJob.SumNetWeight = job.SumNetWeight;
+                    repJob.SumPackages = job.SumPackages;
+                    repJob.SumCbm = job.SumCbm;
+                    repJob.SumContainers = job.SumContainers;
+                    repJob.SumGrossWeight = job.SumGrossWeight;
+                    repJob.PackageTypeId = job.PackageTypeId;
 
-                hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
-                return hs;
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    return hs;
+                }
             }
 
-            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT_COPY, "R" + job.JobNo].Value);
+
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT_COPY, "R" + jobNo].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
