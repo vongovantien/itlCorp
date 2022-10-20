@@ -251,7 +251,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     onApplySearchCharge() {
         const body: ISearchMoreCharge = {
             chargeShipments: this.searchInfo.chargeShipments,
-            inSoa: this.selectedInSOA.id,
+            inSoa: this.selectedInSOA,
             jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : '',
             hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : '',
             mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : '',
@@ -261,8 +261,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             dateType: this.searchInfo.dateType,
             fromDate: this.searchInfo.fromDate,
             toDate: this.searchInfo.toDate,
-            type: this.selectedType.text,
-            isOBH: this.selectedOBH.id,
+            type: this.selectedType,
+            isOBH: this.selectedOBH,
             strCreators: this.searchInfo.strCreators,
             strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
             commondityGroupId: !!this.commodity ? this.commodity.id : null,
