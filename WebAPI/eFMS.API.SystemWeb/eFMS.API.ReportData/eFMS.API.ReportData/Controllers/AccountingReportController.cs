@@ -225,7 +225,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
+        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + lang, accessToken);
@@ -235,7 +235,9 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoAdvance.AdvanceNo, stream, "Advance Form - eFMS");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileEdoc + "Advance" + "/" + advanceId, accessToken);
+            string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Advance";
+
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + advanceId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
             return Ok(result);
@@ -321,7 +323,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPayment")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang)
+        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
@@ -332,7 +334,8 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
             return Ok(result);
@@ -347,7 +350,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPaymentTemplate")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang)
+        public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
@@ -358,7 +361,8 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Template Form - eFMS");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
             return Ok(result);
@@ -372,7 +376,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportGeneralSettlementPayment")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId)
+        public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GeneralSettlementPaymentExport + "?settlementId=" + settlementId, accessToken);
@@ -383,7 +387,8 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
             var file = new FileHelper().ReturnFormFile(dataObjects.Result.SettlementNo, stream, "Settlement General Preview - eFMS");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
             var result = response.Content.ReadAsAsync<ResultHandle>().Result;
             HeaderResponse(file.FileName);
             return Ok(result);
