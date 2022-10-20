@@ -32,4 +32,11 @@ export class ReportManagementRepo {
     previewSaleSummaryReport(body: any) {
         return this._api.post(`${environment.HOST.REPORT_MANAGEMENT}/api/${this.VERSION}/en-US/SaleReport/SummarySaleReport`, body);
     }
+
+    getGeneralReport(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.REPORT_MANAGEMENT}/api/${this.VERSION}/en-US/GeneralReport/GetDataGeneralReport`, body, {
+            page: '' + page,
+            size: '' + size
+        });
+    }
 }

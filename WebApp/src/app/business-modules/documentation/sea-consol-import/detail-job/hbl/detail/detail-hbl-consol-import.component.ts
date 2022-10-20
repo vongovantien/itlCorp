@@ -12,12 +12,12 @@ import { DataService } from '@services';
 import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { InfoPopupComponent } from '@common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -169,11 +169,24 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         const deliveryDate = {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
-        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+        const checkPoint = {
+            partnerId: body.customerId,
+            salesmanId: body.saleManId,
+            transactionType: 'DOC',
+            type: 8,
+            hblId: this.hblId
+        };
+        this._documentationRepo.validateCheckPointContractPartner(checkPoint)
             .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
+                switchMap(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                            return of(false);
+                        }
+                        return this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+                    })
+            ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
@@ -219,7 +232,13 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
     }
 
     sendMail(type: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC', null, 7, 'false')
+        this._documentationRepo.validateCheckPointContractPartner({
+            partnerId: this.hblDetail.customerId,
+            hblId: this.hblId,
+            transactionType: 'DOC',
+            type: 7,
+            salesmanId: this.hblDetail.saleManId
+        }, 'false')
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     if (!!err.error.message) {
@@ -239,171 +258,4 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 },
             );
     }
-    // onPreview(type: string) {
-    //     this.isClickSubMenu = false;
-
-    //     // Preview Delivery Order
-    //     if (type === 'DELIVERY_ORDER') {
-    //         this.previewDeliveryOrder();
-    //     }
-
-    //     // Preview Arrival Notice
-    //     if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
-    //         const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-    //         this.previewArrivalNotice(_currency);
-    //     }
-
-    //     // PREVIEW PROOF OF DELIVERY
-    //     if (type === 'PROOF_OF_DELIVERY') {
-    //         this.previewProofOfDelivery();
-    //     }
-    //     if (type === 'E_MANIFEST') {
-    //         this.exportEManifest();
-    //     }
-    //     if (type === 'GOODS_DECLARE') {
-    //         this.exportGoodsDeclare();
-    //     }
-    //     if (type === 'DANGEROUS_GOODS') {
-    //         this.exportDangerousGoods();
-    //     }
-    // }
-    // previewProofOfDelivery() {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._documentationRepo.previewProofofDelivery(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     if (res?.dataSource?.length > 0) {
-    //                         this.dataReport = res;
-    //                         this.showReport();
-    //                     }
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // previewArrivalNotice(_currency: string) {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency });
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     if (res?.dataSource.length > 0) {
-    //                         this.dataReport = res;
-    //                         this.showReport();
-    //                     } else {
-    //                         this._toastService.warning('There is no data charge to display preview');
-    //                     }
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // previewDeliveryOrder() {
-    //     if (this.hblDetail.deliveryOrderNo === null) {
-    //         this._toastService.warning('There is no delivery order information. You must save delivery order information');
-    //         return;
-    //     }
-
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._documentationRepo.previewDeliveryOrder(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     if (res?.dataSource.length > 0) {
-    //                         this.dataReport = res;
-    //                         this.showReport();
-    //                     } else {
-    //                         this._toastService.warning('There is no data charge to display preview');
-    //                     }
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // exportDangerousGoods() {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._exportRepository.exportDangerousGoods(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     this.downLoadFile(res, "application/ms-excel", "Dangerous Goods.xlsx");
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // exportGoodsDeclare() {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._exportRepository.exportGoodDeclare(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).pipe(catchError(this.catchError))
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     this.downLoadFile(res, "application/ms-excel", "Goods Declare.xlsx");
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // exportEManifest() {
-    //     this._documentationRepo.validateCheckPointContractPartner(this.hblDetail.customerId, this.hblId, 'DOC')
-    //         .pipe(
-    //             switchMap((res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     return this._exportRepository.exportEManifest(this.hblId);
-    //                 }
-    //                 this._toastService.warning(res.message);
-    //                 return of(false);
-    //             })
-    //         ).subscribe(
-    //             (res: any) => {
-    //                 if (res !== false) {
-    //                     this.downLoadFile(res, "application/ms-excel", "E-Manifest.xlsx");
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // @delayTime(1000)
-    // showReport(): void {
-    //     this.reportPopup.frm.nativeElement.submit();
-    //     this.reportPopup.show();
-    // }
 }

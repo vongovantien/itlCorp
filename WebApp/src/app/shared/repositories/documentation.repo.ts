@@ -889,39 +889,6 @@ export class DocumentationRepo {
         );
     }
 
-    getGeneralReport(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetDataGeneralReport`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleDepartmentReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/DepartSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleMonthlyReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleQuaterReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/QuaterSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleSummaryReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SummarySaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
     getHAWBListOfShipment(jobId: string, hblId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetHAWBListOfShipment`, { jobId: jobId, hblId: hblId }).pipe(
             map((data: any) => data)
@@ -1135,18 +1102,6 @@ export class DocumentationRepo {
         );
     }
 
-    previewCombinationSalesReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/CombinationSaleReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
-    previewSaleKickBackReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SaleKickBackReport`, body).pipe(
-            map((data: any) => data)
-        );
-    }
-
     checkExistSIExport(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShippingInstruction/CheckExistSIExport`, { jobId: id }).pipe(
             catchError((error) => throwError(error)),
@@ -1260,8 +1215,7 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/GetAllShipment`, { JobNo: jobNo });
     }
 
-    validateCheckPointContractPartner(partnerId: string, hblId: string, transactionType: string, settlementCode: string = '', type: number = 5
-        , showErrMessage: string = 'true') {
+    validateCheckPointContractPartner(body: any, showErrMessage: any = 'true') {
         /*
             1 - SHIPMENT
             2 - SOA
@@ -1271,8 +1225,8 @@ export class DocumentationRepo {
             6 - HBL
             7 - Preview HBL
         */
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
-            { partnerId: partnerId, hblId: hblId, transactionType: transactionType, settlementCode: settlementCode, type: type }, { "showErrMessage": showErrMessage });
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/ValidateCheckPointPartner`,
+            body, null, { "showErrMessage": showErrMessage });
     }
 
     detailLinkFee(id: any) {

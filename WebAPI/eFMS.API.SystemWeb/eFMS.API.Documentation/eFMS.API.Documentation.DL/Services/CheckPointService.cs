@@ -209,6 +209,24 @@ namespace eFMS.API.Documentation.DL.Services
             return valid;
         }
 
+        private bool ValidateCheckPointPrepaidContractChangePartnerOrSalesman(Guid HblId, string partnerId, string transactionType)
+        {
+            bool valid = true;
+            var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
+            if (surcharges.Count() == 0)
+            {
+                return true;
+            }
+
+            var hasIssuedDebit = surcharges.Any(x => !string.IsNullOrEmpty(x.DebitNo));
+            if (hasIssuedDebit)
+            {
+                return false;
+            }
+
+            return valid;
+        }
+
         public bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType)
         {
             // Hết hạn, vượt hạn mức, treo công nợ
@@ -275,7 +293,13 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.Data.Count == 0) return result;
             foreach (var partner in criteria.Data)
             {
-                var isValid = ValidateCheckPointPartnerSurcharge(partner.PartnerId, partner.HblId ?? Guid.Empty, criteria.TransactionType, criteria.Type, criteria.SettlementCode);
+                CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
+                    HblId = partner.HblId ?? Guid.Empty,
+                    TransactionType = criteria.TransactionType,
+                    type = criteria.Type,
+                    SettlementCode = criteria.SettlementCode,
+                };
+                var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
                 if (!isValid.Success)
                 {
                     return isValid;
@@ -284,34 +308,116 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState ValidateCheckPointPartnerSurcharge(string partnerId, Guid HblId, string transactionType, CHECK_POINT_TYPE checkPointType, string settlementCode)
+        public HandleState ValidateCheckPointPartnerSurcharge(CheckPoint criteria)
         {
             HandleState result = new HandleState();
             bool isValid = false;
             string currentSaleman = string.Empty;
-            CatPartner partner = catPartnerRepository.First(x => x.Id == partnerId);
+            string currentPartner = string.Empty;
+            CatPartner partner = catPartnerRepository.First(x => x.Id == criteria.PartnerId);
             CatContract contract;
+            int errorCode = -1;
+
             if (partner.PartnerMode == "Internal")
             {
                 return result;
             }
-            if (HblId == Guid.Empty)
+            CHECK_POINT_TYPE checkPointType = criteria.type;
+            if (criteria.HblId == Guid.Empty)
             {
-                contract = GetContractByPartnerId(partnerId);
+                contract = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
                 currentSaleman = contract?.SaleManId;
             }
             else
             {
-                if (transactionType == "CL")
+                if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
                 {
-                    currentSaleman = opsTransactionRepository.First(x => x.Hblid == HblId)?.SalemanId;
-                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                    var hasRefund = csSurchargeRepository.Any(x => x.Hblid == criteria.HblId
+                       && x.Type != DocumentConstants.CHARGE_BUY_TYPE
+                       && x.PaymentObjectId == criteria.PartnerId
+                       && x.IsRefundFee == true);
+                    if (hasRefund)
+                    {
+                        return result;
+                    }
                 }
-                else
+                
+                if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
-                    currentSaleman = csTransactionDetail.First(x => x.Id == HblId)?.SaleManId;
-                    contract = GetContractByPartnerId(partnerId, currentSaleman);
+                    if (criteria.TransactionType == "CL")
+                    {
+                        var ops = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
+                        currentSaleman = ops.SalemanId;
+                        currentPartner = ops.CustomerId;
+                    }
+                    else
+                    {
+                        var cs = csTransactionDetail.First(x => x.Id == criteria.HblId);
+                        currentSaleman = cs.SaleManId;
+                        currentPartner = cs.CustomerId;
+                    }
+
+                    if (currentSaleman == salemanBOD)
+                    {
+                        isValid = true;
+                        return result;
+                    }
+                    var contractCurrent = GetContractByPartnerId(currentPartner, currentSaleman);
+                    partner = catPartnerRepository.First(x => x.Id == currentPartner);
+
+                    if (contractCurrent == null)
+                    {
+                        return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                    }
+
+                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer.
+                    {
+                        isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                        if (!isValid)
+                        {
+                            return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
+                            partner?.ShortName));
+                        }
+                        currentSaleman = criteria.SalesmanId;
+                        currentPartner = criteria.PartnerId;
+                    } else
+                    {
+                        
+                        if(currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
+                        {
+                            currentSaleman = criteria.SalesmanId;
+                            currentPartner = criteria.PartnerId;
+                            var contractNext = GetContractByPartnerId(currentPartner, currentSaleman);
+                            partner = catPartnerRepository.First(x => x.Id == currentPartner);
+                            if (contractNext.ContractType == "Prepaid")
+                            {
+                                isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                                if (!isValid)
+                                {
+                                    return new HandleState((object)string.Format(@"Cannot change to Prepaid Contract with HBL has issued debit/invoice",
+                                    partner?.ShortName));
+                                }
+                                else
+                                {
+                                    isValid = true;
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                } else
+                {
+                    if (criteria.TransactionType == "CL")
+                    {
+                        currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
+                    }
+                    else
+                    {
+                        currentSaleman = csTransactionDetail.First(x => x.Id == criteria.HblId)?.SaleManId;
+                    }
                 }
+
+                contract = GetContractByPartnerId(criteria.PartnerId, currentSaleman);
             }
 
             if (currentSaleman == salemanBOD)
@@ -325,7 +431,6 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
             }
 
-            int errorCode = -1;
             switch (contract.ContractType)
             {
                 case "Cash":
@@ -336,7 +441,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        isValid = ValidateCheckPointCashContractPartner(partnerId, HblId, transactionType, settlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
                     else isValid = true;
                     if (!isValid) errorCode = 1;
@@ -410,7 +515,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Prepaid":
                     if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
                     {
-                        isValid = ValidateCheckPointPrepaidContractPartner(HblId, partnerId, transactionType);
+                        isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
                     } else
                     {
                         isValid = true;
@@ -602,12 +707,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return partners;
         }
-
-        /// <summary>
-        /// Check if shipment allow check no profit
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+       
         public bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked)
         {
             if (isCheked == true)
@@ -641,15 +741,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-
-        /// <summary>
-        ///  Check if duplicate shipment allow check no profit
-        /// </summary>
-        /// <param name="jobNo"></param>
-        /// <param name="isCheked"></param>
-        /// <param name="isReplicate">shipment has Job Replicate</param>
-        /// <param name="shipmentInvalid"></param>
-        /// <returns></returns>
+       
         public bool AllowCheckNoProfitShipmentDuplicate(string jobNo, bool? isCheked, bool isReplicate, out string shipmentInvalid)
         {
             shipmentInvalid = string.Empty;
@@ -717,13 +809,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-
-        /// <summary>
-        /// Check if can uncheck no profit shipment
-        /// </summary>
-        /// <param name="jobNo"></param>
-        /// <param name="isCheked"></param>
-        /// <returns></returns>
+      
         public bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked)
         {
             if (isCheked == false)

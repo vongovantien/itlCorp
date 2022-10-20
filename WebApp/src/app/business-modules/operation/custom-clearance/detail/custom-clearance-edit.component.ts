@@ -8,6 +8,7 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { ToastrService } from 'ngx-toastr';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { SystemConstants } from '@constants';
 
 
 @Component({
@@ -93,16 +94,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
     }
 
     updateAndConvertClearance(body: CustomClearance) {
-        this._documentation.validateCheckPointContractPartner(body.customerId, '', 'CL', null, 1)
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        this._toart.warning(res.message);
-                        return of(false);
-                    }
-                    return this._documentation.convertExistedClearanceToJob([body]);
-                })
-            )
+        return this._documentation.convertExistedClearanceToJob([body])
             .subscribe((response) => {
                 if (!!response && response.status) {
                     this._toart.success(`Convert ${body.clearanceNo} Successfull`);

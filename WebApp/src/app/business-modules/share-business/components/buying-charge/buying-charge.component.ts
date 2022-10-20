@@ -721,7 +721,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._toastService.clear();
 
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
-                this._documentRepo.validateCheckPointContractPartner(partnerData.id, this.hbl.id, transactionType)
+                this._documentRepo.validateCheckPointContractPartner({
+                    partnerId: partnerData.id,
+                    transactionType: transactionType,
+                    hblId: this.hbl.id
+                })
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
@@ -804,17 +808,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
                 const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
                 if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                    this._documentRepo.validateCheckPointContractPartner(this.hbl.customerId, this.hbl.id, transactionType)
-                        .subscribe(
-                            (res: CommonInterface.IResult) => {
-                                if (res.status) {
-                                    chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
-                                } else {
-                                    this._toastService.warning(res.message);
-                                }
-                                this._cd.markForCheck();
+                    this._documentRepo.validateCheckPointContractPartner({
+                        partnerId: this.hbl.customerId,
+                        transactionType: transactionType,
+                        hblId: this.hbl.id
+                    }).subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
+                            } else {
+                                this._toastService.warning(res.message);
                             }
-                        )
+                            this._cd.markForCheck();
+                        }
+                    )
                 } else {
                     chargeItem = this.mapValueWhenSelectPartnerTypeHeader(chargeItem, partnerType);
                 }

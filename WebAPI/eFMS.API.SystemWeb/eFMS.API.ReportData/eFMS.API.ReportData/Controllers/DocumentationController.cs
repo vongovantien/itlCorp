@@ -300,7 +300,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportShipmentOverview(GeneralReportCriteria criteria )
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataShipmentOverviewUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.ReportAPI + Urls.Report.GetDataShipmentOverviewUrl);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -341,8 +341,8 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             // Get data source
-            var urlData = reportType == "FCL" ? Urls.Documentation.GetDataShipmentOverviewFCLUrl : Urls.Documentation.GetDataShipmentOverviewLCLUrl; // FCL or LCL
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + urlData);
+            var urlData = reportType == "FCL" ? Urls.Report.GetDataShipmentOverviewFCLUrl : Urls.Report.GetDataShipmentOverviewLCLUrl; // FCL or LCL
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.ReportAPI + urlData);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -392,7 +392,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportStandardGeneralReport(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataStandardGeneralReportUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.ReportAPI + Urls.Report.GetDataStandardGeneralReportUrl);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel

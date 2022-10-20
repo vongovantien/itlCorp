@@ -7,7 +7,7 @@ import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virt
 import { Observable, fromEvent, merge, combineLatest, Subject } from 'rxjs';
 import { distinctUntilChanged, share, filter, takeUntil } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from './shared/directives/inject-view-container-ref.directive';
-import { ConfirmPopupComponent, InfoPopupComponent } from './shared/common/popup';
+import { ConfirmPopupComponent } from './shared/common/popup';
 
 @Directive()
 export abstract class AppForm extends AppPage {
