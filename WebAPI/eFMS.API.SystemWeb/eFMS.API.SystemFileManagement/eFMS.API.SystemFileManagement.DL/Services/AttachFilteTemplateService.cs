@@ -18,7 +18,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public async Task<HandleState> Import(List<SysAttachFileTemplate> list)
         {
-            if(list.Count == 0)
+            if (list.Count == 0)
             {
                 return new HandleState();
             }

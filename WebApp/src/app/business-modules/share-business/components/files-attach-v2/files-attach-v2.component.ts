@@ -93,7 +93,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
         console.log(this.selectedEdoc);
-
+        this.selectedEdoc.name = edoc.userFileName;
     }
 
     downloadEdoc() {
@@ -112,8 +112,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Job Ref', field: 'jobRef' },
             { title: 'Source', field: 'source' }
         ];
+        this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         this.documentAttach.listFile.push(this.selectedEdoc);
+        console.log(this.documentAttach.listFile);
         this.documentAttach.show();
     }
 

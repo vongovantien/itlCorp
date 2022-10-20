@@ -1,8 +1,4 @@
-﻿using Amazon;
-using Amazon.Runtime;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Amazon.S3.Model.Internal.MarshallTransformations;
+﻿using Amazon.S3.Model;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
 using eFMS.API.SystemFileManagement.DL.IService;
@@ -43,6 +39,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _apiUrl = apiUrl;
             _sysImageDetailRepo = sysImageDetailRepo;
             _client = client;
+            _attachFileTemplateRepo = attachFileTemplateRepo;
         }
 
 
@@ -149,7 +146,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             DatetimeCreated = DateTime.Now,
                             DatetimeModified = DateTime.Now,
                             DepartmentId = currentUser.DepartmentId,
-                            ExpiredDate = attachTemplate.StorageTime==null?null: ConvertExpiredDate((int)attachTemplate.StorageTime, attachTemplate.StorageType),
+                            ExpiredDate = attachTemplate.StorageTime == null ? null : ConvertExpiredDate((int)attachTemplate.StorageTime, attachTemplate.StorageType),
                             GroupId = currentUser.GroupId,
                             Hblid = edoc.HBL,
                             JobId = edoc.JobId,
@@ -160,7 +157,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             UserModified = currentUser.UserName,
                             DocumentTypeId = attachTemplate.Id,
                             SysImageId = imageID,
-                            Source=model.FolderName
+                            Source = model.FolderName
                         };
                         list.Add(sysImage);
                         listDetail.Add(sysImageDetail);
@@ -259,7 +256,26 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
                 }
-               
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
+        public async Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate)
+        {
+            var edoc = _sysImageDetailRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
+            try
+            {
+                if (edoc != null)
+                {
+                    edoc.SystemFileName = edocUpdate.SystemFileName;
+                    var hs = _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
+                }
+                var result = _sysImageDetailRepo.SubmitChanges();
                 return result;
             }
             catch (Exception ex)

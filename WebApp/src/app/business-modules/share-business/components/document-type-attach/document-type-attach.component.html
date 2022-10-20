@@ -45,7 +45,8 @@
                                             <td class="">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control text-primary"
-                                                        [ngModelChange]="" [ngModel]="file.aliasName">
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
+                                                        [ngModel]="file.aliasName">
                                                 </div>
                                             </td>
                                             <td class="disabled">
@@ -57,7 +58,7 @@
                                             <td class="">
                                                 <div class="form-group ">
                                                     <select class="form-control" [(ngModel)]="file.docType"
-                                                        (ngModelChange)="onSelectDataFormInfo($event,i)">
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                         <option *ngFor="let docType of documentTypes"
                                                             [ngValue]="docType.code">
                                                             {{docType.nameEn}}

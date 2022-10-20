@@ -2,7 +2,7 @@
 
 namespace eFMS.API.SystemFileManagement.DL.Models
 {
-    public class SysAttachFileTemplateModel: SysAttachFileTemplate
+    public class SysAttachFileTemplateModel : SysAttachFileTemplate
     {
     }
 }

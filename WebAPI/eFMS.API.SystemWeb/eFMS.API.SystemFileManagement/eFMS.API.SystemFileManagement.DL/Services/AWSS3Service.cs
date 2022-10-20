@@ -31,9 +31,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IEDocService edocService;
         private IS3Service _client;
 
-        public AWSS3Service(IContextBase<SysImage> SysImageRepo, 
-            IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, 
-            ICurrentUser currentUser, 
+        public AWSS3Service(IContextBase<SysImage> SysImageRepo,
+            IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
+            ICurrentUser currentUser,
             IOptions<ApiUrl> apiUrl,
             IS3Service s3,
             IEDocService edoc)

@@ -1,16 +1,16 @@
 ﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
-using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -24,11 +24,13 @@ namespace eFMS.API.SystemFileManagement.Controllers
 
         private IEDocService _edocService;
         private IContextBase<SysImage> _sysImageRepo;
+        private readonly IStringLocalizer stringLocalizer;
 
-        public EDocController(IEDocService edocService, IContextBase<SysImage> SysImageRepo)
+        public EDocController(IEDocService edocService, IContextBase<SysImage> SysImageRepo, IStringLocalizer<LanguageSub> localizer)
         {
             _edocService = edocService;
             _sysImageRepo = SysImageRepo;
+            stringLocalizer = localizer;
         }
 
 
@@ -52,7 +54,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
             {
                 return BadRequest(result);
             }
-                return Ok(result);
+            return Ok(result);
         }
 
         [HttpDelete("DeleteEDoc/{edocId}")]
@@ -62,6 +64,19 @@ namespace eFMS.API.SystemFileManagement.Controllers
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
+        }
+
+        [HttpPut]
+        [Route("UpdateEdoc")]
+        //[Authorize]
+        public async Task<IActionResult> Update(SysImageDetailModel model)
+        {
+            var hs = await _edocService.UpdateEDoc(model);
+            if (!hs.Success)
+            {
+                return BadRequest(hs);
+            }
+            return Ok(new ResultHandle { Status = hs.Success, Message = "Update Edoc Success" });
         }
     }
 }

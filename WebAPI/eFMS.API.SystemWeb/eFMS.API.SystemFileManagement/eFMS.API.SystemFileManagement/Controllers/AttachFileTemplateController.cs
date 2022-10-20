@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.SystemFileManagement.DL.IService;
-using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
 {
@@ -68,7 +65,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
                     list.Add(template);
                 }
                 var data = await AttachFilteTemplateService.Import(list);
-                if(data.Success)
+                if (data.Success)
                 {
                     return Ok(new ResultHandle { Message = "Import successful" });
                 }
