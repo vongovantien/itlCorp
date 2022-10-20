@@ -90,8 +90,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
-        // this.selectedInSOA = false;
-
 
     }
 

@@ -455,11 +455,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return false;
         }
-        if(this.selectedType.value === this.types[0].value){
+        if(this.selectedType === this.types[0].value){
             if(!this.salemanDisplay){
                 return false;
             }
-            if(this.selectedStaffType.value === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
+            if(this.selectedStaffType === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
                 this._toastService.warning("Selection Staff Saleman and Saleman must be the same.")
                 return false;
             }
@@ -582,7 +582,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         const agreementLst = this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id);
         let currency = this.currencyList.filter((curr) => agreementLst.map(x => x.creditCurrency).includes(curr.id));
         if (!currency) {
-            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
         } else if (currency.length > 1) {
             if (this.selectedService[0] !== 'All') {
                 this.selectedService.forEach((item: any) => {
@@ -592,15 +592,15 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     }
                 })
             }
+            this.selectedCurrency = currency[0].id;
         }
-        this.selectedCurrency = currency[0];
         if (!this.selectedCurrency) {
-            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
         }
     }
 
     getInfoAgreement(){
-        if(this.selectedType.value === this.types[0].value && !!this.selectedPartner.value){
+        if(this.selectedType === this.types[0].value && !!this.selectedPartner.value){
             this.saleMans = [];
             this._catalogueRepo.getAgreement(
                 {
@@ -613,9 +613,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                             this.saleMans = _uniqBy(this.saleMans, 'id');
                         }else{
                             this.saleMans = this.itlBOD;
-                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
                         }
-                        this.updateDataSearch('currency', this.selectedCurrency.id);
+                        this.updateDataSearch('currency', this.selectedCurrency);
                         if(this.saleMans.length > 0){
                             this.onSelectDataFormInfo(this.saleMans[0], 'saleman');
                         }
