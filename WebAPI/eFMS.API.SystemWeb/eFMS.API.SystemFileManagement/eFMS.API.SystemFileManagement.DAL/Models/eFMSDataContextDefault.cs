@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -1101,6 +1103,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.AccountingType).HasMaxLength(50);
+
                 entity.Property(e => e.Code).HasMaxLength(150);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
@@ -1114,6 +1118,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.NameVn)
                     .HasColumnName("NameVN")
                     .HasMaxLength(250);
+
+                entity.Property(e => e.PartnerType).HasMaxLength(50);
 
                 entity.Property(e => e.PreFix).HasMaxLength(150);
 
@@ -1560,11 +1566,13 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasColumnName("GroupID")
                     .HasColumnType("decimal(18, 0)");
 
-                entity.Property(e => e.Hblid)
-                    .HasColumnName("HBLID")
-                    .HasMaxLength(50);
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 

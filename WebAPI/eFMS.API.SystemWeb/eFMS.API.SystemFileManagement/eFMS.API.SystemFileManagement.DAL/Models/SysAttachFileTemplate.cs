@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -25,5 +26,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public string StorageFollowing { get; set; }
         public string Tag { get; set; }
         public int Id { get; set; }
+        public string AccountingType { get; set; }
+        public string PartnerType { get; set; }
     }
 }
