@@ -28,6 +28,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobId: string = '';
     isOps: boolean = false;
     edocByJob: any[] = [];
+    edocByAcc: any[] = [];
     selectedEdoc: any;
     transationType: string;
     housebills: any[];
@@ -39,6 +40,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     { title: 'House Bill No', field: 'hbl' },
     { title: 'Note', field: 'note' },
     { title: 'Source', field: 'source' },]
+
+    jobNo: string = '';
 
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
@@ -72,6 +75,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         this.transationType = res.transactionType;
                         this.getDocumentType(res.transactionType);
                         this.getEDocByJobID(res.transactionType);
+                        this.jobNo = res.jobNo;
                     }
                 );
         } else {
@@ -82,16 +86,18 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         this.transationType = res.transactionType;
                         this.getDocumentType(res.transactionType);
                         this.getEDocByJobID(res.transactionType);
+                        this.jobNo = res.jobNo;
                     }
                 );
         }
 
 
         this.headers = [
-            { title: 'No', field: 'no' },
             { title: 'Alias Name', field: 'aliasName' },
             { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Job Ref', field: 'jobRef' },
             { title: 'House Bill No', field: 'houseBillNo' },
+            { title: 'Billing No', field: 'billingNo' },
             { title: 'Source', field: 'source' },
             { title: 'Tag', field: 'tag' },
             { title: 'Attach Time', field: 'attachTime' },
@@ -171,9 +177,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
-                    this.edocByJob = res;
+                    this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
+                    this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
                     console.log(res);
-
                 },
             );
     }

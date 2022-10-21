@@ -189,7 +189,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 AliasName: x.aliasName,
                 BillingNo: null,
                 BillingType: null,
-                HBL: x.hblid,
+                HBL: x.hblid !== undefined ? x.hblid : null,
                 FileName: x.name,
                 Note: x.note
             }));
@@ -253,7 +253,7 @@ export interface IEDocFile {
     AliasName: string,
     BillingNo: string,
     BillingType: string,
-    HBL: string,
+    HBL: string
     FileName: string,
     Note: string
 }

@@ -192,7 +192,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
-            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType);
+            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType||x.Type== "Accountant");
             var lst = await _sysImageDetailRepo.GetAsync(x => x.JobId == jobID);
             if (lst == null) { return null; }
             var result = new List<EDocGroupByType>();
@@ -240,6 +240,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
                 };
             });
+            var resultAcc = result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
+            var resultGen = result.Where(x => x.documentType.Type != "Accountant").ToList();
+            result= resultGen.Concat(resultAcc).ToList();
             return result;
         }
 
