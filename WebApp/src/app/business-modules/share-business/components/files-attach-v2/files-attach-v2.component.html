@@ -170,7 +170,7 @@
         </div>
     </div>
 </div>
-<document-type-attach (onSearch)="getEDocByJobID($event)"></document-type-attach>
+<document-type-attach [isAccountant]="isAccountant" (onSearch)="getEDocByJobID($event)"></document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc=null">
     <ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -22,7 +22,7 @@ import { ShareDocumentTypeAttachComponent } from '../document-type-attach/docume
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
 
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
-
+    @Input() isAccountant: boolean = false;
     documentTypes: any[] = [];
     headers: CommonInterface.IHeaderTable[];
     jobId: string = '';
@@ -54,43 +54,49 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     ngOnInit() {
-        this._activedRoute.params
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((params: Params) => {
-                console.log(params);
-                if (params.jobId) {
-                    this.jobId = params.jobId;
-                    console.log(params);
-                } else {
-                    this.jobId = params.id;
-                    this.isOps = true;
-                }
-            });
-
-        if (this.isOps == false) {
-            this._store.select(getTransactionDetailCsTransactionState)
-                .pipe(skip(1), takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: CsTransaction) => {
-                        this.transationType = res.transactionType;
-                        this.getDocumentType(res.transactionType);
-                        this.getEDocByJobID(res.transactionType);
-                        this.jobNo = res.jobNo;
-                    }
-                );
-        } else {
-            this._store.select(getOperationTransationState)
+        if (!this.isAccountant) {
+            this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        this.transationType = res.transactionType;
-                        this.getDocumentType(res.transactionType);
-                        this.getEDocByJobID(res.transactionType);
-                        this.jobNo = res.jobNo;
+                .subscribe((params: Params) => {
+                    console.log(params);
+                    if (params.jobId) {
+                        this.jobId = params.jobId;
+                        console.log(params);
+                    } else {
+                        this.jobId = params.id;
+                        this.isOps = true;
                     }
-                );
-        }
+                });
+            if (this.isOps == false) {
+                this._store.select(getTransactionDetailCsTransactionState)
+                    .pipe(skip(1), takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: CsTransaction) => {
+                            this.transationType = res.transactionType;
+                            this.getDocumentType(res.transactionType);
+                            this.getEDocByJobID(res.transactionType);
+                            this.jobNo = res.jobNo;
+                        }
+                    );
+            } else {
+                this._store.select(getOperationTransationState)
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: any) => {
+                            this.transationType = res.transactionType;
+                            this.getDocumentType(res.transactionType);
+                            this.getEDocByJobID(res.transactionType);
+                            this.jobNo = res.jobNo;
+                        }
+                    );
 
+
+            }
+        } else {
+            this.transationType = 'Accountant';
+            this.getDocumentType('Accountant');
+            this.getEDocByJobID('Accountant');
+        }
 
         this.headers = [
             { title: 'Alias Name', field: 'aliasName' },

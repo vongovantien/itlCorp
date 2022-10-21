@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { CsTransaction } from '@models';
@@ -37,7 +37,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     selectedtDocType: any = null;
 
     formData: IEDocUploadFile;
-
+    @Input() isAccountant: boolean = false;
     documentTypes: any[] = [];
     source: string = 'Job';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
@@ -60,42 +60,44 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     ngOnInit(): void {
-        this._activedRoute.params
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((params: Params) => {
-                console.log(params);
-                if (params.jobId) {
-                    this.jobId = params.jobId;
-                    console.log(params);
-                } else {
-                    this.jobId = params.id;
-                    this.isOps = true;
-                }
-            });
-
-        if (this.isOps == false) {
-            this._store.select(getTransactionDetailCsTransactionState)
-                .pipe(skip(1), takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: CsTransaction) => {
-                        this.fileNo = res.jobNo;
-                        this.transactionType = res.transactionType;
-                    }
-                );
-        } else {
-            this._store.select(getOperationTransationState)
+        if (!this.isAccountant) {
+            this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        this.fileNo = res.opstransaction.jobNo;
-                        console.log(res);
-
+                .subscribe((params: Params) => {
+                    console.log(params);
+                    if (params.jobId) {
+                        this.jobId = params.jobId;
+                        console.log(params);
+                    } else {
+                        this.jobId = params.id;
+                        this.isOps = true;
                     }
-                );
+                });
+
+            if (this.isOps == false) {
+                this._store.select(getTransactionDetailCsTransactionState)
+                    .pipe(skip(1), takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: CsTransaction) => {
+                            this.fileNo = res.jobNo;
+                            this.transactionType = res.transactionType;
+                        }
+                    );
+            } else {
+                this._store.select(getOperationTransationState)
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: any) => {
+                            this.fileNo = res.opstransaction.jobNo;
+                            console.log(res);
+
+                        }
+                    );
+            }
+
         }
-
-        if (this.isUpdate) {
-
+        else {
+            this.transactionType = 'Accountant';
         }
         this.getHblList();
     }
