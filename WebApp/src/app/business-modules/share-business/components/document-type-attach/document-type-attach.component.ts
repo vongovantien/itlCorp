@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { SystemFileManageRepo } from '@repositories';
+import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -42,11 +42,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     source: string = 'Job';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
 
+    housebills: any[] = []
+
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
         private _activedRoute: ActivatedRoute,
         private _systemFileManagerRepo: SystemFileManageRepo,
+        private _documentationRepo: DocumentationRepo
     ) {
         super();
 
@@ -85,6 +88,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (res: any) => {
                         this.fileNo = res.opstransaction.jobNo;
+                        console.log(res);
+
                     }
                 );
         }
@@ -92,6 +97,25 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         if (this.isUpdate) {
 
         }
+        this.getHblList();
+    }
+
+
+
+    getHblList() {
+        this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.housebills = res;
+                        console.log(res);
+
+                    }
+
+                },
+            );
     }
 
     chooseFile(event: any) {
@@ -123,7 +147,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         console.log(this.listFile[index]);
         switch (type) {
             case 'docType':
-
                 this.listFile[index].docType = event;
                 this.listFile[index].aliasName = this.isUpdate ? event + this.listFile[index].name : event + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 console.log(this.listFile);
@@ -131,6 +154,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             case 'aliasName':
                 console.log(event);
                 this.listFile[index].aliasName = event;
+                break;
+            case 'houseBill':
+                console.log(event);
+                this.listFile[index].hblid = event;
+                break;
+            case 'note':
+                console.log(event);
+                this.listFile[index].note = event;
                 break;
         }
     }
@@ -158,8 +189,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 AliasName: x.aliasName,
                 BillingNo: null,
                 BillingType: null,
-                HBL: null,
-                FileName: x.name
+                HBL: x.hblid,
+                FileName: x.name,
+                Note: x.note
             }));
         });
         console.log(edocFileList);
@@ -171,19 +203,39 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             EDocFiles: edocFileList,
         })
         console.log(this.EdocUploadFile);
-
-        this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success("Upload file successfully!");
-                        this.resetForm();
-                        this.hide();
-                        this.onSearch.emit(this.transactionType);
+        if (this.isUpdate) {
+            let edocUploadModel: any = {
+                Hblid: edocFileList[0].HBL,
+                SystemFileName: edocFileList[0].AliasName,
+                Note: edocFileList[0].Note
+            }
+            this._systemFileManagerRepo.updateEdoc(edocUploadModel)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.resetForm();
+                            this.hide();
+                            this.onSearch.emit(this.transactionType);
+                        }
                     }
-                }
-            );
+                );
+        } else {
+            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.resetForm();
+                            this.hide();
+                            this.onSearch.emit(this.transactionType);
+                        }
+                    }
+                );
+        }
+
     }
 }
 
@@ -202,5 +254,6 @@ export interface IEDocFile {
     BillingNo: string,
     BillingType: string,
     HBL: string,
-    FileName: string
+    FileName: string,
+    Note: string
 }

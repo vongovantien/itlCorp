@@ -77,4 +77,11 @@ export class SystemFileManageRepo {
             map((data: any) => data)
         );
     }
+
+    updateEdoc(body: any = {}) {
+        return this._api.put(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UpdateEdoc`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }

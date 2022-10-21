@@ -30,11 +30,22 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByJob: any[] = [];
     selectedEdoc: any;
     transationType: string;
+    housebills: any[];
+    headerAttach: any[] = [{ title: 'No', field: 'no' },
+    { title: 'Alias Name', field: 'aliasName' },
+    { title: 'Real File Name', field: 'realFilename' },
+    { title: 'Document Type', field: 'docType' },
+    { title: 'Job Ref', field: 'jobRef' },
+    { title: 'House Bill No', field: 'hbl' },
+    { title: 'Note', field: 'note' },
+    { title: 'Source', field: 'source' },]
+
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>,
         private _toast: ToastrService,
+
     ) {
         super();
     }
@@ -88,7 +99,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         ];
         //this.getDocumentType();
         //this.getEDocByJobID();
+        //this.documentAttach.headers = this.headerAttach;
     }
+
 
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
@@ -104,14 +117,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     editEdoc() {
         console.log(this.documentAttach.listFile);
         console.log(this.selectedEdoc);
-        this.documentAttach.headers = [
-            { title: 'No', field: 'no' },
-            { title: 'Alias Name', field: 'aliasName' },
-            { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Document Type', field: 'docType' },
-            { title: 'Job Ref', field: 'jobRef' },
-            { title: 'Source', field: 'source' }
-        ];
+        // this.documentAttach.headers = [
+        //     { title: 'No', field: 'no' },
+        //     { title: 'Alias Name', field: 'aliasName' },
+        //     { title: 'Real File Name', field: 'realFilename' },
+        //     { title: 'Document Type', field: 'docType' },
+        //     { title: 'Job Ref', field: 'jobRef' },
+        //     { title: 'Source', field: 'source' }
+        // ];
+        this.documentAttach.headers = this.headerAttach;
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         this.documentAttach.listFile.push(this.selectedEdoc);
@@ -170,14 +184,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     // }
 
     showDocumentAttach() {
-        this.documentAttach.headers = [
-            { title: 'No', field: 'no' },
-            { title: 'Alias Name', field: 'aliasName' },
-            { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Document Type', field: 'docType' },
-            { title: 'Job Ref', field: 'jobRef' },
-            { title: 'Source', field: 'source' }
-        ];
+        // this.documentAttach.headers = [
+        //     { title: 'No', field: 'no' },
+        //     { title: 'Alias Name', field: 'aliasName' },
+        //     { title: 'Real File Name', field: 'realFilename' },
+        //     { title: 'Document Type', field: 'docType' },
+        //     { title: 'Job Ref', field: 'jobRef' },
+        //     { title: 'House Bill No', field: 'hbl' },
+        //     { title: 'Note', field: 'note' },
+        //     { title: 'Source', field: 'source' },
+        // ];
+        this.documentAttach.headers = this.headerAttach;
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
     }

@@ -28,9 +28,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly IOptions<ApiUrl> _apiUrl;
         private readonly string _domainTest;
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
+        private IContextBase<OpsTransaction> _opsTranRepo;
+        private IContextBase<CsTransactionDetail> _tranDeRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
 
-        public EDocService(IContextBase<SysImage> SysImageRepo, IContextBase<SysAttachFileTemplate> attachFileTemplateRepo, IS3Service client, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl, IContextBase<SysImageDetail> sysImageDetailRepo)
+        public EDocService(IContextBase<SysImage> SysImageRepo,
+            IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
+            IS3Service client,
+            ICurrentUser currentUser, 
+            IOptions<ApiUrl> apiUrl, 
+            IContextBase<SysImageDetail> sysImageDetailRepo,
+            IContextBase<OpsTransaction> opsTranRepo,
+            IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
@@ -40,6 +49,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _sysImageDetailRepo = sysImageDetailRepo;
             _client = client;
             _attachFileTemplateRepo = attachFileTemplateRepo;
+            _tranDeRepo = tranDeRepo;
+            _opsTranRepo = opsTranRepo;
         }
 
 
@@ -157,7 +168,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             UserModified = currentUser.UserName,
                             DocumentTypeId = attachTemplate.Id,
                             SysImageId = imageID,
-                            Source = model.FolderName
+                            Source = model.FolderName,
+                            Note=edoc.Note
                         };
                         list.Add(sysImage);
                         listDetail.Add(sysImageDetail);
@@ -216,12 +228,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
                     ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
+                    HBLNo = x.Hblid!=null?_attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno :
+                    _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno:null,
                 };
                 lstImageMD.Add(imageModel);
             });
             lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
             {
-                result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
+                if(result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
+                {
+                    result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
+                };
             });
             return result;
         }
@@ -265,6 +282,68 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
+        public async Task<HandleState> GenEdoc(FileUploadModel model)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                //var key = "";
+                //List<SysImage> list = new List<SysImage>();
+                //foreach (var file in model.Files)
+                //{
+                //    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+
+                //    string extension = Path.GetExtension(file.FileName);
+                //    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                //    var putRequest = new PutObjectRequest()
+                //    {
+                //        BucketName = _bucketName,
+                //        Key = key,
+                //        InputStream = file.OpenReadStream(),
+                //    };
+
+                //    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                //    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                //    {
+                //        string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                //        if (extension == ".doc")
+                //        {
+                //            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                //        }
+                //        var sysImage = new SysImage
+                //        {
+                //            Id = Guid.NewGuid(),
+                //            Url = urlImage,
+                //            Name = fileName + extension,
+                //            Folder = model.FolderName,
+                //            ObjectId = model.Id.ToString(),
+                //            UserCreated = currentUser.UserName,
+                //            UserModified = currentUser.UserName,
+                //            DateTimeCreated = DateTime.Now,
+                //            DatetimeModified = DateTime.Now,
+                //            ChildId = model.Child,
+                //            KeyS3 = key
+                //        };
+                //        list.Add(sysImage);
+                //    }
+                //}
+                //if (list.Count > 0)
+                //{
+                //    result = await _sysImageRepo.AddAsync(list);
+                //    list.ForEach(x =>
+                //    {
+                //        MappingeDocToShipment(x.Id,)
+                //    })
+                //}
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
         public async Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate)
         {
             var edoc = _sysImageDetailRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
@@ -273,6 +352,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (edoc != null)
                 {
                     edoc.SystemFileName = edocUpdate.SystemFileName;
+                    edoc.Hblid = edocUpdate.Hblid;
+                    edoc.Note = edocUpdate.Note;
                     var hs = _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
                 }
                 var result = _sysImageDetailRepo.SubmitChanges();
