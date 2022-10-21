@@ -65,8 +65,6 @@ export class Contract {
     emailAddress: string = null;
     firstShipmentDate: any = null;
     paymentTermObh: string = null;
-
-
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
