@@ -50,6 +50,7 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
+            assignedItem.UserCreated = currentUser.UserID;
             int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
             assignedItem.Type = model.Type == "User" ? "User" : "System";
@@ -178,8 +179,8 @@ namespace eFMS.API.Operation.DL.Services
             var assigned = mapper.Map<OpsStageAssigned>(model);
             assigned.UserModified = currentUser.UserID;
             assigned.DatetimeModified = DateTime.Now;
-            assigned.Hblid = houseBill.Id ?? model.HblId;
-            assigned.Hblno = houseBill?.Hwbno;
+            assigned.Hblid = houseBill != null ? houseBill?.Id : null;
+            assigned.Hblno = houseBill != null ? houseBill?.Hwbno : model.Hblno;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
             var job = opsTransRepository.First(x => x.Id == model.JobId);
             var jobCsTransaction = csTransactionReporsitory.First(x => x.Id == model.JobId);
@@ -275,6 +276,7 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.MainPersonInCharge = assignedItem.MainPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.MainPersonInCharge)?.Username : assignedItem.MainPersonInCharge;
                 assignedItem.RealPersonInCharge = assignedItem.RealPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.RealPersonInCharge)?.Username : assignedItem.RealPersonInCharge;
                 assignedItem.Hblid = hbls.Any(x => x.Id == item.Hblid) ? item.Hblid : null;
+                assignedItem.Hblno = hbls.Any(x => x.Id == item.Hblid) ? hbls.FirstOrDefault(x => x.Id == item.Hblid)?.Hwbno : item.Hblno;
 
                 results.Add(assignedItem);
             }

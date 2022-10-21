@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { InjectViewContainerRefDirective } from '@directives';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { getCurrentUserState, IAppState } from '@store';
@@ -24,6 +25,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ShareBusinessStageManagementDetailComponent) popupDetail: ShareBusinessStageManagementDetailComponent;
     @ViewChild(ShareBusinessAssignStagePopupComponent) assignStagePopup: ShareBusinessAssignStagePopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     data: any = null;
     jobId: string = '';
@@ -56,7 +58,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
             { title: 'Code', field: 'stageCode', sortable: true },
             { title: 'Name', field: 'stageNameEN', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
-            { title: 'House Bill', field: 'hblNo', sortable: true },
+            { title: 'House Bill', field: 'hblno', sortable: true },
             { title: 'Role', field: 'departmentName', sortable: true },
             { title: 'Deadline Date', field: 'deadline', sortable: true },
             { title: 'Finish Date', field: 'doneDate', sortable: true },

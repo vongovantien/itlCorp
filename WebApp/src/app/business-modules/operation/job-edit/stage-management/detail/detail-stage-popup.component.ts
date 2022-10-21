@@ -111,6 +111,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         });
 
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'mainPersonInCharge':
@@ -123,6 +124,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 break;
         }
     }
+
     onSubmit(form: FormGroup) {
         this.isSummited = true;
         if (form.invalid) {
@@ -184,6 +186,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.isSummited = false;
         this.hide();
     }
+
     resetFormControl(control: FormControl | AbstractControl) {
         if (!!control && control instanceof FormControl) {
             control.setValue(null);

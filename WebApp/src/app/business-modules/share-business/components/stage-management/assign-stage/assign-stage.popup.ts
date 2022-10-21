@@ -126,9 +126,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignStage() {
         this.isSubmitted = true;
-        console.log(this.selectedHbl.value)
-        console.log(this.selectedHblData.id)
-        if (!this.selectedUser.value || !this.selectedStage.value || !this.selectedHblData.value) {
+        if (!this.selectedUser.value || !this.selectedStage.value || !this.selectedHbl.value) {
             return;
         }
         const body: IAssignStage = {

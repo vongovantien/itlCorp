@@ -111,7 +111,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
         this.status = this.form.controls['status'];
-        this.hblno = this.form.controls['hblno'];
+        this.hblno = this.form.controls['hblno'];;
     }
 
     initFormUpdate() {
@@ -123,7 +123,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             processTime: this.data.processTime,
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
             status: this.data.status,
-            hblno: this.data.hblno
+            hblno: this.data.hblno,
         });
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
@@ -181,7 +181,8 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 description: form.value.description,
                 deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
                 status: form.value.status,
-                type: 'User'
+                type: 'User',
+                userCreated: this.data.userCreated
             };
             console.log(body)
             this._operationRepo.updateStageToJob(body).pipe(
@@ -236,6 +237,10 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     onCancel() {
         this.isSubmitted = false;
         this.hide();
+    }
+
+    resetFormControl() {
+
     }
 }
 

@@ -3885,6 +3885,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
+
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -4367,6 +4371,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeType).HasMaxLength(500);
 
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")

@@ -2,6 +2,10 @@
 {
     public static class DocumentConstants
     {
+        //Stage from constants
+        public const string FROM_USER = "User";
+        public const string FROM_SYSTEM = "System";
+
         //Document stage code
         public static readonly string UPDATE_ATA_CODE = "U_ATA";
         public static readonly string UPDATE_ATD_CODE = "U_ATD";
@@ -138,7 +142,7 @@
         public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
         public static readonly string SETTING_FLOW_APPLY_TYPE_CHECK_POINT = "Check Point";
         public static readonly string SETTING_FLOW_APPLY_TYPE_NONE = "None";
-        public static readonly string SETTING_FLOW_APPLY_TYPE_ALERT= "Alert";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_ALERT = "Alert";
 
         public static readonly string SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH = "Both";
         public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_CASH = "Cash";

@@ -140,7 +140,8 @@
                                     [currentActiveItemId]="selectedHbl" [height]="150"
                                     (itemSelected)="onSelectHouseBill" [dataSources]="configHbl.dataSource"
                                     [displayFields]="configHbl.displayFields"
-                                    [selectedDisplayFields]="configHbl.selectedDisplayFields">
+                                    [selectedDisplayFields]="configHbl.selectedDisplayFields"
+                                    (remove)="resetFormControl()">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !selectedHbl.value">
                                     House Bill is required!
