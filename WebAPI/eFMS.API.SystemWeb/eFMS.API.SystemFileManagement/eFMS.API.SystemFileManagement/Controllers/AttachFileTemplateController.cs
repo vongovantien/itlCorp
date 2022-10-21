@@ -61,6 +61,8 @@ namespace eFMS.API.SystemFileManagement.Controllers
                         StorageFollowing = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         //StorageTime = (int)worksheet.Cells[row, 13].Value,
                         StorageType = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        AccountingType = worksheet.Cells[row, 15].Value?.ToString().Trim(),
+                        PartnerType = worksheet.Cells[row, 16].Value?.ToString().Trim(),
                     };
                     list.Add(template);
                 }
