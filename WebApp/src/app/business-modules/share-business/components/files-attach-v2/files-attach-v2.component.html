@@ -46,7 +46,8 @@
                         </div>
                     </div>
                     <div class="m-portlet__body">
-                        <div class="collapse" id={{docType.documentType.code}}>
+                        <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
+                            id={{docType.documentType.code}}>
                             <div class="table-wrapper table-scrollable">
                                 <table class="table table-hover table-brand table-editable dataTable table-summary ">
                                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
@@ -120,7 +121,8 @@
                         </div>
                     </div>
                     <div class="m-portlet__body">
-                        <div class="collapse" id={{docType.documentType.code}}>
+                        <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
+                            id={{docType.documentType.code}}>
                             <div class="table-wrapper table-scrollable">
                                 <table class="table table-hover table-brand table-editable dataTable table-summary ">
                                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">

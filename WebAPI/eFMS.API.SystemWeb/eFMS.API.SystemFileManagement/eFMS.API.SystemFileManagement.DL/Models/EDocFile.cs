@@ -12,6 +12,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string TransactionType { get; set; }
         public string AliasName { get; set; }
         public string FileName { get; set; }
-        public string? Note { get; set; }
+        public string Note { get; set; }
     }
 }

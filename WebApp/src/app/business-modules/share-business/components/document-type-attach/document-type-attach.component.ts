@@ -189,7 +189,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 AliasName: x.aliasName,
                 BillingNo: null,
                 BillingType: null,
-                HBL: x.hblid !== undefined ? x.hblid : null,
+                HBL: x.hblid !== undefined ? x.hblid : "",
                 FileName: x.name,
                 Note: x.note
             }));
