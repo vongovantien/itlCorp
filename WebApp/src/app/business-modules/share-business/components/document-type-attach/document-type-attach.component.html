@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
+                <div class="row" *ngIf="!isUpdate">
                     <div class="col-md-12">
                         <div class="text-center">
                             <div class="dropzone">
@@ -44,15 +44,15 @@
                                             <td class="table-actions-col">{{i}}</td>
                                             <td class="">
                                                 <div class="form-group ">
-                                                    <input type="text" class="form-control text-primary"
+                                                    <input type="text" class="form-control "
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
                                                         [ngModel]="file.aliasName">
                                                 </div>
                                             </td>
                                             <td class="disabled">
                                                 <div class="form-group ">
-                                                    <input type="text" class="form-control text-primary"
-                                                        [ngModel]="file.name" disabled>
+                                                    <input type="text" class="form-control " [ngModel]="file.name"
+                                                        disabled>
                                                 </div>
                                             </td>
                                             <td class="">
@@ -68,12 +68,29 @@
                                             </td>
                                             <td class="disabled">
                                                 <div class="form-group ">
-                                                    <input type="text" class="form-control text-primary"
-                                                        [ngModel]="fileNo" disabled>
+                                                    <input type="text" class="form-control " [ngModel]="fileNo"
+                                                        disabled>
                                                 </div>
+                                            <td class="">
+                                                <div class="form-group ">
+                                                    <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
+                                                        <option *ngFor="let hbl of housebills" [ngValue]="hbl.id">
+                                                            {{hbl.hwbno}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control "
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
+                                                        [ngModel]="file.note">
+                                                </div>
+                                            </td>
                                             <td class="disabled">
                                                 <div class="form-group ">
-                                                    <input type="text" class="form-control text-primary" disabled
+                                                    <input type="text" class="form-control " disabled
                                                         [ngModel]="source">
                                                 </div>
                                             </td>

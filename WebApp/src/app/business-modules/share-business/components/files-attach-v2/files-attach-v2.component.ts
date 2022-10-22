@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -22,65 +22,88 @@ import { ShareDocumentTypeAttachComponent } from '../document-type-attach/docume
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
 
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
-
+    @Input() isAccountant: boolean = false;
     documentTypes: any[] = [];
     headers: CommonInterface.IHeaderTable[];
     jobId: string = '';
     isOps: boolean = false;
     edocByJob: any[] = [];
+    edocByAcc: any[] = [];
     selectedEdoc: any;
     transationType: string;
+    housebills: any[];
+    headerAttach: any[] = [{ title: 'No', field: 'no' },
+    { title: 'Alias Name', field: 'aliasName' },
+    { title: 'Real File Name', field: 'realFilename' },
+    { title: 'Document Type', field: 'docType' },
+    { title: 'Job Ref', field: 'jobRef' },
+    { title: 'House Bill No', field: 'hbl' },
+    { title: 'Note', field: 'note' },
+    { title: 'Source', field: 'source' },]
+
+    jobNo: string = '';
+
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>,
         private _toast: ToastrService,
+
     ) {
         super();
     }
 
     ngOnInit() {
-        this._activedRoute.params
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((params: Params) => {
-                console.log(params);
-                if (params.jobId) {
-                    this.jobId = params.jobId;
-                    console.log(params);
-                } else {
-                    this.jobId = params.id;
-                    this.isOps = true;
-                }
-            });
-
-        if (this.isOps == false) {
-            this._store.select(getTransactionDetailCsTransactionState)
-                .pipe(skip(1), takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: CsTransaction) => {
-                        this.transationType = res.transactionType;
-                        this.getDocumentType(res.transactionType);
-                        this.getEDocByJobID(res.transactionType);
-                    }
-                );
-        } else {
-            this._store.select(getOperationTransationState)
+        if (!this.isAccountant) {
+            this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        this.transationType = res.transactionType;
-                        this.getDocumentType(res.transactionType);
-                        this.getEDocByJobID(res.transactionType);
+                .subscribe((params: Params) => {
+                    console.log(params);
+                    if (params.jobId) {
+                        this.jobId = params.jobId;
+                        console.log(params);
+                    } else {
+                        this.jobId = params.id;
+                        this.isOps = true;
                     }
-                );
+                });
+            if (this.isOps == false) {
+                this._store.select(getTransactionDetailCsTransactionState)
+                    .pipe(skip(1), takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: CsTransaction) => {
+                            this.transationType = res.transactionType;
+                            this.getDocumentType(res.transactionType);
+                            this.getEDocByJobID(res.transactionType);
+                            this.jobNo = res.jobNo;
+                        }
+                    );
+            } else {
+                this._store.select(getOperationTransationState)
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: any) => {
+                            this.transationType = res.transactionType;
+                            this.getDocumentType(res.transactionType);
+                            this.getEDocByJobID(res.transactionType);
+                            this.jobNo = res.jobNo;
+                        }
+                    );
+
+
+            }
+        } else {
+            this.transationType = 'Accountant';
+            this.getDocumentType('Accountant');
+            this.getEDocByJobID('Accountant');
         }
 
-
         this.headers = [
-            { title: 'No', field: 'no' },
             { title: 'Alias Name', field: 'aliasName' },
             { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Job Ref', field: 'jobRef' },
             { title: 'House Bill No', field: 'houseBillNo' },
+            { title: 'Billing No', field: 'billingNo' },
             { title: 'Source', field: 'source' },
             { title: 'Tag', field: 'tag' },
             { title: 'Attach Time', field: 'attachTime' },
@@ -88,7 +111,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         ];
         //this.getDocumentType();
         //this.getEDocByJobID();
+        //this.documentAttach.headers = this.headerAttach;
     }
+
 
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
@@ -104,14 +129,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     editEdoc() {
         console.log(this.documentAttach.listFile);
         console.log(this.selectedEdoc);
-        this.documentAttach.headers = [
-            { title: 'No', field: 'no' },
-            { title: 'Alias Name', field: 'aliasName' },
-            { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Document Type', field: 'docType' },
-            { title: 'Job Ref', field: 'jobRef' },
-            { title: 'Source', field: 'source' }
-        ];
+        // this.documentAttach.headers = [
+        //     { title: 'No', field: 'no' },
+        //     { title: 'Alias Name', field: 'aliasName' },
+        //     { title: 'Real File Name', field: 'realFilename' },
+        //     { title: 'Document Type', field: 'docType' },
+        //     { title: 'Job Ref', field: 'jobRef' },
+        //     { title: 'Source', field: 'source' }
+        // ];
+        this.documentAttach.headers = this.headerAttach;
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         this.documentAttach.listFile.push(this.selectedEdoc);
@@ -157,9 +183,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
-                    this.edocByJob = res;
+                    this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
+                    this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
                     console.log(res);
-
                 },
             );
     }
@@ -170,14 +196,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     // }
 
     showDocumentAttach() {
-        this.documentAttach.headers = [
-            { title: 'No', field: 'no' },
-            { title: 'Alias Name', field: 'aliasName' },
-            { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Document Type', field: 'docType' },
-            { title: 'Job Ref', field: 'jobRef' },
-            { title: 'Source', field: 'source' }
-        ];
+        // this.documentAttach.headers = [
+        //     { title: 'No', field: 'no' },
+        //     { title: 'Alias Name', field: 'aliasName' },
+        //     { title: 'Real File Name', field: 'realFilename' },
+        //     { title: 'Document Type', field: 'docType' },
+        //     { title: 'Job Ref', field: 'jobRef' },
+        //     { title: 'House Bill No', field: 'hbl' },
+        //     { title: 'Note', field: 'note' },
+        //     { title: 'Source', field: 'source' },
+        // ];
+        this.documentAttach.headers = this.headerAttach;
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
     }

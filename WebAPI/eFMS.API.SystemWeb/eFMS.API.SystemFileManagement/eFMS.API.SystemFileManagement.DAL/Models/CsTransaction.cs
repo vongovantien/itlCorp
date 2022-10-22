@@ -5,6 +5,11 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 {
     public partial class CsTransaction
     {
+        public CsTransaction()
+        {
+            CsTransactionDetail = new HashSet<CsTransactionDetail>();
+        }
+
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -69,5 +74,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public DateTime? Atd { get; set; }
         public bool? IsMawb { get; set; }
         public bool? NoProfit { get; set; }
+
+        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }
