@@ -5,7 +5,7 @@ import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
 import { CsTransactionDetail } from '@models';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -21,6 +21,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
     constructor(
         private readonly _documentationRepo: DocumentationRepo,
         private readonly _cd: ChangeDetectorRef,
+        private readonly _export: ExportRepo,
         private readonly _toastService: ToastrService) {
         super();
     }
@@ -71,6 +72,12 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
             (v: any) => {
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
+            });
+
+        ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc.subscribe(
+            (v: any) => {
+                console.log("saving edoc...");
+                this._export.exportCrystalReportPDF(this.dataReport).subscribe();
             });
     }
 
