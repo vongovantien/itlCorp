@@ -88,7 +88,6 @@ export class ShareBusinessAsignmentComponent extends AppList {
             })
     }
 
-
     getCSTransactionDetails(id: any) {
         this._progressRef.start();
         this._documentRepo.getDetailTransaction(id)
@@ -104,7 +103,6 @@ export class ShareBusinessAsignmentComponent extends AppList {
 
     openPopUpAssignStage() {
         this.assignStagePopup.jobId = this.jobId;
-        this.assignStagePopup.getHblList(this.jobId);
         this.assignStagePopup.isAsignment = true;
         this.assignStagePopup.show();
     }
@@ -174,7 +172,6 @@ export class ShareBusinessAsignmentComponent extends AppList {
     }
 
     getDetail(id: string) {
-        this.popupDetail.getHblList(this.jobId);
         this._operation.getDetailStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
@@ -184,6 +181,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
 
                 } else {
                     this.selectedStage = new Stage(res);
+                    this.popupDetail.getHblList(this.jobId);
                     this.openPopupDetail();
                 }
             },

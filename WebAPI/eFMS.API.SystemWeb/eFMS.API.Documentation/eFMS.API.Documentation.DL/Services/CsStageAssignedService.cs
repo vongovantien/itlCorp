@@ -75,19 +75,6 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var stage in listStageAssigned)
             {
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
-                //assignedItem.Id = Guid.NewGuid();
-                //assignedItem.JobId = stage.JobId;
-                //assignedItem.Deadline = DateTime.Now;
-                //assignedItem.Status = TermData.Done;
-                //assignedItem.Hblid = stage.Hblid;
-                //assignedItem.Hblno = stage.Hblno;
-                //assignedItem.StageId = stage.StageId;
-                //assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-                //assignedItem.UserCreated = currentUser.UserID;
-                //assignedItem.Type = stage.Type;
-                //assignedItem.MainPersonInCharge = stage.MainPersonInCharge;
-                //assignedItem.RealPersonInCharge = stage.RealPersonInCharge;
-                //assignedItem.OrderNumberProcessed = stage.OrderNumberProcessed;
                 await DataContext.AddAsync(assignedItem, false);
             }
 

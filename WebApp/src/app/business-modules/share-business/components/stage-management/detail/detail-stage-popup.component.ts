@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
-import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DocumentationRepo } from '@repositories';
+import { FormValidators } from 'src/app/shared/validators/form.validator';
+import { CsTransactionDetail } from './../../../../../shared/models/document/csTransactionDetail';
 
 import { PopupBase } from "src/app/popup.base";
 import { Stage, User } from "src/app/shared/models";
@@ -102,7 +104,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 endDate: null
             }],
             'status': [this.statusStage[0]],
-            'hblno': null
+            'hblno': ['', FormValidators.required]
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -139,8 +141,9 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.selectedRealPersonInCharge.value = $event.username;
     }
 
-    onSelectHouseBill($event: any) {
-        this.selectedHbl.value = $event.hblno;
+    onSelectHouseBill($event: CsTransactionDetail) {
+        this.selectedHbl.value = $event.hwbno;
+        this.hblno.setValue($event.hwbno);
     }
 
     getHblList(jobId: string) {
@@ -170,7 +173,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 id: this.data.id,
                 jobId: this.data.jobId,
                 hblId: this.selectedHbl.value,
-                hblno: this.data.hblno,
+                hblno: form.value.hblno,
                 stageId: this.data.stageId,
                 name: this.data.name,
                 orderNumberProcessed: this.data.orderNumberProcessed,
@@ -239,8 +242,12 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.hide();
     }
 
-    resetFormControl() {
-
+    resetFormControl(control: FormControl | AbstractControl) {
+        if (!!control && control instanceof FormControl) {
+            control.setValue(null);
+            control.markAsUntouched({ onlySelf: true });
+            control.markAsPristine({ onlySelf: true });
+        }
     }
 }
 

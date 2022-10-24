@@ -107,9 +107,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             mainPersonInCharge: this.data.mainPersonInCharge,
             realPersonInCharge: this.data.realPersonInCharge,
             status: this.data.status,
-            hblNo: this.data.hblno
         });
-
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -137,7 +135,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         const body = {
             id: this.data.id,
             jobId: this.data.jobId,
-            hblId: this.data.hblId,
             stageId: this.data.stageId,
             name: this.data.name,
             orderNumberProcessed: this.data.orderNumberProcessed,
