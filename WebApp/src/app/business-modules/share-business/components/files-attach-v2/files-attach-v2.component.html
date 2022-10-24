@@ -1,26 +1,21 @@
 <div class="m-portlet">
-    <div class="m-portlet__head alert-block__heading pointer">
-        <div class="m-portlet__head-caption">
-            <div class="m-portlet__head-title w-100">
-                <h3 class="m-portlet__head-text collapse-toggle"> Attachment File
-                </h3>
-            </div>
-        </div>
-    </div>
-    <ng-container *ngIf="typeFrom==='Job'">
-        <div class="m-portlet__body">
-            <div class="m-portlet">
-                <div class="m-portlet__head alert-block__heading pointer">
-                    <div class="m-portlet__head-caption">
-                        <div class="m-portlet__head-title w-100">
-                            <h3 class="m-portlet__head-text collapse-toggle"> General File
-                            </h3>
-                        </div>
+    <div class="m-portlet__body">
+        <ng-container *ngIf="typeFrom === 'Job'">
+            <div class="m-portlet__head pointer">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title w-100">
+                        <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
+                            [attr.data-target]="'#generalFile'" aria-expanded="true">
+                            <i class="la la-plus m--margin-right-5"></i>
+                            General File
+                        </h3>
                     </div>
                 </div>
-                <div class="m-portlet__body">
+            </div>
+            <div class="m-portlet">
+                <div class="m-portlet__body collapse show" id="generalFile">
                     <div class="c-button-actions">
-                        <div class="form-group ">
+                        <div class="form-group float-right">
                             <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="showDocumentAttach()">
                                 <span>
@@ -36,14 +31,18 @@
                     <ng-container *ngFor="let docType of edocByJob; let i = index; trackBy: trackByFn">
                         <div class="m-portlet__head alert-block__heading pointer">
                             <div class="m-portlet__head-caption">
-                                <div class="m-portlet__head-title w-100">
-                                    <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
+                                <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
+                                    <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
                                         [attr.data-target]="'#' + docType.documentType.code">
                                         <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
-                                        Number of
-                                        File :
-                                        {{docType?.eDocs?.length}} Required: {{docType.documentType.required}}
-                                    </h3>
+                                    </h4>
+                                    <div class="text-right">
+                                        <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only "
+                                            [ngClass]="docType.documentType.required && !!docType?.eDocs?.length ? 'btn-success': 'btn-danger'">
+                                            <i
+                                                class="la la-{{docType.documentType.required && !!docType?.eDocs?.length ? 'check' : 'exclamation'}}"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -89,6 +88,8 @@
                                                     </td>
                                                 </tr>
                                             </ng-container>
+                                            <tr *ngIf="!(docType?.eDocs)?.length" app-table-none-record>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -97,11 +98,11 @@
                     </ng-container>
                 </div>
             </div>
-        </div>
-    </ng-container>
+        </ng-container>
+    </div>
     <div class="m-portlet__body">
         <div class="m-portlet">
-            <div class="c-button-actions" *ngIf="typeFrom!=='Job'">
+            <div class="c-button-actions" *ngIf="typeFrom !== 'Job'">
                 <div class="form-group ">
                     <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                         (click)="showDocumentAttach()">
@@ -114,15 +115,18 @@
                     </button>
                 </div>
             </div>
-            <div class="m-portlet__head alert-block__heading pointer">
+            <div class="m-portlet__head pointer">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title w-100">
-                        <h3 class="m-portlet__head-text collapse-toggle"> Accounting File
+                        <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
+                            [attr.data-target]="'#accountingFile'" aria-expanded="true">
+                            <i class="la la-plus m--margin-right-5"></i>
+                            Accounting File
                         </h3>
                     </div>
                 </div>
             </div>
-            <div class="m-portlet__body">
+            <div class="m-portlet__body collapse show" id="accountingFile">
                 <ng-container *ngFor="let docType of edocByAcc; let i = index; trackBy: trackByFn">
                     <div class="m-portlet__head alert-block__heading pointer">
                         <div class="m-portlet__head-caption">
@@ -177,6 +181,9 @@
                                                 </td>
                                             </tr>
                                         </ng-container>
+
+                                        <tr *ngIf="!(docType?.eDocs)?.length" app-table-none-record>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
