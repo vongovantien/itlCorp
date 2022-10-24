@@ -84,4 +84,9 @@ export class SystemFileManageRepo {
                 map((data: any) => data)
             );
     }
+    getEDocByAccountant(jobId: string, transitionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByAccountant?jobId=${jobId}&transactionType=${transitionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }

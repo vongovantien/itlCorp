@@ -179,6 +179,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
+                    console.log(res);
 
                     this.documentTypes = res;
                     this.documentAttach.documentTypes = res;

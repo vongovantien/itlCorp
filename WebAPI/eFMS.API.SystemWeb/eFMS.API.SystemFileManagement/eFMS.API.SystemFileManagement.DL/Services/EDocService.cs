@@ -150,9 +150,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             ChildId = null,
                             KeyS3 = key
                         };
+                        var attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                         if (type == "Job")
                         {
-                            var attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                             var sysImageDetail = new SysImageDetail
                             {
                                 Id = Guid.NewGuid(),
@@ -218,7 +218,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         SystemFileName = sysImage.Name,
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
-                                        Source = type
+                                        Source = type,
+                                        ExpiredDate = attachTemplate.StorageTime == null ? null : ConvertExpiredDate((int)attachTemplate.StorageTime, attachTemplate.StorageType),
+                                        DocumentTypeId = attachTemplate.Id,
+                                        Note = edoc.Note,
+                                        GroupId = currentUser.GroupId,
                                     };
 
                                     await _sysImageDetailRepo.AddAsync(imageDetail, false);
@@ -244,6 +248,58 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
+        }
+        public async Task<List<EDocGroupByType>> GetEDocByAccountant(string billingNo, string transactionType)
+        {
+            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType || x.Type == "Accountant");
+            var lst = await _sysImageDetailRepo.GetAsync(x => x.BillingNo == billingNo&&x.BillingType==transactionType);
+            if (lst == null) { return null; }
+            var result = new List<EDocGroupByType>();
+            lstTran.ForEach(x =>
+            {
+                var data = new EDocGroupByType()
+                {
+                    documentType = x
+                };
+                result.Add(data);
+            });
+            var lstImageMD = new List<SysImageDetailModel>();
+            lst.ForEach(x =>
+            {
+                var imageModel = new SysImageDetailModel()
+                {
+                    BillingNo = x.BillingNo,
+                    BillingType = x.BillingNo,
+                    DatetimeCreated = x.DatetimeCreated,
+                    DatetimeModified = x.DatetimeModified,
+                    DepartmentId = x.DepartmentId,
+                    DocumentTypeId = x.DocumentTypeId,
+                    ExpiredDate = x.ExpiredDate,
+                    GroupId = x.GroupId,
+                    Hblid = x.Hblid,
+                    Id = x.Id,
+                    JobId = x.JobId,
+                    OfficeId = x.OfficeId,
+                    Source = x.Source,
+                    SysImageId = x.SysImageId,
+                    SystemFileName = x.SystemFileName,
+                    UserCreated = x.UserCreated,
+                    UserFileName = x.UserFileName,
+                    UserModified = x.UserModified,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
+                    HBLNo = x.Hblid != null ? _attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno :
+                    _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null,
+                };
+                lstImageMD.Add(imageModel);
+            });
+            lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
+            {
+                if (result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
+                {
+                    result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
+                };
+            });
+            return result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
