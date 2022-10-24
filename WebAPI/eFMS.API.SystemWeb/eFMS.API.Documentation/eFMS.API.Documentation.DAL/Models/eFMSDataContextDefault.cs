@@ -1885,7 +1885,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
-
             modelBuilder.Entity<CatStage>(entity =>
             {
                 entity.ToTable("catStage");
@@ -1939,6 +1938,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
+
+            
 
             modelBuilder.Entity<CatUnit>(entity =>
             {

@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
+using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Services;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Infrastructure;
 using eFMS.API.Shipment.Infrastructure;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
+using eFMS.API.Shipment.Service.Contexts;
+using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -47,7 +52,8 @@ namespace eFMS.API.Shipment
             services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
-
+            services.AddHostedService<ScopedAlertATDHostedService>();
+            services.AddScoped<IScopedProcessingAlertATDService, ScopedProcessingAlertATDService>();
             services.Configure<ApiServiceUrl>(option => {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
                 option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
