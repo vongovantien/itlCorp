@@ -141,7 +141,8 @@ export class ApiService {
                 JobId: edoc.EDocFiles[i].JobId,
                 TransactionType: edoc.EDocFiles[i].TransactionType,
                 FileName: edoc.EDocFiles[i].FileName,
-                Note: edoc.EDocFiles[i].Note
+                Note: edoc.EDocFiles[i].Note,
+                BillingId: edoc.EDocFiles[i].BillingId
             });
             edocFile.push(edocFileItem);
         }
@@ -157,6 +158,7 @@ export class ApiService {
             formData.append(`edocUploadModel.EDocFiles[${i}][TransactionType]`, edocFile[i].TransactionType);
             formData.append(`edocUploadModel.EDocFiles[${i}][FileName]`, edocFile[i].FileName);
             formData.append(`edocUploadModel.EDocFiles[${i}][Note]`, edocFile[i].Note);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingId]`, edocFile[i].BillingId);
         }
         for (const file of files) {
             formData.append('files', file);

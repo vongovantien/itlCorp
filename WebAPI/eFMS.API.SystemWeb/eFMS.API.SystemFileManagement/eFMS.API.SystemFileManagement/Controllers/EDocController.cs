@@ -36,9 +36,9 @@ namespace eFMS.API.SystemFileManagement.Controllers
 
         [HttpPut("UploadEdoc")]
         //[Authorize]
-        public async Task<IActionResult> UploadEdoc([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files)
+        public async Task<IActionResult> UploadEdoc([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files,string type)
         {
-            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files);
+            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files,type);
             if (hs.Success)
             {
                 return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
@@ -78,20 +78,6 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Edoc Success" });
         }
-
-        [HttpPut]
-        [Route("GenEdoc")]
-        //[Authorize]
-        public async Task<IActionResult> GenEdoc(string type,Guid id,List<IFormFile> files)
-        {
-            //var hs = await _edocService.GenEDoc(type, id, files);
-            //var hs = await _edocService.GenEDoc(x);
-            var hs = new HandleState();
-            if (!hs.Success)
-            {
-                return BadRequest(hs);
-            }
-            return Ok(new ResultHandle { Status = hs.Success, Message = "Update Edoc Success" });
-        }
+    
     }
 }

@@ -201,7 +201,7 @@
                             <!-- <span class="badge badge-success"
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span> -->
                         </ng-template>
-                        <files-attach-v2 [isAccountant]="true">
+                        <files-attach-v2 [typeFrom]="'SOA'">
                         </files-attach-v2>
                         <!-- <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
                             folderModuleName="SOA" [objId]="soa.id" [readOnly]="soa.syncStatus === 'Synced'?'':null">

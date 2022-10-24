@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
+import { AccountingRepo, DocumentationRepo, SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, skip, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
@@ -37,19 +38,22 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     selectedtDocType: any = null;
 
     formData: IEDocUploadFile;
-    @Input() isAccountant: boolean = false;
+    @Input() typeFrom: string = 'Job';
     documentTypes: any[] = [];
     source: string = 'Job';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
 
-    housebills: any[] = []
+    housebills: any[] = [];
+    billingNo: string = '';
+    billingId: string = '';
 
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
         private _activedRoute: ActivatedRoute,
         private _systemFileManagerRepo: SystemFileManageRepo,
-        private _documentationRepo: DocumentationRepo
+        private _documentationRepo: DocumentationRepo,
+        private _accoutingRepo: AccountingRepo
     ) {
         super();
 
@@ -60,7 +64,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     ngOnInit(): void {
-        if (!this.isAccountant) {
+        if (this.typeFrom === 'Job') {
             this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((params: Params) => {
@@ -94,10 +98,28 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         }
                     );
             }
-
         }
         else {
             this.transactionType = 'Accountant';
+            switch (this.typeFrom) {
+                case 'SOA':
+                    this._activedRoute.queryParams.subscribe((params: any) => {
+                        if (!!params.no && params.currency) {
+                            this._accoutingRepo.getDetaiLSOA(params.no, params.currency || 'VND')
+                                .pipe(
+                                    catchError(this.catchError),
+                                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+                                )
+                                .subscribe(
+                                    (res: any) => {
+                                        this.billingId = res.id
+                                    },
+                                );
+                        }
+                    });
+                    break;
+                default: break;
+            }
         }
         this.getHblList();
     }
@@ -185,15 +207,16 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({
-                JobId: this.jobId,
+                JobId: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
                 Code: x.docType,
                 TransactionType: this.transactionType,
                 AliasName: x.aliasName,
                 BillingNo: null,
                 BillingType: null,
-                HBL: x.hblid !== undefined ? x.hblid : "",
+                HBL: x.hblid !== undefined ? x.hblid : SystemConstants.EMPTY_GUID,
                 FileName: x.name,
-                Note: x.note
+                Note: x.note,
+                BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
             }));
         });
         console.log(edocFileList);
@@ -201,7 +224,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.EdocUploadFile = ({
             ModuleName: 'Document',
             FolderName: 'Shipment',
-            Id: this.jobId,
+            Id: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
             EDocFiles: edocFileList,
         })
         console.log(this.EdocUploadFile);
@@ -224,7 +247,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     }
                 );
         } else {
-            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files)
+            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -257,5 +280,6 @@ export interface IEDocFile {
     BillingType: string,
     HBL: string
     FileName: string,
-    Note: string
+    Note: string,
+    BillingId: string,
 }

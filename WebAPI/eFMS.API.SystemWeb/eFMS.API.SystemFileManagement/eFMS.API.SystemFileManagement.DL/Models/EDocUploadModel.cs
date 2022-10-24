@@ -8,6 +8,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string FolderName { get; set; }
         public string ModuleName { get; set; }
         public List<EDocFile> EDocFiles { get; set; }
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
     }
 }

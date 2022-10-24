@@ -60,8 +60,8 @@ export class SystemFileManageRepo {
         );
     }
 
-    uploadEDoc(body: any, files: any) {
-        return this._api.putEDocFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadEdoc`, body, files).pipe(
+    uploadEDoc(body: any, files: any, type: string) {
+        return this._api.putEDocFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadEdoc?type=${type}`, body, files).pipe(
             map((data: any) => data)
         );
     }

@@ -22,7 +22,8 @@ import { ShareDocumentTypeAttachComponent } from '../document-type-attach/docume
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
 
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
-    @Input() isAccountant: boolean = false;
+    @Input() typeFrom: string = 'Job';
+    @Input() billingId: string = '';
     documentTypes: any[] = [];
     headers: CommonInterface.IHeaderTable[];
     jobId: string = '';
@@ -40,9 +41,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     { title: 'House Bill No', field: 'hbl' },
     { title: 'Note', field: 'note' },
     { title: 'Source', field: 'source' },]
+    accountantAttach: any[] = [{ title: 'No', field: 'no' },
+    { title: 'Alias Name', field: 'aliasName' },
+    { title: 'Real File Name', field: 'realFilename' },
+    { title: 'Document Type', field: 'docType' },
+    { title: 'Note', field: 'note' },]
 
     jobNo: string = '';
-
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _activedRoute: ActivatedRoute,
@@ -54,7 +59,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     ngOnInit() {
-        if (!this.isAccountant) {
+        if (this.typeFrom === 'Job') {
             this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((params: Params) => {
@@ -95,7 +100,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.transationType = 'Accountant';
             this.getDocumentType('Accountant');
-            this.getEDocByJobID('Accountant');
+            if (this.typeFrom === 'SOA') {
+                console.log(this.billingId);
+            }
+            //this.getEDocByJobID('Accountant');
         }
 
         this.headers = [
@@ -137,7 +145,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         //     { title: 'Job Ref', field: 'jobRef' },
         //     { title: 'Source', field: 'source' }
         // ];
-        this.documentAttach.headers = this.headerAttach;
+        if (this.typeFrom === 'Job') {
+            this.documentAttach.headers = this.headerAttach;
+        } else {
+            this.documentAttach.headers = this.accountantAttach;
+        }
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         this.documentAttach.listFile.push(this.selectedEdoc);
@@ -206,7 +218,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         //     { title: 'Note', field: 'note' },
         //     { title: 'Source', field: 'source' },
         // ];
-        this.documentAttach.headers = this.headerAttach;
+        if (this.typeFrom === 'Job') {
+            this.documentAttach.headers = this.headerAttach;
+        } else {
+            this.documentAttach.headers = this.accountantAttach;
+        }
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
     }
