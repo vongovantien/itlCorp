@@ -1,13 +1,13 @@
-import { takeUntil } from 'rxjs/operators';
-import { ActivatedRoute, Params } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
-import { AppForm } from '@app';
-import { AccountingRepo, SystemFileManageRepo } from '@repositories';
-import { SysImage } from '@models';
-import { InjectViewContainerRefDirective } from '@directives';
-import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { AppForm } from '@app';
+import { ConfirmPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { SysImage } from '@models';
+import { SystemFileManageRepo } from '@repositories';
+import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'accounting-attach-file-list',
@@ -36,6 +36,9 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
 
     files: SysImage[] = [];
     selectedFile: SysImage;
+
+    @Input() accType: string = '';
+    @Input() accId: string = '';
 
     constructor(
         private _fileRepo: SystemFileManageRepo,
@@ -86,12 +89,12 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._fileRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
+            this._fileRepo.uploadEDocFromAccountant('Accounting', this.accType, this.accId, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success("Upload file successfully!");
-                            this.getFiles(this._id);
+                            this.getFiles(this.accId);
                         }
                     }
                 );

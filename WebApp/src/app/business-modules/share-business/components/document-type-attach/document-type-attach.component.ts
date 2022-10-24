@@ -94,7 +94,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         (res: any) => {
                             this.fileNo = res.opstransaction.jobNo;
                             console.log(res);
-
+                            this.transactionType = 'CL';
                         }
                     );
             }

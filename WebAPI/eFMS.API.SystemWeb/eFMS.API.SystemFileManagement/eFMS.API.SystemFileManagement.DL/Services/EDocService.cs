@@ -594,5 +594,70 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return template;
         }
+
+        public async Task<HandleState> UploadEDocFromAccountant(FileUploadModel model)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var key = "";
+                List<SysImage> list = new List<SysImage>();
+                foreach (var file in model.Files)
+                {
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+
+                    string extension = Path.GetExtension(file.FileName);
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                    var putRequest = new PutObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = key,
+                        InputStream = file.OpenReadStream(),
+                    };
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        if (extension == ".doc")
+                        {
+                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        }
+                        var sysImage = new SysImage
+                        {
+                            Id = Guid.NewGuid(),
+                            Url = urlImage,
+                            Name = fileName + extension,
+                            Folder = model.FolderName,
+                            ObjectId = model.Id.ToString(),
+                            UserCreated = currentUser.UserName,
+                            UserModified = currentUser.UserName,
+                            DateTimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            ChildId = model.Child,
+                            KeyS3 = key
+                        };
+                        list.Add(sysImage);
+                    }
+                }
+                if (list.Count > 0)
+                {
+                    result = await _sysImageRepo.AddAsync(list);
+                }
+                if (result.Success)
+                {
+                    list.ForEach(x =>
+                    {
+                        var c = MappingeDocToShipment(x.Id, model.Id.ToString(), model.FolderName);
+                    });
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
     }
 }

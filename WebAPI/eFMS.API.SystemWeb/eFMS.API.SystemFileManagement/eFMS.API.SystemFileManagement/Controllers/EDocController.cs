@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -89,6 +90,26 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Edoc Success" });
         }
-    
+
+        [HttpPut("UploadEDocFromAccountant/{moduleName}/{folder}/{id}")]
+        //[Authorize]
+        public async Task<IActionResult> UploadFilesAttachEDoc(List<IFormFile> files, Guid id, string moduleName, string folder)
+        {
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = files,
+                FolderName = folder,
+                Id = id,
+                Child = null,
+                ModuleName = moduleName,
+            };
+            HandleState hs = await _edocService.UploadEDocFromAccountant(model);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(hs);
+        }
+
     }
 }

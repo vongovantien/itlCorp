@@ -32,6 +32,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     soaNO: string = '';
 
     soa: SOA = new SOA();
+    soaId: string = '';
 
     isClickSubMenu: boolean = false;
 
@@ -122,6 +123,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             .subscribe(
                 (res: any) => {
                     this.soa = new SOA(res);
+                    console.log(res);
+                    this.soaId = res.id;
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
                 },
