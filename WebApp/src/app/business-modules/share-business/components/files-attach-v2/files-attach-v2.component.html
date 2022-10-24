@@ -102,7 +102,7 @@
     </div>
     <div class="m-portlet__body">
         <div class="m-portlet">
-            <div class="c-button-actions">
+            <div class="c-button-actions" *ngIf="typeFrom !== 'Job'">
                 <div class="form-group float-right">
                     <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                         (click)="showDocumentAttach()">
@@ -159,7 +159,7 @@
                                                     <span>{{doc.userFileName}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{jobNo}}</span>
+                                                    <span>{{doc.jobNo}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>

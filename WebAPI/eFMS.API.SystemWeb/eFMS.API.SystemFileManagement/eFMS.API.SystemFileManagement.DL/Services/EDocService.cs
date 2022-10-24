@@ -31,6 +31,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
         private IContextBase<OpsTransaction> _opsTranRepo;
         private IContextBase<CsTransactionDetail> _tranDeRepo;
+        private IContextBase<CsTransaction> _cstranRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
 
         public EDocService(IContextBase<SysImage> SysImageRepo,
@@ -40,7 +41,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IOptions<ApiUrl> apiUrl,
             IContextBase<SysImageDetail> sysImageDetailRepo,
             IContextBase<OpsTransaction> opsTranRepo,
-            IContextBase<CsTransactionDetail> tranDeRepo)
+            IContextBase<CsTransaction> cstranRepo,
+        IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
@@ -52,6 +54,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _attachFileTemplateRepo = attachFileTemplateRepo;
             _tranDeRepo = tranDeRepo;
             _opsTranRepo = opsTranRepo;
+            _cstranRepo = cstranRepo;
         }
 
 
@@ -343,6 +346,33 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 lstImageMD.Add(imageModel);
             });
+            var newImageIds = _sysImageDetailRepo.Get(x => x.JobId == jobID).Select(x=>x.SysImageId).ToList();
+            var imageExist = _sysImageRepo.Get(x => x.ObjectId == jobID.ToString()).ToList();
+            var imageMap = imageExist.Where(x => !newImageIds.Contains(x.Id)).ToList();
+            var listOther = new List<SysImageDetailModel>();
+            if (imageMap.Count > 0)
+            {
+                imageMap.ForEach(x =>
+                {
+                    var imagedetail = new SysImageDetailModel
+                    {
+                        BillingNo = null,
+                        BillingType = "Other",
+                        DatetimeCreated = x.DateTimeCreated,
+                        DatetimeModified = x.DatetimeModified,
+                        DepartmentId = currentUser.DepartmentId,
+                        DocumentTypeId = getDocumentType(transactionType),
+                        ImageUrl = x.Url,
+                        GroupId = currentUser.GroupId,
+                        UserCreated = x.UserCreated,
+                        UserModified = x.UserModified,
+                        SystemFileName = "OTH" + x.Name,
+                        JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
+                        UserFileName = x.Name
+                    };
+                    listOther.Add(imagedetail);
+                });
+            }
             lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
             {
                 if (result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
@@ -352,8 +382,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             var resultAcc = result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
             var resultGen = result.Where(x => x.documentType.Type != "Accountant").ToList();
+            resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault().EDocs = listOther;
             result = resultGen.Concat(resultAcc).ToList();
             return result;
+        }
+
+        private int getDocumentType(string transationType)
+        {
+            return _attachFileTemplateRepo.Get(x => x.TransactionType == transationType && x.Code == "OTH").FirstOrDefault().Id;
         }
 
         public async Task<HandleState> DeleteEdoc(Guid edocId)

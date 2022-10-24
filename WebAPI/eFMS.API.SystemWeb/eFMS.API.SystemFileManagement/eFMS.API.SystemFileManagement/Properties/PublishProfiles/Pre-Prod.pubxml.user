@@ -7,7 +7,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>\\192.168.0.120\inetpub\eFMS-API\FileManagement</_PublishTargetUrl>
-    <History>True|2022-10-24T10:38:33.4434066Z;True|2022-10-24T14:10:28.6577265+07:00;True|2022-10-24T11:38:29.6599747+07:00;</History>
+    <History>True|2022-10-24T11:33:10.7136680Z;False|2022-10-24T18:32:57.3628282+07:00;True|2022-10-24T18:21:43.5493082+07:00;True|2022-10-24T17:38:33.4434066+07:00;True|2022-10-24T14:10:28.6577265+07:00;True|2022-10-24T11:38:29.6599747+07:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>
