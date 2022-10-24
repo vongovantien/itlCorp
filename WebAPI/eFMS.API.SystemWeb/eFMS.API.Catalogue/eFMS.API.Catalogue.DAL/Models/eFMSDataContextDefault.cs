@@ -122,17 +122,11 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("('(1)')");
 
-                entity.Property(e => e.BankAccountName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.BankAccountName).HasMaxLength(500);
 
-                entity.Property(e => e.BankAccountNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.BankAccountNo).HasMaxLength(50);
 
-                entity.Property(e => e.BankAddress)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.BankAddress).HasMaxLength(500);
 
                 entity.Property(e => e.BankId).HasColumnName("BankID");
 
@@ -159,12 +153,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
 
-                entity.Property(e => e.Source)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Source).HasMaxLength(20);
 
                 entity.Property(e => e.SwiftCode)
-                    .HasMaxLength(50)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
@@ -2577,6 +2569,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
+
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -3013,6 +3009,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeType).HasMaxLength(500);
 
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")
