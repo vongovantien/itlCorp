@@ -113,11 +113,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 var hs = new HandleState();
                 var key = "";
-                List<SysImage> list = new List<SysImage>();
-                List<SysImageDetail> listDetail = new List<SysImageDetail>();
                 var edocMapModel = MapEDocUploadModel(model, files);
                 foreach (var edoc in edocMapModel.EDocFilesMap)
                 {
+                    List<SysImage> list = new List<SysImage>();
+                    List<SysImageDetail> listDetail = new List<SysImageDetail>();
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(edoc.File.FileName)));
 
                     string extension = Path.GetExtension(edoc.File.FileName);
@@ -239,6 +239,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     if (hs.Success)
                     {
                         result = await _sysImageRepo.AddAsync(list);
+                        _sysImageRepo.SubmitChanges();
                     }
                 }
                 return result;
@@ -315,7 +316,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 result.Add(data);
             });
             var lstImageMD = new List<SysImageDetailModel>();
-            lst.ForEach(x =>
+            lst.ToList().ForEach(x =>
             {
                 var imageModel = new SysImageDetailModel()
                 {
@@ -337,9 +338,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserCreated = x.UserCreated,
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
-                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,
-                    HBLNo = x.Hblid!=null?_attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno :
-                    _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno:null,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault()!=null ? _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url:null,
+                    HBLNo = x.Hblid!=null?_attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault()!=null?
+                    _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno:null :
+                    _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault()!=null? _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno:null : null,
                 };
                 lstImageMD.Add(imageModel);
             });
