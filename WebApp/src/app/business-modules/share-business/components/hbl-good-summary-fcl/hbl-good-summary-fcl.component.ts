@@ -99,7 +99,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                             this.selectedPackage = res.packageType;
                             this.packageQty = res.packageQty;
                             this.containerDescription = res.contSealNo;
-                            // this.containers = res.csMawbcontainers;
+                            this.containers = res.csMawbcontainers;
                         }
                     }
                 );
@@ -116,14 +116,14 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!!this.description  && containers.length>0) {
+        if (!this.description && this.containers.length>0) {
             this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!!this.commodities && containers.length>0) {
+        if (!this.commodities && this.containers.length>0) {
             this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
@@ -131,12 +131,13 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         // * GW, Nw, CW, CBM
-        this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
-        this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
-        this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
-        this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
-        this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
-
+        if (!!containers.length) {
+            this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
+            this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
+            this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
+            this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
+            this.packageQty = (containers || []).reduce((acc: string, curr: Container) => acc += curr.packageQuantity, 0);
+        }   
         this.grossWeight = +this.grossWeight.toFixed(3);
         this.netWeight = +this.netWeight.toFixed(3);
         this.totalChargeWeight = +this.totalChargeWeight.toFixed(3);
@@ -150,8 +151,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         // * Container
-        if (this.containers.length>0) {
-            this.containerDetail = '';
+        if (this.containers.length>0 && !this.containerDescription) {
+            // this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
@@ -164,30 +165,31 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                 });
             }
         }
-
-        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
-        const contObject1 = this.mapObjectData(objApartOf);
-        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
-        const contObject2 = this.mapObjectData(objNotApartOf);
-        const contDataNotAprtOf = [];
-        for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
-            contDataNotAprtOf.push({
-                cont: item,
-                quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-            });
-        }
-
-        for (const item of contDataNotAprtOf) {
-            this.containerDetail += this.handleStringCont(item);
-        }
-
-        for (const item of contObject1) {
-            this.containerDetail += "A Part Of ";
-            this.containerDetail += this.handleStringCont(item);
-        }
-
-        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
         
+        if (!!this.containers.length && !this.containerDetail){
+            const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+            const contObject1 = this.mapObjectData(objApartOf);
+            const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+            const contObject2 = this.mapObjectData(objNotApartOf);
+            const contDataNotAprtOf = [];
+            for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
+                contDataNotAprtOf.push({
+                    cont: item,
+                    quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+                });
+            }
+
+            for (const item of contDataNotAprtOf) {
+                this.containerDetail += this.handleStringCont(item);
+            }
+
+            for (const item of contObject1) {
+                this.containerDetail += "A Part Of ";
+                this.containerDetail += this.handleStringCont(item);
+            }
+
+            this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
+        } 
     }
 
     initContainer() {
