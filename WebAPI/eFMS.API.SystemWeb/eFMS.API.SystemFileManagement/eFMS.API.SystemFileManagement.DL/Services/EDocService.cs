@@ -549,33 +549,33 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     break;
                 default: break;
             };
-            //if (jobIds.Count > 0)
-            //{
-            //    var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
-            //    foreach (var item in jobIds)
-            //    {
-            //        var imageDetail = new SysImageDetail
-            //        {
-            //            SysImageId = imageId,
-            //            BillingType = billingType,
-            //            BillingNo = bilingNo,
-            //            DatetimeCreated = DateTime.Now, 
-            //            DatetimeModified = DateTime.Now,
-            //            Id = Guid.NewGuid(),
-            //            JobId = item.JobId,
-            //            UserCreated = sysImage.UserCreated,
-            //            SystemFileName = sysImage.Name,
-            //            UserFileName = sysImage.Name,
-            //            UserModified = sysImage.UserCreated,
-            //            Source = billingType,
-            //            DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate("Accountant", item.TransactionType, _codeAttachFile, billingType)?.FirstOrDefault()?.Id
-            //        };
+            if (jobIds.Count > 0)
+            {
+                var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
+                foreach (var item in jobIds)
+                {
+                    var imageDetail = new SysImageDetail
+                    {
+                        SysImageId = imageId,
+                        BillingType = billingType,
+                        BillingNo = bilingNo,
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        Id = Guid.NewGuid(),
+                        JobId = item.JobId,
+                        UserCreated = sysImage.UserCreated,
+                        SystemFileName = sysImage.Name,
+                        UserFileName = sysImage.Name,
+                        UserModified = sysImage.UserCreated,
+                        Source = billingType,
+                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate("Accountant", item.TransactionType, _codeAttachFile, billingType)?.FirstOrDefault()?.Id
+                    };
 
-            //        await _sysImageDetailRepo.AddAsync(imageDetail, false);
-            //    }
+                    await _sysImageDetailRepo.AddAsync(imageDetail, false);
+                }
 
-            //    result = _sysImageDetailRepo.SubmitChanges();
-            //}
+                result = _sysImageDetailRepo.SubmitChanges();
+            }
             return result;
         }
         private IQueryable<SysAttachFileTemplate> GetDocumentTypeWithTypeAttachTemplate(string type, string transactionType, string code, string accountingType)
