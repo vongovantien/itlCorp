@@ -134,6 +134,13 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => criteria.SyncStatus == x.SyncStatus);
             }
 
+            // Tìm theo Receipt Type
+            if (!string.IsNullOrEmpty(criteria.Class))
+            {
+                query = query.And(x => criteria.Class == x.Class);
+            }
+
+
             // Tìm theo ngày sync/ngày thu
             if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Last Sync")
             {
