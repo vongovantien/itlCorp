@@ -194,7 +194,7 @@
         <div class="menu-context__item" (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
-        <div class="menu-context__item" (click)="deleteEdoc()">
+        <div class="menu-context__item" (click)="deleteEdoc()" *ngIf="typeFrom==='Job'">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
         <div class="menu-context__item" (click)="downloadEdoc()">
