@@ -111,6 +111,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             HandleState result = new HandleState();
             try
             {
+                var hs = new HandleState();
                 var key = "";
                 List<SysImage> list = new List<SysImage>();
                 List<SysImageDetail> listDetail = new List<SysImageDetail>();
@@ -152,6 +153,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             ChildId = null,
                             KeyS3 = key
                         };
+                        list.Add(sysImage);
                         var attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                         if (type == "Job")
                         {
@@ -179,6 +181,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             };
 
                             listDetail.Add(sysImageDetail);
+                            await _sysImageDetailRepo.AddAsync(sysImageDetail, false);
                         }
                         else
                         {
@@ -229,16 +232,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
                                     await _sysImageDetailRepo.AddAsync(imageDetail, false);
                                 }
-
-                                result = _sysImageDetailRepo.SubmitChanges();
                             }
-                            list.Add(sysImage);
                         }
+                        hs = _sysImageDetailRepo.SubmitChanges();
                     }   
-                }
-                if (list.Count > 0)
-                {
-                    var hs = await _sysImageDetailRepo.AddAsync(listDetail);
                     if (hs.Success)
                     {
                         result = await _sysImageRepo.AddAsync(list);
