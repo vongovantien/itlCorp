@@ -2247,15 +2247,15 @@ namespace eFMS.API.ReportData.FormatExcel
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
-                        if (itemCharge.VATAmount < 0)
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
-                            workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
-                        }
-                        else
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
-                        }
+                        //if (itemCharge.VATAmount < 0)
+                        //{
+                        //    workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
+                        //    workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
+                        //}
+                        //else
+                        //{
+                        //    workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                        //}
 
 
                         if (itemCharge.Type.Contains("OBH"))
@@ -5615,6 +5615,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("cusAdvAmountUsd",item.CusAdvanceAmountUsd);
                     mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
                     mappingKeyValue.Add("agreementAdvAmountUsd", item.AgreementCusAdvanceUsd);
+                    mappingKeyValue.Add("hub", item.Office);
                     mappingKeyValue.Add("description", item.Description);
 
                     excel.SetData(mappingKeyValue);

@@ -11,7 +11,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
-                <app-form-create-sea-export type='SCE'>
+                <app-form-create-sea-export type='SCE' [isDetail]="true">
                     <ng-container *ngIf="!!shipmentDetail">
                         <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
                             [userCreated]="shipmentDetail.userNameCreated"
@@ -72,6 +72,9 @@
         </li>
         <li class="m-nav-sticky__item">
             <a title="Preview Shipping Instruction" [routerLink]="['./si']">SI</a>
+        </li>
+        <li class="m-nav-sticky__item">
+            <a title="Send Pre Alert" [routerLink]="['./prealert']">Send P.A</a>
         </li>
         <li class="m-nav-sticky__item">
             <a title="Preview Shipment Cover Page" style="cursor: pointer;" (click)="previewShipmentCoverPage()">CP</a>

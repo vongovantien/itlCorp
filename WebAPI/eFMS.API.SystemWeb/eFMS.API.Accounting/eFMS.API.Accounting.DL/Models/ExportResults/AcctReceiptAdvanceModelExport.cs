@@ -24,6 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal CusAdvanceAmountUsd { get; set; }
         public decimal AgreementCusAdvanceVnd { get; set; }
         public decimal AgreementCusAdvanceUsd { get; set; }
+        public string Office { get; set; }
 
 
     }

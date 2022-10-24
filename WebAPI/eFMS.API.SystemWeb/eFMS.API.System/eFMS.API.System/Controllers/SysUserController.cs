@@ -456,5 +456,14 @@ namespace eFMS.API.System.Controllers
             var result = sysUserService.GetListUserWithPermission(menuID, action);
             return Ok(result);
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("GetPersonInchargeByCurrentUser")]
+        public IActionResult GetPersonInchargeByCurrentUser(int? groupId)
+        {
+            var results = sysUserService.GetPersonInchargeByCurrentUser(groupId);
+            return Ok(results);
+        }
     }
 }

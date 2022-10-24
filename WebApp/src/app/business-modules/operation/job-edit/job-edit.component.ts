@@ -251,7 +251,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         if (this.isDuplicate) {
             this.insertDuplicateJob();
         } else {
-            this.updateShipment();
+            const checkPoint = {
+                partnerId: this.opsTransaction.customerId,
+                salesmanId: this.opsTransaction.salemanId,
+                transactionType: 'CL',
+                type: 8,
+                hblId: this.opsTransaction.hblid
+            };
+            this._documentRepo.validateCheckPointContractPartner(checkPoint)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this._toastService.error(res.message);
+                            return;
+                        }
+                        this.updateShipment();
+                    }
+                )
         }
     }
 
@@ -311,7 +327,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.shipmentType = form.shipmentType;
         this.opsTransaction.noProfit = form.noProfit;
 
-        if (!!this.editForm.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
+        if ((!!this.editForm.shipmentNo || !!this.opsTransaction.serviceNo) && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
@@ -330,7 +346,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this.opsTransaction.serviceNo = res.jobNo;
                             this.opsTransaction.serviceHblId = res.hblId;
                             this.opsTransaction.isLinkJob = true;
-                        }else{
+                        } else {
                             this.opsTransaction.serviceNo = null;
                             this.opsTransaction.serviceHblId = null;
                             this.opsTransaction.isLinkJob = false;

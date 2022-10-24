@@ -4,12 +4,9 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
@@ -30,10 +27,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> catUnitRepository;
         private readonly IContextBase<CatCommodity> catCommodityRepository;
 
-        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, 
+        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository,
             IContextBase<OpsTransaction> opsTransRepo,
             IContextBase<CsTransaction> csTransRepo,
-            IMapper mapper, ICurrentUser user, 
+            IMapper mapper, ICurrentUser user,
             IStringLocalizer<LanguageSub> localize,
             IContextBase<CsTransactionDetail> detailRepo,
             IContextBase<CatUnit> unitRepo,
@@ -52,12 +49,12 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var houseBills = detailRepository.Get(x => x.JobId == JobId).ToList();
             List<object> returnList = new List<object>();
-            foreach(var item in houseBills)
+            foreach (var item in houseBills)
             {
                 var conts = DataContext.Get(x => x.Hblid == item.Id).ToList();
-                foreach(var c in conts)
+                foreach (var c in conts)
                 {
-                    var obj = new { c.ContainerTypeId, c.Quantity,hblid=item.Id };
+                    var obj = new { c.ContainerTypeId, c.Quantity, hblid = item.Id };
                     returnList.Add(obj);
                 }
             }
@@ -81,7 +78,8 @@ namespace eFMS.API.Documentation.DL.Services
                            from packType in grpPackageTypes.DefaultIfEmpty()
                            join commodity in commodities on container.CommodityId equals commodity.Id into grpCommodities
                            from com in grpCommodities.DefaultIfEmpty()
-                           select new CsMawbcontainerModel {
+                           select new CsMawbcontainerModel
+                           {
                                Id = container.Id,
                                Mblid = container.Mblid,
                                Hblid = container.Hblid,
@@ -107,7 +105,7 @@ namespace eFMS.API.Documentation.DL.Services
                                DatetimeModified = container.DatetimeModified,
                                IsPartOfContainer = container.IsPartOfContainer
                            });
-            if(results.Count() > 0)
+            if (results.Count() > 0)
             {
                 results = results.OrderBy(x => x.ContainerNo);
             }
@@ -144,15 +142,15 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
                 Hashtable ht = new Hashtable();
-                int sumCont = 0;decimal sumGW = 0; decimal sumNW = 0; decimal sumCW = 0; decimal sumCBM = 0; int sumPackages = 0;
+                int sumCont = 0; decimal sumGW = 0; decimal sumNW = 0; decimal sumCW = 0; decimal sumCBM = 0; int sumPackages = 0;
                 foreach (var item in list)
                 {
                     sumCont = sumCont + (int)item.Quantity;
-                    sumGW = sumGW + (item.Gw != null?(long)item.Gw: 0);
-                    sumNW = sumNW + (item.Nw != null?(long)item.Nw: 0);
-                    sumCW = sumCW + (item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0);
-                    sumCBM = sumCBM + (item.Cbm != null? (long)item.Cbm: 0);
-                    sumPackages = sumPackages + (item.PackageQuantity != null? (int)item.PackageQuantity: 0);
+                    sumGW = sumGW + (item.Gw != null ? (long)item.Gw : 0);
+                    sumNW = sumNW + (item.Nw != null ? (long)item.Nw : 0);
+                    sumCW = sumCW + (item.ChargeAbleWeight != null ? (long)item.ChargeAbleWeight : 0);
+                    sumCBM = sumCBM + (item.Cbm != null ? (long)item.Cbm : 0);
+                    sumPackages = sumPackages + (item.PackageQuantity != null ? (int)item.PackageQuantity : 0);
                     if (ht.ContainsKey(item.ContainerTypeName))
                     {
                         var sumContDes = Convert.ToInt32(ht[item.ContainerTypeName]) + item.Quantity;
@@ -191,12 +189,12 @@ namespace eFMS.API.Documentation.DL.Services
                         containerDes = containerDes + ht[key] + "x" + key + "; ";
                     }
                     containerDes = containerDes.Substring(0, containerDes.Length - 2);
-                    opstrans.SumCbm = sumCBM != 0? (decimal?)sumCBM: null;
+                    opstrans.SumCbm = sumCBM != 0 ? (decimal?)sumCBM : null;
                     opstrans.SumChargeWeight = sumCW != 0 ? (decimal?)sumCW : null;
                     opstrans.SumGrossWeight = sumGW != 0 ? (decimal?)sumGW : null;
                     opstrans.SumNetWeight = sumNW != 0 ? (decimal?)sumNW : null;
                     opstrans.SumPackages = sumPackages != 0 ? (int?)sumPackages : null;
-                    opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
+                    opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null;
                     opstrans.ContainerDescription = containerDes;
                 }
                 else
@@ -255,7 +253,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState(ex.Message);
             }
         }
-        
+
         public HandleState Importcontainer(List<CsMawbcontainerImportModel> data)
         {
             try
@@ -284,7 +282,8 @@ namespace eFMS.API.Documentation.DL.Services
             var packages = units.Where(x => x.UnitType == "Package");
             var unitOfMeasures = units.Where(x => x.UnitType == "WeightMeasurement");
             var containerShipments = DataContext.Get().ToList();
-            list.ForEach(item => {
+            list.ForEach(item =>
+            {
                 if (string.IsNullOrEmpty(item.ContainerTypeName))
                 {
                     item.IsValid = false;
@@ -379,7 +378,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if(item.PackageQuantityError != null)
+                if (item.PackageQuantityError != null)
                 {
                     if (Int64.TryParse(item.PackageQuantityError, out long x))
                     {
@@ -392,7 +391,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
                     }
                 }
-                if(item.NwError != null)
+                if (item.NwError != null)
                 {
                     if (decimal.TryParse(item.NwError, out decimal x))
                     {
@@ -567,7 +566,8 @@ namespace eFMS.API.Documentation.DL.Services
             var packages = units.Where(x => x.UnitType == "Package");
             var unitOfMeasures = units.Where(x => x.UnitType == "WeightMeasurement");
             var containerShipments = DataContext.Get().ToList();
-            list.ForEach(item => {
+            list.ForEach(item =>
+            {
                 var container = containers.FirstOrDefault(x => x.UnitNameEn == item.ContainerTypeName);
                 if (container == null)
                 {
@@ -593,7 +593,8 @@ namespace eFMS.API.Documentation.DL.Services
                         item.PackageTypeNameError = null;
                     }
                 }
-                else {
+                else
+                {
                     item.IsValid = false;
                     item.PackageTypeNameError = stringLocalizer[DocumentationLanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_EMPTY].Value;
                 }
@@ -735,6 +736,24 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             });
             return list;
+        }
+
+        public IQueryable<CsMawbcontainerModel> GetContainerListByJobId(Guid jobId)
+        {
+            IQueryable<CsMawbcontainerModel> resultList = (
+                 from hbl in detailRepository.Get(x => x.JobId == jobId)
+                 join cont in DataContext.Get() on hbl.Id equals cont.Hblid
+                 join catUnit in catUnitRepository.Get() on cont.PackageTypeId equals catUnit.Id
+                 select new CsMawbcontainerModel
+                 {
+                     Id = cont.Id,
+                     PackageTypeId = cont.PackageTypeId,
+                     PackageTypeName = catUnit.Code,
+                     Quantity = cont.Quantity
+                 }
+                );
+
+            return resultList;
         }
     }
 }

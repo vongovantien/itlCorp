@@ -3111,6 +3111,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PackagesNote).HasMaxLength(250);
 
+                entity.Property(e => e.PackagesType).HasMaxLength(50);
+
                 entity.Property(e => e.PaymenType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3126,6 +3128,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.RouteInfo).HasMaxLength(500);
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);
+
+                entity.Property(e => e.ShippingMark).HasMaxLength(500);
 
                 entity.Property(e => e.Supplier).HasMaxLength(250);
 
@@ -3899,6 +3903,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.StageId).HasColumnName("StageID");
 
                 entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

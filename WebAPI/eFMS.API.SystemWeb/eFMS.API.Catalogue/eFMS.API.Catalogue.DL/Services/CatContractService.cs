@@ -1436,7 +1436,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
-                body.Replace("{{dear}}", partner.ContractType == "Cash" ? "Accountant Team" : "AR Team");
+                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE) ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
@@ -1449,7 +1449,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-                if (partner.ContractType == "Cash")
+                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE)
                 {
                     lstTo = listEmailViewModel.ListAccountant;
                     if (listEmailViewModel.ListCCAccountant != null)
@@ -1501,7 +1501,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
             string _saleService = GetContractServicesName(contract.SaleService);
-            contract.Arconfirmed = false;
             contract.DatetimeModified = DateTime.Now;
             DataContext.Update(contract, x => x.Id.ToString() == contractId);
 

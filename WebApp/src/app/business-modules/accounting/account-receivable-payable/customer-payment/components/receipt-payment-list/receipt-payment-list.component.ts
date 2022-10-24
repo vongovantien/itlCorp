@@ -13,8 +13,8 @@ import {
     ReceiptCreditListState,
     ReceiptDebitListState,
     ReceiptPartnerCurrentState,
-    ReceiptAgreementCreditCurrencyState,
-    ReceiptClassState
+    ReceiptClassState,
+    ReceiptAgreementState
 } from '../../store/reducers';
 import {
     InsertAdvance,
@@ -31,6 +31,7 @@ import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-l
 import { takeUntil, switchMap, switchMapTo, take, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { IAgreementReceipt } from '../form-create-receipt/form-create-receipt.component';
 @Component({
     selector: 'customer-payment-list-receipt',
     templateUrl: './receipt-payment-list.component.html',
@@ -178,6 +179,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.calculateCreditAmount(data);
                 }
             )
+
+        this._actionStoreSubject
+            .pipe(
+                filter(x => x.type === ReceiptActionTypes.SELECT_AGREEMENT),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (agreement: any) => {
+                    if (!!agreement) {
+                        this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
+                        this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
+                    }
+                }
+            )
     }
 
     calculateCreditAmount(credits: ReceiptInvoiceModel[]) {
@@ -213,11 +228,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     listenAgreementData() {
-        this._store.select(ReceiptAgreementCreditCurrencyState)
+        this._store.select(ReceiptAgreementState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (currency: string) => {
-                    currency !== undefined && !this.currencyId.value && (this.currencyId.setValue(currency));
+                (agreement: IAgreementReceipt) => {
+                    if (!!agreement) {
+                        if (!this.currencyId.value) {
+                            this.currencyId.setValue(agreement.creditCurrency);
+                        }
+                        //this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
+                        //this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
+                    }
                 }
             );
     }
@@ -486,6 +507,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE;
                 break;
             case AccountingConstants.RECEIPT_CLASS.COLLECT_OBH:
+            case AccountingConstants.RECEIPT_CLASS.COLLECT_OBH_OTHER:
                 otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.COLLECT_OBH;
                 break;
             case AccountingConstants.RECEIPT_CLASS.PAY_OBH:

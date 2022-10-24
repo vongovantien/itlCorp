@@ -259,8 +259,14 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
         body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
-
-        this._documentationRepo.validateCheckPointContractPartner(body.customerId, SystemConstants.EMPTY_GUID, 'DOC', null, 6)
+        const checkPointCreate = {
+            partnerId: body.customerId,
+            hblId: SystemConstants.EMPTY_GUID,
+            transactionType: 'DOC',
+            type: 6,
+            salesmanId: body.saleManId
+        }
+        this._documentationRepo.validateCheckPointContractPartner(checkPointCreate)
             .pipe(
                 switchMap(
                     (res: CommonInterface.IResult) => {

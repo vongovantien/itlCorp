@@ -108,5 +108,13 @@
         {
             public const string GetDataUnlockRequestExportUrl = "/api/v1/en-US/UnlockRequest/GetDataUnlockRequestsExport";
         }
+
+        public class Report
+        {
+            public const string GetDataStandardGeneralReportUrl = "/api/v1/en-US/GeneralReport/QueryDataGeneralReport";
+            public const string GetDataShipmentOverviewUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverview";
+            public const string GetDataShipmentOverviewFCLUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverviewFCL";
+            public const string GetDataShipmentOverviewLCLUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverviewLCL";
+        }
     }
 }

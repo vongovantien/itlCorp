@@ -3,7 +3,7 @@ import { Component, ViewChild } from "@angular/core";
 import { SortService } from "@services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
-import { DocumentationRepo, ExportRepo } from "@repositories";
+import { ExportRepo, ReportManagementRepo } from "@repositories";
 import { catchError, finalize, map } from "rxjs/operators";
 import { LoadingPopupComponent } from "@common";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -26,9 +26,9 @@ export class GeneralReportComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _documentRepo: DocumentationRepo,
         private _exportRepo: ExportRepo,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _report: ReportManagementRepo
 
     ) {
         super();
@@ -72,11 +72,10 @@ export class GeneralReportComponent extends AppList {
     }
 
     searchGeneralReport() {
-        console.log(this.dataSearch);
         this._progressRef.start();
-        this._documentRepo.getGeneralReport(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._report.getGeneralReport(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
-                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                catchError(() => of(this.loadingPopupComponent.downloadFail())),
                 finalize(() => {
                     this._progressRef.complete();
                 }),
@@ -98,15 +97,15 @@ export class GeneralReportComponent extends AppList {
         this.dataList = this._sortService.sort(this.dataList, sort, this.order);
     }
 
-    startDownloadReport(data: any, fileName: string){
-        if(data.byteLength > 0){
+    startDownloadReport(data: any, fileName: string) {
+        if (data.byteLength > 0) {
             this.downLoadFile(data, SystemConstants.FILE_EXCEL, fileName);
             this.loadingPopupComponent.downloadSuccess();
-        }else{
+        } else {
             this.loadingPopupComponent.downloadFail();
         }
     }
-    
+
     exportShipmentOverview() {
         if (this.dataList.length === 0) {
             this._toastService.warning('No Data To View, Please Re-Apply Report');
@@ -117,7 +116,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverview(this.dataSearch)
                 .pipe(
-                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
@@ -138,7 +137,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverviewWithType(this.dataSearch, reportType)
                 .pipe(
-                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
@@ -159,7 +158,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportStandardGeneralReport(this.dataSearch)
                 .pipe(
-                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(

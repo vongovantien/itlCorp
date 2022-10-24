@@ -9,6 +9,7 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -74,16 +75,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     }
 
     saveAndConvertClearance(body: CustomClearance) {
-        this._documentation.validateCheckPointContractPartner(body.customerId, '', 'CL', null, 1)
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        this._toastr.warning(res.message);
-                        return of(false);
-                    }
-                    return this._documentation.convertClearanceToJob(body);
-                })
-            )
+        this._documentation.convertClearanceToJob(body)
             .subscribe(
                 (response: any) => {
                     if (!!response && response.status) {

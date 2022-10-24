@@ -55,6 +55,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
         AccountingConstants.RECEIPT_CLASS.ADVANCE,
         AccountingConstants.RECEIPT_CLASS.COLLECT_OBH,
+        AccountingConstants.RECEIPT_CLASS.COLLECT_OBH_OTHER,
         AccountingConstants.RECEIPT_CLASS.PAY_OBH,
         AccountingConstants.RECEIPT_CLASS.NET_OFF];
     partnerTypeState: string;
@@ -227,7 +228,8 @@ export interface IAgreementReceipt {
     contractType: string;
     saleManName: string;
     expiredDate: Date;
-    cusAdvanceAmount: number;
+    customerAdvanceAmountUsd: number;
+    customerAdvanceAmountVnd: number;
     creditCurrency: string;
 }
 
