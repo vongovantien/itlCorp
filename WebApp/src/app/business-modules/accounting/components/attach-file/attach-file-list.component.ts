@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
 import { AppForm } from '@app';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, SystemFileManageRepo } from '@repositories';
 import { SysImage } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
@@ -38,7 +38,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     selectedFile: SysImage;
 
     constructor(
-        private _accountingRepo: AccountingRepo,
+        private _fileRepo: SystemFileManageRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
     ) {
@@ -57,7 +57,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     getFiles(id: string) {
-        this._accountingRepo.getAttachedFiles(this.folderModuleName, id)
+        this._fileRepo.getAttachedFiles(this.folderModuleName, id)
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
@@ -86,7 +86,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._accountingRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
+            this._fileRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -117,7 +117,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     onDeleteFile(id: string) {
-        this._accountingRepo.deleteAttachedFile(this.folderModuleName, id)
+        this._fileRepo.deleteAttachedFile(this.folderModuleName, id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -147,7 +147,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 chillId: this.chillId,
                 fileName: fileName
             }
-            this._accountingRepo.dowloadallAttach(model)
+            this._fileRepo.dowloadallAttach(model)
                 .subscribe(
                     (res: any) => {
                         this.downLoadFile(res, "application/zip", model.fileName);

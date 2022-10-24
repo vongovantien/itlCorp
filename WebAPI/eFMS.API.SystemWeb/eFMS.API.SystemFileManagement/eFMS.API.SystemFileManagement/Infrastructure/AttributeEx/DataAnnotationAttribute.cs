@@ -1,5 +1,5 @@
-﻿using eFMS.API.SystemFileManagement.DL.Common;
-using eFMS.API.Common.Globals;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.SystemFileManagement.DL.Common;
 using Microsoft.Extensions.Localization;
 using System;
 using System.ComponentModel.DataAnnotations;

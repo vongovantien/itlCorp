@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
-import { ShareBussinessFilesAttachComponent } from 'src/app/business-modules/share-business/components/files-attach/files-attach.component';
 
 @NgModule({
     imports: [
@@ -13,9 +13,9 @@ import { ShareBussinessFilesAttachComponent } from 'src/app/business-modules/sha
     ],
     providers: [],
     entryComponents: [
-        ShareBussinessFilesAttachComponent
+        ShareBussinessAttachFileV2Component
     ]
 })
 export class SeaImportAttachFilesModule {
-    static rootComponent = ShareBussinessFilesAttachComponent;
+    static rootComponent = ShareBussinessAttachFileV2Component;
 }

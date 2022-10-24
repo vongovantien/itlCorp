@@ -4,7 +4,8 @@ using System.ComponentModel;
 
 namespace eFMS.API.SystemFileManagement.DL.Common
 {
-    public enum PaymentType {
+    public enum PaymentType
+    {
         Invoice,
         OBH
     }
@@ -99,8 +100,8 @@ namespace eFMS.API.SystemFileManagement.DL.Common
         public static readonly string Finish = "Finish";
 
         public static readonly string InlandTrucking = "InlandTrucking";
-        public static readonly string AirExport  = "AirExport";
-        public static readonly string AirImport  = "AirImport";
+        public static readonly string AirExport = "AirExport";
+        public static readonly string AirImport = "AirImport";
         public static readonly string SeaConsolExport = "SeaConsolExport";
         public static readonly string SeaConsolImport = "SeaConsolImport";
         public static readonly string SeaFCLExport = "SeaFCLExport";

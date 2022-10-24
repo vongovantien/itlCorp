@@ -1,22 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagingService } from 'src/app/shared/services/paging-service';
-import { SystemConstants } from 'src/constants/system.const';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo, SettingRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
+import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { SettingRepo } from 'src/app/shared/repositories';
+import { PagingService } from 'src/app/shared/services/paging-service';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
-  selector: 'app-link-fee-import',
-  templateUrl: './link-fee-import.component.html'
+    selector: 'app-link-fee-import',
+    templateUrl: './link-fee-import.component.html'
 })
 export class LinkFeeImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent) importAlert: InfoPopupComponent;

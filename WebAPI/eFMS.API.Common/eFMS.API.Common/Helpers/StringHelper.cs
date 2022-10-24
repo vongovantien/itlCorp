@@ -62,7 +62,7 @@ namespace eFMS.API.Common.Helpers
             {
                 return string.Empty;
             }
-            foreach(var item in charRemove)
+            foreach (var item in charRemove)
             {
                 var regex = new Regex(item);
                 if (regex.IsMatch(str))

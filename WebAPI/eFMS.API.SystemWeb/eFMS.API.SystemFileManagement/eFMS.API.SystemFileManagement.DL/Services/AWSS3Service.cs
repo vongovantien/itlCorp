@@ -1,10 +1,11 @@
-﻿using eFMS.API.SystemFileManagement.DL.IService;
-using eFMS.API.SystemFileManagement.DL.Models;
+﻿using Amazon.S3.Model;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.SystemFileManagement.DL.IService;
+using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
 using System;
@@ -12,43 +13,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Net;
-using eFMS.API.SystemFileManagement.Service.Models;
-using eFMS.API.SystemFileManagement.Service.Common;
-using Amazon.Runtime;
-using Amazon.S3;
-using Amazon;
-using Amazon.S3.Model;
+using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
     public class AWSS3Service : IAWSS3Service
     {
         private ICurrentUser currentUser;
-        private AmazonS3Client _client;
         private IContextBase<SysImage> _sysImageRepo;
-        private readonly string _awsAccessKeyId;
         private readonly string _bucketName;
-        private readonly string _awsSecretAccessKey;
         private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
+        private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
+        private IEDocService edocService;
+        private IS3Service _client;
 
-        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser, IOptions<ApiUrl> apiUrl)
+        public AWSS3Service(IContextBase<SysImage> SysImageRepo,
+            IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
+            ICurrentUser currentUser,
+            IOptions<ApiUrl> apiUrl,
+            IS3Service s3,
+            IEDocService edoc)
         {
             this.currentUser = currentUser;
-
-            _awsAccessKeyId = DbHelper.DbHelper.AWSS3AccessKeyId;
+            _client = s3;
             _bucketName = DbHelper.DbHelper.AWSS3BucketName;
-            _awsSecretAccessKey = DbHelper.DbHelper.AWSS3SecretAccessKey;
+            _attachFileTemplateRepo = attachFileTemplateRepo;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
-
-            var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
-            _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
             _sysImageRepo = SysImageRepo;
             _apiUrl = apiUrl;
+            edocService = edoc;
         }
 
         public async Task<HandleState> DeleteFile(string moduleName, string folder, Guid id)
@@ -67,7 +62,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Key = it.KeyS3,
                 };
 
-                DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
+                DeleteObjectResponse rsDelete = await _client.DeleteObjectAsync(request);
                 if (rsDelete != null)
                     result = await _sysImageRepo.DeleteAsync(x => x.Id == id);
                 return result;
@@ -77,7 +72,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-        
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
             var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
@@ -85,17 +79,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return res.OrderByDescending(x => x.DateTimeCreated).ToList();
         }
-
-        private string BeforeExtention(string fileName)
-        {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\\\/]+", "");
-        }
-
-        private string RenameFileS3(string fileName)
-        {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$-]+", "") + "_" + StringHelper.RandomString(5);
-        }
-
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
         {
             HandleState result = new HandleState();
@@ -105,7 +88,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
-                    string fileName = RenameFileS3(Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName)));
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -117,7 +100,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         InputStream = file.OpenReadStream(),
                     };
 
-                    PutObjectResponse putObjectResponse = _client.PutObjectAsync(putRequest).Result;
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
                         string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -153,7 +136,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-
         public async Task<string> PostFileReportAsync(FileUploadModel model)
         {
             var result = string.Empty;
@@ -163,8 +145,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 List<SysImage> list = new List<SysImage>();
                 foreach (var file in model.Files)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(BeforeExtention(file.FileName));
-                    fileName = RenameFileS3(fileName);
+                    string fileName = Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName));
+                    fileName = FileHelper.RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -176,7 +158,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         InputStream = file.OpenReadStream(),
                     };
 
-                    PutObjectResponse putObjectResponse = _client.PutObjectAsync(putRequest).Result;
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
                         result = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -193,7 +175,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return ex.ToString();
             }
         }
-
         public async Task<HandleState> OpenFile(string moduleName, string folder, Guid objId, string fileName)
         {
             try
@@ -209,7 +190,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     BucketName = _bucketName,
                     Key = key
                 };
-                GetObjectResponse response = _client.GetObjectAsync(request).Result;
+                GetObjectResponse response = await _client.GetObjectAsync(request);
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
                 return new HandleState(true, response.ResponseStream);
             }
@@ -267,7 +248,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         BucketName = _bucketName,
                         Key = it.KeyS3
                     };
-                    GetObjectResponse response = _client.GetObjectAsync(request).Result;
+                    GetObjectResponse response = await _client.GetObjectAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
@@ -282,8 +263,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-
-
         byte[] GetZipArchive(List<InMemoryFile> files)
         {
             byte[] archiveFile;
@@ -307,7 +286,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return archiveFile;
         }
-
         class InMemoryFile
         {
             public string FileName { get; set; }
@@ -320,7 +298,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             input.CopyTo(ms);
             return ms.ToArray();
         }
-
         public async Task<HandleState> CoppyObjectAsync(FileCoppyModel filecCoppyModel)
         {
             try
@@ -341,7 +318,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-
         private FileCoppyModel ReDirectFolder(FileCoppyModel filecCoppyModel)
         {
             if (filecCoppyModel.Type != null)
@@ -372,13 +348,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return filecCoppyModel;
         }
-
         public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
         {
             try
             {
                 var filecCoppyConvert = ReDirectFolder(filecCoppyModel);
-                var listObject = _client.ListObjectsAsync(_bucketName, filecCoppyConvert.srcKey).Result;
+                ListObjectsRequest request = new ListObjectsRequest { BucketName = _bucketName, Prefix = filecCoppyConvert.srcKey };
+                var listObject = await _client.GetListObjectAsync(request);
                 var listFile = listObject.S3Objects.Select(x => x.Key).ToList();
                 //listFile.RemoveAt(0);
                 foreach (var item in listFile)
@@ -411,6 +387,70 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+        public async Task<string> PostFileAttacheDoc(FileUploadModel model)
+        {
+            try
+            {
+                var urlImage = "";
+                List<SysImage> list = new List<SysImage>();
+                foreach (var file in model.Files)
+                {
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                    var key = "";
 
+                    string extension = Path.GetExtension(file.FileName);
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                    var putRequest = new PutObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = key,
+                        InputStream = file.OpenReadStream(),
+                    };
+
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        if (extension == ".doc")
+                        {
+                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        }
+                        var sysImage = new SysImage
+                        {
+                            Id = Guid.NewGuid(),
+                            Url = urlImage,
+                            Name = fileName + extension,
+                            Folder = model.FolderName,
+                            ObjectId = model.Id.ToString(),
+                            UserCreated = currentUser.UserName,
+                            UserModified = currentUser.UserName,
+                            DateTimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            ChildId = model.Child,
+                            KeyS3 = key
+                        };
+                        list.Add(sysImage);
+                    }
+                }
+                if (list.Count > 0)
+                {
+                    HandleState result = await _sysImageRepo.AddAsync(list);
+
+                    if (result.Success)
+                    {
+                        foreach (var image in list)
+                        {
+                            var hsEdoc = edocService.MappingeDocToShipment(image.Id, image.ObjectId, image.Folder);
+                        }
+                    }
+                }
+                return urlImage;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

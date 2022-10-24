@@ -55,15 +55,17 @@ namespace eFMS.API.Infrastructure.NoSql
                         userModified = change.Entity.GetValueBy("UserModified");
                         if (changedProperties.Count > 0)
                         {
-                            var log = new ItemLog { Id = Guid.NewGuid(),
+                            var log = new ItemLog
+                            {
+                                Id = Guid.NewGuid(),
                                 PrimaryKeyValue = change.OriginalValues[primaryKey.Name].ToString(),
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
                                 UserModified = userModified,
                                 UserNameModified = currentUser.UserName,
-                                CompanyId = true? currentUser.CompanyID.ToString(): string.Empty,
-                                OfficeId = true? currentUser.OfficeID.ToString(): string.Empty,
+                                CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
+                                OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
                                 DepartmentId = currentUser.DepartmentId,
                                 GroupId = currentUser.GroupId,
                                 // UserModified = change.CurrentValues["UserModified"]?.ToString()
@@ -103,7 +105,7 @@ namespace eFMS.API.Infrastructure.NoSql
                     var propertyNew = newChange.GetType().GetProperties();
                     var primaryKey = oldChange.GetType().GetProperty("Id").GetValue(oldChange); // get primarykey value
                     List<PropertyChange> changedProperties = new List<PropertyChange>();
-                    for (var i = 0; i< propertyOld.Count(); i++)
+                    for (var i = 0; i < propertyOld.Count(); i++)
                     {
                         var originalValue = propertyOld[i].GetValue(oldChange)?.ToString();
                         var currentValue = propertyNew[i].GetValue(newChange)?.ToString();
@@ -159,7 +161,9 @@ namespace eFMS.API.Infrastructure.NoSql
                     var entityName = add.Entity.GetType().Name;
                     var properties = add.OriginalValues.Properties;
                     var primaryKey = properties.FirstOrDefault(x => x.IsKey());
-                    var log = new ItemLog { Id = Guid.NewGuid(),
+                    var log = new ItemLog
+                    {
+                        Id = Guid.NewGuid(),
                         PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Added,
                         ActionName = "Added",

@@ -23,7 +23,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
 
         public UserBaseService(
-            IContextBase<SysUser> repository, 
+            IContextBase<SysUser> repository,
             IMapper mapper,
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<SysGroup> sysGroup,
@@ -163,7 +163,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
         }
-        
+
         public bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId)
         {
             var isBod = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
@@ -280,8 +280,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         /// <returns></returns>
         public bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId)
         {
-            var isDeptAccountant = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant 
-                                                           && x.Id == deptId 
+            var isDeptAccountant = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant
+                                                           && x.Id == deptId
                                                            && x.BranchId == officeId).Any();
             return isDeptAccountant;
         }

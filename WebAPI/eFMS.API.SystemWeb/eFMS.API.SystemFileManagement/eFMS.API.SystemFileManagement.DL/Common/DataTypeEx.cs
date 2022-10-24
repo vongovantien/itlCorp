@@ -30,7 +30,7 @@ namespace eFMS.API.SystemFileManagement.DL.Common
                 //Tách chuỗi serviceType thành mảng
                 string[] arrayStrServiceTypeId = serviceTypeId.Split(';').Where(x => x.ToString() != string.Empty).ToArray();
                 //Xóa các serviceTypeId trùng
-                string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();                
+                string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
                 serviceName = string.Join("; ", arrayGrpServiceTypeId.Select(s => CustomData.Services.Where(x => x.Value == s).FirstOrDefault()?.DisplayName.Trim() ?? string.Empty));
             }
             return serviceName;

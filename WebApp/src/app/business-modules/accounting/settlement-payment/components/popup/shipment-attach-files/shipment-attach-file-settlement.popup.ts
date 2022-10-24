@@ -1,5 +1,5 @@
 import { getSettlementPaymentDetailState } from './../../store/reducers/index';
-import { AccountingRepo } from '@repositories';
+import { SystemFileManageRepo } from '@repositories';
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -33,12 +33,12 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
 
     files: SysImage[] = [];
     settlementId: string;
-    settlementNo:string;
+    settlementNo: string;
 
     shipmentGroups: ISettlementShipmentGroup = null;
 
     constructor(
-        private _accountingRepo: AccountingRepo,
+        private _fileRepo: SystemFileManageRepo,
         private _toastService: ToastrService,
         private _store: Store<ISettlementPaymentState>,
     ) {
@@ -63,7 +63,7 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0 && !!this.settlementId && !!this.shipmentGroups) {
             const folderChild = this.generateChild(this.shipmentGroups);
-            this._accountingRepo.uploadAttachedFiles("Settlement", this.settlementId, fileList, folderChild)
+            this._fileRepo.uploadAttachedFiles("Settlement", this.settlementId, fileList, folderChild)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -77,7 +77,7 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
 
     getFiles(settlementId: string, folderChild: string) {
         this.isLoading = true;
-        this._accountingRepo.getAttachedFiles('Settlement', settlementId, folderChild)
+        this._fileRepo.getAttachedFiles('Settlement', settlementId, folderChild)
             .pipe(finalize(() => this.isLoading = false))
             .subscribe(
                 (data: any) => {
@@ -89,7 +89,7 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
     }
 
     onDeleteFile(id: string) {
-        this._accountingRepo.deleteAttachedFile('Settlement', id)
+        this._fileRepo.deleteAttachedFile('Settlement', id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -141,10 +141,10 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
             let model = {
                 folderName: 'Settlement',
                 objectId: this.settlementId,
-                chillId:this.generateChild(this.shipmentGroups),
+                chillId: this.generateChild(this.shipmentGroups),
                 fileName: arr[0] + "_" + arr[1] + ".zip"
             }
-            this._accountingRepo.dowloadallAttach(model)
+            this._fileRepo.dowloadallAttach(model)
                 .subscribe(
                     (res: any) => {
                         this.downLoadFile(res, "application/zip", model.fileName);
