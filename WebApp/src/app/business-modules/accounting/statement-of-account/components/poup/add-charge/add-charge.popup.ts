@@ -98,10 +98,10 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     initBasicData() {
         this.types = [
-            { text: 'Debit', id: 1 },
-            { text: 'Credit', id: 2 },
+            { text: 'Debit', id: 'Debit' },
+            { text: 'Credit', id: 'Credit' },
         ];
-        this.selectedType = this.types[0].text;
+        this.selectedType = this.types[0].id;
 
         this.obhs = [
             { text: 'Yes', id: true },
@@ -173,7 +173,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
 
     updateDefaultValue(dataSearch: SOASearchCharge) {
-        this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0].text;
+        this.selectedType = this.types.filter((i: any) => i.id === dataSearch.type)[0].id;
         this.selectedOBH = this.obhs.filter((i: any) => i.id === dataSearch.isOBH)[0].id;
 
         if (dataSearch.serviceTypeId === '') {
@@ -306,7 +306,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedShipment = {};
         this.selectedCDNote = null;
         this.selectedCharges = [];
-        this.selectedType = this.types[0].text;
+        this.selectedType = this.types[0].id;
         this.selectedOBH = this.obhs[1].id;
         this.selectedInSOA = this.inSOAs[1].id;
 
