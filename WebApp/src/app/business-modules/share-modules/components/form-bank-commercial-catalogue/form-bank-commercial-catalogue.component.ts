@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
+import { SystemConstants } from '@constants';
 import { Bank } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -57,7 +58,12 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     initForm() {
         this.formGroup = this._fb.group({
-            bankAccountNo: [null, FormValidators.required],
+            bankAccountNo: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+                FormValidators.required,
+                FormValidators.validateSpecialChar
+            ])],
             bankAccountName: [null, FormValidators.required],
             bankAddress: [null, FormValidators.required],
             bankNameEn: [null, FormValidators.required],

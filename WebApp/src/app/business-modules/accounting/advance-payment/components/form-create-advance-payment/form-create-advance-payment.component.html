@@ -89,14 +89,15 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
                     <ng-container *ngIf="paymentMethod.value === 'Bank'; else bankTpl">
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
                             [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
-                            [displayFields]="displayFieldBankAccount" (remove)="resetFormControl(bankName)"
+                            [displayFields]="displayFieldBankAccount" (remove)="resetFormControl(bankAccountNo)"
                             placeholder="Please Select Bank Account No" allowFreeText formControlName="bankAccountNo">
                         </app-combo-grid-virtual-scroll>
                     </ng-container>
@@ -171,6 +172,7 @@
                                 <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
                                 </option>
                             </select>
+
                         </div>
                     </div>
                     <div class="col-lg-6" *ngIf="isAdvCarrier">

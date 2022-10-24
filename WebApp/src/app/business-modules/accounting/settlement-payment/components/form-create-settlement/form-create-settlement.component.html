@@ -184,8 +184,9 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                                        <label class=" form-control-label">
                                             Bank Account No:
                                         </label>
                                         <ng-container *ngIf="paymentMethod.value.value === 'Bank'; else bankTpl">
@@ -193,7 +194,7 @@
                                                 (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
                                                 [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
                                                 [displayFields]="displayFieldBankAccount"
-                                                (remove)="resetFormControl(bankName)"
+                                                (remove)="resetFormControl(bankAccountNo)"
                                                 placeholder="Please Select Bank Account No" allowFreeText
                                                 formControlName="bankAccountNo">
                                             </app-combo-grid-virtual-scroll>

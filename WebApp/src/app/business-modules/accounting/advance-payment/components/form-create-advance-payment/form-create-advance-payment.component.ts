@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppForm } from '@app';
+import { SystemConstants } from '@constants';
 import { Bank, Currency, Partner, User } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
+import { FormValidators } from '@validators';
 import { finalize } from 'rxjs/operators';
 
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -126,7 +128,11 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             note: [],
             currency: [],
             paymentTerm: [9],
-            bankAccountNo: [],
+            bankAccountNo: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+                FormValidators.validateSpecialChar
+            ])],
             bankAccountName: [],
             bankName: [],
             payee: this.isAdvCarrier ? [null, Validators.required] : [],
