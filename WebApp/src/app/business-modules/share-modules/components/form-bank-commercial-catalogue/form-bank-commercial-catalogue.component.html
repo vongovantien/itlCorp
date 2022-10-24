@@ -17,20 +17,22 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAccountNo.valid || !bankAccountNo.value)} ">
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
                                 <label required>Bank Account No</label>
                                 <input type="text" class="form-control" formControlName="bankAccountNo">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAccountNo.invalid">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && (bankAccountNo.errors | equalError: 'required') || (bankAccountNo.errors | equalError: 'required') && bankAccountNo.dirty">
                                     Bank Account No is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAccountName.valid || !bankAccountName.value)}">
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountName.dirty)  && !bankAccountName.valid}">
                                 <label required>Bank Account Name</label>
                                 <input type="text" class="form-control" formControlName="bankAccountName">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAccountName.invalid">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && (bankAccountName.errors | equalError: 'required') || (bankAccountName.errors | equalError: 'required') && bankAccountName.dirty">
                                     Bank Account Name is required
                                 </div>
                             </div>
@@ -39,7 +41,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankAddress.valid || !bankAddress.value)}">
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAddress.dirty)  && !bankAddress.valid}">
                                 <label required>Bank Address</label>
                                 <input type="text" class="form-control" formControlName="bankAddress">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && bankAddress.invalid">

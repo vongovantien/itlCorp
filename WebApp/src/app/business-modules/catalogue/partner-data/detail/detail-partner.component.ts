@@ -176,7 +176,6 @@ export class PartnerDetailComponent extends AppList {
                             this.getParentCustomers();
                             this.formPartnerComponent.getACRefName(this.partner.parentId);
                         }
-                        console.log(this.partner.partnerMode);
                         if (this.partner.partnerMode === 'External') {
                             this.formPartnerComponent.isDisabledInternalCode = true;
                         }
@@ -185,6 +184,7 @@ export class PartnerDetailComponent extends AppList {
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
                         this.partnerBankList.partnerId = this.partner.id;
+                        this.partnerBankList.getListBank(this.partner.id);
                         this.userCreatePopup.partnerId = this.partner.id;
                         this._store.select(getMenuUserPermissionState)
                             .pipe(takeUntil(this.ngUnsubscribe))

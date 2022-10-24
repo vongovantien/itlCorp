@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SystemConstants } from '@constants';
+import { FormValidators } from '@validators';
 import { catchError, finalize } from 'rxjs/operators';
 import { Bank } from './../../../../../shared/models/catalogue/catBank.model';
 
@@ -104,7 +106,11 @@ export class SettlementFormCreateComponent extends AppForm {
             'statusApproval': ['New'],
             'payee': [],
             'beneficiaryName': [],
-            'bankAccountNo': [],
+            'bankAccountNo': [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+                FormValidators.validateSpecialChar
+            ])],
             'bankName': [],
             'bankNameDescription': [],
             'advanceAmount': [],
