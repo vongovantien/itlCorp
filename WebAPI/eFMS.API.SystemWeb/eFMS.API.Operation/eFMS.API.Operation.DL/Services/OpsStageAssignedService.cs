@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
+using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.Service.Models;
 using eFMS.API.Provider.Services.IService;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ITL.NetCore.Common;
-using eFMS.API.Operation.DL.Common;
-using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -30,7 +30,7 @@ namespace eFMS.API.Operation.DL.Services
             ICurrentUser user,
             ICatDepartmentApiService departmentApi,
             IContextBase<OpsTransaction> opsTransRepo,
-            IContextBase<SysUser> userRepo, 
+            IContextBase<SysUser> userRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<CsTransactionDetail> csTransactionDetailRepo) : base(repository, mapper)
         {
@@ -50,11 +50,14 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
+            assignedItem.UserCreated = currentUser.UserID;
             int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
-            assignedItem.Type = model.Type == "User" ? "User":"System" ;
+            assignedItem.Type = model.Type == "User" ? "User" : "System";
+            assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId).Hwbno;
+
             DataContext.Add(assignedItem, false);
-            if(model.IsUseReplicate)
+            if (model.IsUseReplicate)
             {
                 var jobReplicate = opsTransRepository.Get(x => x.Id == model.JobId)?.FirstOrDefault();
                 var assignedItemReplicate = mapper.Map<OpsStageAssigned>(model);
@@ -83,7 +86,7 @@ namespace eFMS.API.Operation.DL.Services
             if (listToDelete.Count() > 0)
             {
                 var list = mapper.Map<List<OpsStageAssigned>>(listToDelete);
-                foreach(var item in list)
+                foreach (var item in list)
                 {
                     DataContext.Delete(x => x.Id == item.Id, false);
                 }
@@ -128,15 +131,15 @@ namespace eFMS.API.Operation.DL.Services
             var stages = catStageApi.GetAll().Result;
             var departments = catDepartmentApi.GetAll().Result;
             var result = mapper.Map<OpsStageAssignedModel>(data);
-            if(stages != null)
+            if (stages != null)
             {
                 var stage = stages?.FirstOrDefault(x => x.Id == result.StageId);
-                result.StageCode = stages.FirstOrDefault(x => x.Id == result.StageId).Code;
-                result.StageNameEN = stages.FirstOrDefault(x => x.Id == result.StageId).StageNameEn;
+                result.StageCode = stages.FirstOrDefault(x => x.Id == result.StageId)?.Code;
+                result.StageNameEN = stages.FirstOrDefault(x => x.Id == result.StageId)?.StageNameEn;
                 result.DepartmentName = departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
-                result.Description = result.Description != null ? result.Description : stages.FirstOrDefault(x => x.Id == result.StageId).DescriptionEn;
-                result.HblNo = (data.Hblid != null && data.Hblid != Guid.Empty) ? csTransactionDetailReporsitory.First(x => x.Id == data.Hblid).Hwbno : null;
+                result.Description = result.Description != null ? result.Description : stages.FirstOrDefault(x => x.Id == result.StageId)?.DescriptionEn;
             }
+
             return result;
         }
 
@@ -154,12 +157,13 @@ namespace eFMS.API.Operation.DL.Services
             var data = DataContext.Get(x => x.JobId == jobId);
             var stages = catStageApi.GetAll().Result;
             if (stages == null) return null;
-            if(departmentStage != null)
+            if (departmentStage != null)
             {
                 stages = stages.Where(x => x.DepartmentId == departmentStage).ToList();
             }
             var results = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id))
-                .Select(x => new OpsStageAssignedModel {
+                .Select(x => new OpsStageAssignedModel
+                {
                     Id = Guid.Empty,
                     StageId = x.Id,
                     Name = string.Empty,
@@ -171,9 +175,12 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState Update(OpsStageAssignedEditModel model)
         {
+            var houseBill = csTransactionDetailReporsitory.First(x => x.Id == model.HblId);
             var assigned = mapper.Map<OpsStageAssigned>(model);
             assigned.UserModified = currentUser.UserID;
             assigned.DatetimeModified = DateTime.Now;
+            assigned.Hblid = houseBill != null ? houseBill?.Id : null;
+            assigned.Hblno = houseBill != null ? houseBill?.Hwbno : model.Hblno;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
             var job = opsTransRepository.First(x => x.Id == model.JobId);
             var jobCsTransaction = csTransactionReporsitory.First(x => x.Id == model.JobId);
@@ -228,7 +235,7 @@ namespace eFMS.API.Operation.DL.Services
                 SubmitChanges();
                 if (result.Success)
                 {
-                    if(job == null)
+                    if (job == null)
                     {
                         csTransactionReporsitory.Update(jobCsTransaction, x => x.Id == jobCsTransaction.Id);
                         csTransactionReporsitory.SubmitChanges();
@@ -238,13 +245,14 @@ namespace eFMS.API.Operation.DL.Services
                         opsTransRepository.Update(job, x => x.Id == job.Id);
                         opsTransRepository.SubmitChanges();
                     }
-                  
+
                 }
             }
             catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
             }
+
             return result;
         }
 
@@ -262,16 +270,17 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.StageCode = stage?.Code;
                 assignedItem.StageNameEN = stage?.StageNameEn;
                 assignedItem.Status = assignedItem.Status?.Trim();
-                assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
+                assignedItem.DepartmentName = stage == null ? null : departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
                 assignedItem.DoneDate = item.DatetimeModified;
-                assignedItem.Description = assignedItem.Description ?? stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
+                assignedItem.Description = assignedItem.Description ?? stages.FirstOrDefault(x => x.Id == item.StageId)?.DescriptionEn;
                 assignedItem.MainPersonInCharge = assignedItem.MainPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.MainPersonInCharge)?.Username : assignedItem.MainPersonInCharge;
                 assignedItem.RealPersonInCharge = assignedItem.RealPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.RealPersonInCharge)?.Username : assignedItem.RealPersonInCharge;
-                assignedItem.HblNo = (item.Hblid != null && item.Hblid != Guid.Empty) ? hbls.First(x => x.Id == item.Hblid).Hwbno : null;
+                assignedItem.Hblid = hbls.Any(x => x.Id == item.Hblid) ? item.Hblid : null;
+                assignedItem.Hblno = hbls.Any(x => x.Id == item.Hblid) ? hbls.FirstOrDefault(x => x.Id == item.Hblid)?.Hwbno : item.Hblno;
 
                 results.Add(assignedItem);
             }
-            return results.OrderBy(x=>x.Deadline).ToList();
+            return results.OrderBy(x => x.Deadline).ToList();
         }
     }
 }

@@ -63,18 +63,20 @@
                     <tr
                         *ngFor="let stage of stages | filter : keyword : ['orderNumberProcessed','mainPersonInCharge','stageCode','stageNameEN','description','departmentName','status','processTime','deadline','doneDate']; let i = index; trackBy: trackByFn">
                         <td class="table-actions-col no-sorting">
-                            <span *ngIf="stage.type==='User'">
+                            <ng-container *ngIf="stage.type==='User'">
                                 <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                     [state]="!!data && data.isLocked"
                                     class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                     <i class="la la-edit"></i>
                                 </button>
-                            </span>
-                            <!-- <button type="button" *ngIf="!!data && !data.isLocked"
-                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove"
-                                (click)="showDeletePopup(stage)">
-                                <i class="la la-trash"></i>
-                            </button> -->
+                            </ng-container>
+                            <ng-container *ngIf="!!data && !data.isLocked && currentUser?.id === stage.userCreated">
+                                <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                    title="Remove" (click)="showDeletePopup(stage)">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </ng-container>
+
                         </td>
 
                         <td class="sorting">
@@ -103,11 +105,10 @@
                             <span>{{stage.description}}</span>
                         </td>
                         <td class="sorting">
-                            <span>{{stage.departmentName}}</span>
+                            <span>{{stage.hblno}}</span>
                         </td>
-
                         <td class="sorting">
-                            <span>{{stage.processTime}}</span>
+                            <span>{{stage.departmentName}}</span>
                         </td>
                         <td class="sorting">
                             <span>{{stage.deadline | date: 'HH:mm dd/MM/yyyy'}}</span>

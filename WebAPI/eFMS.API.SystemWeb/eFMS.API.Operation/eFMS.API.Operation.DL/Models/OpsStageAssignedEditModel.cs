@@ -7,7 +7,8 @@ namespace eFMS.API.Operation.DL.Models
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
-
+        public Guid? HblId { get; set; }
+        public string Hblno { get; set; }
         [Required]
         public int StageId { get; set; }
         public string Name { get; set; }
@@ -21,5 +22,7 @@ namespace eFMS.API.Operation.DL.Models
         public string Status { get; set; }
         public bool IsUseReplicate { get; set; }
         public string Type { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
     }
 }

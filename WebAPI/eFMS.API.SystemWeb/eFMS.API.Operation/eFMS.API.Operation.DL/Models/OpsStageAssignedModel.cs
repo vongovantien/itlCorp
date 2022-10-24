@@ -3,12 +3,11 @@ using System;
 
 namespace eFMS.API.Operation.DL.Models
 {
-    public class OpsStageAssignedModel: OpsStageAssigned
+    public class OpsStageAssignedModel : OpsStageAssigned
     {
         public string StageCode { get; set; }
         public string StageNameEN { get; set; }
         public string DepartmentName { get; set; }
         public DateTime? DoneDate { get; set; }
-        public string HblNo { get; set; }
     }
 }

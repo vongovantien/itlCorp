@@ -7,16 +7,14 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, OpsStageAssignedModel>, ICsStageAssignedService 
+    public class CsStageAssignedService : RepositoryBase<OpsStageAssigned, OpsStageAssignedModel>, ICsStageAssignedService
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CsTransaction> csTransRepository;
@@ -48,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria)
         {
             var currentJob = await csTransRepository.Get(x => x.Id == criteria.JobId).FirstOrDefaultAsync();
+            var hbl = await csTransDetailRepository.Get(x => x.Id == criteria.HblId).FirstOrDefaultAsync();
             var stage = await stageService.GetStageByType(criteria.StageType);
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
@@ -55,11 +54,13 @@ namespace eFMS.API.Documentation.DL.Services
             newItem.Id = Guid.NewGuid();
             newItem.StageId = stage.Id;
             newItem.Status = TermData.Done;
-            newItem.DatetimeCreated = newItem.DatetimeModified;
             newItem.Deadline = DateTime.Now;
             newItem.MainPersonInCharge = newItem.RealPersonInCharge = currentUser.UserID;
-            newItem.Hblid = criteria.HblId;
+            newItem.Hblid = hbl.Id;
+            newItem.Hblno = hbl.Hwbno;
             newItem.JobId = criteria.JobId;
+            newItem.Type = DocumentConstants.FROM_SYSTEM;
+            newItem.DatetimeCreated = DateTime.Now;
             var orderNumberProcess = await DataContext.CountAsync(x => x.JobId == criteria.JobId);
             newItem.OrderNumberProcessed = orderNumberProcess + 1;
 
@@ -74,17 +75,6 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var stage in listStageAssigned)
             {
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
-                assignedItem.Id = Guid.NewGuid();
-                assignedItem.JobId = stage.JobId;
-                assignedItem.Deadline = DateTime.Now;
-                assignedItem.Status = TermData.Done;
-                assignedItem.Hblid = stage.Hblid;
-                assignedItem.StageId = stage.StageId;
-                assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-                assignedItem.UserCreated = currentUser.UserID;
-                assignedItem.MainPersonInCharge = stage.MainPersonInCharge;
-                assignedItem.RealPersonInCharge = stage.RealPersonInCharge;
-                assignedItem.OrderNumberProcessed = stage.OrderNumberProcessed;
                 await DataContext.AddAsync(assignedItem, false);
             }
 
@@ -153,8 +143,13 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
             int orderNumberProcess = await DataContext.CountAsync(x => x.JobId == jobId);
+            var hbl = new CsTransactionDetail();
             var result = new HandleState();
 
+            if (hblId != null && hblId != Guid.Empty)
+            {
+                hbl = await csTransDetailRepository.FirstAsync(x => x.Id == hblId);
+            }
             foreach (var stage in listStages)
             {
                 var stageAssigned = new CsStageAssignedModel();
@@ -163,9 +158,10 @@ namespace eFMS.API.Documentation.DL.Services
                 stageAssigned.Deadline = DateTime.Now;
                 stageAssigned.Status = TermData.Done;
                 stageAssigned.Hblid = hblId;
+                stageAssigned.Hblno = hbl.Hwbno;
                 stageAssigned.StageId = stage.Id;
+                stageAssigned.Type = DocumentConstants.FROM_SYSTEM;
                 stageAssigned.DatetimeCreated = stageAssigned.DatetimeModified = DateTime.Now;
-                stageAssigned.UserCreated = currentUser.UserID;
                 stageAssigned.MainPersonInCharge = currentUser.UserID;
                 stageAssigned.RealPersonInCharge = currentUser.UserID;
                 stageAssigned.OrderNumberProcessed = orderNumberProcess + 1;
