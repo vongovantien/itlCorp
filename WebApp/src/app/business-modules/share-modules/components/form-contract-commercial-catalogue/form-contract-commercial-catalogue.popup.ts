@@ -974,6 +974,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.isDisabledExpiredDateField = false;
                 }
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
+                this.formGroup.controls['creditCurrency'].setValue("VND");
+                this.formGroup.controls['currencyId'].setValue("VND");
                 break;
             case 'Cash':
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
