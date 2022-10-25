@@ -34,29 +34,25 @@
                     <tbody>
                         <ng-container *ngIf="!!partnerBanks.length">
                             <tr
-                                *ngFor="let item of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
+                                *ngFor="let bank of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
-                                        <button class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
-                                            (click)="gotoDetailBank(item.id, i)" title="Edit">
-                                            <i class="la la-edit"></i>
-                                        </button>
-                                        <ng-container>
-                                            <button class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                (click)="onDeleteBank(item.id)">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </ng-container>
+                                        <app-permission-button *ngIf="!!bank && bank.permission?.allowUpdate"
+                                            type="detail" (onClick)="gotoDetailBank(item.id, i)">
+                                        </app-permission-button>
+                                        <app-permission-button *ngIf="!!bank && bank.permission.alowDelete"
+                                            type="delete" (onClick)="onDeleteBank(item.id)">
+                                        </app-permission-button>
                                     </div>
                                 </td>
-                                <td>{{item.bankAccountNo}}</td>
-                                <td>{{item.bankAccountName}}</td>
-                                <td>{{item.bankAddress}}</td>
-                                <td>{{item.swiftCode}}</td>
-                                <td>{{item.bankNameEn}}</td>
-                                <td>{{item.code}}</td>
-                                <td>{{item.source}}</td>
-                                <td>{{item.note}}</td>
+                                <td>{{bank.bankAccountNo}}</td>
+                                <td>{{bank.bankAccountName}}</td>
+                                <td>{{bank.bankAddress}}</td>
+                                <td>{{bank.swiftCode}}</td>
+                                <td>{{bank.bankNameEn}}</td>
+                                <td>{{bank.code}}</td>
+                                <td>{{bank.source}}</td>
+                                <td>{{bank.note}}</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(isLoading) && !partnerBanks.length"></tr>

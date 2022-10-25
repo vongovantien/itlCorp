@@ -24,6 +24,10 @@
                                     *ngIf="isSubmitted && (bankAccountNo.errors | equalError: 'required') || (bankAccountNo.errors | equalError: 'required') && bankAccountNo.dirty">
                                     Bank Account No is required
                                 </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="(isSubmitted || bankAccountNo.dirty) && !bankAccountNo.valid && !(formGroup.get('bankAccountNo').value?.length === 0|| formGroup.get('bankAccountNo').value === null)">
+                                    Bank account number must not have letters or special characters!
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">

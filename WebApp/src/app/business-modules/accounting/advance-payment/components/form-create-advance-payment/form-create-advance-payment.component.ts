@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AppForm } from '@app';
-import { SystemConstants } from '@constants';
 import { Bank, Currency, Partner, User } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { FormValidators } from '@validators';
 import { finalize } from 'rxjs/operators';
 
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -128,11 +126,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             note: [],
             currency: [],
             paymentTerm: [9],
-            bankAccountNo: [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
-                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
-                FormValidators.validateSpecialChar
-            ])],
+            bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
             payee: this.isAdvCarrier ? [null, Validators.required] : [],
@@ -204,6 +198,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onChangePaymentMethod(method: string) {
+        console.log(method)
         if (method === 'Bank') {
             if (!this.payee.value) {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
