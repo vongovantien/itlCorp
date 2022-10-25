@@ -236,12 +236,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 }
                             }
                         }
-                        hs = _sysImageDetailRepo.SubmitChanges();
                     }
-                    if (hs.Success)
+                    result = await _sysImageRepo.AddAsync(list);
+                    _sysImageRepo.SubmitChanges();
+                    if (result.Success)
                     {
-                        result = await _sysImageRepo.AddAsync(list);
-                        _sysImageRepo.SubmitChanges();
+                        _sysImageDetailRepo.SubmitChanges();
                     }
                 }
                 return result;
@@ -383,7 +383,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             var resultAcc = result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
             var resultGen = result.Where(x => x.documentType.Type != "Accountant").ToList();
-            resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault().EDocs = listOther;
+            resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault().EDocs = listOther.Count>0? listOther:new List<SysImageDetailModel>();
             result = resultGen.Concat(resultAcc).ToList();
             return result;
         }

@@ -89,8 +89,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transationType = res.transactionType;
-                            this.getDocumentType(res.transactionType);
-                            this.getEDocByJobID(res.transactionType);
+                            this.getDocumentType('CL');
+                            this.getEDocByJobID('CL');
                             this.jobNo = res.jobNo;
                         }
                     );
