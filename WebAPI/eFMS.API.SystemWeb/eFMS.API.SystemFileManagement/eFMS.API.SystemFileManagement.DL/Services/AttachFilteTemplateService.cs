@@ -34,9 +34,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 case "SOA":
                     return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA");
-                case "SM":
+                case "Settlement":
                     return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement");
-                case "AD":
+                case "Advace":
                     return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance");
                 default:
                     return await DataContext.GetAsync(x => x.TransactionType == transactionType);

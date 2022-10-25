@@ -98,12 +98,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
             }
         } else {
-            this.transationType = 'Accountant';
-            this.getDocumentType('Accountant');
-            if (this.typeFrom === 'SOA') {
-                console.log(this.billingId);
-            }
-            //this.getEDocByJobID('Accountant');
+            this.transationType = this.typeFrom;
+            this.getDocumentType(this.typeFrom);
         }
 
         this.headers = [
@@ -202,27 +198,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
-    // downloadEdoc() {
-    //     console.log(this.selectedEdoc);
-
-    //     document.location.href = this.selectedEdoc.imageUrl;
-    // }
 
     showDocumentAttach() {
-        // this.documentAttach.headers = [
-        //     { title: 'No', field: 'no' },
-        //     { title: 'Alias Name', field: 'aliasName' },
-        //     { title: 'Real File Name', field: 'realFilename' },
-        //     { title: 'Document Type', field: 'docType' },
-        //     { title: 'Job Ref', field: 'jobRef' },
-        //     { title: 'House Bill No', field: 'hbl' },
-        //     { title: 'Note', field: 'note' },
-        //     { title: 'Source', field: 'source' },
-        // ];
         if (this.typeFrom === 'Job') {
             this.documentAttach.headers = this.headerAttach;
         } else {
-            this.documentAttach.headers = this.accountantAttach;
+            this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
