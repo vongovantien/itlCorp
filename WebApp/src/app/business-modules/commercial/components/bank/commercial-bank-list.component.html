@@ -37,11 +37,11 @@
                                 *ngFor="let bank of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
-                                        <app-permission-button *ngIf="!!bank && bank.permission?.allowUpdate"
-                                            type="detail" (onClick)="gotoDetailBank(item.id, i)">
+                                        <app-permission-button *ngIf="!!partner && partner.permission?.allowUpdate"
+                                            type="detail" (onClick)="gotoDetailBank(bank.id, i)">
                                         </app-permission-button>
-                                        <app-permission-button *ngIf="!!bank && bank.permission.alowDelete"
-                                            type="delete" (onClick)="onDeleteBank(item.id)">
+                                        <app-permission-button *ngIf="!!partner && partner.permission?.allowDelete"
+                                            type="delete" (onClick)="onDeleteBank(bank.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>

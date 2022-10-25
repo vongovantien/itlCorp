@@ -308,21 +308,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            ICurrentUser _user = null;
-            string partnerType = catPartnerRepository.Get(x => x.Id == id.ToString()).Select(t => t.PartnerType).FirstOrDefault();
-
-            switch (partnerType)
-            {
-                case "Customer":
-                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
-                    break;
-                case "Agent":
-                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
-                    break;
-                default:
-                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-                    break;
-            }
             if (data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();

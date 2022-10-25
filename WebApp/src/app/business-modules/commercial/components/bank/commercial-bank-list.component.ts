@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
-import { Bank } from '@models';
+import { Bank, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo } from '@repositories';
 import { SortService } from '@services';
@@ -9,7 +9,6 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
-
 @Component({
     selector: 'app-commercial-bank-list',
     templateUrl: './commercial-bank-list.component.html',
@@ -22,6 +21,7 @@ export class CommercialBankListComponent extends AppList {
 
     partnerBanks: Bank[] = [];
     partnerId: string = '';
+    partner: Partner;
     isUpdate: Boolean = false;
     id: string = '';
     indexLstBank: number = null;
@@ -58,6 +58,7 @@ export class CommercialBankListComponent extends AppList {
             })).subscribe(
                 (res: Bank[]) => {
                     this.partnerBanks = res || [];
+                    console.log(res)
                 }
             );
     }
@@ -72,6 +73,7 @@ export class CommercialBankListComponent extends AppList {
     }
 
     gotoDetailBank(id: string, index: number = null) {
+        console.log(id)
         this.formUpdateBankPopup.isUpdate = true;
         this.formUpdateBankPopup.partnerId = this.partnerId;
         !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;
