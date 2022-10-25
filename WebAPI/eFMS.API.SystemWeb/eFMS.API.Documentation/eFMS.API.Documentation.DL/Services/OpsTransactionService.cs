@@ -1138,7 +1138,8 @@ namespace eFMS.API.Documentation.DL.Services
                         && x.SaleService.Contains("CL")
                         && x.Active == true
                         && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    } else
+                    }
+                    else
                     {
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
@@ -2841,7 +2842,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
 
-            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT_COPY, "R" + jobNo].Value);
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
