@@ -198,7 +198,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onChangePaymentMethod(method: string) {
-        console.log(method)
         if (method === 'Bank') {
             if (!this.payee.value) {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);

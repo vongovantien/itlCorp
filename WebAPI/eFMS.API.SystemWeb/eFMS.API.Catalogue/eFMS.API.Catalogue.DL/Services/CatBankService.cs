@@ -5,7 +5,6 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
-using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -26,21 +25,18 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
-        private readonly IContextBase<CatPartner> catPartnerRepository;
 
         public CatBankService(IContextBase<CatBank> repository,
             ICacheServiceBase<CatBank> cacheService,
             IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
-            IContextBase<CatPartner> catPartnerRepo,
         ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
             mapper = imapper;
-            catPartnerRepository = catPartnerRepo;
         }
 
         #region CRUD
@@ -304,10 +300,6 @@ namespace eFMS.API.Catalogue.DL.Services
         public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
         {
             var data = await DataContext.WhereAsync(x => x.PartnerId == id);
-            if (data == null)
-            {
-                return null;
-            }
             if (data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
