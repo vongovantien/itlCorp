@@ -98,24 +98,23 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
             }
         } else {
-            this.transationType = this.typeFrom;
-            this.getDocumentType(this.typeFrom);
+            this.transationType = 'Accountant';
+            this.getDocumentType('Accountant');
+            if (this.typeFrom === 'SOA') {
+                console.log(this.billingId);
+            }
         }
 
         this.headers = [
             { title: 'Alias Name', field: 'aliasName' },
             { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Job Ref', field: 'jobRef' },
             { title: 'House Bill No', field: 'houseBillNo' },
             { title: 'Billing No', field: 'billingNo' },
             { title: 'Source', field: 'source' },
-            { title: 'Tag', field: 'tag' },
+            { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'attachTime' },
             { title: 'Attach Person', field: 'attachPerson' },
         ];
-        //this.getDocumentType();
-        //this.getEDocByJobID();
-        //this.documentAttach.headers = this.headerAttach;
     }
 
 

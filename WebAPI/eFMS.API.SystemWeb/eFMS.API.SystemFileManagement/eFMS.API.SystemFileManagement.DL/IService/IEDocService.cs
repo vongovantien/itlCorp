@@ -16,6 +16,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> DeleteEdoc(Guid edocId);
         Task<HandleState> MappingeDocToShipment(Guid imageId, string billingId, string billingType);
         Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate);
-        Task<HandleState> UploadEDocFromAccountant(FileUploadModel model);
+        Task<HandleState> PostFileAttacheDoc(FileUploadModel model);
+        Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model);
     }
 }

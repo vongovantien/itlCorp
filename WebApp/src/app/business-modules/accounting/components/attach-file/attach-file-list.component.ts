@@ -89,7 +89,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._fileRepo.uploadEDocFromAccountant('Accounting', this.accType, this.accId, fileList)
+            this._fileRepo.uploadAttachedFileEdoc('Accounting', this.accType, this.accId, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {

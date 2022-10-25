@@ -16,8 +16,8 @@ export class SystemFileManageRepo {
         );
     }
 
-    uploadEDocFromAccountant(moduleName: string, folder: string, id: string, files: any) {
-        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadEDocFromAccountant/${moduleName}/${folder}/${id}`, files, 'files').pipe(
+    uploadAttachedFileEdoc(moduleName: string, folder: string, id: string, files: any) {
+        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadAttachedFileEdoc/${moduleName}/${folder}/${id}`, files, 'files').pipe(
             map((data: any) => data)
         );
     }

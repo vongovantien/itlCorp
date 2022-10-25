@@ -119,6 +119,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     List<SysImage> list = new List<SysImage>();
                     List<SysImageDetail> listDetail = new List<SysImageDetail>();
+
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(edoc.File.FileName)));
 
                     string extension = Path.GetExtension(edoc.File.FileName);
@@ -456,7 +457,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             string bilingNo = string.Empty;
             var transctionTypeJobModels = new List<TransctionTypeJobModel>();
-            int? _documentType = null;
 
             switch (billingType)
             {
@@ -624,74 +624,100 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             var template = _attachFileTemplateRepo.Get(queryAttachTemplate);
 
-
-
             return template;
         }
 
-        public async Task<HandleState> UploadEDocFromAccountant(FileUploadModel model)
+        private async Task<List<SysImage>> UpLoadS3(FileUploadModel model)
         {
-            HandleState result = new HandleState();
+            var urlImage = "";
+            List<SysImage> list = new List<SysImage>();
+            foreach (var file in model.Files)
+            {
+                string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                var key = "";
+
+                string extension = Path.GetExtension(file.FileName);
+                key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                var putRequest = new PutObjectRequest()
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                    InputStream = file.OpenReadStream(),
+                };
+
+                PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                    if (extension == ".doc")
+                    {
+                        urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                    }
+                    var sysImage = new SysImage
+                    {
+                        Id = Guid.NewGuid(),
+                        Url = urlImage,
+                        Name = fileName + extension,
+                        Folder = model.FolderName,
+                        ObjectId = model.Id.ToString(),
+                        UserCreated = currentUser.UserName,
+                        UserModified = currentUser.UserName,
+                        DateTimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        ChildId = model.Child,
+                        KeyS3 = key
+                    };
+                    list.Add(sysImage);
+                }
+            }
+
+            return list;
+        }
+
+        public async Task<HandleState> PostFileAttacheDoc(FileUploadModel model)
+        {
             try
             {
-                var key = "";
-                List<SysImage> list = new List<SysImage>();
-                foreach (var file in model.Files)
+                List<SysImage> imageList = await UpLoadS3(model);
+                HandleState result = new HandleState();
+                if (imageList.Count > 0)
                 {
-                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                    HandleState hsAddImage = await _sysImageRepo.AddAsync(imageList);
 
-                    string extension = Path.GetExtension(file.FileName);
-                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-
-                    var putRequest = new PutObjectRequest()
+                    if (hsAddImage.Success)
                     {
-                        BucketName = _bucketName,
-                        Key = key,
-                        InputStream = file.OpenReadStream(),
-                    };
-                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
-                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
-                    {
-                        string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-                        if (extension == ".doc")
+                        foreach (var image in imageList)
                         {
-                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                            result = await MappingeDocToShipment(image.Id, image.ObjectId, image.Folder);
                         }
-                        var sysImage = new SysImage
-                        {
-                            Id = Guid.NewGuid(),
-                            Url = urlImage,
-                            Name = fileName + extension,
-                            Folder = model.FolderName,
-                            ObjectId = model.Id.ToString(),
-                            UserCreated = currentUser.UserName,
-                            UserModified = currentUser.UserName,
-                            DateTimeCreated = DateTime.Now,
-                            DatetimeModified = DateTime.Now,
-                            ChildId = model.Child,
-                            KeyS3 = key
-                        };
-                        list.Add(sysImage);
                     }
-                }
-                if (list.Count > 0)
-                {
-                    result = await _sysImageRepo.AddAsync(list);
-                }
-                if (result.Success)
-                {
-                    list.ForEach(x =>
-                    {
-                        var c = MappingeDocToShipment(x.Id, model.Id.ToString(), model.FolderName);
-                    });
                 }
                 return result;
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.ToString());
+                return null;
             }
         }
 
+        public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
+        {
+            var urlImage = "";
+            List<SysImage> imageList = await UpLoadS3(model);
+            urlImage = imageList.FirstOrDefault()?.Url;
+            if (imageList.Count > 0)
+            {
+                HandleState hsAddImage = await _sysImageRepo.AddAsync(imageList);
+                if (hsAddImage.Success)
+                {
+                    foreach (var image in imageList)
+                    {
+                        HandleState result = await MappingeDocToShipment(image.Id, image.ObjectId, image.Folder);
+                    }
+                }
+            }
+            return urlImage;
+        }
     }
 }
