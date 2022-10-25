@@ -183,7 +183,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             };
 
                             listDetail.Add(sysImageDetail);
-                            await _sysImageDetailRepo.AddAsync(sysImageDetail, false);
+                            _sysImageDetailRepo.Add(sysImageDetail, false);
                         }
                         else
                         {
@@ -232,13 +232,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         GroupId = currentUser.GroupId,
                                     };
 
-                                    await _sysImageDetailRepo.AddAsync(imageDetail, false);
+                                    _sysImageDetailRepo.Add(imageDetail, false);
                                 }
                             }
                         }
                     }
-                    result = await _sysImageRepo.AddAsync(list);
-                    _sysImageRepo.SubmitChanges();
+                    _sysImageRepo.Add(list,false);
+                    result = _sysImageRepo.SubmitChanges();
                     if (result.Success)
                     {
                         _sysImageDetailRepo.SubmitChanges();
@@ -349,7 +349,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             var newImageIds = _sysImageDetailRepo.Get(x => x.JobId == jobID).Select(x=>x.SysImageId).ToList();
             var imageExist = _sysImageRepo.Get(x => x.ObjectId == jobID.ToString()).ToList();
-            var imageMap = imageExist.Where(x => !newImageIds.Contains(x.Id)).ToList();
+            var imageMap = new List<SysImage>();
+            foreach (var image in imageExist)
+            {
+                if (!newImageIds.Any(x => x == image.Id))
+                {
+                    imageMap.Add(image);
+                }
+            }
             var listOther = new List<SysImageDetailModel>();
             if (imageMap.Count > 0)
             {

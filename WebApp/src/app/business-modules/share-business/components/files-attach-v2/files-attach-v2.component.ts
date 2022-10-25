@@ -132,14 +132,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     editEdoc() {
         console.log(this.documentAttach.listFile);
         console.log(this.selectedEdoc);
-        // this.documentAttach.headers = [
-        //     { title: 'No', field: 'no' },
-        //     { title: 'Alias Name', field: 'aliasName' },
-        //     { title: 'Real File Name', field: 'realFilename' },
-        //     { title: 'Document Type', field: 'docType' },
-        //     { title: 'Job Ref', field: 'jobRef' },
-        //     { title: 'Source', field: 'source' }
-        // ];
         if (this.typeFrom === 'Job') {
             this.documentAttach.headers = this.headerAttach;
         } else {
