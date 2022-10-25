@@ -31,7 +31,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByJob: any[] = [];
     edocByAcc: any[] = [];
     selectedEdoc: any;
-    transationType: string;
+    transationType: string = '';
     housebills: any[];
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
