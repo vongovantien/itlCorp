@@ -36,19 +36,15 @@ namespace eFMS.API.Documentation.DL.Services
                 int hourCurrent = 25 - DateTime.Now.Hour;
                 int numerOfHours = hourCurrent;
                 new LogHelper("ScopedAlertATAHostedService", "hourCurrent: " + numerOfHours);
-                if (hourCurrent == 24)
+                using (var scope = services.CreateScope())
                 {
-                    using (var scope = services.CreateScope())
-                    {
-                        new LogHelper("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now);
-                        var scopedProcessingService =
-                            scope.ServiceProvider
-                                .GetRequiredService<IScopedProcessingAlertATDService>();
-                        await scopedProcessingService.AlertATD();
-                    }
-                    numerOfHours = 24;
+                    new LogHelper("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now);
+                    var scopedProcessingService =
+                        scope.ServiceProvider
+                            .GetRequiredService<IScopedProcessingAlertATDService>();
+                    await scopedProcessingService.AlertATD();
                 }
-                await Task.Delay(TimeSpan.FromHours(numerOfHours));
+                await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
             }
         }
 
