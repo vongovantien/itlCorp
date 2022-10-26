@@ -31,7 +31,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByJob: any[] = [];
     edocByAcc: any[] = [];
     selectedEdoc: any;
-    transationType: string;
+    transationType: string = '';
     housebills: any[];
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
@@ -89,8 +89,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transationType = res.transactionType;
-                            this.getDocumentType(res.transactionType);
-                            this.getEDocByJobID(res.transactionType);
+                            this.getDocumentType('CL');
+                            this.getEDocByJobID('CL');
                             this.jobNo = res.jobNo;
                         }
                     );
@@ -99,27 +99,19 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             }
         } else {
             this.transationType = 'Accountant';
-            this.getDocumentType('Accountant');
-            if (this.typeFrom === 'SOA') {
-                console.log(this.billingId);
-            }
-            //this.getEDocByJobID('Accountant');
+            this.getDocumentType(this.typeFrom);
         }
 
         this.headers = [
             { title: 'Alias Name', field: 'aliasName' },
             { title: 'Real File Name', field: 'realFilename' },
-            { title: 'Job Ref', field: 'jobRef' },
             { title: 'House Bill No', field: 'houseBillNo' },
             { title: 'Billing No', field: 'billingNo' },
             { title: 'Source', field: 'source' },
-            { title: 'Tag', field: 'tag' },
+            { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'attachTime' },
             { title: 'Attach Person', field: 'attachPerson' },
         ];
-        //this.getDocumentType();
-        //this.getEDocByJobID();
-        //this.documentAttach.headers = this.headerAttach;
     }
 
 
@@ -137,14 +129,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     editEdoc() {
         console.log(this.documentAttach.listFile);
         console.log(this.selectedEdoc);
-        // this.documentAttach.headers = [
-        //     { title: 'No', field: 'no' },
-        //     { title: 'Alias Name', field: 'aliasName' },
-        //     { title: 'Real File Name', field: 'realFilename' },
-        //     { title: 'Document Type', field: 'docType' },
-        //     { title: 'Job Ref', field: 'jobRef' },
-        //     { title: 'Source', field: 'source' }
-        // ];
         if (this.typeFrom === 'Job') {
             this.documentAttach.headers = this.headerAttach;
         } else {
@@ -202,27 +186,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
-    // downloadEdoc() {
-    //     console.log(this.selectedEdoc);
-
-    //     document.location.href = this.selectedEdoc.imageUrl;
-    // }
 
     showDocumentAttach() {
-        // this.documentAttach.headers = [
-        //     { title: 'No', field: 'no' },
-        //     { title: 'Alias Name', field: 'aliasName' },
-        //     { title: 'Real File Name', field: 'realFilename' },
-        //     { title: 'Document Type', field: 'docType' },
-        //     { title: 'Job Ref', field: 'jobRef' },
-        //     { title: 'House Bill No', field: 'hbl' },
-        //     { title: 'Note', field: 'note' },
-        //     { title: 'Source', field: 'source' },
-        // ];
         if (this.typeFrom === 'Job') {
             this.documentAttach.headers = this.headerAttach;
         } else {
-            this.documentAttach.headers = this.accountantAttach;
+            this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
