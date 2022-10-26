@@ -476,7 +476,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.SystemFileName = edocUpdate.SystemFileName;
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
-                    var hs = _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
+                    var hs = await _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
                 }
                 if (edoc == null)
                 {
@@ -500,7 +500,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         JobId=Guid.Parse(image.ObjectId),
                         Source="Shipment",
                     };
-                    var hs = _sysImageDetailRepo.AddAsync(edocGenAdd, false);
+                    var hs = await _sysImageDetailRepo.AddAsync(edocGenAdd, false);
                 }
                 var result = _sysImageDetailRepo.SubmitChanges();
                 return result;

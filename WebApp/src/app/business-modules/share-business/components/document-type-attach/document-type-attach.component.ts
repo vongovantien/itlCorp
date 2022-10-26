@@ -1,41 +1,29 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
-import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { AccountingRepo, DocumentationRepo, SystemFileManageRepo } from '@repositories';
+import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, skip, takeUntil } from 'rxjs/operators';
-import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
-import { getOperationTransationState } from 'src/app/business-modules/operation/store';
+import { catchError } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
-import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
-
-
+import { getTransactionLocked, getTransactionPermission } from '../../store';
 @Component({
     selector: 'document-type-attach',
     templateUrl: './document-type-attach.component.html',
     styleUrls: ['./document-type-attach.component.scss']
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
-
     @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     headers: CommonInterface.IHeaderTable[];
-
-    jobId: string;
-
+    @Input() jobId: string = '';
     isOps: boolean = false;
-
     fileNo: string;
     transactionType: string = '';
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
-
     isUpdate: boolean = false;
-
     selectedtDocType: any = null;
     edocSelected: any;
     detailDocId: number;
@@ -44,116 +32,29 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     documentTypes: any[] = [];
     source: string = 'Job';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
-
-    housebills: any[] = [];
+    @Input() housebills: any[] = [];
     billingNo: string = '';
     billingId: string = '';
     chargeSM: any;
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
-        private _activedRoute: ActivatedRoute,
         private _systemFileManagerRepo: SystemFileManageRepo,
-        private _documentationRepo: DocumentationRepo,
-        private _accoutingRepo: AccountingRepo
     ) {
         super();
-
         this.isLocked = this._store.select(getTransactionLocked);
-
         this.permissionShipments = this._store.select(getTransactionPermission);
-
     }
-
     ngOnInit(): void {
-        if (this.typeFrom === 'Job') {
-            this._activedRoute.params
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe((params: Params) => {
-                    console.log(params);
-                    if (params.jobId) {
-                        this.jobId = params.jobId;
-                        console.log(params);
-                    } else {
-                        this.jobId = params.id;
-                        this.isOps = true;
-                    }
-                });
-
-            if (this.isOps == false) {
-                this._store.select(getTransactionDetailCsTransactionState)
-                    .pipe(skip(1), takeUntil(this.ngUnsubscribe))
-                    .subscribe(
-                        (res: CsTransaction) => {
-                            this.fileNo = res.jobNo;
-                            this.transactionType = res.transactionType;
-                        }
-                    );
-            } else {
-                this._store.select(getOperationTransationState)
-                    .pipe(takeUntil(this.ngUnsubscribe))
-                    .subscribe(
-                        (res: any) => {
-                            this.fileNo = res.opstransaction.jobNo;
-                            console.log(res);
-                            this.transactionType = 'CL';
-                        }
-                    );
-            }
-        }
-        else {
+        if (this.typeFrom !== 'Job') {
             this.transactionType = 'Accountant';
-
         }
-        this.getHblList();
+        // this.getHblList();
     }
-
-
-    getHblList() {
-        if (this.typeFrom === 'Job') {
-            this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
-                .pipe(
-                    catchError(this.catchError),
-                ).subscribe(
-                    (res: any) => {
-                        if (!!res) {
-                            this.housebills = res;
-                            console.log(res);
-                            console.log(this.edocSelected);
-                        }
-
-                    },
-                );
-        } else {
-            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            console.log(data);
-                            data.forEach(element => {
-                                let item = ({
-                                    hwbno: element.hbl,
-                                    jobNo: element.jobId,
-                                    id: element.hblid
-                                })
-                                this.housebills.push(item);
-                            }
-                            );
-                        }
-                    }
-                );
-            console.log(this.chargeSM);
-            //this.chargeSM
-        }
-    }
-
     chooseFile(event: any) {
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
         //this.listFile = files;
-        console.log(this.listFile);
         for (let i = 0; i < files.length; i++) {
             this.listFile.push(files[i]);
         }
@@ -172,11 +73,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
         }
     }
-
     onSelectDataFormInfo(event: any, index: number, type: string) {
-        console.log(event);
-        console.log(this.listFile[index]);
-        console.log(this.documentTypes);
         switch (type) {
             case 'docType':
                 this.listFile[index].docType = event;
@@ -184,41 +81,30 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.selectedtDocType = event;
                 break;
             case 'aliasName':
-                console.log(event);
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
                 if (this.typeFrom === 'Job') {
-                    console.log(event);
                     this.listFile[index].hblid = event;
                 } else {
-                    console.log(this.housebills);
                     this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
                     this.listFile[index].hblid = event;
-
                 }
                 break;
             case 'note':
-                console.log(event);
                 this.listFile[index].note = event;
                 break;
         }
     }
-
-
     resetForm() {
         this.listFile?.splice(0, this.listFile.length);
     }
     removeFile(index: number) {
         this.listFile?.splice(index, 1);
     }
-
     uploadEDoc() {
-        console.log(this.listFile);
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
-        console.log(this.listFile);
-
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({
@@ -235,15 +121,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
             }));
         });
-        console.log(edocFileList);
-
         this.EdocUploadFile = ({
             ModuleName: 'Document',
             FolderName: 'Shipment',
             Id: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
             EDocFiles: edocFileList,
         })
-        console.log(this.EdocUploadFile);
         if (this.isUpdate) {
             let edocUploadModel: any = {
                 Hblid: edocFileList[0].HBL,
@@ -278,11 +161,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     }
                 );
         }
-
     }
 }
-
-
 export interface IEDocUploadFile {
     FolderName: string,
     ModuleName: string,

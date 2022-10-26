@@ -60,7 +60,7 @@
                                                     <select class="form-control" [(ngModel)]="file.docType"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                         <option *ngFor="let docType of documentTypes"
-                                                            [selected]="docType.id==detailDocId" [ngValue]="docType.id">
+                                                            [ngValue]="docType.id">
                                                             {{docType.nameEn}}
                                                         </option>
                                                     </select>

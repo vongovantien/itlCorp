@@ -49,7 +49,7 @@
                         [class]="!!(docType?.eDocs?.length) ? 'collapse show':'collapse'">
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable-edit table-summary ">
-                                <thead app-table-header [headers]="headers"
+                                <thead app-table-header [headers]="headersGen"
                                     (onClick)="sortEdoc(docType?.eDocs,$event.sortField)">
                                     <th class="first table-actions-col">
                                         Stt
@@ -102,9 +102,7 @@
                                             <td>
                                                 <span>{{doc.hblNo}}</span>
                                             </td>
-                                            <td>
-                                                <span>{{doc.billingNo}}</span>
-                                            </td>
+
                                             <td>
                                                 <span>{{doc.source}}</span>
                                             </td>
@@ -264,7 +262,8 @@
         </div>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDocByJobID($event)"></document-type-attach>
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDocByJobID($event)" [jobId]="jobId"
+    [housebills]="housebills"></document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
