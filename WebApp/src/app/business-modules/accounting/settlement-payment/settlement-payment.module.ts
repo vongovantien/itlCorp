@@ -40,9 +40,9 @@ import { SettlementPaymentDetailComponent } from './detail/detail-settlement-pay
 import { SettlementPaymentComponent } from './settlement-payment.component';
 
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { SettlementDetailChargesPaymentComponent } from './components/popup/payment-management/detail-charges-payment/detail-charges-payment.component';
 import { SettlementShipmentAttachFilePopupComponent } from './components/popup/shipment-attach-files/shipment-attach-file-settlement.popup';
+import { ShareBussinessAccountingModule } from '../../share-business/share-bussines-accounting.module';
 
 const routing: Routes = [
     {
@@ -124,7 +124,7 @@ const maskConfig: Partial<IConfig> = {
         NgxMaskModule.forRoot(maskConfig),
         TabsModule,
         ScrollingModule,
-        ShareBussinessModule
+        ShareBussinessAccountingModule
     ],
     exports: [],
     declarations: [
