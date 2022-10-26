@@ -7,10 +7,12 @@ using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -36,9 +38,9 @@ namespace eFMS.API.SystemFileManagement.Controllers
 
         [HttpPut("UploadEdoc")]
         //[Authorize]
-        public async Task<IActionResult> UploadEdoc([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files,string type)
+        public async Task<IActionResult> UploadEdoc([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files, string type)
         {
-            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files,type);
+            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files, type);
             if (hs.Success)
             {
                 return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
@@ -89,6 +91,48 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return Ok(new ResultHandle { Status = hs.Success, Message = "Update Edoc Success" });
         }
-    
+
+        [HttpPut("UploadAttachedFileEdoc/{moduleName}/{folder}/{id}")]
+        public async Task<IActionResult> UploadFilesAttachEDoc(List<IFormFile> files, Guid id, string moduleName, string folder)
+        {
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = files,
+                FolderName = folder,
+                Id = id,
+                Child = null,
+                ModuleName = moduleName,
+            };
+            HandleState hs = await _edocService.PostFileAttacheDoc(model);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = model });
+        }
+
+        [HttpPut("PostAttachFileTemplateToEDoc/{moduleName}/{folder}/{id}")]
+        public async Task<IActionResult> UploadAttachedFileEdoc(FileReportUpload files, string moduleName, string folder, Guid id, string child = null)
+        {
+            var stream = new MemoryStream(files.FileContent);
+            var fFile = new FormFile(stream, 0, stream.Length, null, files.FileName);
+            var fFiles = new List<IFormFile>() { fFile };
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = fFiles,
+                FolderName = folder,
+                Id = id,
+                Child = child,
+                ModuleName = moduleName
+            };
+
+            string fileUrl = await _edocService.PostAttachFileTemplateToEDoc(model);
+            if (!string.IsNullOrEmpty(fileUrl))
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = fileUrl });
+            };
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
+        }
+
     }
 }

@@ -30,12 +30,23 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType)
         {
-            
-            if (transactionType=="Accountant")
+            switch (transactionType)
             {
-                return await DataContext.GetAsync(x => x.Type == "Accountant");
+                case "SOA":
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA");
+                case "Settlement":
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement");
+                case "Advace":
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance");
+                default:
+                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType);
             }
-            return await DataContext.GetAsync(x => x.TransactionType == transactionType);
+
+            //if (transactionType=="Accountant")
+            //{
+            //    return await DataContext.GetAsync(x => x.Type == "Accountant");
+            //}
+            //return await DataContext.GetAsync(x => x.TransactionType == transactionType);
         }
     }
 }

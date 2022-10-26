@@ -6,5 +6,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
     {
         public string ImageUrl { get; set; }
         public string HBLNo { get; set; }
+        public string JobNo { get; set; }
     }
 }

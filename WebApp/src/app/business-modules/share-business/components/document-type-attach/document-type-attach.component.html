@@ -71,7 +71,14 @@
                                                     <input type="text" class="form-control " [ngModel]="fileNo"
                                                         disabled>
                                                 </div>
-                                            <td class="" *ngIf="typeFrom==='Job'">
+                                            </td>
+                                            <td class="disabled" *ngIf="typeFrom!=='Job'">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control " [ngModel]="file.jobNo"
+                                                        disabled>
+                                                </div>
+                                            </td>
+                                            <td class="">
                                                 <div class="form-group ">
                                                     <select class="form-control" [(ngModel)]="file.hwbNo"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
@@ -88,7 +95,7 @@
                                                         [ngModel]="file.note">
                                                 </div>
                                             </td>
-                                            <td class="disabled" *ngIf="typeFrom==='Job'">
+                                            <td class="disabled">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " disabled
                                                         [ngModel]="source">

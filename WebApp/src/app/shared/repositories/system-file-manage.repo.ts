@@ -16,6 +16,12 @@ export class SystemFileManageRepo {
         );
     }
 
+    uploadAttachedFileEdoc(moduleName: string, folder: string, id: string, files: any) {
+        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadAttachedFileEdoc/${moduleName}/${folder}/${id}`, files, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteFile(moduleName: string, folder: string, id: string, file: string) {
         return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteSpecificFile/${moduleName}/${folder}/${id}/${file}`).pipe(
             map((data: any) => data)

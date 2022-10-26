@@ -198,14 +198,13 @@
                     <tab>
                         <ng-template tabHeading>
                             <span class="m--margin-right-10">Attach files</span>
-                            <!-- <span class="badge badge-success"
-                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span> -->
+                            <span class="badge badge-success"
+                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <files-attach-v2 [typeFrom]="'SOA'">
-                        </files-attach-v2>
-                        <!-- <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
-                            folderModuleName="SOA" [objId]="soa.id" [readOnly]="soa.syncStatus === 'Synced'?'':null">
-                        </accounting-attach-file-list> -->
+                        <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
+                            [accId]="soaId" [accType]="'SOA'" folderModuleName="SOA" [objId]="soa.id"
+                            [readOnly]="soa.syncStatus === 'Synced'?'':null">
+                        </accounting-attach-file-list>
                     </tab>
                 </tabset>
 

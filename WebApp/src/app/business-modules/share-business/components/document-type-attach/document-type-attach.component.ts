@@ -7,7 +7,8 @@ import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
@@ -46,7 +47,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     housebills: any[] = [];
     billingNo: string = '';
     billingId: string = '';
-
+    chargeSM: any;
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
@@ -94,32 +95,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         (res: any) => {
                             this.fileNo = res.opstransaction.jobNo;
                             console.log(res);
-
+                            this.transactionType = 'CL';
                         }
                     );
             }
         }
         else {
             this.transactionType = 'Accountant';
-            switch (this.typeFrom) {
-                case 'SOA':
-                    this._activedRoute.queryParams.subscribe((params: any) => {
-                        if (!!params.no && params.currency) {
-                            this._accoutingRepo.getDetaiLSOA(params.no, params.currency || 'VND')
-                                .pipe(
-                                    catchError(this.catchError),
-                                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
-                                )
-                                .subscribe(
-                                    (res: any) => {
-                                        this.billingId = res.id
-                                    },
-                                );
-                        }
-                    });
-                    break;
-                default: break;
-            }
+
         }
         this.getHblList();
     }
@@ -127,19 +110,43 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
 
     getHblList() {
-        this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
-            .pipe(
-                catchError(this.catchError),
-            ).subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.housebills = res;
-                        console.log(res);
+        if (this.typeFrom === 'Job') {
+            this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
+                .pipe(
+                    catchError(this.catchError),
+                ).subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.housebills = res;
+                            console.log(res);
 
+                        }
+
+                    },
+                );
+        } else {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            console.log(data);
+                            data.forEach(element => {
+                                let item = ({
+                                    hwbno: element.hbl,
+                                    jobNo: element.jobId,
+                                    id: element.hblid
+                                })
+                                this.housebills.push(item);
+                            }
+                            );
+                        }
                     }
-
-                },
-            );
+                );
+            console.log(this.chargeSM);
+            //this.chargeSM
+        }
     }
 
     chooseFile(event: any) {
@@ -180,8 +187,15 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
-                console.log(event);
-                this.listFile[index].hblid = event;
+                if (this.typeFrom === 'Job') {
+                    console.log(event);
+                    this.listFile[index].hblid = event;
+                } else {
+                    console.log(this.housebills);
+                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
+                    this.listFile[index].hblid = event;
+
+                }
                 break;
             case 'note':
                 console.log(event);
@@ -211,11 +225,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Code: x.docType,
                 TransactionType: this.transactionType,
                 AliasName: x.aliasName,
-                BillingNo: null,
-                BillingType: null,
+                BillingNo: '',
+                BillingType: '',
                 HBL: x.hblid !== undefined ? x.hblid : SystemConstants.EMPTY_GUID,
                 FileName: x.name,
-                Note: x.note,
+                Note: x.note !== undefined ? x.note : '',
                 BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
             }));
         });

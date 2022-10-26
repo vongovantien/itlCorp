@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -19,7 +18,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public int? DepartmentId { get; set; }
         public string UserModified { get; set; }
         public Guid? Hblid { get; set; }
-        public Guid JobId { get; set; }
+        public Guid? JobId { get; set; }
         public int? DocumentTypeId { get; set; }
         public string Source { get; set; }
         public Guid? SysImageId { get; set; }
