@@ -114,14 +114,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
 
         this.headers = [
-            { title: 'Alias Name', field: 'aliasName', sortable: true },
-            { title: 'Real File Name', field: 'realFilename', sortable: true },
-            { title: 'House Bill No', field: 'houseBillNo', sortable: true },
+            { title: 'Alias Name', field: 'systemFileName', sortable: true },
+            { title: 'Real File Name', field: 'userFileName', sortable: true },
+            { title: 'House Bill No', field: 'hblNo', sortable: true },
             { title: 'Billing No', field: 'billingNo', sortable: true },
             { title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note' },
-            { title: 'Attach Time', field: 'attachTime', sortable: true },
-            { title: 'Attach Person', field: 'attachPerson', sortable: true },
+            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+            { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
 
         this._store.select(getCurrentUserState)
@@ -235,9 +235,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 
-    sortEdoc(edos: IEDoc[], sort: string): void {
-        console.log(edos);
-        edos = this._sortService.sort(edos, sort, this.order);
+    sortEdoc(type: string, index: number, sort: string): void {
+        if (!type) return;
+        this.setSortBy(sort, this.sort !== sort ? true : !this.order);
+
+        if (type === 'General') {
+            this.edocByJob[index].eDocs = this._sortService.sort(this.edocByJob[index].eDocs, sort, this.order);
+        } else {
+            this.edocByAcc[index].eDocs = this._sortService.sort(this.edocByAcc[index].eDocs, sort, this.order);
+        }
     }
 }
 
