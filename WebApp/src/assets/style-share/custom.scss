@@ -1287,7 +1287,7 @@ a:not([href]):not([tabindex]) {
 
 @for $i from 13 through 30 {
     .font-#{$i} {
-        font-size: #{$i}px;
+        font-size: #{$i}px !important;
     }
 }
 
