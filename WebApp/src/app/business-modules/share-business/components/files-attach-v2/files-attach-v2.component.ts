@@ -33,6 +33,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc: any;
     transactionType: string = '';
     housebills: any[];
+
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
     { title: 'Real File Name', field: 'realFilename' },
@@ -136,9 +137,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
-        this.documentAttach.listFile.push(this.selectedEdoc);
+        let detailSeletedEdoc = ({
+            aliasName: this.selectedEdoc.systemFileName,
+            name: this.selectedEdoc.userFileName,
+        })
+        this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
+        console.log(this.documentAttach.detailDocId);
+
+        this.documentAttach.listFile.push(detailSeletedEdoc);
         console.log(this.documentAttach.listFile);
         this.documentAttach.show();
+        this.getEDocByJobID(this.transactionType);
     }
 
     deleteEdoc() {

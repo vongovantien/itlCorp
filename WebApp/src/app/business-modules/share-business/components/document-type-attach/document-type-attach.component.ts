@@ -37,7 +37,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     isUpdate: boolean = false;
 
     selectedtDocType: any = null;
-
+    edocSelected: any;
+    detailDocId: number;
     formData: IEDocUploadFile;
     @Input() typeFrom: string = 'Job';
     documentTypes: any[] = [];
@@ -108,7 +109,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
 
-
     getHblList() {
         if (this.typeFrom === 'Job') {
             this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
@@ -119,7 +119,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         if (!!res) {
                             this.housebills = res;
                             console.log(res);
-
+                            console.log(this.edocSelected);
                         }
 
                     },
@@ -176,11 +176,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     onSelectDataFormInfo(event: any, index: number, type: string) {
         console.log(event);
         console.log(this.listFile[index]);
+        console.log(this.documentTypes);
         switch (type) {
             case 'docType':
                 this.listFile[index].docType = event;
                 this.listFile[index].aliasName = this.isUpdate ? event + this.listFile[index].name : event + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
-                console.log(this.listFile);
+                this.selectedtDocType = event;
                 break;
             case 'aliasName':
                 console.log(event);
@@ -231,6 +232,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 FileName: x.name,
                 Note: x.note !== undefined ? x.note : '',
                 BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
+                Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
             }));
         });
         console.log(edocFileList);
@@ -246,7 +248,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             let edocUploadModel: any = {
                 Hblid: edocFileList[0].HBL,
                 SystemFileName: edocFileList[0].AliasName,
-                Note: edocFileList[0].Note
+                Note: edocFileList[0].Note,
+                Id: edocFileList[0].Id,
+                DocumentTypeId: this.selectedtDocType,
             }
             this._systemFileManagerRepo.updateEdoc(edocUploadModel)
                 .pipe(catchError(this.catchError))
@@ -296,4 +300,5 @@ export interface IEDocFile {
     FileName: string,
     Note: string,
     BillingId: string,
+    Id: string
 }

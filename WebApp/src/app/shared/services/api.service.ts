@@ -142,7 +142,8 @@ export class ApiService {
                 TransactionType: edoc.EDocFiles[i].TransactionType,
                 FileName: edoc.EDocFiles[i].FileName,
                 Note: edoc.EDocFiles[i].Note,
-                BillingId: edoc.EDocFiles[i].BillingId
+                BillingId: edoc.EDocFiles[i].BillingId,
+                Id: edoc.EDocFiles[i].Id
             });
             edocFile.push(edocFileItem);
         }

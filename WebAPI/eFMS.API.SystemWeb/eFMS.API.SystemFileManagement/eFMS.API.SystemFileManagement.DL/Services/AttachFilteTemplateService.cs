@@ -33,13 +33,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             switch (transactionType)
             {
                 case "SOA":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code!="OTH");
                 case "Settlement":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Settlement" && x.Code != "OTH" || x.AccountingType == "ADV-Settlement");
                 case "Advace":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                 default:
-                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType);
+                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
             }
 
             //if (transactionType=="Accountant")

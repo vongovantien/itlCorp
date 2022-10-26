@@ -156,7 +156,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             KeyS3 = key
                         };
                         list.Add(sysImage);
-                        var attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code && x.TransactionType == edoc.TransactionType).FirstOrDefault();
+                        var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.Code && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                         if (type == "Job")
                         {
                             var sysImageDetail = new SysImageDetail
@@ -344,6 +344,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     HBLNo = x.Hblid != null ? _attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ?
                     _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null :
                     _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ? _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null : null,
+                    Note=x.Note,
                 };
                 lstImageMD.Add(imageModel);
             });
@@ -391,6 +392,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             var resultAcc = result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
             var resultGen = result.Where(x => x.documentType.Type != "Accountant").ToList();
+            var resultGenEdoc = resultGen.Where(x => x.EDocs != null).ToList().OrderBy(x=>x.EDocs.Count());
+            var resultGenNotEdoc = resultGen.Where(x => x.EDocs == null);
+            resultGen = resultGenEdoc.Concat(resultGenNotEdoc).ToList();
             resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault().EDocs = listOther.Count>0? listOther:new List<SysImageDetailModel>();
             result = resultGen.Concat(resultAcc).ToList();
             return result;
@@ -473,6 +477,30 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     var hs = _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
+                }
+                if (edoc == null)
+                {
+                    var image = _sysImageRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
+                    var edocGenAdd = new SysImageDetail()
+                    {
+                        DocumentTypeId = edocUpdate.DocumentTypeId,
+                        SystemFileName = edocUpdate.SystemFileName,
+                        Hblid = edocUpdate.Hblid,
+                        Note = edocUpdate.Note,
+                        UserFileName=image.Name,
+                        UserCreated=currentUser.UserName,
+                        DatetimeCreated=DateTime.Now,
+                        DatetimeModified=DateTime.Now,
+                        DepartmentId=currentUser.DepartmentId,
+                        Id=edocUpdate.Id,
+                        UserModified=currentUser.UserName,
+                        GroupId=currentUser.GroupId,
+                        OfficeId=currentUser.OfficeID,
+                        SysImageId=image.Id,
+                        JobId=Guid.Parse(image.ObjectId),
+                        Source="Shipment",
+                    };
+                    var hs = _sysImageDetailRepo.AddAsync(edocGenAdd, false);
                 }
                 var result = _sysImageDetailRepo.SubmitChanges();
                 return result;
