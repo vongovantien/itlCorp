@@ -12,12 +12,12 @@ export const environment = {
         OPERATION: "uat-api-efms.itlvn.com/Operation",
         SYSTEM: "uat-api-efms.itlvn.com/System",
         REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",
-        EXPORT: "localhost:44369",
+        EXPORT: "uat-api-efms.itlvn.com/Export",
         SETTING: "uat-api-efms.itlvn.com/Setting",
         INDENTITY_SERVER_URL: "https://uat-api-efms.itlvn.com/identityserver",
         EXPORT_CRYSTAL: "uat-api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         PARTNER_API: "uat-api-efms.itlvn.com/partner",
-        FILE_SYSTEM: "localhost:44329",
+        FILE_SYSTEM: "uat-api-efms.itlvn.com/File",
         REPORT_MANAGEMENT: "uat-api-efms.itlvn.com/Report"
     },
     AUTHORIZATION:
