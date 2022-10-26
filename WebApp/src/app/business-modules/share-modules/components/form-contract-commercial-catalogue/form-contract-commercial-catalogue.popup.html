@@ -592,7 +592,7 @@
                         </span>
                     </button>
                     <button (click)="onARConfirmed()"
-                        *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)"
+                        *ngIf=" (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true && selectedContract.active === false && isUpdate && selectedContract.contractType != 'Prepaid' && !isCreateNewCommercial &&  (selectedContract.arconfirmed === false || selectedContract.arconfirmed === null)"
                         class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-check"></i>
