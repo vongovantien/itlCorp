@@ -376,7 +376,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserModified = x.UserModified,
                         SystemFileName = "OTH" + x.Name,
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
-                        UserFileName = x.Name
+                        UserFileName = x.Name,
+                        Id=x.Id
                     };
                     listOther.Add(imagedetail);
                 });
@@ -406,7 +407,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                var lst = await _sysImageRepo.GetAsync(x => x.Id == edoc.SysImageId);
+                var lst = new List<SysImage>();
+                if (edoc != null)
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.Id == edoc.SysImageId);
+                }
+                else
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.Id == edocId);
+
+                    edoc = new SysImageDetail()
+                    {
+                        Id = Guid.Empty,
+                        Source = "Job"
+                    };
+                }
+                
                 if (edoc.Source == "Job")
                 {
                     var it = lst.FirstOrDefault();
@@ -420,13 +436,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
                     DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
                     if (rsDelete != null)
-                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
-                    if (result.Success)
+                        if (edoc.Id != Guid.Empty)
+                        {
+                            result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                        }
+                        else
+                        {
+                            result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                        }
+                    if (result.Success && edoc.Id != Guid.Empty)
                     {
                         await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
                     }
                 }
-                else
+                else 
                 {
                     await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
                 }

@@ -31,7 +31,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByJob: any[] = [];
     edocByAcc: any[] = [];
     selectedEdoc: any;
-    transationType: string = '';
+    transactionType: string = '';
     housebills: any[];
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
@@ -77,7 +77,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .pipe(skip(1), takeUntil(this.ngUnsubscribe))
                     .subscribe(
                         (res: CsTransaction) => {
-                            this.transationType = res.transactionType;
+                            this.transactionType = res.transactionType;
                             this.getDocumentType(res.transactionType);
                             this.getEDocByJobID(res.transactionType);
                             this.jobNo = res.jobNo;
@@ -88,7 +88,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .pipe(takeUntil(this.ngUnsubscribe))
                     .subscribe(
                         (res: any) => {
-                            this.transationType = res.transactionType;
+                            this.transactionType = 'CL';
                             this.getDocumentType('CL');
                             this.getEDocByJobID('CL');
                             this.jobNo = res.jobNo;
@@ -98,7 +98,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
             }
         } else {
-            this.transationType = 'Accountant';
+            this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom);
         }
 
@@ -150,7 +150,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 (res: any) => {
                     if (res.status) {
                         this._toast.success("Delete Sucess")
-                        this.getEDocByJobID(this.transationType);
+                        this.getEDocByJobID(this.transactionType);
                     }
                 },
             );
