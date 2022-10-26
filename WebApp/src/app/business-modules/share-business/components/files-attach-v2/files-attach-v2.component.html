@@ -56,10 +56,10 @@
                                     </th>
                                 </thead>
                                 <tbody>
-                                    <ng-container *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
+                                    <ng-container *ngFor="let doc of docType?.eDocs; let j = index; trackBy: trackByFn">
                                         <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)"
                                             [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
-                                            <td>{{i + 1}}</td>
+                                            <td>{{j + 1}}</td>
                                             <td>
                                                 <span>{{doc.systemFileName}} </span>
                                             </td>
@@ -177,7 +177,8 @@
                         id={{docType.documentType.code}}>
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable table-summary ">
-                                <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortEdoc('Accountant',i, $event.sortField)">
                                     <th class="first table-actions-col">
                                         Stt
                                     </th>
