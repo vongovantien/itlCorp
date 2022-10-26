@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -21,6 +17,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.Controllers
 {
@@ -97,9 +97,9 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [HttpGet("CustomDeclaration")]
-        public IActionResult GetCustomDeclaration(string keySearch, string customerNo,bool imporTed, int page, int size)
+        public IActionResult GetCustomDeclaration(string keySearch, string customerNo, bool imporTed, int page, int size)
         {
-            var data = customsDeclarationService.GetCustomDeclaration(keySearch , customerNo, imporTed, page, size, out int rowsCount);
+            var data = customsDeclarationService.GetCustomDeclaration(keySearch, customerNo, imporTed, page, size, out int rowsCount);
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
@@ -212,17 +212,20 @@ namespace eFMS.API.Operation.Controllers
         public IActionResult Delete(int id)
         {
             CustomsDeclarationModel currentCd = customsDeclarationService.Get(x => x.Id == id)?.FirstOrDefault();
-            if(currentCd == null)
+            if (currentCd == null)
             {
                 return NotFound(new ResultHandle { Status = false, Message = "Not found clearance " + currentCd.ClearanceNo });
             }
 
-            CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == currentCd.ClearanceNo && x.Id != currentCd.Id)?.FirstOrDefault() ;
-            if(HasReplicate != null)
+            CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == currentCd.ClearanceNo && x.Id != currentCd.Id)?.FirstOrDefault();
+            if (HasReplicate != null)
             {
                 return BadRequest(
-                    new ResultHandle { Status = false, Message = string.Format("Please you remove Custom Clearance {0} in {1}", currentCd.ClearanceNo, HasReplicate.JobNo)
-                });
+                    new ResultHandle
+                    {
+                        Status = false,
+                        Message = string.Format("Please you remove Custom Clearance {0} in {1}", currentCd.ClearanceNo, HasReplicate.JobNo)
+                    });
             }
 
             HandleState hs = customsDeclarationService.Delete(x => x.Id == id);
@@ -292,7 +295,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances )
+        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             if (clearances.Any(x => x.isDelete == true))
             {
@@ -382,7 +385,7 @@ namespace eFMS.API.Operation.Controllers
                     return BadRequest();
                 }
 
-                CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == item.ClearanceNo 
+                CustomsDeclarationModel HasReplicate = customsDeclarationService.Get(x => x.ClearanceNo == item.ClearanceNo
                 && x.Id != item.Id && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
                 if (HasReplicate != null && !string.IsNullOrEmpty(HasReplicate.JobNo))
                 {
@@ -501,7 +504,7 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost]
         [Route("Import")]
         [Authorize]
-        public IActionResult Import([FromBody]List<CustomsDeclarationModel> data)
+        public IActionResult Import([FromBody] List<CustomsDeclarationModel> data)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);

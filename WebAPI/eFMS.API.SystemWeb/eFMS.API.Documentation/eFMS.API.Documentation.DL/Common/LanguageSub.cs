@@ -1,13 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eFMS.API.Documentation.DL.Common
+﻿namespace eFMS.API.Documentation.DL.Common
 {
     public class DocumentationLanguageSub
     {
@@ -111,5 +102,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PARTNER_CODE_DUPLICATE = "MSG_PARTNER_CODE_DUPLICATE";
         public static readonly string MSG_CHARGE_CODE_WRONG_SERVICE = "MSG_CHARGE_CODE_WRONG_SERVICE";
         public static readonly string MSG_TOTAL_OVER_LIMIT = "MSG_TOTAL_OVER_LIMIT";
+
+        public static readonly string MSG_REPLICATE_NOT_EXISTS = "MSG_REPLICATE_NOT_EXISTS";
     }
 }
