@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { ActivatedRoute } from '@angular/router';
 import { DocumentationRepo } from '@repositories';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { CsTransactionDetail } from './../../../../../shared/models/document/csTransactionDetail';
@@ -70,7 +71,9 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         private _operationRepo: OperationRepo,
         private _toaster: ToastrService,
         private _systemRepo: SystemRepo,
-        private _document: DocumentationRepo
+        private _document: DocumentationRepo,
+        private _activedRouter: ActivatedRoute
+
     ) {
         super();
         this.initForm();
@@ -84,6 +87,11 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
 
     ngOnInit() {
         this.getListSystemUser();
+        this._activedRouter.params.subscribe((res: any) => {
+            if (!!res.jobId) {
+                this.getHblList(res.jobId);
+            }
+        });
     }
 
     initForm() {
@@ -152,7 +160,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             .subscribe(
                 (res: any) => {
                     this.configHbl.dataSource = res;
-                    console.log(res)
                 },
                 () => { }
             );
@@ -187,7 +194,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 type: 'User',
                 userCreated: this.data.userCreated
             };
-            console.log(body)
             this._operationRepo.updateStageToJob(body).pipe(
                 takeUntil(this.ngUnsubscribe),
                 catchError(this.catchError),
@@ -213,7 +219,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 }
             );
         }
-
     }
 
     getListSystemUser() {
