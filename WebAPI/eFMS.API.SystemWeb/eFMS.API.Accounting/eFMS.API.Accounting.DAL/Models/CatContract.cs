@@ -53,5 +53,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string SalesCompanyId { get; set; }
         public bool? NoDue { get; set; }
         public string ShipmentType { get; set; }
+        public string EmailAddress { get; set; }
+        public DateTime? FirstShipmentDate { get; set; }
+        public int? PaymentTermObh { get; set; }
     }
 }
