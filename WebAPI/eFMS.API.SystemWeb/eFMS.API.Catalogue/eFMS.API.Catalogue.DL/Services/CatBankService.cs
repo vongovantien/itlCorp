@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using ITL.NetCore.Connection.Caching;
-using System.Collections.Generic;
-using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Common.Globals;
-using Microsoft.Extensions.Localization;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
@@ -31,7 +31,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser currUser) : base(repository, cacheService, imapper)
+        ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
@@ -192,7 +192,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => (x.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             else if (criteria.BankNameEn != null)
                 query = (x => (x.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-            else if(criteria.Active != null)
+            else if (criteria.Active != null)
             {
                 query = (x => x.Active == criteria.Active);
             }
@@ -300,8 +300,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
         {
             var data = await DataContext.WhereAsync(x => x.PartnerId == id);
-
-            if(data.Count() == 0)
+            if (data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
             }

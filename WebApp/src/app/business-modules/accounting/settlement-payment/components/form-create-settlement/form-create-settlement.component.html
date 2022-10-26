@@ -189,7 +189,8 @@
                                         <label class=" form-control-label">
                                             Bank Account No:
                                         </label>
-                                        <ng-container *ngIf="paymentMethod.value.value === 'Bank'; else bankTpl">
+                                        <ng-container
+                                            *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'Other'; else bankTpl">
                                             <app-combo-grid-virtual-scroll
                                                 (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
                                                 [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
