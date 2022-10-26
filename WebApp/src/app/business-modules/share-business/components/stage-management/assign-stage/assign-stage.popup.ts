@@ -68,15 +68,20 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         private _operationRepo: OperationRepo,
         private _toastService: ToastrService,
         private _document: DocumentationRepo,
-        private route: ActivatedRoute
+        private _activedRouter: ActivatedRoute
     ) {
         super();
     }
 
     ngOnInit(): void {
-        this.jobId = this.route.snapshot.paramMap.get('jobId');
         this.getStage();
         this.getListUser();
+        this._activedRouter.params.subscribe((res: any) => {
+            if (!!res.jobId) {
+                this.getHblList(res.jobId)
+                this.jobId = res.jobId;
+            }
+        });
     }
 
     getStage() {
@@ -85,18 +90,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     this.configStage.dataSource = res;
-                },
-                () => { }
-            );
-    }
-
-    getHblList(jobId: string) {
-        this._document.getListHouseBillOfJob({ jobId: jobId })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.configHbl.dataSource = res;
-                    console.log(res)
                 },
                 () => { }
             );
@@ -183,6 +176,17 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             default:
                 break;
         }
+    }
+
+    getHblList(jobId: string) {
+        this._document.getListHouseBillOfJob({ jobId: jobId })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.configHbl.dataSource = res;
+                },
+                () => { }
+            );
     }
 
     closePopup() {

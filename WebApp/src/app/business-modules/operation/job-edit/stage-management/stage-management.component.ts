@@ -40,7 +40,7 @@ export class OpsModuleStageManagementComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
