@@ -90,4 +90,12 @@ export class SystemFileManageRepo {
                 map((data: any) => data)
             );
     }
+    uploadAttachedFileEdocByUrl(url: string, module: string, folder: string, objectId: string) {
+        return this._api.post(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadAttachedFileEdocByUrl`, null, {
+            fileUrl: url,
+            module: module,
+            folder: folder,
+            id: objectId
+        });
+    }
 }

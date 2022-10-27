@@ -1,11 +1,13 @@
+import { HttpResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { PopupBase } from '@app';
 import { ReportPreviewComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
-import { CsTransactionDetail } from '@models';
-import { DocumentationRepo, ExportRepo } from '@repositories';
+import { Crystal, CsTransactionDetail } from '@models';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -22,7 +24,8 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
         private readonly _documentationRepo: DocumentationRepo,
         private readonly _cd: ChangeDetectorRef,
         private readonly _export: ExportRepo,
-        private readonly _toastService: ToastrService) {
+        private readonly _toastService: ToastrService,
+        private readonly _fileMngtRepo: SystemFileManageRepo) {
         super();
     }
 
@@ -77,7 +80,21 @@ export class ShareSeaServiceMenuPreviewHBLSeaExportComponent extends PopupBase i
         ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc.subscribe(
             (v: any) => {
                 console.log("saving edoc...");
-                this._export.exportCrystalReportPDF(this.dataReport).subscribe();
+                this._export.exportCrystalReportPDF(this.dataReport, 'response', 'text').subscribe(
+                    (res: any) => {
+                        console.log(res);
+                        if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                            this._fileMngtRepo.uploadAttachedFileEdocByUrl((this.dataReport as Crystal).pathReportGenerate, 'Document', 'Shipment', this.hblDetail.jobId)
+                                .subscribe(console.log);
+                        }
+                    },
+                    (errors) => {
+                        console.log("error", errors);
+                    },
+                    () => {
+                        console.log("finally");
+                    }
+                );
             });
     }
 

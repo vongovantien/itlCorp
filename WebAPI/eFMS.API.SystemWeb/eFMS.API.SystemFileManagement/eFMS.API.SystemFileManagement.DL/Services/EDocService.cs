@@ -1,6 +1,7 @@
 ﻿using Amazon.S3.Model;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.SystemFileManagement.DL.Common;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
 using eFMS.API.SystemFileManagement.Service.Models;
@@ -189,35 +190,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         else
                         {
                             string bilingNo = string.Empty;
-                            var jobIds = GetJobFromAccountant(type, edoc.BillingId);
+                            var models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
 
-                            switch (type)
+                            if (models.Count > 0)
                             {
-                                case "Advance":
-                                    var adv = DC.AcctAdvancePayment.FirstOrDefault(x => x.Id.ToString() == edoc.BillingId);
-                                    bilingNo = adv.AdvanceNo;
-                                    break;
-                                case "Settlement":
-                                    bilingNo = DC.AcctSettlementPayment.FirstOrDefault(x => x.Id.ToString() == edoc.BillingId).SettlementNo;
-                                    break;
-                                case "SOA":
-                                    var soa = DC.AcctSoa.FirstOrDefault(x => x.Id.ToString() == edoc.BillingId);
-                                    if (soa != null)
-                                    {
-                                        bilingNo = soa.Soano;
-                                    }
-                                    break;
-                                default: break;
-                            };
-                            if (jobIds.Count > 0)
-                            {
-                                foreach (var Id in jobIds)
+                                foreach (var item in models)
                                 {
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
                                         BillingType = type,
-                                        BillingNo = bilingNo,
+                                        BillingNo = item.BillingNo,
                                         DatetimeCreated = DateTime.Now,
                                         DatetimeModified = DateTime.Now,
                                         Id = Guid.NewGuid(),
@@ -255,7 +238,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
        
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
-            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType || x.Type == "Accountant");
+            var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType || x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT);
             var lst = await _sysImageDetailRepo.GetAsync(x => x.JobId == jobID);
             if (lst == null) { return null; }
             var result = new List<EDocGroupByType>();
@@ -340,8 +323,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
                 };
             });
-            var resultAcc = result.Where(x => x.documentType.Type == "Accountant" && x.EDocs != null).ToList();
-            var resultGen = result.Where(x => x.documentType.Type != "Accountant").ToList();
+            var resultAcc = result.Where(x => x.documentType.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT && x.EDocs != null).ToList();
+            var resultGen = result.Where(x => x.documentType.Type != SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT).ToList();
             var resultGenEdoc = resultGen.Where(x => x.EDocs != null).ToList().OrderBy(x=>x.EDocs.Count());
             var resultGenNotEdoc = resultGen.Where(x => x.EDocs == null);
             resultGen = resultGenEdoc.Concat(resultGenNotEdoc).ToList();
@@ -462,7 +445,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        private List<TransctionTypeJobModel> GetJobFromAccountant(string billingType, string billingId)
+        private List<TransctionTypeJobModel> GetTransactionTypeJobBillingModel(string billingType, string billingId)
         {
             string bilingNo = string.Empty;
             var transctionTypeJobModels = new List<TransctionTypeJobModel>();
@@ -483,7 +466,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL" });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD" });
                                 }
                             }
                             else
@@ -491,7 +474,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "AD" });
                                 }
                             }
                         }
@@ -507,7 +490,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
                             if (opsJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL" });
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM" });
                             }
                         }
                         else
@@ -515,7 +498,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
                             if (csJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType });
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SM" });
                             }
                         }
                     }
@@ -543,7 +526,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL" });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SOA" });
                                 }
                             }
                             else
@@ -551,11 +534,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SOA" });
                                 }
                             }
                         }
                     }
+                    break;
+                case "Shipment":
                     break;
                 default:
                     break;
@@ -567,40 +552,31 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             HandleState result = new HandleState();
             string bilingNo = string.Empty;
-            var jobIds = GetJobFromAccountant(billingType, billingId);
-            string _codeAttachFile = string.Empty;
 
-            switch (billingType)
-            {
-                case "Advance":
-                    var adv = DC.AcctAdvancePayment.FirstOrDefault(x => x.Id.ToString() == billingId);
-                    bilingNo = adv.AdvanceNo;
-                    _codeAttachFile = "AD";
-                    break;
-                case "Settlement":
-                    bilingNo = DC.AcctSettlementPayment.FirstOrDefault(x => x.Id.ToString() == billingId).SettlementNo;
-                    _codeAttachFile = "SM";
-                    break;
-                case "SOA":
-                    var soa = DC.AcctSoa.FirstOrDefault(x => x.Id.ToString() == billingId);
-                    if (soa != null)
-                    {
-                        bilingNo = soa.Soano;
-                    }
-                    _codeAttachFile = "SOA";
-                    break;
-                default: break;
+            var models = GetTransactionTypeJobBillingModel(billingType, billingId);
+            var listAccountantTypes = new List<string> {
+                SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADVANCE,
+                SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
+                SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SOA,
             };
-            if (jobIds.Count > 0)
+            string type = string.Empty;
+            if(listAccountantTypes.Contains(billingType))
+            {
+                type = SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT;
+            } else
+            {
+                type = SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL;
+            }
+            if (models.Count > 0)
             {
                 var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
-                foreach (var item in jobIds)
+                foreach (var item in models)
                 {
                     var imageDetail = new SysImageDetail
                     {
                         SysImageId = imageId,
                         BillingType = billingType,
-                        BillingNo = bilingNo,
+                        BillingNo = item.BillingNo,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         Id = Guid.NewGuid(),
@@ -610,7 +586,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
-                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate("Accountant", item.TransactionType, _codeAttachFile, billingType)?.FirstOrDefault()?.Id
+                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id
                     };
 
                     await _sysImageDetailRepo.AddAsync(imageDetail, false);

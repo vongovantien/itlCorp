@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
@@ -123,5 +124,35 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
         }
 
+        [HttpPost("UploadAttachedFileEdocByUrl")]
+        public async Task<IActionResult> UploadAttachedFileEdocByUrl(string fileUrl, string module, string folder, Guid Id)
+        {
+            
+            byte[] filesArrayBuffer = await FileHelper.DownloadFile(fileUrl);
+            if (filesArrayBuffer == null)
+            {
+                return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = fileUrl });
+            }
+            FileReportUpload fileUpload = new FileReportUpload {
+                FileName = Path.GetFileName(fileUrl),
+                FileContent = filesArrayBuffer
+            };
+           
+            var stream = new MemoryStream(fileUpload.FileContent);
+            List<IFormFile> fFiles = new List<IFormFile>() { new FormFile(stream, 0, stream.Length, null, fileUpload.FileName) };
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = fFiles,
+                FolderName = folder,
+                Id = Id,
+                ModuleName = module
+            };
+            HandleState hs = await _edocService.PostFileAttacheDoc(model);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = model });
+        }
     }
 }
