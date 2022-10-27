@@ -30,7 +30,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByAcc: any[] = [];
     selectedEdoc: IEDoc;
     transactionType: string = '';
-    housebills: any[];
+    housebills: any[] = [];
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
     { title: 'Real File Name', field: 'realFilename' },

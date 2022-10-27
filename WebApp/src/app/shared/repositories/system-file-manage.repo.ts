@@ -90,9 +90,19 @@ export class SystemFileManageRepo {
                 map((data: any) => data)
             );
     }
+
     getEDocByAccountant(jobId: string, transitionType: string) {
         return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByAccountant?jobId=${jobId}&transactionType=${transitionType}`).pipe(
             map((data: any) => data)
         );
+    }
+
+    uploadAttachedFileEdocByUrl(url: string, module: string, folder: string, objectId: string) {
+        return this._api.post(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadAttachedFileEdocByUrl`, null, {
+            fileUrl: url,
+            module: module,
+            folder: folder,
+            id: objectId
+        });
     }
 }

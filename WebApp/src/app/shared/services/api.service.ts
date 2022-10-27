@@ -74,13 +74,16 @@ export class ApiService {
         return this._http.put(this.setUrl(url), formData, options);
     }
 
-    postFormData(url: string, formData: any) {
+    postFormData(url: string, formData: any, observe: any = 'body', responseType: any = 'json') {
         const options = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/x-www-form-urlencoded',
-            })
+            }),
         };
-        return this._http.post(this.setUrl(url), formData);
+        return this._http.post(this.setUrl(url), formData, {
+            observe: observe,
+            responseType: responseType
+        });
 
     }
 
