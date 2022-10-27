@@ -1,14 +1,15 @@
+import { HttpResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from '@app';
 import { ReportPreviewComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { CsTransactionDetail } from '@models';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { SystemConstants } from '@constants';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-menu-preview-hbl-sea-import',
@@ -182,17 +183,27 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
+                        console.log(res)
                         return this._exportRepository.exportDangerousGoods(this.hblDetail.id);
                     }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
+                    return of(res);
+                }),
+                catchError((res) => {
+                    console.log(res);
+                    return of(null);
+                }),
             ).subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    console.log(res)
+                    if (!res || res.status === 204) {
+                        this._toastService.error("No data to preview");
+                        return;
+                    } else if ((res as HttpResponse<any>).status && !!res.message) {
+                        this._toastService.warning(res.message);
+                    } else {
                         this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
-                },
+                }
             );
     }
 

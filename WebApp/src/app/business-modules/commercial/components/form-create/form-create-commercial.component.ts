@@ -348,11 +348,14 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     setValueInforCompany() {
-        this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
-        this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
-        this.formGroup.controls['addressVn'].setValue(this.inforCompany.addressVn);
-        this.formGroup.controls['addressEn'].setValue(this.inforCompany.addressEn);
-        this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
-        this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
+        console.log(this.formGroup.controls["partnerNameVn"].value);
+        console.log(this.formGroup.controls["partnerNameEn"].value);
+        console.log(this.formGroup.controls["addressVn"].value);
+        // this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
+        // this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
+        // this.formGroup.controls['addressVn'].setValue(this.inforCompany.addressVn);
+        // this.formGroup.controls['addressEn'].setValue(this.inforCompany.addressEn);
+        // this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
+        // this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
     }
 }
