@@ -111,5 +111,8 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PARTNER_CODE_DUPLICATE = "MSG_PARTNER_CODE_DUPLICATE";
         public static readonly string MSG_CHARGE_CODE_WRONG_SERVICE = "MSG_CHARGE_CODE_WRONG_SERVICE";
         public static readonly string MSG_TOTAL_OVER_LIMIT = "MSG_TOTAL_OVER_LIMIT";
+        public static readonly string MSG_CLEARANCE_IS_EXPIRED = "MSG_CLEARANCE_IS_EXPIRED";
+        public static readonly string MSG_CLEARANCE_IS_OVERDUE = "MSG_CLEARANCE_IS_OVERDUE";
+        public static readonly string MSG_CLEARANCE_IS_OVERLIMIT = "MSG_CLEARANCE_IS_OVERLIMIT";
     }
 }
