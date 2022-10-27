@@ -9,9 +9,12 @@ import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { of } from 'rxjs';
+import { formatDate } from '@angular/common';
+import { mode } from 'crypto-js';
 
 
 @Component({
@@ -96,22 +99,26 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             });
             return;
         }
-        const houseBill: HouseBill = this.getDataForm();
-        houseBill.jobId = this.jobId;
-        if (!this.hblSeparateId) {
-            houseBill.parentId = this.hblId;
-            this.createHbl(houseBill, this.hblId);
-        } else {
-            const modelUpdate = this.getDataForm();
-
-            modelUpdate.id = this.hblSeparateId;
-            modelUpdate.jobId = this.jobId;
-            modelUpdate.parentId = this.hblId;
-
-            for (const dim of modelUpdate.dimensionDetails) {
-                dim.hblid = this.hblSeparateId;
+        this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+        .pipe(catchError(this.catchError))
+        .subscribe(
+            (res: any) => {
+                if (!!res && res.length > 0) {
+                    let jobNo = '';
+                    res.forEach(element => {
+                        jobNo += element + '<br>';
+                    });
+                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                        class: 'bg-danger'
+                    });
+                } else {
+                    const houseBill: HouseBill = this.getDataForm();
+                    this.setData(houseBill);
+                    this.createHbl(houseBill);
+                }
             }
-            this.updateHbl(modelUpdate, true);
-        }
+        );
     }
 }
+    
