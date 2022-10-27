@@ -315,7 +315,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 ert.Color = System.Drawing.Color.Black;
             }
             addressStartContent = 14;
-            if (transactionDetail.CsMawbcontainers?.Count > 0)
+            if (transactionDetail.CsMawbcontainers.Count > 0)
             {
                 foreach (var item in transactionDetail.CsMawbcontainers)
                 {
