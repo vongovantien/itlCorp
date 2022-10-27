@@ -57,8 +57,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     users: User[] = [];
     description: string = '';
-    hblNo: string = '';
-
     isSubmitted: boolean = false;
     jobId: string = '';
     isAsignment: boolean = false;
