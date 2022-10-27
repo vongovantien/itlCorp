@@ -139,22 +139,24 @@
                         <i class="la la-plus m--margin-right-5"></i>
                         Accounting File
                     </h3>
+
+                    <div class="c-button-actions" *ngIf="typeFrom !== 'Shipment'">
+                        <div class="form-group float-right">
+                            <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
+                                (click)="showDocumentAttach()">
+                                <span>
+                                    <i class="la la-download"></i>
+                                    <span>
+                                        Attach Files
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="c-button-actions" *ngIf="typeFrom !== 'Shipment'">
-            <div class="form-group float-right">
-                <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
-                    (click)="showDocumentAttach()">
-                    <span>
-                        <i class="la la-download"></i>
-                        <span>
-                            Attach Files
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
+
         <div class="m-portlet__body collapse show" id="accountingFile">
             <ng-container *ngFor="let docType of edocByAcc; let i = index; trackBy: trackByFn">
                 <div class="m-portlet__head alert-block__heading pointer">
