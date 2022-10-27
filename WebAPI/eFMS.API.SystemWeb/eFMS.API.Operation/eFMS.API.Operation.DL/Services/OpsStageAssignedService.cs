@@ -46,7 +46,7 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState Add(OpsStageAssignedEditModel model)
         {
             var assignedItem = mapper.Map<OpsStageAssigned>(model);
-            var orderNumber = DataContext.Where(x => x.JobId == model.JobId).Select(x => x.OrderNumberProcessed).Max();
+            var orderNumber = DataContext.Where(x => x.JobId == model.JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
 
             assignedItem.Id = Guid.NewGuid();
             assignedItem.Status = OperationConstants.InSchedule;
@@ -55,14 +55,14 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.UserCreated = currentUser.UserID;
             assignedItem.OrderNumberProcessed = orderNumber + 1;
             assignedItem.Type = model.Type == "User" ? "User" : "System";
-            assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId).Hwbno;
+            assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId)?.Hwbno;
 
             DataContext.Add(assignedItem, false);
             if (model.IsUseReplicate)
             {
                 var jobReplicate = opsTransRepository.Get(x => x.Id == model.JobId)?.FirstOrDefault();
                 var assignedItemReplicate = mapper.Map<OpsStageAssigned>(model);
-                var orderNumberProcessed = DataContext.Where(x => x.JobId == assignedItemReplicate.JobId).Select(x => x.OrderNumberProcessed).Max();
+                var orderNumberProcessed = DataContext.Where(x => x.JobId == assignedItemReplicate.JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
 
                 assignedItemReplicate.Id = Guid.NewGuid();
                 assignedItemReplicate.JobId = (jobReplicate?.ReplicatedId) ?? Guid.NewGuid();

@@ -57,6 +57,8 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     users: User[] = [];
     description: string = '';
+    hblNo: string = '';
+
     isSubmitted: boolean = false;
     jobId: string = '';
     isAsignment: boolean = false;
@@ -162,7 +164,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     onSelectData(data: any, type: string) {
-        console.log(data)
+
         switch (type) {
             case "stage":
                 this.selectedStageData = data;
@@ -171,6 +173,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             case "user":
                 this.selectedUserData = data;
                 this.selectedUser = { field: 'username', value: data.username };
+                break;
             case "hbl":
                 this.selectedHblData = data;
                 this.selectedHbl = { field: 'hwbno', value: data.hwbno };

@@ -150,6 +150,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     }
 
     onSelectHouseBill($event: CsTransactionDetail) {
+        console.log($event)
         this.selectedHbl.value = $event.hwbno;
         this.hblno.setValue($event.hwbno);
     }

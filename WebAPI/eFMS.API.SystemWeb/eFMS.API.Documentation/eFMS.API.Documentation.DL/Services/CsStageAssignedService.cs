@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             var currentJob = await csTransRepository.Get(x => x.Id == criteria.JobId).FirstOrDefaultAsync();
             var hbl = await csTransDetailRepository.Get(x => x.Id == criteria.HblId).FirstOrDefaultAsync();
             var stage = await stageService.GetStageByType(criteria.StageType);
-            var orderNumber = DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).Max();
+            var orderNumber = DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).DefaultIfEmpty(0).Max();
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -144,7 +144,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
 
-            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max();
+            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
             var hbl = new CsTransactionDetail();
             var result = new HandleState();
 
