@@ -46,13 +46,14 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState Add(OpsStageAssignedEditModel model)
         {
             var assignedItem = mapper.Map<OpsStageAssigned>(model);
+            var orderNumber = DataContext.Where(x => x.JobId == model.JobId).Select(x => x.OrderNumberProcessed).Max();
+
             assignedItem.Id = Guid.NewGuid();
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
             assignedItem.UserCreated = currentUser.UserID;
-            int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
-            assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
+            assignedItem.OrderNumberProcessed = orderNumber + 1;
             assignedItem.Type = model.Type == "User" ? "User" : "System";
             assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId).Hwbno;
 
@@ -61,14 +62,14 @@ namespace eFMS.API.Operation.DL.Services
             {
                 var jobReplicate = opsTransRepository.Get(x => x.Id == model.JobId)?.FirstOrDefault();
                 var assignedItemReplicate = mapper.Map<OpsStageAssigned>(model);
+                var orderNumberProcessed = DataContext.Where(x => x.JobId == assignedItemReplicate.JobId).Select(x => x.OrderNumberProcessed).Max();
 
                 assignedItemReplicate.Id = Guid.NewGuid();
                 assignedItemReplicate.JobId = (jobReplicate?.ReplicatedId) ?? Guid.NewGuid();
                 assignedItemReplicate.Status = OperationConstants.InSchedule;
                 assignedItemReplicate.RealPersonInCharge = assignedItem.MainPersonInCharge;
                 assignedItemReplicate.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-                int orderNumberProcessRep = DataContext.Count(x => x.JobId == assignedItemReplicate.JobId);
-                assignedItemReplicate.OrderNumberProcessed = orderNumberProcessRep + 1;
+                assignedItemReplicate.OrderNumberProcessed = orderNumberProcessed + 1;
 
                 DataContext.Add(assignedItemReplicate, false);
             }

@@ -155,7 +155,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     }
 
     getHblList(jobId: string) {
-        this._document.getListHouseBillOfJob({ jobId: jobId })
+        this._document.getHBLOfJob({ jobId: jobId })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

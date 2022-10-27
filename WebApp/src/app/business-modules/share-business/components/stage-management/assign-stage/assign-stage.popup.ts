@@ -162,6 +162,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     onSelectData(data: any, type: string) {
+        console.log(data)
         switch (type) {
             case "stage":
                 this.selectedStageData = data;
@@ -179,7 +180,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     getHblList(jobId: string) {
-        this._document.getListHouseBillOfJob({ jobId: jobId })
+        this._document.getHBLOfJob({ jobId: jobId })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
