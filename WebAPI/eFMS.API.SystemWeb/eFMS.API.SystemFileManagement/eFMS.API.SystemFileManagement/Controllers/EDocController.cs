@@ -59,17 +59,6 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetEDocByAccountant")]
-        public async Task<IActionResult> GetEDocByAccountant(string billingNo, string transactionType)
-        {
-            var result = await _edocService.GetEDocByAccountant(billingNo, transactionType);
-            if (result == null)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
         [HttpDelete("DeleteEDoc/{edocId}")]
         public async Task<IActionResult> DeleteEDoc(Guid edocId)
         {

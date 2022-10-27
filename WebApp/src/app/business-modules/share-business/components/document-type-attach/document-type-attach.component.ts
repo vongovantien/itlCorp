@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ConfirmPopupComponent } from '@common';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
@@ -14,13 +13,12 @@ import { getTransactionLocked, getTransactionPermission } from '../../store';
     styleUrls: ['./document-type-attach.component.scss']
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
-    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
+    @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
-    headers: CommonInterface.IHeaderTable[];
+    headers: CommonInterface.IHeaderTable[] = [];
     @Input() jobId: string = '';
     isOps: boolean = false;
-    fileNo: string;
-    transactionType: string = '';
+    @Input() transactionType: string = '';
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
@@ -28,14 +26,15 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     edocSelected: any;
     detailDocId: number;
     formData: IEDocUploadFile;
-    @Input() typeFrom: string = 'Job';
+    @Input() typeFrom: string = 'Shipment';
     documentTypes: any[] = [];
-    source: string = 'Job';
+    source: string = 'Shipment';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
     @Input() housebills: any[] = [];
     billingNo: string = '';
     billingId: string = '';
     chargeSM: any;
+    isSubmitted: boolean = false;
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
@@ -46,7 +45,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.permissionShipments = this._store.select(getTransactionPermission);
     }
     ngOnInit(): void {
-        if (this.typeFrom !== 'Job') {
+        if (this.typeFrom !== 'Shipment') {
             this.transactionType = 'Accountant';
         }
         // this.getHblList();
@@ -84,7 +83,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
-                if (this.typeFrom === 'Job') {
+                if (this.typeFrom === 'Shipment') {
                     this.listFile[index].hblid = event;
                 } else {
                     this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
@@ -103,8 +102,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile?.splice(index, 1);
     }
     uploadEDoc() {
+        console.log(this.selectedtDocType);
+
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
+        this.isSubmitted = true;
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({

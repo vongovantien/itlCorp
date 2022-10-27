@@ -1,24 +1,24 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 
-import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
-import { DocumentationRepo } from '@repositories';
-import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
-import { DIM, CsTransaction } from '@models';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
 import { ICanComponentDeactivate } from '@core';
+import { CsTransaction, DIM } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 
-import { combineLatest, of, Observable, merge } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
+import { combineLatest, merge, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import * as fromShareBussiness from '../../../share-business/store';
-import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RoutingConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
+import isUUID from 'validator/lib/isUUID';
+import * as fromShareBussiness from '../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -31,7 +31,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     //@ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
     jobId: string;
@@ -124,14 +123,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
                     this.shipmentDetail = res;
-                    this.formCreateComponent.isUpdate = true;
-
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
                         this.formCreateComponent.getUserLogged();
                         this.headerComponent.resetBreadcrumb("Create Job");
                     } else {
                         this.headerComponent.resetBreadcrumb("Job Detail");
+                        //this.attachV2.isJobLock = res.isLocked;
                     }
                 }
             )

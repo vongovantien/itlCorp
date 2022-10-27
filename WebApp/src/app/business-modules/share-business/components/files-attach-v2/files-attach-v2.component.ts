@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { ContextMenuDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
@@ -20,7 +21,8 @@ import { ShareDocumentTypeAttachComponent } from '../document-type-attach/docume
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
-    @Input() typeFrom: string = 'Job';
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+    @Input() typeFrom: string = 'Shipment';
     @Input() billingId: string = '';
     headersGen: CommonInterface.IHeaderTable[];
     documentTypes: any[] = [];
@@ -30,11 +32,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     edocByAcc: any[] = [];
     selectedEdoc: IEDoc;
     transactionType: string = '';
-    housebills: any[];
+    housebills: any[] = [];
+    isJobLock: boolean = false;
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
     { title: 'Real File Name', field: 'realFilename' },
-    { title: 'Document Type', field: 'docType' },
+    { title: 'Document Type', field: 'docType', required: true },
     { title: 'Job Ref', field: 'jobRef' },
     { title: 'House Bill No', field: 'hbl' },
     { title: 'Note', field: 'note' },
@@ -42,7 +45,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     accountantAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
     { title: 'Real File Name', field: 'realFilename' },
-    { title: 'Document Type', field: 'docType' },
+    { title: 'Document Type', field: 'docType', required: true },
     { title: 'Note', field: 'note' },]
     jobNo: string = '';
     constructor(
@@ -58,7 +61,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.requestSort = this.sortEdoc;
     }
     ngOnInit() {
-        if (this.typeFrom === 'Job') {
+        if (this.typeFrom === 'Shipment') {
             this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((params: Params) => {
@@ -77,11 +80,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            this.documentAttach.transactionType = res.transactionType;
+                            //  this.documentAttach.transactionType = res.transactionType;
                             this.getDocumentType(res.transactionType);
                             this.getEDocByJobID(res.transactionType);
                             this.jobNo = res.jobNo;
-                            this.documentAttach.fileNo = res.jobNo;
+                            //this.documentAttach.jobNo = res.jobNo;
+                            this.isJobLock = res.isLocked;
                         }
                     );
             } else {
@@ -90,11 +94,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            this.documentAttach.transactionType = 'CL'
+                            //this.documentAttach.transactionType = 'CL'
                             this.getDocumentType('CL');
                             this.getEDocByJobID('CL');
-                            this.jobNo = res.jobNo;
-                            this.documentAttach.fileNo = res.jobNo;
+                            this.jobNo = res.opstransaction.jobNo;
+                            //this.documentAttach.fileNo = res.jobNo;
+                            this.isJobLock = res.opstransaction.isLocked;
+                            console.log(this.jobNo);
+
                         }
                     );
             }
@@ -131,7 +138,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.getHblList();
     }
     getHblList() {
-        if (this.typeFrom === 'Job') {
+        if (this.typeFrom === 'Shipment') {
             this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
                 .pipe(
                     catchError(this.catchError),
@@ -175,7 +182,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
     }
     editEdoc() {
-        if (this.typeFrom === 'Job') {
+        if (this.typeFrom === 'Shipment') {
             this.documentAttach.headers = this.headerAttach;
         } else {
             this.documentAttach.headers = this.accountantAttach;
@@ -196,8 +203,20 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.show();
         this.getEDocByJobID(this.transactionType);
     }
-    deleteEdoc() {
-        this._systemFileRepo.deleteEdoc(this.selectedEdoc.id)
+    confirmDelete() {
+        let messageDelete = `Do you want to delete this Attach File ? `;
+        let itemDelete = this.selectedEdoc.id;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Delete Attach File',
+            body: messageDelete,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-danger',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.deleteEdoc(itemDelete))
+    }
+    deleteEdoc(id: string = '') {
+        this._systemFileRepo.deleteEdoc(id)
             .pipe(
                 catchError(this.catchError),
             )
@@ -211,7 +230,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     getDocumentType(transactionType: string) {
-        this._systemFileRepo.getDocumentType(transactionType)
+        this._systemFileRepo.getDocumentType(transactionType, null)
             .pipe(
                 catchError(this.catchError),
             )
@@ -235,7 +254,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     showDocumentAttach() {
-        if (this.typeFrom === 'Job') {
+        if (this.typeFrom === 'Shipment') {
             this.documentAttach.headers = this.headerAttach;
         } else {
             this.documentAttach.headers = this.headerAttach;

@@ -1,6 +1,6 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <ng-container *ngIf="typeFrom === 'Job'">
+        <ng-container *ngIf="typeFrom === 'Shipment'">
             <div class="m-portlet__head pointer">
                 <div class="m-portlet__head-caption d-flex justify-content-between align-items-center">
                     <div class="m-portlet__head-title ">
@@ -10,7 +10,7 @@
                             General File
                         </h3>
                     </div>
-                    <div class="c-button-actions">
+                    <div class="c-button-actions" *ngIf="isJobLock===false">
                         <div class="form-group float-right">
                             <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="showDocumentAttach()">
@@ -142,7 +142,7 @@
                 </div>
             </div>
         </div>
-        <div class="c-button-actions" *ngIf="typeFrom !== 'Job'">
+        <div class="c-button-actions" *ngIf="typeFrom !== 'Shipment'">
             <div class="form-group float-right">
                 <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                     (click)="showDocumentAttach()">
@@ -263,15 +263,15 @@
         </div>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDocByJobID($event)" [jobId]="jobId"
-    [housebills]="housebills"></document-type-attach>
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDocByJobID($event)" [jobId]="jobId" [jobNo]="jobNo"
+    [transactionType]="transactionType" [housebills]="housebills"></document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
-        <div class="menu-context__item" (click)="editEdoc()">
+        <div class="menu-context__item" *ngIf="isJobLock===false" (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
-        <div class="menu-context__item" (click)="deleteEdoc()" *ngIf="typeFrom === 'Job'">
+        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="typeFrom === 'Shipment' && isJobLock===false">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
@@ -282,3 +282,5 @@
         <span><i class="la la-download align-middle text-primary"></i>Download</span>
     </div>
 </app-context-menu>
+
+<ng-template inject></ng-template>
