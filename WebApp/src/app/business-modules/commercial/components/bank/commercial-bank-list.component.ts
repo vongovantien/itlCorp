@@ -58,7 +58,7 @@ export class CommercialBankListComponent extends AppList {
             })).subscribe(
                 (res: Bank[]) => {
                     this.partnerBanks = res || [];
-                    console.log(res)
+
                 }
             );
     }
@@ -73,7 +73,6 @@ export class CommercialBankListComponent extends AppList {
     }
 
     gotoDetailBank(id: string, index: number = null) {
-        console.log(id)
         this.formUpdateBankPopup.isUpdate = true;
         this.formUpdateBankPopup.partnerId = this.partnerId;
         !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;

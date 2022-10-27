@@ -46,7 +46,7 @@ namespace eFMS.API.Catalogue.DL.Services
             bank.Id = Guid.NewGuid();
             bank.DatetimeCreated = bank.DatetimeModified = DateTime.Now;
             bank.Active = true;
-            bank.UserCreated = currentUser.UserID;
+            bank.UserCreated = bank.UserModified = currentUser.UserID;
             var result = DataContext.Add(bank, false);
             DataContext.SubmitChanges();
             if (result.Success)

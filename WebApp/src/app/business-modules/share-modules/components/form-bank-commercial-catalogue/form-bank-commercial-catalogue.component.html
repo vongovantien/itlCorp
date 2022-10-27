@@ -94,6 +94,22 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row" *ngIf="isUpdate && !!bankDetail">
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer m--align-center">
