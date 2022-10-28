@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
@@ -9,12 +9,10 @@ import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
-import { of } from 'rxjs';
-import { formatDate } from '@angular/common';
-import { mode } from 'crypto-js';
+import { CommonEnum } from '@enums';
 
 
 @Component({
@@ -30,7 +28,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     hblDetail: any;
     hblSeprateDetail: any;
     hblSeparateId: string;
-
+    hwbno: AbstractControl;
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -53,6 +51,16 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     }
 
     ngOnInit() {
+        this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+        .pipe( catchError(this.catchError))
+            .subscribe( hawbNoGenerate => {
+                if (this.formCreateHBLComponent.hwbno.value.includes('N/H')) {
+                    this.formCreateHBLComponent.hwbno.setValue('N/H');
+                }
+                else{
+                    this.formCreateHBLComponent.hwbno.setValue(hawbNoGenerate.hblNo);
+                }
+            });
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId) {
                 this.hblId = param.hblId;
