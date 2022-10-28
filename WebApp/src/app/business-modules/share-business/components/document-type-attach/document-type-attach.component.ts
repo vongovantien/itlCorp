@@ -125,9 +125,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }));
         });
         this.EdocUploadFile = ({
-            ModuleName: 'Document',
-            FolderName: 'Shipment',
-            Id: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
+            ModuleName: this.typeFrom !== 'Settlement' ? 'Document' : 'Accounting',
+            FolderName: this.typeFrom !== 'Settlement' ? 'Shipment' : 'Settlement',
+            Id: this.typeFrom !== 'Settlement' ? this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID : this.billingId,
             EDocFiles: edocFileList,
         })
 
