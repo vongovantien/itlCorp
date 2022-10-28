@@ -30,6 +30,9 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     bankNameEn: AbstractControl;
     bankCode: AbstractControl;
     note: AbstractControl;
+
+    bankDetail: Bank;
+
     id: string = '';
     banks: Observable<Bank[]>;
     partnerId: string = '';
@@ -117,6 +120,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     updateFormValue(data: Bank) {
+        this.bankDetail = data
         const formValue = {
             bankId: !!data.bankId ? data.bankId : null,
             bankAccountNo: !!data.bankAccountNo ? data.bankAccountNo : null,

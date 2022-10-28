@@ -1,30 +1,30 @@
-import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
-import { ISettlementPaymentState } from './../components/store/reducers/index';
+import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { formatDate } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
+import { ISettlementPaymentState } from './../components/store/reducers/index';
 
 import { AppPage } from '@app';
+import { InfoPopupComponent, ReportPreviewComponent } from '@common';
+import { RoutingConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ICrystalReport } from '@interfaces';
 import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
-import { RoutingConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 import { DataService } from '@services';
 
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 
-import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
-import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment, LoadDetailSettlePaymentFail } from '../components/store';
-import { EMPTY, Observable } from 'rxjs';
 import { getCurrentUserState } from '@store';
+import { EMPTY, Observable } from 'rxjs';
+import { catchError, concatMap, finalize, pluck } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
+import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -213,6 +213,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
 
+                    this.formCreateSurcharge.getBankAccountPayee(this.settlementPayment.settlement.payee);
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
