@@ -1164,7 +1164,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (customerContract.IsOverLimit == true)
                         {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.PartnerTaxCode, officeName, customer.ShortName);
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.PartnerTaxCode, officeName, customer.ShortName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }

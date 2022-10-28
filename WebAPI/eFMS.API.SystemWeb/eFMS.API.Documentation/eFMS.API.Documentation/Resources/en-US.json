@@ -102,5 +102,5 @@
   "MSG_SHIPMENT_INVALID_NO_PROFIT": "{0} with check No Profit have Profit > 0",
   "MSG_CLEARANCE_IS_EXPIRED": "{0} - {1} Agreement of {2} is Expired, please check it again!",
   "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} Agreement of {2} has Overdue Debts, please check it again!",
-  "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} Agreement of {2} is Over Credit Limit (Debit Rate) , please check it again!"
+  "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} Agreement of {2} is Over Credit Limit {3}% , please check it again!"
 }
