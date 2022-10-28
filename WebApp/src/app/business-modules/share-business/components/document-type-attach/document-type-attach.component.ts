@@ -32,7 +32,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
     @Input() housebills: any[] = [];
     billingNo: string = '';
-    billingId: string = '';
+    @Input() billingId: string = '';
     chargeSM: any;
     isSubmitted: boolean = false;
     constructor(
@@ -75,9 +75,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
-                this.listFile[index].docType = event;
-                this.listFile[index].aliasName = this.isUpdate ? event + this.listFile[index].name : event + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
-                this.selectedtDocType = event;
+                console.log(event);
+                this.listFile[index].Code = event.code;
+                this.listFile[index].DocumentId = event.id;
+                this.listFile[index].aliasName = this.isUpdate ? event.code + this.listFile[index].name : event.code + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
+                this.selectedtDocType = event.id;
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
@@ -102,8 +104,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile?.splice(index, 1);
     }
     uploadEDoc() {
-        console.log(this.selectedtDocType);
-
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
         this.isSubmitted = true;
@@ -111,7 +111,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             files.push(x);
             edocFileList.push(({
                 JobId: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
-                Code: x.docType,
+                Code: x.Code,
                 TransactionType: this.transactionType,
                 AliasName: x.aliasName,
                 BillingNo: '',
@@ -121,6 +121,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Note: x.note !== undefined ? x.note : '',
                 BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
                 Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
+                DocumentId: x.DocumentId
             }));
         });
         this.EdocUploadFile = ({
@@ -129,6 +130,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             Id: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
             EDocFiles: edocFileList,
         })
+
+
         if (this.isUpdate) {
             let edocUploadModel: any = {
                 Hblid: edocFileList[0].HBL,
@@ -136,6 +139,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Note: edocFileList[0].Note,
                 Id: edocFileList[0].Id,
                 DocumentTypeId: this.selectedtDocType,
+            }
+            if (edocUploadModel.DocumentTypeId === undefined) {
+                console.log(edocUploadModel.DocumentTypeId);
+
+                this._toastService.error("Please fill all field!");
+                return;
             }
             this._systemFileManagerRepo.updateEdoc(edocUploadModel)
                 .pipe(catchError(this.catchError))
@@ -150,6 +159,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     }
                 );
         } else {
+            console.log(edocFileList.find(x => x.DocumentId));
+
+            if (edocFileList.find(x => x.DocumentId === undefined)) {
+
+                this._toastService.error("Please fill all field!");
+                return;
+            }
             this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
                 .pipe(catchError(this.catchError))
                 .subscribe(
@@ -182,5 +198,6 @@ export interface IEDocFile {
     FileName: string,
     Note: string,
     BillingId: string,
-    Id: string
+    Id: string,
+    DocumentId: string
 }

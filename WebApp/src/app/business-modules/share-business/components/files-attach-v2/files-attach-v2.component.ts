@@ -33,7 +33,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc: IEDoc;
     transactionType: string = '';
     housebills: any[] = [];
-    isJobLock: boolean = false;
     headerAttach: any[] = [{ title: 'No', field: 'no' },
     { title: 'Alias Name', field: 'aliasName' },
     { title: 'Real File Name', field: 'realFilename' },
@@ -85,7 +84,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                             this.getEDocByJobID(res.transactionType);
                             this.jobNo = res.jobNo;
                             //this.documentAttach.jobNo = res.jobNo;
-                            this.isJobLock = res.isLocked;
+                            this.isLocked = res.isLocked;
                         }
                     );
             } else {
@@ -99,7 +98,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                             this.getEDocByJobID('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             //this.documentAttach.fileNo = res.jobNo;
-                            this.isJobLock = res.opstransaction.isLocked;
+                            this.isLocked = res.opstransaction.isLocked;
                             console.log(this.jobNo);
 
                         }
@@ -108,6 +107,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom);
+            this.getEDocByJobID(this.typeFrom);
         }
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -173,6 +173,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
+        console.log(edoc);
+
         const qContextMenuList = this.queryListMenuContext.toArray();
         if (!!qContextMenuList.length) {
             qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
@@ -182,6 +184,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
     }
     editEdoc() {
+        console.log(this.selectedEdoc);
         if (this.typeFrom === 'Shipment') {
             this.documentAttach.headers = this.headerAttach;
         } else {
@@ -189,11 +192,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
+        console.log(this.selectedEdoc);
+
+        let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
-            docType: this.selectedEdoc.documentTypeId,
+            docType: docType,
             note: this.selectedEdoc.note,
             hwbNo: this.selectedEdoc.hblid,//hblNo 
             hblid: this.selectedEdoc.hblid//hblNo 
@@ -242,16 +248,31 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     getEDocByJobID(transactionType: string) {
-        this._systemFileRepo.getEDocByJob(this.jobId, transactionType)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any[]) => {
-                    this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
-                    this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
-                },
-            );
+        if (this.typeFrom === 'Shipment') {
+            this._systemFileRepo.getEDocByJob(this.jobId, transactionType)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any[]) => {
+                        console.log(res);
+                        this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
+                        this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
+                    },
+                );
+        } else {
+            this._systemFileRepo.getEDocByJob(this.billingId, transactionType)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any[]) => {
+                        console.log(res);
+                        this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
+                        this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
+                    },
+                );
+        }
     }
     showDocumentAttach() {
         if (this.typeFrom === 'Shipment') {
