@@ -1149,12 +1149,12 @@ namespace eFMS.API.Documentation.DL.Services
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
                         if (customerContract == null)
                         {
-                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
                             return new HandleState(errorContract);
                         }
                         if (customerContract.IsExpired == true)
                         {
-                            string errorContract = String.Format("{0} - {1} Agreement of {2} is Expired, please check it again!", item.PartnerTaxCode, officeName, customer.ShortName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.PartnerTaxCode, officeName, customer.ShortName);
                             return new HandleState(errorContract);
                         }
                         if (customerContract.IsOverDue == true)
@@ -1164,7 +1164,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (customerContract.IsOverLimit == true)
                         {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.PartnerTaxCode, officeName, customer.ShortName);
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.PartnerTaxCode, officeName, customer.ShortName);
                             return new HandleState(errorContract);
                         }
                     }
@@ -1292,7 +1292,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-        }
+         }
 
         private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd,
             CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
