@@ -1,21 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
-import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
-import { CommonEnum } from '@enums';
-import { FormValidators } from '@validators';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Container, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { FormValidators } from '@validators';
 
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -64,6 +64,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     shipmentType: AbstractControl;
     note: AbstractControl;
     noProfit: AbstractControl;
+    eta: AbstractControl;
+    deliveryDate: AbstractControl;
+    suspendTime: AbstractControl;
+    clearanceDate: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -181,8 +185,14 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
             note: this.opsTransaction.note,
-            noProfit: this.opsTransaction.noProfit
+            noProfit: this.opsTransaction.noProfit,
+            eta: !!this.opsTransaction.eta ? { startDate: new Date(this.opsTransaction.eta), endDate: new Date(this.opsTransaction.eta) } : null,
+            deliveryDate: !!this.opsTransaction.deliveryDate ? { startDate: new Date(this.opsTransaction.deliveryDate), endDate: new Date(this.opsTransaction.deliveryDate) } : null,
+            clearanceDate: !!this.opsTransaction.clearanceDate ? { startDate: new Date(this.opsTransaction.clearanceDate), endDate: new Date(this.opsTransaction.clearanceDate) } : null,
+            suspendTime: this.opsTransaction.suspendTime,
         });
+
+        console.log(this.opsTransaction)
 
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
@@ -241,7 +251,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             containerDescription: [null],
             packageTypeId: [null],
             note: [null],
-            noProfit: [false]
+            noProfit: [false],
+            eta: [null],
+            deliveryDate: [null],
+            suspendTime: [null],
+            clearanceDate: [null],
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -278,6 +292,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.shipmentType = this.formEdit.controls['shipmentType'];
         this.note = this.formEdit.controls['note'];
         this.noProfit = this.formEdit.controls['noProfit'];
+        this.eta = this.formEdit.controls['eta'];
+        this.deliveryDate = this.formEdit.controls['deliveryDate'];
+        this.suspendTime = this.formEdit.controls['suspendTime'];
+        this.clearanceDate = this.formEdit.controls['clearanceDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -338,7 +356,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':    
+            case 'fieldOps':
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -398,9 +416,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
-    
-    getSalesmanList(data: any){
-        this.shipmentType.setValue(data); 
+
+    getSalesmanList(data: any) {
+        this.shipmentType.setValue(data);
         this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
             .subscribe(
                 (res: any) => {
@@ -422,7 +440,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                         this.salemansId.setValue(null);
                     }
                 }
-            );          
+            );
     }
 }
 export interface ILinkAirSeaInfoModel {
