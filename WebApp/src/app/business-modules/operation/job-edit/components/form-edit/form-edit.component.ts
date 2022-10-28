@@ -457,11 +457,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 packagesQty += s.pcs;
             });
             this.formEdit.patchValue({
-                sumCbm: sumCbm !== 0 ? sumCbm : null,
-                sumNetWeight: nw !== 0 ? nw : null,
+                sumCbm: sumCbm !== 0 ? sumCbm.toFixed(3) : null,
+                sumNetWeight: nw !== 0 ? nw.toFixed(3) : null,
                 sumContainers: containerQty !== 0 ? containerQty : null,
                 sumPackages: packagesQty !== 0 ? packagesQty : null,
-                sumGrossWeight: gw !== 0 ? gw : null,
+                sumGrossWeight: gw !== 0 ? gw.toFixed(3) : null,
                 packageTypeId: res[0].unitCodeId !== 0 ? res[0].unitCodeId : null,
             });
         }
