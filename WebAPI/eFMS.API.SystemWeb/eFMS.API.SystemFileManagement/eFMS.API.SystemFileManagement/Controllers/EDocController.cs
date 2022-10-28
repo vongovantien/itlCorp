@@ -63,7 +63,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpGet("GetEDocByAccountant")]
         public async Task<IActionResult> GetEDocByAccountant(Guid billingId, string transactionType)
         {
-            var result = await _edocService.GetEDocByAccountant(billingId, transactionType);
+            var result = _edocService.GetEDocByAccountant(billingId, transactionType);
             if (result == null)
             {
                 return BadRequest(result);

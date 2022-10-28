@@ -46,7 +46,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
     ngOnInit(): void {
         if (this.typeFrom !== 'Shipment') {
-            this.transactionType = 'Accountant';
+            this.transactionType = this.typeFrom;
         }
         // this.getHblList();
     }

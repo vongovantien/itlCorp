@@ -130,7 +130,6 @@
         </ng-container>
     </div>
     <div class="m-portlet__body">
-
         <div class="m-portlet__head pointer">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title w-100">
@@ -156,116 +155,210 @@
                 </div>
             </div>
         </div>
-
-        <div class="m-portlet__body collapse show" id="accountingFile">
-            <ng-container *ngFor="let docType of edocByAcc; let i = index; trackBy: trackByFn">
-                <div class="m-portlet__head alert-block__heading pointer">
-                    <div class="m-portlet__head-caption">
-                        <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
-                            <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
-                                [attr.data-target]="'#' + docType.documentType.code">
-                                <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
-                            </h4>
-                            <div class="text-right" *ngIf="!!docType?.eDocs?.length">
-                                <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only btn-success">
-                                    <i class="la la-check"></i>
-                                </button>
+        <ng-container *ngIf="typeFrom === 'Shipment'">
+            <div class="m-portlet__body collapse show" id="accountingFile">
+                <ng-container *ngFor="let docType of edocByAcc; let i = index; trackBy: trackByFn">
+                    <div class="m-portlet__head alert-block__heading pointer">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
+                                <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
+                                    [attr.data-target]="'#' + docType.documentType.code">
+                                    <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
+                                </h4>
+                                <div class="text-right" *ngIf="!!docType?.eDocs?.length">
+                                    <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only btn-success">
+                                        <i class="la la-check"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="m-portlet__body">
-                    <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
-                        id={{docType.documentType.code}}>
-                        <div class="table-wrapper table-scrollable">
-                            <table class="table table-hover table-editable dataTable table-summary ">
-                                <thead app-table-header [headers]="headers"
-                                    (onClick)="sortEdoc('Accountant',i, $event.sortField)">
-                                    <th class="first table-actions-col">
-                                        Stt
-                                    </th>
-                                </thead>
-                                <tbody>
-                                    <ng-container *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
-                                        <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
-                                            <td>{{i + 1}}</td>
-                                            <td>
-                                                <span>{{doc.systemFileName}} </span>
-                                            </td>
-                                            <td>
-                                                <a class="text-underline" [href]="doc.imageUrl"
-                                                    target="_blank">{{doc.userFileName}}.{{doc.imageUrl |
-                                                    extension}}</a>
-                                                <span class="m--margin-left-10">
-                                                    <ng-container [ngSwitch]="doc.imageUrl | extension">
-                                                        <ng-container *ngSwitchCase="'pdf'">
-                                                            <i class="fa fa-file-pdf-o fa-lg" aria-hidden="true"></i>
+                    <div class="m-portlet__body">
+                        <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
+                            id={{docType.documentType.code}}>
+                            <div class="table-wrapper table-scrollable">
+                                <table class="table table-hover table-editable dataTable table-summary ">
+                                    <thead app-table-header [headers]="headers"
+                                        (onClick)="sortEdoc(docType?.eDocs,i, $event.sortField)">
+                                        <th class="first table-actions-col">
+                                            Stt
+                                        </th>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container
+                                            *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
+                                            <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
+                                                <td>{{i + 1}}</td>
+                                                <td>
+                                                    <span>{{doc.systemFileName}} </span>
+                                                </td>
+                                                <td>
+                                                    <a class="text-underline" [href]="doc.imageUrl"
+                                                        target="_blank">{{doc.userFileName}}.{{doc.imageUrl |
+                                                        extension}}</a>
+                                                    <span class="m--margin-left-10">
+                                                        <ng-container [ngSwitch]="doc.imageUrl | extension">
+                                                            <ng-container *ngSwitchCase="'pdf'">
+                                                                <i class="fa fa-file-pdf-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'doc'">
+                                                                <i class="fa fa-file-word-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'docx'">
+                                                                <i class="fa fa-file-word-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'xlsx'">
+                                                                <i class="fa fa-file-excel-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'xls'">
+                                                                <i class="fa fa-file-excel-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'txt'">
+                                                                <i class="fa fa-file-text-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'jpg'">
+                                                                <i class="fa fa-file-image-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchCase="'png'">
+                                                                <i class="fa fa-file-image-o fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                            </ng-container>
+                                                            <ng-container *ngSwitchDefault>
+                                                                <i class="fa fa-file fa-lg" aria-hidden="true"></i>
+                                                            </ng-container>
                                                         </ng-container>
-                                                        <ng-container *ngSwitchCase="'doc'">
-                                                            <i class="fa fa-file-word-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'docx'">
-                                                            <i class="fa fa-file-word-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'xlsx'">
-                                                            <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'xls'">
-                                                            <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'txt'">
-                                                            <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'jpg'">
-                                                            <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'png'">
-                                                            <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchDefault>
-                                                            <i class="fa fa-file fa-lg" aria-hidden="true"></i>
-                                                        </ng-container>
-                                                    </ng-container>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span>{{doc.hblNo}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{doc.billingNo}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{doc.source}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{doc.note}}</span>
-                                            </td>
-                                            <td>
-                                                <span>
-                                                    {{ doc.datetimeCreated | date:'dd/MM/yyyy HH:mm' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="text-success">{{doc.userCreated}}</span>
-                                            </td>
-                                        </tr>
-                                    </ng-container>
-                                </tbody>
-                            </table>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{doc.hblNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{doc.billingNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{doc.source}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{doc.note}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        {{ doc.datetimeCreated | date:'dd/MM/yyyy HH:mm' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-success">{{doc.userCreated}}</span>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                </ng-container>
+                <ng-container *ngIf="!edocByAcc.length">
+                    <div class="no-data">
+                        <i class="flaticon-coins"></i>
+                        <span class="no-data-text">No files found</span>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="typeFrom !== 'Shipment'">
+            <div class="m-portlet__body collapse show" id="accountingFile">
+                <div class="m-portlet__body">
+                    <div class="table-wrapper table-scrollable">
+                        <table class="table table-hover table-editable dataTable table-summary ">
+                            <thead app-table-header [headers]="headersAcc"
+                                (onClick)="sortEdoc(doc,i, $event.sortField)">
+                                <th class="first table-actions-col">
+                                    Stt
+                                </th>
+                            </thead>
+                            <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
+
+                                <tbody>
+                                    <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
+                                        <td>{{i + 1}}</td>
+                                        <td>
+                                            <span>{{doc.systemFileName}} </span>
+                                        </td>
+                                        <td>
+                                            <a class="text-underline" [href]="doc.imageUrl"
+                                                target="_blank">{{doc.userFileName}}.{{doc.imageUrl |
+                                                extension}}</a>
+                                            <span class="m--margin-left-10">
+                                                <ng-container [ngSwitch]="doc.imageUrl | extension">
+                                                    <ng-container *ngSwitchCase="'pdf'">
+                                                        <i class="fa fa-file-pdf-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'doc'">
+                                                        <i class="fa fa-file-word-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'docx'">
+                                                        <i class="fa fa-file-word-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'xlsx'">
+                                                        <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'xls'">
+                                                        <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'txt'">
+                                                        <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'jpg'">
+                                                        <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="'png'">
+                                                        <i class="fa fa-file-image-o fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchDefault>
+                                                        <i class="fa fa-file fa-lg" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span>{{doc.hblNo}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{doc.note}}</span>
+                                        </td>
+                                        <td>
+                                            <span>
+                                                {{ doc.datetimeCreated | date:'dd/MM/yyyy HH:mm' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">{{doc.userCreated}}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </ng-container>
+                        </table>
+                    </div>
                 </div>
-            </ng-container>
-            <ng-container *ngIf="!edocByAcc.length">
-                <div class="no-data">
-                    <i class="flaticon-coins"></i>
-                    <span class="no-data-text">No files found</span>
-                </div>
-            </ng-container>
-        </div>
+                <ng-container *ngIf="!edocByAcc?.eDocs?.length">
+                    <div class="no-data">
+                        <i class="flaticon-coins"></i>
+                        <span class="no-data-text">No files found</span>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDocByJobID($event)" [jobId]="jobId" [jobNo]="jobNo"
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
     [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills"></document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">

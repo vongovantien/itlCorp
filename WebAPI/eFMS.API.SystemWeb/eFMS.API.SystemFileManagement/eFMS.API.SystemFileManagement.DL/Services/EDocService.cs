@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -33,6 +34,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<OpsTransaction> _opsTranRepo;
         private IContextBase<CsTransactionDetail> _tranDeRepo;
         private IContextBase<CsTransaction> _cstranRepo;
+        private IContextBase<AcctSettlementPayment> _setleRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
 
         public EDocService(IContextBase<SysImage> SysImageRepo,
@@ -43,7 +45,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IContextBase<SysImageDetail> sysImageDetailRepo,
             IContextBase<OpsTransaction> opsTranRepo,
             IContextBase<CsTransaction> cstranRepo,
-        IContextBase<CsTransactionDetail> tranDeRepo)
+            IContextBase<AcctSettlementPayment> setleRepo,
+            IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
             _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
@@ -56,6 +59,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _tranDeRepo = tranDeRepo;
             _opsTranRepo = opsTranRepo;
             _cstranRepo = cstranRepo;
+            _setleRepo = setleRepo;
         }
 
 
@@ -345,7 +349,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DatetimeCreated = x.DateTimeCreated,
                         DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = getDocumentType(transactionType),
+                        DocumentTypeId = GetDocumentType(transactionType),
                         ImageUrl = x.Url,
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
@@ -377,109 +381,69 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             result = resultGen.Concat(resultAcc).ToList();
             return result;
         }
-        public async Task<List<EDocGroupByType>> GetEDocByAccountant(Guid billingId, string transactionType)
+        public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
-            //var lstSM=_acctset
-            //var lstTran = await _attachFileTemplateRepo.GetAsync(x => x.TransactionType == transactionType || x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT);
-            //if (lst == null) { return null; }
-            var result = new List<EDocGroupByType>();
-            //lstTran.ForEach(x =>
-            //{
-            //    var data = new EDocGroupByType()
-            //    {
-            //        documentType = x
-            //    };
-            //    result.Add(data);
-            //});
-            //var lstImageMD = new List<SysImageDetailModel>();
-            //lst.ToList().ForEach(x =>
-            //{
-            //    var imageModel = new SysImageDetailModel()
-            //    {
-            //        BillingNo = x.BillingNo,
-            //        BillingType = x.BillingNo,
-            //        DatetimeCreated = x.DatetimeCreated,
-            //        DatetimeModified = x.DatetimeModified,
-            //        DepartmentId = x.DepartmentId,
-            //        DocumentTypeId = x.DocumentTypeId,
-            //        ExpiredDate = x.ExpiredDate,
-            //        GroupId = x.GroupId,
-            //        Hblid = x.Hblid,
-            //        Id = x.Id,
-            //        JobId = x.JobId,
-            //        OfficeId = x.OfficeId,
-            //        Source = x.Source,
-            //        SysImageId = x.SysImageId,
-            //        SystemFileName = x.SystemFileName,
-            //        UserCreated = x.UserCreated,
-            //        UserFileName = x.UserFileName,
-            //        UserModified = x.UserModified,
-            //        ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url : null,
-            //        HBLNo = x.Hblid != null ? _attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ?
-            //        _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null :
-            //        _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ? _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null : null,
-            //        Note = x.Note
-            //    };
-            //    lstImageMD.Add(imageModel);
-            //});
-            //var newImageIds = _sysImageDetailRepo.Get(x => x.JobId == jobID).Select(x => x.SysImageId).ToList();
-            //var imageExist = _sysImageRepo.Get(x => x.ObjectId == jobID.ToString()).ToList();
-            //var imageMap = new List<SysImage>();
-            //foreach (var image in imageExist)
-            //{
-            //    if (!newImageIds.Any(x => x == image.Id))
-            //    {
-            //        imageMap.Add(image);
-            //    }
-            //}
-            //var otherId = lstTran.Where(x => x.Code == "OTH").FirstOrDefault().Id;
-            //var listOther = new List<SysImageDetailModel>();
-            //listOther.AddRange(lstImageMD.Where(x => x.DocumentTypeId == otherId));
-            //if (imageMap.Count > 0)
-            //{
-            //    imageMap.ForEach(x =>
-            //    {
-            //        var imagedetail = new SysImageDetailModel
-            //        {
-            //            BillingNo = null,
-            //            BillingType = "Other",
-            //            DatetimeCreated = x.DateTimeCreated,
-            //            DatetimeModified = x.DatetimeModified,
-            //            DepartmentId = currentUser.DepartmentId,
-            //            DocumentTypeId = getDocumentType(transactionType),
-            //            ImageUrl = x.Url,
-            //            GroupId = currentUser.GroupId,
-            //            UserCreated = x.UserCreated,
-            //            UserModified = x.UserModified,
-            //            SystemFileName = "OTH" + x.Name,
-            //            JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
-            //            UserFileName = x.Name,
-            //            Id = x.Id
-            //        };
-            //        listOther.Add(imagedetail);
-            //    });
-            //}
-            //lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
-            //{
-            //    if (result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
-            //    {
-            //        result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
-            //    };
-            //});
-            //var resultAcc = result.Where(x => x.documentType.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT && x.EDocs != null).ToList();
-            //var resultGen = result.Where(x => x.documentType.Type != SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT).ToList();
-            //var resultGenEdoc = resultGen.Where(x => x.EDocs != null).ToList().OrderBy(x => x.EDocs.Count());
-            //var resultGenNotEdoc = resultGen.Where(x => x.EDocs == null);
-            //resultGen = resultGenEdoc.Concat(resultGenNotEdoc).ToList();
-            //if (resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault() != null)
-            //{
-            //    resultGen.Where(x => x.documentType.Code == "OTH").FirstOrDefault().EDocs = listOther.Count > 0 ? listOther : new List<SysImageDetailModel>();
-            //}
-            //result = resultGen.Concat(resultAcc).ToList();
+            var result = new EDocGroupByType();
+            var lstEdoc = new List<SysImageDetailModel>();
+            var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList();
+          
+            if (transactionType == "Settlement")
+            {
+                var settle = _setleRepo.Get(z => z.Id == billingId).FirstOrDefault();
+                var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
+                var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x=>x.Id);
+                result.documentType = attachTemplate;
+                imageExist.ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        Id = billingId,
+                        BillingNo = settle.SettlementNo,
+                        SystemFileName = "SM" + x.Name,
+                        ImageUrl = x.Url,
+                        DatetimeCreated = x.DateTimeCreated,
+                        BillingType = transactionType,
+                        DatetimeModified = x.DatetimeModified,
+                        DepartmentId = currentUser.DepartmentId,
+                        DocumentTypeId = attachTemplate.Id,
+                        Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
+                        SysImageId = x.Id,
+                        UserCreated = x.UserCreated,
+                        UserFileName = x.Name,
+                        UserModified = x.UserModified
+                    };
+                lstEdoc.Add(edoc);
+                });
+                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).ToList();
+                settleEdoc.ForEach(x =>
+                {
+                    var image= _sysImageRepo.Get(z=>z.Id == x.SysImageId).FirstOrDefault();
+                    var edoc = new SysImageDetailModel()
+                    {
+                        Id = billingId,
+                        BillingNo = settle.SettlementNo,
+                        SystemFileName = x.SystemFileName,
+                        ImageUrl = image.Url,
+                        DatetimeCreated = x.DatetimeCreated,
+                        BillingType = transactionType,
+                        DatetimeModified = x.DatetimeModified,
+                        DepartmentId = currentUser.DepartmentId,
+                        DocumentTypeId = attachTemplate.Id,
+                        Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
+                        SysImageId = x.Id,
+                        UserCreated = x.UserCreated,
+                        UserFileName = x.UserFileName,
+                        UserModified = x.UserModified
+                    };
+                    lstEdoc.Add(edoc);
+                });
+                result.EDocs = lstEdoc;
+                return result;
+            };
             return result;
         }
 
-        private int getDocumentType(string transationType)
+        private int GetDocumentType(string transationType)
         {
             return _attachFileTemplateRepo.Get(x => x.TransactionType == transationType && x.Code == "OTH").FirstOrDefault().Id;
         }

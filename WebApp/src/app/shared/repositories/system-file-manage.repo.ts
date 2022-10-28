@@ -78,6 +78,12 @@ export class SystemFileManageRepo {
         );
     }
 
+    getEDocByAccountant(billingId: string, transitionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByAccountant?billingId=${billingId}&transactionType=${transitionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteEdoc(edocId: string) {
         return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DeleteEDoc/${edocId}`).pipe(
             map((data: any) => data)

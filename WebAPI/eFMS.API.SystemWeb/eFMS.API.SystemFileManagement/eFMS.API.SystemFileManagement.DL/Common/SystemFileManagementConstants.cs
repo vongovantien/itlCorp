@@ -6,6 +6,7 @@
         public const string ATTACH_TEMPLATE_TYPE_ACCOUNTANT = "Accountant";
         public const string ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADVANCE = "Advance";
         public const string ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT = "Settlement";
+        public const string ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE = "ADV-Settlement";
         public const string ATTACH_TEMPLATE_ACCOUNTING_TYPE_SOA = "SOA";
     }
 }
