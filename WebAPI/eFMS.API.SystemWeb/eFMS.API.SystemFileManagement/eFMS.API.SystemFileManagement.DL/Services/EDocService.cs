@@ -399,7 +399,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var edoc = new SysImageDetailModel()
                     {
-                        Id = billingId,
+                        Id = x.Id,
                         BillingNo = settle.SettlementNo,
                         SystemFileName = "SM" + x.Name,
                         ImageUrl = x.Url,
@@ -422,7 +422,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var jobDetail = GetJobDetail(x.JobId, x.Hblid);
                     var edoc = new SysImageDetailModel()
                     {
-                        Id = billingId,
+                        Id = x.Id,
                         BillingNo = settle.SettlementNo,
                         SystemFileName = x.SystemFileName,
                         ImageUrl = image.Url,
@@ -517,9 +517,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
                     }
                 }
-                else
+                else 
                 {
-                    await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                    if (edoc != null)
+                    {
+                        await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                    }
                     await _sysImageRepo.DeleteAsync(x => x.Folder == edoc.Source && x.Id == edoc.SysImageId);
                 }
 
