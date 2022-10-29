@@ -220,6 +220,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         DocumentTypeId = attachTemplate.Id,
                                         Note = edoc.Note,
                                         GroupId = currentUser.GroupId,
+                                        Hblid=edoc.HBL,
                                     };
 
                                     _sysImageDetailRepo.Add(imageDetail, false);
@@ -246,7 +247,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = sysImage.Name,
+                                        SystemFileName = "SM"+sysImage.Name,
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -393,7 +394,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
                 var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x=>x.Id);
                 result.documentType = attachTemplate;
-                imageExist.ForEach(x =>
+                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).ToList();
+                imageExist.Where(x=>!settleEdoc.Any(z=>z.SysImageId==x.Id)).ToList().ForEach(x =>
                 {
                     var edoc = new SysImageDetailModel()
                     {
@@ -414,7 +416,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                 lstEdoc.Add(edoc);
                 });
-                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).ToList();
                 settleEdoc.ForEach(x =>
                 {
                     var image= _sysImageRepo.Get(z=>z.Id == x.SysImageId).FirstOrDefault();
@@ -433,7 +434,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         SysImageId = x.Id,
                         UserCreated = x.UserCreated,
                         UserFileName = x.UserFileName,
-                        UserModified = x.UserModified
+                        UserModified = x.UserModified,
+                        Note = x.Note,
+                        HBLNo = GetHBLNo(x.JobId, x.Hblid),
                     };
                     lstEdoc.Add(edoc);
                 });
@@ -441,6 +444,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return result;
             };
             return result;
+        }
+
+        private string GetHBLNo(Guid? jobId,Guid? hblId)
+        {
+            if (hblId == null || jobId == null)
+            {
+                return null;
+            }
+            var jobType=_opsTranRepo.Get(x=>x.Id==jobId);
+            if (jobType.FirstOrDefault() != null)
+            {
+                return _opsTranRepo.Get(x => x.Hblid == hblId).FirstOrDefault().Hwbno;
+            }
+            return _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault().Hwbno;
         }
 
         private int GetDocumentType(string transationType)

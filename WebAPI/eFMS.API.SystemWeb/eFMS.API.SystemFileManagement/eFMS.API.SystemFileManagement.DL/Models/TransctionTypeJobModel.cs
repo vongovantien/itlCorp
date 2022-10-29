@@ -8,5 +8,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string TransactionType { get; set; }
         public string BillingNo { get; set; }
         public string Code { get; set; }
+        public Guid HBLNo { get; set; }
     }
 }

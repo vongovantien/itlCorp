@@ -155,7 +155,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 ).subscribe(
                     (res: any) => {
                         if (!!res) {
-                            this.housebills = res;
+                            console.log(this.housebills);
+
                         }
                     },
                 );
@@ -170,7 +171,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                 let item = ({
                                     hwbno: element.hbl,
                                     jobNo: element.jobId,
-                                    id: element.hblid
+                                    id: element.hblid,
+                                    jobId: element.shipmentId,
                                 })
                                 this.housebills.push(item);
                             }
@@ -212,7 +214,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             docType: docType,
             note: this.selectedEdoc.note,
             hwbNo: this.selectedEdoc.hblid,//hblNo 
-            hblid: this.selectedEdoc.hblid//hblNo 
+            hblid: this.selectedEdoc.hblid,//hblNo 
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);

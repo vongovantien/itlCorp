@@ -28,11 +28,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     formData: IEDocUploadFile;
     @Input() typeFrom: string = 'Shipment';
     documentTypes: any[] = [];
-    source: string = 'Shipment';
+    //source: string = 'Shipment';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
     @Input() housebills: any[] = [];
-    billingNo: string = '';
+    //billingNo: string = '';
     @Input() billingId: string = '';
+    @Input() billingNo: string = '';
     chargeSM: any;
     isSubmitted: boolean = false;
     constructor(
@@ -45,9 +46,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.permissionShipments = this._store.select(getTransactionPermission);
     }
     ngOnInit(): void {
-        if (this.typeFrom !== 'Shipment') {
-            this.transactionType = this.typeFrom;
-        }
+        this.transactionType = this.typeFrom;
         // this.getHblList();
     }
     chooseFile(event: any) {
@@ -90,6 +89,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 } else {
                     this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
                     this.listFile[index].hblid = event;
+                    this.listFile[index].jobId = this.housebills.find(x => x.id === event).jobId;
+                    //this.listFile[index].billingNo = this.billingNo;
                 }
                 break;
             case 'note':
@@ -110,12 +111,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({
-                JobId: this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID,
+                JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId,
                 Code: x.Code,
                 TransactionType: this.transactionType,
                 AliasName: x.aliasName,
                 BillingNo: '',
-                BillingType: '',
+                BillingType: this.typeFrom,
                 HBL: x.hblid !== undefined ? x.hblid : SystemConstants.EMPTY_GUID,
                 FileName: x.name,
                 Note: x.note !== undefined ? x.note : '',
