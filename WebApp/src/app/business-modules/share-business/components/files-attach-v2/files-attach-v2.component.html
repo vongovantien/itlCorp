@@ -330,6 +330,9 @@
                                         <td>
                                             <span>{{doc.hblNo}}</span>
                                         </td>
+                                        <td *ngIf="typeFrom==='Settlement'">
+                                            <span>{{doc.jobNo}}</span>
+                                        </td>
                                         <td>
                                             <span>{{doc.note}}</span>
                                         </td>
@@ -367,7 +370,7 @@
         <div class="menu-context__item" *ngIf="isLocked===false" (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
-        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="typeFrom === 'Shipment' && isLocked===false">
+        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="isLocked===false">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>

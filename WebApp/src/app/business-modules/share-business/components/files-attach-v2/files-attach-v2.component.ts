@@ -114,6 +114,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.headersAcc = [{ title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
             { title: 'House Bill No', field: 'hblNo', sortable: true },
+            { title: 'Job No', field: 'jobNo' },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
