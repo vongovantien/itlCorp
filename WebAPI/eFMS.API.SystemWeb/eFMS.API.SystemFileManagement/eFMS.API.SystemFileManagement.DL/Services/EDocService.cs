@@ -409,8 +409,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
                 var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x => x.Id);
                 result.documentType = attachTemplate;
-                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).ToList();
-                imageExist.Where(x => !settleEdoc.Any(z => z.SysImageId == x.Id)).ToList().ForEach(x =>
+                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).GroupBy(x=>x.SysImageId).ToList();
+                imageExist.Where(x => !settleEdoc.Any(z => z.FirstOrDefault().SysImageId == x.Id)).ToList().ForEach(x =>
                 {
                     var edoc = new SysImageDetailModel()
                     {
@@ -431,52 +431,51 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     lstEdoc.Add(edoc);
                 });
-                settleEdoc.ForEach(x =>
+                foreach(var x in settleEdoc)
                 {
-                    var image = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault();
-                    var jobDetail = GetJobDetail(x.JobId, x.Hblid);
+                    var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
+                    var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
                     var edoc = new SysImageDetailModel()
                     {
-                        Id = x.Id,
+                        Id = x.FirstOrDefault().Id,
                         BillingNo = settle.SettlementNo,
-                        SystemFileName = x.SystemFileName,
+                        SystemFileName = x.FirstOrDefault().SystemFileName,
                         ImageUrl = image.Url,
-                        DatetimeCreated = x.DatetimeCreated,
+                        DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
                         BillingType = transactionType,
-                        DatetimeModified = x.DatetimeModified,
+                        DatetimeModified = x.FirstOrDefault().DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
                         DocumentTypeId = attachTemplate.Id,
                         Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
-                        SysImageId = x.Id,
-                        UserCreated = x.UserCreated,
-                        UserFileName = x.UserFileName,
-                        UserModified = x.UserModified,
-                        Note = x.Note,
+                        SysImageId = x.FirstOrDefault().Id,
+                        UserCreated = x.FirstOrDefault().UserCreated,
+                        UserFileName = x.FirstOrDefault().UserFileName,
+                        UserModified = x.FirstOrDefault().UserModified,
+                        Note = x.FirstOrDefault().Note,
                         HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
-                });
+                }
                 result.EDocs = lstEdoc;
                 return result;
             };
             return result;
         }
 
-        private TransctionTypeJobModel GetJobDetail(Guid? jobId, Guid? hblId)
+        private TransctionTypeJobModel GetJobDetail(Guid? jobId, Guid? hblId, int? documentId)
         {
-            if (hblId == null || jobId == null)
+            var typeJob = _attachFileTemplateRepo.Get(x => x.Id == documentId).FirstOrDefault();
+            if (typeJob.TransactionType == "CL")
             {
-                return null;
-            }
-            var jobType = _opsTranRepo.Get(x => x.Id == jobId);
-            if (jobType.FirstOrDefault() != null)
-            {
-                var JobOPS = _opsTranRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
+                var JobOPS = hblId==Guid.Empty|| hblId == null? _opsTranRepo.Get(x => x.Id == jobId).FirstOrDefault():_opsTranRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
                 return new TransctionTypeJobModel() { HBLNo = JobOPS.Hwbno, JobNo = JobOPS.JobNo };
             }
-            var JobCS = _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault();
-            return new TransctionTypeJobModel() { HBLNo = JobCS.Hwbno, JobNo = _cstranRepo.Get(x => x.Id == JobCS.JobId).FirstOrDefault().JobNo };
+            else
+            {
+                var JobCS = _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault();
+                return new TransctionTypeJobModel() { HBLNo = JobCS.Hwbno, JobNo = _cstranRepo.Get(x => x.Id == JobCS.JobId).FirstOrDefault().JobNo };
+            }
         }
 
         private int GetDocumentType(string transationType)

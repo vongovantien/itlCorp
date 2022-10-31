@@ -110,7 +110,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({
-                JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId,
+                JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                 Code: x.Code,
                 TransactionType: this.transactionType,
                 AliasName: x.aliasName,
