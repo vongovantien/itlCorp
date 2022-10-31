@@ -156,7 +156,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        if (containers.length>0 && !this.containerDescription) {
+        if (this.containers.length>0) {
             // this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {
@@ -187,7 +187,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         // for (const item of contData) {
         //     this.containerDetail += this.handleStringCont(item);
         // }
-        // this.containerDetail = 'A PART OF CONTAINER S.T.C';
+        this.containerDetail = 'A PART OF CONTAINER S.T.C';
 
     }
 

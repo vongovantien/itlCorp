@@ -151,8 +151,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         }
 
         // * Container
-        if (this.containers.length>0 && !this.containerDescription) {
-            // this.containerDetail = '';
+        if (this.containers.length>0) {
+            this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
@@ -166,30 +166,30 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             }
         }
         
-        if (!!this.containers.length && !this.containerDetail){
-            const objApartOf = containers.filter(x => x.isPartOfContainer === true);
-            const contObject1 = this.mapObjectData(objApartOf);
-            const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
-            const contObject2 = this.mapObjectData(objNotApartOf);
-            const contDataNotAprtOf = [];
-            for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
-                contDataNotAprtOf.push({
-                    cont: item,
-                    quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-                });
-            }
+        
+        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+        const contObject1 = this.mapObjectData(objApartOf);
+        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+        const contObject2 = this.mapObjectData(objNotApartOf);
+        const contDataNotAprtOf = [];
+        for (const item of Object.keys(_groupBy(contObject2, 'cont'))) {
+            contDataNotAprtOf.push({
+                cont: item,
+                quantity: _groupBy(contObject2, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
 
-            for (const item of contDataNotAprtOf) {
-                this.containerDetail += this.handleStringCont(item);
-            }
+        for (const item of contDataNotAprtOf) {
+            this.containerDetail += this.handleStringCont(item);
+        }
 
-            for (const item of contObject1) {
-                this.containerDetail += "A Part Of ";
-                this.containerDetail += this.handleStringCont(item);
-            }
+        for (const item of contObject1) {
+            this.containerDetail += "A Part Of ";
+            this.containerDetail += this.handleStringCont(item);
+        }
 
-            this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
-        } 
+        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
+       
     }
 
     initContainer() {
@@ -221,9 +221,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     onRefresh() {
         this.confirmRefresh.hide();
-
-        // this.description = '';
-        // this.commodities = '';
+        this.containerDetail = '';
+        this.containerDescription = '';
         this.updateData(this.containers);
     }
 
