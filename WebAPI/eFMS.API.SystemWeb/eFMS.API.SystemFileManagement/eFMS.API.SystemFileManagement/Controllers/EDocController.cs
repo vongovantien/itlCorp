@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
@@ -138,7 +137,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpPost("UploadPreviewTemplateToEDoc")]
         public async Task<IActionResult> UploadPreviewTemplateToEDoc(List<EDocAttachPreviewTemplateUploadModel> models)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = models });
             }

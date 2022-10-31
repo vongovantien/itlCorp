@@ -22,8 +22,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
-    selectedtDocType: any = null;
-    edocSelected: any;
+    @Input() selectedtDocType: any = null;
     detailDocId: number;
     formData: IEDocUploadFile;
     @Input() typeFrom: string = 'Shipment';
@@ -156,6 +155,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             this.resetForm();
                             this.hide();
                             this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
                         }
                     }
                 );
@@ -176,6 +176,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             this.resetForm();
                             this.hide();
                             this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
                         }
                     }
                 );

@@ -187,7 +187,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
         console.log(edoc);
-
+        this.documentAttach.selectedtDocType = edoc.documentTypeId;
         const qContextMenuList = this.queryListMenuContext.toArray();
         if (!!qContextMenuList.length) {
             qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
@@ -263,7 +263,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
-            this._systemFileRepo.getEDocByJob(this.jobId, transactionType)
+            this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
                 .pipe(
                     catchError(this.catchError),
                 )

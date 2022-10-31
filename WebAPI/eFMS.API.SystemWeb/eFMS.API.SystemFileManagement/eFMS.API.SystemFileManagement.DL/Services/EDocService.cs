@@ -177,7 +177,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         list.Add(sysImage);
                         if (type == "Shipment")
                         {
-                            var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId && x.TransactionType == edoc.TransactionType).FirstOrDefault();
+                            var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
                             var sysImageDetail = new SysImageDetail
                             {
                                 Id = Guid.NewGuid(),
@@ -348,9 +348,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     imageMap.Add(image);
                 }
             }
-            var otherId = lstTran.Where(x => x.Code == "OTH").FirstOrDefault().Id;
+            var otherId = lstTran.Where(x => x.Code == "OTH").FirstOrDefault()!=null? lstTran.Where(x => x.Code == "OTH").FirstOrDefault().Id:0;
             var listOther = new List<SysImageDetailModel>();
-            listOther.AddRange(lstImageMD.Where(x => x.DocumentTypeId == otherId));
+            if (otherId != 0)
+            {
+                listOther.AddRange(lstImageMD.Where(x => x.DocumentTypeId == otherId));
+            }
             if (imageMap.Count > 0)
             {
                 imageMap.ForEach(x =>
@@ -896,7 +899,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                     }
                 }
-                
+
                 return result;
             }
             catch (Exception ex)
@@ -911,7 +914,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 string code = PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
-                var imageDetail = new SysImageDetail {
+                var imageDetail = new SysImageDetail
+                {
                     Id = Guid.NewGuid(),
                     DatetimeCreated = DateTime.Now,
                     DatetimeModified = DateTime.Now,
@@ -929,7 +933,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     DocumentTypeId = _attachFileTemplateRepo.Get(x => x.Code == code && x.TransactionType == model.TransactionType)?.FirstOrDefault().Id
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
-                
+
                 return result;
             }
             catch (Exception ex)
