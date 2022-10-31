@@ -53,8 +53,8 @@ export class ReportPreviewComponent extends PopupBase {
 
     onConfirmSaveEdoc() {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-            title: 'Confirm save eDOC',
-            body: 'Are you sure to save this file',
+            title: 'Confirm save attachment',
+            body: 'Are you sure to save this file to job ?',
         }, () => {
             this.onConfirmEdoc.emit();
         });

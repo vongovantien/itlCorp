@@ -135,36 +135,20 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
         }
 
-        [HttpPost("UploadAttachedFileEdocByUrl")]
-        public async Task<IActionResult> UploadAttachedFileEdocByUrl(string fileUrl, string module, string folder, Guid Id)
+        [HttpPost("UploadPreviewTemplateToEDoc")]
+        public async Task<IActionResult> UploadPreviewTemplateToEDoc(List<EDocAttachPreviewTemplateUploadModel> models)
         {
-
-            byte[] filesArrayBuffer = await FileHelper.DownloadFile(fileUrl);
-            if (filesArrayBuffer == null)
+            if(!ModelState.IsValid)
             {
-                return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = fileUrl });
+                return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = models });
             }
-            FileReportUpload fileUpload = new FileReportUpload
-            {
-                FileName = Path.GetFileName(fileUrl),
-                FileContent = filesArrayBuffer
-            };
 
-            var stream = new MemoryStream(fileUpload.FileContent);
-            List<IFormFile> fFiles = new List<IFormFile>() { new FormFile(stream, 0, stream.Length, null, fileUpload.FileName) };
-            FileUploadModel model = new FileUploadModel
-            {
-                Files = fFiles,
-                FolderName = folder,
-                Id = Id,
-                ModuleName = module
-            };
-            HandleState hs = await _edocService.PostFileAttacheDoc(model);
+            HandleState hs = await _edocService.AttachPreviewTemplate(models);
             if (hs.Success)
             {
                 return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
             }
-            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = model });
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = models });
         }
     }
 }

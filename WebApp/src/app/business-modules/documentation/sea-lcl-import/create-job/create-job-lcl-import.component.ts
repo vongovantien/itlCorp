@@ -7,7 +7,7 @@ import { formatDate } from '@angular/common';
 import { ShareBusinessImportJobDetailPopupComponent, ShareJobDetailComponent } from '@share-bussiness';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
 import { RoutingConstants } from '@constants';
 
@@ -37,8 +37,10 @@ export class SeaLCLImportCreateJobComponent extends ShareJobDetailComponent impl
         protected _documenRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.gotoList;
     }
 

@@ -9,6 +9,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<CsTransaction> _cstranRepo;
         private IContextBase<AcctSettlementPayment> _setleRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
-
+        private readonly Dictionary<string, string> PreviewTemplateCodeMappingAttachTemplateCode = new Dictionary<string, string>();
         public EDocService(IContextBase<SysImage> SysImageRepo,
             IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
             IS3Service client,
@@ -59,6 +60,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _opsTranRepo = opsTranRepo;
             _cstranRepo = cstranRepo;
             _setleRepo = setleRepo;
+
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("HBL", "HBL");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("MBL", "MBL");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("DEBIT", "INV");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("CREDIT", "CN");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("INVOICE", "INV");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("MAWB", "MAWB");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("MNF", "MNF");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("POD", "POD");
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("AT", "OTH"); // Attach List
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("CoverPage", "OTH"); // Coverpage
+            PreviewTemplateCodeMappingAttachTemplateCode.Add("PLSheet", "OTH"); // PL
         }
 
 
@@ -838,6 +851,91 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
             }
             return urlImage;
+        }
+
+        public async Task<HandleState> AttachPreviewTemplate(List<EDocAttachPreviewTemplateUploadModel> models)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                foreach (var model in models)
+                {
+
+                    byte[] filesArrayBuffer = await FileHelper.DownloadFile(model.Url);
+                    if (filesArrayBuffer == null)
+                    {
+                        return new HandleState((object)"Not found files");
+                    }
+                    FileReportUpload fileUpload = new FileReportUpload
+                    {
+                        FileName = Path.GetFileName(model.Url),
+                        FileContent = filesArrayBuffer
+                    };
+
+                    var stream = new MemoryStream(fileUpload.FileContent);
+                    List<IFormFile> fFiles = new List<IFormFile>() { new FormFile(stream, 0, stream.Length, null, fileUpload.FileName) };
+                    FileUploadModel UploadModel = new FileUploadModel
+                    {
+                        Files = fFiles,
+                        FolderName = model.Folder,
+                        Id = model.ObjectId,
+                        ModuleName = model.Module
+                    };
+                    List<SysImage> imageList = await UpLoadS3(UploadModel);
+
+                    if (imageList.Count > 0)
+                    {
+                        HandleState hsAddImage = await _sysImageRepo.AddAsync(imageList);
+
+                        if (hsAddImage.Success)
+                        {
+                            foreach (var image in imageList)
+                            {
+                                result = await MappingPreviewTemplateToShipment(model, image);
+                            }
+                        }
+                    }
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState((object)ex.ToString());
+            }
+        }
+
+        private async Task<HandleState> MappingPreviewTemplateToShipment(EDocAttachPreviewTemplateUploadModel model, SysImage image)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                string code = PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
+                var imageDetail = new SysImageDetail {
+                    Id = Guid.NewGuid(),
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserCreated = currentUser.UserName,
+                    UserModified = currentUser.UserName,
+                    DepartmentId = currentUser.DepartmentId,
+                    OfficeId = currentUser.OfficeID,
+                    GroupId = currentUser.GroupId,
+                    Hblid = model.HblId,
+                    JobId = model.ObjectId,
+                    Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
+                    SysImageId = image.Id,
+                    UserFileName = Path.GetFileNameWithoutExtension(image.Name),
+                    SystemFileName = Path.GetFileNameWithoutExtension(image.Name),
+                    DocumentTypeId = _attachFileTemplateRepo.Get(x => x.Code == code && x.TransactionType == model.TransactionType)?.FirstOrDefault().Id
+                };
+                result = await _sysImageDetailRepo.AddAsync(imageDetail);
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState((object)ex.ToString());
+            }
         }
     }
 }
