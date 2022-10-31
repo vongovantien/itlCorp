@@ -1,24 +1,22 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 
-import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
-import { DocumentationRepo } from '@repositories';
-import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
-import { DIM, CsTransaction } from '@models';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { ICanComponentDeactivate } from '@core';
+import { CsTransaction, DIM } from '@models';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
 
-import { combineLatest, of, Observable, merge } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
+import { combineLatest, merge, Observable, of } from 'rxjs';
+import { catchError, concatMap, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import * as fromShareBussiness from '../../../share-business/store';
-import isUUID from 'validator/lib/isUUID';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RoutingConstants } from '@constants';
+import { ICrystalReport } from '@interfaces';
+import isUUID from 'validator/lib/isUUID';
+import * as fromShareBussiness from '../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -29,15 +27,10 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    //@ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
-    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     dimensionDetails: DIM[];
 
@@ -59,13 +52,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _ngProgressService: NgProgress,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
 
     ) {
-        super(_toastService, _documentRepo, _router, _store);
-
-        this._progressRef = this._ngProgressService.ref();
-
+        super(_toastService, _documentRepo, _router, _store, _exportRepo, _fileMngtRepo);
         this.requestCancel = this.handleCancelForm;
     }
 
@@ -124,34 +115,17 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (res: CsTransaction) => {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
                     this.shipmentDetail = res;
-                    this.formCreateComponent.isUpdate = true;
-
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
                         this.formCreateComponent.getUserLogged();
                         this.headerComponent.resetBreadcrumb("Create Job");
                     } else {
                         this.headerComponent.resetBreadcrumb("Job Detail");
+                        //this.attachV2.isJobLock = res.isLocked;
                     }
                 }
             )
     }
-
-    previewShipmentCoverPage() {
-        this._documentRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
 
     onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
@@ -216,11 +190,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
         this._documentRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -255,57 +227,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
             class: 'bg-danger'
         });
-    }
-
-
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'hbl':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
-                break;
-            case 'shipment':
-                if (this.ACTION === 'COPY') {
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
-                } else {
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`]);
-                }
-                break;
-            case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
-                break;
-            case 'assignment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-            case 'files':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
-                break;
-            case 'advance-settle':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
-                break;
-        }
-        // if (tabName !== 'advance-settle') {
-        //     this._viewContainerRef.clear();
-        // }
-    }
-
-    previewPLsheet(currency: string) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documentRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`]);
     }
 
     prepareDeleteJob() {
@@ -347,13 +268,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documentRepo.deleteMasterBill(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -414,13 +331,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     onLockShipment() {
-        this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -491,13 +404,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             podDescription: modelAdd.podDescription,
         };
 
-        this._progressRef.start();
         this._documentRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
@@ -556,38 +465,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         return of(!isEdited);
     }
 
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
-    }
-
-    // onUpdateFlightInfo() {
-    //     //this.confirmPopup.show();
-    // }
-
     updateFlightInfor() {
         this._documentRepo.updateFlightInfo(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
-            ).subscribe(
+            .subscribe(
                 (r: any) => {
                     if (r.status) {
                         this._toastService.success(r.message);
@@ -597,7 +477,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 },
 
             );
-        //this.confirmPopup.close();
     }
 }
 

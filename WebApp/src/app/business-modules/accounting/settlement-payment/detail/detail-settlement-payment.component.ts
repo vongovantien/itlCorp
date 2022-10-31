@@ -174,8 +174,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this._toastService.warning("Settlement not found");
                         return;
                     }
-                    this.settlementPayment = res;
-
+                    this.settlementPayment = res
                     // * Update store.
                     this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 

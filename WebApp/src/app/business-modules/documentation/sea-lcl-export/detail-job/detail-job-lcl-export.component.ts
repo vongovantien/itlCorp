@@ -1,22 +1,19 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import { ICanComponentDeactivate } from '@core';
-import { CsTransaction } from '@models';
-import { DocumentationRepo } from '@repositories';
-import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { SeaLCLExportCreateJobComponent } from '../create-job/create-job-lcl-export.component';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 
 import { combineLatest, of, Observable } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, concatMap } from 'rxjs/operators';
 
 
 import isUUID from 'validator/lib/isUUID';
@@ -30,32 +27,25 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
-
-    shipmentDetail: CsTransaction;
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
-    params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
 
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
-        protected _documenRepo: DocumentationRepo,
+        protected _documentRepo: DocumentationRepo,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
-        this._progressRef = this._ngProgressService.ref();
+        super(_toastService, _documentRepo, _router, _actionStoreSubject, _cd, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.handleCancelForm;
     }
 
@@ -150,7 +140,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     duplicateJob(body: any) {
-        this._documenRepo.importCSTransaction(body)
+        this._documentRepo.importCSTransaction(body)
             .pipe(
                 catchError(this.catchError)
             )
@@ -177,11 +167,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
-        this._documenRepo.updateCSTransaction(body)
+        this._documentRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -215,55 +203,12 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         });
     }
 
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'hbl':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/hbl`]);
-                break;
-            case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
-                break;
-            case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
-                break;
-            case 'assignment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-            case 'files':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
-                break;
-            case 'advance-settle':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
-                break;
-        }
-    }
-
-    previewPLsheet(currency: string) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}`]);
-    }
-
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(
                 concatMap((isAllowDelete: boolean) => {
                     if (isAllowDelete) {
-                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                        return this._documentRepo.checkMasterBillAllowToDelete(this.jobId);
                     }
                     return of(403);
                 }),
@@ -298,13 +243,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documentRepo.deleteMasterBill(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -328,7 +269,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'SLE')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'SLE')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
@@ -366,14 +307,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     }
 
     onLockShipment() {
-
-        this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -422,34 +358,15 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
         };
 
-        this._progressRef.start();
         this._documentRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
                         this._toastService.success(r.message);
                     } else {
                         this._toastService.error(r.message);
-                    }
-                },
-            );
-    }
-
-    previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
@@ -497,25 +414,5 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             return;
         }
         return of(!isEdited);
-    }
-
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
     }
 }

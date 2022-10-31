@@ -6,6 +6,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
@@ -28,25 +29,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return hs;
         }
 
-        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType)
+        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType,string billingNo)
         {
             switch (transactionType)
             {
                 case "SOA":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code!="OTH");
                 case "Settlement":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement");
+                    var SMCode= await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
+                    return SMCode.GroupBy(x => x.Code).Select(x=>x.FirstOrDefault()).ToList();
                 case "Advace":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                 default:
-                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType);
+                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
             }
-
-            //if (transactionType=="Accountant")
-            //{
-            //    return await DataContext.GetAsync(x => x.Type == "Accountant");
-            //}
-            //return await DataContext.GetAsync(x => x.TransactionType == transactionType);
         }
     }
 }

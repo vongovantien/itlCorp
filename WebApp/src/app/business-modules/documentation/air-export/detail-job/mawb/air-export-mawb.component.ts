@@ -5,9 +5,9 @@ import { IAppState, getCataloguePortState, GetCataloguePortAction } from '@store
 import { getTransactionLocked, getTransactionPermission, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction } from '@share-bussiness';
 import { FormGroup, AbstractControl, Validators, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';
-import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { Customer, PortIndex, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction, Currency } from '@models';
+import { Customer, PortIndex, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction, Currency, Crystal } from '@models';
 import { formatDate, formatCurrency } from '@angular/common';
 import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
@@ -19,10 +19,13 @@ import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { Observable, of, merge } from 'rxjs';
-import { map, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged, mergeMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareAirServiceDIMVolumePopupComponent } from '../../../share-air/components/dim/dim-volume.popup';
 import { HttpResponse, HttpResponseBase } from '@angular/common/http';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -30,11 +33,10 @@ import { HttpResponse, HttpResponseBase } from '@angular/common/http';
     styleUrls: ['./air-export-mawb.component.scss']
 })
 
-export class AirExportMAWBFormComponent extends AppForm implements OnInit {
+export class AirExportMAWBFormComponent extends AppForm implements OnInit, ICrystalReport {
     @ViewChild(ShareAirServiceDIMVolumePopupComponent) dimVolumePopup: ShareAirServiceDIMVolumePopupComponent;
     @ViewChild(ShareAirExportOtherChargePopupComponent) otherChargePopup: ShareAirExportOtherChargePopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     formMAWB: FormGroup;
 
@@ -125,7 +127,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -184,7 +187,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         return data;
                     } else {
                         console.log("created csAirwaybill");
-
                         this.isUpdate = false;
                         this.formMAWB.patchValue({
                             pod: data.pod,
@@ -519,7 +521,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                title: 'Cannot update MAWB',
+                body: this.invalidFormText,
+            });
             return;
         }
 
@@ -830,7 +835,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -848,7 +853,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -866,7 +871,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -884,7 +889,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -893,7 +898,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             );
     }
 
-    exportNCTSALS(){
+    exportNCTSALS() {
         this._progressRef.start();
         this._exportRepo.exportNCTSALSAirwayBill(this.jobId)
             .pipe(
@@ -902,7 +907,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -921,14 +926,68 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.reportPopup.frm.nativeElement.submit();
-                            this.reportPopup.show();
-                        }, 1000);
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
+            );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: 'MAWB',
+                            transactionType: 'AE'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
             );
     }
 }

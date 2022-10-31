@@ -74,13 +74,16 @@ export class ApiService {
         return this._http.put(this.setUrl(url), formData, options);
     }
 
-    postFormData(url: string, formData: any) {
+    postFormData(url: string, formData: any, observe: any = 'body', responseType: any = 'json') {
         const options = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/x-www-form-urlencoded',
-            })
+            }),
         };
-        return this._http.post(this.setUrl(url), formData);
+        return this._http.post(this.setUrl(url), formData, {
+            observe: observe,
+            responseType: responseType
+        });
 
     }
 
@@ -136,13 +139,15 @@ export class ApiService {
                 BillingNo: edoc.EDocFiles[i].BillingNo,
                 BillingType: edoc.EDocFiles[i].BillingType,
                 Code: edoc.EDocFiles[i].Code,
+                DocumentId: edoc.EDocFiles[i].DocumentId,
                 //FileInput: edoc.EDocFiles[i].FileInput,
                 HBL: edoc.EDocFiles[i].HBL,
                 JobId: edoc.EDocFiles[i].JobId,
                 TransactionType: edoc.EDocFiles[i].TransactionType,
                 FileName: edoc.EDocFiles[i].FileName,
                 Note: edoc.EDocFiles[i].Note,
-                BillingId: edoc.EDocFiles[i].BillingId
+                BillingId: edoc.EDocFiles[i].BillingId,
+                Id: edoc.EDocFiles[i].Id
             });
             edocFile.push(edocFileItem);
         }
@@ -152,6 +157,7 @@ export class ApiService {
             formData.append(`edocUploadModel.EDocFiles[${i}][BillingNo]`, edocFile[i].BillingNo);
             formData.append(`edocUploadModel.EDocFiles[${i}][BillingType]`, edocFile[i].BillingType);
             formData.append(`edocUploadModel.EDocFiles[${i}][Code]`, edocFile[i].Code);
+            formData.append(`edocUploadModel.EDocFiles[${i}][DocumentId]`, edocFile[i].DocumentId);
             //formData.append(`edocUploadModel.EDocFiles[${i}].[File]`, edocFile[i].FileInput);
             formData.append(`edocUploadModel.EDocFiles[${i}][HBL]`, edocFile[i].HBL);
             formData.append(`edocUploadModel.EDocFiles[${i}][JobId]`, edocFile[i].JobId);

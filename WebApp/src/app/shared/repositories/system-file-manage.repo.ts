@@ -60,8 +60,8 @@ export class SystemFileManageRepo {
         return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/DeleteAttachedFile/Accounting/${folder}/${id}`);
     }
 
-    getDocumentType(transactionType: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}`).pipe(
+    getDocumentType(transactionType: string, billingNo: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}&billingNo=${billingNo}`).pipe(
             map((data: any) => data)
         );
     }
@@ -78,6 +78,12 @@ export class SystemFileManageRepo {
         );
     }
 
+    getEDocByAccountant(billingId: string, transitionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByAccountant?billingId=${billingId}&transactionType=${transitionType}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteEdoc(edocId: string) {
         return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DeleteEDoc/${edocId}`).pipe(
             map((data: any) => data)
@@ -90,9 +96,8 @@ export class SystemFileManageRepo {
                 map((data: any) => data)
             );
     }
-    getEDocByAccountant(jobId: string, transitionType: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetEDocByAccountant?jobId=${jobId}&transactionType=${transitionType}`).pipe(
-            map((data: any) => data)
-        );
+
+    uploadPreviewTemplateEdoc(body) {
+        return this._api.post(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadPreviewTemplateToEDoc`, body);
     }
 }

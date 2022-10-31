@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
@@ -60,9 +61,9 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpGet("GetEDocByAccountant")]
-        public async Task<IActionResult> GetEDocByAccountant(string billingNo, string transactionType)
+        public async Task<IActionResult> GetEDocByAccountant(Guid billingId, string transactionType)
         {
-            var result = await _edocService.GetEDocByAccountant(billingNo, transactionType);
+            var result = _edocService.GetEDocByAccountant(billingId, transactionType);
             if (result == null)
             {
                 return BadRequest(result);
@@ -134,5 +135,20 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
         }
 
+        [HttpPost("UploadPreviewTemplateToEDoc")]
+        public async Task<IActionResult> UploadPreviewTemplateToEDoc(List<EDocAttachPreviewTemplateUploadModel> models)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = models });
+            }
+
+            HandleState hs = await _edocService.AttachPreviewTemplate(models);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = models });
+        }
     }
 }
