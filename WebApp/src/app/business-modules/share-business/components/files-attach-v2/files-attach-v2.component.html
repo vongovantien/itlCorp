@@ -194,8 +194,7 @@
                                                 </td>
                                                 <td>
                                                     <a class="text-underline" [href]="doc.imageUrl"
-                                                        target="_blank">{{doc.userFileName}}.{{doc.imageUrl |
-                                                        extension}}</a>
+                                                        target="_blank">{{doc.userFileName}}</a>
                                                     <span class="m--margin-left-10">
                                                         <ng-container [ngSwitch]="doc.imageUrl | extension">
                                                             <ng-container *ngSwitchCase="'pdf'">

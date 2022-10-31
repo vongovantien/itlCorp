@@ -140,7 +140,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Id: edocFileList[0].Id,
                 DocumentTypeId: this.selectedtDocType,
             }
-            if (edocUploadModel.DocumentTypeId === undefined) {
+            if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
                 console.log(edocUploadModel.DocumentTypeId);
 
                 this._toastService.error("Please fill all field!");
@@ -162,7 +162,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         } else {
             console.log(edocFileList.find(x => x.DocumentId));
 
-            if (edocFileList.find(x => x.DocumentId === undefined)) {
+            if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
 
                 this._toastService.error("Please fill all field!");
                 return;
