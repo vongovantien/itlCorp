@@ -155,6 +155,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             this.resetForm();
                             this.hide();
                             this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
                         }
                     }
                 );
@@ -175,6 +176,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             this.resetForm();
                             this.hide();
                             this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
                         }
                     }
                 );
