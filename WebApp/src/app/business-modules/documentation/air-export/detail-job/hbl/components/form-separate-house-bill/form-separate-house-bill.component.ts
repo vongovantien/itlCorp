@@ -28,7 +28,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     hblDetail: any;
     hblSeprateDetail: any;
     hblSeparateId: string;
-    hwbno: AbstractControl;
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -80,18 +79,32 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             });
     }
 
+
     ngAfterViewInit() {
         this.formCreateHBLComponent.isSeparate = true;
-        this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
-        .pipe( catchError(this.catchError))
-            .subscribe( hawbNoGenerate => {
-                if (this.formCreateHBLComponent.hwbno.value.includes('N/H')) {
-                    this.formCreateHBLComponent.hwbno.setValue('N/H');
-                }
+        this._store.select(fromShareBussiness.getTransactionIsHawb)
+        .pipe(
+            catchError(this.catchError)
+        )
+        .subscribe(
+            (res: any) => {
+                if (!!res) {
+                    this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+                    .pipe( catchError(this.catchError))
+                    .subscribe( ()  => {       
+                        this.formCreateHBLComponent.hwbno.setValue('N/H'); 
+                        })
+                    }
                 else{
-                    this.formCreateHBLComponent.hwbno.setValue(hawbNoGenerate.hblNo);
+                    this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+                    .pipe( catchError(this.catchError))
+                    .subscribe( hawbNoGenerate  => {       
+                        this.formCreateHBLComponent.hwbno.setValue(hawbNoGenerate.hblNo);   
+                    })
+                    
                 }
-            });
+        });
+
     }
 
     onCancel() {
