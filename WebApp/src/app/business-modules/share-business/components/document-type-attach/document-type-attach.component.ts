@@ -22,8 +22,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
-    selectedtDocType: any = null;
-    edocSelected: any;
+    @Input() selectedtDocType: any = null;
     detailDocId: number;
     formData: IEDocUploadFile;
     @Input() typeFrom: string = 'Shipment';
