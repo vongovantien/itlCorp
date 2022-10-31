@@ -348,9 +348,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     imageMap.Add(image);
                 }
             }
-            var otherId = lstTran.Where(x => x.Code == "OTH").FirstOrDefault().Id;
+            var otherId = lstTran.Where(x => x.Code == "OTH").FirstOrDefault()!=null? lstTran.Where(x => x.Code == "OTH").FirstOrDefault().Id:0;
             var listOther = new List<SysImageDetailModel>();
-            listOther.AddRange(lstImageMD.Where(x => x.DocumentTypeId == otherId));
+            if (otherId != 0)
+            {
+                listOther.AddRange(lstImageMD.Where(x => x.DocumentTypeId == otherId));
+            }
             if (imageMap.Count > 0)
             {
                 imageMap.ForEach(x =>
