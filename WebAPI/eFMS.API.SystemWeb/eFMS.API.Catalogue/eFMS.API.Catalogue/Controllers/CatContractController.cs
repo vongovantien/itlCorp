@@ -212,6 +212,11 @@ namespace eFMS.API.Catalogue.Controllers
             var hs = catContractService.Update(model, out isChangeAgrmentType);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            DateTime localDate = DateTime.Now;
+            var expiredCheck = DateTime.Compare(localDate, (DateTime)model.ExpiredDate);
+            if (expiredCheck > 0)
+                model.IsExpired = true;
+
             if (!hs.Success)
             {
                 return BadRequest(result);
