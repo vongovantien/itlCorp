@@ -138,17 +138,18 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpPost("UploadAttachedFileEdocByUrl")]
         public async Task<IActionResult> UploadAttachedFileEdocByUrl(string fileUrl, string module, string folder, Guid Id)
         {
-            
+
             byte[] filesArrayBuffer = await FileHelper.DownloadFile(fileUrl);
             if (filesArrayBuffer == null)
             {
                 return BadRequest(new ResultHandle { Message = "Not found files", Status = false, Data = fileUrl });
             }
-            FileReportUpload fileUpload = new FileReportUpload {
+            FileReportUpload fileUpload = new FileReportUpload
+            {
                 FileName = Path.GetFileName(fileUrl),
                 FileContent = filesArrayBuffer
             };
-           
+
             var stream = new MemoryStream(fileUpload.FileContent);
             List<IFormFile> fFiles = new List<IFormFile>() { new FormFile(stream, 0, stream.Length, null, fileUpload.FileName) };
             FileUploadModel model = new FileUploadModel
