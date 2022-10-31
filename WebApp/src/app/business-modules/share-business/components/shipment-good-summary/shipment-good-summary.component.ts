@@ -152,27 +152,26 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalCBM = +this.totalCBM.toFixed(3);
 
         // * Container, Package.
-        if (this.containers.length>0 && !this.containerDetail) {
+        if (this.containers.length>0) {
             this.containerDetail = '';
-        
-            const contObject: any[] = (containers || []).map((container: Container | any) => ({
-                cont: container.containerTypeName,
-                quantity: container.quantity
-            }));
-
-            const contData = [];
-            for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
-                contData.push({
-                    cont: item,
-                    quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
-                });
-            }
-
-            for (const item of contData) {
-                this.containerDetail += this.handleStringCont(item);
-            }
-            this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
         }
+        const contObject: any[] = (containers || []).map((container: Container | any) => ({
+            cont: container.containerTypeName,
+            quantity: container.quantity
+        }));
+
+        const contData = [];
+        for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
+            contData.push({
+                cont: item,
+                quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+            });
+        }
+
+        for (const item of contData) {
+            this.containerDetail += this.handleStringCont(item);
+        }
+        this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
     }
 
     onRefresh() {
