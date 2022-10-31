@@ -31,13 +31,14 @@
                         <ng-template tabHeading>
                             <span class="m--margin-right-10">Attach files</span>
                             <span class="badge badge-success"
-                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                                *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
                         <!-- <accounting-attach-file-list *ngIf="!!settlementPayment" (onChange)="attachFiles = $event"
                             [fileNo]="settlementPayment.settlement.settlementNo" [folderModuleName]="folderModuleName"
                             [accId]="settlementId" [accType]="'Settlement'">
                         </accounting-attach-file-list> -->
-                        <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId">
+                        <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId"
+                            (onChange)="attachFiles = $event">
                         </files-attach-v2>
                     </tab>
                 </tabset>

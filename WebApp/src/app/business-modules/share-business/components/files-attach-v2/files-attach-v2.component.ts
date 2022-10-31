@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
@@ -24,6 +24,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @Input() typeFrom: string = 'Shipment';
     @Input() billingId: string = '';
+    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
     headersGen: CommonInterface.IHeaderTable[];
     headersAcc: CommonInterface.IHeaderTable[];
     documentTypes: any[] = [];
@@ -272,6 +273,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         console.log(res);
                         this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
                         this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
+                        this.onChange.emit(res);
                     },
                 );
         } else {
@@ -283,6 +285,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (res: any[]) => {
                         console.log(res);
                         this.edocByAcc = res;
+                        this.onChange.emit(res);
                     },
                 );
         }
