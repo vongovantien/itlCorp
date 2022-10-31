@@ -4,9 +4,8 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
-import { AppForm } from '@app';
 import { InfoPopupComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import {
@@ -19,7 +18,6 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
 import * as fromShareBusiness from '../../../share-business/store';
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Component({
@@ -40,9 +38,11 @@ export class AirImportCreateJobComponent extends ShareJobDetailComponent impleme
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngtRepo);
         this.requestCancel = this.gotoList;
     }
 

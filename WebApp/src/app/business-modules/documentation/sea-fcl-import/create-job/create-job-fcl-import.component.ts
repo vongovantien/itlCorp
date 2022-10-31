@@ -4,9 +4,8 @@ import { ActionsSubject, Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
-import { AppForm } from '@app';
 import { CsTransaction, Container } from '@models';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
@@ -42,9 +41,11 @@ export class SeaFCLImportCreateJobComponent extends ShareJobDetailComponent {
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.gotoList;
     }
 

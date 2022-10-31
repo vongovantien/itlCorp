@@ -50,7 +50,7 @@
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable-edit table-summary ">
                                 <thead app-table-header [headers]="headersGen"
-                                    (onClick)="sortEdoc(docType?.eDocs,$event.sortField)">
+                                    (onClick)="sortEdoc('General',i, $event.sortField)">
                                     <th class="first table-actions-col">
                                         Stt
                                     </th>

@@ -1,34 +1,31 @@
 import { InitProfitHBLAction, GetDetailHBLAction, InitListHBLAction } from './../../store/actions/hbl.action';
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
-import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
+import { HouseBill, CsTransactionDetail, CsTransaction, Crystal } from "@models";
 import { getHBLSState, IShareBussinessState, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction, LoadListPartnerForKeyInSurcharge } from "../../store";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
-import { NgProgress } from "@ngx-progressbar/core";
 import { ViewChild, Directive } from "@angular/core";
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
-import { CatalogueRepo, DocumentationRepo } from "@repositories";
+import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
-import { takeUntil, catchError, finalize, map, switchMap } from "rxjs/operators";
+import { takeUntil, catchError, finalize, map, switchMap, concatMap, mergeMap } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ShareBussinessMassUpdatePodComponent } from './mass-update-pod/mass-update-pod.component';
+import { InjectViewContainerRefDirective } from '@directives';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Directive()
 export abstract class AppShareHBLBase extends AppList implements ICrystalReport {
-    @ViewChild(ConfirmPopupComponent) confirmDeleteHBLPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
-    @ViewChild(InfoPopupComponent) canNotDeleteJobPopup: InfoPopupComponent;
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(ShareBussinessMassUpdatePodComponent) massUpdatePODComponent: ShareBussinessMassUpdatePodComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     houseBills: HouseBill[] = [];
 
@@ -54,16 +51,16 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         protected _sortService: SortService,
         protected _store: Store<IShareBussinessState>,
         protected _spinner: NgxSpinnerService,
-        protected _progressService: NgProgress,
         protected _toastService: ToastrService,
         protected _documentRepo: DocumentationRepo,
         protected _activedRoute: ActivatedRoute,
         protected _router: Router,
-        protected _catalogueRepo: CatalogueRepo
+        protected _catalogueRepo: CatalogueRepo,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
         this.requestSort = this.sortLocal;
     }
 
@@ -107,22 +104,11 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     configHBL() {
-        // this.headers = [
-        //     { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
-        //     { title: 'Customer', field: 'customerName', sortable: true },
-        //     { title: 'Salesman', field: 'saleManName', sortable: true },
-        //     { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
-        //     { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
-        //     { title: 'Package', field: 'packages', sortable: true },
-        //     { title: 'C.W', field: 'cw', sortable: true },
-        //     { title: 'G.W', field: 'gw', sortable: true },
-        //     { title: 'CBM', field: 'cbm', sortable: true }
-        // ];
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
@@ -253,14 +239,18 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         event.stopImmediatePropagation();
         event.stopPropagation();
 
-        this.confirmDeleteHBLPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure you want to delete this House Bill, All related charges added to this House Bill will be lost',
+            labelCancel: 'No'
+        }, () => {
+            this.onDeleteHbl();
+        });
         this.selectedIndexHBL = index;
         this.selectedHbl = hbl;
 
     }
 
     onDeleteHbl() {
-        this.confirmDeleteHBLPopup.hide();
         this.deleteHbl(this.selectedHbl.id);
     }
 
@@ -296,7 +286,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                 if (value) {
                     this.deleteJob();
                 } else {
-                    this.info403Popup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
                 }
             });
     }
@@ -310,24 +300,23 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.confirmDeleteJobPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Alert',
+                            body: 'You you sure you want to delete this Job?',
+                            labelConfirm: 'Yes'
+                        }, () => { this.onDeleteJob(); });
                     } else {
-                        this.canNotDeleteJobPopup.show();
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'You are not allowed to delete this job'
+                        });
                     }
                 },
             );
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documentRepo.deleteMasterBill(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.confirmDeleteJobPopup.hide();
-                })
-            ).subscribe(
+            .subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
 
@@ -370,7 +359,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -406,11 +395,49 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
 
     }
 
-    abstract gotoList(): void;
-    abstract gotoCreate(): void;
-    abstract gotoDetail(id: string): void;
-    abstract onSelectTab(tabName: string): void;
-    // abstract duplicateConfirm(): void;
+    gotoList() {
+        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}`]);
+    }
+
+    gotoCreate() {
+        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}/hbl/new`]);
+    }
+
+    gotoDetail(id: string) {
+        this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}/hbl/${id}`]);
+                    } else {
+                        this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, {});
+                    }
+                },
+            );
+    }
+
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'shipment':
+                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
+                break;
+            case 'cdNote':
+                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.transactionType)}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
+        }
+    }
 
     public listenShortcutMovingTab(): void { }
 
@@ -421,5 +448,56 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
         }
     }
 
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: this.selectedHbl.id,
+                            templateCode: 'PLSheet',
+                            transactionType: this.selectedHbl.transactionType
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
+
+    }
 }
 

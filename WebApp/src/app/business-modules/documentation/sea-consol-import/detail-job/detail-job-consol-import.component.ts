@@ -1,15 +1,13 @@
-import { Component, ViewChild, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaConsolImportCreateJobComponent } from '../create-job/create-job-consol-import.component';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ICanComponentDeactivate } from '@core';
-import { CsTransaction } from '@models';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, SubHeaderComponent, ReportPreviewComponent } from '@common';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';
@@ -20,7 +18,6 @@ import * as fromShareBussiness from './../../../share-business/store';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 import isUUID from 'validator/lib/isUUID';
-import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -29,14 +26,9 @@ import { HttpErrorResponse } from '@angular/common/http';
     templateUrl: './detail-job-consol-import.component.html',
 })
 export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
-    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    fclImportDetail: CsTransaction;
     action: any = {};
 
     nextState: RouterStateSnapshot;
@@ -49,12 +41,12 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
         protected cdr: ChangeDetectorRef,
-        private readonly _ngProgressService: NgProgress,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr, _store);
+        super(_router, _documentRepo, _actionStoreSubject, _toastService, cdr, _store, _exportRepo, _fileMngt);
 
-        this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
     }
 
@@ -105,7 +97,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
             )
             .subscribe(
                 (res: any) => {
-                    this.fclImportDetail = res; // TODO Model.
+                    this.shipmentDetail = res; // TODO Model.
                     // * reset field duplicate
                     if (this.ACTION === "COPY") {
                         this.formCreateComponent.getUserLogged();
@@ -158,13 +150,13 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         });
 
         modelUpdate.id = this.jobId;
-        modelUpdate.branchId = this.fclImportDetail.branchId;
-        modelUpdate.transactionType = this.fclImportDetail.transactionType;
-        modelUpdate.jobNo = this.fclImportDetail.jobNo;
-        modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
-        modelUpdate.userCreated = this.fclImportDetail.userCreated;
-        modelUpdate.currentStatus = this.fclImportDetail.currentStatus;
-        modelUpdate.isLocked = this.fclImportDetail.isLocked;
+        modelUpdate.branchId = this.shipmentDetail.branchId;
+        modelUpdate.transactionType = this.shipmentDetail.transactionType;
+        modelUpdate.jobNo = this.shipmentDetail.jobNo;
+        modelUpdate.datetimeCreated = this.shipmentDetail.datetimeCreated;
+        modelUpdate.userCreated = this.shipmentDetail.userCreated;
+        modelUpdate.currentStatus = this.shipmentDetail.currentStatus;
+        modelUpdate.isLocked = this.shipmentDetail.isLocked;
 
         if (this.ACTION === 'COPY') {
             this.duplicateJob(modelUpdate);
@@ -238,28 +230,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         });
     }
 
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'hbl':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl`]);
-                break;
-            case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
-                break;
-            case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
-                break;
-            case 'assignment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-            case 'files':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
-                break;
-            case 'advance-settle':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
-                break;
-        }
-    }
 
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
@@ -441,41 +411,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
             )
     }
 
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}`]);
-    }
-
-    previewPLsheet(currency: string) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
         if (isEdited) {
@@ -520,25 +455,5 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
         }
 
         return of(!isEdited);
-    }
-
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
     }
 }

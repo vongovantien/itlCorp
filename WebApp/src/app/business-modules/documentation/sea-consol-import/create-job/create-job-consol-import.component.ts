@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppForm } from '@app';
 import { CsTransaction, Container } from '@models';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import { ShareBusinessImportJobDetailPopupComponent, ShareBussinessShipmentGoodSummaryComponent, ShareJobDetailComponent } from '@share-bussiness';
@@ -41,8 +41,10 @@ export class SeaConsolImportCreateJobComponent extends ShareJobDetailComponent {
         protected _toastService: ToastrService,
         protected _cd: ChangeDetectorRef,
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.gotoList;
     }
 

@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
 import { InfoPopupComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { CsTransaction } from '@models';
 import { CommonEnum } from '@enums';
 import { RoutingConstants } from '@constants';
@@ -37,9 +37,11 @@ export class AirExportCreateJobComponent extends ShareJobDetailComponent impleme
         protected _toastService: ToastrService,
         protected _documenRepo: DocumentationRepo,
         protected _router: Router,
-        protected _store: Store<IShareBussinessState>
+        protected _store: Store<IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngtRepo);
         this.requestCancel = this.gotoList;
     }
 
