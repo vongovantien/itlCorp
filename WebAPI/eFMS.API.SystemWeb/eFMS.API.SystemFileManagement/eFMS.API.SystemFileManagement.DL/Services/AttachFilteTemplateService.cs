@@ -29,15 +29,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return hs;
         }
 
-        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType,string billingNo)
+        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType, string billingNo)
         {
             switch (transactionType)
             {
                 case "SOA":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code!="OTH");
+                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code != "OTH");
                 case "Settlement":
-                    var SMCode= await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
-                    return SMCode.GroupBy(x => x.Code).Select(x=>x.FirstOrDefault()).ToList();
+                    var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
+                    return SMCode.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
                 case "Advace":
                     return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                 default:
