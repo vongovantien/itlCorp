@@ -212,8 +212,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         dueDate: !!this.settlementPayment.settlement.dueDate ? { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) } : null
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
+                    if (!!this.settlementPayment.settlement.payee) {
+                        this.formCreateSurcharge.getBankAccountPayee(this.settlementPayment.settlement.payee);
+                    }
 
-                    this.formCreateSurcharge.getBankAccountPayee(this.settlementPayment.settlement.payee);
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 

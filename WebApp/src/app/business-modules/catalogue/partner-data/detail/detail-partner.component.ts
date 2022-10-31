@@ -184,6 +184,7 @@ export class PartnerDetailComponent extends AppList {
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
                         this.partnerBankList.partnerId = this.partner.id;
+                        this.partnerBankList.partner = this.partner;
                         this.partnerBankList.getListBank(this.partner.id);
                         this.userCreatePopup.partnerId = this.partner.id;
                         this._store.select(getMenuUserPermissionState)
