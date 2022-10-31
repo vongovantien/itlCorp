@@ -28,6 +28,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     hblDetail: any;
     hblSeprateDetail: any;
     hblSeparateId: string;
+    hwbno: AbstractControl;
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -89,12 +90,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         .subscribe(
             (res: any) => {
                 if (!!res) {
-                    this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
-                    .pipe( catchError(this.catchError))
-                    .subscribe( ()  => {       
-                        this.formCreateHBLComponent.hwbno.setValue('N/H'); 
-                        })
-                    }
+                    this.formCreateHBLComponent.hwbnoSeparate = 'N/H';
+                }
                 else{
                     this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
                     .pipe( catchError(this.catchError))

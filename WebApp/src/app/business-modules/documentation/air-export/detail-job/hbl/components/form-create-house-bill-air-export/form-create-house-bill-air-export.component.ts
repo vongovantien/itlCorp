@@ -131,7 +131,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dateTimeModified: string;
     userCreated: string;
     userModified: string;
-
+    hwbnoSeparate: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -493,7 +493,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
             etd: !!data.etd ? { startDate: new Date(data.etd), endDate: new Date(data.etd) } : null,
             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : new Date(),
-            hwbno: !!data.hwbno ? data.hwbno : null,
+            hwbno: !!this.hwbnoSeparate ? this.hwbnoSeparate : (!!data.hwbno ? data.hwbno : null),
             shipmenttype: data.shipmentType,
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,
@@ -503,7 +503,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             currencyId: data.currencyId,
             flightNo: data.flightNo,
             rclass: data.rclass,
-
             dimensionDetails: []
         };
         if (isImport) {
