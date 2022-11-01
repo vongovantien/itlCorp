@@ -195,7 +195,6 @@ export class SettlementFormCreateComponent extends AppForm {
                     this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                     this.setBankInfo(beneficiary);
                 }
-                this.getBankAccountPayee(this.payee.value)
             } else {
                 this.resetBankInfo();
             }
@@ -246,29 +245,19 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.bankNameDescription.setValue(data.bankNameEn)
                 this.mapBankCode(data.code)
                 break;
-            case 'payee':
-                if (this.paymentMethod.value === 'Bank' || this.paymentMethod.value === 'Other') {
-                    this.getBankAccountPayee(data.id)
-                }
-                break;
         }
     }
 
-
-    getBankAccountPayee(id: string) {
-        this._catalogueRepo.getListBankByPartnerById(id)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-            })).subscribe(
-                (res: any[]) => {
-                    this.bankAccount = res;
-                    if (!!res && res.length > 0) {
-                        this.bankAccountNo.setValue(res[0].bankAccountNo);
-                        this.bankName.setValue(res[0].bankNameEn);
-                        this.bankNameDescription.setValue(res[0].bankNameEn);
-                        this.mapBankCode(res[0].code);
-                    }
-                });
+    getBankAccountPayee() {
+        if (!!this.payee.value && this.paymentMethod.value.value === 'Bank') {
+            this._catalogueRepo.getListBankByPartnerById(this.payee.value)
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.isLoading = false;
+                })).subscribe(
+                    (res: any[]) => {
+                        this.bankAccount = res;
+                    });
+        }
     }
 
     checkStaffPartner() {

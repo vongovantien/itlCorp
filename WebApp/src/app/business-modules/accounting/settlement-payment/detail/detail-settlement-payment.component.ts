@@ -232,9 +232,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     // if (this.requestSurchargeListComponent.groupShipments.length) {
                     //     this.requestSurchargeListComponent.openAllCharge.next(true);
                     // }
-                    if (!!this.settlementPayment.settlement.payee && (this.settlementPayment.settlement.paymentMethod === 'Bank' || this.settlementPayment.settlement.paymentMethod === 'Other')) {
-                        this.formCreateSurcharge.getBankAccountPayee(this.settlementPayment.settlement.payee);
-                    }
                 },
                 () => {
                     this._store.dispatch(LoadDetailSettlePaymentFail());

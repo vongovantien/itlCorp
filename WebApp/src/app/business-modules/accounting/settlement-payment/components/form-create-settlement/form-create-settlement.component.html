@@ -160,7 +160,7 @@
                                     Bank Name:
                                 </label>
                                 <ng-container *ngIf="!readonlyForm; else bankTpl">
-                                    <app-combo-grid-virtual-scroll
+                                    <app-combo-grid-virtual-scroll (click)="getBankAccountPayee()"
                                         (itemSelected)="onSelectDataFormInfo($event, 'bankName'); mapBankCode($event.code)"
                                         [dataSources]="banks | async" formControlName="bankNameDescription"
                                         [displayFields]="displayFieldBank" [selectedDisplayFields]="['bankNameEn']"
@@ -191,7 +191,7 @@
                                         </label>
                                         <ng-container
                                             *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'Other'; else bankTpl">
-                                            <app-combo-grid-virtual-scroll
+                                            <app-combo-grid-virtual-scroll (click)="getBankAccountPayee()"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
                                                 [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
                                                 [displayFields]="displayFieldBankAccount"
