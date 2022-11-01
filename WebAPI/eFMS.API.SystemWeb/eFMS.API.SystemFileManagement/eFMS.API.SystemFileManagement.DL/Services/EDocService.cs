@@ -442,7 +442,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         BillingNo = settle.SettlementNo,
                         SystemFileName = x.FirstOrDefault().SystemFileName,
-                        ImageUrl = image.Url,
+                        ImageUrl = image==null? null:image.Url,
                         DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
                         BillingType = transactionType,
                         DatetimeModified = x.FirstOrDefault().DatetimeModified,
@@ -553,8 +553,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     lst = await _sysImageRepo.GetAsync(x => x.Id == edoc.SysImageId);
                 }
-                else
-                {
+                else{
                     lst = await _sysImageRepo.GetAsync(x => x.Id == edocId);
 
                     edoc = new SysImageDetail()
