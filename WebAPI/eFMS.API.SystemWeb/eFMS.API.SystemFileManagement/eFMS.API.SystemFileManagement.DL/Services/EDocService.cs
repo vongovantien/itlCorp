@@ -532,7 +532,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             else
             {
-                var JobCS = _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault();
+                var JobCS = hblId == Guid.Empty || hblId == null ? _tranDeRepo.Get(x => x.JobId == jobId).FirstOrDefault() : _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault();
                 return new TransctionTypeJobModel() { HBLNo = JobCS.Hwbno, JobNo = _cstranRepo.Get(x => x.Id == JobCS.JobId).FirstOrDefault().JobNo };
             }
         }
