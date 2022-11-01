@@ -241,7 +241,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             })).subscribe(
                 (res: any[]) => {
                     this.bankAccount = res;
-                    if (res.length > 0) {
+                    if (!!res && res.length > 0) {
                         this.bankAccountNo.setValue(res[0].bankAccountNo);
                         this.bankAccountName.setValue(res[0].bankAccountName);
                         this.bankName.setValue(res[0].bankNameEn);

@@ -268,7 +268,7 @@ export class SettlementFormCreateComponent extends AppForm {
             })).subscribe(
                 (res: any[]) => {
                     this.bankAccount = res;
-                    if (res.length > 0) {
+                    if (!!res && res.length > 0) {
                         this.bankAccountNo.setValue(res[0].bankAccountNo);
                         this.bankName.setValue(res[0].bankNameEn);
                         this.bankNameDescription.setValue(res[0].bankNameEN);
