@@ -28,7 +28,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     hblDetail: any;
     hblSeprateDetail: any;
     hblSeparateId: string;
-    hwbno: AbstractControl;
+
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -83,7 +83,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
 
 
     ngAfterViewInit() {
-        this.formCreateHBLComponent.isSeparate = true;
         this._documentRepo.getDetailTransaction(this.jobId)
             .pipe(catchError(this.catchError))
             .subscribe((data: any) => {
