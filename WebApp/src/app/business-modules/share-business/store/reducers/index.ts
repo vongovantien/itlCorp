@@ -53,7 +53,6 @@ export const getTransationLoading = createSelector(shareBussinessState, (state: 
 export const getTransactionLocked = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.isLocked);
 export const getTransactionNoProfit = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.noProfit);
 export const getTransactionPermission = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.permission);
-export const getTransactionIsHawb = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction.cstransaction.isHawb);
 export const getTransactionListPagingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction.pagingData);
 
 // * HBL
