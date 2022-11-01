@@ -198,7 +198,7 @@ export class AdvancePaymentDetailComponent
                         this.listAdvancePaymentCarrierComponent.advanceNo =
                             this.advancePayment.advanceNo;
                     }
-                    if (!!this.advancePayment.payee) {
+                    if (!!this.advancePayment.payee && this.advancePayment.paymentMethod === 'Bank') {
                         this.formCreateComponent.getBankAccountPayee(this.advancePayment.payee);
                     }
                 },

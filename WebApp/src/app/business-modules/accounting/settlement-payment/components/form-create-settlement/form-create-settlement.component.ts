@@ -55,7 +55,7 @@ export class SettlementFormCreateComponent extends AppForm {
     bankCode: AbstractControl;
     dueDate: AbstractControl;
 
-    bankAccount: Observable<Bank[]>;
+    bankAccount: Bank[] = [];
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
@@ -189,11 +189,18 @@ export class SettlementFormCreateComponent extends AppForm {
     getBeneficiaryInfo() {
         if (!!this.payee.value) {
             if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
-                const beneficiary = this.getPartnerById(this.payee.value);
-                if (!!beneficiary) {
-                    this.beneficiaryName.setValue(beneficiary.partnerNameVn);
-                    this.bankAccountNo.setValue(beneficiary.bankAccountNo);
-                    this.setBankInfo(beneficiary);
+                this.getBankAccountPayee(this.payee.value)
+                if (!!this.bankAccount) {
+                    this.bankAccountNo.setValue(this.bankAccount[0].bankAccountNo);
+                    this.setBankInfo(!!this.bankAccount[0]);
+                }
+                else {
+                    const beneficiary = this.getPartnerById(this.payee.value);
+                    if (!!beneficiary) {
+                        this.beneficiaryName.setValue(beneficiary.partnerNameVn);
+                        this.bankAccountNo.setValue(beneficiary.bankAccountNo);
+                        this.setBankInfo(beneficiary);
+                    }
                 }
             } else {
                 this.resetBankInfo();
@@ -246,7 +253,9 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.mapBankCode(data.code)
                 break;
             case 'payee':
-                this.getBankAccountPayee(data.id)
+                if (this.paymentMethod.value === 'Bank' || this.paymentMethod.value === 'Other') {
+                    this.getBankAccountPayee(data.id)
+                }
                 break;
         }
     }
@@ -257,8 +266,14 @@ export class SettlementFormCreateComponent extends AppForm {
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             })).subscribe(
-                (res: any) => {
+                (res: any[]) => {
                     this.bankAccount = res;
+                    if (res.length > 0) {
+                        this.bankAccountNo.setValue(res[0].bankAccountNo);
+                        this.bankName.setValue(res[0].bankNameEn);
+                        this.bankNameDescription.setValue(res[0].bankNameEN);
+                        this.mapBankCode(res[0].code);
+                    }
                 });
     }
 

@@ -62,7 +62,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     selectedPayee: Partner;
     banks: Observable<Bank[]>;
-    bankAccount: Observable<Bank[]>;
+    bankAccount: Bank[] = [];
     bankCode: AbstractControl;
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
@@ -206,6 +206,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
+                this.getBankAccountPayee(this.selectedPayee.id);
             }
         }
         else {
@@ -224,11 +225,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onSelectPayee(payee: Partner) {
+        console.log(payee)
         this.selectedPayee = payee;
         if (this.paymentMethod.value === 'Bank') {
             this.setBankInfoForPayee(payee);
+            this.getBankAccountPayee(payee.id)
+
         }
-        this.getBankAccountPayee(payee.id)
     }
 
     getBankAccountPayee(id: string) {
@@ -236,8 +239,14 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             })).subscribe(
-                (res: any) => {
+                (res: any[]) => {
                     this.bankAccount = res;
+                    if (res.length > 0) {
+                        this.bankAccountNo.setValue(res[0].bankAccountNo);
+                        this.bankAccountName.setValue(res[0].bankAccountName);
+                        this.bankName.setValue(res[0].bankNameEn);
+                        this.mapBankCode(res[0].code);
+                    }
                 });
     }
 
