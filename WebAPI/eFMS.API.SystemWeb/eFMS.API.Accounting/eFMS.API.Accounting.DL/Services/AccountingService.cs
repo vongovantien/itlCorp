@@ -4,18 +4,23 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -267,8 +272,8 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (BravoVoucherModel item in data)
                     {
                         // Ds surcharge của voucher
-                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == item.Stt);
-                        surcharges = GetShipmentSurchargesData(surcharges);
+                        //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == item.Stt);
+                        var surcharges = GetShipmentSurchargesData(item.Stt.ToString(), "VOUCHER").AsQueryable();
 
                         IQueryable<BravoVoucherChargeModel> queryChargesVoucher = from surcharge in surcharges
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id
@@ -363,8 +368,8 @@ namespace eFMS.API.Accounting.DL.Services
                             item.SettleAmount = settle.Amount;
 
                             // Ds Surcharge của settlement.
-                            IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
-                            surcharges = GetShipmentSurchargesData(surcharges);
+                            //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
+                            var surcharges = GetShipmentSurchargesData(item.ReferenceNo, "SETTLEMENT").AsQueryable();
                             //*Note: Nếu charge là OBH thì OriginalAmount = Thành tiền trước thuế + Tiền thuế; OriginalAmount3 = 0; 
                             //Ngược lại OriginalAmount = Thành tiền trước thuế, OriginalAmount3 = Tiền thuế
 
@@ -603,8 +608,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
-                var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                surcharges = GetShipmentSurchargesData(surcharges);
+                //var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                var surcharges = GetShipmentSurchargesData(cdNote.Code, "CDNOTE");
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
                 var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
 
@@ -797,8 +802,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var charges = new List<ChargeCreditSyncModel>();
-                    var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    surcharges = GetShipmentSurchargesData(surcharges);
+                    //var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    var surcharges = GetShipmentSurchargesData(cdNote.Code, "CDNOTE");
                     string hblId = string.Empty;
 
                     foreach (var surcharge in surcharges)
@@ -953,8 +958,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 int decimalRound = 0;
                 var charges = new List<ChargeSyncModel>();
-                var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                surcharges = GetShipmentSurchargesData(surcharges);
+                //var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                var surcharges = GetShipmentSurchargesData(soa.Soano, "SOA");
                 var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
                 var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
 
@@ -1123,8 +1128,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var charges = new List<ChargeCreditSyncModel>();
-                    var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                    surcharges = GetShipmentSurchargesData(surcharges);
+                    //var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                    var surcharges = GetShipmentSurchargesData(soa.Soano, "SOA");
 
                     foreach (var surcharge in surcharges)
                     {
@@ -2751,35 +2756,43 @@ namespace eFMS.API.Accounting.DL.Services
 
                 IQueryable<AccAccountingPayment> paymentsDebit = payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => (x.NetOffVnd != null && x.NetOffVnd != 0) || (x.NetOffUsd != null && x.NetOffUsd != 0));
-
-                if (receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK || receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH)
+                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
                 {
-                    if (paymentsDebit.Count() > 0)
-                    {
-                        var firstPayment = paymentsDebit.Take<AccAccountingPayment>(1);
-                        PaymentModel paymentModelCollectAdv = GenerateReceiptSyncModel("COLL_ADV", receipt, firstPayment, out AcctReceiptSyncModel receiptSyncCollectAdv);
-                        receiptSyncs.Add(receiptSyncCollectAdv); // Sync cho kt k cần lưu phiếu                        
-                        data.Add(paymentModelCollectAdv);
-                    }
-
-                    PaymentModel paymentModelClearAdv = GenerateReceiptSyncModel("CLEAR_ADV", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncClearAdv);
-                    receiptSyncs.Add(receiptSyncClearAdv);
-                    data.Add(paymentModelClearAdv);
+                    PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
+                    receiptSyncs.Add(receiptSyncNetOff);
+                    data.Add(paymentModelNetOff);
                 }
                 else
                 {
-                    if (paymentsDebit.Count() > 0)
+                    if (receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK || receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH)
                     {
-                        PaymentModel paymentModelClearDebit = GenerateReceiptSyncModel("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
-                        receiptSyncs.Add(receiptSyncDebit);
-                        data.Add(paymentModelClearDebit);
-                    }
+                        if (paymentsDebit.Count() > 0)
+                        {
+                            var firstPayment = paymentsDebit.Take<AccAccountingPayment>(1);
+                            PaymentModel paymentModelCollectAdv = GenerateReceiptSyncModel("COLL_ADV", receipt, firstPayment, out AcctReceiptSyncModel receiptSyncCollectAdv);
+                            receiptSyncs.Add(receiptSyncCollectAdv); // Sync cho kt k cần lưu phiếu                        
+                            data.Add(paymentModelCollectAdv);
+                        }
 
-                    if (paymentNetOff.Count() > 0)
+                        PaymentModel paymentModelClearAdv = GenerateReceiptSyncModel("CLEAR_ADV", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncClearAdv);
+                        receiptSyncs.Add(receiptSyncClearAdv);
+                        data.Add(paymentModelClearAdv);
+                    }
+                    else
                     {
-                        PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
-                        receiptSyncs.Add(receiptSyncNetOff);
-                        data.Add(paymentModelNetOff);
+                        if (paymentsDebit.Count() > 0)
+                        {
+                            PaymentModel paymentModelClearDebit = GenerateReceiptSyncModel("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
+                            receiptSyncs.Add(receiptSyncDebit);
+                            data.Add(paymentModelClearDebit);
+                        }
+
+                        if (paymentNetOff.Count() > 0)
+                        {
+                            PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
+                            receiptSyncs.Add(receiptSyncNetOff);
+                            data.Add(paymentModelNetOff);
+                        }
                     }
                 }
             }
@@ -2848,7 +2861,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    CustomerCode = partner.AccountNo,
                                                                    BankAccountNo = receiptItem.BankAccountNo,
                                                                    ObhPartnerCode = obhAccountNo,
-                                                                   Description = GeneratePaymentReceiptDescription(payment, type),
+                                                                   Description = receiptItem.Type == "Agent" ? ("Cấn trừ " + payment.BillingRefNo) : GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = GetChargeTypeReceiptPayment(receiptItem, payment, type),
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
@@ -3107,7 +3120,14 @@ namespace eFMS.API.Accounting.DL.Services
             switch (type)
             {
                 case "NETOFF":
-                    return receipt.PaymentRefNo + "CR";
+                    if (receipt.Type == "Agent")
+                    {
+                        return receipt.PaymentRefNo;
+                    }
+                    else
+                    {
+                        return receipt.PaymentRefNo + "CR";
+                    }
                 case "COLL_ADV":
                     return receipt.PaymentRefNo + "_AD"; 
                 default:
@@ -3120,6 +3140,10 @@ namespace eFMS.API.Accounting.DL.Services
             string _des = "Thu công nợ khách hàng";
             if (type == "NETOFF")
             {
+                if(receipt.Type == "Agent")
+                {
+                    return "AGENT Cấn Trừ Công Nợ";
+                }
                 return "Công Nợ Cấn Trừ";
             }
            
@@ -3186,17 +3210,24 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (type == "NETOFF")
             {
-                if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                if (receipt.Type == "Agent")
                 {
-                    _paidAmount = payment.NetOffVnd;
+                    _paidAmount = receipt.PaidAmountUsd;
                 }
-                else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
+                else
                 {
-                    _paidAmount = payment.NetOffUsd;
-                }
-                if (key == "amount")
-                {
-                    _paidAmount = payment.NetOffVnd;
+                    if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmount = payment.NetOffVnd;
+                    }
+                    else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
+                    {
+                        _paidAmount = payment.NetOffUsd;
+                    }
+                    if (key == "amount")
+                    {
+                        _paidAmount = payment.NetOffVnd;
+                    }
                 }
             }
             else if (type == "COLL_ADV")
@@ -3491,49 +3522,37 @@ namespace eFMS.API.Accounting.DL.Services
         /// <summary>
         /// Update shipment info for surcharges
         /// </summary>
-        /// <param name="surcharges">origin surcharges</param>
         /// <returns></returns>
-        private IQueryable<CsShipmentSurcharge> GetShipmentSurchargesData(IQueryable<CsShipmentSurcharge> surcharges)
+        private List<CsShipmentSurcharge> GetShipmentSurchargesData(string code, string type)
         {
-            var opsTransaction = opsTransactionRepository.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            var csTransaction = csTransactionRepository.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            var csTransactionDetail = csTransactionDetailRepository.Get();
-            var transactionData = from trans in csTransaction
-                                  join tranDetail in csTransactionDetail on trans.Id equals tranDetail.JobId
-                                  select new
-                                  {
-                                      JobNo = trans.JobNo,
-                                      HblId = tranDetail.Id,
-                                      Mawb = !string.IsNullOrEmpty(trans.Mawb) ? trans.Mawb : tranDetail.Mawb,
-                                      HblNo = tranDetail.Hwbno
-                                  };
-
-            foreach (var item in surcharges)
+            Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true;
+            
+            switch (type)
             {
-                if(item.TransactionType == "CL")
-                {
-                    var opsDetail = opsTransaction.FirstOrDefault(x => x.Hblid == item.Hblid);
-                    if(opsDetail != null)
-                    {
-                        item.Hblid = opsDetail.Hblid;
-                        item.JobNo = opsDetail.JobNo;
-                        item.Mblno = opsDetail.Mblno;
-                        item.Hblno = opsDetail.Hwbno;
-                    }
-                }
-                else
-                {
-                    var shipment = transactionData.FirstOrDefault(x => x.HblId == item.Hblid);
-                    if(shipment != null)
-                    {
-                        item.Hblid = shipment.HblId;
-                        item.JobNo = shipment.JobNo;
-                        item.Mblno = shipment.Mawb;
-                        item.Hblno = shipment.HblNo;
-                    }
-                }
+                case "SOA":
+                    surchargesQuery = surchargesQuery.And(q => q.Soano == code || q.PaySoano == code);
+                    break;
+                case "VOUCHER":
+                    surchargesQuery = surchargesQuery.And(q => (q.Type == AccountingConstants.TYPE_CHARGE_OBH ? q.PayerAcctManagementId : q.AcctManagementId) == Guid.Parse(code));
+                    break;
+                case "SETTLEMENT":
+                    surchargesQuery = surchargesQuery.And(q => q.SettlementCode == code);
+                    break;
+                case "CDNOTE":
+                    surchargesQuery = surchargesQuery.And(q => q.CreditNo == code || q.DebitNo == code);
+                    break;
             }
-            return surcharges;
+            var surchargesBefore = SurchargeRepository.Get(surchargesQuery).ToList();
+            
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@code", Value = code },
+                new SqlParameter(){ ParameterName = "@type", Value = type }
+            };
+            var listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetUpdatedSurchargeSync>(parameters);
+            var data = mapper.Map<List<CsShipmentSurcharge>>(listSurcharges);
+            // Log change data
+            databaseUpdateService.LogUpdateEntity(surchargesBefore, data);
+            return data;
         }
     }
 }

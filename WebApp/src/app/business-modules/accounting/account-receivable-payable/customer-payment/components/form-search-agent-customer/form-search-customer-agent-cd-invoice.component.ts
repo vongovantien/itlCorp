@@ -72,11 +72,12 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     ) { super(); }
 
     ngOnInit(): void {
-        if (environment.production) {
-            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
-        } else {
-            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
-        }
+        // if (environment.production) {
+        //     this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
+        // } else {
+        //     this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
+        // }
+        this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.initSubmitClickSubscription(() => this.searchData());
         this.initForm();

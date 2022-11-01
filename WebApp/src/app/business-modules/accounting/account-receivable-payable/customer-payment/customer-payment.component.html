@@ -290,7 +290,7 @@
 
 <app-dropdown #createReceitTypeTpl>
     <a class="dropdown-item pointer" (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
-    <ng-container *ngIf="!isProduction">
+    <ng-container>
         <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
             Receipt</a>
     </ng-container>

@@ -610,4 +610,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
     }
+
+    onChangePaymentMethod(){
+        this.formCreate.getPaymentMethod();
+    }
 }

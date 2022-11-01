@@ -56,7 +56,9 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !agreementId.valid }">
-                <label class="form-control-label" required>Agreement
+                <label class="form-control-label" required *ngIf="isRequireAgreement">Agreement
+                </label>
+                <label class="form-control-label" *ngIf="!isRequireAgreement">Agreement
                 </label>
                 <app-combo-grid-virtual-scroll #combogridAgreement
                     (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreementId)"
