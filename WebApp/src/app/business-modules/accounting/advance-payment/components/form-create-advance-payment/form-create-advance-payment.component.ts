@@ -206,6 +206,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
+                this.getBankAccountPayee(true);
             }
         }
         else {
@@ -224,21 +225,27 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onSelectPayee(payee: Partner) {
-        console.log(payee)
         this.selectedPayee = payee;
         if (this.paymentMethod.value === 'Bank') {
             this.setBankInfoForPayee(payee);
+            this.getBankAccountPayee(true);
         }
     }
 
-    getBankAccountPayee() {
-        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other')) {
+    getBankAccountPayee(isSetBank: Boolean) {
+        if (!!this.payee.value && this.paymentMethod.value === 'Bank') {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
                 })).subscribe(
                     (res: any[]) => {
                         this.bankAccount = res;
+                        if (isSetBank === true && !!res && res.length > 0) {
+                            this.bankAccountNo.setValue(res[0].bankAccountNo);
+                            this.bankAccountName.setValue(res[0].bankAccountName);
+                            this.bankName.setValue(res[0].bankNameEn);
+                            this.mapBankCode(res[0].code);
+                        }
                     });
         }
     }
