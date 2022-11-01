@@ -11,7 +11,7 @@
                                 {{advancePayment.syncStatus}}{{advancePayment.syncStatus === 'Rejected' &&
                                 advancePayment.reasonReject ? ' - ' + advancePayment.reasonReject : ''}}
                             </span>
-        
+
                             <!-- ? Cho phép người có quyền approve chỉnh sửa -->
                             <div class="update-payment-term pos-rel">
                                 <ng-container *ngIf="(!!advancePayment 
@@ -20,24 +20,24 @@
                                 && advancePayment.statusApproval !== 'Done' 
                                 && advancePayment.isManager 
                                 && !advancePayment.isApproved);else paymentTermReadonly">
-        
+
                                     <input type="number" integer class="form-control m-input m-input--square "
                                         placeholder="days" [(ngModel)]="paymentTerm">
-        
+
                                     <button title="Update payment term" style="position:absolute; top: 0; right: 0;"
                                         (click)="updatePaymentTerm(paymentTerm)"
                                         class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only  m--margin-left-10 btn-update-payment">
                                         <i class="la la-refresh"></i>
                                     </button>
-        
+
                                 </ng-container>
-        
+
                                 <ng-template #paymentTermReadonly>
                                     <input type="number" integer class="form-control m-input m-input--square "
                                         placeholder="days" [(ngModel)]="paymentTerm" disabled>
                                 </ng-template>
                             </div>
-        
+
                         </adv-payment-form-create>
                         <div class="row" *ngIf="!!advancePayment">
                             <div class="col-lg-6">
@@ -59,10 +59,14 @@
                     <tab>
                         <ng-template tabHeading>
                             <span class="m--margin-right-10">Attach files</span>
-                            <span class="badge badge-success" *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                            <span class="badge badge-success"
+                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <accounting-attach-file-list *ngIf="advancePayment" (onChange)="attachFiles = $event"  [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName' readOnly>
-                        </accounting-attach-file-list> 
+                        <!-- <accounting-attach-file-list *ngIf="advancePayment" (onChange)="attachFiles = $event"  [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName' readOnly>
+                        </accounting-attach-file-list>  -->
+                        <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId"
+                            (onChange)="attachFiles = $event">
+                        </files-attach-v2>
                     </tab>
                 </tabset>
             </div>
@@ -133,10 +137,14 @@
                                     <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
                                             single</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'preview')">Preview multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG', 'preview')">Preview multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN', 'download')">Print multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG', 'download')">Print multiple (ENG)</a>
+                                        <a class="dropdown-item pointer"
+                                            (click)="exportAdvPayment('VN', 'preview')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer"
+                                            (click)="exportAdvPayment('ENG', 'preview')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer"
+                                            (click)="exportAdvPayment('VN', 'download')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer"
+                                            (click)="exportAdvPayment('ENG', 'download')">Print multiple (ENG)</a>
                                     </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
