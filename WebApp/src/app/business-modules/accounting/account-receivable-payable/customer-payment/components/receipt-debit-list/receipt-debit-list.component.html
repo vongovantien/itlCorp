@@ -88,8 +88,8 @@
                                     <ng-container
                                         *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH' && (receiptType$ | async) !== 'CUSTOMER'">
                                         <input type="text" class="form-control text-right text-success font-15"
-                                            [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
-                                            [disabled]="isReadonly"
+                                            [(ngModel)]="item.netOffUsd" name="netOffUsd" autoFormatCurrency
+                                            [disabled]="true"
                                             (ngModelChange)="calculateTotalPaidAmount(item,'netOffUsd')">
                                     </ng-container>
                                 </td>
@@ -97,8 +97,8 @@
                                     <ng-container
                                         *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH' && (receiptType$ | async) !== 'CUSTOMER'">
                                         <input type="text" class="form-control text-right text-success font-15"
-                                            [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
-                                            [disabled]="isReadonly"
+                                            [(ngModel)]="item.netOffVnd" name="netOffVnd" numeric autoFormatCurrency
+                                            [disabled]="true"
                                             (ngModelChange)="calculateTotalPaidAmount(item,'netOffVnd')">
                                     </ng-container>
                                 </td>

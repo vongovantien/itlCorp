@@ -14,7 +14,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 import { Observable } from 'rxjs';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement, SelectReceiptClass } from '../../store/actions';
-import { ReceiptTypeState } from '../../store/reducers';
+import { ReceiptPaymentMethodState, ReceiptTypeState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -50,6 +50,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     isReadonly = null;
     customerName: string;
     contractNo: string;
+    isRequireAgreement: boolean = true;
 
     classReceipt: string[] = [
         AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
@@ -80,6 +81,11 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 (partnerGroup) => {
                     if (!!partnerGroup) {
                         this.partnerTypeState = partnerGroup;
+                        if (this.partnerTypeState.toUpperCase() === 'CUSTOMER') {
+                            this.isRequireAgreement = true;
+                        }else{
+                            this.getPaymentMethod();
+                        }
                     }
                 }
             )
@@ -100,12 +106,28 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             );
     }
 
+    getPaymentMethod() {
+        this._store.select(ReceiptPaymentMethodState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data) => {
+                    if (!!data) {
+                        if (data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
+                            this.isRequireAgreement = true;
+                        } else {
+                            this.isRequireAgreement = false;
+                        }
+                    }
+                }
+            )
+    }
+
     initForm() {
         this.formSearchInvoice = this._fb.group({
             customerId: [null, Validators.required],
             date: [],
             paymentRefNo: [null],
-            agreementId: [null, Validators.required],
+            agreementId: this.isRequireAgreement ? [null, Validators.required] : [null],
             class: [this.classReceipt[0]],
             referenceNo: [{ value: null, disabled: true }]
         });
