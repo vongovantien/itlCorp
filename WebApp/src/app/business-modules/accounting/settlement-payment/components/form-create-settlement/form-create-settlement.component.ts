@@ -55,7 +55,7 @@ export class SettlementFormCreateComponent extends AppForm {
     bankCode: AbstractControl;
     dueDate: AbstractControl;
 
-    bankAccount: Observable<Bank[]>;
+    bankAccount: Bank[] = [];
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
@@ -195,6 +195,7 @@ export class SettlementFormCreateComponent extends AppForm {
                     this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                     this.setBankInfo(beneficiary);
                 }
+                this.getBankAccountPayee(true);
             } else {
                 this.resetBankInfo();
             }
@@ -246,20 +247,29 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.mapBankCode(data.code)
                 break;
             case 'payee':
-                this.getBankAccountPayee(data.id)
+                this.getBankAccountPayee(true);
                 break;
         }
     }
 
-
-    getBankAccountPayee(id: string) {
-        this._catalogueRepo.getListBankByPartnerById(id)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-            })).subscribe(
-                (res: any) => {
-                    this.bankAccount = res;
-                });
+    getBankAccountPayee(isSetBank: Boolean) {
+        console.log("abc")
+        console.log(!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other'))
+        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other')) {
+            this._catalogueRepo.getListBankByPartnerById(this.payee.value)
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.isLoading = false;
+                })).subscribe(
+                    (res: any[]) => {
+                        this.bankAccount = res;
+                        if (isSetBank === true && !!res && res.length > 0) {
+                            this.bankAccountNo.setValue(res[0].bankAccountNo);
+                            this.bankNameDescription.setValue(res[0].bankNameEn);
+                            this.bankName.setValue(res[0].bankNameEn);
+                            this.mapBankCode(res[0].code);
+                        }
+                    });
+        }
     }
 
     checkStaffPartner() {

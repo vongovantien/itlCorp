@@ -1,31 +1,29 @@
+import { formatDate } from "@angular/common";
 import {
-    Component,
-    ViewChild,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
+    ChangeDetectorRef, Component,
+    ViewChild
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { formatDate } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
 
 import { AppPage } from "@app";
-import { AccountingRepo, ExportRepo } from "@repositories";
-import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
 import { InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { RoutingConstants } from "@constants";
 import { delayTime } from "@decorators";
 import { ICrystalReport } from "@interfaces";
+import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
+import { AccountingRepo, ExportRepo } from "@repositories";
 
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
 import { AdvancePaymentListRequestComponent } from "../components/list-advance-payment-request/list-advance-payment-request.component";
 
-import { catchError, concatMap, map, takeUntil } from "rxjs/operators";
-import isUUID from "validator/lib/isUUID";
 import { InjectViewContainerRefDirective } from "@directives";
-import { combineLatest, EMPTY } from "rxjs";
-import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
-import { getCurrentUserState, IAppState } from "@store";
 import { Store } from "@ngrx/store";
+import { IAppState } from "@store";
+import { combineLatest, EMPTY } from "rxjs";
+import { catchError, concatMap, map } from "rxjs/operators";
+import isUUID from "validator/lib/isUUID";
+import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
 
 @Component({
     selector: "app-advance-payment-detail",
@@ -200,7 +198,6 @@ export class AdvancePaymentDetailComponent
                         this.listAdvancePaymentCarrierComponent.advanceNo =
                             this.advancePayment.advanceNo;
                     }
-                    this.formCreateComponent.getBankAccountPayee(this.advancePayment.payee);
                 },
                 (error: any) => {
                     console.log(error);

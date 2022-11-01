@@ -212,7 +212,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
 
-                    this.formCreateSurcharge.getBankAccountPayee(this.settlementPayment.settlement.payee);
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
