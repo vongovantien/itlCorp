@@ -109,6 +109,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     );
             }
         } else {
+
             this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);

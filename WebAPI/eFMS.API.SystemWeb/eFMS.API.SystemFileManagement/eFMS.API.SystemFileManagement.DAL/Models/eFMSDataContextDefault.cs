@@ -1308,6 +1308,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -1335,7 +1337,13 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -1458,6 +1466,8 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasColumnName("SupplierID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -1839,8 +1849,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.OfficeType).HasMaxLength(500);
-
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")
                     .HasMaxLength(50)
@@ -1998,13 +2006,13 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.SystemFileName)
                     .HasColumnName("SystemFIleName")
-                    .HasMaxLength(50);
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserFileName).HasMaxLength(50);
+                entity.Property(e => e.UserFileName).IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
