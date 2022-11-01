@@ -12,7 +12,7 @@ import { RoutingConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
-import { Surcharge, SysImage } from '@models';
+import { Surcharge } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { DataService } from '@services';
 
@@ -41,7 +41,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
-    attachFiles: SysImage[] = [];
+    attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
 
