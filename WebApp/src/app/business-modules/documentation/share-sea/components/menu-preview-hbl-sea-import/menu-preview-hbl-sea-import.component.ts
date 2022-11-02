@@ -1,14 +1,15 @@
+import { HttpResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from '@app';
 import { ReportPreviewComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { CsTransactionDetail } from '@models';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { SystemConstants } from '@constants';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-menu-preview-hbl-sea-import',
@@ -184,15 +185,22 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                     if (res.status) {
                         return this._exportRepository.exportDangerousGoods(this.hblDetail.id);
                     }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
+                    return of(res);
+                }),
+                catchError((res) => {
+                    return of(null);
+                }),
             ).subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    if (!!res && res.status === 204) {
+                        this._toastService.error("Shipment has no container list, cannot preview Dangerous Goods template!");
+                        return;
+                    } else if ((res as HttpResponse<any>).status && !!res.message) {
+                        this._toastService.warning(res.message);
+                    } else {
                         this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
-                },
+                }
             );
     }
 
