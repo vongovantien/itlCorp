@@ -11,7 +11,6 @@
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
                         disabled=true formControlName="jobNo">
-
                 </div>
             </div>
             <div class="col-lg-4">
@@ -54,6 +53,52 @@
                     <div class="form-control-feedback"
                         *ngIf="isSubmitted && finishDate.value.startDate && (serviceDate.value.startDate > finishDate.value.startDate)">
                         Finish Date must be greater or equal to Service Date
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">
+                        ETA
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" placeholder="DD/MM/YYYY" readonly
+                            formControlName="eta" (remove)="resetFormControl(eta)" calendar
+                            [allowRemove]="!!eta.value && !!eta.value.startDate" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Delivery Date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
+                            formControlName="deliveryDate" calendar
+                            [allowRemove]="!!deliveryDate.value && !!deliveryDate.value.startDate"
+                            (remove)="resetFormControl(deliveryDate)" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Clearance Date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
+                            formControlName="clearanceDate" calendar
+                            [allowRemove]="!!clearanceDate.value && !!clearanceDate.value.startDate"
+                            (remove)="resetFormControl(clearanceDate)" />
                     </div>
                 </div>
             </div>
@@ -349,6 +394,17 @@
                 </div>
             </div>
             <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Suspend Time
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                        name="suspendTime" formControlName="suspendTime" placeholder="Enter text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="form-group"
@@ -416,6 +472,7 @@
                 </ng-container>
             </div>
         </div>
+        <h3 class="c-block-title">Goods Information</h3>
         <hr>
         <div class="row">
             <div class="col-lg-4">
@@ -507,13 +564,10 @@
                     <textarea formControlName="note" name="note" placeholder="Note" class="form-control"></textarea>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        &nbsp;
-                    </label>
-                    <div class="row justify-content-end">
-                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+            <div class="col-4" *ngIf="opsTransaction">
+                <div class="text-right" *ngIf="!opsTransaction.isLocked">
+                    <div class="m--margin-bottom-15 m--margin-top-25" *ngIf="opsTransaction.permission.allowUpdate">
+                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                             (click)="showListContainer()">
                             <span>
                                 <i class="la la-list"></i>
