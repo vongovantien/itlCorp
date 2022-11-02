@@ -18,7 +18,6 @@ import { ICrystalReport } from '@interfaces';
 import isUUID from 'validator/lib/isUUID';
 import * as fromShareBussiness from '../../../share-business/store';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
 @Component({
     selector: 'app-detail-job-air-export',
@@ -29,7 +28,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
-    selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
 
     dimensionDetails: DIM[];
@@ -227,6 +225,36 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             body: `You cannot change shipment type because contract on HBL is Cash - Nominated with following: ${message.slice(0, -2)}`,
             class: 'bg-danger'
         });
+    }
+
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'hbl':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
+                break;
+            case 'shipment':
+                if (this.ACTION === 'COPY') {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`]);
+                }
+                break;
+            case 'cdNote':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
+                break;
+            case 'assignment':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
+        }
+        // if (tabName !== 'advance-settle') {
+        //     this._viewContainerRef.clear();
+        // }
     }
 
     prepareDeleteJob() {
@@ -478,5 +506,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
             );
     }
+
 }
 
