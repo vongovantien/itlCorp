@@ -378,7 +378,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         SystemFileName = "OTH" + x.Name,
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
                         UserFileName = x.Name,
-                        Id = x.Id
+                        Id = x.Id,
                     };
                     listOther.Add(imagedetail);
                 });

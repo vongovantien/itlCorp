@@ -136,12 +136,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
         if (this.isUpdate) {
             let edocUploadModel: any = {
-                Hblid: edocFileList[0].HBL,
+                Hblid: edocFileList[0].HBL.id,
                 SystemFileName: edocFileList[0].AliasName,
                 Note: edocFileList[0].Note,
                 Id: edocFileList[0].Id,
+                JobId: edocFileList[0].JobId,
                 DocumentTypeId: this.selectedtDocType,
             }
+
             if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
                 console.log(edocUploadModel.DocumentTypeId);
 
@@ -198,7 +200,7 @@ export interface IEDocFile {
     AliasName: string,
     BillingNo: string,
     BillingType: string,
-    HBL: string
+    HBL: any
     FileName: string,
     Note: string,
     BillingId: string,
