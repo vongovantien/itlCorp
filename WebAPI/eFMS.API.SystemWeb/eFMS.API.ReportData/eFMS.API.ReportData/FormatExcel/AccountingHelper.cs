@@ -5599,6 +5599,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
+                excel.IsWriteLnString = false; // Không xuống dòng cho description
                 int _length = result.Details.Count;
 
                 for (int i = 0; i < _length; i++)
