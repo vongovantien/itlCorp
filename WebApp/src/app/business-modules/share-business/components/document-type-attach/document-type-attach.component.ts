@@ -47,6 +47,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
         // this.getHblList();
+        console.log(this.documentTypes);
+
     }
     chooseFile(event: any) {
         const fileList = event.target['files'];

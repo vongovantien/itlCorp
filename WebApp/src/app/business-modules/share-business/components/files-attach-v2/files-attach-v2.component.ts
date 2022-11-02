@@ -159,7 +159,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (res: any) => {
                         if (!!res) {
                             console.log(this.housebills);
-
+                            this.housebills = res;
                         }
                     },
                 );
