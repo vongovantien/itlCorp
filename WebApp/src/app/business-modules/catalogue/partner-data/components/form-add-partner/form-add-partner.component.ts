@@ -620,11 +620,23 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     setValueInforCompany() {
-        this.partnerForm.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
-        this.partnerForm.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
-        this.partnerForm.controls['addressVn'].setValue(this.inforCompany.addressVn);
-        this.partnerForm.controls['addressEn'].setValue(this.inforCompany.addressEn);
-        this.partnerForm.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
-        this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
+        if (!this.partnerForm.controls["partnerNameVn"].value?.trim() && !!this.inforCompany.partnerNameVn) {
+            this.partnerForm.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn)
+        }
+        if (!this.partnerForm.controls["partnerNameEn"].value?.trim() && !!this.inforCompany.partnerNameEn) {
+            this.partnerForm.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn)
+        }
+        if (!this.partnerForm.controls["addressVn"].value?.trim() && !!this.inforCompany.addressVn) {
+            this.partnerForm.controls["addressVn"].setValue(this.inforCompany.addressVn)
+        }
+        if (!this.partnerForm.controls["addressEn"].value?.trim() && !!this.inforCompany.addressEn) {
+            this.partnerForm.controls["addressEn"].setValue(this.inforCompany.addressEn)
+        }
+        if (!this.partnerForm.controls["addressShippingVn"].value?.trim() && !!this.inforCompany.addressShippingVn) {
+            this.partnerForm.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn)
+        }
+        if (!this.partnerForm.controls["addressShippingEn"].value?.trim() && !!this.inforCompany.addressShippingEn) {
+            this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
+        }
     }
 }
