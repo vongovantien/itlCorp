@@ -56,37 +56,37 @@
                     </div>
                 </div>
             </div> -->
-       
-                <div class="form">
-                    <div class="row m-form m-form m-form--state">
-                        <div class="col">
-                            <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment" class="combogridShipmment"
+
+            <div class="form">
+                <div class="row m-form m-form m-form--state">
+                    <div class="col">
+                        <!-- <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment" class="combogridShipmment"
                                 (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                 [selectedDisplayFields]="configShipment.selectedDisplayFields"
                                 [dataSources]="configShipment.dataSource"  [(ngModel)]="keyword"
                                 [displayFields]="configShipment.displayFields" [height]="200">
                             </app-combo-grid-virtual-scroll> -->
-                                <div (clickOutside)="onClickOutsideShipmentName()">
-                                    <div class="m-input-icon m-input-icon--right down">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                        placeholder="Enter JobId or MBL No or HBL No" (click)="isShow = !isShow"
-                                        (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
-                                        [ngModelOptions]="{standalone: true}">
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-search"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <ng-container *ngIf="isShow">
-                                        <app-combo-grid [data]="shipments" [headers]="headersShipment" [hideInput]="true"
-                                            (onClick)="onSelectDataFormInfo($event,'shipment')">
-                                        </app-combo-grid>
-                                    </ng-container>
-                                </div>
+                        <div (clickOutside)="onClickOutsideShipmentName()">
+                            <div class="m-input-icon m-input-icon--right down">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                    placeholder="Enter JobId or MBL No or HBL No" (click)="isShow = !isShow"
+                                    (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
+                                    [ngModelOptions]="{standalone: true}">
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <ng-container *ngIf="isShow">
+                                <app-combo-grid [data]="shipments" [headers]="headersShipment" [hideInput]="true"
+                                    (onClick)="onSelectDataFormInfo($event,'shipment')">
+                                </app-combo-grid>
+                            </ng-container>
                         </div>
                     </div>
                 </div>
+            </div>
 
             <!--end::Form-->
         </div>

@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { AuthGuardService, MenuResolveGuard } from '@core';
+import { ForbiddenPageComponent } from './403/403.component';
+import { NotfoundPageComponent } from './404/404-page.component';
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
-import { NotfoundPageComponent } from './404/404-page.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ForbiddenPageComponent } from './403/403.component';
-import { MenuResolveGuard, AuthGuardService } from '@core';
 
 const routes: Routes = [
 
@@ -38,16 +37,15 @@ const routes: Routes = [
             {
                 path: '',
                 //component: DashboardComponent
-                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                loadChildren: () => import('./tracking/tracking.module').then(m => m.TrackingModule),
                 data: {
                     name: "Dashboard",
                 }
             },
             {
-                //path: 'dashboard',
-                //component: DashboardComponent,
                 path: 'dashboard',
-                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                //component: DashboardComponent
+                loadChildren: () => import('./tracking/tracking.module').then(m => m.TrackingModule),
                 data: {
                     name: "Dashboard",
                 }
