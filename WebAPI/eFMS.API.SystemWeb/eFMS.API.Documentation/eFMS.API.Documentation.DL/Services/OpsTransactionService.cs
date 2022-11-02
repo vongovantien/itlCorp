@@ -1175,7 +1175,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (customerContract.IsOverDue == true)
                         {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.PartnerTaxCode, customerContract.ContractType, customer.ShortName, SalesmanName);
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName);
                             return new HandleState(errorContract);
                         }
                         if (customerContract.IsOverLimit == true)
