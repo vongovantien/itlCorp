@@ -366,7 +366,7 @@
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
         <div class="menu-context__item"
-            *ngIf="isLocked===false &&  (typeFrom!=='Settlement' && selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
+            *ngIf="isLocked===false &&  (typeFrom==='Settlement' || selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
             (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>

@@ -43,11 +43,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     { title: 'House Bill No', field: 'hbl' },
     { title: 'Note', field: 'note' },
     { title: 'Source', field: 'source' },]
-    accountantAttach: any[] = [{ title: 'No', field: 'no' },
-    { title: 'Alias Name', field: 'aliasName' },
-    { title: 'Real File Name', field: 'realFilename' },
-    { title: 'Document Type', field: 'docType', required: true },
-    { title: 'Note', field: 'note' },]
+    // accountantAttach: any[] = [{ title: 'No', field: 'no' },
+    // { title: 'Alias Name', field: 'aliasName' },
+    // { title: 'Real File Name', field: 'realFilename' },
+    // { title: 'Document Type', field: 'docType', required: true },
+    // { title: 'Note', field: 'note' },]
     jobNo: string = '';
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
@@ -203,21 +203,24 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         if (this.typeFrom === 'Shipment') {
             this.documentAttach.headers = this.headerAttach;
         } else {
-            this.documentAttach.headers = this.accountantAttach;
+            this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
-        console.log(this.selectedEdoc);
+        console.log(this.documentTypes);
 
         let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        console.log(docType);
+
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: this.selectedEdoc.hblid,//hblNo 
-            hblid: this.selectedEdoc.hblid,//hblNo 
+            hwbNo: this.selectedEdoc.hblNo,//hblNo 
+            hblid: this.selectedEdoc.hblid,//hblNo
+            jobNo: this.selectedEdoc.jobNo,
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);
