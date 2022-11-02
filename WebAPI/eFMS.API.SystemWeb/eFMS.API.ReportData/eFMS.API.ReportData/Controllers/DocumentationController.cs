@@ -114,11 +114,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.HouseBillDetailUrl + hblid, accessToken);
 
             var dataObject = responseFromApi.Content.ReadAsAsync<CsTransactionDetailModel>();
-            if (dataObject.Result.CsMawbcontainers == null)
-            {
-                ResultHandle result = new ResultHandle { Status = false, Message = string.Format($"Shipment has no container list, cannot preview Dangerous Goods template!"), Data = null };
-                return Ok(null);
-            }
+
             var stream = new DocumentationHelper().CreateDangerousGoods(dataObject.Result);
             if (stream == null)
             {
