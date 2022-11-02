@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -4382,8 +4380,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.OfficeType).HasMaxLength(500);
 
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")
