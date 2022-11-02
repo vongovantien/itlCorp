@@ -458,8 +458,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Note = x.FirstOrDefault().Note,
                         HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = jobDetail != null ? jobDetail.JobNo : null,
-                        Hblid=x.FirstOrDefault()?.Hblid,
-                        JobId=x.FirstOrDefault()?.JobId
+                        Hblid= jobDetail != null ? jobDetail.HBLId : Guid.Empty,
+                        JobId = jobDetail != null ? jobDetail.JobId : Guid.Empty,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -536,7 +536,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     return null;
                 }
-                return new TransctionTypeJobModel() { HBLNo = JobOPS.FirstOrDefault().Hwbno, JobNo = JobOPS.FirstOrDefault().JobNo };
+                return new TransctionTypeJobModel() { HBLNo = JobOPS.FirstOrDefault().Hwbno, JobNo = JobOPS.FirstOrDefault().JobNo, JobId=JobOPS.FirstOrDefault().Id,HBLId=JobOPS.FirstOrDefault().Hblid };
             }
             else
             {
@@ -545,7 +545,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     return null;
                 }
-                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = _cstranRepo.Get(x => x.Id == JobCS.FirstOrDefault().JobId).FirstOrDefault().JobNo };
+                var cs = _cstranRepo.Get(x => x.Id == JobCS.FirstOrDefault().JobId);
+                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.FirstOrDefault().JobNo,JobId=cs.FirstOrDefault().Id,HBLId=JobCS.FirstOrDefault().Id };
             }
         }
 
