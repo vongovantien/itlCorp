@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -13,8 +6,6 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Services;
-using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -22,6 +13,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -407,6 +405,14 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult QueryData(CsTransactionDetailCriteria criteria)
         {
             var data = csTransactionDetailService.Query(criteria);
+            return Ok(data);
+        }
+
+        [HttpPost("Query")]
+        [Authorize]
+        public async Task<IActionResult> Query(CsTransactionDetailCriteria criteria)
+        {
+            var data = await csTransactionDetailService.QueryData(criteria);
             return Ok(data);
         }
 

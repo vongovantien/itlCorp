@@ -10,6 +10,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -48,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             var currentJob = await csTransRepository.Get(x => x.Id == criteria.JobId).FirstOrDefaultAsync();
             var hbl = await csTransDetailRepository.Get(x => x.Id == criteria.HblId).FirstOrDefaultAsync();
             var stage = await stageService.GetStageByType(criteria.StageType);
+            var orderNumber = DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -56,13 +58,12 @@ namespace eFMS.API.Documentation.DL.Services
             newItem.Status = TermData.Done;
             newItem.Deadline = DateTime.Now;
             newItem.MainPersonInCharge = newItem.RealPersonInCharge = currentUser.UserID;
-            newItem.Hblid = hbl.Id;
-            newItem.Hblno = hbl.Hwbno;
+            newItem.Hblid = hbl?.Id;
+            newItem.Hblno = hbl?.Hwbno;
             newItem.JobId = criteria.JobId;
             newItem.Type = DocumentConstants.FROM_SYSTEM;
             newItem.DatetimeCreated = DateTime.Now;
-            var orderNumberProcess = await DataContext.CountAsync(x => x.JobId == criteria.JobId);
-            newItem.OrderNumberProcessed = orderNumberProcess + 1;
+            newItem.OrderNumberProcessed = orderNumber + 1;
 
             var result = await AddNewStageAssigned(newItem);
             return result;
@@ -142,7 +143,8 @@ namespace eFMS.API.Documentation.DL.Services
         private async Task<List<CsStageAssignedModel>> SetMutipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
         {
             List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
-            int orderNumberProcess = await DataContext.CountAsync(x => x.JobId == jobId);
+
+            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
             var hbl = new CsTransactionDetail();
             var result = new HandleState();
 
@@ -164,10 +166,10 @@ namespace eFMS.API.Documentation.DL.Services
                 stageAssigned.DatetimeCreated = stageAssigned.DatetimeModified = DateTime.Now;
                 stageAssigned.MainPersonInCharge = currentUser.UserID;
                 stageAssigned.RealPersonInCharge = currentUser.UserID;
-                stageAssigned.OrderNumberProcessed = orderNumberProcess + 1;
+                stageAssigned.OrderNumberProcessed = orderNumber + 1;
                 listStageAssigned.Add(stageAssigned);
 
-                orderNumberProcess++;
+                orderNumber++;
             }
             return listStageAssigned;
         }

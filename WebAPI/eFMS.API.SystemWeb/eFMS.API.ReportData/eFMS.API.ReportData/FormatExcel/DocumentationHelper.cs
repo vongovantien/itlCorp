@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Criteria;
 using eFMS.API.ReportData.Models.Documentation;
@@ -10,10 +11,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using Microsoft.Office;
 using Font = System.Drawing.Font;
-using Microsoft.Office.Interop.Excel;
-using eFMS.API.ReportData.Consts;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
@@ -41,7 +39,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -231,7 +229,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -361,7 +359,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -465,7 +463,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 new TitleModel { VNTitle = "Đơn vị thể tích", ENTitle = "Dimension of unit"}
             };
             addressStartContent = 9;
-            int k = 0;
             for (int i = 0; i < goodsInfos.Count; i++)
             {
                 workSheet.Cells[addressStartContent, i + 1].Style.WrapText = true;
@@ -637,7 +634,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -942,7 +939,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1134,7 +1131,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1194,7 +1191,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1258,10 +1255,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
-            }           
+            }
         }
 
         /// <summary>
@@ -1293,7 +1290,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -1315,7 +1312,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1333,7 +1330,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 var excel = new ExcelExport(path);
                 var listKeyData = new Dictionary<string, object>();
-                listKeyData.Add("FromDate", "From " + Convert.ToDateTime( criteria.ServiceDateFrom).ToShortDateString() + " To " + Convert.ToDateTime(criteria.ServiceDateTo).ToShortDateString());
+                listKeyData.Add("FromDate", "From " + Convert.ToDateTime(criteria.ServiceDateFrom).ToShortDateString() + " To " + Convert.ToDateTime(criteria.ServiceDateTo).ToShortDateString());
 
                 int j = 0;
                 int startRow = 11;
@@ -1460,7 +1457,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -1590,7 +1587,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
 
             int revenueCol = 28;
-            for(int i= 0; i <= 5; i++)
+            for (int i = 0; i <= 5; i++)
             {
                 workSheet.Cells[10, revenueCol].Value = subheadersTable[i];
                 revenueCol++;
@@ -1725,7 +1722,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j + addressStartContent, 56].Value = item.PMTerm;
                 workSheet.Cells[j + addressStartContent, 57].Value = item.ShipmentNotes;
                 workSheet.Cells[j + addressStartContent, 58].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
-              
+
                 j++;
                 positionStart++;
             }
@@ -1796,7 +1793,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalBuyHandling].Value = overview.Select(t => t.TotalBuyHandling).Sum();
             workSheet.Cells[addressTotalBuyHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyCustom= workSheet.Cells[address, 37].Start.Address;
+            string addressTotalBuyCustom = workSheet.Cells[address, 37].Start.Address;
             workSheet.Cells[addressTotalBuyCustom].Value = overview.Select(t => t.TotalCustomBuy).Sum();
             workSheet.Cells[addressTotalBuyCustom].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
@@ -1864,7 +1861,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1934,7 +1931,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -2456,7 +2453,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -2618,7 +2615,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
-                var path = f.FullName+".xlsx";
+                var path = f.FullName + ".xlsx";
                 if (!File.Exists(path))
                 {
                     return null;
@@ -2663,7 +2660,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Start of Table
                 var startOfDetail = 11;
                 excel.StartDetailTable = startOfDetail;
-                
+
                 int i = 0;
                 while (i < shipments.Count())
                 {
@@ -2742,7 +2739,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -2764,7 +2761,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -3038,7 +3035,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -3444,7 +3441,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -3556,7 +3553,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return excelPackage.Stream;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -3881,7 +3878,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
                 listKeyData.Add("ExchangeRate", resultData.ExchangeRate);
                 excel.SetData(listKeyData);
-                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate?.ToString("MMM-yyyy")).ThenBy(x=>x.CustomerName).ThenBy(x => x.HBLNo);
+                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate?.ToString("MMM-yyyy")).ThenBy(x => x.CustomerName).ThenBy(x => x.HBLNo);
                 var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
 
                 var formatMonth = years.Count() > 1 ? "MMM-yyyy" : "MMM";
@@ -3964,7 +3961,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -4115,7 +4112,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -4147,7 +4144,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 foreach (var mon in monthGrp)
                 {
-                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.CustomerName).ThenBy(x=>x.JobId);
+                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.CustomerName).ThenBy(x => x.JobId);
                     if (shipmentGrp.Count() > 0)
                     {
                         listKeyData = new Dictionary<string, object>();
@@ -4191,7 +4188,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -4212,7 +4209,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 int startRow = 4;
                 excel.StartDetailTable = startRow;
-                
+
                 var contractGrp = result.GroupBy(x => new { x.SaleManId, x.SalemanName, x.SalemanEmail, x.AccountNo, x.CustomerName, x.ContractId, x.DebitAmount, x.CreditCurrency });
                 int? stt = 1;
                 salemanName = result.FirstOrDefault().SalemanName;
@@ -4258,12 +4255,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 return excel.ExcelStream();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
         }
-         
+
         public Stream GenerateExportOutsourcingRegcognising(List<ExportOutsourcingRegcognisingModel> result)
         {
             try
@@ -4338,68 +4335,68 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyFormula.Add("SumTotalBuying", _statement);
 
                     _address = excel.AddressOfKey("Balance");
-                    _statement = string.Format("SUBTOTAL(9,{0}:{1})-SUBTOTAL(9,{2}:{3})", "N"+(startRow+1).ToString(), "P"+ columnNum, "AD"+(startRow+1).ToString(),"AF"+ columnNum);
+                    _statement = string.Format("SUBTOTAL(9,{0}:{1})-SUBTOTAL(9,{2}:{3})", "N" + (startRow + 1).ToString(), "P" + columnNum, "AD" + (startRow + 1).ToString(), "AF" + columnNum);
                     listKeyFormula.Add("Balance", _statement);
 
                     //TotalRNet += outRe.ReplicateJob.Sum(x => x?.NETAmount)??0;
-                    TotalBalance += (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount))??0;
+                    TotalBalance += (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount)) ?? 0;
                     //TotalBUY += outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) ?? 0;
                     //TotalNET += outRe.OriginalJob.Sum(x => x?.NETAmount) ?? 0;
                     //TotalRSell += outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) ?? 0;
                     //TotalRVAT += outRe.ReplicateJob.Sum(x => x?.VATAmount) ?? 0;
                     //TotalVAT += outRe.OriginalJob.Sum(x => x?.VATAmount) ?? 0;
-                    
+
                     startRow++;
                     excel.SetData(listGroupHead);
                     for (int i = 0; i < outRe.ReplicateJob.Count(); i++)
-                        {
-                            var listKeyData = new Dictionary<string, object>();
-                            excel.SetDataTable();
-                            listKeyData.Add("RJobID", outRe.ReplicateJob[i]?.JobId);
-                            listKeyData.Add("RCustomNo", outRe.ReplicateJob[i]?.CustomNo);
-                            listKeyData.Add("RHBL", outRe.ReplicateJob[i]?.HBL);
-                            listKeyData.Add("RCustomer", outRe.ReplicateJob[i]?.Customer);
-                            listKeyData.Add("RProductService", outRe.ReplicateJob[i]?.ProductService);
-                            listKeyData.Add("RDateService", outRe.ReplicateJob[i]?.DateService.ToString("dd/MM/yyyy"));
-                            listKeyData.Add("JobID", outRe.OriginalJob[i]?.JobId);
-                            listKeyData.Add("CustomNo", outRe.OriginalJob[i]?.CustomNo);
-                            listKeyData.Add("HBL", outRe.OriginalJob[i]?.HBL);
-                            listKeyData.Add("Customer", outRe.OriginalJob[i]?.Customer);
-                            listKeyData.Add("ProductService", outRe.OriginalJob[i]?.ProductService);
-                            listKeyData.Add("DateService", outRe.OriginalJob[i]?.DateService.ToString("dd/MM/yyyy"));
-                            listKeyData.Add("RPartnerName", outRe.ReplicateJob[i]?.PartnerName);
-                            listKeyData.Add("RPartnerCode", outRe.ReplicateJob[i]?.PartnerCode);
-                            listKeyData.Add("RChargeCode", outRe.ReplicateJob[i]?.ChargeCode);
-                            listKeyData.Add("RChargeName", outRe.ReplicateJob[i]?.ChargeName);
-                            listKeyData.Add("RDebitNo", outRe.ReplicateJob[i]?.DebitNo);
-                            listKeyData.Add("RSOA", outRe.ReplicateJob[i]?.SOA);
-                            listKeyData.Add("RCreator", outRe.ReplicateJob[i]?.Creator);
-                            listKeyData.Add("RNetAmount", outRe.ReplicateJob[i]?.NETAmount);
-                            listKeyData.Add("RVATAmount", outRe.ReplicateJob[i]?.VATAmount);
-                            listKeyData.Add("PartnerName", outRe.OriginalJob[i]?.PartnerName);
-                            listKeyData.Add("PartnerCode", outRe.OriginalJob[i]?.PartnerCode);
-                            listKeyData.Add("ChargeCode", outRe.OriginalJob[i]?.ChargeCode);
-                            listKeyData.Add("ChargeName", outRe.OriginalJob[i]?.ChargeName);
-                            listKeyData.Add("DebitNo", outRe.OriginalJob[i]?.DebitNo);
-                            listKeyData.Add("SOA", outRe.OriginalJob[i]?.SOA);
-                            listKeyData.Add("Creator", outRe.OriginalJob[i]?.Creator);
-                            listKeyData.Add("NetAmount", outRe.OriginalJob[i]?.NETAmount);
-                            listKeyData.Add("VATAmount", outRe.OriginalJob[i]?.VATAmount);
-                            listKeyData.Add("TotalSelling", outRe.ReplicateJob[i]?.VATAmount + outRe.ReplicateJob[i]?.NETAmount);
-                            listKeyData.Add("TotalBuying", outRe.OriginalJob[i]?.VATAmount + outRe.OriginalJob[i]?.NETAmount);
-                            excel.SetData(listKeyData);
-                            startRow++;
-                        }
+                    {
+                        var listKeyData = new Dictionary<string, object>();
+                        excel.SetDataTable();
+                        listKeyData.Add("RJobID", outRe.ReplicateJob[i]?.JobId);
+                        listKeyData.Add("RCustomNo", outRe.ReplicateJob[i]?.CustomNo);
+                        listKeyData.Add("RHBL", outRe.ReplicateJob[i]?.HBL);
+                        listKeyData.Add("RCustomer", outRe.ReplicateJob[i]?.Customer);
+                        listKeyData.Add("RProductService", outRe.ReplicateJob[i]?.ProductService);
+                        listKeyData.Add("RDateService", outRe.ReplicateJob[i]?.DateService.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("JobID", outRe.OriginalJob[i]?.JobId);
+                        listKeyData.Add("CustomNo", outRe.OriginalJob[i]?.CustomNo);
+                        listKeyData.Add("HBL", outRe.OriginalJob[i]?.HBL);
+                        listKeyData.Add("Customer", outRe.OriginalJob[i]?.Customer);
+                        listKeyData.Add("ProductService", outRe.OriginalJob[i]?.ProductService);
+                        listKeyData.Add("DateService", outRe.OriginalJob[i]?.DateService.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("RPartnerName", outRe.ReplicateJob[i]?.PartnerName);
+                        listKeyData.Add("RPartnerCode", outRe.ReplicateJob[i]?.PartnerCode);
+                        listKeyData.Add("RChargeCode", outRe.ReplicateJob[i]?.ChargeCode);
+                        listKeyData.Add("RChargeName", outRe.ReplicateJob[i]?.ChargeName);
+                        listKeyData.Add("RDebitNo", outRe.ReplicateJob[i]?.DebitNo);
+                        listKeyData.Add("RSOA", outRe.ReplicateJob[i]?.SOA);
+                        listKeyData.Add("RCreator", outRe.ReplicateJob[i]?.Creator);
+                        listKeyData.Add("RNetAmount", outRe.ReplicateJob[i]?.NETAmount);
+                        listKeyData.Add("RVATAmount", outRe.ReplicateJob[i]?.VATAmount);
+                        listKeyData.Add("PartnerName", outRe.OriginalJob[i]?.PartnerName);
+                        listKeyData.Add("PartnerCode", outRe.OriginalJob[i]?.PartnerCode);
+                        listKeyData.Add("ChargeCode", outRe.OriginalJob[i]?.ChargeCode);
+                        listKeyData.Add("ChargeName", outRe.OriginalJob[i]?.ChargeName);
+                        listKeyData.Add("DebitNo", outRe.OriginalJob[i]?.DebitNo);
+                        listKeyData.Add("SOA", outRe.OriginalJob[i]?.SOA);
+                        listKeyData.Add("Creator", outRe.OriginalJob[i]?.Creator);
+                        listKeyData.Add("NetAmount", outRe.OriginalJob[i]?.NETAmount);
+                        listKeyData.Add("VATAmount", outRe.OriginalJob[i]?.VATAmount);
+                        listKeyData.Add("TotalSelling", outRe.ReplicateJob[i]?.VATAmount + outRe.ReplicateJob[i]?.NETAmount);
+                        listKeyData.Add("TotalBuying", outRe.OriginalJob[i]?.VATAmount + outRe.OriginalJob[i]?.NETAmount);
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
 
                     if (outRe.ReplicateJob.Sum(x => x?.VATAmount + x?.NETAmount) - outRe.OriginalJob.Sum(x => x?.VATAmount + x?.NETAmount) != 0)
                     {
-                        excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                        excel.Worksheet.Cells[startRow - outRe.ReplicateJob.Count() - 1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
                     }
                     else
                     {
-                        excel.Worksheet.Cells[startRow- outRe.ReplicateJob.Count()-1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                        excel.Worksheet.Cells[startRow - outRe.ReplicateJob.Count() - 1, 33, startRow, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
                     }
-                    excel.SetFormula(listKeyFormula,startGroup);
+                    excel.SetFormula(listKeyFormula, startGroup);
                 }
                 var listDataTotal = new Dictionary<string, object>();
                 //listDataTotal.Add("TotalRNet", TotalRNet);
@@ -4438,15 +4435,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.SetFormula(listKeyFormulaTotal);
                 if (TotalBalance != 0)
                 {
-                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    excel.Worksheet.Cells[startRow + 1, 33, startRow + 1, 33].Style.Fill.BackgroundColor.SetColor(Color.Red);
                 }
                 else
                 {
-                    excel.Worksheet.Cells[startRow+1, 33, startRow+1, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    excel.Worksheet.Cells[startRow + 1, 33, startRow + 1, 33].Style.Fill.BackgroundColor.SetColor(Color.Green);
                 }
                 return excel.ExcelStream();
-                }
-            catch (Exception ex)
+            }
+            catch (Exception)
             {
                 return null;
             }

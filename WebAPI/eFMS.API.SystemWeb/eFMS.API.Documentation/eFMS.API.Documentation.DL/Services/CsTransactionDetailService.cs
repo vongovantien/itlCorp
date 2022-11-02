@@ -22,8 +22,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -600,7 +598,7 @@ namespace eFMS.API.Documentation.DL.Services
                     return detail;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -783,7 +781,7 @@ namespace eFMS.API.Documentation.DL.Services
                     return detail;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -972,6 +970,30 @@ namespace eFMS.API.Documentation.DL.Services
                 fe.Packages = string.Join(", ", packages.Where(x => !string.IsNullOrEmpty(x)));
             });
             return results;
+        }
+
+
+        public async Task<IQueryable<CsTransactionDetailModel>> QueryData(CsTransactionDetailCriteria criteria)
+        {
+            var query = from detail in DataContext.Get(x => x.JobId == criteria.JobId)
+                        join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
+                        from cus in customers.DefaultIfEmpty()
+                        select new { detail, cus };
+
+            var res = from detail in query.Select(s => s.detail)
+                      join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
+                      from cus in customers.DefaultIfEmpty()
+                      select new CsTransactionDetailModel
+                      {
+                          Id = detail.Id,
+                          JobId = detail.JobId,
+                          Hwbno = detail.Hwbno,
+                          Mawb = detail.Mawb,
+                          SaleManId = detail.SaleManId,
+                          CustomerId = detail.CustomerId,
+                          CustomerName = cus.ShortName,
+                      };
+            return res;
         }
 
         public IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, CsTransaction shipment = null)
@@ -1629,7 +1651,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Notify = ReportUltity.ReplaceNullAddressDescription(data.NotifyPartyDescription)?.ToUpper();
                 housebill.PlaceAtReceipt = data.PickupPlace?.ToUpper();// Place of receipt
                 housebill.PlaceDelivery = data.DeliveryPlace?.ToUpper();// Place of Delivery
-                // ocean name
+                                                                        // ocean name
                 if (reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME || reportType == DocumentConstants.HBLOFLANDING_FBL_NOFRAME)
                 {
                     housebill.LocalVessel = data.OceanVoyNo?.ToUpper(); // = mother vessel
@@ -2430,7 +2452,7 @@ namespace eFMS.API.Documentation.DL.Services
             var transDetails = DataContext.Get(x => jobIds.Contains(x.JobId));
             housebillDaily = (from transDetail in transDetails
                               join tran in trans on transDetail.JobId equals tran.Id //into transGrp
-                              //from tran in transGrp.DefaultIfEmpty()
+                                                                                     //from tran in transGrp.DefaultIfEmpty()
                               join pod in pods on transDetail.Pod equals pod.Id into podGrp
                               from pod in podGrp.DefaultIfEmpty()
                               join warehouse in warehouses on transDetail.WarehouseId equals warehouse.Id into warehouseGrp
@@ -2626,7 +2648,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
+            var customers = catPartnerRepo.Get();
             var transDetails = DataContext.Get(x => x.JobId == shipment.Id);
+
+
             var result = new List<object>();
             if (hblId != null && hblId != Guid.Empty) // TH checkpoint của 1 Hblid đã được check trước đó
             {
@@ -2637,7 +2662,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             foreach (var hbl in transDetails)
             {
-                var checkPoint = new CheckPoint {
+                var checkPoint = new CheckPoint
+                {
                     PartnerId = hbl.CustomerId,
                     HblId = hbl.Id,
                     TransactionType = "DOC",
