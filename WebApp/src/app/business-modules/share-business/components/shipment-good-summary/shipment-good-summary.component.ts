@@ -176,7 +176,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     onRefresh() {
         this.confirmRefresh.hide();
-
+        this.containerDetail = '';
         this.updateData(this.containers);
     }
 
