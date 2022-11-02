@@ -632,7 +632,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     edoc.DocumentTypeId = edocUpdate.DocumentTypeId;
-                    edoc.JobId = edoc.JobId;    
+                    edoc.JobId = edocUpdate.JobId;    
                     var hs = await _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
                 }
                 if (edoc == null)
