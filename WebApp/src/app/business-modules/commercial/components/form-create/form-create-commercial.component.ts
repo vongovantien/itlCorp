@@ -350,24 +350,23 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     setValueInforCompany() {
-        if (!this.formGroup.controls["partnerNameVn"].value || this.inforCompany.partnerNameVn.trim.length !== 0) {
+        if (!this.formGroup.controls["partnerNameVn"].value?.trim() && !!this.inforCompany.partnerNameVn) {
             this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn)
         }
-        if (!this.formGroup.controls["partnerNameEn"].value || this.inforCompany.partnerNameEn.trim.length !== 0) {
+        if (!this.formGroup.controls["partnerNameEn"].value?.trim() && !!this.inforCompany.partnerNameEn) {
             this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn)
         }
-        if (!this.formGroup.controls["addressVn"].value || this.inforCompany.addressVn.trim.length !== 0) {
+        if (!this.formGroup.controls["addressVn"].value?.trim() && !!this.inforCompany.addressVn) {
             this.formGroup.controls["addressVn"].setValue(this.inforCompany.addressVn)
         }
-        if (!this.formGroup.controls["addressEn"].value || this.inforCompany.addressEn.trim.length !== 0) {
+        if (!this.formGroup.controls["addressEn"].value?.trim() && !!this.inforCompany.addressEn) {
             this.formGroup.controls["addressEn"].setValue(this.inforCompany.addressEn)
         }
-        if (!this.formGroup.controls["addressShippingVn"].value || this.inforCompany.addressShippingVn.trim.length !== 0) {
+        if (!this.formGroup.controls["addressShippingVn"].value?.trim() && !!this.inforCompany.addressShippingVn) {
             this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn)
         }
-        if (!this.formGroup.controls["addressShippingEn"].value || this.inforCompany.addressShippingEn.trim.length !== 0) {
+        if (!this.formGroup.controls["addressShippingEn"].value?.trim() && !!this.inforCompany.addressShippingEn) {
             this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
-
     }
 }
