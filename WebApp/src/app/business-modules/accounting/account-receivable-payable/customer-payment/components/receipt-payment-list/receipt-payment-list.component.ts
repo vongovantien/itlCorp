@@ -149,16 +149,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         // this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal', notEqualInternalCode: this.currentUser });
         this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
 
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (partnerGroup) => {
-                    if (!!partnerGroup) {
-                        this.receiptType = partnerGroup;
-                    }
-                }
-            )
-
         this.initForm();
         this.listenCustomerInfoData();
         this.listenAgreementData();
@@ -239,6 +229,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 (data: string) => {
                     if (!!data) {
                         this.partnerId = data;
+                        this._store.select(ReceiptTypeState)
+                            .pipe(takeUntil(this.ngUnsubscribe))
+                            .subscribe(
+                                (partnerGroup) => {
+                                    if (!!partnerGroup) {
+                                        this.receiptType = partnerGroup;
+                                    }
+                                }
+                            )
                     }
                 }
             );
