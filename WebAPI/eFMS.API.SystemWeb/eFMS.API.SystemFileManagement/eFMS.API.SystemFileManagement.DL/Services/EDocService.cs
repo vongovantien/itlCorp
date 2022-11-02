@@ -342,6 +342,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 lstImageMD.Add(imageModel);
             });
+            lstImageMD.OrderBy(x => x.DatetimeCreated);
             var newImageIds = _sysImageDetailRepo.Get(x => x.JobId == jobID).Select(x => x.SysImageId).ToList();
             var imageExist = _sysImageRepo.Get(x => x.ObjectId == jobID.ToString()).ToList();
             var imageMap = new List<SysImage>();
@@ -377,11 +378,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         SystemFileName = "OTH" + x.Name,
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
                         UserFileName = x.Name,
-                        Id = x.Id
+                        Id = x.Id,
                     };
                     listOther.Add(imagedetail);
                 });
             }
+            listOther.OrderBy(x => x.DatetimeCreated);
             lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
             {
                 if (result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
@@ -458,10 +460,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Note = x.FirstOrDefault().Note,
                         HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = jobDetail != null ? jobDetail.JobNo : null,
+                        Hblid= jobDetail != null ? jobDetail.HBLId : Guid.Empty,
+                        JobId = jobDetail != null ? jobDetail.JobId : Guid.Empty,
                     };
                     lstEdoc.Add(edoc);
                 }
-                result.EDocs = lstEdoc;
+                result.EDocs = lstEdoc.OrderBy(x=>x.DatetimeCreated).ToList();
                 return result;
             }
             else if (transactionType == "Advance")
@@ -518,7 +522,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     lstEdoc.Add(edoc);
                 }
-                result.EDocs = lstEdoc;
+                result.EDocs = lstEdoc.OrderBy(x=>x.DatetimeCreated).ToList();
                 return result;
             };
             return result;
@@ -529,13 +533,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var typeJob = _attachFileTemplateRepo.Get(x => x.Id == documentId).FirstOrDefault();
             if (typeJob.TransactionType == "CL")
             {
-                var JobOPS = hblId == Guid.Empty || hblId == null ? _opsTranRepo.Get(x => x.Id == jobId).FirstOrDefault() : _opsTranRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
-                return new TransctionTypeJobModel() { HBLNo = JobOPS.Hwbno, JobNo = JobOPS.JobNo };
+                var JobOPS = hblId == Guid.Empty || hblId == null ? _opsTranRepo.Get(x => x.Id == jobId) : _opsTranRepo.Get(x => x.Hblid == hblId);
+                if (JobOPS.Count() == 0)
+                {
+                    return null;
+                }
+                return new TransctionTypeJobModel() { HBLNo = JobOPS.FirstOrDefault().Hwbno, JobNo = JobOPS.FirstOrDefault().JobNo, JobId=JobOPS.FirstOrDefault().Id,HBLId=JobOPS.FirstOrDefault().Hblid };
             }
             else
             {
-                var JobCS = hblId == Guid.Empty || hblId == null ? _tranDeRepo.Get(x => x.JobId == jobId).FirstOrDefault() : _tranDeRepo.Get(x => x.Id == hblId).FirstOrDefault();
-                return new TransctionTypeJobModel() { HBLNo = JobCS.Hwbno, JobNo = _cstranRepo.Get(x => x.Id == JobCS.JobId).FirstOrDefault().JobNo };
+                var JobCS = hblId == Guid.Empty || hblId == null ? _tranDeRepo.Get(x => x.JobId == jobId) : _tranDeRepo.Get(x => x.Id == hblId);
+                if (JobCS.Count() == 0)
+                {
+                    return null;
+                }
+                var cs = _cstranRepo.Get(x => x.Id == JobCS.FirstOrDefault().JobId);
+                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.FirstOrDefault().JobNo,JobId=cs.FirstOrDefault().Id,HBLId=JobCS.FirstOrDefault().Id };
             }
         }
 
@@ -619,6 +632,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     edoc.DocumentTypeId = edocUpdate.DocumentTypeId;
+                    edoc.JobId = edocUpdate.JobId;    
                     var hs = await _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
                 }
                 if (edoc == null)

@@ -102,10 +102,9 @@
                                             <td>
                                                 <span>{{doc.hblNo}}</span>
                                             </td>
-
-                                            <td>
+                                            <!-- <td>
                                                 <span>{{doc.source}}</span>
-                                            </td>
+                                            </td> -->
                                             <td>
                                                 <span>{{doc.note}}</span>
                                             </td>
@@ -242,6 +241,9 @@
                                                     <span>{{doc.billingNo}}</span>
                                                 </td>
                                                 <td>
+                                                    <span>{{doc.source}}</span>
+                                                </td>
+                                                <td>
                                                     <span>{{doc.note}}</span>
                                                 </td>
                                                 <td>
@@ -363,12 +365,12 @@
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
         <div class="menu-context__item"
-            *ngIf="isLocked===false &&  (typeFrom!=='Settlement' && selectedEdoc.source==='Shipment')"
+            *ngIf="isLocked===false &&  (typeFrom==='Settlement' || selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
             (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
         <div class="menu-context__item" (click)="confirmDelete()"
-            *ngIf="isLocked===false && (typeFrom==='Settlement' || selectedEdoc.source==='Shipment')">
+            *ngIf="isLocked===false && (typeFrom==='Settlement' || selectedEdoc.source==='Shipment'||selectedEdoc.source===null)">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>

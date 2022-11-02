@@ -47,6 +47,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
         // this.getHblList();
+        console.log(this.documentTypes);
+
     }
     chooseFile(event: any) {
         const fileList = event.target['files'];
@@ -86,9 +88,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 if (this.typeFrom === 'Shipment') {
                     this.listFile[index].hblid = event;
                 } else {
-                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
-                    this.listFile[index].hblid = event;
-                    this.listFile[index].jobId = this.housebills.find(x => x.id === event).jobId;
+                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
+                    this.listFile[index].hblid = event.id;
+                    this.listFile[index].jobId = this.housebills.find(x => x.id === event.id).jobId;
                     //this.listFile[index].billingNo = this.billingNo;
                 }
                 break;
@@ -134,12 +136,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
         if (this.isUpdate) {
             let edocUploadModel: any = {
-                Hblid: edocFileList[0].HBL,
+                Hblid: edocFileList[0].HBL.id,
                 SystemFileName: edocFileList[0].AliasName,
                 Note: edocFileList[0].Note,
                 Id: edocFileList[0].Id,
+                JobId: edocFileList[0].JobId,
                 DocumentTypeId: this.selectedtDocType,
             }
+
             if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
                 console.log(edocUploadModel.DocumentTypeId);
 
@@ -196,7 +200,7 @@ export interface IEDocFile {
     AliasName: string,
     BillingNo: string,
     BillingType: string,
-    HBL: string
+    HBL: any
     FileName: string,
     Note: string,
     BillingId: string,

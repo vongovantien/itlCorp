@@ -43,11 +43,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     { title: 'House Bill No', field: 'hbl' },
     { title: 'Note', field: 'note' },
     { title: 'Source', field: 'source' },]
-    accountantAttach: any[] = [{ title: 'No', field: 'no' },
-    { title: 'Alias Name', field: 'aliasName' },
-    { title: 'Real File Name', field: 'realFilename' },
-    { title: 'Document Type', field: 'docType', required: true },
-    { title: 'Note', field: 'note' },]
+    // accountantAttach: any[] = [{ title: 'No', field: 'no' },
+    // { title: 'Alias Name', field: 'aliasName' },
+    // { title: 'Real File Name', field: 'realFilename' },
+    // { title: 'Document Type', field: 'docType', required: true },
+    // { title: 'Note', field: 'note' },]
     jobNo: string = '';
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
@@ -135,7 +135,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
             { title: 'House Bill No', field: 'hblNo', sortable: true },
-            { title: 'Source', field: 'source', sortable: true },
+            //{ title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
@@ -158,7 +158,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (res: any) => {
                         if (!!res) {
                             console.log(this.housebills);
-
+                            this.housebills = res;
                         }
                     },
                 );
@@ -202,21 +202,25 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         if (this.typeFrom === 'Shipment') {
             this.documentAttach.headers = this.headerAttach;
         } else {
-            this.documentAttach.headers = this.accountantAttach;
+            this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
-        console.log(this.selectedEdoc);
+        console.log(this.documentTypes);
 
         let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        console.log(docType);
+        let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: this.selectedEdoc.hblid,//hblNo 
-            hblid: this.selectedEdoc.hblid,//hblNo 
+            hwbNo: hwbNo,//hblNo 
+            hblid: this.selectedEdoc.hblid,//hblNo
+            jobNo: this.selectedEdoc.jobNo,
+            jobId: this.selectedEdoc.jobId
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);
