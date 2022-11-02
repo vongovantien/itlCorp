@@ -88,9 +88,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 if (this.typeFrom === 'Shipment') {
                     this.listFile[index].hblid = event;
                 } else {
-                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event).jobNo;
-                    this.listFile[index].hblid = event;
-                    this.listFile[index].jobId = this.housebills.find(x => x.id === event).jobId;
+                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
+                    this.listFile[index].hblid = event.id;
+                    this.listFile[index].jobId = this.housebills.find(x => x.id === event.id).jobId;
                     //this.listFile[index].billingNo = this.billingNo;
                 }
                 break;

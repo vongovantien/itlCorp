@@ -210,16 +210,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
         let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
         console.log(docType);
-
+        let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: this.selectedEdoc.hblNo,//hblNo 
+            hwbNo: hwbNo,//hblNo 
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
+            jobId: this.selectedEdoc.jobId
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);
