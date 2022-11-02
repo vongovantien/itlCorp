@@ -1,17 +1,16 @@
-import { Component, OnInit, ViewChild, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { catchError, finalize } from 'rxjs/operators';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
-import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants, SystemConstants } from '@constants';
+import { NgProgress } from '@ngx-progressbar/core';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
-import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { FormUpdateEmailCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
+import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -20,6 +19,7 @@ import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(FormUpdateEmailCommercialCatalogueComponent) formUpdateEmailPopup: FormUpdateEmailCommercialCatalogueComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
@@ -308,5 +308,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         }
         this.formContractPopup.contracts = this.contracts;
         this.onActiveContract.emit(this.selectedContract);
+    }
+
+    onUpdateEmailPopup() {
+
     }
 }

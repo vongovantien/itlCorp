@@ -34,7 +34,8 @@
                     <tbody>
                         <ng-container *ngIf="!!contracts.length">
                             <tr *ngFor="let item of contracts | filter : keyword :['username', 'contractNo',
-                             'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;">
+                             'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;"
+                                [contextMenu]="receiptContextMenu">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button (click)="getDetailContract(item.id,i)"
@@ -73,6 +74,11 @@
     </div>
 </div>
 
+<app-context-menu #receiptContextMenu>
+    <div class="menu-context__item">
+        <span><i class="la la-edit"></i><span> Update email address</span></span>
+    </div>
+</app-context-menu>
 <confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
