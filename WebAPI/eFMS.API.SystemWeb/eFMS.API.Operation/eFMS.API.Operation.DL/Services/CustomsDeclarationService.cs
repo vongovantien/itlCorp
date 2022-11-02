@@ -187,8 +187,8 @@ namespace eFMS.API.Operation.DL.Services
                 pattern.Replace(clearance.MA_DV, "");
             }
             string _accountNo = clearance.MA_DV;
-            var partner = customerRepository.Get(x => x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
-            if (partner != null)
+            var partner = customerRepository.Get(x => x.Active == true && x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
+            if(partner != null)
             {
                 _accountNo = partner.AccountNo;
             }
