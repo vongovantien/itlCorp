@@ -210,6 +210,33 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         });
     }
 
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'hbl':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
+                break;
+            case 'shipment':
+                if (this.ACTION === 'COPY') {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`]);
+                }
+                break;
+            case 'cdNote':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
+                break;
+            case 'assignment':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
+        }
+    }
+
     prepareDeleteJob() {
         this._documenRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(

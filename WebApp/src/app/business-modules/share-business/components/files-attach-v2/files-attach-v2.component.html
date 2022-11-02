@@ -181,7 +181,7 @@
                                     <thead app-table-header [headers]="headers"
                                         (onClick)="sortEdoc(docType?.eDocs,i, $event.sortField)">
                                         <th class="first table-actions-col">
-                                            Stt
+                                            No
                                         </th>
                                     </thead>
                                     <tbody>
@@ -242,9 +242,6 @@
                                                     <span>{{doc.billingNo}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{doc.source}}</span>
-                                                </td>
-                                                <td>
                                                     <span>{{doc.note}}</span>
                                                 </td>
                                                 <td>
@@ -279,7 +276,7 @@
                             <thead app-table-header [headers]="headersAcc"
                                 (onClick)="sortEdoc(doc,i, $event.sortField)">
                                 <th class="first table-actions-col">
-                                    Stt
+                                    No
                                 </th>
                             </thead>
                             <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">

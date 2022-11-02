@@ -234,6 +234,29 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
             );
     }
 
+    onSelectTab(tabName: string) {
+        switch (tabName) {
+            case 'hbl':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl`]);
+                break;
+            case 'shipment':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                break;
+            case 'cdNote':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
+                break;
+            case 'assignment':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
+        }
+    }
+
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(

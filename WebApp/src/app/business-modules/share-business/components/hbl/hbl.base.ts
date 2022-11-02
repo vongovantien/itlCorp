@@ -12,14 +12,14 @@ import { ToastrService } from "ngx-toastr";
 import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
-import { takeUntil, catchError, finalize, map, switchMap, concatMap, mergeMap } from "rxjs/operators";
+import { takeUntil, catchError, map, switchMap, concatMap, mergeMap } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { ShareBussinessMassUpdatePodComponent } from './mass-update-pod/mass-update-pod.component';
-import { InjectViewContainerRefDirective } from '@directives';
 import { HttpResponse } from '@angular/common/http';
+import { InjectViewContainerRefDirective } from '@directives';
 
 
 @Directive()
@@ -255,11 +255,9 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     }
 
     deleteHbl(id: string) {
-        this._progressRef.start();
         this._documentRepo.deleteHbl(id)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); }),
+                catchError(this.catchError)
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -292,11 +290,9 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     }
 
     deleteJob() {
-        this._progressRef.start();
         this._documentRepo.checkMasterBillAllowToDelete(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             ).subscribe(
                 (res: any) => {
                     if (res) {
@@ -406,8 +402,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     gotoDetail(id: string) {
         this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             ).subscribe(
                 (res: any) => {
                     if (res) {
