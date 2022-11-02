@@ -12,6 +12,7 @@ import { HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import { delayTime } from '@decorators';
 import { Router } from '@angular/router';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
 @Directive()
 export abstract class ShareJobDetailComponent extends AppForm {
@@ -22,6 +23,7 @@ export abstract class ShareJobDetailComponent extends AppForm {
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
     shipmentDetail: CsTransaction;
     params: any;
+    selectedTab: TAB | string = 'SHIPMENT';
 
     constructor(
         protected _router: Router,
@@ -89,35 +91,10 @@ export abstract class ShareJobDetailComponent extends AppForm {
         );
     }
 
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'hbl':
-                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}/hbl`]);
-                break;
-            case 'shipment':
-                if (this.ACTION === 'COPY') {
-                    this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
-                } else {
-                    this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`]);
-                }
-                break;
-            case 'cdNote':
-                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
-                break;
-            case 'assignment':
-                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-            case 'files':
-                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
-                break;
-            case 'advance-settle':
-                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
-                break;
-        }
-    }
+
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail.transactionType)}`]);
+        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.shipmentDetail?.transactionType)}`]);
     }
 
     handleConfirmSaveAttachment(tempalteCode: string) {
