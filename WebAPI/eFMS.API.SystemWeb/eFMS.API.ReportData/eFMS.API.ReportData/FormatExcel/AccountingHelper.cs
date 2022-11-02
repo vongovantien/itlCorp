@@ -775,6 +775,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("Salesman", item.Salesman);
                         listKeyData.Add("Creator", item.Creator);
                         listKeyData.Add("CombineNo", item.CombineNo);
+                        listKeyData.Add("BillingNote", item.BillingNote);
                     }
                     else
                     {
