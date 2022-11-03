@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
 
-import { CommonEnum } from '@enums';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountReceivableListTrialOfficialComponent } from '../components/list-trial-official/list-trial-official-account-receivable.component';
-import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
-import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
-import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { RoutingConstants } from '@constants';
-import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableListState } from './store/reducers';
+import { CommonEnum } from '@enums';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
+import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableNoAgreementComponent } from '../components/list-no-agreement/list-no-agreement-account-receivable.component';
+import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
+import { AccountReceivableListTrialOfficialComponent } from '../components/list-trial-official/list-trial-official-account-receivable.component';
+import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
 
 @Component({
     selector: 'app-account-receivable',

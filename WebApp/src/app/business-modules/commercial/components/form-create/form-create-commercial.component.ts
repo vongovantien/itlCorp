@@ -6,10 +6,9 @@ import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { CountryModel, Partner, ProviceModel } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { AppForm } from 'src/app/app.form';
-
 import { Observable } from 'rxjs';
 import { catchError, finalize, shareReplay } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'form-create-commercial',

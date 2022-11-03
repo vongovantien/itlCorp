@@ -1,14 +1,13 @@
-import { chargeState } from './../../../../catalogue/charge/store/reducers/index';
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
-import { FormBuilder, FormGroup, AbstractControl, Validators, FormControl } from "@angular/forms";
 import { formatDate } from "@angular/common";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 
 import { PopupBase } from "@app";
-import { SystemRepo, OperationRepo, DocumentationRepo } from "@repositories";
-import { User, Stage } from "@models";
+import { Stage, User } from "@models";
+import { DocumentationRepo, OperationRepo, SystemRepo } from "@repositories";
 
-import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
 
 @Component({
     selector: "detail-stage-popup",
@@ -108,10 +107,9 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             mainPersonInCharge: this.data.mainPersonInCharge,
             realPersonInCharge: this.data.realPersonInCharge,
             status: this.data.status,
-            hblNo: this.data.hblNo
         });
-
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'mainPersonInCharge':
@@ -124,6 +122,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 break;
         }
     }
+
     onSubmit(form: FormGroup) {
         this.isSummited = true;
         if (form.invalid) {
@@ -184,6 +183,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.isSummited = false;
         this.hide();
     }
+
     resetFormControl(control: FormControl | AbstractControl) {
         if (!!control && control instanceof FormControl) {
             control.setValue(null);

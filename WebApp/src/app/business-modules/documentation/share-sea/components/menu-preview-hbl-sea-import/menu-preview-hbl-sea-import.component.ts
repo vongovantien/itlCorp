@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from '@app';
 import { ReportPreviewComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { CsTransactionDetail } from '@models';
@@ -8,7 +9,6 @@ import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-menu-preview-hbl-sea-import',

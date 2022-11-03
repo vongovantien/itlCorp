@@ -11,14 +11,15 @@
             </div>
             <div class="modal-body">
                 <div class="row m-form m-form--state">
-                    <div class="col-md-6 ">
+                    <div class="col-md-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedStage.value}">
                             <label for="">Stage Content <span class="text-danger">(*)</span></label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedStage" [height]="150"
-                                (itemSelected)="onSelectStage($event)" [dataSources]="configStage.dataSource"
+                                (itemSelected)="onSelectData($event,'stage')" [dataSources]="configStage.dataSource"
                                 [displayFields]="configStage.displayFields"
-                                [selectedDisplayFields]="configStage.selectedDisplayFields" (remove)="removeStage()">
+                                [selectedDisplayFields]="configStage.selectedDisplayFields"
+                                (remove)="onRemoveData('stage')">
                             </app-combo-grid-virtual-scroll>
 
                             <div class="form-control-feedback" *ngIf="isSubmitted && !selectedStage.value">
@@ -26,17 +27,33 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.value}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedUser" [height]="150"
-                                (itemSelected)="onSelectUser($event)" [dataSources]="configUser.dataSource"
+                                (itemSelected)="onSelectData($event, 'user')" [dataSources]="configUser.dataSource"
                                 [displayFields]="configUser.displayFields"
-                                [selectedDisplayFields]="configUser.selectedDisplayFields" (remove)="removeUser()">
+                                [selectedDisplayFields]="configUser.selectedDisplayFields"
+                                (remove)="onRemoveData('user')">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback" *ngIf="isSubmitted && !selectedUser.value">
                                 User is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedHbl.value}">
+                            <label for="">House Bill <span class="text-danger">(*)</span></label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedHbl" [height]="150"
+                                (itemSelected)="onSelectData($event, 'hbl')" [dataSources]="configHbl.dataSource"
+                                [displayFields]="configHbl.displayFields"
+                                [selectedDisplayFields]="configHbl.selectedDisplayFields"
+                                (remove)="onRemoveData('hbl')">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !selectedHbl.value">
+                                House Bill is required!
                             </div>
                         </div>
                     </div>
