@@ -257,7 +257,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             noProfit: [false],
             eta: [null],
             deliveryDate: [null],
-            suspendTime: [null],
+            suspendTime: [null, Validators.compose([
+                Validators.maxLength(150),
+            ])],
             clearanceDate: [null],
         }, { validator: FormValidators.comparePort });
 

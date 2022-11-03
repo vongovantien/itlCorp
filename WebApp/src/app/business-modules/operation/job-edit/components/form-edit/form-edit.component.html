@@ -394,12 +394,16 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group"
+                    [ngClass]="{ 'm-form__group has-danger': (suspendTime.dirty && !suspendTime.valid) || (isSubmitted && !suspendTime.valid) }">
                     <label class="form-control-label" for="">
                         Suspend Time
                     </label>
                     <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
                         name="suspendTime" formControlName="suspendTime" placeholder="Enter text">
+                    <div class="form-control-feedback" *ngIf="suspendTime.errors | equalError: 'maxlength'">
+                        You cannot input more than 150 characters!
+                    </div>
                 </div>
             </div>
         </div>
