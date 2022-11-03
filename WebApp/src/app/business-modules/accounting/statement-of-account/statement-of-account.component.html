@@ -96,6 +96,8 @@
                                                     {{soa.syncStatus}}{{soa.reasonReject ? ' - ' + soa.reasonReject :
                                                     ''}}
                                                 </span>
+                                                <span *ngSwitchCase="'Removed Inv'" class="text-danger">
+                                                    {{soa.syncStatus}}</span>
                                                 <span *ngSwitchDefault>
                                                     {{soa.syncStatus}}
                                                 </span>
