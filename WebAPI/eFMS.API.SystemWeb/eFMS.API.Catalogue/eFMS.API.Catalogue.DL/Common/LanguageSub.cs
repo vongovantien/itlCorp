@@ -71,7 +71,6 @@
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_NOT_VALID = "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID";
         public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE = "MSG_CONTRACT_DUPLICATE_SERVICE";
         public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT = "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT";
-        public static readonly string MSG_CONTRACT_CURRENCY_NOT_VALID = "MSG_CONTRACT_CURRENCY_NOT_VALID";
 
         public static readonly string MSG_CONTRACT_EFFECTIVE_DATE_EMPTY = "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY";
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";
@@ -118,7 +117,7 @@
         public static readonly string MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY = "MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY";
         public static readonly string MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY = "MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY";
         public static readonly string MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY = "MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY";
-        public static readonly string MSG_CHARGE_DEFAULT_NOT_VALID= "MSG_CHARGE_DEFAULT_NOT_VALID";
+        public static readonly string MSG_CHARGE_DEFAULT_NOT_VALID = "MSG_CHARGE_DEFAULT_NOT_VALID";
         #endregion
 
         #region Charge
@@ -132,14 +131,14 @@
         public static readonly string MSG_CHARGE_SERVICE_TYPE_NOT_FOUND = "MSG_CHARGE_SERVICE_TYPE_NOT_FOUND";
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EXISTED = "MSG_CHARGE_CODE_EXISTED";
-        public static readonly string MSG_CHARGE_CODE_DUPLICATED= "MSG_CHARGE_CODE_DUPLICATED";
+        public static readonly string MSG_CHARGE_CODE_DUPLICATED = "MSG_CHARGE_CODE_DUPLICATED";
         public static readonly string MSG_CHARGE_UNIT_EMPTY = "MSG_CHARGE_UNIT_EMPTY";
         public static readonly string MSG_CHARGE_UNIT_NOT_FOUND = "MSG_CHARGE_UNIT_NOT_FOUND";
         #endregion
 
         #region commodity group
         public static readonly string MSG_COMMOIDITY_CODE_EMPTY = "MSG_COMMOIDITY_CODE_EMPTY";
-        public static readonly string MSG_COMMOIDITY_CODE_EXISTED= "MSG_COMMOIDITY_CODE_EXISTED";
+        public static readonly string MSG_COMMOIDITY_CODE_EXISTED = "MSG_COMMOIDITY_CODE_EXISTED";
         public static readonly string MSG_COMMOIDITY_CODE_DUPLICATED = "MSG_COMMOIDITY_CODE_DUPLICATED";
         public static readonly string MSG_COMMOIDITY_NAME_EN_EMPTY = "MSG_COMMOIDITY_NAME_EN_EMPTY";
         public static readonly string MSG_COMMOIDITY_NAME_LOCAL_EMPTY = "MSG_COMMOIDITY_NAME_LOCAL_EMPTY";
@@ -178,7 +177,7 @@
         #region Bank
         public static readonly string MSG_BANK_NAME_EN_EMPTY = "MSG_BANK_NAME_EN_EMPTY";
         public static readonly string MSG_BANK_NAME_VN_EMPTY = "MSG_BANK_NAME_VN_EMPTY";
-       
+
         public static readonly string MSG_BANK_CODE_EMPTY = "MSG_BANK_CODE_EMPTY";
         public static readonly string MSG_BANK_CODE_EXISTED = "MSG_BANK_CODE_EXISTED";
         public static readonly string MSG_BANK_CODE_DUPLICATED = "MSG_BANK_CODE_DUPLICATED";
