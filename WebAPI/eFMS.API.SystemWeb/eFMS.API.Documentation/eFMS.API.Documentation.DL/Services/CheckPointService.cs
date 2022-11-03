@@ -318,7 +318,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatContract contract;
             int errorCode = -1;
 
-            if (partner.PartnerMode == "Internal")
+            if (partner.PartnerMode == "Internal" || partner.PartnerType == "Agent")
             {
                 return result;
             }
