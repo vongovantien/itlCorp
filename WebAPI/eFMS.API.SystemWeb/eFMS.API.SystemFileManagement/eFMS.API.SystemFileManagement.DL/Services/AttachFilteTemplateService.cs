@@ -34,12 +34,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             switch (transactionType)
             {
                 case "SOA":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code != "OTH");
+                    var soas = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code != "OTH");
+                    return soas.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
                 case "Settlement":
                     var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
                     return SMCode.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
-                case "Advace":
-                    return await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
+                case "Advance":
+                    var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
+                    return advs.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
                 default:
                     return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
             }
