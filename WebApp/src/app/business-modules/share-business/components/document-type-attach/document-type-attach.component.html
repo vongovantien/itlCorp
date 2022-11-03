@@ -75,22 +75,24 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                    <div class="form-group ">
-                                                        <input type="text" class="form-control " [ngModel]="file.jobNo"
-                                                            disabled>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <div class="form-group ">
-                                                        <select class="form-control" [(ngModel)]="file.hwbNo"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
-                                                            <option *ngFor="let hbl of housebills" [ngValue]="hbl">
-                                                                {{hbl.hwbno}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </td>
+                                                <ng-container *ngIf="typeFrom!=='SOA'&&typeFrom!=='Advance'">
+                                                    <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                                        <div class="form-group ">
+                                                            <input type="text" class="form-control "
+                                                                [ngModel]="file.jobNo" disabled>
+                                                        </div>
+                                                    </td>
+                                                    <td class="">
+                                                        <div class="form-group ">
+                                                            <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
+                                                                <option *ngFor="let hbl of housebills" [ngValue]="hbl">
+                                                                    {{hbl.hwbno}}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
                                                 <td class="">
                                                     <div class="form-group ">
                                                         <input type="text" class="form-control "

@@ -147,6 +147,20 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
+        if (this.typeFrom === 'SOA' || this.typeFrom === 'Advance') {
+            this.headerAttach = [
+                { title: 'Alias Name', field: 'aliasName', width: 300 },
+                { title: 'Real File Name', field: 'realFilename', width: 300 },
+                { title: 'Document Type', field: 'docType', required: true },
+                { title: 'Note', field: 'note' }
+            ]
+            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+            { title: 'Note', field: 'note' },
+            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+            { title: 'Attach Person', field: 'userCreated', sortable: true },
+            ];
+        }
         this.getHblList();
     }
     getHblList() {
@@ -162,7 +176,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         }
                     },
                 );
-        } else {
+        } else if (this.typeFrom === 'Settlement') {
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -183,6 +197,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     }
                 );
             //this.chargeSM
+        } else {
+
         }
     }
     onSelectEDoc(edoc: any) {
