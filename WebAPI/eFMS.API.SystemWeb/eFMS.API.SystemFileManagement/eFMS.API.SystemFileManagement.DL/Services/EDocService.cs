@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -211,13 +212,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         else if (type == "Settlement")
                         {
                             string bilingNo = string.Empty;
-                            var models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
-
+                            var models = new List<TransctionTypeJobModel>();
+                            if (edoc.HBL != null)
+                            {
+                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId).Where(x=>x.HBLId==edoc.HBL).ToList();
+                            }
+                            else
+                            {
+                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
+                            }
                             if (models.Count > 0)
                             {
                                 foreach (var item in models)
                                 {
-                                    var attachTemplate = GetAttTepmlateByJob(item.TransactionType, item.Code);
+                                    var attachTemplate = GetAttTepmlateByJob(item.TransactionType, edoc.Code);
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
@@ -407,7 +415,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var result = new EDocGroupByType();
             var lstEdoc = new List<SysImageDetailModel>();
-            var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList();
+            var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList(); // file goc co tren SM
 
             if (transactionType == "Settlement")
             {
@@ -415,8 +423,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
                 var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x => x.Id);
                 result.documentType = attachTemplate;
-                var settleEdoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == settle.SettlementNo).GroupBy(x => x.SysImageId).ToList();
-                imageExist.Where(x => !settleEdoc.Any(z => z.FirstOrDefault().SysImageId == x.Id)).ToList().ForEach(x =>
+                var settleEdocIamgeIds = _sysImageDetailRepo.Get(x =>  x.BillingNo == settle.SettlementNo).Select(x => x.SysImageId).ToList(); //ID file goc tren SM da dc generate detail.
+                imageExist.Where(x => !settleEdocIamgeIds.Contains(x.Id)).ToList().ForEach(x =>
                 {
                     var edoc = new SysImageDetailModel()
                     {
@@ -428,40 +436,43 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         BillingType = transactionType,
                         DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = attachTemplate.Id,
+                        DocumentTypeId = 0, // TODO hoac gan cho no 1 cai bo other.
                         Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
                         SysImageId = x.Id,
                         UserCreated = x.UserCreated,
                         UserFileName = x.Name,
                         UserModified = x.UserModified,
+                        DocumentTypeName = "Other"
                     };
                     lstEdoc.Add(edoc);
                 });
-                foreach (var x in settleEdoc)
+                var edosExisted = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo);
+                foreach (var x in edosExisted)
                 {
-                    var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
-                    var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var image = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault();
+                    var jobDetail = GetJobDetail(x.JobId, x.Hblid, x.DocumentTypeId);
                     var edoc = new SysImageDetailModel()
                     {
-                        Id = x.FirstOrDefault().Id,
+                        Id = x.Id,
                         BillingNo = settle.SettlementNo,
-                        SystemFileName = x.FirstOrDefault().SystemFileName,
+                        SystemFileName = x.SystemFileName,
                         ImageUrl = image==null? null:image.Url,
-                        DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
+                        DatetimeCreated = x.DatetimeCreated,
                         BillingType = transactionType,
-                        DatetimeModified = x.FirstOrDefault().DatetimeModified,
+                        DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = attachTemplate.Id,
+                        DocumentTypeId = x?.DocumentTypeId,
                         Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
-                        SysImageId = x.FirstOrDefault().Id,
-                        UserCreated = x.FirstOrDefault().UserCreated,
-                        UserFileName = x.FirstOrDefault().UserFileName,
-                        UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.FirstOrDefault().Note,
+                        SysImageId = x.Id,
+                        UserCreated = x.UserCreated,
+                        UserFileName = x.UserFileName,
+                        UserModified = x.UserModified,
+                        Note = x.Note,
                         HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = jobDetail != null ? jobDetail.JobNo : null,
                         Hblid= jobDetail != null ? jobDetail.HBLId : Guid.Empty,
                         JobId = jobDetail != null ? jobDetail.JobId : Guid.Empty,
+                        DocumentTypeName=_attachFileTemplateRepo.Get(y=>y.Id== x.DocumentTypeId).FirstOrDefault().NameEn
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -705,23 +716,24 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     break;
                 case "Settlement":
                     bilingNo = DC.AcctSettlementPayment.FirstOrDefault(x => x.Id.ToString() == billingId).SettlementNo;
-                    var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => x.JobNo).Select(x => x.Key);
+                    var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => new { x.JobNo ,x.Hblid}).Select(x => new { x.FirstOrDefault().JobNo, x.FirstOrDefault().Hblid });
                     foreach (var item in grpJobsSm)
                     {
-                        if (item.Contains("LOG"))
+                        if (item.JobNo.Contains("LOG"))
                         {
-                            var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                            var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM" });
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM",HBLId= opsJob.Hblid });
                             }
                         }
                         else
                         {
-                            var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                            var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (csJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SM" });
+                                var hblId = _tranDeRepo.Get(x => x.JobId == csJob.Id).FirstOrDefault().Id;
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SM",HBLId= hblId });
                             }
                         }
                     }
@@ -810,7 +822,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
-                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id
+                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
+                        
                     };
 
                     await _sysImageDetailRepo.AddAsync(imageDetail, false);

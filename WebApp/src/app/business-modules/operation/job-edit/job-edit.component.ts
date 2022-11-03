@@ -1,41 +1,40 @@
-import { formatDate } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { ActionsSubject, Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
-import { finalize } from 'rxjs/operators';
 import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
+import { finalize, mergeMap } from 'rxjs/operators';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
+import { AbstractControl } from '@angular/forms';
+import { Store, ActionsSubject } from '@ngrx/store';
+import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
-import { AppForm } from '@app';
-import { ConfirmPopupComponent, InfoPopupComponent, SubHeaderComponent } from '@common';
-import { JobConstants, RoutingConstants } from '@constants';
-import { ICanComponentDeactivate } from '@core';
-import { InjectViewContainerRefDirective } from '@directives';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
+import { OpsTransaction, CsTransactionDetail, CsTransaction, Container, Crystal } from '@models';
 import { CommonEnum } from '@enums';
-import { Container, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
-import { DocumentationRepo } from '@repositories';
-import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
+import { InjectViewContainerRefDirective } from '@directives';
+import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
+import { ICanComponentDeactivate } from '@core';
+import { AppForm } from '@app';
 
-import { ILinkAirSeaInfoModel, JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
-import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
+import { JobManagementFormEditComponent, ILinkAirSeaInfoModel } from './components/form-edit/form-edit.component';
 
+import { catchError, map, takeUntil, tap, switchMap, concatMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
-import { catchError, concatMap, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import * as fromShareBussiness from './../../share-business/store';
 
-
-import { HttpErrorResponse } from '@angular/common/http';
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
 })
-export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate {
+export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(PlSheetPopupComponent) plSheetPopup: PlSheetPopupComponent;
     @ViewChild(ShareBussinessSellingChargeComponent) sellingChargeComponent: ShareBussinessSellingChargeComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
@@ -70,6 +69,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -542,8 +543,25 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
     }
 
-    onOpePLPrint() {
-        this.plSheetPopup.show();
+    onOpenPLPrint(currency: string) {
+        this._documentRepo.previewPL(this.jobId, currency)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+
     }
 
     selectTabCharge(tabName: string) {
@@ -701,5 +719,61 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 }
             },
         );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.confirmContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.confirmContainerRef.viewContainerRef.clear();
+            });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.opsTransaction.id,
+                            hblId: this.opsTransaction.hblid,
+                            templateCode: 'PLSheet',
+                            transactionType: 'CL'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 }

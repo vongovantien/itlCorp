@@ -35,14 +35,14 @@
                                 <h4 class=" m-portlet__head-text font-14">
                                     <i class="la la-angle-up margin-right-5"></i> {{docType.documentType.nameEn}}
                                 </h4>
-                                <div class="text-right" *ngIf="docType.documentType.required">
-                                    <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only "
-                                        [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
-                                        <i
-                                            class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
-                                    </button>
-                                </div>
                             </div>
+                        </div>
+                        <div class="text-right" *ngIf="docType.documentType.required">
+                            <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only "
+                                [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
+                                <i
+                                    class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="m-portlet__body p-0" id={{docType.documentType.code}}
@@ -286,9 +286,9 @@
                                 <tbody>
                                     <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
                                         <td>{{i + 1}}</td>
-                                        <td>
+                                        <!-- <td>
                                             <span>{{doc.systemFileName}} </span>
-                                        </td>
+                                        </td> -->
                                         <td>
                                             <a class="text-underline" [href]="doc.imageUrl"
                                                 target="_blank">{{doc.userFileName}}</a>
@@ -323,6 +323,9 @@
                                                     </ng-container>
                                                 </ng-container>
                                             </span>
+                                        </td>
+                                        <td>
+                                            <span>{{doc.documentTypeName}}</span>
                                         </td>
                                         <td>
                                             <span>{{doc.hblNo}}</span>

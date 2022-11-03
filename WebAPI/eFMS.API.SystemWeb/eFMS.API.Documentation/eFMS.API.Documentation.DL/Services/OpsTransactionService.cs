@@ -25,11 +25,11 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Authorizations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -79,6 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
+        private readonly IOptions<ApiUrl> apiUrl;
+
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -117,7 +119,8 @@ namespace eFMS.API.Documentation.DL.Services
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<CsTransactionDetail> transactionDetail,
-            IContextBase<AccAccountingManagement> accMngt
+            IContextBase<AccAccountingManagement> accMngt,
+            IOptions<ApiUrl> aUrl
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -160,6 +163,7 @@ namespace eFMS.API.Documentation.DL.Services
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
             accMngtRepo = accMngt;
+            apiUrl = aUrl;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1696,6 +1700,14 @@ namespace eFMS.API.Documentation.DL.Services
                     dataSources.Add(surchargeRpt);
                 }
             }
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = shipment.JobNo.Replace("/", "_") + "_" + "FormPLsheet" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(dataSources);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

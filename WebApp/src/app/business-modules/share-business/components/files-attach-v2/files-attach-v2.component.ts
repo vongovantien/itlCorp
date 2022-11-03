@@ -113,8 +113,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
-            this.headersAcc = [{ title: 'Alias Name', field: 'systemFileName', sortable: true },
-            { title: 'Real File Name', field: 'userFileName', sortable: true },
+            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
             { title: 'House Bill No', field: 'hblNo', sortable: true },
             { title: 'Job No', field: 'jobNo' },
             { title: 'Note', field: 'note' },
