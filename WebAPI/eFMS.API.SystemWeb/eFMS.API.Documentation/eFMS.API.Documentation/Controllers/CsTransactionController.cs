@@ -677,8 +677,6 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-
-
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

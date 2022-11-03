@@ -1274,4 +1274,11 @@ export class DocumentationRepo {
                 })
             );
     }
+
+    syncGoodInforToReplicateJob(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }

@@ -1,35 +1,33 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
-using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
-using System.Linq.Expressions;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1000,7 +998,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
+                ShipmentType = customerContract.ShipmentType == "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -1140,7 +1138,8 @@ namespace eFMS.API.Documentation.DL.Services
                         && x.SaleService.Contains("CL")
                         && x.Active == true
                         && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    } else
+                    }
+                    else
                     {
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
@@ -1348,6 +1347,10 @@ namespace eFMS.API.Documentation.DL.Services
                     Hblid = cd.Hblid,
                     Mblid = cd.Mblid,
                     NetWeight = cd.NetWeight,
+                    GrossWeight = cd.GrossWeight,
+                    Pcs = cd.Pcs,
+                    Cbm = cd.Cbm,
+                    UnitCode = cd.UnitCode,
                     Note = cd.Note,
                     AccountNo = cd.AccountNo,
                     PartnerTaxCode = cd.PartnerTaxCode,
@@ -2814,6 +2817,32 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
+        }
+
+        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        {
+            var hs = new HandleState();
+
+            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            if (job != null)
+            {
+                var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+                if (job != null && repJob != null)
+                {
+                    repJob.SumNetWeight = job.SumNetWeight;
+                    repJob.SumPackages = job.SumPackages;
+                    repJob.SumCbm = job.SumCbm;
+                    repJob.SumContainers = job.SumContainers;
+                    repJob.SumGrossWeight = job.SumGrossWeight;
+                    repJob.PackageTypeId = job.PackageTypeId;
+
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    return hs;
+                }
+            }
+
+
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)
