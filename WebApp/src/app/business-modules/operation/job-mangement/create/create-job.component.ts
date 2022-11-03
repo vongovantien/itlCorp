@@ -1,18 +1,18 @@
-import { Component, ViewChild } from "@angular/core";
-import { ToastrService } from "ngx-toastr";
-import { Router } from "@angular/router";
 import { formatDate } from "@angular/common";
+import { Component, ViewChild } from "@angular/core";
+import { Router } from "@angular/router";
 import { InfoPopupComponent } from "@common";
+import { ToastrService } from "ngx-toastr";
 
-import { OpsTransaction, LinkAirSeaModel } from "@models";
 import { AppForm } from "@app";
-import { DocumentationRepo } from "@repositories";
 import { RoutingConstants, SystemConstants } from "@constants";
+import { LinkAirSeaModel, OpsTransaction } from "@models";
+import { DocumentationRepo } from "@repositories";
 import { JobManagementFormCreateComponent } from "../components/form-create/form-create-job.component";
 
-import { takeUntil, catchError, mergeMap, switchMap } from "rxjs/operators";
 import _merge from 'lodash/merge';
 import { of } from "rxjs";
+import { catchError, mergeMap, switchMap, takeUntil } from "rxjs/operators";
 
 
 @Component({
@@ -41,6 +41,9 @@ export class JobManagementCreateJobComponent extends AppForm {
         const form: any = this.formCreateComponent.formCreate.getRawValue();
         const formData = {
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
+            deliveryDate: !!form.deliveryDate && !!form.deliveryDate.startDate ? formatDate(form.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            clearanceDate: !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             commodityGroupId: form.commodity,
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
