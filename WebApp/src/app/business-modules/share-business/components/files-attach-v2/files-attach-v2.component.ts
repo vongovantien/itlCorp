@@ -1,3 +1,4 @@
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
@@ -25,6 +26,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @Input() typeFrom: string = 'Shipment';
     @Input() billingId: string = '';
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
+    get readonly(): boolean {
+        return this._readonly;
+    }
     headersGen: CommonInterface.IHeaderTable[];
     headersAcc: CommonInterface.IHeaderTable[];
     documentTypes: any[] = [];
@@ -35,20 +42,22 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc: IEDoc;
     transactionType: string = '';
     housebills: any[] = [];
-    headerAttach: any[] = [{ title: 'No', field: 'no' },
-    { title: 'Alias Name', field: 'aliasName' },
-    { title: 'Real File Name', field: 'realFilename' },
-    { title: 'Document Type', field: 'docType', required: true },
-    { title: 'Job Ref', field: 'jobRef' },
-    { title: 'House Bill No', field: 'hbl' },
-    { title: 'Note', field: 'note' },
-    { title: 'Source', field: 'source' },]
+
+    headerAttach: any[] = [
+        { title: 'Alias Name', field: 'aliasName', width: 300 },
+        { title: 'Real File Name', field: 'realFilename', width: 300 },
+        { title: 'Document Type', field: 'docType', required: true },
+        { title: 'Job Ref', field: 'jobRef' },
+        { title: 'House Bill No', field: 'hbl' },
+        { title: 'Note', field: 'note' },
+    ]
     // accountantAttach: any[] = [{ title: 'No', field: 'no' },
     // { title: 'Alias Name', field: 'aliasName' },
     // { title: 'Real File Name', field: 'realFilename' },
     // { title: 'Document Type', field: 'docType', required: true },
     // { title: 'Note', field: 'note' },]
     jobNo: string = '';
+    private _readonly: boolean = false;
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
         private readonly _activedRoute: ActivatedRoute,
@@ -262,6 +271,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 (res: any[]) => {
                     this.documentTypes = res;
                     this.documentAttach.documentTypes = res;
+                    console.log(this.documentAttach.documentTypes);
                 },
             );
     }
