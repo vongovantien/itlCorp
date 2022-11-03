@@ -1975,7 +1975,7 @@ namespace eFMS.API.Documentation.DL.Services
             var jobNoProfit = new List<OpsTransaction>();
             foreach (var shipment in shipmentGrp)
             {
-                var opsDetail = opsTransaction.First(x => x.Hwbno == shipment.Key.Hblno && x.Mblno == shipment.Key.Mblno);
+                var opsDetail = opsTransaction.Where(x => x.Hwbno == shipment.Key.Hblno && x.Mblno == shipment.Key.Mblno).FirstOrDefault();
                 if (opsDetail != null)
                 {
                     if (opsDetail.NoProfit == true)
