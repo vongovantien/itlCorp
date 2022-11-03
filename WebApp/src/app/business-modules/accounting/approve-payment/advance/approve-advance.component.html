@@ -65,7 +65,7 @@
                         <!-- <accounting-attach-file-list *ngIf="advancePayment" (onChange)="attachFiles = $event"  [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName' readOnly>
                         </accounting-attach-file-list>  -->
                         <files-attach-v2 [typeFrom]="'Advance'" [billingId]="idAdvPayment"
-                            (onChange)="attachFiles = $event">
+                            (onChange)="attachFiles = $event" readOnly>
                         </files-attach-v2>
                     </tab>
                 </tabset>

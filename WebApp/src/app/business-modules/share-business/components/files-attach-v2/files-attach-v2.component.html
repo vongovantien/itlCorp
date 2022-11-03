@@ -137,8 +137,7 @@
                         <i class="la la-plus m--margin-right-5"></i>
                         Accounting File
                     </h3>
-
-                    <div class="c-button-actions" *ngIf="typeFrom !== 'Shipment'&&typeFrom!=='Advance'">
+                    <div class="c-button-actions" *ngIf="typeFrom !== 'Shipment' && !readonly">
                         <div class="form-group float-right">
                             <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="showDocumentAttach()">
@@ -277,7 +276,7 @@
                         <table class="table table-hover table-editable dataTable table-summary ">
                             <thead app-table-header [headers]="headersAcc"
                                 (onClick)="sortEdoc(doc,i, $event.sortField)">
-                                <th class="first table-actions-col">
+                                <th class="m--w-50 first table-actions-col">
                                     No
                                 </th>
                             </thead>
