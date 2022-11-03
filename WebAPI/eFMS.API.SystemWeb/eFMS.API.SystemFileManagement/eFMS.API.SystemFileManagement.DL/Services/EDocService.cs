@@ -213,7 +213,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             string bilingNo = string.Empty;
                             var models = new List<TransctionTypeJobModel>();
-                            if (edoc.HBL != null||edoc.HBL!=Guid.Empty)
+                            if (edoc.HBL != null&&edoc.HBL!=Guid.Empty)
                             {
                                 models = GetTransactionTypeJobBillingModel(type, edoc.BillingId).Where(x=>x.HBLId==edoc.HBL).ToList();
                             }
