@@ -253,7 +253,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                         else
                         {
-                            var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                             string bilingNo = string.Empty;
                             var models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
 
@@ -261,6 +260,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             {
                                 foreach (var item in models)
                                 {
+                                    var attachTemplate = _attachFileTemplateRepo.Get(x => x.TransactionType == item.TransactionType && x.Code == edoc.Code).FirstOrDefault();
+
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
@@ -271,7 +272,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = "SM" + sysImage.Name,
+                                        SystemFileName = edoc.Code + "_" + sysImage.Name,
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -322,6 +323,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var lstImageMD = new List<SysImageDetailModel>();
             lst.ToList().ForEach(x =>
             {
+                var template = _attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId)?.FirstOrDefault();
+                string _hblNo = string.Empty;
+                if(x.Hblid != null && x.Hblid != Guid.Empty && template != null)
+                {
+                    if(template.TransactionType == "CL")
+                    {
+                        _hblNo = _opsTranRepo.Get(y => y.Hblid == x.Hblid)?.FirstOrDefault()?.Hwbno;
+                    } else
+                    {
+                        _hblNo = _tranDeRepo.Get(y => y.Id == x.Hblid)?.FirstOrDefault()?.Hwbno;
+                    }
+                }
                 var imageModel = new SysImageDetailModel()
                 {
                     BillingNo = x.BillingNo,
@@ -343,9 +356,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
                     ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url : null,
-                    HBLNo = x.Hblid != null ? _attachFileTemplateRepo.Get(z => z.Id == x.DocumentTypeId).FirstOrDefault().TransactionType == "CL" ? _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ?
-                    _opsTranRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null :
-                    _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault() != null ? _tranDeRepo.Get(y => y.Id == x.Hblid).FirstOrDefault().Hwbno : null : null,
+                    HBLNo = _hblNo,
                     Note = x.Note
                 };
                 lstImageMD.Add(imageModel);
@@ -522,6 +533,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DatetimeModified = x.FirstOrDefault().DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
                         DocumentTypeId = attachTemplate.Id,
+                        DocumentTypeName = attachTemplate.NameEn,
                         Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE,
                         SysImageId = x.FirstOrDefault().Id,
                         UserCreated = x.FirstOrDefault().UserCreated,
@@ -706,7 +718,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD" });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
                                 }
                             }
                             else
