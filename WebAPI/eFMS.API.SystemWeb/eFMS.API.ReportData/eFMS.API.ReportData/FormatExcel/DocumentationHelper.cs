@@ -1246,6 +1246,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
+                excel.IsWriteLnString = true;
                 var listKeyData = new Dictionary<string, object>();
                 listKeyData.Add("MawbNo", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
                 listKeyData.Add("FlightNo", airwayBillExport.FlightNo);

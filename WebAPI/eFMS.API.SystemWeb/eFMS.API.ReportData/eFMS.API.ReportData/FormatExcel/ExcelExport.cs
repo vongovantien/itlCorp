@@ -65,7 +65,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 EndCol = Worksheet.Dimension.End.Column;
                 NumberOfGroup = 1;
                 IndexOfGroup = 1;
-                IsWriteLnString = true;
+                IsWriteLnString = false;
                 #endregion
             }
             catch (Exception ex)
