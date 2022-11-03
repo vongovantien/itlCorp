@@ -2006,15 +2006,11 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SystemFileName)
-                    .HasColumnName("SystemFIleName")
-                    .IsUnicode(false);
+                entity.Property(e => e.SystemFileName).HasColumnName("SystemFIleName");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.UserFileName).IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
