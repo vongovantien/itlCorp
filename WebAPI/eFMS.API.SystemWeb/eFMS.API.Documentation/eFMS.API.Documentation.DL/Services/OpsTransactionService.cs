@@ -1,18 +1,29 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
@@ -30,6 +41,7 @@ using Newtonsoft.Json;
 using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -78,7 +90,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
-
+        private readonly ICsStageAssignedService csStageAssignedService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -116,7 +128,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
-            IContextBase<CsTransactionDetail> transactionDetail
+            IContextBase<CsTransactionDetail> transactionDetail,
+            ICsStageAssignedService csStageAssigned
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -158,6 +171,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableService = accAccountReceivable;
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
+            csStageAssignedService = csStageAssigned;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -271,7 +285,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(originJob, null), null);
             }
 
-            entityReplicate.DatetimeCreated = originJob.DatetimeCreated;
+            entityReplicate.DatetimeCreated = DateTime.Now;
             entityReplicate.UserCreated = currentUser.UserID;
             entityReplicate.UserModified = currentUser.UserID;
             entityReplicate.DatetimeModified = DateTime.Now;
@@ -2468,7 +2482,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(job, null), null);
                     }
-                    entityReplicate.DatetimeCreated = job.DatetimeCreated;
+                    entityReplicate.DatetimeCreated = DateTime.Now;
                     entityReplicate.UserCreated = currentUser.UserID;
                     entityReplicate.UserModified = currentUser.UserID;
                     entityReplicate.DatetimeModified = DateTime.Now;
@@ -2527,25 +2541,31 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         // copy assignment
-                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id)?.FirstOrDefault();
-                        if (assign != null)
+                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id);
+                        if (assign?.Count() > 0)
                         {
-                            var opsAssignProp = assign.GetType().GetProperties();
-                            OpsStageAssigned newOpsAssigned = new OpsStageAssigned();
-
-                            foreach (var prop in opsAssignProp)
+                            var listStage = new List<CsStageAssignedModel>();
+                            foreach (var item in assign)
                             {
-                                newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(assign, null), null);
+                                var opsAssignProp = item.GetType().GetProperties();
+                                CsStageAssignedModel newOpsAssigned = new CsStageAssignedModel();
+                                foreach (var prop in opsAssignProp)
+                                {
+                                    newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(item, null), null);
+                                }
+
+                                newOpsAssigned.DatetimeCreated = DateTime.Now;
+                                newOpsAssigned.DatetimeModified = DateTime.Now;
+                                newOpsAssigned.UserCreated = currentUser.UserID;
+                                newOpsAssigned.UserModified = currentUser.UserID;
+                                newOpsAssigned.Id = Guid.NewGuid();
+                                newOpsAssigned.JobId = entityReplicate.Id;
+
+                                listStage.Add(newOpsAssigned);
                             }
+                            HandleState hsAssign = await csStageAssignedService.AddMutipleStageAssigned(listStage);
+                            hs = hsAssign;
 
-                            newOpsAssigned.DatetimeCreated = DateTime.Now;
-                            newOpsAssigned.DatetimeModified = DateTime.Now;
-                            newOpsAssigned.UserCreated = currentUser.UserID;
-                            newOpsAssigned.UserModified = currentUser.UserID;
-                            newOpsAssigned.Id = Guid.NewGuid();
-                            newOpsAssigned.JobId = entityReplicate.Id;
-
-                            HandleState hsAssign = opsStageAssignedRepository.Add(newOpsAssigned);
                         }
                     }
                 };
