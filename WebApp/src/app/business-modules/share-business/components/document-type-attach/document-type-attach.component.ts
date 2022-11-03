@@ -15,24 +15,24 @@ import { getTransactionLocked, getTransactionPermission } from '../../store';
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
     @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
-    headers: CommonInterface.IHeaderTable[] = [];
+    @Input() housebills: any[] = [];
+    @Input() billingId: string = '';
+    @Input() billingNo: string = '';
     @Input() jobId: string = '';
-    isOps: boolean = false;
     @Input() transactionType: string = '';
+    @Input() selectedtDocType: any = null;
+    @Input() typeFrom: string = 'Shipment';
+
+    headers: CommonInterface.IHeaderTable[] = [];
+    isOps: boolean = false;
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
-    @Input() selectedtDocType: any = null;
     detailDocId: number;
     formData: IEDocUploadFile;
-    @Input() typeFrom: string = 'Shipment';
     documentTypes: any[] = [];
-    //source: string = 'Shipment';
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
-    @Input() housebills: any[] = [];
-    //billingNo: string = '';
-    @Input() billingId: string = '';
-    @Input() billingNo: string = '';
+
     chargeSM: any;
     isSubmitted: boolean = false;
     constructor(
@@ -44,17 +44,25 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.isLocked = this._store.select(getTransactionLocked);
         this.permissionShipments = this._store.select(getTransactionPermission);
     }
+
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
-        // this.getHblList();
-        console.log(this.documentTypes);
 
     }
+
     chooseFile(event: any) {
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
         //this.listFile = files;
+        let docType: any;
+        if (this.documentTypes.length === 1) {
+            docType = this.documentTypes[0];
+        }
         for (let i = 0; i < files.length; i++) {
+            files[i].Code = docType.code;
+            files[i].DocumentId = docType.id;
+            files[i].docType = docType;
+            files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             this.listFile.push(files[i]);
         }
         if (fileList?.length > 0) {
@@ -71,6 +79,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 return;
             }
         }
+        event.target.value = ''
+
     }
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
