@@ -106,6 +106,8 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
             return;
         }
         this.selectedFile = _file;
+        console.log(this.selectedFile);
+
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef, {
@@ -120,7 +122,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     onDeleteFile(id: string) {
-        this._fileRepo.deleteAttachedFile(this.folderModuleName, id)
+        this._fileRepo.deleteEdoc(id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

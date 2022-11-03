@@ -558,8 +558,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     return null;
                 }
-                var cs = _cstranRepo.Get(x => x.Id == JobCS.FirstOrDefault().JobId);
-                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.FirstOrDefault().JobNo,JobId=cs.FirstOrDefault().Id,HBLId=JobCS.FirstOrDefault().Id };
+                var csId = JobCS.FirstOrDefault().JobId;
+                var cs = _cstranRepo.Get(x => x.Id == csId).FirstOrDefault();
+                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.JobNo,JobId=cs.Id,HBLId=JobCS.FirstOrDefault().Id };
             }
         }
 
@@ -574,6 +575,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
+                var edocAcc = _sysImageDetailRepo.Get(x => x.SysImageId == edocId).FirstOrDefault();
                 var lst = new List<SysImage>();
                 if (edoc != null)
                 {
@@ -585,7 +587,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc = new SysImageDetail()
                     {
                         Id = Guid.Empty,
-                        Source = "Shipment"
+                        Source = edocAcc==null?"Shipment":"Accountant"
                     };
                 }
 
@@ -617,11 +619,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
                 else
                 {
-                    if (edoc != null)
+                    if (edocAcc != null)
                     {
-                        await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                        await _sysImageDetailRepo.DeleteAsync(x => x.SysImageId == edocId);
+                        await _sysImageRepo.DeleteAsync(x => x.Folder == edocAcc.Source && x.Id == edocAcc.SysImageId);
                     }
-                    await _sysImageRepo.DeleteAsync(x => x.Folder == edoc.Source && x.Id == edoc.SysImageId);
+                    else
+                    {
+                        await _sysImageRepo.DeleteAsync(x => x.Folder == edoc.Source && x.Id == edoc.SysImageId);
+                    }
                 }
 
                 return result;
