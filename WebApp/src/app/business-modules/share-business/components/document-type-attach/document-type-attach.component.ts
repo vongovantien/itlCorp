@@ -59,10 +59,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             docType = this.documentTypes[0];
         }
         for (let i = 0; i < files.length; i++) {
-            files[i].Code = docType.code;
-            files[i].DocumentId = docType.id;
+            files[i].Code = docType?.code;
+            files[i].DocumentId = docType?.id;
             files[i].docType = docType;
-            files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+            files[i].aliasName = docType?.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             this.listFile.push(files[i]);
         }
         if (fileList?.length > 0) {
