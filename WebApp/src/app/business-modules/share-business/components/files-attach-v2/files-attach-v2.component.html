@@ -327,12 +327,24 @@
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>
                                         </td>
+<<<<<<< Updated upstream
                                         <td>
                                             <span>{{doc.hblNo}}</span>
                                         </td>
                                         <td *ngIf="typeFrom==='Settlement'">
                                             <span>{{doc.jobNo}}</span>
                                         </td>
+=======
+                                        <ng-container *ngIf="typeFrom!=='Advance'&&typeFrom!=='SOA'">
+                                            <td>
+                                                <span>{{doc.hblNo}}</span>
+                                            </td>
+                                            <td
+                                                *ngIf="typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
+                                                <span>{{doc.jobNo}}</span>
+                                            </td>
+                                        </ng-container>
+>>>>>>> Stashed changes
                                         <td>
                                             <span>{{doc.note}}</span>
                                         </td>
