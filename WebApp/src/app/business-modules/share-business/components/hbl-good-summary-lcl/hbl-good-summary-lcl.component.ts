@@ -156,8 +156,8 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        if (containers.length>0 && !this.containerDescription) {
-            // this.containerDetail = '';
+        if (this.containers.length>0) {
+            this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {
                 const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
@@ -187,7 +187,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         // for (const item of contData) {
         //     this.containerDetail += this.handleStringCont(item);
         // }
-        // this.containerDetail = 'A PART OF CONTAINER S.T.C';
+        this.containerDetail = 'A PART OF CONTAINER S.T.C';
 
     }
 
@@ -205,7 +205,8 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     onRefresh() {
         this.confirmRefresh.hide();
-
+        this.containerDetail = '';
+        this.containerDescription = '';
         this.updateData(this.containers);
     }
 }
