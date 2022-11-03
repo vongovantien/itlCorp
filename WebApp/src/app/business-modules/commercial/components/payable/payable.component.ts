@@ -43,8 +43,6 @@ export class PayableComponent extends AppForm {
 
     ngOnInit() {
         this.initForm();
-        console.log(this.partnerId);
-
     }
 
     onSavePayable() {

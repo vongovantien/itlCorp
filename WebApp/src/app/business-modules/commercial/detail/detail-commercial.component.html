@@ -34,7 +34,8 @@
                     </div>
                 </div>
                 <hr />
-                <form-create-commercial [isUpdate]="true" (partnerLocationString)="onChangePartnerLocation($event)" [isActive]="partner?.active">
+                <form-create-commercial [isUpdate]="true" (partnerLocationString)="onChangePartnerLocation($event)"
+                    [isActive]="partner?.active">
                 </form-create-commercial>
                 <div class="row" *ngIf="!!partner && !isAddSubPartner">
                     <div class="col-6">
@@ -67,6 +68,9 @@
             </tab>
             <tab heading="Email">
                 <app-commercial-email-list></app-commercial-email-list>
+            </tab>
+            <tab heading="Bank">
+                <app-commercial-bank-list></app-commercial-bank-list>
             </tab>
             <tab heading="Payable">
                 <app-payable (savePayable)="onSaveWithPayable($event)"></app-payable>

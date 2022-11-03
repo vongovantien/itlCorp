@@ -92,7 +92,6 @@ export class UserProfilePageComponent extends AppForm {
         this._store.dispatch(new GetCatalogueBankAction());
 
         this.banks = this._store.select(getCatalogueBankState);
-
         this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
@@ -113,7 +112,7 @@ export class UserProfilePageComponent extends AppForm {
                 }
             );
 
-            this.getListUserLevelByUserId();
+        this.getListUserLevelByUserId();
     }
 
     ngAfterViewInit() {
@@ -357,8 +356,8 @@ export class UserProfilePageComponent extends AppForm {
 
     onSelectUserLevel(item: UserLevel) {
         this.selectedUserLevel = item;
-        this.userLevels.forEach(x=>x.isDefault=false);
-        item.isDefault=true;
+        this.userLevels.forEach(x => x.isDefault = false);
+        item.isDefault = true;
     }
 
     cancel() {

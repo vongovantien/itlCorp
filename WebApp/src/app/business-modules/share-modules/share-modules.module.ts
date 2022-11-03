@@ -1,25 +1,27 @@
-import { PayableComponent } from './../commercial/components/payable/payable.component';
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ShareModulesInputShipmentPopupComponent, FormContractCommercialPopupComponent, PartnerRejectPopupComponent, ShareModulesReasonRejectPopupComponent } from './components';
-import { ModalModule } from 'ngx-bootstrap/modal/';
-import { PipeModule } from "src/app/shared/pipes/pipe.module";
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ModalModule } from 'ngx-bootstrap/modal/';
 import { DirectiveModule } from "src/app/shared/directives/directive.module";
+import { PipeModule } from "src/app/shared/pipes/pipe.module";
+import { CommercialBankListComponent } from './../commercial/components/bank/commercial-bank-list.component';
+import { PayableComponent } from './../commercial/components/payable/payable.component';
+import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent, ShareModulesInputShipmentPopupComponent, ShareModulesReasonRejectPopupComponent } from './components';
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
-import { CommonComponentModule } from "src/app/shared/common/common.module";
-import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
-import { CommercialContractListComponent } from "../commercial/components/contract/commercial-contract-list.component";
-import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
-import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
 import { NgSelectModule } from "@ng-select/ng-select";
+import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
+import { CommonComponentModule } from "src/app/shared/common/common.module";
+import { CommercialBranchSubListComponent } from "../commercial/components/branch-sub/commercial-branch-sub-list.component";
+import { CommercialContractListComponent } from "../commercial/components/contract/commercial-contract-list.component";
 import { CommercialEmailListComponent } from '../commercial/components/email/commercial-email-list.component';
-import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
 import { FormSearchExportComponent } from '../commercial/components/popup/form-search-export/form-search-export.popup';
+import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 import { ShareBussinessAdjustDebitValuePopupComponent } from './components/adjust-debit-value/adjust-debit-value.popup';
+import { FormBankCommercialCatalogueComponent } from './components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
+import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
 
 const COMPONENTS = [
     ShareModulesInputShipmentPopupComponent,
@@ -29,15 +31,18 @@ const COMPONENTS = [
     PartnerRejectPopupComponent,
     CommercialBranchSubListComponent,
     CommercialEmailListComponent,
+    CommercialBankListComponent,
     FormUpdateEmailCommercialCatalogueComponent,
     ShareModulesReasonRejectPopupComponent,
     FormSearchExportComponent,
     ShareBussinessAdjustDebitValuePopupComponent,
-    PayableComponent
+    PayableComponent,
+    FormBankCommercialCatalogueComponent
 ];
+
 @NgModule({
     declarations: [
-        ...COMPONENTS
+        ...COMPONENTS,
     ],
     imports: [
         NgxDaterangepickerMd,
