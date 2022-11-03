@@ -11,7 +11,7 @@ import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 
 import { combineLatest, of, Observable } from 'rxjs';
-import { map, tap, switchMap, skip, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
+import { map, tap, switchMap, skip, catchError, takeUntil, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 
@@ -294,13 +294,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documenRepo.deleteMasterBill(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -323,13 +319,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     }
 
     onLockShipment() {
-        this._progressRef.start();
         this._documenRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -378,13 +370,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
             podDescription: modelAdd.podDescription
         };
 
-        this._progressRef.start();
         this._documenRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
