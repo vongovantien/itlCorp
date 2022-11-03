@@ -738,6 +738,9 @@
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndCol">
             <summary>End of column in excel</summary>
         </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.IsWriteLnString">
+            <summary>Is Cell Need Writeline String</summary>
+        </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.NumberOfGroup">
             <summary>Number of group to copied</summary>
         </member>

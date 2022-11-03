@@ -284,7 +284,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return new FileHelper().ExportExcel(null,new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - Phiếu Cân NCTS & ALS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "Air Export - NCTS & ALS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
