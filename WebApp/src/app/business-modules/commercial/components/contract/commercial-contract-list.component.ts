@@ -311,6 +311,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     onUpdateEmailPopup() {
-
+        this.formUpdateEmailPopup.show();
+        this.formContractPopup.isUpdate = true;
     }
 }

@@ -75,11 +75,16 @@
 </div>
 
 <app-context-menu #receiptContextMenu>
-    <div class="menu-context__item">
+    <div class="menu-context__item" (click)="onUpdateEmailPopup()">
         <span><i class="la la-edit"></i><span> Update email address</span></span>
     </div>
 </app-context-menu>
+
 <confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
+
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
+
+<popup-update-email-commercial-catalogue>
+</popup-update-email-commercial-catalogue>
 <permission-403-popup></permission-403-popup>

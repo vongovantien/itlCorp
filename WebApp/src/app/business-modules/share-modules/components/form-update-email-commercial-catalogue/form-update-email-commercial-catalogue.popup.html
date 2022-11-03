@@ -15,26 +15,37 @@
             <div class="modal-body">
                 <form class="m-form m-form--state" [formGroup]="formGroup">
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
-                                <label required>Office</label>
-                                <div class="pos-rel">
-                                    <ng-select [items]="offices" [clearable]="true" class="custom"
-                                        formControlName="officeId" bindLabel="text" placeholder="Please select">
+                        <ng-container *ngIf="isUpdated;else templateName">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
+                                    <label required>Office</label>
+                                    <div class="pos-rel">
+                                        <ng-select [items]="offices" [clearable]="true" class="custom"
+                                            formControlName="officeId" bindLabel="text" placeholder="Please select">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && type.invalid}">
+                                    <label required>Type</label>
+                                    <ng-select [items]="types" class="custom" formControlName="type"
+                                        placeholder="Please select">
                                     </ng-select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && type.invalid}">
-                                <label required>Type</label>
-                                <ng-select [items]="types" class="custom" formControlName="type"
-                                    placeholder="Please select">
-                                </ng-select>
+                        </ng-container>
+                        <ng-template #templateName>
+                            <div class="col-lg-12">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && type.invalid}">
+                                    <label>Salesman</label>
+                                    <input type="text" class="form-control" formControlName="saleMan" disabled>
+                                </div>
                             </div>
-                        </div>
+                        </ng-template>
                         <div class="col-lg-12">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':( isSubmitted || email.dirty )  && email.invalid}">
@@ -43,7 +54,6 @@
                             </div>
                         </div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer m--align-center">
