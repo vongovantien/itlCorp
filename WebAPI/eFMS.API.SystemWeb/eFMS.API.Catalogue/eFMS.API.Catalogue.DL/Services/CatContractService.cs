@@ -1436,7 +1436,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
-                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE) ? "Accountant Team" : "AR Team");
+                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID) ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
@@ -1449,7 +1449,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE)
+                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID)
                 {
                     lstTo = listEmailViewModel.ListAccountant;
                     if (listEmailViewModel.ListCCAccountant != null)
