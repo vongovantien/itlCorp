@@ -65,8 +65,9 @@
                                             </td>
                                             <td>
                                                 <a class="text-underline" [href]="doc.imageUrl"
-                                                    target="_blank">{{doc.userFileName}}.{{doc.imageUrl |
-                                                    extension}}</a>
+                                                    target="_blank">{{doc.userFileName}}.{{doc.billingType!=='Other'?(doc.imageUrl
+                                                    |
+                                                    extension):''}}</a>
                                                 <span class="m--margin-left-10">
                                                     <ng-container [ngSwitch]="doc.imageUrl | extension">
                                                         <ng-container *ngSwitchCase="'pdf'">
@@ -239,9 +240,9 @@
                                                 <td>
                                                     <span>{{doc.billingNo}}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <span>{{doc.source}}</span>
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <span>{{doc.note}}</span>
                                                 </td>
@@ -329,7 +330,7 @@
                                         <td>
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <td *ngIf="typeFrom==='Settlement'">
+                                        <td *ngIf="typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
                                             <span>{{doc.jobNo}}</span>
                                         </td>
                                         <td>
