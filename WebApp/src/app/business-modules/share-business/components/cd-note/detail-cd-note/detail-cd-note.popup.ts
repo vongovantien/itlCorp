@@ -1,6 +1,5 @@
 import { Component, ViewChild, Output, EventEmitter } from "@angular/core";
-import { PopupBase } from "src/app/popup.base";
-import { DocumentationRepo, AccountingRepo } from "src/app/shared/repositories";
+import { DocumentationRepo, AccountingRepo, SystemFileManageRepo, ExportRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError, switchMap } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
@@ -8,7 +7,6 @@ import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
-import { NgProgress } from "@ngx-progressbar/core";
 import { AccountingConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of } from "rxjs";
@@ -16,13 +14,13 @@ import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-m
 import { InjectViewContainerRefDirective } from "@directives";
 import { ICrystalReport } from "@interfaces";
 import { delayTime } from "@decorators";
-import { ReportPreviewComponent } from "@common";
+import { DetailCDNoteBase } from "../detail-cd-note.base";
 
 @Component({
     selector: 'cd-note-detail-popup',
     templateUrl: './detail-cd-note.popup.html'
 })
-export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implements ICrystalReport {
+export class ShareBussinessCdNoteDetailPopupComponent extends DetailCDNoteBase implements ICrystalReport {
     @ViewChild(ShareBussinessCdNoteAddPopupComponent) cdNoteEditPopupComponent: ShareBussinessCdNoteAddPopupComponent;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ShareBussinessPaymentMethodPopupComponent) paymentMethodPopupComponent: ShareBussinessPaymentMethodPopupComponent;
@@ -45,15 +43,15 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
     paymentMethodSelected: string = '';
 
     constructor(
-        private _documentationRepo: DocumentationRepo,
-        private _sortService: SortService,
-        private _toastService: ToastrService,
-        private _progressService: NgProgress,
-        private _accountantRepo: AccountingRepo,
+        protected _documentationRepo: DocumentationRepo,
+        protected _sortService: SortService,
+        protected _toastService: ToastrService,
+        protected _accountantRepo: AccountingRepo,
+        protected _fileMngtRepo: SystemFileManageRepo,
+        protected _exportRepo: ExportRepo
     ) {
-        super();
+        super(_documentationRepo, _sortService, _toastService, _accountantRepo, _fileMngtRepo, _exportRepo);
         this.requestSort = this.sortChargeCdNote;
-        this._progressRef = this._progressService.ref();
     }
 
     @delayTime(1000)
@@ -284,7 +282,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
                     if (res !== false) {
                         if (res != null && res.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport(this.CdNoteDetail.cdNote.type);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -300,7 +298,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
                 (res: any | Crystal) => {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = JSON.stringify(res);
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.CdNoteDetail.cdNote.type);
 
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -397,19 +395,5 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase implemen
 
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote)
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
     }
 }
