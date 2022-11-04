@@ -29,7 +29,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return hs;
         }
 
-        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingNo)
+        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType)
         {
             switch (transactionType)
             {
@@ -59,12 +59,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     }).ToList();
                 default:
                     var jobs= await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
-                    return (List<DocumentTypeModel>)jobs.ToList().Select(x => new DocumentTypeModel()
-                    {
-                        Id = x.Id,
-                        Code = x.Code,
-                        NameEn = x.NameEn,
-                    });
+                    var result = new List<DocumentTypeModel>();
+                    jobs.ToList().ForEach(x =>
+                     {
+                         var type = new DocumentTypeModel()
+                         {
+                             Id = x.Id,
+                             Code = x.Code,
+                             NameEn = x.NameEn,
+                         };
+                         result.Add(type);
+                     });
+                    return result;
             }
         }
     }

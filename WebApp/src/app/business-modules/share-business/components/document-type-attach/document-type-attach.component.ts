@@ -88,6 +88,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         switch (type) {
             case 'docType':
                 console.log(event);
+                this.listFile[index].nameALS = this.listFile[index].name;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))

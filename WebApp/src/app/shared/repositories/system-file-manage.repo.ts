@@ -60,8 +60,8 @@ export class SystemFileManageRepo {
         return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/DeleteAttachedFile/Accounting/${folder}/${id}`);
     }
 
-    getDocumentType(transactionType: string, billingNo: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}&billingNo=${billingNo}`).pipe(
+    getDocumentType(transactionType: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}`).pipe(
             map((data: any) => data)
         );
     }

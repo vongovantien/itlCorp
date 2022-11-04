@@ -44,10 +44,13 @@
                                                 </td>
                                                 <td class="">
                                                     <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
-                                                        <input type="text" class="form-control "
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
-                                                            [ngModel]="file.aliasName">
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.nameALS) }">
+                                                        <div class="form-control ">
+                                                            <span>{{file?.Code}}_</span>
+                                                            <input type="text"
+                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'nameALS')"
+                                                                [ngModel]="file.nameALS">
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td class="disabled">

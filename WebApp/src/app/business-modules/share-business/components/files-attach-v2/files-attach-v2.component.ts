@@ -194,7 +194,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             console.log(_uniqBy(data, 'hbl'));
-
+                            console.log(this.housebills);
+                            this.housebills = [];
                             _uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     hwbno: element.hbl,
@@ -202,7 +203,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                     id: element.hblid,
                                     jobId: element.shipmentId,
                                 })
+
                                 this.housebills.push(item);
+                                console.log(this.housebills);
+
                             }
                             );
                         }
@@ -242,13 +246,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
+            nameALS: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
             hwbNo: hwbNo,//hblNo 
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
-            jobId: this.selectedEdoc.jobId
+            jobId: this.selectedEdoc.jobId,
+            Code: docType.code
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);
@@ -282,7 +288,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     getDocumentType(transactionType: string) {
-        this._systemFileRepo.getDocumentType(transactionType, null)
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
