@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute } from '@angular/router';
 import { DocumentationRepo } from '@repositories';
-import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { CsTransactionDetail } from './../../../../../shared/models/document/csTransactionDetail';
 
 import { PopupBase } from "src/app/popup.base";
@@ -40,6 +39,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     systemUsers: User[] = [];
     selectedMainPersonInCharge: IPersonInCharge = null;
     selectedRealPersonInCharge: IPersonInCharge = null;
+    selectedHbl: Partial<CommonInterface.IComboGridData> = {};
 
     // config for combo gird
     configComboGrid: any = {
@@ -61,9 +61,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         dataSource: [],
         selectedDisplayFields: ['hwbno'],
     };
-
-    selectedHbl: Partial<CommonInterface.IComboGridData> = {};
-    selectedHblData: any;
 
     isSubmitted: boolean = false;
 
@@ -113,7 +110,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 endDate: null
             }],
             'status': [this.statusStage[0]],
-            'hblno': ['', FormValidators.required]
+            'hblno': [null]
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -122,7 +119,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
         this.status = this.form.controls['status'];
-        this.hblno = this.form.controls['hblno'];;
+        this.hblno = this.form.controls['hblno'];
     }
 
     initFormUpdate() {
@@ -139,7 +136,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
         this.selectedRealPersonInCharge = Object.assign({}, { field: 'id', value: this.data.realPersonInCharge });
-        this.selectedHbl = Object.assign({}, { field: 'id', value: this.data.id });
+        this.selectedHbl = Object.assign({}, { field: 'id', value: this.data.hblId });
     }
 
     onSelectMainPersonIncharge($event: User) {
@@ -154,6 +151,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.selectedHbl.value = $event.hwbno;
         this.hblno.setValue($event.hwbno);
     }
+
 
     getHblList(jobId: string) {
         this._document.getHBLOfJob({ jobId: jobId })
@@ -180,7 +178,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             const body = {
                 id: this.data.id,
                 jobId: this.data.jobId,
-                hblId: this.selectedHbl.value,
+                hblId: !!this.selectedHbl.value ? this.selectedHbl.value : null,
                 hblno: form.value.hblno,
                 stageId: this.data.stageId,
                 name: this.data.name,
@@ -217,6 +215,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 () => {
                     this.isSubmitted = false;
                     this.form.reset();
+                    this.onResetValue();
                 }
             );
         }
@@ -246,17 +245,26 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     onCancel() {
         this.isSubmitted = false;
         this.hide();
+        this.onResetValue();
     }
 
-    resetFormControl(control: FormControl | AbstractControl) {
-        if (!!control && control instanceof FormControl) {
-            control.setValue(null);
-            control.markAsUntouched({ onlySelf: true });
-            control.markAsPristine({ onlySelf: true });
+    onResetValue() {
+        this.selectedHbl = {}
+        this.hblno.setValue(null);
+    }
+
+
+    onRemoveData(type: string) {
+        switch (type) {
+            case "hbl":
+                this.selectedHbl = {};
+                this.hblno.setValue(null)
+                break;
+            default:
+                break;
         }
     }
 }
-
 
 interface IPersonInCharge {
     field: string;

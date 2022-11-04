@@ -975,7 +975,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public async Task<IQueryable<CsTransactionDetailModel>> QueryData(CsTransactionDetailCriteria criteria)
         {
-            var query = from detail in DataContext.Get(x => x.JobId == criteria.JobId)
+            var query = from detail in DataContext.Get(x => x.JobId == criteria.JobId && x.ParentId == null)
                         join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                         from cus in customers.DefaultIfEmpty()
                         select new { detail, cus };

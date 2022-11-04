@@ -97,11 +97,11 @@ namespace eFMS.API.Operation.Controllers
         {
             string message = string.Empty;
             if (!ModelState.IsValid) return BadRequest();
-            if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge && x.Hblid == model.HblId))
-            {
-                message = stringLocalizer[OperationLanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
-                return BadRequest(new ResultHandle { Status = false, Message = message });
-            }
+            //if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge && x.Hblid == model.HblId))
+            //{
+            //    message = stringLocalizer[OperationLanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
+            //    return BadRequest(new ResultHandle { Status = false, Message = message });
+            //}
             var hs = opsStageAssignedService.Add(model);
             message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
