@@ -43,18 +43,14 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedHbl.value}">
-                            <label for="">House Bill <span class="text-danger">(*)</span></label>
+                        <div class="form-group">
+                            <label for="">House Bill</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedHbl" [height]="150"
                                 (itemSelected)="onSelectData($event, 'hbl')" [dataSources]="configHbl.dataSource"
                                 [displayFields]="configHbl.displayFields"
                                 [selectedDisplayFields]="configHbl.selectedDisplayFields"
                                 (remove)="onRemoveData('hbl')">
                             </app-combo-grid-virtual-scroll>
-                            <div class="form-control-feedback" *ngIf="isSubmitted && !selectedHbl.value">
-                                House Bill is required!
-                            </div>
                         </div>
                     </div>
                     <div class="col-md-12">
