@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
+import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -156,6 +157,20 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
+        if (this.typeFrom === 'SOA' || this.typeFrom === 'Advance') {
+            this.headerAttach = [
+                { title: 'Alias Name', field: 'aliasName', width: 300 },
+                { title: 'Real File Name', field: 'realFilename', width: 300 },
+                { title: 'Document Type', field: 'docType', required: true },
+                { title: 'Note', field: 'note' }
+            ]
+            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+            { title: 'Note', field: 'note' },
+            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+            { title: 'Attach Person', field: 'userCreated', sortable: true },
+            ];
+        }
         this.getHblList();
     }
     getHblList() {
@@ -171,14 +186,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         }
                     },
                 );
-        } else {
+        } else if (this.typeFrom === 'Settlement') {
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
                 takeUntil(this.ngUnsubscribe)
             )
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            data.forEach(element => {
+                            console.log(_uniqBy(data, 'hbl'));
+
+                            _uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     hwbno: element.hbl,
                                     jobNo: element.jobId,
@@ -192,6 +209,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     }
                 );
             //this.chargeSM
+        } else {
+
         }
     }
     onSelectEDoc(edoc: any) {

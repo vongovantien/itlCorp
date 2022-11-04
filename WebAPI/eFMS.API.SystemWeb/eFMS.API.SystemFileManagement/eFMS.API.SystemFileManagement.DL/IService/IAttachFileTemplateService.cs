@@ -10,6 +10,6 @@ namespace eFMS.API.SystemFileManagement.DL.IService
     public interface IAttachFileTemplateService : IRepositoryBase<SysAttachFileTemplate, SysAttachFileTemplateModel>
     {
         Task<HandleState> Import(List<SysAttachFileTemplate> list);
-        Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType, string billingNo);
+        Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingNo);
     }
 }
