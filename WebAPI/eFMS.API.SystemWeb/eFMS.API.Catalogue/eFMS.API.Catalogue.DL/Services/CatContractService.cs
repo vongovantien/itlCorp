@@ -453,16 +453,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
-            DateTime localDate = DateTime.Now;
-            var expiredCheck = DateTime.Compare(localDate, (DateTime)entity.ExpiredDate);
-            if (expiredCheck <= 0)
-            {
-                entity.IsExpired = false;
-            }
-            else if (expiredCheck > 0)
-            {
-                entity.IsExpired = true;
-            }
+            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
