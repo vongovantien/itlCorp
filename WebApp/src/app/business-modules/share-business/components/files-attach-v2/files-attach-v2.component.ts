@@ -243,13 +243,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
+            nameALS: this.selectedEdoc.userFileName,
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
             hwbNo: hwbNo,//hblNo 
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
-            jobId: this.selectedEdoc.jobId
+            jobId: this.selectedEdoc.jobId,
+            Code: docType.code
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);
