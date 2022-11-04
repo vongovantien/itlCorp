@@ -917,26 +917,26 @@ namespace eFMS.API.Documentation.DL.Services
                        && x.SaleService.Contains("CL")
                        && x.Active == true
                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
                     if (customerContract == null)
                     {
+                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
                         string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
                         return new HandleState(errorContract);
                     }
                     string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
                     if (customerContract.IsExpired == true)
                     {
-                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.PartnerTaxCode, officeName, customerContract.ContractType, SalesmanName);
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName);
                         return new HandleState(errorContract);
                     }
                     if (customerContract.IsOverDue == true)
                     {
-                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.PartnerTaxCode, customerContract.ContractType, officeName, SalesmanName);
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName);
                         return new HandleState(errorContract);
                     }
                     if (customerContract.IsOverLimit == true)
                     {
-                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.PartnerTaxCode, officeName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                         return new HandleState(errorContract);
                     }
                 }
@@ -1190,26 +1190,27 @@ namespace eFMS.API.Documentation.DL.Services
                        && x.SaleService.Contains("CL")
                        && x.Active == true
                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        
                         if (customerContract == null)
                         {
+                            string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
                             string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
                             return new HandleState(errorContract);
                         }
                         string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
                         if (customerContract.IsExpired == true)
                         {
-                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.PartnerTaxCode, officeName, customerContract.ContractType, SalesmanName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName);
                             return new HandleState(errorContract);
                         }
                         if (customerContract.IsOverDue == true)
                         {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.PartnerTaxCode, customerContract.ContractType, officeName, SalesmanName);
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName);
                             return new HandleState(errorContract);
                         }
                         if (customerContract.IsOverLimit == true)
                         {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.PartnerTaxCode, officeName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.PartnerTaxCode, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }
