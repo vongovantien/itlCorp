@@ -77,9 +77,9 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpGet("GetDocumentType")]
-        public async Task<IActionResult> GetDocumentTypeAsync(string transactionType, string billingNo)
+        public async Task<IActionResult> GetDocumentTypeAsync(string transactionType)
         {
-            var result = await AttachFilteTemplateService.GetDocumentType(transactionType, billingNo);
+            var result = await AttachFilteTemplateService.GetDocumentType(transactionType);
             if (result == null)
             {
                 return BadRequest(result);

@@ -202,6 +202,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                     id: element.hblid,
                                     jobId: element.shipmentId,
                                 })
+                                this.housebills = [];
                                 this.housebills.push(item);
                             }
                             );
@@ -282,7 +283,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     getDocumentType(transactionType: string) {
-        this._systemFileRepo.getDocumentType(transactionType, null)
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
