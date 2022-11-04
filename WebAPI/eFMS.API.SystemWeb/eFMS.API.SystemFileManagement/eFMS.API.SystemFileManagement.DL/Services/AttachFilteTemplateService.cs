@@ -29,21 +29,42 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return hs;
         }
 
-        public async Task<List<SysAttachFileTemplate>> GetDocumentType(string transactionType, string billingNo)
+        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingNo)
         {
             switch (transactionType)
             {
                 case "SOA":
                     var soas = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code != "OTH");
-                    return soas.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
+                    return soas.GroupBy(x => x.Code).Select(x => new DocumentTypeModel()
+                    {
+                        Id= x.FirstOrDefault().Id,
+                        Code=x.FirstOrDefault().Code,
+                        NameEn=x.FirstOrDefault().NameEn,
+                    }).ToList();
                 case "Settlement":
                     var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
-                    return SMCode.GroupBy(x => x.NameEn).Select(x => x.FirstOrDefault()).ToList();
+                    return SMCode.GroupBy(x => new { x.Code,x.AccountingType }).Select(x=>new DocumentTypeModel()
+                    {
+                        Id = x.FirstOrDefault().Id,
+                        Code = x.FirstOrDefault().Code,
+                        NameEn = x.FirstOrDefault().NameEn,
+                    }).ToList();
                 case "Advance":
                     var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
-                    return advs.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
+                    return advs.GroupBy(x => x.Code).Select(x => new DocumentTypeModel()
+                    {
+                        Id = x.FirstOrDefault().Id,
+                        Code = x.FirstOrDefault().Code,
+                        NameEn = x.FirstOrDefault().NameEn,
+                    }).ToList();
                 default:
-                    return await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
+                    var jobs= await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
+                    return (List<DocumentTypeModel>)jobs.ToList().Select(x => new DocumentTypeModel()
+                    {
+                        Id = x.Id,
+                        Code = x.Code,
+                        NameEn = x.NameEn,
+                    });
             }
         }
     }
