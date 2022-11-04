@@ -38,7 +38,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     return soas.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
                 case "Settlement":
                     var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
-                    return SMCode.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
+                    return SMCode.GroupBy(x => x.NameEn).Select(x => x.FirstOrDefault()).ToList();
                 case "Advance":
                     var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                     return advs.GroupBy(x => x.Code).Select(x => x.FirstOrDefault()).ToList();
