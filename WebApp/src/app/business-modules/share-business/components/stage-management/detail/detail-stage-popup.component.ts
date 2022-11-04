@@ -174,8 +174,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         if (!this.selectedMainPersonInCharge.value) {
             return;
         } else {
-            console.log(!!this.selectedHbl)
-            console.log(this.selectedHbl.value)
             const body = {
                 id: this.data.id,
                 jobId: this.data.jobId,
@@ -251,7 +249,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
 
     onResetValue() {
         this.selectedHbl = {}
-        console.log(this.selectedHbl)
         this.hblno.setValue(null);
     }
 
@@ -267,7 +264,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         }
     }
 }
-
 
 interface IPersonInCharge {
     field: string;
