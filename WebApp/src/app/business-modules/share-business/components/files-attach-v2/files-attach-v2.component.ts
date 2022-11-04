@@ -194,7 +194,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             console.log(_uniqBy(data, 'hbl'));
-
+                            console.log(this.housebills);
+                            this.housebills = [];
                             _uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     hwbno: element.hbl,
@@ -202,8 +203,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                     id: element.hblid,
                                     jobId: element.shipmentId,
                                 })
-                                this.housebills = [];
+
                                 this.housebills.push(item);
+                                console.log(this.housebills);
+
                             }
                             );
                         }
