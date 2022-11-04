@@ -442,6 +442,16 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
+            DateTime localDate = DateTime.Now;
+            var expiredCheck = DateTime.Compare(localDate, (DateTime)entity.ExpiredDate);
+            if (expiredCheck <= 0)
+            {
+                entity.IsExpired = false;
+            }
+            else if (expiredCheck > 0)
+            {
+                entity.IsExpired = true;
+            }
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -669,6 +679,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 objUpdate.DatetimeModified = DateTime.Now;
                 objUpdate.UserModified = currentUser.UserID;
+                // DateTime localDate = DateTime.Now;
+                // var expiredCheck = DateTime.Compare(localDate, (DateTime)objUpdate.ExpiredDate);
+                // if (expiredCheck <= 0)
+                // {
+                //     objUpdate.IsExpired = false;
+                // }
+                // else if (expiredCheck > 0)
+                // {
+                //     objUpdate.IsExpired = true;
+                // }
+
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
