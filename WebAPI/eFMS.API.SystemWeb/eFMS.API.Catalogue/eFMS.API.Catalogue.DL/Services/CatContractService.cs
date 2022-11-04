@@ -434,6 +434,17 @@ namespace eFMS.API.Catalogue.DL.Services
             isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+
+            var expiredCheck = ((DateTime.Now).ToShortDateString()).CompareTo(((DateTime)entity.ExpiredDate).ToShortDateString());
+            if (expiredCheck <= 0)
+            {
+                entity.IsExpired = false;
+            }
+            else if (expiredCheck > 0)
+            {
+                entity.IsExpired = true;
+            }
+
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
@@ -442,6 +453,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
+            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -669,6 +681,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 objUpdate.DatetimeModified = DateTime.Now;
                 objUpdate.UserModified = currentUser.UserID;
+                // DateTime localDate = DateTime.Now;
+                // var expiredCheck = DateTime.Compare(localDate, (DateTime)objUpdate.ExpiredDate);
+                // if (expiredCheck <= 0)
+                // {
+                //     objUpdate.IsExpired = false;
+                // }
+                // else if (expiredCheck > 0)
+                // {
+                //     objUpdate.IsExpired = true;
+                // }
+
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
