@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
+import _ from 'lodash';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -192,7 +193,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            data.forEach(element => {
+                            console.log(_.uniqBy(data, 'hbl'));
+
+                            _.uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     hwbno: element.hbl,
                                     jobNo: element.jobId,
