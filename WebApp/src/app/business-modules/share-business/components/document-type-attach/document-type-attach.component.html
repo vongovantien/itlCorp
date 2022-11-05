@@ -44,10 +44,10 @@
                                                 </td>
                                                 <td class="">
                                                     <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.nameALS) }">
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
                                                         <input class="form-control" placeholder="Aias name" type="text"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'nameALS')"
-                                                            [ngModel]="file.nameALS">
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
+                                                            [ngModel]="file.aliasName">
                                                     </div>
                                                 </td>
                                                 <td class="disabled">
@@ -74,7 +74,7 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                <ng-container *ngIf="typeFrom!=='SOA'&&typeFrom!=='Advance'">
+                                                <ng-container *ngIf="typeFrom!=='SOA'">
                                                     <td class="disabled" *ngIf="typeFrom!=='Shipment'">
                                                         <div class="form-group ">
                                                             <input type="text" class="form-control "

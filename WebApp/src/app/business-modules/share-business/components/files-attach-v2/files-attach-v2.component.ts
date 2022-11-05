@@ -157,7 +157,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
-        if (this.typeFrom === 'SOA' || this.typeFrom === 'Advance') {
+        if (this.typeFrom === 'SOA') {
             this.headerAttach = [
                 { title: 'Alias Name', field: 'aliasName', width: 300 },
                 { title: 'Real File Name', field: 'realFilename', width: 300 },
@@ -254,7 +254,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
-            Code: docType.code
+            Code: docType?.code
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.listFile.push(detailSeletedEdoc);

@@ -88,11 +88,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         switch (type) {
             case 'docType':
                 console.log(event);
-                this.listFile[index].nameALS = this.listFile[index].name;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
-                this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
+                //this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.selectedtDocType = event.id;
+                this.listFile[index].aliasName = this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'));
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
@@ -149,7 +149,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
         if (this.isUpdate) {
             let edocUploadModel: any = {
-                Hblid: edocFileList[0].HBL.id,
+                Hblid: edocFileList[0].HBL,
                 SystemFileName: edocFileList[0].AliasName,
                 Note: edocFileList[0].Note,
                 Id: edocFileList[0].Id,

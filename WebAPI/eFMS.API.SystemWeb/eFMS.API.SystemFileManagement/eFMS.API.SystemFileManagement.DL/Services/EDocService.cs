@@ -196,7 +196,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Hblid = edoc.HBL,
                                 JobId = (Guid)edoc.JobId,
                                 OfficeId = currentUser.OfficeID,
-                                SystemFileName = edoc.AliasName,
+                                SystemFileName = attachTemplate.Code+"_"+ edoc.AliasName,
                                 UserCreated = currentUser.UserName,
                                 UserFileName = fileName,
                                 UserModified = currentUser.UserName,
@@ -587,7 +587,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                var edocAcc = _sysImageDetailRepo.Get(x => x.SysImageId == edocId).FirstOrDefault();
+                var edocAcc = new SysImageDetail();
+                if(edoc == null){
+                    edocAcc = _sysImageDetailRepo.Get(x => x.SysImageId == edocId).FirstOrDefault();
+                }
+                else
+                {
+                    edocAcc = null;
+                }
+               
                 var lst = new List<SysImage>();
                 if (edoc != null)
                 {
@@ -638,6 +646,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     }
                     else
                     {
+                        await _sysImageDetailRepo.DeleteAsync(x => x.SysImageId == edoc.SysImageId);
                         await _sysImageRepo.DeleteAsync(x => x.Folder == edoc.Source && x.Id == edoc.SysImageId);
                     }
                 }
@@ -657,7 +666,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 if (edoc != null)
                 {
-                    edoc.SystemFileName = edocUpdate.SystemFileName;
+                    var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
+                    edoc.SystemFileName = attachCode+"_"+ edocUpdate.SystemFileName;
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     edoc.DocumentTypeId = edocUpdate.DocumentTypeId;

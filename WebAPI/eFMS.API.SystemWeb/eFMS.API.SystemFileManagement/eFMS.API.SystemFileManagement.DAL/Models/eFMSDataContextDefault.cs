@@ -1996,10 +1996,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
-                entity.Property(e => e.Note)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.Source)
