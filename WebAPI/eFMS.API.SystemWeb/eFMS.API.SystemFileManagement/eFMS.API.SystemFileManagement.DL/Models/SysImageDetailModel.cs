@@ -9,5 +9,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string JobNo { get; set; }
         public string DocumentTypeName { get; set; }
         public string TransactionType { get; set; }
+        public string AccountingType { get; set; }
     }
 }
