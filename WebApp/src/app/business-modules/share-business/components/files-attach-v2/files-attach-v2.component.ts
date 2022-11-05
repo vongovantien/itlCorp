@@ -239,10 +239,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         console.log(this.documentTypes);
-
-        let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        let docType = this.typeFrom === 'Shipment' ? this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId) :
+            this.documentTypes.find(x => x.nameEn === this.selectedEdoc.documentTypeName);
         console.log(docType);
         let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
+        if (docType === undefined) {
+            this.documentTypes.push(({ id: this.selectedEdoc.documentTypeId, code: "OTH", nameEn: 'Other' }));
+            docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        } else {
+            this.documentTypes.splice(this.documentTypes.findIndex(x => x.code === 'OTH'), 1);
+        }
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
@@ -254,9 +260,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
-            Code: docType?.code
+            Code: docType?.code,
+            tranType: this.selectedEdoc.transactionType
         })
+        console.log(detailSeletedEdoc);
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
+        this.documentAttach.selectedtTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
         this.documentAttach.show();
         this.getEDoc(this.transactionType);
@@ -384,4 +393,6 @@ interface IEDoc {
     userCreated: string;
     userFileName: string;
     userModified: string;
+    documentTypeName: string;
+    transactionType: string;
 }

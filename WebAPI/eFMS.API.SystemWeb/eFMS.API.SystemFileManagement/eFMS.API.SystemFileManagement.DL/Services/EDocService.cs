@@ -361,7 +361,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 lstImageMD.Add(imageModel);
             });
-            lstImageMD.OrderBy(x => x.DatetimeCreated);
             var newImageIds = _sysImageDetailRepo.Get(x => x.JobId == jobID).Select(x => x.SysImageId).ToList();
             var imageExist = _sysImageRepo.Get(x => x.ObjectId == jobID.ToString()).ToList();
             var imageMap = new List<SysImage>();
@@ -402,12 +401,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     listOther.Add(imagedetail);
                 });
             }
-            listOther.OrderBy(x => x.DatetimeCreated);
             lstImageMD.GroupBy(x => x.DocumentTypeId).ToList().ForEach(x =>
             {
                 if (result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault() != null)
                 {
-                    result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.ToList();
+                    result.Where(y => y.documentType.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().EDocs = x.OrderBy(z => z.DatetimeCreated).ToList();
                 };
             });
             var resultAcc = result.Where(x => x.documentType.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT && x.EDocs != null).ToList();
@@ -483,11 +481,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         JobNo = jobDetail != null ? jobDetail.JobNo : null,
                         Hblid= jobDetail != null ? jobDetail.HBLId : Guid.Empty,
                         JobId = jobDetail != null ? jobDetail.JobId : Guid.Empty,
-                        DocumentTypeName=_attachFileTemplateRepo.Get(y=>y.Id== x.DocumentTypeId).FirstOrDefault().NameEn
+                        DocumentTypeName=_attachFileTemplateRepo.Get(y=>y.Id== x.DocumentTypeId).FirstOrDefault().NameEn,
+                        TransactionType=jobDetail?.TransactionType
                     };
                     lstEdoc.Add(edoc);
                 }
-                result.EDocs = lstEdoc.OrderBy(x=>x.DatetimeCreated).ToList();
+                //result.EDocs = lstEdoc.GroupBy(x => x.DocumentTypeId).ToList().Select(x => x.FirstOrDefault()).OrderBy(x => x.DatetimeCreated).ToList();
+                result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
                 return result;
             }
             else if (transactionType == "Advance")
@@ -561,7 +561,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     return null;
                 }
-                return new TransctionTypeJobModel() { HBLNo = JobOPS.FirstOrDefault().Hwbno, JobNo = JobOPS.FirstOrDefault().JobNo, JobId=JobOPS.FirstOrDefault().Id,HBLId=JobOPS.FirstOrDefault().Hblid };
+                return new TransctionTypeJobModel() { HBLNo = JobOPS.FirstOrDefault().Hwbno, JobNo = JobOPS.FirstOrDefault().JobNo, JobId=JobOPS.FirstOrDefault().Id,HBLId=JobOPS.FirstOrDefault().Hblid,TransactionType="CL" };
             }
             else
             {
@@ -572,7 +572,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
                 var csId = JobCS.FirstOrDefault().JobId;
                 var cs = _cstranRepo.Get(x => x.Id == csId).FirstOrDefault();
-                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.JobNo,JobId=cs.Id,HBLId=JobCS.FirstOrDefault().Id };
+                return new TransctionTypeJobModel() { HBLNo = JobCS.FirstOrDefault().Hwbno, JobNo = cs.JobNo,JobId=cs.Id,HBLId=JobCS.FirstOrDefault().Id,TransactionType=typeJob.TransactionType };
             }
         }
 
@@ -658,7 +658,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-
+        private int GetDocTypeIdByJob(string transactionType,int docId)
+        {
+            var doctype = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault();
+            if(doctype.TransactionType==transactionType) return docId;
+            return _attachFileTemplateRepo.Get(x => x.NameEn == doctype.NameEn && x.TransactionType == transactionType).FirstOrDefault().Id;
+        }
         public async Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate)
         {
             var edoc = _sysImageDetailRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
@@ -670,7 +675,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.SystemFileName = attachCode+"_"+ edocUpdate.SystemFileName;
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
-                    edoc.DocumentTypeId = edocUpdate.DocumentTypeId;
+                    edoc.DocumentTypeId = GetDocTypeIdByJob(edocUpdate.TransactionType,(int)edocUpdate.DocumentTypeId);
                     edoc.JobId = edocUpdate.JobId;    
                     var hs = await _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
                 }
@@ -804,6 +809,21 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     }
                     break;
                 case "Shipment":
+                    var csjobdetail = _tranDeRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault();
+                    if (csjobdetail != null)
+                    {
+                        bilingNo = csjobdetail.Hwbno;
+                        var csjob = _cstranRepo.Get(x => x.Id == csjobdetail.JobId).FirstOrDefault();
+                        transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csjobdetail.JobId, TransactionType = csjob.TransactionType, BillingNo = bilingNo, Code = "OTH" });
+                    }
+                    else
+                    {
+                        var opsjob = _opsTranRepo.Get(x => x.Hblid.ToString() == billingId).FirstOrDefault();
+                        if (opsjob != null)
+                        {
+                            transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsjob.Id, TransactionType = "CL", BillingNo = opsjob.Hwbno, Code = "OTH" });
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -850,8 +870,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
-                        DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
-                        
+                        DocumentTypeId =  GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
+                        Hblid=billingType=="Shipment"?Guid.Parse(billingId) :Guid.Empty,
                     };
 
                     await _sysImageDetailRepo.AddAsync(imageDetail, false);
@@ -868,7 +888,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 queryAttachTemplate = queryAttachTemplate.And(x => x.Code == code);
             }
-            if (!string.IsNullOrEmpty(accountingType))
+            if (!string.IsNullOrEmpty(accountingType)&&accountingType!="Shipment")
             {
                 queryAttachTemplate = queryAttachTemplate.And(x => x.AccountingType == accountingType);
             }
@@ -950,6 +970,57 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return null;
             }
         }
+
+        //public async Task<HandleState> MappingeDocToHBL(Guid imageId, string billingId, string billingType)
+        //{
+        //    HandleState result = new HandleState();
+        //    string bilingNo = string.Empty;
+
+        //    var models = GetTransactionTypeJobBillingModel(billingType, billingId);
+        //    var listAccountantTypes = new List<string> {
+        //        SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADVANCE,
+        //        SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
+        //        SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SOA,
+        //    };
+        //    string type = string.Empty;
+        //    if (listAccountantTypes.Contains(billingType))
+        //    {
+        //        type = SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_ACCOUNTANT;
+        //    }
+        //    else
+        //    {
+        //        type = SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL;
+        //    }
+        //    if (models.Count > 0)
+        //    {
+        //        var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
+        //        foreach (var item in models)
+        //        {
+        //            var imageDetail = new SysImageDetail
+        //            {
+        //                SysImageId = imageId,
+        //                BillingType = billingType,
+        //                BillingNo = item.BillingNo,
+        //                DatetimeCreated = DateTime.Now,
+        //                DatetimeModified = DateTime.Now,
+        //                Id = Guid.NewGuid(),
+        //                JobId = item.JobId,
+        //                UserCreated = sysImage.UserCreated,
+        //                SystemFileName = sysImage.Name,
+        //                UserFileName = sysImage.Name,
+        //                UserModified = sysImage.UserCreated,
+        //                Source = billingType,
+        //                DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
+
+        //            };
+
+        //            await _sysImageDetailRepo.AddAsync(imageDetail, false);
+        //        }
+
+        //        result = _sysImageDetailRepo.SubmitChanges();
+        //    }
+        //    return result;
+        //}
 
         public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
         {
