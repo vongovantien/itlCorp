@@ -550,7 +550,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     lstEdoc.Add(edoc);
                 }
                 result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
-                return result;
             };
             return result;
         }
