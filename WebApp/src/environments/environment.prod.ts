@@ -23,5 +23,5 @@ export const environment = {
   {
     requireHttps: true
   },
-  GOOGLE_ANALYTICS_ID: 'UA-192958167-1',
+  GOOGLE_ANALYTICS_ID: 'G-4SH6Q571PW',
 };
