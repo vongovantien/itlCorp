@@ -583,6 +583,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         let currency = this.currencyList.filter((curr) => agreementLst.map(x => x.creditCurrency).includes(curr.id));
         if (!currency) {
             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
+            return;
         } else if (currency.length > 1) {
             if (this.selectedService[0] !== 'All') {
                 this.selectedService.forEach((item: any) => {
@@ -592,8 +593,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     }
                 })
             }
-            this.selectedCurrency = currency[0].id;
         }
+        this.selectedCurrency = currency[0].id;
         if (!this.selectedCurrency) {
             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
         }
