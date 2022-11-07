@@ -488,11 +488,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         TransactionType = jobDetail?.TransactionType
                     };
                     lstEdoc.Add(edoc);
-
+                }
                     //result.EDocs = lstEdoc.GroupBy(x => x.DocumentTypeId).ToList().Select(x => x.FirstOrDefault()).OrderBy(x => x.DatetimeCreated).ToList();
                     result.EDocs = lstEdoc.OrderBy(y => y.DatetimeCreated).ToList();
                     return result;
-                }
             }
             else if (transactionType == "Advance")
             {
