@@ -1980,16 +1980,13 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var creatorId = cdNoteDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
-                            // payment.BillingNote = soaDetail.Note;
-                            payment.BillingNote = string.Empty;
+                            payment.BillingNote = cdNoteDetail?.Note;
                         }
                         else // Billing là soa
                         {
                             var creatorId = soaDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
-                            // payment.BillingNote = soaDetail.Note;
-                            payment.BillingNote = string.Empty;
-
+                            payment.BillingNote = soaDetail?.Note;
                         }
 
                         results.Add(payment);
@@ -2316,15 +2313,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var creatorId = cdNoteDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
-                        // payment.BillingNote = soaDetail.Note;
-                        payment.BillingNote = string.Empty;
+                        payment.BillingNote = cdNoteDetail?.Note;
                     }
                     else // Billing là soa
                     {
                         var creatorId = soaDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
-                        // payment.BillingNote = soaDetail.Note;
-                        payment.BillingNote = string.Empty;
+                        payment.BillingNote = soaDetail?.Note;
                     }
 
                     results.Add(payment);
