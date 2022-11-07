@@ -13,7 +13,6 @@ import { of } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
 import { InjectViewContainerRefDirective } from "@directives";
 import { ICrystalReport } from "@interfaces";
-import { ReportPreviewComponent } from "@common";
 import { DetailCDNoteBase } from "../../cd-note/detail-cd-note.base";
 
 @Component({

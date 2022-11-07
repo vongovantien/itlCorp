@@ -84,6 +84,8 @@ export class AdvancePaymentDetailComponent
                 }
             }
         );
+
+
     }
 
     @delayTime(1000)

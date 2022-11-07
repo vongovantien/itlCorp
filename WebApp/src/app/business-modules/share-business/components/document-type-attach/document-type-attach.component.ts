@@ -21,6 +21,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() jobId: string = '';
     @Input() transactionType: string = '';
     @Input() selectedtDocType: any = null;
+    @Input() selectedtTrantype: any = null;
     @Input() typeFrom: string = 'Shipment';
 
     headers: CommonInterface.IHeaderTable[] = [];
@@ -47,7 +48,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
-
     }
 
     chooseFile(event: any) {
@@ -66,6 +66,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
             this.listFile.push(files[i]);
+            this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
         }
         if (fileList?.length > 0) {
             let validSize: boolean = true;
@@ -88,18 +89,18 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         switch (type) {
             case 'docType':
                 console.log(event);
-                this.listFile[index].nameALS = this.listFile[index].name;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
-                this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
+                //this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.selectedtDocType = event.id;
+                // this.listFile[index].aliasName = this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'));
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
                 if (this.typeFrom === 'Shipment') {
-                    this.listFile[index].hblid = event;
+                    this.listFile[index].hblid = event.id;
                 } else {
                     this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
                     this.listFile[index].hblid = event.id;
@@ -124,6 +125,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.isSubmitted = true;
         this.listFile.forEach(x => {
             files.push(x);
+            console.log(x);
+
             edocFileList.push(({
                 JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                 Code: x.Code,
@@ -149,12 +152,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
         if (this.isUpdate) {
             let edocUploadModel: any = {
-                Hblid: edocFileList[0].HBL.id,
+                Hblid: edocFileList[0].HBL,
                 SystemFileName: edocFileList[0].AliasName,
                 Note: edocFileList[0].Note,
                 Id: edocFileList[0].Id,
                 JobId: edocFileList[0].JobId,
                 DocumentTypeId: this.selectedtDocType,
+                TransactionType: this.selectedtTrantype,
             }
 
             if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {

@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -1995,10 +1993,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
-
-                entity.Property(e => e.Note)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 

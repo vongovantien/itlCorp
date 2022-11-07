@@ -44,13 +44,10 @@
                                                 </td>
                                                 <td class="">
                                                     <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.nameALS) }">
-                                                        <div class="form-control ">
-                                                            <span>{{file?.Code}}_</span>
-                                                            <input type="text"
-                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'nameALS')"
-                                                                [ngModel]="file.nameALS">
-                                                        </div>
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
+                                                        <input class="form-control" placeholder="Aias name" type="text"
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
+                                                            [ngModel]="file.aliasName">
                                                     </div>
                                                 </td>
                                                 <td class="disabled">
@@ -77,7 +74,7 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                <ng-container *ngIf="typeFrom!=='SOA'&&typeFrom!=='Advance'">
+                                                <ng-container *ngIf="typeFrom!=='SOA'">
                                                     <td class="disabled" *ngIf="typeFrom!=='Shipment'">
                                                         <div class="form-group ">
                                                             <input type="text" class="form-control "
@@ -97,7 +94,7 @@
                                                 </ng-container>
                                                 <td class="">
                                                     <div class="form-group ">
-                                                        <input type="text" class="form-control "
+                                                        <input type="text" class="form-control " placeholder="Note"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
                                                             [ngModel]="file.note">
                                                     </div>

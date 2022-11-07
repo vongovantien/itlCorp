@@ -94,7 +94,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
                             //  this.documentAttach.transactionType = res.transactionType;
-                            this.getDocumentType(res.transactionType);
+                            this.getDocumentType(res.transactionType, null);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
                             //this.documentAttach.jobNo = res.jobNo;
@@ -108,7 +108,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         (res: any) => {
                             this.transactionType = 'CL';
                             //this.documentAttach.transactionType = 'CL'
-                            this.getDocumentType('CL');
+                            this.getDocumentType('CL', null);
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             //this.documentAttach.fileNo = res.jobNo;
@@ -121,7 +121,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
 
             this.transactionType = this.typeFrom;
-            this.getDocumentType(this.typeFrom);
+            this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
             this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
             { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
@@ -157,7 +157,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
-        if (this.typeFrom === 'SOA' || this.typeFrom === 'Advance') {
+        if (this.typeFrom === 'SOA') {
             this.headerAttach = [
                 { title: 'Alias Name', field: 'aliasName', width: 300 },
                 { title: 'Real File Name', field: 'realFilename', width: 300 },
@@ -239,10 +239,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
         console.log(this.documentTypes);
-
-        let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        let docType = this.typeFrom === 'Shipment' ? this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId) :
+            this.documentTypes.find(x => x.nameEn === this.selectedEdoc.documentTypeName);
         console.log(docType);
         let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
+        if (docType === undefined) {
+            this.documentTypes.push(({ id: this.selectedEdoc.documentTypeId, code: "OTH", nameEn: 'Other' }));
+            docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
+        } else {
+            this.documentTypes.splice(this.documentTypes.findIndex(x => x.code === 'OTH'), 1);
+        }
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
@@ -254,9 +260,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
-            Code: docType.code
+            Code: docType?.code,
+            tranType: this.selectedEdoc.transactionType,
+            AccountingType: this.typeFrom
         })
+        console.log(detailSeletedEdoc);
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
+        this.documentAttach.selectedtTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
         this.documentAttach.show();
         this.getEDoc(this.transactionType);
@@ -287,8 +297,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
-    getDocumentType(transactionType: string) {
-        this._systemFileRepo.getDocumentType(transactionType)
+    getDocumentType(transactionType: string, billingId: string) {
+        this._systemFileRepo.getDocumentType(transactionType, billingId)
             .pipe(
                 catchError(this.catchError),
             )
@@ -384,4 +394,6 @@ interface IEDoc {
     userCreated: string;
     userFileName: string;
     userModified: string;
+    documentTypeName: string;
+    transactionType: string;
 }

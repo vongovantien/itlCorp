@@ -13,8 +13,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 {
     public class AttachFilteTemplateService : RepositoryBase<SysAttachFileTemplate, SysAttachFileTemplateModel>, IAttachFileTemplateService
     {
-        public AttachFilteTemplateService(IContextBase<SysAttachFileTemplate> repository, IMapper mapper) : base(repository, mapper)
+        private IContextBase<CsShipmentSurcharge> _surchargeRepo;
+        private IContextBase<AcctSettlementPayment> _settleRepo;
+        public AttachFilteTemplateService(IContextBase<SysAttachFileTemplate> repository, IMapper mapper, IContextBase<CsShipmentSurcharge> surchargeRepo, IContextBase<AcctSettlementPayment> settleRepo) : base(repository, mapper)
         {
+            _surchargeRepo = surchargeRepo;
+            _settleRepo = settleRepo;
         }
 
         public async Task<HandleState> Import(List<SysAttachFileTemplate> list)
@@ -29,7 +33,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return hs;
         }
 
-        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType)
+        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingId)
         {
             switch (transactionType)
             {
@@ -37,13 +41,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var soas = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "SOA" && x.Code != "OTH");
                     return soas.GroupBy(x => x.Code).Select(x => new DocumentTypeModel()
                     {
-                        Id= x.FirstOrDefault().Id,
-                        Code=x.FirstOrDefault().Code,
-                        NameEn=x.FirstOrDefault().NameEn,
+                        Id = x.FirstOrDefault().Id,
+                        Code = x.FirstOrDefault().Code,
+                        NameEn = x.FirstOrDefault().NameEn,
                     }).ToList();
                 case "Settlement":
-                    var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
-                    return SMCode.GroupBy(x => new { x.Code,x.AccountingType }).Select(x=>new DocumentTypeModel()
+                    var settleNo = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().SettlementNo;
+                    var transType = _surchargeRepo.Get(x => x.SettlementCode == settleNo).Select(x => x.TransactionType).ToList();
+                    var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && transType.Contains(x.TransactionType));
+                    return SMCode.GroupBy(x => new { x.Code }).Select(x => new DocumentTypeModel()
                     {
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
@@ -58,7 +64,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         NameEn = x.FirstOrDefault().NameEn,
                     }).ToList();
                 default:
-                    var jobs= await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
+                    var jobs = await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
                     var result = new List<DocumentTypeModel>();
                     jobs.ToList().ForEach(x =>
                      {
