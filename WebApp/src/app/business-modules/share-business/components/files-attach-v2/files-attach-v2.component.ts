@@ -43,6 +43,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc: IEDoc;
     transactionType: string = '';
     housebills: any[] = [];
+    jobs: any[] = [];
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -50,6 +51,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Document Type', field: 'docType', required: true },
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'House Bill No', field: 'hbl' },
+        { title: 'Note', field: 'note' },
+    ]
+    headerSettleAttach: any[] = [
+        { title: 'Alias Name', field: 'aliasName', width: 300 },
+        { title: 'Real File Name', field: 'realFilename', width: 300 },
+        { title: 'Document Type', field: 'docType', required: true },
+        { title: 'Job Ref', field: 'jobRef' },
+        //{ title: 'House Bill No', field: 'hbl' },
         { title: 'Note', field: 'note' },
     ]
     // accountantAttach: any[] = [{ title: 'No', field: 'no' },
@@ -118,6 +127,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         }
                     );
             }
+        }
+        else if (this.typeFrom === 'Settlement') {
+
+            this.transactionType = this.typeFrom;
+            this.getDocumentType(this.typeFrom, this.billingId);
+            this.getEDoc(this.typeFrom);
+            this.getJobList();
+            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
+            { title: 'Job No', field: 'jobNo' },
+            { title: 'Note', field: 'note' },
+            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+            { title: 'Attach Person', field: 'userCreated', sortable: true },
+            ];
         } else {
 
             this.transactionType = this.typeFrom;
@@ -135,7 +159,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
-            { title: 'House Bill No', field: 'hblNo', sortable: true },
+            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
             { title: 'Billing No', field: 'billingNo', sortable: true },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
@@ -173,49 +197,89 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
         this.getHblList();
     }
-    getHblList() {
-        if (this.typeFrom === 'Shipment') {
-            this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
-                .pipe(
-                    catchError(this.catchError),
-                ).subscribe(
-                    (res: any) => {
-                        if (!!res) {
-                            console.log(this.housebills);
-                            this.housebills = res;
-                        }
-                    },
-                );
-        } else if (this.typeFrom === 'Settlement') {
-            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            console.log(_uniqBy(data, 'hbl'));
-                            console.log(this.housebills);
-                            this.housebills = [];
-                            _uniqBy(data, 'hbl').forEach(element => {
-                                let item = ({
-                                    hwbno: element.hbl,
-                                    jobNo: element.jobId,
-                                    id: element.hblid,
-                                    jobId: element.shipmentId,
-                                })
+    getJobList() {
+        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        )
+            .subscribe(
+                (data) => {
+                    if (!!data) {
+                        console.log(_uniqBy(data, 'jobId'));
+                        console.log(this.jobs);
+                        this.jobs = [];
+                        _uniqBy(data, 'hbl').forEach(element => {
+                            let item = ({
+                                jobNo: element.jobId,
+                                id: element.shipmentId
+                                // hwbno: element.hbl,
+                                // jobNo: element.jobId,
+                                // id: element.hblid,
+                                // jobId: element.shipmentId,
+                            })
 
-                                this.housebills.push(item);
-                                console.log(this.housebills);
-
-                            }
-                            );
+                            this.jobs.push(item);
+                            //console.log(this.housebills);
+                            console.log(this.jobs);
                         }
+                        );
                     }
-                );
-            //this.chargeSM
-        } else {
+                }
+            );
+    }
+    getHblList() {
+        this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(this.housebills);
+                        this.housebills = res;
+                    }
+                },
+            );
+        // if (this.typeFrom === 'Shipment') {
+        //     this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
+        //         .pipe(
+        //             catchError(this.catchError),
+        //         ).subscribe(
+        //             (res: any) => {
+        //                 if (!!res) {
+        //                     console.log(this.housebills);
+        //                     this.housebills = res;
+        //                 }
+        //             },
+        //         );
+        // } else if (this.typeFrom === 'Settlement') {
+        //     this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+        //         takeUntil(this.ngUnsubscribe)
+        //     )
+        //         .subscribe(
+        //             (data) => {
+        //                 if (!!data) {
+        //                     console.log(_uniqBy(data, 'hbl'));
+        //                     console.log(this.housebills);
+        //                     this.housebills = [];
+        //                     _uniqBy(data, 'hbl').forEach(element => {
+        //                         let item = ({
+        //                             hwbno: element.hbl,
+        //                             jobNo: element.jobId,
+        //                             id: element.hblid,
+        //                             jobId: element.shipmentId,
+        //                         })
 
-        }
+        //                         this.housebills.push(item);
+        //                         console.log(this.housebills);
+
+        //                     }
+        //                     );
+        //                 }
+        //             }
+        //         );
+        //this.chargeSM
+        //     } else {
+
+        // }
     }
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
@@ -231,8 +295,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
     editEdoc() {
         console.log(this.selectedEdoc);
-        if (this.typeFrom === 'Shipment') {
-            this.documentAttach.headers = this.headerAttach;
+        if (this.typeFrom === 'Settlement') {
+            this.documentAttach.headers = this.headerSettleAttach;
+
         } else {
             this.documentAttach.headers = this.headerAttach;
         }
@@ -304,6 +369,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
+                    console.log(res);
+
                     this.documentTypes = res;
                     this.documentAttach.documentTypes = res;
                     console.log(this.documentAttach.documentTypes);
@@ -340,8 +407,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
     showDocumentAttach() {
-        if (this.typeFrom === 'Shipment') {
-            this.documentAttach.headers = this.headerAttach;
+        if (this.typeFrom === 'Settlement') {
+            this.documentAttach.headers = this.headerSettleAttach;
         } else {
             this.documentAttach.headers = this.headerAttach;
         }
