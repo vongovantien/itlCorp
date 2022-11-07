@@ -2564,7 +2564,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 listStage.Add(newOpsAssigned);
                             }
                             HandleState hsAssign = await csStageAssignedService.AddMutipleStageAssigned(listStage);
-                            hs = hsAssign;
 
                         }
                     }
