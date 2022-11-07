@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -12,6 +10,8 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
+using System.Collections.Generic;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -38,8 +38,8 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="service"></param>
         /// <param name="iMapper"></param>
         /// <param name="user"></param>
-        public OpsStageAssignedController(IStringLocalizer<LanguageSub> localizer, 
-            IOpsStageAssignedService service, 
+        public OpsStageAssignedController(IStringLocalizer<LanguageSub> localizer,
+            IOpsStageAssignedService service,
             IMapper iMapper,
             ICurrentUser user)
         {
@@ -97,11 +97,11 @@ namespace eFMS.API.Operation.Controllers
         {
             string message = string.Empty;
             if (!ModelState.IsValid) return BadRequest();
-            if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge))
-            {
-                message = stringLocalizer[OperationLanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
-                return BadRequest(new ResultHandle { Status = false, Message = message });
-            }
+            //if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge && x.Hblid == model.HblId))
+            //{
+            //    message = stringLocalizer[OperationLanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
+            //    return BadRequest(new ResultHandle { Status = false, Message = message });
+            //}
             var hs = opsStageAssignedService.Add(model);
             message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

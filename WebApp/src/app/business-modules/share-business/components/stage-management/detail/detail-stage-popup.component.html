@@ -133,20 +133,15 @@
                             </div>
                         </div>
                         <div class="col-lg-6 ">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (isSubmitted || hblno.dirty)  && !hblno.valid}">
-                                <label for="">House Bill <span class="text-danger">(*)</span></label>
+                            <div class="form-group">
+                                <label for="">House Bill</label>
                                 <app-combo-grid-virtual-scroll formControlName="hblno"
                                     [currentActiveItemId]="selectedHbl" [height]="150"
                                     (itemSelected)="onSelectHouseBill($event)" [dataSources]="configHbl.dataSource"
                                     [displayFields]="configHbl.displayFields"
                                     [selectedDisplayFields]="configHbl.selectedDisplayFields"
-                                    (remove)="resetFormControl(hblno)">
+                                    (remove)="onRemoveData('hbl')">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback"
-                                    *ngIf="(isSubmitted || hblno.dirty) && hblno.errors | equalError:'required'">
-                                    House Bill is required!
-                                </div>
                             </div>
                         </div>
                     </div>
