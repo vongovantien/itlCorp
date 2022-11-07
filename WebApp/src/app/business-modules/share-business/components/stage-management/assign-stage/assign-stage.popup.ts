@@ -119,13 +119,13 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser.value || !this.selectedStage.value || !this.selectedHbl.value) {
+        if (!this.selectedUser.value || !this.selectedStage.value) {
             return;
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
             jobId: this.jobId,
-            hblId: this.selectedHblData.id,
+            hblId: !!this.selectedHbl.value ? this.selectedHblData.id : null,
             stageId: this.selectedStageData.id,
             mainPersonInCharge: this.selectedUserData.id,
             description: this.description,
