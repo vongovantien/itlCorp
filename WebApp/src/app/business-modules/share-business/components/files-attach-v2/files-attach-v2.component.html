@@ -279,14 +279,10 @@
                                     No
                                 </th>
                             </thead>
-                            <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
-
-                                <tbody>
+                            <tbody>
+                                <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
                                     <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
                                         <td>{{i + 1}}</td>
-                                        <!-- <td>
-                                            <span>{{doc.systemFileName}} </span>
-                                        </td> -->
                                         <td>
                                             <a class="text-underline" [href]="doc.imageUrl"
                                                 target="_blank">{{doc.userFileName}}</a>
@@ -328,7 +324,8 @@
                                         <td *ngIf="typeFrom!=='Settlement'">
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <td *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA'">
+                                        <td
+                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom == 'Advance'">
                                             <span>{{doc.jobNo}}</span>
                                         </td>
                                         <td>
@@ -343,18 +340,13 @@
                                             <span class=" text-success">{{doc.userCreated}}</span>
                                         </td>
                                     </tr>
-                                </tbody>
-
-                            </ng-container>
+                                </ng-container>
+                                <tr *ngIf="!(edocByAcc?.eDocs?.length)" app-table-none-record title="No files found">
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
-                <ng-container *ngIf="!edocByAcc?.eDocs?.length">
-                    <div class="no-data">
-                        <i class="flaticon-coins"></i>
-                        <span class="no-data-text">No files found</span>
-                    </div>
-                </ng-container>
             </div>
         </ng-container>
     </div>
