@@ -76,12 +76,18 @@
                                                 </td>
                                                 <ng-container *ngIf="typeFrom!=='SOA'">
                                                     <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                        <div class="form-group ">
+                                                        <!-- <div class="form-group " *ngIf="typeFrom!=='Settlement'">
                                                             <input type="text" class="form-control "
                                                                 [ngModel]="file.jobNo" disabled>
-                                                        </div>
+                                                        </div> -->
+                                                        <select class="form-control" [(ngModel)]="file.jobNo"
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
+                                                            <option *ngFor="let job of jobs" [ngValue]="job">
+                                                                {{job.jobNo}}
+                                                            </option>
+                                                        </select>
                                                     </td>
-                                                    <td class="">
+                                                    <td class="" *ngIf="typeFrom!=='Settlement'">
                                                         <div class="form-group ">
                                                             <select class="form-control" [(ngModel)]="file.hwbNo"
                                                                 (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">

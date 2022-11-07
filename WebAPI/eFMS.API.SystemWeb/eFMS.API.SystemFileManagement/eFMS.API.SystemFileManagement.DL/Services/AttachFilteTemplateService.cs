@@ -44,16 +44,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
+                        TransactionType="SOA"
                     }).ToList();
                 case "Settlement":
                     var settleNo = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().SettlementNo;
                     var transType = _surchargeRepo.Get(x => x.SettlementCode == settleNo).Select(x => x.TransactionType).ToList();
-                    var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && transType.Contains(x.TransactionType));
-                    return SMCode.GroupBy(x => new { x.Code }).Select(x => new DocumentTypeModel()
+                    var SMCode = await DataContext.GetAsync(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
+                    return SMCode.GroupBy(x => new { x.Code,x.AccountingType,x.NameEn }).Select(x => new DocumentTypeModel()
                     {
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
+                        TransactionType=x.FirstOrDefault().TransactionType
                     }).ToList();
                 case "Advance":
                     var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");

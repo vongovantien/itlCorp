@@ -214,19 +214,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             string bilingNo = string.Empty;
                             var models = new List<TransctionTypeJobModel>();
                             var tranType = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault()?.TransactionType;
-                            if (edoc.HBL != null && edoc.HBL != Guid.Empty)
+                            if (edoc.JobId != null && edoc.JobId != Guid.Empty)
                             {
-                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId).Where(x => x.HBLId == edoc.HBL).ToList();
+                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId).Where(x => x.JobId == edoc.JobId).ToList();
                             }
                             else
                             {
                                 models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
                             }
-                            if (models.Where(x => x.TransactionType == tranType).ToList().Count > 0)
-                            {
-                                foreach (var item in models.Where(x => x.TransactionType == tranType))
+                                foreach (var item in models)
                                 {
-                                    var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId);
+                                    var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId,item.TransactionType);
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
@@ -237,7 +235,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = sysImage.Name,
+                                        SystemFileName = edoc.AliasName,
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -250,7 +248,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
                                     _sysImageDetailRepo.Add(imageDetail, false);
                                 }
-                            }
+                            
                         }
                         else
                         {
@@ -303,10 +301,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId)
+        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId,string transationType)
         {
             var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
-            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.NameEn == nameEn).FirstOrDefault();
+            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.NameEn == nameEn&&x.TransactionType==transationType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
@@ -360,7 +358,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserModified = x.UserModified,
                     ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url : null,
                     HBLNo = _hblNo,
-                    Note = x.Note
+                    Note = x.Note,
+                    TransactionType=transactionType
                 };
                 lstImageMD.Add(imageModel);
             });
@@ -400,6 +399,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
                         UserFileName = x.Name,
                         Id = x.Id,
+                        TransactionType=transactionType
                     };
                     listOther.Add(imagedetail);
                 });
@@ -475,7 +475,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DepartmentId = currentUser.DepartmentId,
                         DocumentTypeId = x?.DocumentTypeId,
                         Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
-                        SysImageId = x.Id,
+                        SysImageId = x.SysImageId,
                         UserCreated = x.UserCreated,
                         UserFileName = x.UserFileName,
                         UserModified = x.UserModified,
@@ -490,7 +490,42 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     lstEdoc.Add(edoc);
                 }
                 //result.EDocs = lstEdoc.GroupBy(x => x.DocumentTypeId).ToList().Select(x => x.FirstOrDefault()).OrderBy(x => x.DatetimeCreated).ToList();
-                result.EDocs = lstEdoc.OrderBy(y => y.DatetimeCreated).ToList();
+                var lstEdocModel = new List<SysImageDetailModel>();
+                var edocLst = lstEdoc.OrderBy(x => x.DatetimeCreated).GroupBy(x=>x.SysImageId).ToList();
+                edocLst.ForEach(x =>
+                {
+                    var tottalItem = _sysImageDetailRepo.Get(z => z.SysImageId == x.FirstOrDefault().SysImageId).ToList();
+                    if (tottalItem.Count() == 1)
+                    {
+                        lstEdocModel.Add(x.FirstOrDefault());
+                    }
+                    else if(tottalItem.Count() > 1)
+                    {
+                        //var item = x.FirstOrDefault();
+                        var edoc = new SysImageDetailModel()
+                        {
+                            JobNo = null,
+                            HBLNo = null,
+                            JobId = Guid.Empty,
+                            Hblid = Guid.Empty,
+                            SystemFileName = x.FirstOrDefault()?.SystemFileName,
+                            UserFileName = x.FirstOrDefault()?.UserFileName,
+                            DocumentTypeName = x.FirstOrDefault()?.DocumentTypeName,
+                            DocumentTypeId = x.FirstOrDefault()?.DocumentTypeId,
+                            TransactionType = x.FirstOrDefault()?.TransactionType,
+                            ImageUrl = x.FirstOrDefault()?.ImageUrl,
+                            SysImageId = x.FirstOrDefault()?.SysImageId,
+                            UserCreated = x.FirstOrDefault()?.UserCreated,
+                            Source = x.FirstOrDefault()?.Source,
+                            AccountingType = x.FirstOrDefault()?.AccountingType,
+                            DatetimeCreated = x.FirstOrDefault()?.DatetimeCreated,
+                            Note = x.FirstOrDefault()?.Note,
+                        };
+                        lstEdocModel.Add(edoc);
+                    }
+                });
+                //result.EDocs = lstEdoc.OrderBy(y => y.DatetimeCreated).ToList();
+                result.EDocs = lstEdocModel;
                 return result;
             }
             else if (transactionType == "Advance")
@@ -863,7 +898,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         JobId = item.JobId,
                         UserCreated = sysImage.UserCreated,
                         SystemFileName = sysImage.Name,
-                        UserFileName = sysImage.Name,
+                        UserFileName = sysImage.Name.Contains("OTH")?sysImage.Name:"OTH_" +sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
                         DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
@@ -950,7 +985,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (imageList.Count > 0)
                 {
                     HandleState hsAddImage = await _sysImageRepo.AddAsync(imageList);
-
                     if (hsAddImage.Success)
                     {
                         foreach (var image in imageList)

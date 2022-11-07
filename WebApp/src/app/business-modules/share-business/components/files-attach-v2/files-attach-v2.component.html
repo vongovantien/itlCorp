@@ -65,9 +65,7 @@
                                             </td>
                                             <td>
                                                 <a class="text-underline" [href]="doc.imageUrl"
-                                                    target="_blank">{{doc.userFileName}}.{{doc.billingType!=='Other'?(doc.imageUrl
-                                                    |
-                                                    extension):''}}</a>
+                                                    target="_blank">{{doc.userFileName}}</a>
                                                 <span class="m--margin-left-10">
                                                     <ng-container [ngSwitch]="doc.imageUrl | extension">
                                                         <ng-container *ngSwitchCase="'pdf'">
@@ -327,10 +325,10 @@
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>
                                         </td>
-                                        <td>
+                                        <td *ngIf="typeFrom!=='Settlement'">
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <td *ngIf="typeFrom==='Settlement' || typeFrom==='SOA'">
+                                        <td *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA'">
                                             <span>{{doc.jobNo}}</span>
                                         </td>
                                         <td>
@@ -342,7 +340,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="text-success">{{doc.userCreated}}</span>
+                                            <span class=" text-success">{{doc.userCreated}}</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -361,14 +359,14 @@
         </ng-container>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo" [jobs]="jobs"
     [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
 </document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
         <div class="menu-context__item"
-            *ngIf="isLocked===false &&  (typeFrom==='Settlement' || selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
+            *ngIf="isLocked===false &&  (selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
             (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>

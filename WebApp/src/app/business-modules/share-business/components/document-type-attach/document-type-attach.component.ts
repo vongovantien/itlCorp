@@ -16,6 +16,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
+    @Input() jobs: any[] = [];
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
     @Input() jobId: string = '';
@@ -33,8 +34,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     formData: IEDocUploadFile;
     documentTypes: any[] = [];
     accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
-
-    chargeSM: any;
     isSubmitted: boolean = false;
     constructor(
         private _toastService: ToastrService,
@@ -99,14 +98,21 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
-                if (this.typeFrom === 'Shipment') {
-                    this.listFile[index].hblid = event.id;
-                } else {
-                    this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
-                    this.listFile[index].hblid = event.id;
-                    this.listFile[index].jobId = this.housebills.find(x => x.id === event.id).jobId;
-                    //this.listFile[index].billingNo = this.billingNo;
-                }
+                // if (this.typeFrom === 'Shipment') {
+                //     this.listFile[index].hblid = event.id;
+                // } else {
+                //     this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
+                //     this.listFile[index].hblid = event.id;
+                //     this.listFile[index].jobId = this.housebills.find(x => x.id === event.id).jobId;
+                //     //this.listFile[index].billingNo = this.billingNo;
+                //}]
+                this.listFile[index].hblid = event.id;
+                break;
+            case 'job':
+                this.listFile[index].jobNo = event.jobNo;
+                this.listFile[index].jobId = event.id;
+                console.log(event);
+
                 break;
             case 'note':
                 this.listFile[index].note = event;
