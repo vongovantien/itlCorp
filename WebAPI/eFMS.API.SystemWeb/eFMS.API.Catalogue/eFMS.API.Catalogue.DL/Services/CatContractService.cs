@@ -435,7 +435,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
 
-            var expiredCheck = ((DateTime.Now).ToShortDateString()).CompareTo(((DateTime)entity.ExpiredDate).ToShortDateString());
+            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
             if (expiredCheck <= 0)
             {
                 entity.IsExpired = false;
