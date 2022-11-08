@@ -159,7 +159,7 @@
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
                                 <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
-                                    [attr.data-target]="'#' + docType.documentType.code">
+                                    [attr.data-target]="'#' + docType.documentType.code + i">
                                     <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
                                 </h4>
                                 <div class="text-right" *ngIf="!!docType?.eDocs?.length">
@@ -170,9 +170,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="m-portlet__body">
+                    <div class="m-portlet__body p-0">
                         <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
-                            id={{docType.documentType.code}}>
+                            [id]="docType.documentType.code + i">
                             <div class="table-wrapper table-scrollable">
                                 <table class="table table-hover table-editable dataTable table-summary ">
                                     <thead app-table-header [headers]="headers"
