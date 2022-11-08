@@ -235,7 +235,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = edoc.AliasName,
+                                        SystemFileName = attachTemplate.Code +"_" + edoc.AliasName,
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -703,7 +703,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (edoc != null)
                 {
                     var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
-                    edoc.SystemFileName = attachCode + "_" + edocUpdate.SystemFileName;
+                    edoc.SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName);
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     edoc.DocumentTypeId = GetDocTypeIdByJob(edocUpdate.TransactionType, (int)edocUpdate.DocumentTypeId, edocUpdate.AccountingType);
@@ -712,11 +712,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
                 if (edoc == null)
                 {
+                    var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
                     var image = _sysImageRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
                     var edocGenAdd = new SysImageDetail()
                     {
                         DocumentTypeId = edocUpdate.DocumentTypeId,
-                        SystemFileName = edocUpdate.SystemFileName,
+                        SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName),
                         Hblid = edocUpdate.Hblid,
                         Note = edocUpdate.Note,
                         UserFileName = image.Name,
@@ -741,6 +742,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
+        }
+
+        private string clearPrefix(string fileName)
+        {
+            var prefix = fileName.Split('_')[0].ToString();
+            if (_attachFileTemplateRepo.Get(x => x.Code == prefix).FirstOrDefault() != null)
+            {
+                return fileName.Remove(0, prefix.Length+1);
+            }
+            return fileName;
         }
 
         private List<TransctionTypeJobModel> GetTransactionTypeJobBillingModel(string billingType, string billingId)
@@ -897,7 +908,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = Guid.NewGuid(),
                         JobId = item.JobId,
                         UserCreated = sysImage.UserCreated,
-                        SystemFileName = sysImage.Name,
+                        SystemFileName = sysImage.Name.Contains("OTH") ? sysImage.Name : "OTH_" + sysImage.Name,
                         UserFileName = sysImage.Name.Contains("OTH")?sysImage.Name:"OTH_" +sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,

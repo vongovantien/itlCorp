@@ -325,10 +325,11 @@
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>
                                         </td>
-                                        <td *ngIf="typeFrom!=='Settlement'">
+                                        <td *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'">
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <td *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA'">
+                                        <td
+                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
                                             <span>{{doc.jobNo}}</span>
                                         </td>
                                         <td>
