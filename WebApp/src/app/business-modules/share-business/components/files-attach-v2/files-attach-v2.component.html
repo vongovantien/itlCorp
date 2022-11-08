@@ -184,7 +184,8 @@
                                     <tbody>
                                         <ng-container
                                             *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
-                                            <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
+                                            <tr [contextMenu]="edocAccountantShipmentTypeContext"
+                                                (onTouch)="onSelectEDoc(doc)">
                                                 <td>{{i + 1}}</td>
                                                 <td>
                                                     <span>{{doc.systemFileName}} </span>
@@ -268,6 +269,7 @@
                 </ng-container>
             </div>
         </ng-container>
+        <!-- * SM - SOA - ADV -->
         <ng-container *ngIf="typeFrom !== 'Shipment'">
             <div class="m-portlet__body collapse show" id="accountingFile">
                 <div class="m-portlet__body">
@@ -281,7 +283,7 @@
                             </thead>
                             <tbody>
                                 <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
-                                    <tr [contextMenu]="edocContext" (onTouch)="onSelectEDoc(doc)">
+                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)">
                                         <td>{{i + 1}}</td>
                                         <td>
                                             <a class="text-underline" [href]="doc.imageUrl"
@@ -357,12 +359,35 @@
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
-        <div class="menu-context__item"
-            *ngIf="isLocked===false &&  (selectedEdoc.source==='Shipment'||selectedEdoc.source===null)"
+        <div class="menu-context__item" *ngIf="isLocked === false && !readonly && typeFrom === 'Shipment'"
             (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
-        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="isLocked===false && isDelete">
+        <div class="menu-context__item" (click)="confirmDelete()"
+            *ngIf="isLocked===false && !readonly && typeFrom === 'Shipment' ">
+            <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
+        </div>
+    </ng-container>
+    <div class="menu-context__item" (click)="viewFileEdoc()">
+        <span><i class="la la-eye align-middle text-primary"></i>View</span>
+    </div>
+    <div class="menu-context__item" (click)="downloadEdoc()">
+        <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+</app-context-menu>
+
+<app-context-menu #edocAccountantShipmentTypeContext (clickOutside)="selectedEdoc = null">
+    <div class="menu-context__item" (click)="viewFileEdoc()">
+        <span><i class="la la-eye align-middle text-primary"></i>View</span>
+    </div>
+    <div class="menu-context__item" (click)="downloadEdoc()">
+        <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+</app-context-menu>
+
+<app-context-menu #edocAccountantContext (clickOutside)="selectedEdoc = null">
+    <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
+        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="!readonly">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
