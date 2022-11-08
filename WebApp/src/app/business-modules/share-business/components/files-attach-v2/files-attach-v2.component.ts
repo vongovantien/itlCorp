@@ -12,7 +12,7 @@ import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
+import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
@@ -228,7 +228,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     }
                 );
         } else if (this.typeFrom === 'Advance') {
-            this._store.select(getAdvanceDetailState).pipe(
+            this._store.select(getAdvanceDetailRequestState).pipe(
                 takeUntil(this.ngUnsubscribe)
             )
                 .subscribe(
@@ -237,9 +237,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                             console.log(_uniqBy(data, 'jobId'));
                             console.log(data);
                             this.jobs = [];
-                            data.data.forEach(element => {
-                                this.jobs.push(({ jobNo: element.jobId }))
-                            });
+                            for (let element of data) {
+                                this.jobs.push({ jobNo: element.jobId, })
+                            }
+                            console.log(this.jobs);
+                            // data.forEach((element: any) => {
+                            //     this.jobs.push(({ jobNo: element.jobId }))
+                            //     console.log(element);
+                            // });
+
                             // _uniqBy(data, 'jobId').forEach(element => {
                             //     let item = ({
                             //         jobNo: element.jobId,

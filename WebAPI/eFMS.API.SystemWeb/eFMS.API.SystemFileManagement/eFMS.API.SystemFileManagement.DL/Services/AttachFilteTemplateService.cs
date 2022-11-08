@@ -45,7 +45,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
                         TransactionType="SOA"
-                    }).ToList();
+                    }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Settlement":
                     var settleNo = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().SettlementNo;
                     var transType = _surchargeRepo.Get(x => x.SettlementCode == settleNo).Select(x => x.TransactionType).ToList();
@@ -56,7 +56,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
                         TransactionType=x.FirstOrDefault().TransactionType
-                    }).ToList();
+                    }).OrderBy(x => x.NameEn.Substring(0,1)).ToList();
                 case "Advance":
                     var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                     return advs.GroupBy(x => x.Code).Select(x => new DocumentTypeModel()
@@ -64,7 +64,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
-                    }).ToList();
+                    }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 default:
                     var jobs = await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
                     var result = new List<DocumentTypeModel>();
@@ -78,7 +78,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                          };
                          result.Add(type);
                      });
-                    return result;
+                    return result.OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
             }
         }
     }
