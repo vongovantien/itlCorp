@@ -720,7 +720,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
                     edoc.SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName);
-                    edoc.UserFileName = clearPrefix(edocUpdate.SystemFileName);
+                    //edoc.UserFileName = clearPrefix(edocUpdate.SystemFileName);
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
                     edoc.DocumentTypeId = GetDocTypeIdByJob(edocUpdate.TransactionType, (int)edocUpdate.DocumentTypeId, edocUpdate.AccountingType);
@@ -735,7 +735,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         DocumentTypeId = edocUpdate.DocumentTypeId,
                         SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName),
-                        UserFileName = clearPrefix(edocUpdate.SystemFileName),
+                        //UserFileName = clearPrefix(edocUpdate.SystemFileName),
                         Hblid = edocUpdate.Hblid,
                         Note = edocUpdate.Note,
                         UserCreated = currentUser.UserName,
@@ -763,10 +763,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string clearPrefix(string fileName)
         {
-            var prefix = fileName.Split('_')[0].ToString();
-            if (_attachFileTemplateRepo.Get(x => x.Code == prefix).FirstOrDefault() != null)
+            var prefixs = _attachFileTemplateRepo.Get().Select(x => x.Code).ToList();
+            var code = prefixs.Where(x => fileName.Contains(x)).FirstOrDefault();
+            if (code != null)
             {
-                return fileName.Remove(0, prefix.Length+1);
+                return fileName.Remove(0, code.Length + 1);
             }
             return fileName;
         }
