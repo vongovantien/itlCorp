@@ -12,7 +12,7 @@ import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
+import { getAdvanceDetailRequestState, getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
@@ -31,6 +31,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+    isDelete: boolean = false;
     get readonly(): boolean {
         return this._readonly;
     }
@@ -59,14 +60,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Real File Name', field: 'realFilename', width: 300 },
         { title: 'Document Type', field: 'docType', required: true },
         { title: 'Job Ref', field: 'jobRef' },
-        //{ title: 'House Bill No', field: 'hbl' },
         { title: 'Note', field: 'note' },
     ]
-    // accountantAttach: any[] = [{ title: 'No', field: 'no' },
-    // { title: 'Alias Name', field: 'aliasName' },
-    // { title: 'Real File Name', field: 'realFilename' },
-    // { title: 'Document Type', field: 'docType', required: true },
-    // { title: 'Note', field: 'note' },]
     jobNo: string = '';
     private _readonly: boolean = false;
     constructor(
@@ -90,10 +85,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe((params: Params) => {
                     if (params.jobId) {
                         this.jobId = params.jobId;
-                        //this.documentAttach.jobId = params.jobId;
                     } else {
                         this.jobId = params.id;
-                        //this.documentAttach.jobId = params.jobId;
                         this.isOps = true;
                     }
                 });
@@ -103,11 +96,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            //  this.documentAttach.transactionType = res.transactionType;
                             this.getDocumentType(res.transactionType, null);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
-                            //this.documentAttach.jobNo = res.jobNo;
                             this.isLocked = res.isLocked;
                         }
                     );
@@ -117,11 +108,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            //this.documentAttach.transactionType = 'CL'
                             this.getDocumentType('CL', null);
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
-                            //this.documentAttach.fileNo = res.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
                             console.log(this.jobNo);
 
@@ -197,6 +186,22 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             ];
         }
         this.getHblList();
+
+        if ((this.typeFrom === 'Advance')) {
+            this._store.select(getAdvanceDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        console.log(data);
+
+                        if (data.statusApproval === 'Done') {
+                            this.isDelete = false;
+                        } else {
+                            this.isDelete = true;
+                        }
+                    });
+        }
     }
     getJobList() {
         if (this.typeFrom === 'Settlement') {
@@ -213,14 +218,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                 let item = ({
                                     jobNo: element.jobId,
                                     id: element.shipmentId
-                                    // hwbno: element.hbl,
-                                    // jobNo: element.jobId,
-                                    // id: element.hblid,
-                                    // jobId: element.shipmentId,
                                 })
 
                                 this.jobs.push(item);
-                                //console.log(this.housebills);
                                 console.log(this.jobs);
                             }
                             );
@@ -241,26 +241,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                                 this.jobs.push({ jobNo: element.jobId, })
                             }
                             console.log(this.jobs);
-                            // data.forEach((element: any) => {
-                            //     this.jobs.push(({ jobNo: element.jobId }))
-                            //     console.log(element);
-                            // });
-
-                            // _uniqBy(data, 'jobId').forEach(element => {
-                            //     let item = ({
-                            //         jobNo: element.jobId,
-                            //         //id: element.shipmentId
-                            //         // hwbno: element.hbl,
-                            //         // jobNo: element.jobId,
-                            //         // id: element.hblid,
-                            //         // jobId: element.shipmentId,
-                            //     })
-
-                            //     this.jobs.push(item);
-                            //     //console.log(this.housebills);
-                            //     console.log(this.jobs);
-                            // }
-                            // );
                         }
                     }
                 );
@@ -279,48 +259,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     }
                 },
             );
-        // if (this.typeFrom === 'Shipment') {
-        //     this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
-        //         .pipe(
-        //             catchError(this.catchError),
-        //         ).subscribe(
-        //             (res: any) => {
-        //                 if (!!res) {
-        //                     console.log(this.housebills);
-        //                     this.housebills = res;
-        //                 }
-        //             },
-        //         );
-        // } else if (this.typeFrom === 'Settlement') {
-        //     this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-        //         takeUntil(this.ngUnsubscribe)
-        //     )
-        //         .subscribe(
-        //             (data) => {
-        //                 if (!!data) {
-        //                     console.log(_uniqBy(data, 'hbl'));
-        //                     console.log(this.housebills);
-        //                     this.housebills = [];
-        //                     _uniqBy(data, 'hbl').forEach(element => {
-        //                         let item = ({
-        //                             hwbno: element.hbl,
-        //                             jobNo: element.jobId,
-        //                             id: element.hblid,
-        //                             jobId: element.shipmentId,
-        //                         })
-
-        //                         this.housebills.push(item);
-        //                         console.log(this.housebills);
-
-        //                     }
-        //                     );
-        //                 }
-        //             }
-        //         );
-        //this.chargeSM
-        //     } else {
-
-        // }
     }
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
@@ -428,7 +366,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 )
                 .subscribe(
                     (res: any[]) => {
-                        console.log(res);
                         this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
                         this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
                         this.onChange.emit(res);

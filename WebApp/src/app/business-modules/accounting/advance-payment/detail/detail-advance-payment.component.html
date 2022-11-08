@@ -32,10 +32,6 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
-                        <!-- <accounting-attach-file-list *ngIf="!!advancePayment" (onChange)="attachFiles = $event"
-                            [accId]="advId" [accType]="'Advance'" [fileNo]="advancePayment.advanceNo"
-                            [folderModuleName]='folderModuleName'>
-                        </accounting-attach-file-list> -->
                         <files-attach-v2 [typeFrom]="'Advance'" [billingId]="advId" (onChange)="attachFiles = $event">
                         </files-attach-v2>
                     </tab>

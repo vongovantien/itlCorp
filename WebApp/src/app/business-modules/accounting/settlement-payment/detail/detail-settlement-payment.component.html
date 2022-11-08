@@ -33,10 +33,6 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
-                        <!-- <accounting-attach-file-list *ngIf="!!settlementPayment" (onChange)="attachFiles = $event"
-                            [fileNo]="settlementPayment.settlement.settlementNo" [folderModuleName]="folderModuleName"
-                            [accId]="settlementId" [accType]="'Settlement'">
-                        </accounting-attach-file-list> -->
                         <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId"
                             (onChange)="attachFiles = $event">
                         </files-attach-v2>
