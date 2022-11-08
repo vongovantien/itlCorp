@@ -1,27 +1,28 @@
-import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { AppPage } from 'src/app/app.base';
-import { AccountingRepo, ExportRepo } from '@repositories';
-import { AdvancePayment, SysImage } from '@models';
-import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
+import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
+import { AdvancePayment, SysImage } from '@models';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { AppPage } from 'src/app/app.base';
+import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
 
-import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
+import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
 
-import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 import { RoutingConstants } from '@constants';
+import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 
-import { catchError, concatMap, finalize, map, takeUntil } from 'rxjs/operators';
-import { combineLatest, of } from 'rxjs';
-import { ListAdvancePaymentCarrierComponent } from '../../advance-payment/components/list-advance-payment-carrier/list-advance-payment-carrier.component';
-import { getCurrentUserState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+import { IAppState } from '@store';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { ListAdvancePaymentCarrierComponent } from '../../advance-payment/components/list-advance-payment-carrier/list-advance-payment-carrier.component';
+import { LoadAdvanceDetailSuccess } from '../../advance-payment/store';
 
 @Component({
     selector: 'app-approve-advance',
@@ -104,7 +105,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                     if (!!res) {
                         this.advancePayment = new AdvancePayment(res);
                         console.log(this.advancePayment);
-
+                        this._store.dispatch(LoadAdvanceDetailSuccess(res));
                         // * wait to currecy list api
                         this.formCreateComponent.formCreate.patchValue({
                             advanceNo: this.advancePayment.advanceNo,
@@ -229,9 +230,9 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
 
     back() {
         if (!this.approveInfo.requesterAprDate) {
-            if(!this.isAdvCarrier){
+            if (!this.isAdvCarrier) {
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${this.idAdvPayment}`]);
-            }else{
+            } else {
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${this.idAdvPayment}`], {
                     queryParams: Object.assign({}, { action: "carrier" })
                 });
