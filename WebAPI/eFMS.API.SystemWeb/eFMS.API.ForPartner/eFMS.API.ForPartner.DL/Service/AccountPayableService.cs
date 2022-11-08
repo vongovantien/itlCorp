@@ -4,14 +4,19 @@ using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.DL.Models.Payable;
+using eFMS.API.ForPartner.Service.Contexts;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.API.ForPartner.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +36,8 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
+        private readonly IContextBase<AcctCreditManagementAr> creditManagementArRepository;
+        private readonly IContextBase<AccAccountingManagement> accountingManagementRepository;
         public AccountPayableService(IContextBase<AccAccountPayable> repository,
             IContextBase<CatPartner> partnerRepo,
             ICurrentUser cUser,
@@ -42,6 +49,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctCdnote> acctCdNoteRepo,
             IContextBase<AcctSettlementPayment> settlementPaymentRepo,
             IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<AcctCreditManagementAr> creditManagementArRepo,
+            IContextBase<AccAccountingManagement> accountingManagementRepo,
             IMapper mapper) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -54,6 +63,8 @@ namespace eFMS.API.ForPartner.DL.Service
             acctCdNoteRepository = acctCdNoteRepo;
             settlementPaymentRepository = settlementPaymentRepo;
             surchargeRepository = surchargeRepo;
+            creditManagementArRepository = creditManagementArRepo;
+            accountingManagementRepository = accountingManagementRepo;
         }
 
         private SysPartnerApi GetInfoPartnerByApiKey(string apiKey)
@@ -95,7 +106,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     voucherDetail.ToList().ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
                     var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
                     // Update TransactionType without charge mode
-                    
+
                     // Get surcharges info => comment use case hd có tiền âm
                     //var listCharges = model.Details.Select(x => x.ChargeId).ToList();
                     //var sucharges = surchargeRepository.Get(x => listCharges.Any(chg => chg == x.Id));
@@ -300,6 +311,118 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        /// <summary>
+        /// Add Credit Mangagement
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<HandleState> AddCreditMangagement(VoucherSyncCreateModel model)
+        {
+            HandleState hsUpdate = new HandleState();
+            using (var trans = creditManagementArRepository.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var detailBravoRefNos = model.Details.Where(x => !string.IsNullOrEmpty(x.BravoRefNo)).ToList();
+                    if (detailBravoRefNos.Count == 0)
+                    {
+                        return hsUpdate;
+                    }
+                    var partner = partnerRepository.Get(x => x.AccountNo == model.CustomerCode).FirstOrDefault();
+                    SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
+
+                    //var creditManagements = creditManagementArRepository.Get(x => x.PartnerId == partner.Id && x.OfficeId == office.Id.ToString());
+                    var shipments = detailBravoRefNos.GroupBy(x => new { x.JobNo, x.MblNo, x.Hblno, x.BravoRefNo });
+                    //var listChargeIds = model.Details.Select(x => x.ChargeId).ToList();
+                    //var surcharges = surchargeRepository.Get(x => listChargeIds.Contains(x.Id));
+                    var _code = string.Empty;
+                    var _type = string.Empty;
+                    decimal? exchangeRateUsd = 0;
+                    if (model.DocType == "SOA" || model.DocType == "CDNOTE")
+                    {
+                        _code = model.DocCode;
+                        _type = model.DocType == "SOA" ? "CREDITSOA" : "CREDITNOTE";
+                        exchangeRateUsd = model.DocType == "SOA" ? acctSOARepository.Get(x => x.Soano == _code).FirstOrDefault()?.ExcRateUsdToLocal : acctCdNoteRepository.Get(x => x.Code == _code).FirstOrDefault()?.ExcRateUsdToLocal;
+                    }
+                    foreach (var item in shipments)
+                    {
+                        // Get detail to update Credit AR
+                        var acctCredit = new AcctCreditManagementAr();
+                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno);
+                        var detailBilling = surcharges.FirstOrDefault();
+                        //.Select(x => new { Code = string.IsNullOrEmpty(x.CreditNo) ? x.PaySoano : x.CreditNo, Type = string.IsNullOrEmpty(x.CreditNo) ? "CREDITSOA" : "CREDITNOTE", x.Hblid }).FirstOrDefault();
+                        var syncFrom = string.Empty;
+                        if (string.IsNullOrEmpty(_code))
+                        {
+                            _type = detailBilling.Type == "OBH" ? (detailBilling.PaySyncedFrom.Contains("SOA") ? "CREDITSOA" : "CREDITNOTE") : (detailBilling.SyncedFrom.Contains("SOA") ? "CREDITSOA" : "CREDITNOTE");
+                            _code = _type == "CREDITSOA" ? detailBilling.PaySoano : detailBilling.CreditNo;
+                        }
+                        decimal totalVnd = 0, totalUsd = 0;
+                        if (_type == "CREDITSOA")
+                        {
+                            totalVnd = surcharges.Where(x => x.PaySoano == _code).Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                            totalUsd = surcharges.Where(x => x.PaySoano == _code).Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                        }
+                        else if (_type == "CREDITNOTE")
+                        {
+                            totalVnd = surcharges.Where(x => x.CreditNo == _code).Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                            totalUsd = surcharges.Where(x => x.CreditNo == _code).Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                        }
+                        acctCredit.Id = Guid.NewGuid();
+                        acctCredit.Code = _code;
+                        acctCredit.Type = _type;
+                        acctCredit.PartnerId = partner.Id;
+                        acctCredit.JobNo = item.Key.JobNo;
+                        acctCredit.Mblno = item.Key.MblNo;
+                        acctCredit.Hblno = item.Key.Hblno;
+                        acctCredit.Hblid = detailBilling.Hblid;
+                        acctCredit.SurchargeId = string.Join(';', item.Select(x => x.ChargeId).Distinct());
+                        acctCredit.Currency = item.FirstOrDefault().Currency;
+                        acctCredit.ExchangeRate = item.FirstOrDefault().ExchangeRate;
+                        acctCredit.ExchangeRateUsdToLocal = exchangeRateUsd;
+                        acctCredit.AmountVnd = acctCredit.RemainVnd = item.Sum(x => x.AmountVnd + x.VatAmountVnd);
+                        acctCredit.AmountUsd = acctCredit.RemainUsd = item.Sum(x => x.AmountUsd + x.VatAmountUsd);
+                        if (acctCredit.Currency == ForPartnerConstants.CURRENCY_LOCAL)
+                        {
+                            acctCredit.AmountUsd = acctCredit.RemainUsd = totalUsd;
+                        }
+                        else
+                        {
+                            acctCredit.AmountVnd = acctCredit.RemainVnd = totalVnd;
+                        }
+                        acctCredit.CompanyId = currentUser.CompanyID;
+                        acctCredit.OfficeId = office.Id.ToString();
+                        acctCredit.DepartmentId = currentUser.DepartmentId;
+                        acctCredit.DatetimeCreated = acctCredit.DatetimeModified = DateTime.Now;
+                        acctCredit.UserCreated = acctCredit.UserModified = currentUser.UserID;
+                        acctCredit.NetOff = false;
+                        acctCredit.ReferenceNo = item.Key.BravoRefNo;
+                        acctCredit.Source = "Bravo";
+                        hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
+                        if (!hsUpdate.Success)
+                        {
+                            new LogHelper("AddCreditMangagement_Fail", JsonConvert.SerializeObject(acctCredit));
+                        }
+                        else
+                        {
+                            trans.Commit();
+                        }
+                    }
+                    return hsUpdate;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    new LogHelper("AddCreditMangagement_Exception", JsonConvert.SerializeObject(model));
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
         public bool IsPayableHasPayment(VoucherSyncDeleteModel model)
         {
 
@@ -405,7 +528,7 @@ namespace eFMS.API.ForPartner.DL.Service
         /// <param name="accountPayables"></param>
         /// <param name="apiKey"></param>
         /// <returns></returns>
-        public HandleState InsertAccountPayablePayment(List<AccAccountPayableModel> accountPayables, string apiKey)
+        public async Task<HandleState> InsertAccountPayablePayment(List<AccAccountPayableModel> accountPayables, string apiKey)
         {
             var hsPayable = new HandleState();
             var hsPayablePM = new HandleState();
@@ -417,6 +540,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.Action = "InsertAccountPayable";
             var listInsertPayment = new List<AccAccountPayablePayment>();
             var listInsertPayable = new List<AccAccountPayable>();
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -425,6 +549,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var partner = partnerRepository.Get(x => x.AccountNo == acc.CustomerCode).FirstOrDefault();
                         var office = officeRepository.Get(x => x.Code == acc.OfficeCode).FirstOrDefault();
+                        var acctMngIds = accountingManagementRepository.Get(x => x.VoucherId == acc.PaymentNo && x.Date == acc.PaymentDate && x.PartnerId == acc.CustomerCode).Select(x => x.Id).ToList();
+
                         var detailGroup = acc.Details.GroupBy(x => new { VoucherNo = string.IsNullOrEmpty(x.VoucherNo) ? null : x.VoucherNo, x.TransactionType, x.BravoRefNo, x.AdvRefNo, x.AcctId, x.Currency, x.ExchangeRate });
                         foreach (var acctPM in detailGroup)
                         {
@@ -510,7 +636,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableExisted.UserModified = currentUser.UserID;
                                 #endregion
                                 listInsertPayment.Add(accPayablePayment);
-                                DataContext.Update(payableExisted, x => x.Id == payableExisted.Id, false);
+                                await DataContext.UpdateAsync(payableExisted, x => x.Id == payableExisted.Id, false);
                             }
                             else if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV)
                             {
@@ -779,45 +905,54 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
 
-                                var hsPayableCredit = DataContext.Update(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
-                                var hsPayableAdv = DataContext.Update(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
+                                var hsPayableCredit = await DataContext.UpdateAsync(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
+                                var hsPayableAdv = await DataContext.UpdateAsync(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
                             }
                         }
                         if (listInsertPayment.Count > 0)
                         {
                             foreach (var item in listInsertPayment)
                             {
-                                hsPayablePM = paymentRepository.Add(item, false);
+                                hsPayablePM = await paymentRepository.AddAsync(item);
+                                if (!hsPayablePM.Success)
+                                {
+                                    new LogHelper("InsertAccountPayablePayment", hsPayablePM.Message?.ToString());
+                                    return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
+                                }
+                                else
+                                {
+                                    await UpdateCreditMangagement(listInsertPayment, acctMngIds);
+                                }
                             }
                         }
-                        if (!hsPayablePM.Success)
-                        {
-                            new LogHelper("InsertAccountPayablePayment", hsPayablePM.Message?.ToString());
-                            return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
+                        //if (!hsPayablePM.Success)
+                        //{
+                        //    new LogHelper("InsertAccountPayablePayment", hsPayablePM.Message?.ToString());
+                        //    return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
 
-                        }
-                        else
-                        {
-                            HandleState hsAddP = paymentRepository.SubmitChanges();
-                            if (hsAddP.Success == false)
-                            {
-                                new LogHelper("InsertAccountPayablePayment", hsAddP.Message?.ToString());
-                                return new HandleState("Ghi nhận thất bại. " + hsAddP.Message?.ToString());
+                        //}
+                        //else
+                        //{
+                        //    HandleState hsAddP = paymentRepository.SubmitChanges();
+                        //    if (hsAddP.Success == false)
+                        //    {
+                        //        new LogHelper("InsertAccountPayablePayment", hsAddP.Message?.ToString());
+                        //        return new HandleState("Ghi nhận thất bại. " + hsAddP.Message?.ToString());
 
 
-                            }
-                        }
+                        //    }
+                        //}
 
                         if (listInsertPayable.Count > 0)
                         {
                             foreach (var item in listInsertPayable)
                             {
-                                hsPayable = DataContext.Add(item, false);
+                                hsPayable = await DataContext.AddAsync(item);
                             }
                         }
-                        if (hsPayable.Success)
+                        if (!hsPayable.Success)
                         {
-                            DataContext.SubmitChanges();
+                            new LogHelper("InsertAccountPayablePayment_Fail", hsPayable.Message?.ToString());
                         }
                         trans.Commit();
                     }
@@ -834,6 +969,56 @@ namespace eFMS.API.ForPartner.DL.Service
                     trans.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Update trừ cn trên credit
+        /// </summary>
+        /// <param name="payable"></param>
+        /// <param name="acctIds"></param>
+        /// <returns></returns>
+        private async Task<HandleState> UpdateCreditMangagement(List<AccAccountPayablePayment> payables, List<Guid> acctIds)
+        {
+            var hs = new HandleState();
+            var surcharges = await surchargeRepository.GetAsync(x => acctIds.Contains((Guid)x.AcctManagementId));
+            var shipments = surcharges.GroupBy(x => new { x.JobNo, x.Mblno, x.Hblno, x.Hblid })
+                .Select(x => new
+                {
+                    x.Key.JobNo,
+                    x.Key.Hblid
+                ,
+                    Code = x.FirstOrDefault().Type == "OBH" ? (x.FirstOrDefault().PaySyncedFrom.Contains("SOA") ? x.FirstOrDefault().PaySoano : x.FirstOrDefault().CreditNo) :
+                (x.FirstOrDefault().SyncedFrom.Contains("SOA") ? x.FirstOrDefault().PaySoano : x.FirstOrDefault().CreditNo)
+                });
+            foreach (var payable in payables)
+            {
+                var creditMng = creditManagementArRepository.Get(x => x.PartnerId == payable.PartnerId && x.ReferenceNo == payable.ReferenceNo && (x.RemainVnd > 0 || x.RemainUsd > 0));
+                var data = from cre in creditMng
+                           join shp in shipments on new { cre.JobNo, Hblid = (Guid)cre.Hblid, cre.Code } equals new { shp.JobNo, shp.Hblid, shp.Code }
+                           select cre;
+                foreach (var item in data)
+                {
+                    item.RemainVnd = item.RemainVnd == 0 ? item.RemainVnd : (item.RemainVnd - payable.PaymentAmountVnd);
+                    item.RemainUsd = item.RemainUsd == 0 ? item.RemainUsd : (item.RemainUsd - payable.PaymentAmountUsd);
+                    if(payable.Currency == ForPartnerConstants.CURRENCY_LOCAL)
+                    {
+                        if (item.RemainVnd == 0)
+                            item.RemainUsd = 0;
+                    }
+                    else
+                    {
+                        if (item.RemainUsd == 0)
+                            item.RemainVnd = 0;
+                    }
+                    await creditManagementArRepository.UpdateAsync(item, x => x.Id == item.Id, false);
+                }
+                hs = creditManagementArRepository.SubmitChanges();
+            }
+            if (!hs.Success)
+            {
+                new LogHelper("UpdateCreditMangagement_Fail", hs.Message?.ToString());
+            }
+            return hs;
         }
 
         /// <summary>
@@ -857,12 +1042,12 @@ namespace eFMS.API.ForPartner.DL.Service
                     foreach (var acc in accountPayables)
                     {
                         SysOffice office = officeRepository.Get(x => x.Code == acc.OfficeCODE).FirstOrDefault();
-                        if(office == null)
+                        if (office == null)
                         {
                             throw new Exception(acc.OfficeCODE + " không tồn tại");
                         }
-                        IQueryable<AccAccountPayablePayment> existPayment = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo 
-                        && x.OfficeId == office.Id 
+                        IQueryable<AccAccountPayablePayment> existPayment = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo
+                        && x.OfficeId == office.Id
                         && x.ReferenceNo == acc.BravoRefNo
                         && x.AcctId == acc.AcctId
                         );
@@ -912,6 +1097,14 @@ namespace eFMS.API.ForPartner.DL.Service
 
                             HandleState hsUpdDatacontext = DataContext.Update(pm, x => x.Id == pm.Id, false);
                         }
+
+                        var creditMngs = creditManagementArRepository.Get(x => x.OfficeId == office.Id.ToString() && x.ReferenceNo == acc.BravoRefNo);
+                        foreach (var acct in creditMngs)
+                        {
+                            acct.RemainVnd = acct.RemainUsd = 0;
+                            acct.DatetimeModified = DateTime.Now;
+                            HandleState hsUpdCreditMng = creditManagementArRepository.Update(acct, x => x.Id == acct.Id, false);
+                        }
                     }
 
                     hsDelPayable = paymentRepository.SubmitChanges();
@@ -919,19 +1112,24 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
                     }
+                    var hsUpdateCreditMng = creditManagementArRepository.SubmitChanges();
+                    if (!hsUpdateCreditMng.Success)
+                    {
+                        new LogHelper("CancelPayablePayment_UpdateCreditManagement_Fail", hsUpdateCreditMng.Message?.ToString() + " \n " + JsonConvert.SerializeObject(accountPayables));
+                    }
                     hs = DataContext.SubmitChanges();
                     if (!hs.Success)
                     {
                         trans.Rollback();
                         throw new Exception("Hủy ghi nhận thất bại. " + hs.Message?.ToString());
-                    } 
+                    }
                     trans.Commit();
                     return hs;
                 }
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    new LogHelper("CancelAccountPayablePayment", ex.ToString());
+                    new LogHelper("CancelAccountPayablePayment_Fail", ex.ToString());
                     return new HandleState((object)ex.Message);
                 }
                 finally
@@ -977,10 +1175,12 @@ namespace eFMS.API.ForPartner.DL.Service
                         hsPayable = await DataContext.DeleteAsync(x => payableDelete.Any(pa => pa.Id == x.Id));
                         if (hsPayable.Success)
                         {
+                            await DeleteCreditManagement(payableDelete);
                             trans.Commit();
                         }
                         else
                         {
+                            new LogHelper("DeleteAccountPayable_Fail", hsPayable.Message?.ToString());
                             trans.Dispose();
                         }
                     }
@@ -998,5 +1198,45 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        /// <summary>
+        /// Delete Credit Management AR when delete voucher
+        /// </summary>
+        /// <param name="payables"></param>
+        /// <returns></returns>
+        private async Task<HandleState> DeleteCreditManagement(List<AccAccountPayable> payables)
+        {
+            HandleState hsDeleteCredit = new HandleState();
+            currentUser.Action = "DeleteCreditManagement";
+            using (var trans = creditManagementArRepository.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var refNos = payables.Select(x => x.ReferenceNo).ToList();
+                    var billingNos = payables.Select(x => x.BillingNo).ToList();
+                    var partnerId = payables.FirstOrDefault().PartnerId;
+                    var creditMngIds = creditManagementArRepository.Get(x => x.PartnerId == partnerId && billingNos.Contains(x.Code) && refNos.Contains(x.ReferenceNo)).Select(x => x.Id).ToList();
+                    hsDeleteCredit = await creditManagementArRepository.DeleteAsync(x => creditMngIds.Contains(x.Id));
+                    if (!hsDeleteCredit.Success)
+                    {
+                        new LogHelper("DeleteCreditManagement_Fail", hsDeleteCredit.Message?.ToString());
+                    }
+                    else
+                    {
+                        trans.Commit();
+                    }
+                    return hsDeleteCredit;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+        }
     }
 }
