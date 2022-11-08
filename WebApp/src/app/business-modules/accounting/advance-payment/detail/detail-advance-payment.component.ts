@@ -119,7 +119,7 @@ export class AdvancePaymentDetailComponent
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    console.log(res.advanceRequests);
+                    console.log(res);
                     if (!res) {
                         this._toastService.warning("Advance Payment not found");
                         this.back();

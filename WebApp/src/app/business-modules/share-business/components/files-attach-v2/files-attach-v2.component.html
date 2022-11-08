@@ -362,8 +362,7 @@
             (click)="editEdoc()">
             <span><i class="la la-edit align-middle text-success"></i>Edit</span>
         </div>
-        <div class="menu-context__item" (click)="confirmDelete()"
-            *ngIf="isLocked===false && (typeFrom==='Settlement' || selectedEdoc.source==='Shipment'||selectedEdoc.source==='Advance'||selectedEdoc.source===null)">
+        <div class="menu-context__item" (click)="confirmDelete()" *ngIf="isLocked===false && isDelete">
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>

@@ -12,7 +12,7 @@ import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
+import { getAdvanceDetailRequestState, getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
@@ -31,6 +31,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+    isDelete: boolean = false;
     get readonly(): boolean {
         return this._readonly;
     }
@@ -197,6 +198,26 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             ];
         }
         this.getHblList();
+        if ((this.typeFrom === 'Settlement' || this.selectedEdoc?.source === 'Shipment' || this.selectedEdoc?.source === null)) {
+            this.isDelete = true;
+        } else {
+            this.isDelete = false;
+        }
+        if ((this.typeFrom === 'Advance')) {
+            this._store.select(getAdvanceDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        console.log(data);
+
+                        if (data.statusApproval === 'Done') {
+                            this.isDelete = false;
+                        } else {
+                            this.isDelete = true;
+                        }
+                    });
+        }
     }
     getJobList() {
         if (this.typeFrom === 'Settlement') {
