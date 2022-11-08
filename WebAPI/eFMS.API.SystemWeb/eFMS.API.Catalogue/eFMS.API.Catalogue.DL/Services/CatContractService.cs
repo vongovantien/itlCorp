@@ -928,7 +928,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         contract.TrialCreditDays = contract.PaymentTerm;
                     }
                     contract.CreditLimitRate = !string.IsNullOrEmpty(item.CreditLimitedRated) ? Convert.ToInt32(item.CreditLimitedRated) : (int?)null;
-                    contract.Active = true;
+                    contract.Active = false;
                     contract.PartnerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     contract.Id = Guid.NewGuid();
                     contracts.Add(contract);
