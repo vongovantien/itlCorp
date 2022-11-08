@@ -1043,7 +1043,31 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        
+        /// <summary>
+        /// delete credit management data
+        /// </summary>
+        /// <param name="surchargesSoa"></param>
+        /// <param name="soaNo"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public HandleState DeleteAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string action)
+        {
+            var hs = new HandleState();
+            var hblIds = surchargesSoa.Select(x => x.Hblid).ToList();
+            var deleteCredits = mapper.Map<List<AcctCreditManagementModel>>(acctCreditManagementArRepository.Get(x => x.Code == soaNo && hblIds.Contains((Guid)x.Hblid)));
+            // Update database
+            var addCreditMng = UpdateCreditManagement(new List<AcctCreditManagementModel>(), deleteCredits, action);
+            string logName = string.Format("SoaCredit_{0}_{1}AcctCreditManagementAR", soaNo, action);
+            string logMessage = string.Format(" * DataTypeSoaCredit: {0} \n * Result: {1}",
+                JsonConvert.SerializeObject(new List<AcctCreditManagementModel>()),
+                JsonConvert.SerializeObject(addCreditMng));
+            new LogHelper(logName, logMessage);
+            if (!addCreditMng.Status)
+            {
+                hs = new HandleState((object)addCreditMng.Message);
+            }
+            return hs;
+        }
         #endregion -- Insert & Update SOA             
 
         #region -- List Status SOA --

@@ -504,10 +504,10 @@ namespace eFMS.API.Documentation.DL.Services
                         trans.Dispose();
                     }
                 }
-                if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
-                {
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
-                }
+                //if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
+                //{
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -763,14 +763,14 @@ namespace eFMS.API.Documentation.DL.Services
                     //    UpdateCombineBilling(cdNote.CombineBillingNo);
                     //}
                 }
-                if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
-                {
-                    // Get all origin data and updated soano data
-                    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
-                    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
-                    surchargesCDNote.AddRange(surchargeUpdate);
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
-                }
+                //if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
+                //{
+                //    // Get all origin data and updated soano data
+                //    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
+                //    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
+                //    surchargesCDNote.AddRange(surchargeUpdate);
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -957,6 +957,33 @@ namespace eFMS.API.Documentation.DL.Services
                         JsonConvert.SerializeObject(addCreditMng));
                     new LogHelper(logName, logMessage);
                 }
+            }
+            return hs;
+        }
+
+        /// <summary>
+        /// delete credit management data
+        /// </summary>
+        /// <param name="surchargesCreditNote"></param>
+        /// <param name="creditNo"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private HandleState DeleteAcctCreditManagement(List<CsShipmentSurcharge> surchargesCreditNote, string creditNo, string action)
+        {
+            var hs = new HandleState();
+            var shipmentLst = surchargesCreditNote.Select(x => x.Hblid).ToList();
+            var acctCreditDelete = mapper.Map<List<AcctCreditManagementModel>>(acctCreditManagementArRepository.Get(x => x.Code == creditNo && shipmentLst.Any(s => s == x.Hblid))).ToList();
+            // Update database
+            var addCreditMng = UpdateCreditManagement(new List<AcctCreditManagementModel>(), acctCreditDelete, action);
+
+            if (!addCreditMng.Status)
+            {
+                hs = new HandleState((object)addCreditMng.Message);
+                string logName = string.Format("CreditNote_{0}_{1}AcctCreditManagementAR", creditNo, action);
+                string logMessage = string.Format(" * DataTypeCreditNote: {0} \n * Result: {1}",
+                    JsonConvert.SerializeObject(new List<AcctCreditManagementModel>()),
+                    JsonConvert.SerializeObject(addCreditMng));
+                new LogHelper(logName, logMessage);
             }
             return hs;
         }
@@ -1373,7 +1400,8 @@ namespace eFMS.API.Documentation.DL.Services
                         // Delete credit AR
                         if (cdNote.Type == "CREDIT" && hsSur.Success)
                         {
-                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
+                            //UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
+                            DeleteAcctCreditManagement(surchargeUpdate, cdNote.Code, "Delete");
                         }
                     }
                 }

@@ -678,7 +678,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash">Hash Value</param>s
         /// <returns></returns>
         [HttpPost("InsertPayablePayment")]
-        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -697,7 +697,7 @@ namespace eFMS.API.ForPartner.Controllers
                 return Ok(_result);
             }
 
-            var hs = accPayableService.InsertAccountPayablePayment(model, apiKey);
+            var hs = await accPayableService.InsertAccountPayablePayment(model, apiKey);
 
             string _message = hs.Success ? "Ghi nhận giảm trừ công nợ thành công" : string.Format("{0}. Ghi nhận giảm trừ công nợ thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
@@ -834,11 +834,13 @@ namespace eFMS.API.ForPartner.Controllers
                 Response.OnCompleted(async () =>
                 {
                     HandleState payableHandle = await accPayableService.InsertAccPayable(model);
+
+                    HandleState hsCredit = await accPayableService.AddCreditMangagement(model);
                 });
             }
-           
+
             return Ok(result);
-          
+
         }
 
         /// <summary>
