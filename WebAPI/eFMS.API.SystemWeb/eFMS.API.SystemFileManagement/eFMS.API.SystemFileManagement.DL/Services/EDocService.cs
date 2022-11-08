@@ -764,10 +764,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private string clearPrefix(string fileName)
         {
             var prefixs = _attachFileTemplateRepo.Get().Select(x => x.Code).ToList();
-            var code = prefixs.Where(x => fileName.Contains(x)).FirstOrDefault();
+            string code = null;
+            prefixs.ForEach(x =>
+            {
+                if (fileName.Contains(x)) {
+                    code = x;
+                }
+            });
             if (code != null)
             {
-                return fileName.Remove(0, code.Length + 1);
+                 return fileName.Remove(0, code.Length).ToString();
             }
             return fileName;
         }
