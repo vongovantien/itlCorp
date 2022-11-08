@@ -160,6 +160,9 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
 
     }
 
+    resetPartnerMapping(data: any){
+        this.partnerMapping.setValue('00000000-0000-0000-0000-000000000000');
+    }
 
     initForm() {
         this.formGroup = this._fb.group({
