@@ -10,6 +10,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string Code { get; set; }
         public string HBLNo { get; set; }
         public string JobNo { get; set; }
-        public Guid HBLId { get; set; }
+        public Guid? HBLId { get; set; }
     }
 }

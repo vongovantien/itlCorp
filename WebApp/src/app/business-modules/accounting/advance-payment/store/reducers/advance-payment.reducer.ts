@@ -6,7 +6,6 @@ export interface AdvancePaymentListState {
     isLoaded: boolean;
     dataSearch: any;
     pagingData: any;
-    advanceDetail: any;
 }
 
 export const initialState: AdvancePaymentListState = {
@@ -14,12 +13,11 @@ export const initialState: AdvancePaymentListState = {
     isLoading: false,
     isLoaded: false,
     pagingData: { page: 1, pageSize: 15 },
-    dataSearch: null,
-    advanceDetail: { data: [], totalItems: 0, },
+    dataSearch: null
 };
 
 
-const advancePaymentReducer = createReducer(
+const AdvancePaymentListReducer = createReducer(
     initialState,
     on(Types.SearchListAdvancePayment, (state: AdvancePaymentListState, payload: any) => {
         return { ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 } }
@@ -33,14 +31,9 @@ const advancePaymentReducer = createReducer(
         Types.LoadListAdvancePaymentSuccess, (state: AdvancePaymentListState, payload: CommonInterface.IResponsePaging) => {
             return { ...state, advances: payload, isLoading: false, isLoaded: true };
         }
-    ),
-    on(
-        Types.LoadDetailSuccess, (state: AdvancePaymentListState, payload: CommonInterface.IResponsePaging) => {
-            return { ...state, advanceDetail: payload, isLoading: false, isLoaded: true };
-        }
     )
 );
 
-export function reducer(state: any | undefined, action: Action) {
-    return advancePaymentReducer(state, action);
+export function advancePaymentListReducer(state: any | undefined, action: Action) {
+    return AdvancePaymentListReducer(state, action);
 };

@@ -5,7 +5,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
-import { LoadDetailSuccess } from './../store/actions/advance-payment.action';
+import { LoadAdvanceDetailSuccess } from './../store/actions/advance-payment.action';
 
 import { AppPage } from "@app";
 import { InfoPopupComponent, ReportPreviewComponent } from "@common";
@@ -120,12 +120,12 @@ export class AdvancePaymentDetailComponent
             .subscribe(
                 (res: any) => {
                     console.log(res.advanceRequests);
-                    this._store.dispatch(LoadDetailSuccess({ data: res.advanceRequests, page: 1, size: 1, totalItems: 1 }))
                     if (!res) {
                         this._toastService.warning("Advance Payment not found");
                         this.back();
                         return;
                     }
+                    this._store.dispatch(LoadAdvanceDetailSuccess(res));
                     this.advancePayment = new AdvancePayment(res);
                     switch (this.advancePayment.statusApproval) {
                         case "New":
