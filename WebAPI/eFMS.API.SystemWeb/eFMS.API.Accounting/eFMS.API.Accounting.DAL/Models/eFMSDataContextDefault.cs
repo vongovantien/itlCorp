@@ -1903,7 +1903,7 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)
-                    .HasMaxLength(50)
+                    .HasMaxLength(1000)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
@@ -4119,8 +4119,6 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.OfficeType).HasMaxLength(500);
 
                 entity.Property(e => e.PersonalId)
                     .HasColumnName("PersonalID")
