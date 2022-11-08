@@ -549,7 +549,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var partner = partnerRepository.Get(x => x.AccountNo == acc.CustomerCode).FirstOrDefault();
                         var office = officeRepository.Get(x => x.Code == acc.OfficeCode).FirstOrDefault();
-                        var acctMngIds = accountingManagementRepository.Get(x => x.VoucherId == acc.PaymentNo && x.Date == acc.PaymentDate && x.PartnerId == acc.CustomerCode).Select(x => x.Id).ToList();
+                        var acctMngIds = accountingManagementRepository.Get(x => x.VoucherId == acc.PaymentNo && x.Date.Value.Date == acc.PaymentDate.Date && x.PartnerId == partner.Id).Select(x => x.Id).ToList();
 
                         var detailGroup = acc.Details.GroupBy(x => new { VoucherNo = string.IsNullOrEmpty(x.VoucherNo) ? null : x.VoucherNo, x.TransactionType, x.BravoRefNo, x.AdvRefNo, x.AcctId, x.Currency, x.ExchangeRate });
                         foreach (var acctPM in detailGroup)
@@ -636,7 +636,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableExisted.UserModified = currentUser.UserID;
                                 #endregion
                                 listInsertPayment.Add(accPayablePayment);
-                                await DataContext.UpdateAsync(payableExisted, x => x.Id == payableExisted.Id, false);
+                                await DataContext.UpdateAsync(payableExisted, x => x.Id == payableExisted.Id);
                             }
                             else if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV)
                             {
@@ -905,8 +905,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 payableAdvExisted.UserModified = currentUser.UserID;
                                 #endregion
 
-                                var hsPayableCredit = await DataContext.UpdateAsync(payableCreditExisted, x => x.Id == payableCreditExisted.Id, false);
-                                var hsPayableAdv = await DataContext.UpdateAsync(payableAdvExisted, x => x.Id == payableAdvExisted.Id, false);
+                                var hsPayableCredit = await DataContext.UpdateAsync(payableCreditExisted, x => x.Id == payableCreditExisted.Id);
+                                var hsPayableAdv = await DataContext.UpdateAsync(payableAdvExisted, x => x.Id == payableAdvExisted.Id);
                             }
                         }
                         if (listInsertPayment.Count > 0)
@@ -919,10 +919,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                     new LogHelper("InsertAccountPayablePayment", hsPayablePM.Message?.ToString());
                                     return new HandleState("Ghi nhận thất bại. " + hsPayablePM.Message?.ToString());
                                 }
-                                else
-                                {
-                                    await UpdateCreditMangagement(listInsertPayment, acctMngIds);
-                                }
+                                
                             }
                         }
                         //if (!hsPayablePM.Success)
@@ -939,7 +936,6 @@ namespace eFMS.API.ForPartner.DL.Service
                         //        new LogHelper("InsertAccountPayablePayment", hsAddP.Message?.ToString());
                         //        return new HandleState("Ghi nhận thất bại. " + hsAddP.Message?.ToString());
 
-
                         //    }
                         //}
 
@@ -947,12 +943,17 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             foreach (var item in listInsertPayable)
                             {
-                                hsPayable = await DataContext.AddAsync(item);
+                                hsPayable = await DataContext.AddAsync(item, false);
                             }
+                            DataContext.SubmitChanges();
                         }
                         if (!hsPayable.Success)
                         {
                             new LogHelper("InsertAccountPayablePayment_Fail", hsPayable.Message?.ToString());
+                        }
+                        else
+                        {
+                            await UpdateCreditMangagement(listInsertPayment, acctMngIds);
                         }
                         trans.Commit();
                     }
@@ -1101,9 +1102,10 @@ namespace eFMS.API.ForPartner.DL.Service
                         var creditMngs = creditManagementArRepository.Get(x => x.OfficeId == office.Id.ToString() && x.ReferenceNo == acc.BravoRefNo);
                         foreach (var acct in creditMngs)
                         {
-                            acct.RemainVnd = acct.RemainUsd = 0;
+                            acct.RemainVnd = acct.AmountVnd;
+                            acct.RemainUsd = acct.AmountUsd;
                             acct.DatetimeModified = DateTime.Now;
-                            HandleState hsUpdCreditMng = creditManagementArRepository.Update(acct, x => x.Id == acct.Id, false);
+                            creditManagementArRepository.Update(acct, x => x.Id == acct.Id, false);
                         }
                     }
 
