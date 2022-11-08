@@ -41,7 +41,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     isOps: boolean = false;
     edocByJob: any[] = [];
     edocByAcc: any[] = [];
-    selectedEdoc: IEDoc;
+    selectedEdoc: IEDocItem;
     transactionType: string = '';
     housebills: any[] = [];
     jobs: any[] = [];
@@ -160,8 +160,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
-            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
-            { title: 'Billing No', field: 'billingNo', sortable: true },
+            { title: 'House Bill No', field: 'hblNo', sortable: true },
+            { title: 'Billing Nos', field: 'billingNo', sortable: true },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
@@ -434,8 +434,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     catchError(this.catchError),
                 )
                 .subscribe(
-                    (res: any[]) => {
-                        console.log(res);
+                    (res: any) => {
                         this.edocByAcc = res;
                         this.onChange.emit(res);
                     },
@@ -474,7 +473,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 }
-interface IEDoc {
+interface IEDocItem {
     billingNo: string;
     billingType: string;
     datetimeCreated: Date;
@@ -499,4 +498,9 @@ interface IEDoc {
     userModified: string;
     documentTypeName: string;
     transactionType: string;
+}
+
+interface IEDoc {
+    documentType: any;
+    eDocs: IEDocItem[];
 }
