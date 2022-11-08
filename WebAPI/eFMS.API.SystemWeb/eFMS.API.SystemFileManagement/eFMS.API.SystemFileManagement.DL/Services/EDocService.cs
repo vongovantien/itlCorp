@@ -915,7 +915,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var sysImage = _sysImageRepo.Get(x => x.Id == imageId)?.FirstOrDefault();
                 foreach (var item in models)
                 {
-                    var x = Path.GetFileNameWithoutExtension(sysImage.Name.Contains("OTH") ? sysImage.Name : "OTH_" + sysImage.Name);
                     var imageDetail = new SysImageDetail
                     {
                         SysImageId = imageId,
@@ -926,8 +925,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = Guid.NewGuid(),
                         JobId = item.JobId,
                         UserCreated = sysImage.UserCreated,
-                        SystemFileName = Path.GetFileNameWithoutExtension(sysImage.Name.Contains("OTH") ? sysImage.Name : "OTH_" + sysImage.Name),
-                        UserFileName = sysImage.Name.Contains("OTH")?sysImage.Name:"OTH_" +sysImage.Name,
+                        SystemFileName = Path.GetFileNameWithoutExtension(sysImage.Name.Contains(item.Code+"_") ? sysImage.Name : item.Code+"_" + sysImage.Name),
+                        UserFileName = sysImage.Name.Contains(item.Code + "_") ?sysImage.Name: item.Code + "_" + sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
                         DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
