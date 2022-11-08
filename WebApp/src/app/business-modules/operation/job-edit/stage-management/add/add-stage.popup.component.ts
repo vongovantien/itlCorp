@@ -1,13 +1,13 @@
-import { Component, Input, EventEmitter, Output } from "@angular/core";
-import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
+import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 
 import { PopupBase } from "src/app/popup.base";
 import { OperationRepo } from "src/app/shared/repositories";
 
-import { takeUntil, catchError, finalize } from "rxjs/operators";
+import _includes from "lodash/includes";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
-import _includes from "lodash/includes";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { Stage } from "src/app/shared/models";
 
 @Component({
@@ -147,7 +147,7 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase {
 
     checkUncheckAllStage(type: string) {
         switch (type) {
-            case 'stageNotAsigned': {
+            case 'stageNotAssigned': {
                 for (const stage of this.stages) {
                     stage.isSelected = this.isMasterStageNotAssigned;
                 }
@@ -156,7 +156,8 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase {
                 break;
             }
             case 'stageSelected': {
-                for (const stage of this.selectedStages) {
+                const selectedStages = this.selectedStages.filter(s => s.type !== 'System')
+                for (const stage of selectedStages) {
                     stage.isSelected = this.isMasterStageSelected;
                 }
 
