@@ -35,7 +35,7 @@
                         <ng-container *ngIf="!!contracts.length">
                             <tr *ngFor="let item of contracts | filter : keyword :['username', 'contractNo',
                              'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;"
-                                [contextMenu]="receiptContextMenu">
+                                [contextMenu]="contextMenu" (onTouch)="onSelectContract(item)">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button (click)="getDetailContract(item.id,i)"
@@ -73,11 +73,12 @@
         </div>
     </div>
 </div>
-
-<app-context-menu #receiptContextMenu>
-    <div class="menu-context__item" (click)="onUpdateEmailPopup()">
-        <span><i class="la la-edit"></i><span> Update email address</span></span>
-    </div>
+<app-context-menu #contextMenu>
+    <ng-container *ngIf="!!menuPermission && menuPermission.detail !== 'None'">
+        <div class="menu-context__item" (click)="onUpdateEmailPopup()">
+            <span><i class="la la-edit"></i><span> Update email address</span></span>
+        </div>
+    </ng-container>
 </app-context-menu>
 
 <confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
@@ -85,6 +86,6 @@
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
 
-<popup-update-email-commercial-catalogue>
-</popup-update-email-commercial-catalogue>
+<popup-form-update-email-contract (onRequest)="onRequestContract($event)"></popup-form-update-email-contract>
+
 <permission-403-popup></permission-403-popup>

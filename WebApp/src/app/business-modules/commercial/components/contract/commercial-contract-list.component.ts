@@ -2,15 +2,18 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { RoutingConstants, SystemConstants } from '@constants';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
+import { getMenuUserPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
-import { FormUpdateEmailCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
+import { FormUpdateEmailContractComponent } from '../popup/form-update-email-contract/form-update-email-contract.component';
+import { IAppState } from './../../../../store/reducers/index';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -19,7 +22,7 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
-    @ViewChild(FormUpdateEmailCommercialCatalogueComponent) formUpdateEmailPopup: FormUpdateEmailCommercialCatalogueComponent;
+    @ViewChild(FormUpdateEmailContractComponent) formUpdateEmailContractPopup: FormUpdateEmailContractComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
@@ -35,6 +38,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     type: string = '';
     partnerLocation: string = null;
+    menuPermission: SystemInterface.IUserPermission;
 
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
@@ -42,7 +46,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
         protected _activeRoute: ActivatedRoute,
-        private _systemfileManageRepo: SystemFileManageRepo
+        private _systemfileManageRepo: SystemFileManageRepo,
+        private _store: Store<IAppState>,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -54,6 +59,18 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this.type = result.type;
 
         });
+
+        this._store.select(getMenuUserPermissionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: SystemInterface.IUserPermission) => {
+                    if (res !== null && res !== undefined) {
+                        console.log(res)
+                        this.menuPermission = res;
+                    }
+                }
+            );
+
         this.headers = [
             { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Contract No', field: 'contractNo', sortable: true },
@@ -310,8 +327,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.onActiveContract.emit(this.selectedContract);
     }
 
+    onSelectContract(contract: Contract) {
+        console.log(this.selectedContract)
+        this.selectedContract = contract;
+    }
+
     onUpdateEmailPopup() {
-        this.formUpdateEmailPopup.show();
-        this.formContractPopup.isUpdate = true;
+        this.formUpdateEmailContractPopup.show();
+        this.formUpdateEmailContractPopup.selectedContract = this.selectedContract;
+        this.formUpdateEmailContractPopup.updateFormValue(this.selectedContract);
     }
 }

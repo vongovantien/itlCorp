@@ -2,7 +2,6 @@
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -39,5 +38,6 @@ namespace eFMS.API.Catalogue.DL.IService
         bool SendMailARConfirmed(string partnerId, string contractId, string partnerType);
         IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria);
         string CheckExistedContract(CatContractModel model);
+        Task<HandleState> UpdateEmailContract(Guid id, UpdateEmailContractModel model);
     }
 }
