@@ -1,5 +1,5 @@
-import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
-import { reducer, AdvancePaymentListState } from "./advance-payment.reducer";
+import { ActionReducerMap, createFeatureSelector, createSelector } from "@ngrx/store";
+import { AdvancePaymentListState, reducer } from "./advance-payment.reducer";
 
 export * from './advance-payment.reducer';
 export interface IAdvancePaymentState {
@@ -14,6 +14,7 @@ export const getAdvancePaymentSearchParamsState = createSelector(advancePayment,
 export const getAdvancePaymentListState = createSelector(advancePayment, (state: IAdvancePaymentState) => state.list?.advances);
 export const getAdvancePaymentListPagingState = createSelector(advancePayment, (state: IAdvancePaymentState) => state.list.pagingData);
 export const getAdvancePaymentListLoadingState = createSelector(advancePayment, (state: IAdvancePaymentState) => state.list.isLoading);
+export const getAdvanceDetailState = createSelector(advancePayment, (state: IAdvancePaymentState) => state.list.advanceDetail);
 export const reducers: ActionReducerMap<IAdvancePaymentState> = {
     list: reducer
 };

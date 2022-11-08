@@ -12,6 +12,7 @@ import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
+import { getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
@@ -40,7 +41,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     isOps: boolean = false;
     edocByJob: any[] = [];
     edocByAcc: any[] = [];
-    selectedEdoc: IEDoc;
+    selectedEdoc: IEDocItem;
     transactionType: string = '';
     housebills: any[] = [];
     jobs: any[] = [];
@@ -143,13 +144,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Attach Person', field: 'userCreated', sortable: true },
             ];
         } else {
-
+            this.getJobList();
             this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
             this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
             { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-            { title: 'House Bill No', field: 'hblNo', sortable: true },
+            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
             { title: 'Job No', field: 'jobNo' },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
@@ -159,8 +160,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
-            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
-            { title: 'Billing No', field: 'billingNo', sortable: true },
+            { title: 'House Bill No', field: 'hblNo', sortable: true },
+            { title: 'Billing Nos', field: 'billingNo', sortable: true },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
@@ -198,33 +199,67 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.getHblList();
     }
     getJobList() {
-        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        )
-            .subscribe(
-                (data) => {
-                    if (!!data) {
-                        console.log(_uniqBy(data, 'jobId'));
-                        console.log(this.jobs);
-                        this.jobs = [];
-                        _uniqBy(data, 'hbl').forEach(element => {
-                            let item = ({
-                                jobNo: element.jobId,
-                                id: element.shipmentId
-                                // hwbno: element.hbl,
-                                // jobNo: element.jobId,
-                                // id: element.hblid,
-                                // jobId: element.shipmentId,
-                            })
-
-                            this.jobs.push(item);
-                            //console.log(this.housebills);
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            console.log(_uniqBy(data, 'jobId'));
                             console.log(this.jobs);
+                            this.jobs = [];
+                            _uniqBy(data, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobNo: element.jobId,
+                                    id: element.shipmentId
+                                    // hwbno: element.hbl,
+                                    // jobNo: element.jobId,
+                                    // id: element.hblid,
+                                    // jobId: element.shipmentId,
+                                })
+
+                                this.jobs.push(item);
+                                //console.log(this.housebills);
+                                console.log(this.jobs);
+                            }
+                            );
                         }
-                        );
                     }
-                }
-            );
+                );
+        } else if (this.typeFrom === 'Advance') {
+            this._store.select(getAdvanceDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            console.log(_uniqBy(data, 'jobId'));
+                            console.log(data);
+                            this.jobs = [];
+                            data.data.forEach(element => {
+                                this.jobs.push(({ jobNo: element.jobId }))
+                            });
+                            // _uniqBy(data, 'jobId').forEach(element => {
+                            //     let item = ({
+                            //         jobNo: element.jobId,
+                            //         //id: element.shipmentId
+                            //         // hwbno: element.hbl,
+                            //         // jobNo: element.jobId,
+                            //         // id: element.hblid,
+                            //         // jobId: element.shipmentId,
+                            //     })
+
+                            //     this.jobs.push(item);
+                            //     //console.log(this.housebills);
+                            //     console.log(this.jobs);
+                            // }
+                            // );
+                        }
+                    }
+                );
+        }
+
     }
     getHblList() {
         this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
@@ -295,7 +330,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
     editEdoc() {
         console.log(this.selectedEdoc);
-        if (this.typeFrom === 'Settlement') {
+        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
             this.documentAttach.headers = this.headerSettleAttach;
 
         } else {
@@ -308,10 +343,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.documentTypes.find(x => x.nameEn === this.selectedEdoc.documentTypeName);
         console.log(docType);
         let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
-        if (docType === undefined) {
+        if (this.selectedEdoc.userFileName.substring(0, 3) === 'OTH') {
             this.documentTypes.push(({ id: this.selectedEdoc.documentTypeId, code: "OTH", nameEn: 'Other' }));
             docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
-        } else {
+        }
+        else {
             this.documentTypes.splice(this.documentTypes.findIndex(x => x.code === 'OTH'), 1);
         }
         let detailSeletedEdoc = ({
@@ -398,8 +434,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     catchError(this.catchError),
                 )
                 .subscribe(
-                    (res: any[]) => {
-                        console.log(res);
+                    (res: any) => {
                         this.edocByAcc = res;
                         this.onChange.emit(res);
                     },
@@ -407,7 +442,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
     showDocumentAttach() {
-        if (this.typeFrom === 'Settlement') {
+        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advacne') {
             this.documentAttach.headers = this.headerSettleAttach;
         } else {
             this.documentAttach.headers = this.headerAttach;
@@ -438,7 +473,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 }
-interface IEDoc {
+interface IEDocItem {
     billingNo: string;
     billingType: string;
     datetimeCreated: Date;
@@ -463,4 +498,9 @@ interface IEDoc {
     userModified: string;
     documentTypeName: string;
     transactionType: string;
+}
+
+interface IEDoc {
+    documentType: any;
+    eDocs: IEDocItem[];
 }
