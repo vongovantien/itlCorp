@@ -37,6 +37,7 @@ export class FormUpdateEmailContractComponent extends PopupBase {
     ngOnInit() {
         this.initForm();
     }
+
     initForm() {
         this.formGroup = this._fb.group({
             salesman: [null],
@@ -46,18 +47,6 @@ export class FormUpdateEmailContractComponent extends PopupBase {
         });
         this.salesman = this.formGroup.controls['salesman'];
         this.email = this.formGroup.controls['email'];
-    }
-
-    getFormData() {
-        this.isSubmitted = true;
-        if (this.formGroup.valid) {
-            const formBody = this.formGroup.getRawValue();
-            delete formBody['salesman']
-            const cloneObject = {
-                email: !!formBody.email ? formBody.email : null
-            };
-            return cloneObject;
-        }
     }
 
     updateFormValue(data: Contract) {
@@ -70,9 +59,11 @@ export class FormUpdateEmailContractComponent extends PopupBase {
     }
 
     onSubmit() {
-        const mergeObj = this.getFormData();
+        this.isSubmitted = true;
         if (this.formGroup.valid) {
-            this._catalogueRepo.updateEmailContract(this.selectedContract.id, mergeObj.email)
+            const formBody = this.formGroup.getRawValue();
+            delete formBody['salesman']
+            this._catalogueRepo.updateEmailContract(this.selectedContract.id, formBody.email)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

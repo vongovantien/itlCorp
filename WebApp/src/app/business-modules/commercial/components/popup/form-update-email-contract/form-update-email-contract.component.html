@@ -28,9 +28,9 @@
                                 [ngClass]="{ 'm-form__group has-danger': (email.dirty && !email.valid) || (isSubmitted && !email.valid) }">
                                 <label>Email</label>
                                 <textarea class="form-control" cols="30" rows="10" formControlName="email"></textarea>
-                            </div>
-                            <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
-                                You cannot input more than 500 characters!
+                                <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
+                                    You cannot input more than 500 characters!
+                                </div>
                             </div>
                         </div>
                     </div>
