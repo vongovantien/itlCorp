@@ -596,7 +596,13 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPut("UpdateEmailContract/{id}")]
         public async Task<IActionResult> UpdateEmailContract(Guid id, UpdateEmailContractModel model)
         {
-            HandleState result = await catContractService.UpdateEmailContract(id, model);
+            var hs = await catContractService.UpdateEmailContract(id, model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
 

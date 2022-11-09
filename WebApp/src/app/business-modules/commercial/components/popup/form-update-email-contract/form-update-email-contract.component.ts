@@ -79,13 +79,13 @@ export class FormUpdateEmailContractComponent extends PopupBase {
             this._catalogueRepo.updateEmailContract(this.selectedContract.id, mergeObj)
                 .pipe(catchError(this.catchError))
                 .subscribe(
-                    (res: any) => {
-                        if (res.success) {
-                            this._toastService.success('Updated email contract successfully!');
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
                             this.onRequest.emit(true)
                             this.hide();
                         } else {
-                            this._toastService.error("Opps", "Something getting error!");
+                            this._toastService.error(res.message);
                         }
                     }
                 );
