@@ -180,7 +180,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             KeyS3 = key
                         };
                         list.Add(sysImage);
-                        if (type == "Shipment")
+                         if (type == "Shipment")
                         {
                             var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
                             var sysImageDetail = new SysImageDetail
@@ -235,7 +235,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = edoc.AliasName + clearPrefix(edoc.AliasName),
+                                        SystemFileName = attachTemplate.Code + clearPrefix(edoc.AliasName),
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -271,7 +271,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = edoc.Code + "_" + sysImage.Name,
+                                        SystemFileName = attachTemplate.Code + clearPrefix(edoc.AliasName),
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
