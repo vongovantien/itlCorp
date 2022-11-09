@@ -196,7 +196,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Hblid = edoc.HBL,
                                 JobId = (Guid)edoc.JobId,
                                 OfficeId = currentUser.OfficeID,
-                                SystemFileName = attachTemplate.Code + "_" + edoc.AliasName,
+                                SystemFileName = attachTemplate.Code  + clearPrefix(edoc.AliasName),
                                 UserCreated = currentUser.UserName,
                                 UserFileName = fileName,
                                 UserModified = currentUser.UserName,
@@ -235,7 +235,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Id = Guid.NewGuid(),
                                         JobId = item.JobId,
                                         UserCreated = sysImage.UserCreated,
-                                        SystemFileName = attachTemplate.Code +"_" + edoc.AliasName,
+                                        SystemFileName = edoc.AliasName + clearPrefix(edoc.AliasName),
                                         UserFileName = sysImage.Name,
                                         UserModified = sysImage.UserCreated,
                                         Source = type,
@@ -408,9 +408,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = "OTH_" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
+                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
-                        UserFileName = clearPrefix(x.UserFileName),
+                        UserFileName = x.UserFileName+clearPrefix(x.UserFileName),
                         Id = x.Id,
                         TransactionType=transactionType,
                         Note=x.Note,
@@ -719,7 +719,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (edoc != null)
                 {
                     var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
-                    edoc.SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName);
+                    edoc.SystemFileName = attachCode  + clearPrefix(edocUpdate.SystemFileName);
                     //edoc.UserFileName = clearPrefix(edocUpdate.SystemFileName);
                     edoc.Hblid = edocUpdate.Hblid;
                     edoc.Note = edocUpdate.Note;
@@ -734,7 +734,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var edocGenAdd = new SysImageDetail()
                     {
                         DocumentTypeId = edocUpdate.DocumentTypeId,
-                        SystemFileName = attachCode + "_" + clearPrefix(edocUpdate.SystemFileName),
+                        SystemFileName = attachCode + clearPrefix(edocUpdate.SystemFileName),
                         //UserFileName = clearPrefix(edocUpdate.SystemFileName),
                         Hblid = edocUpdate.Hblid,
                         Note = edocUpdate.Note,
@@ -767,15 +767,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             string code = null;
             prefixs.ForEach(x =>
             {
-                if (fileName.Contains(x)) {
+                if (fileName.Contains(x))
+                {
                     code = x;
                 }
             });
             if (code != null)
             {
-                 return fileName.Remove(0, code.Length).ToString();
+                return '_'+ fileName.Remove(0, code.Length).ToString();
             }
-            return fileName;
+            return '_'+fileName;
         }
 
         private List<TransctionTypeJobModel> GetTransactionTypeJobBillingModel(string billingType, string billingId)
