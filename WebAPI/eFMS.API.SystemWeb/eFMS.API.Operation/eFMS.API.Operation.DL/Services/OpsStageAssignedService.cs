@@ -99,6 +99,7 @@ namespace eFMS.API.Operation.DL.Services
                     var assignedItem = mapper.Map<OpsStageAssigned>(item);
                     assignedItem.Id = Guid.NewGuid();
                     assignedItem.JobId = jobId;
+                    assignedItem.Type = OperationConstants.FROM_USER;
                     assignedItem.Deadline = item.Deadline ?? null;
                     assignedItem.Status = OperationConstants.InSchedule;
                     assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;

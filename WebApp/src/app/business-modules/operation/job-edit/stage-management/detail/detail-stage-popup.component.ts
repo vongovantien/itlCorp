@@ -83,7 +83,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             mainPersonInCharge: [null, Validators.required],
             realPersonInCharge: [null],
             'status': [this.statusStage[0]],
-            'hblNo': null
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];

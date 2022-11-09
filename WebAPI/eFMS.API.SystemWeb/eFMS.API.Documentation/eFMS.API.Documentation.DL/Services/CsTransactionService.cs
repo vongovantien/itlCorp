@@ -24,7 +24,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -1072,7 +1071,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.Containers = containers;
                 }
             }
-            if(result != null && result.JobNo != null && result.HblId == null)
+            if (result != null && result.JobNo != null && result.HblId == null)
             {
                 var surchargesOrg = csShipmentSurchargeRepo.Get(x => x.JobNo == jobOps);
                 var surchargesLink = csShipmentSurchargeRepo.Get(x => x.JobNo == result.JobNo);
@@ -2969,9 +2968,9 @@ namespace eFMS.API.Documentation.DL.Services
                             revenue = surcharge.Total;
                         }
                         string _paymentStatus = string.Empty;
-                        if(surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
-                            if(surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                            if (surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
                             {
                                 var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
                                 _paymentStatus = acct?.PaymentStatus;
@@ -3677,9 +3676,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
                            && y.SaleManId == tranDes.SaleManId && y.Active == true
-                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated"||y.ShipmentType== "Freehand & Nominated"));
+                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated" || y.ShipmentType == "Freehand & Nominated"));
         }
-        
+
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
         {
             CatStage stage = null;
@@ -3745,7 +3744,8 @@ namespace eFMS.API.Documentation.DL.Services
                         CsStageAssignedModel newStage = new CsStageAssignedModel();
                         newStage.Id = Guid.NewGuid();
                         newStage.StageId = stage.Id;
-                        newStage.Status = TermData.Done; ;
+                        newStage.Status = TermData.Done;
+                        newStage.Type = DocumentConstants.FROM_SYSTEM;
                         newStage.DatetimeCreated = newStage.DatetimeModified = newStage.Deadline = DateTime.Now;
                         newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
                         if (model.TransactionType == TermData.CsTransaction)
