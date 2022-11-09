@@ -245,10 +245,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 contract.CreditLimit = 20000000;
                 contract.CreditLimitRate = 120;
             }
-            if(contract.ContractType == "Cash")
+            if (contract.ContractType == "Cash")
             {
                 contract.ShipmentType = "Nominated";
-            } else
+            }
+            else
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
@@ -448,7 +449,8 @@ namespace eFMS.API.Catalogue.DL.Services
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
-            } else
+            }
+            else
             {
                 entity.ShipmentType = "Freehand & Nominated";
 
@@ -527,11 +529,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Delete(Guid id)
         {
             var contract = DataContext.First(x => x.Id == id);
-            if(contract == null)
+            if (contract == null)
             {
                 return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
             }
-            if(contract.Active == true)
+            if (contract.Active == true)
             {
                 return new HandleState((object)string.Format("The Contract is active"));
             }
@@ -1605,14 +1607,14 @@ namespace eFMS.API.Catalogue.DL.Services
             bool result = SendMail.Send(subject, body, lstTo, null, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
-               SentUser = SendMail._emailFrom,
-               Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
-               Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
-               Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
-               Subject = subject,
-               Sent = result,
-               SentDateTime = DateTime.Now,
-               Body = body
+                SentUser = SendMail._emailFrom,
+                Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
+                Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
+                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
+                Subject = subject,
+                Sent = result,
+                SentDateTime = DateTime.Now,
+                Body = body
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
@@ -1629,7 +1631,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var departmentsUser = userlevelRepository.Get(x => x.UserId == currentUser.UserID).Select(x => x.DepartmentId).ToList();
             var departments = catDepartmentRepository.Get(x => (x.DeptType == "AR" || x.DeptType == "ACCOUNTANT") && departmentsUser.Any(z => z == x.Id));
-            if(departments.Count() > 1)
+            if (departments.Count() > 1)
             {
                 var department = departments.Where(x => x.Id == currentUser.DepartmentId).FirstOrDefault();
                 return (department == null ? new List<string>() : department.Email?.Split(";").ToList());
@@ -1907,11 +1909,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     var partnerId = criteria.IsGetChild == true ? partnerAcRef.Id : partnerAcRef.ParentId;
                     // IQueryable <CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == partnerId && x.Active == (criteria.Status ?? true));
                     Expression<Func<CatContract, bool>> queryContract = x => x.PartnerId == partnerId;
-                    if(criteria.Status != null)
+                    if (criteria.Status != null)
                     {
                         queryContract = queryContract.And(x => x.Active == criteria.Status);
                     }
-                    if(!string.IsNullOrEmpty(criteria.SalesmanId))
+                    if (!string.IsNullOrEmpty(criteria.SalesmanId))
                     {
                         queryContract = queryContract.And(x => x.SaleManId == criteria.SalesmanId);
                     }
@@ -1957,6 +1959,15 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatContract GetContractById(Guid Id)
         {
             return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+        }
+
+        public async Task<HandleState> UpdateEmailContract(Guid id, UpdateEmailContractModel model)
+        {
+            HandleState hs = new HandleState();
+            CatContract contract = DataContext.First(x => x.Id == id);
+            contract.EmailAddress = model.email;
+            hs = await DataContext.UpdateAsync(contract, x => x.Id == id);
+            return hs;
         }
 
         private bool IsMatchService(string saleService, string serviceTerm)

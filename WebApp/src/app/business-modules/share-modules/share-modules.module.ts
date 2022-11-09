@@ -6,6 +6,7 @@ import { DirectiveModule } from "src/app/shared/directives/directive.module";
 import { PipeModule } from "src/app/shared/pipes/pipe.module";
 import { CommercialBankListComponent } from './../commercial/components/bank/commercial-bank-list.component';
 import { PayableComponent } from './../commercial/components/payable/payable.component';
+import { FormUpdateEmailContractComponent } from './../commercial/components/popup/form-update-email-contract/form-update-email-contract.component';
 import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent, ShareModulesInputShipmentPopupComponent, ShareModulesReasonRejectPopupComponent } from './components';
 
 import { CollapseModule } from 'ngx-bootstrap/collapse';
@@ -33,6 +34,7 @@ const COMPONENTS = [
     CommercialEmailListComponent,
     CommercialBankListComponent,
     FormUpdateEmailCommercialCatalogueComponent,
+    FormUpdateEmailContractComponent,
     ShareModulesReasonRejectPopupComponent,
     FormSearchExportComponent,
     ShareBussinessAdjustDebitValuePopupComponent,

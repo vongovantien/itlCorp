@@ -1,14 +1,14 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PopupBase } from '@app';
-import { SystemRepo, CatalogueRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
 import { Office } from '@models';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize } from 'rxjs/operators';
 import { PartnerEmail } from 'src/app/shared/models/catalogue/partnerEmail.model';
-import _cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'popup-update-email-commercial-catalogue',
     templateUrl: 'form-update-email-commercial-catalogue.popup.html'
@@ -22,7 +22,7 @@ export class FormUpdateEmailCommercialCatalogueComponent extends PopupBase {
     email: AbstractControl;
     partnerId: string = '';
     id: string = '';
-
+    isUpdated: Boolean = false;
     indexDetailEmail: number = null;
 
     formGroup: FormGroup;

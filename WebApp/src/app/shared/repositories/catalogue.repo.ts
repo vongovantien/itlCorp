@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { ApiService } from "../services";
-import { environment } from "src/environments/environment";
-import { throwError, BehaviorSubject } from "rxjs";
-import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
+import { ApiService } from "../services";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -1405,4 +1405,14 @@ export class CatalogueRepo {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetDetailById/${id}`);
 
     }
+
+    updateEmailContract(id: string, body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/UpdateEmailContract/${id}`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        )
+    }
+
 }

@@ -15,31 +15,22 @@
             <div class="modal-body">
                 <form class="m-form m-form--state" [formGroup]="formGroup">
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
-                                <label required>Office</label>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Salesman</label>
                                 <div class="pos-rel">
-                                    <ng-select [items]="offices" [clearable]="true" class="custom"
-                                        formControlName="officeId" bindLabel="text" placeholder="Please select">
-                                    </ng-select>
+                                    <input class="form-control" formControlName="salesman" type="text" readonly />
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && type.invalid}">
-                                <label required>Type</label>
-                                <ng-select [items]="types" class="custom" formControlName="type"
-                                    placeholder="Please select">
-                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':( isSubmitted || email.dirty )  && email.invalid}">
-                                <label required>Email</label>
+                                [ngClass]="{ 'm-form__group has-danger': (email.dirty && !email.valid) || (isSubmitted && !email.valid) }">
+                                <label>Email</label>
                                 <textarea class="form-control" cols="30" rows="10" formControlName="email"></textarea>
+                            </div>
+                            <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
+                                You cannot input more than 500 characters!
                             </div>
                         </div>
                     </div>
