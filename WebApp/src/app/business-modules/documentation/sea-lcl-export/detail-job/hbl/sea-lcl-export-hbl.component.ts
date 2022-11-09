@@ -32,4 +32,19 @@ export class SeaLCLExportHBLComponent extends AppShareHBLBase implements OnInit 
         super(_sortService, _store, _spinner, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo, _exportRepo, _fileMngtRepo);
     }
 
+    configHBL() {
+        this.headers = [
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'Customer', field: 'customerName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
+            { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
+            { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
+            { title: 'Package', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
+            { title: 'CBM', field: 'cbm', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Department', field: 'department', sortable: true }
+        ];
+    }
+
 }
