@@ -113,7 +113,7 @@
                                 [currentActiveItemId]="{ field: 'id', value: partnerMapping.value}"
                                 (itemSelected)="onSelectDataFormInfo($event,'partner')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
-                                (remove)="resetFormControl(partnerMapping)"
+                                (remove)="resetPartnerMapping(partnerMapping)"
                                 [displayFields]="displayFieldsPartner"
                                 placeholder="Select Partner">
                             </app-combo-grid-virtual-scroll>
