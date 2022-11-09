@@ -121,9 +121,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         else if (this.typeFrom === 'Settlement') {
 
             this.transactionType = this.typeFrom;
+            this.getJobList();
             this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
-            this.getJobList();
             this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
             { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
             //{ title: 'House Bill No', field: 'hblNo', sortable: true },
@@ -133,8 +133,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Attach Person', field: 'userCreated', sortable: true },
             ];
         } else {
-            this.getJobList();
             this.transactionType = this.typeFrom;
+            this.getJobList();
             this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
             this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
@@ -213,7 +213,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         if (!!data) {
                             console.log(_uniqBy(data, 'jobId'));
                             console.log(this.jobs);
-                            this.jobs = [];
+                            //this.jobs = [];
                             _uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     jobNo: element.jobId,
@@ -236,7 +236,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         if (!!data) {
                             console.log(_uniqBy(data, 'jobId'));
                             console.log(data);
-                            this.jobs = [];
+                            //this.jobs = [];
                             for (let element of data) {
                                 this.jobs.push({ jobNo: element.jobId, })
                             }
@@ -287,7 +287,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.documentTypes.find(x => x.nameEn === this.selectedEdoc.documentTypeName);
         console.log(docType);
         let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
-        if (this.selectedEdoc.userFileName.substring(0, 3) === 'OTH') {
+        console.log(this.selectedEdoc);
+        if (this.selectedEdoc.billingType === 'Other') {
+
             this.documentTypes.push(({ id: this.selectedEdoc.documentTypeId, code: "OTH", nameEn: 'Other' }));
             docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
         }

@@ -196,7 +196,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Hblid = edoc.HBL,
                                 JobId = (Guid)edoc.JobId,
                                 OfficeId = currentUser.OfficeID,
-                                SystemFileName = attachTemplate.Code  + clearPrefix(edoc.AliasName),
+                                SystemFileName = attachTemplate.Code + clearPrefix(edoc.AliasName),
                                 UserCreated = currentUser.UserName,
                                 UserFileName = fileName,
                                 UserModified = currentUser.UserName,
@@ -410,7 +410,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserModified = x.UserModified,
                         SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
                         JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
-                        UserFileName = x.UserFileName+clearPrefix(x.UserFileName),
+                        UserFileName = x.UserFileName,
                         Id = x.Id,
                         TransactionType=transactionType,
                         Note=x.Note,
@@ -774,7 +774,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             if (code != null)
             {
-                return '_'+ fileName.Remove(0, code.Length).ToString();
+                return '_'+ fileName.Remove(0, code.Length+1).ToString();
             }
             return '_'+fileName;
         }
@@ -933,8 +933,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = Guid.NewGuid(),
                         JobId = item.JobId,
                         UserCreated = sysImage.UserCreated,
-                        SystemFileName = Path.GetFileNameWithoutExtension(sysImage.Name.Contains(item.Code+"_") ? sysImage.Name : item.Code+"_" + sysImage.Name),
-                        UserFileName = sysImage.Name.Contains(item.Code + "_") ?sysImage.Name: item.Code + "_" + sysImage.Name,
+                        SystemFileName = Path.GetFileNameWithoutExtension(sysImage.Name.Contains(item.Code) ? sysImage.Name : item.Code+"_"+ sysImage.Name),
+                        UserFileName =sysImage.Name,
                         UserModified = sysImage.UserCreated,
                         Source = billingType,
                         DocumentTypeId = GetDocumentTypeWithTypeAttachTemplate(type, item.TransactionType, item.Code, billingType)?.FirstOrDefault()?.Id,
