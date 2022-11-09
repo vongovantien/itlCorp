@@ -55,7 +55,7 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.UserCreated = assignedItem.UserModified = currentUser.UserID;
             assignedItem.OrderNumberProcessed = orderNumber + 1;
             assignedItem.Type = OperationConstants.FROM_USER;
-            assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId)?.Hwbno;
+            assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.Hblid)?.Hwbno;
 
             DataContext.Add(assignedItem, false);
             if (model.IsUseReplicate)
@@ -177,7 +177,7 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState Update(OpsStageAssignedEditModel model)
         {
-            var houseBill = csTransactionDetailReporsitory.First(x => x.Id == model.HblId);
+            var houseBill = csTransactionDetailReporsitory.First(x => x.Id == model.Hblid);
             var assigned = mapper.Map<OpsStageAssigned>(model);
             assigned.UserModified = currentUser.UserID;
             assigned.DatetimeModified = DateTime.Now;
