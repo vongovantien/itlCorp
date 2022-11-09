@@ -62,6 +62,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -93,6 +94,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
+            IContextBase<SysImageDetail> imageDetailRepo,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
@@ -124,6 +126,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctApproveSettlementRepository = acctApproveSettlementRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             settingFlowRepository = settingFlowRepo;
+            imageDetailRepository = imageDetailRepo;
         }
 
         #region -- Insert & Update SOA
@@ -528,6 +531,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Delete Credit AR
             if (soa.Type == "Credit" && hs.Success)
             {
+                imageDetailRepository.Delete(x => x.BillingNo == soa.Soano);
                 return new ResultHandle() { Status = true, Message = "Data delete success", Data = surcharges };
                 //UpdateAcctCreditManagement(surcharges, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Delete");
             }

@@ -385,7 +385,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
     showDocumentAttach() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advacne') {
+        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
             this.documentAttach.headers = this.headerSettleAttach;
         } else {
             this.documentAttach.headers = this.headerAttach;
