@@ -1385,12 +1385,12 @@ namespace eFMS.API.Accounting.DL.Services
                                                select new
                                                {
                                                    acc,
-                                                   BillingNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano
+                                                   BillingNo = surcharge.SyncedFrom == "CDNOTE" ? surcharge.DebitNo : (surcharge.SyncedFrom == "SOA" ? surcharge.Soano : string.Empty)
                                                };
                         var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
                         foreach(var item in invOBHGrp)
                         {
-                            if(item.Any(x=>x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                            if(item.All(x=>x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
                             {
                                 invoiceData.AddRange(item.Select(x => x.acc));
                             }
