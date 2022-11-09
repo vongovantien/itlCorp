@@ -38,6 +38,6 @@ namespace eFMS.API.Catalogue.DL.IService
         bool SendMailARConfirmed(string partnerId, string contractId, string partnerType);
         IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria);
         string CheckExistedContract(CatContractModel model);
-        Task<HandleState> UpdateEmailContract(Guid id, UpdateEmailContractModel model);
+        Task<HandleState> UpdateEmailContract(Guid id, string email);
     }
 }

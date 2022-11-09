@@ -1961,11 +1961,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
         }
 
-        public async Task<HandleState> UpdateEmailContract(Guid id, UpdateEmailContractModel model)
+        public async Task<HandleState> UpdateEmailContract(Guid id, string email)
         {
             HandleState hs = new HandleState();
             CatContract contract = DataContext.First(x => x.Id == id);
-            contract.EmailAddress = model.email;
+            contract.EmailAddress = email;
             hs = await DataContext.UpdateAsync(contract, x => x.Id == id);
             return hs;
         }
