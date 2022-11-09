@@ -71,7 +71,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             PreviewTemplateCodeMappingAttachTemplateCode.Add("INVOICE", "INV");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MAWB", "MAWB");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MNF", "MNF");
-            PreviewTemplateCodeMappingAttachTemplateCode.Add("POD", "POD");
+            //PreviewTemplateCodeMappingAttachTemplateCode.Add("POD", "POD");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("AT", "OTH"); // Attach List
             PreviewTemplateCodeMappingAttachTemplateCode.Add("CoverPage", "OTH"); // Coverpage
             PreviewTemplateCodeMappingAttachTemplateCode.Add("PLSheet", "OTH"); // PL
@@ -1164,8 +1164,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             HandleState result = new HandleState();
             try
             {
-                string codeMapping = PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
-                string code = string.IsNullOrEmpty(codeMapping) ? "OTH" : codeMapping;
+                bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
+            
+                string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 var imageDetail = new SysImageDetail
                 {
                     Id = Guid.NewGuid(),
