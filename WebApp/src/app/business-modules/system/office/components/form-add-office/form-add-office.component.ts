@@ -9,7 +9,7 @@ import { AppForm } from 'src/app/app.form';
 
 import { Store } from '@ngrx/store';
 import { checkShareSystemUserLevel, IShareSystemState } from './../../../store';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { Observable } from 'rxjs';
 import { CommonEnum } from '@enums';
 
@@ -161,7 +161,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     }
 
     resetPartnerMapping(data: any){
-        this.partnerMapping.setValue('00000000-0000-0000-0000-000000000000');
+        this.partnerMapping.setValue(SystemConstants.EMPTY_GUID);
     }
 
     initForm() {
