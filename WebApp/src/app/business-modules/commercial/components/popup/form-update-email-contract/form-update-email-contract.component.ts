@@ -3,7 +3,6 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Contract } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { catchError } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
@@ -54,13 +53,10 @@ export class FormUpdateEmailContractComponent extends PopupBase {
         if (this.formGroup.valid) {
             const formBody = this.formGroup.getRawValue();
             delete formBody['salesman']
-            console.log(formBody)
             const cloneObject = {
-                partnerId: !!formBody ? formBody.partnerId : null,
                 email: !!formBody.email ? formBody.email : null
             };
-            const mergeObj = Object.assign(_merge(formBody, cloneObject));
-            return mergeObj;
+            return cloneObject;
         }
     }
 
@@ -76,7 +72,7 @@ export class FormUpdateEmailContractComponent extends PopupBase {
     onSubmit() {
         const mergeObj = this.getFormData();
         if (this.formGroup.valid) {
-            this._catalogueRepo.updateEmailContract(this.selectedContract.id, mergeObj)
+            this._catalogueRepo.updateEmailContract(this.selectedContract.id, mergeObj.email)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

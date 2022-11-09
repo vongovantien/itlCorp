@@ -1394,8 +1394,8 @@ export class CatalogueRepo {
 
     }
 
-    updateEmailContract(id: string, body: any) {
-        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/UpdateEmailContract/${id}`, body).pipe(
+    updateEmailContract(id: string, email: string) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/UpdateEmailContract`, null, { id: id, email: email }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
