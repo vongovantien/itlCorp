@@ -80,7 +80,7 @@
                                                             <input type="text" class="form-control "
                                                                 [ngModel]="file.jobNo" disabled>
                                                         </div> -->
-                                                        <select class="form-control" [(ngModel)]="file.jobNo"
+                                                        <select class="form-control" [(ngModel)]="file.job"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
                                                             <option *ngFor="let job of jobs" [ngValue]="job">
                                                                 {{job.jobNo}}
