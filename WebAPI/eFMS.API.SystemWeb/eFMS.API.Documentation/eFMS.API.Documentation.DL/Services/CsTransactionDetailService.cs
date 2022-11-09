@@ -1384,7 +1384,6 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             surchareRepository.Delete(x => x.Id == item.Id, false);
                         }
-                        imageDetailRepository.Delete(x => x.Hblid == hbId);
                         DataContext.Delete(x => x.Id == hbl.Id);
                         DataContext.SubmitChanges();
                         surchareRepository.SubmitChanges();
@@ -1398,6 +1397,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             return hs;
 
+        }
+
+        public void DeleteEdoc(Guid hbId)
+        {
+            imageDetailRepository.Delete(x => x.Hblid == hbId);
         }
 
         #region --- PREVIEW ---

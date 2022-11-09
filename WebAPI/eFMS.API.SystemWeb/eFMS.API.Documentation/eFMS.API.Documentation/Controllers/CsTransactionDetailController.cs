@@ -20,6 +20,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -166,6 +167,8 @@ namespace eFMS.API.Documentation.Controllers
                     if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
+                        //del edoc
+                        csTransactionDetailService.DeleteEdoc(id);
                     }
                 });
             }

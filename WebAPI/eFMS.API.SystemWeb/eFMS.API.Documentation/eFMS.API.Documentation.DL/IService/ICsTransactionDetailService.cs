@@ -69,5 +69,6 @@ namespace eFMS.API.Documentation.DL.IService
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
         Task<HandleState> UpdateFlightInfo(Guid Id);
         List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
+        void DeleteEdoc(Guid HBLId);
     }
 }
