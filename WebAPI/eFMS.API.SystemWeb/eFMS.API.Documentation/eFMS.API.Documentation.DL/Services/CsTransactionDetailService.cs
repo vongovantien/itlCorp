@@ -61,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
         private readonly IContextBase<AcctCdnote> acctCdnoteRepository;
         private readonly IContextBase<SysGroup> sysGroupRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
@@ -100,6 +101,7 @@ namespace eFMS.API.Documentation.DL.Services
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             ICheckPointService checkPoint,
+            IContextBase<SysImageDetail> imageDetailRepo,
             ICsStageAssignedService stageAssigned, IStageService stageService
             ) : base(repository, mapper)
         {
@@ -137,6 +139,7 @@ namespace eFMS.API.Documentation.DL.Services
             checkPointService = checkPoint;
             csStageAssignedService = stageAssigned;
             catStageService = stageService;
+            imageDetailRepository = imageDetailRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -1381,6 +1384,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             surchareRepository.Delete(x => x.Id == item.Id, false);
                         }
+                        imageDetailRepository.Delete(x => x.Hblid == hbId);
                         DataContext.Delete(x => x.Id == hbl.Id);
                         DataContext.SubmitChanges();
                         surchareRepository.SubmitChanges();
