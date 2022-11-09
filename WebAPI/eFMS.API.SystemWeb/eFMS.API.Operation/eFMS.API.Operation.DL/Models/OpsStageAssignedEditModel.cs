@@ -1,28 +1,11 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using eFMS.API.Operation.Service.Models;
+using System;
 
 namespace eFMS.API.Operation.DL.Models
 {
-    public class OpsStageAssignedEditModel //: OpsStageAssigned
+    public class OpsStageAssignedEditModel : OpsStageAssigned
     {
-        public Guid Id { get; set; }
-        public Guid JobId { get; set; }
         public Guid? HblId { get; set; }
-        public string Hblno { get; set; }
-        [Required]
-        public int StageId { get; set; }
-        public string Name { get; set; }
-        public int? OrderNumberProcessed { get; set; }
-        public string MainPersonInCharge { get; set; }
-        public string RealPersonInCharge { get; set; }
-        public decimal? ProcessTime { get; set; }
-        public string Description { get; set; }
-        public string Comment { get; set; }
-        public DateTime? Deadline { get; set; }
-        public string Status { get; set; }
         public bool IsUseReplicate { get; set; }
-        public string Type { get; set; }
-        public string UserCreated { get; set; }
-        public DateTime? DatetimeCreated { get; set; }
     }
 }

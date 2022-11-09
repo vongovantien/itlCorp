@@ -52,9 +52,9 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-            assignedItem.UserCreated = currentUser.UserID;
+            assignedItem.UserCreated = assignedItem.UserModified = currentUser.UserID;
             assignedItem.OrderNumberProcessed = orderNumber + 1;
-            assignedItem.Type = model.Type == "User" ? "User" : "System";
+            assignedItem.Type = OperationConstants.FROM_USER;
             assignedItem.Hblno = csTransactionDetailReporsitory.First(x => x.Id == model.HblId)?.Hwbno;
 
             DataContext.Add(assignedItem, false);
@@ -103,7 +103,7 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.Deadline = item.Deadline ?? null;
                     assignedItem.Status = OperationConstants.InSchedule;
                     assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-                    assignedItem.UserCreated = currentUser.UserID;
+                    assignedItem.UserCreated = assignedItem.UserModified = currentUser.UserID;
                     DataContext.Add(assignedItem, false);
                 }
                 else
