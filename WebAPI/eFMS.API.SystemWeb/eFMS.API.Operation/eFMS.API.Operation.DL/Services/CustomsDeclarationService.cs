@@ -187,8 +187,8 @@ namespace eFMS.API.Operation.DL.Services
                 pattern.Replace(clearance.MA_DV, "");
             }
             string _accountNo = clearance.MA_DV;
-            var partner = customerRepository.Get(x => x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
-            if(partner != null)
+            var partner = customerRepository.Get(x => x.Active == true && x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
+            if (partner != null)
             {
                 _accountNo = partner.AccountNo;
             }
@@ -222,7 +222,8 @@ namespace eFMS.API.Operation.DL.Services
                 DepartmentId = currentUser.DepartmentId,
                 OfficeId = currentUser.OfficeID,
                 CompanyId = currentUser.CompanyID,
-                AccountNo = _accountNo
+                AccountNo = _accountNo,
+                Eta = clearance.NGAYDEN
             };
             return newItem;
         }
@@ -1320,7 +1321,7 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     var hs = Delete(x => x.Id == item.Id, false);
 
-                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id 
+                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id
                     && x.Source == OperationConstants.FROM_REPLICATE
                     && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
                     if(hasReplicate != null)

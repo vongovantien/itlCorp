@@ -35,31 +35,49 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !clearanceDate.value.startDate)}">
-                            <label class="form-control-label" required>
-                                Clearance Date
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
-                                    formControlName="clearanceDate" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(clearanceDate)"
-                                    *ngIf="!!clearanceDate.value && !!clearanceDate.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !clearanceDate.value.startDate)}">
+                                    <label class="form-control-label" required>
+                                        Clearance Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly placeholder="DD/MM/YYYY" formControlName="clearanceDate" />
+                                        <span class="m-input-icon_clear" (click)="resetFormControl(clearanceDate)"
+                                            *ngIf="!!clearanceDate.value && !!clearanceDate.value.startDate">
+                                            <i class="la la-times"></i>
+                                        </span>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="(clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !!clearanceDate.value && !clearanceDate.value.startDate)">
+                                        Clearance Date is required!
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-control-feedback"
-                                *ngIf="(clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !!clearanceDate.value && !clearanceDate.value.startDate)">
-                                Clearance Date is required!
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        ETA
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly placeholder="DD/MM/YYYY" formControlName="eta" calendar
+                                            [allowRemove]="!!eta.value && !!eta.value.startDate"
+                                            (remove)="resetFormControl(eta)" />
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

@@ -1230,6 +1230,10 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1384,6 +1388,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -1411,7 +1417,13 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -1534,6 +1546,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnName("SupplierID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
