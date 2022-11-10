@@ -22,6 +22,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
     {
         private ICurrentUser currentUser;
         private IContextBase<SysImage> _sysImageRepo;
+        private IContextBase<SysImageDetail> _sysImageDetailRepo;
         private readonly string _bucketName;
         private readonly string _domainTest;
         private readonly IOptions<ApiUrl> _apiUrl;
@@ -31,6 +32,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public AWSS3Service(IContextBase<SysImage> SysImageRepo,
             IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
+            IContextBase<SysImageDetail> sysImageDetailRepo,
             ICurrentUser currentUser,
             IOptions<ApiUrl> apiUrl,
             IS3Service s3,
@@ -44,6 +46,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _sysImageRepo = SysImageRepo;
             _apiUrl = apiUrl;
             edocService = edoc;
+            _sysImageDetailRepo = sysImageDetailRepo;
         }
 
         public async Task<HandleState> DeleteFile(string moduleName, string folder, Guid id)
@@ -65,6 +68,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 DeleteObjectResponse rsDelete = await _client.DeleteObjectAsync(request);
                 if (rsDelete != null)
                     result = await _sysImageRepo.DeleteAsync(x => x.Id == id);
+                if (result.Success)
+                {
+                    var imageDetail= _sysImageDetailRepo.Delete(x=>x.SysImageId==id);
+                }
                 return result;
             }
             catch (Exception ex)

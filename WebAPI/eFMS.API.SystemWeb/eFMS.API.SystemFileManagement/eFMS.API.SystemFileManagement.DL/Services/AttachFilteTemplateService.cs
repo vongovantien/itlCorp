@@ -66,7 +66,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         NameEn = x.FirstOrDefault().NameEn,
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 default:
-                    var jobs = await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType && x.Code != "OTH");
+                    var jobs = await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType);
                     var result = new List<DocumentTypeModel>();
                     jobs.ToList().ForEach(x =>
                      {
