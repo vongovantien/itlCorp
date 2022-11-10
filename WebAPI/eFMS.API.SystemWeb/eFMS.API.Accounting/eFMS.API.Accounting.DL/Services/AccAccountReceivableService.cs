@@ -1403,14 +1403,14 @@ namespace eFMS.API.Accounting.DL.Services
                             //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
                             if (contractModel.BaseOn == "Invoice Date")
                             {
-                                invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? contractModel.PaymentTerm : contractModel.PaymentTermObh;
+                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                             if (contractModel.BaseOn == "Confirmed Billing")
                             {
-                                invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE ? contractModel.PaymentTerm : contractModel.PaymentTermObh;
+                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
                         }
