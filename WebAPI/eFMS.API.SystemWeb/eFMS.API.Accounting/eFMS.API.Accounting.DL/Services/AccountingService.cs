@@ -615,7 +615,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (cdNotePartner != null)
                 {
                     var _partnerId = (cdNotePartner.Id == cdNotePartner.ParentId || string.IsNullOrEmpty(cdNotePartner.ParentId)) ? cdNotePartner.Id : cdNotePartner.ParentId;
-                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfDebitNote.Contains(x.SaleService));
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfDebitNote.Any(z => x.SaleService.Contains(z)));
                     if (contracts != null)
                     {
                         // Ưu tiên Official >> Trial >> Cash (Default là 1)
@@ -992,7 +992,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soaPartner != null)
                 {
                     var _partnerId = (soaPartner.Id == soaPartner.ParentId || string.IsNullOrEmpty(soaPartner.ParentId)) ? soaPartner.Id : soaPartner.ParentId;
-                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfSoaDebit.Contains(x.SaleService));
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfSoaDebit.Any(z => x.SaleService.Contains(z)));
                     if (contracts != null)
                     {
                         // Ưu tiên Official >> Trial >> Cash (Default là 1)
