@@ -30,7 +30,7 @@ build_uat:
   when: manual
   script:
     - cd WebApp
-    - npm run build:uat:en
+    - node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en
     - echo "end job_build"
   only:
     - feature-itl
