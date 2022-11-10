@@ -606,7 +606,31 @@ namespace eFMS.API.Accounting.DL.Services
                 var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                 surcharges = GetShipmentSurchargesData(surcharges);
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
-                var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
+                decimal? _dueDate = 1, _dueDateOBH = 1;//GetDueDate(cdNotePartner, servicesOfDebitNote);
+                if (cdNotePartner != null)
+                {
+                    var _partnerId = (cdNotePartner.Id == cdNotePartner.ParentId || string.IsNullOrEmpty(cdNotePartner.ParentId)) ? cdNotePartner.Id : cdNotePartner.ParentId;
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfDebitNote.Contains(x.SaleService));
+                    if (contracts != null)
+                    {
+                        // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                        var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
+                        if (contractsOffice != null)
+                        {
+                            _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                            _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                        }
+                        else
+                        {
+                            var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                            if (contractsTrial != null)
+                            {
+                                _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                            }
+                        }
+                    }
+                }
 
                 var hblId = string.Empty;
                 foreach (var surcharge in surcharges)
@@ -677,6 +701,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.OriginalAmount = _netAmount; //Thành tiến chưa thuế
                         charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+
+                        charge.DueDate = _dueDate;
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -723,9 +749,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
                         charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
-                    }
 
-                    charge.DueDate = _dueDate;
+                        charge.DueDate = _dueDateOBH;
+                    }
 
                     charges.Add(charge);
 
@@ -956,7 +982,32 @@ namespace eFMS.API.Accounting.DL.Services
                 var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
                 surcharges = GetShipmentSurchargesData(surcharges);
                 var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
-                var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+                //var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+                decimal? _dueDate = 1, _dueDateOBH = 1;
+                if (soaPartner != null)
+                {
+                    var _partnerId = (soaPartner.Id == soaPartner.ParentId || string.IsNullOrEmpty(soaPartner.ParentId)) ? soaPartner.Id : soaPartner.ParentId;
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfSoaDebit.Contains(x.SaleService));
+                    if (contracts != null)
+                    {
+                        // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                        var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
+                        if (contractsOffice != null)
+                        {
+                            _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                            _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                        }
+                        else
+                        {
+                            var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                            if (contractsTrial != null)
+                            {
+                                _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                            }
+                        }
+                    }
+                }
 
                 foreach (var surcharge in surcharges)
                 {
@@ -1023,6 +1074,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế
                         charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+
+                        charge.DueDate = _dueDate;
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -1069,9 +1122,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
                         charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
-                    }
 
-                    charge.DueDate = _dueDate;
+                        charge.DueDate = _dueDateOBH;
+                    }
 
                     charges.Add(charge);
                 }
