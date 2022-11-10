@@ -1,35 +1,32 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
-using ITL.NetCore.Connection;
-using System.Linq.Expressions;
-using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
 using System.Data.SqlClient;
-using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -991,6 +988,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCbm = model.Cbm,
                 Shipper = model.Shipper,
                 Consignee = model.Consignee,
+                Eta = model.Eta,
+                ClearanceDate = model.ClearanceDate,
                 BillingOpsId = currentUser.UserID,
                 GroupId = currentUser.GroupId,
                 DepartmentId = currentUser.DepartmentId,
@@ -1000,7 +999,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
+                ShipmentType = customerContract.ShipmentType == "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -1140,7 +1139,8 @@ namespace eFMS.API.Documentation.DL.Services
                         && x.SaleService.Contains("CL")
                         && x.Active == true
                         && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    } else
+                    }
+                    else
                     {
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")

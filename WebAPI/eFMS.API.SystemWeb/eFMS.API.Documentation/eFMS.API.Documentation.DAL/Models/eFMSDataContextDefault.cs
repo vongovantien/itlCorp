@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -857,9 +859,15 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.RemainVnd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SurchargeId).IsUnicode(false);
 
@@ -1319,7 +1327,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)
-                    .HasMaxLength(50)
+                    .HasMaxLength(1000)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
@@ -1883,6 +1891,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
+
             modelBuilder.Entity<CatStage>(entity =>
             {
                 entity.ToTable("catStage");
@@ -1936,8 +1945,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
-
-
 
             modelBuilder.Entity<CatUnit>(entity =>
             {
@@ -3776,6 +3783,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
