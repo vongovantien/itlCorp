@@ -244,7 +244,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport('HAWB');
+                            this.renderAndShowReport('HBL');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
