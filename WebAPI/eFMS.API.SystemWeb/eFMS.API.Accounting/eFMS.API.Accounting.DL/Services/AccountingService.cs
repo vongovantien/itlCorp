@@ -631,7 +631,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (contractsTrial != null)
                             {
                                 _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                                _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
                             }
                         }
                     }
@@ -1008,7 +1008,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (contractsTrial != null)
                             {
                                 _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                                _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
                             }
                         }
                     }
