@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Contract } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
+import { FormValidators } from '@validators';
 import { ToastrService } from 'ngx-toastr';
 import { catchError } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
@@ -41,8 +42,9 @@ export class FormUpdateEmailContractComponent extends PopupBase {
     initForm() {
         this.formGroup = this._fb.group({
             salesman: [null],
-            email: [null, Validators.compose([
-                Validators.maxLength(500)
+            email: ["", Validators.compose([
+                Validators.maxLength(500),
+                FormValidators.required
             ])]
         });
         this.salesman = this.formGroup.controls['salesman'];
@@ -63,13 +65,15 @@ export class FormUpdateEmailContractComponent extends PopupBase {
         if (this.formGroup.valid) {
             const formBody = this.formGroup.getRawValue();
             delete formBody['salesman']
-            this._catalogueRepo.updateEmailContract(this.selectedContract.id, formBody.email)
+            this._catalogueRepo.updateEmailContract(this.selectedContract.id, formBody.email.trim().replaceAll(/[\s,\n,;]+/g, ";"))
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
                             this.onRequest.emit(true)
+                            this.formGroup.reset()
+                            this.isSubmitted = false
                             this.hide();
                         } else {
                             this._toastService.error(res.message);
@@ -80,6 +84,8 @@ export class FormUpdateEmailContractComponent extends PopupBase {
     }
 
     close() {
+        this.isSubmitted = false
+        this.formGroup.reset()
         this.hide();
     }
 }

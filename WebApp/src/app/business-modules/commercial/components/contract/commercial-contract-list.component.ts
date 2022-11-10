@@ -328,7 +328,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     onSelectContract(contract: Contract) {
-        console.log(this.selectedContract)
         this.selectedContract = contract;
     }
 
