@@ -763,15 +763,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string clearPrefix(string fileName)
         {
-            var prefixs = _attachFileTemplateRepo.Get().Select(x => x.Code).ToList();
+            var prefixs = _attachFileTemplateRepo.Get().Select(x => x.Code).OrderBy(x => x.Length).ToList();
             string code = null;
-            prefixs.ForEach(x =>
+            for(int i=0;i<prefixs.Count; i++)
             {
-                if (fileName.Contains(x))
+                if (fileName.Contains(prefixs[i]))
                 {
-                    code = x;
+                    code = prefixs[i];
                 }
-            });
+            }
+            //prefixs.ForEach(x =>
+            //{
+            //    if (fileName.Contains(x))
+            //    {
+            //        code = x;
+            //    }
+            //});
             if (code != null)
             {
                 return '_'+ fileName.Remove(0, code.Length+1).ToString();
