@@ -3,13 +3,13 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
-import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
-import { catchError} from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
@@ -38,7 +38,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _exportRepo: ExportRepo,
-        protected _documentRepo: DocumentationRepo
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
         super(
             _activedRoute,
@@ -48,7 +48,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             _toastService,
             _actionStoreSubject,
             _router,
-            _exportRepo);
+            _exportRepo,
+            _fileMngtRepo);
     }
 
     ngOnInit() {
@@ -59,7 +60,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
                 this.getSeparate(this.hblId);
             }
         });
-     
+
     }
 
 
@@ -83,7 +84,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
 
 
     ngAfterViewInit() {
-        this._documentRepo.getDetailTransaction(this.jobId)
+        this._documentationRepo.getDetailTransaction(this.jobId)
             .pipe(catchError(this.catchError))
             .subscribe((data: any) => {
                 if (!!data) {
@@ -96,7 +97,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
                             .subscribe(hawbNoGenerate => {
                                 this.formCreateHBLComponent.hwbno.setValue(hawbNoGenerate.hblNo);
                             })
-                        }
+                    }
                 }
             })
     }
@@ -115,25 +116,25 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             return;
         }
         this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
-        .pipe(catchError(this.catchError))
-        .subscribe(
-            (res: any) => {
-                if (!!res && res.length > 0) {
-                    let jobNo = '';
-                    res.forEach(element => {
-                        jobNo += element + '<br>';
-                    });
-                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                        body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
-                        class: 'bg-danger'
-                    });
-                } else {
-                    const houseBill: HouseBill = this.getDataForm();
-                    this.setData(houseBill);
-                    this.createHbl(houseBill);
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.length > 0) {
+                        let jobNo = '';
+                        res.forEach(element => {
+                            jobNo += element + '<br>';
+                        });
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                            class: 'bg-danger'
+                        });
+                    } else {
+                        const houseBill: HouseBill = this.getDataForm();
+                        this.setData(houseBill);
+                        this.createHbl(houseBill);
+                    }
                 }
-            }
-        );
+            );
     }
 }
-    
+

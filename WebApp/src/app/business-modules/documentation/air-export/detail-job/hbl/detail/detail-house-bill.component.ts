@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
-import { CsTransactionDetail, HouseBill, OpsTransaction } from '@models';
+import { Crystal, CsTransactionDetail, HouseBill, OpsTransaction } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
@@ -15,7 +15,7 @@ import { InputBookingNotePopupComponent } from '../components/input-booking-note
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 
 import { merge, of, throwError } from 'rxjs';
-import { catchError, takeUntil, skip, tap, switchMap, filter } from 'rxjs/operators';
+import { catchError, takeUntil, skip, tap, switchMap, filter, concatMap, mergeMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { getCurrentUserState } from '@store';
@@ -40,6 +40,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
         super(
             _activedRoute,
@@ -243,7 +244,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('HAWB');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -268,7 +269,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('AT');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -327,7 +328,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -339,6 +340,43 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: this.hblId,
+                            templateCode: templateCode,
+                            transactionType: 'AE'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     sendMail(type: string) {
