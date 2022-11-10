@@ -432,7 +432,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
+            isChangeAgrmentType = (model.PaymentTerm != currentContract.PaymentTerm || model.PaymentTermObh != currentContract.PaymentTermObh);
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
 
