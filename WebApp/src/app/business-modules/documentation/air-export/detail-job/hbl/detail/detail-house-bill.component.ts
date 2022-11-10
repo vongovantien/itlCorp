@@ -40,7 +40,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _exportRepo: ExportRepo,
-        private _fileMngtRepo: SystemFileManageRepo
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
         super(
             _activedRoute,
