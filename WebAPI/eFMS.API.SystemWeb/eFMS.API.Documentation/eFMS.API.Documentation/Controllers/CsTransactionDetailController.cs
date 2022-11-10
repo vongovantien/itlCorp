@@ -43,7 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsStageAssignedService csStageAssignedService;
-
+        private readonly IEDocService edocService;
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
             ICsTransactionDetailService service,
             ICurrentUser user,
@@ -51,8 +51,8 @@ namespace eFMS.API.Documentation.Controllers
             ICsTransactionService csTransaction,
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
-            ICsStageAssignedService stageAssignedService
-
+            ICsStageAssignedService stageAssignedService,
+             IEDocService EDocService
             )
         {
             stringLocalizer = localizer;
@@ -63,6 +63,7 @@ namespace eFMS.API.Documentation.Controllers
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
             csStageAssignedService = stageAssignedService;
+            edocService = EDocService;
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -168,7 +169,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         await CalculatorReceivable(modelReceivableList);
                         //del edoc
-                        csTransactionDetailService.DeleteEdoc(id);
+                        edocService.DeleteEdocByHBLId(id);
                     }
                 });
             }

@@ -8,7 +8,6 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
-import { cloneDeep } from 'lodash';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -47,6 +46,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     transactionType: string = '';
     housebills: any[] = [];
     jobs: any[] = [];
+    modifiedDocTypes: any;
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -281,29 +281,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.documentAttach.headers = this.headerAttach;
         }
-
-        const modifiedDocTypes = cloneDeep(this.documentTypes);
-
         this.documentAttach.isUpdate = true;
         this.documentAttach.resetForm();
-
-        // console.log(this.documentTypes);
-        // let docType = this.typeFrom === 'Shipment' ? this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId) :
-        //     this.documentTypes.find(x => x.nameEn === this.selectedEdoc.documentTypeName);
-        // // console.log(docType);
+        let docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
         let hwbNo = this.housebills.find(x => x.id === this.selectedEdoc.hblid);
-        // console.log(this.selectedEdoc);
-        if (this.selectedEdoc.billingType !== 'Other') {
-            modifiedDocTypes.splice(modifiedDocTypes.findIndex(x => x.code === 'OTH'), 1);
-            // this.documentTypes.push(({ id: this.selectedEdoc.documentTypeId, code: "OTH", nameEn: 'Other' }));
-            // docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
-        }
-        // else {
-        //     this.documentTypes.splice(this.documentTypes.findIndex(x => x.code === 'OTH'), 1);
-        // }
 
-        this.documentTypes = modifiedDocTypes;
-        const docType = this.documentTypes.find(x => x.id === this.selectedEdoc.documentTypeId);
         let detailSeletedEdoc = ({
             aliasName: this.selectedEdoc.systemFileName,
             name: this.selectedEdoc.userFileName,
