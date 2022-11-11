@@ -336,4 +336,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formUpdateEmailContractPopup.selectedContract = this.selectedContract;
         this.formUpdateEmailContractPopup.updateFormValue(this.selectedContract);
     }
+
+    onHandleRequest($event: boolean) {
+        if ($event) {
+            this.getListContract(this.selectedContract.partnerId);
+        }
+    }
 }
