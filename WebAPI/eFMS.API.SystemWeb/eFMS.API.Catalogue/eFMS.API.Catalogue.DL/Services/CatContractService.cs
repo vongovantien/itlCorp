@@ -252,6 +252,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
+
+            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)contract.ExpiredDate).Date);
+            if (expiredCheck <= 0)
+            {
+                contract.IsExpired = false;
+            }
+            else if (expiredCheck > 0)
+            {
+                contract.IsExpired = true;
+            }
+
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
@@ -434,6 +445,17 @@ namespace eFMS.API.Catalogue.DL.Services
             isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+
+            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+            if (expiredCheck <= 0)
+            {
+                entity.IsExpired = false;
+            }
+            else if (expiredCheck > 0)
+            {
+                entity.IsExpired = true;
+            }
+
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
