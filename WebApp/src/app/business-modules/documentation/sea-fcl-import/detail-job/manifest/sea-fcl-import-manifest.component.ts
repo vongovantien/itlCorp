@@ -378,7 +378,7 @@ export class SeaFclImportManifestComponent extends AppForm implements ICrystalRe
                             objectId: this.jobId,
                             hblId: SystemConstants.EMPTY_GUID,
                             templateCode: 'MNF',
-                            transactionType: 'SLI'
+                            transactionType: 'SFI'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
