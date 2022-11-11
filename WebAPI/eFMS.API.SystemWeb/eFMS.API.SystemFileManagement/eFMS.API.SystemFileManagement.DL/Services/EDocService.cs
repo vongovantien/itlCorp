@@ -1174,6 +1174,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
             
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
+                int? _docTypeId = -1;
+                var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code && x.TransactionType == model.TransactionType)?.FirstOrDefault();
+                if(docTypeTemplate == null)
+                {
+                    _docTypeId = _attachFileTemplateRepo.Get(x => x.Code == "OTH" && x.TransactionType == model.TransactionType)?.FirstOrDefault()?.Id;
+                } else
+                {
+                    _docTypeId = docTypeTemplate.Id;
+                }
                 var imageDetail = new SysImageDetail
                 {
                     Id = Guid.NewGuid(),
@@ -1190,7 +1199,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
                     SystemFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    DocumentTypeId = _attachFileTemplateRepo.Get(x => x.Code == code && x.TransactionType == model.TransactionType)?.FirstOrDefault().Id
+                    DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
 

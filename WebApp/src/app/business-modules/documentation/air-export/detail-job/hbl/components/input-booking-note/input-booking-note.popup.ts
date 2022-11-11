@@ -1,15 +1,17 @@
 import { PopupBase } from "src/app/popup.base";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild } from "@angular/core";
 import { FormGroup, AbstractControl, FormBuilder } from "@angular/forms";
-import { DocumentationRepo } from "@repositories";
-import { catchError, finalize, switchMap, concatMap } from "rxjs/operators";
-import { CsTransactionDetail } from "@models";
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
+import { catchError, finalize, switchMap, concatMap, mergeMap, takeUntil } from "rxjs/operators";
+import { Crystal, CsTransactionDetail } from "@models";
 import { ToastrService } from "ngx-toastr";
 import { of } from "rxjs";
 import { ICrystalReport } from "@interfaces";
 import { ReportPreviewComponent } from "@common";
 import { InjectViewContainerRefDirective } from "@directives";
 import { delayTime } from "@decorators";
+import { HttpResponse } from "@angular/common/http";
+import { SystemConstants } from "@constants";
 
 @Component({
     selector: 'input-booking-note-popup',
@@ -35,7 +37,9 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _fb: FormBuilder,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -161,6 +165,43 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.hblDetail.jobId,
+                            hblId: this.hblId,
+                            templateCode: 'HAWB',
+                            transactionType: 'AE'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 }
 
