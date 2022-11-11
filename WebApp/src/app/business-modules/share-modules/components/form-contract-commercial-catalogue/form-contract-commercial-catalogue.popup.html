@@ -599,8 +599,7 @@
                         </span>
                     </button>
                     <ng-container
-                        *ngIf="currentUser?.userType === 'Super Admin' || contractType.value ==='Cash' || contractType.value ==='Guarantee' || 
-                                contractType.value === 'Prepaid' || selectedContract?.arconfirmed === true">
+                        *ngIf="currentUser?.userType === 'Super Admin' || !!contractType.value || selectedContract?.arconfirmed === true">
                         <button (click)="activeInactiveContract(selectedContract.id)"
                             *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
