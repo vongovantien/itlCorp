@@ -436,16 +436,18 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
 
-            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
-            if (expiredCheck <= 0)
+            if (entity.ExpiredDate != null)
             {
-                entity.IsExpired = false;
+                var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                if (expiredCheck <= 0)
+                {
+                    entity.IsExpired = false;
+                }
+                else if (expiredCheck > 0)
+                {
+                    entity.IsExpired = true;
+                }
             }
-            else if (expiredCheck > 0)
-            {
-                entity.IsExpired = true;
-            }
-
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
