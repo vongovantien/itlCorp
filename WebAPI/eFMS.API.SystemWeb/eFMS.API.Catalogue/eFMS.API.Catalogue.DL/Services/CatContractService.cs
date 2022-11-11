@@ -434,6 +434,19 @@ namespace eFMS.API.Catalogue.DL.Services
             isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+
+            if (entity.ExpiredDate != null)
+            {
+                var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                if (expiredCheck <= 0)
+                {
+                    entity.IsExpired = false;
+                }
+                else if (expiredCheck > 0)
+                {
+                    entity.IsExpired = true;
+                }
+            }
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
