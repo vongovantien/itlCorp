@@ -1038,6 +1038,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCbm = model.Cbm,
                 Shipper = model.Shipper,
                 Consignee = model.Consignee,
+                Eta = model.Eta,
+                ClearanceDate = model.ClearanceDate,
                 BillingOpsId = currentUser.UserID,
                 GroupId = currentUser.GroupId,
                 DepartmentId = currentUser.DepartmentId,

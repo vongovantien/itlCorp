@@ -45,5 +45,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string Shipper { get; set; }
         public string Consignee { get; set; }
         public string AccountNo { get; set; }
+        public DateTime? Eta { get; set; }
     }
 }

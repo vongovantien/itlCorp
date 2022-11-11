@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -3782,6 +3784,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
