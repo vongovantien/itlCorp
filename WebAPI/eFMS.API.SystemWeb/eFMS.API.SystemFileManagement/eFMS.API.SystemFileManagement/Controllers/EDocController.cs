@@ -147,7 +147,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
             {
                 return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
             }
-            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = models });
+            return BadRequest(new ResultHandle { Message = string.IsNullOrEmpty(hs.Message.ToString()) ? "Upload File fail" : hs.Message.ToString(), Status = false, Data = models });
         }
     }
 }
