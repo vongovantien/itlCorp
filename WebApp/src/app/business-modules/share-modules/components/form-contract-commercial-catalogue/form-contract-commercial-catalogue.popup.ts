@@ -248,9 +248,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             autoExtendDays: [],
             noDue: [],
             shipmentType: [],
-            emailAddress: [null, Validators.compose([
-                Validators.pattern(SystemConstants.CPATTERN.EMAIL),
-            ])],
+            emailAddress: [null],
             firstShipmentDate: [null],
             paymentTermObh: [null, Validators.compose([
                 Validators.min(0),
@@ -1041,7 +1039,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     }
                 }
             );
-        console.log(this.selectedContract)
     }
 
     showRejectCommentPopup() {
