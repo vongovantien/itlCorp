@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.SystemFileManagement.DL.Common
 {
@@ -17,7 +15,7 @@ namespace eFMS.API.SystemFileManagement.DL.Common
             Random rnd = new Random();
             int card = rnd.Next(52);
             var currentDate = DateTime.Now;
-            return currentDate.Year.ToString().Substring(2) + String.Format("{0:00}", currentDate.Month) + String.Format("{0:00}", currentDate.Day) 
+            return currentDate.Year.ToString().Substring(2) + String.Format("{0:00}", currentDate.Month) + String.Format("{0:00}", currentDate.Day)
                         + String.Format("{0:00}", card);
         }
         public static string GenerateHousebillNo(string prefix, int number)
@@ -30,7 +28,7 @@ namespace eFMS.API.SystemFileManagement.DL.Common
         {
             number = number + 1;
             var currentDate = DateTime.Now;
-            return servicePrefix + currentDate.Year.ToString().Substring(2) + String.Format("{0:00}", currentDate.Month)  + "/" + String.Format("{0:00000}", number);
+            return servicePrefix + currentDate.Year.ToString().Substring(2) + String.Format("{0:00}", currentDate.Month) + "/" + String.Format("{0:00000}", number);
         }
     }
 }

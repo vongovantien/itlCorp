@@ -1,81 +1,41 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 
 import { NgxCurrencyModule } from 'ngx-currency';
 
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import {
-    ShareBussinessBuyingChargeComponent,
-    ShareBussinessSellingChargeComponent,
-    ShareBussinessOBHChargeComponent,
-    ShareBussinessProfitSummaryComponent,
-    ShareBussinessShipmentGoodSummaryComponent,
-    ShareBussinessContainerListPopupComponent,
-    ShareBussinessGrantTotalProfitComponent,
-    ShareBusinessImportJobDetailPopupComponent,
-    ShareBusinessFormSearchImportJobComponent,
-    ShareBussinessCdNoteListComponent,
-    ShareBussinessCdNoteAddPopupComponent,
-    ShareBussinessCdNoteAddRemainingChargePopupComponent,
-    ShareBussinessCdNoteDetailPopupComponent,
-    ShareBussinessHBLGoodSummaryLCLComponent,
-    ShareBussinessGoodsListPopupComponent,
-    ShareBusinessFormManifestComponent,
-    ShareBusinessFormSearchSeaComponent,
-    ShareBusinessAssignStagePopupComponent,
-    ShareBusinessAsignmentComponent,
-    ShareBusinessStageManagementDetailComponent,
-    ShareBusinessAddHblToManifestComponent,
-    ShareBusinessArrivalNoteComponent,
-    ShareBusinessDeliveryOrderComponent,
-    ShareBusinessImportHouseBillDetailComponent,
-    ShareBusinessFormSearchHouseBillComponent,
-    ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBussinessCdNoteListAirComponent,
-    ShareBussinessCdNoteAddAirPopupComponent,
-    ShareBussinessCdNoteAddRemainingChargeAirPopupComponent,
-    ShareBussinessCdNoteDetailAirPopupComponent,
-    ShareBussinessFilesAttachComponent,
-    ShareBusinessHousebillsInManifestComponent,
-    ShareBusinessArrivalNoteAirComponent,
-    ShareBussinessDateTimeModifiedComponent,
-    ShareContainerImportComponent,
-    ShareBussinessBillInstructionHousebillsSeaExportComponent,
-    ShareBussinessHBLFCLContainerPopupComponent,
-    ShareGoodsImportComponent,
-    ShareBusinessAttachListHouseBillComponent,
-    ShareBussinessInputDailyExportPopupComponent,
-    ShareBussinessPaymentMethodPopupComponent,
-    ShareBussinessJobDetailButtonListComponent
+    ShareBusinessAddHblToManifestComponent, ShareBusinessArrivalNoteAirComponent, ShareBusinessArrivalNoteComponent, ShareBusinessAsignmentComponent, ShareBusinessAssignStagePopupComponent, ShareBusinessAttachListHouseBillComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormManifestComponent, ShareBusinessFormSearchHouseBillComponent, ShareBusinessFormSearchImportJobComponent, ShareBusinessFormSearchSeaComponent, ShareBusinessHousebillsInManifestComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessImportJobDetailPopupComponent, ShareBusinessStageManagementDetailComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent, ShareBussinessBuyingChargeComponent, ShareBussinessCdNoteAddAirPopupComponent, ShareBussinessCdNoteAddPopupComponent, ShareBussinessCdNoteAddRemainingChargeAirPopupComponent, ShareBussinessCdNoteAddRemainingChargePopupComponent, ShareBussinessCdNoteDetailAirPopupComponent, ShareBussinessCdNoteDetailPopupComponent, ShareBussinessCdNoteListAirComponent, ShareBussinessCdNoteListComponent, ShareBussinessContainerListPopupComponent, ShareBussinessDateTimeModifiedComponent, ShareBussinessFilesAttachComponent, ShareBussinessGoodsListPopupComponent, ShareBussinessGrantTotalProfitComponent, ShareBussinessHBLFCLContainerPopupComponent, ShareBussinessHBLGoodSummaryFCLComponent, ShareBussinessHBLGoodSummaryLCLComponent, ShareBussinessInputDailyExportPopupComponent, ShareBussinessJobDetailButtonListComponent, ShareBussinessOBHChargeComponent, ShareBussinessPaymentMethodPopupComponent, ShareBussinessProfitSummaryComponent, ShareBussinessSellingChargeComponent, ShareBussinessShipmentGoodSummaryComponent, ShareContainerImportComponent, ShareGoodsImportComponent
 } from './components';
 
 
-import { reducers, effects } from './store';
-import { ValidatorModule } from 'src/app/shared/validators/validator.module';
-import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
-import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
-import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { ShareBusinessProofOfDelieveyComponent } from './components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 import { ShareModulesModule } from '../share-modules/share-modules.module';
+import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
 import { ShareBussinessMassUpdatePodComponent } from './components/hbl/mass-update-pod/mass-update-pod.component';
+import { ShareBusinessProofOfDelieveyComponent } from './components/hbl/proof-of-delivery/proof-of-delivery.component';
+import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
+import { ShareBussinessAccountingModule } from './share-bussines-accounting.module';
+import { effects, reducers } from './store';
 
 
 
@@ -127,6 +87,7 @@ const COMPONENTS = [
     ShareBussinessJobDetailButtonListComponent,
     ShareBusinessProofOfDelieveyComponent,
     ShareBussinessMassUpdatePodComponent,
+
 ];
 
 
@@ -167,7 +128,8 @@ const customCurrencyMaskConfig = {
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
         NgxSpinnerModule,
-        ShareModulesModule
+        ShareModulesModule,
+        ShareBussinessAccountingModule
     ],
     exports: [
         ...COMPONENTS

@@ -1,6 +1,6 @@
 import { SystemConstants } from "src/constants/system.const";
 import { ChargeConstants } from "@constants";
-import { CommonEnum } from "@enums";
+import { CommonEnum, TransactionTypeEnum } from "@enums";
 import { Observable, fromEvent, merge, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, share } from "rxjs/operators";
 
@@ -214,6 +214,22 @@ export class UtilityHelper {
             [ChargeConstants.SCE_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolExport]],
             [ChargeConstants.SCI_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolImport]],
             [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
+        ]).get(type)[0];
+    }
+
+    getTransationTypeByEnum(type: TransactionTypeEnum) {
+        return new Map([
+            [CommonEnum.TransactionTypeEnum.AirExport, [ChargeConstants.AE_CODE]],
+            [CommonEnum.TransactionTypeEnum.AirImport, [ChargeConstants.AI_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaFCLExport, [ChargeConstants.SFE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaFCLImport, [ChargeConstants.SFI_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaLCLExport, [ChargeConstants.SLE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaLCLImport, [ChargeConstants.SLI_CODE]],
+            [CommonEnum.TransactionTypeEnum.CustomLogistic, [ChargeConstants.CL_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaConsolExport, [ChargeConstants.SCE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaConsolImport, [ChargeConstants.SCI_CODE]],
+            [CommonEnum.TransactionTypeEnum.InlandTrucking, [ChargeConstants.IT_CODE]],
+
         ]).get(type)[0];
     }
 

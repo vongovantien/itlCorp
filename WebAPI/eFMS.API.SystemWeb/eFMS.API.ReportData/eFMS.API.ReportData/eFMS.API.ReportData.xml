@@ -60,7 +60,7 @@
             <param name="accountingPaymentCriteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailAdvancePayment(System.Guid,System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailAdvancePayment(System.Guid,System.String,System.String)">
             <summary>
             Export detail advance payment
             </summary>
@@ -83,7 +83,7 @@
             <param name="soaNo"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPayment(System.Guid,System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPayment(System.Guid,System.String,System.String)">
             <summary>
             Export detail settlement payment
             </summary>
@@ -91,7 +91,7 @@
             <param name="lang">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String,System.String)">
             <summary>
             Export detail settlement template payment
             </summary>
@@ -99,7 +99,7 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportGeneralSettlementPayment(System.Guid)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportGeneralSettlementPayment(System.Guid,System.String)">
             <summary>
             Export General Preview in Settlement detail
             </summary>

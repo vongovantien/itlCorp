@@ -1,15 +1,14 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { CommonEnum } from '@enums';
+import { catchError } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { Charge, Partner } from 'src/app/shared/models';
+import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
-import _uniqBy from 'lodash/uniqBy';
-import { Charge, Partner } from 'src/app/shared/models';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { CommonEnum } from '@enums';
-import { formatDate } from '@angular/common';
-import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 @Component({
     selector: 'app-form-search-rule',
     templateUrl: './form-search-rule.component.html'
@@ -223,8 +222,8 @@ export class FormSearchRuleComponent extends AppForm {
             partnerBuying: this.rule.partnerBuying,
             partnerSelling: this.rule.partnerSelling,
             dateType: formSearch.dateType,
-            fromDate: !!formSearch.date?.startDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
-            toDate: !!formSearch.date?.endDate?formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en'):null,
+            fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : null,
+            toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : null,
             status: formSearch.status,
         };
         console.log(formSearch.date);
@@ -240,15 +239,15 @@ export class FormSearchRuleComponent extends AppForm {
         this.onSearch.emit(bodySearch);
     }
 
-    resetDate(){
+    resetDate() {
         this.date.setValue(null);
     }
 
-    resetPartnerBuying(){
-        this.rule.partnerBuying=null;
+    resetPartnerBuying() {
+        this.rule.partnerBuying = null;
     }
-    resetPartnerSelling(){
-        this.rule.partnerSelling=null;
+    resetPartnerSelling() {
+        this.rule.partnerSelling = null;
     }
 
 }

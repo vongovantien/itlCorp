@@ -81,6 +81,16 @@
                 content: "\f2c4";
             }
         }
+        i.la-minus {
+            &:before {
+                content: "\f2c2";
+            }
+        }
+        // i.la-angle-up {
+        //     &:before {
+        //         content: "\f110";
+        //     }
+        // }
     }
 }
 

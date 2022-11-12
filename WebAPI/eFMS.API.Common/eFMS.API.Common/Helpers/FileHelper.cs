@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Common.Helpers
 {
-    public class FileHelper: ControllerBase
+    public class FileHelper : ControllerBase
     {
         readonly string pathTeamplate = Template.Resources.ExcelTemplate;
         public async Task<FileStreamResult> ExportExcel(string fileName)
@@ -86,6 +88,29 @@ namespace eFMS.API.Common.Helpers
             {
                 return null;
             }
+        }
+
+        public static string BeforeExtention(string fileName)
+        {
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\\\/]+", "");
+        }
+        public static string RenameFileS3(string fileName)
+        {
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$-]+", "") + "_" + StringHelper.RandomString(5);
+        }
+        public static async Task<byte[]> DownloadFile(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                using (var result = await client.GetAsync(url))
+                {
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return await result.Content.ReadAsByteArrayAsync();
+                    }
+                }
+            }
+            return null;
         }
     }
 }

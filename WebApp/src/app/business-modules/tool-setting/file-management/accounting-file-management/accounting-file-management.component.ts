@@ -1,6 +1,6 @@
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnChanges, OnInit } from "@angular/core";
-import { AccountingRepo, SettingRepo } from "@repositories";
+import { AccountingRepo, SettingRepo, SystemFileManageRepo } from "@repositories";
 import { SortService } from "@services";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
@@ -69,7 +69,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
     constructor(
         private _settingRepo: SettingRepo,
         private _sortService: SortService,
-        private _accountingRepo: AccountingRepo,
+        private _file: SystemFileManageRepo,
         private _toastService: ToastrService,
     ) {
         super();
@@ -280,7 +280,7 @@ export class AccountingFileManagementComponent extends AppList implements OnInit
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._accountingRepo.uploadAttachedFiles(this.folderName, this.folderChild, fileList)
+            this._file.uploadAttachedFiles(this.folderName, this.folderChild, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {

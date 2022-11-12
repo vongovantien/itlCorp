@@ -202,7 +202,8 @@
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
                         <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
-                            folderModuleName="SOA" [objId]="soa.id" [readOnly]="soa.syncStatus === 'Synced'?'':null">
+                            [accId]="soaId" [accType]="'SOA'" folderModuleName="SOA" [objId]="soa.id"
+                            [readOnly]="soa.syncStatus === 'Synced'?'':null">
                         </accounting-attach-file-list>
                     </tab>
                 </tabset>

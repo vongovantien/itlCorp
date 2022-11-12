@@ -1,25 +1,23 @@
-import { takeUntil } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-import { SOA, SysImage } from 'src/app/shared/models';
-import { AppList } from 'src/app/app.list';
-import { SortService } from 'src/app/shared/services';
-import { NgProgress } from '@ngx-progressbar/core';
-import { RoutingConstants, SystemConstants } from '@constants';
-import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { AccountingConstants } from '@constants';
-import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
-import { Store } from '@ngrx/store';
-import { getMenuUserSpecialPermissionState, IAppState, getCurrentUserState } from '@store';
-import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
-import { HttpResponse } from '@angular/common/http';
+import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
+import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+import { getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
+import { SOA, SysImage } from 'src/app/shared/models';
+import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 
 @Component({
     selector: 'app-statement-of-account-detail',
@@ -34,6 +32,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     soaNO: string = '';
 
     soa: SOA = new SOA();
+    soaId: string = '';
 
     isClickSubMenu: boolean = false;
 
@@ -124,6 +123,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             .subscribe(
                 (res: any) => {
                     this.soa = new SOA(res);
+                    console.log(res);
+                    this.soaId = res.id;
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
                 },

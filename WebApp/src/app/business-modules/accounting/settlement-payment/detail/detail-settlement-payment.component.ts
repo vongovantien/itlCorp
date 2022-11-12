@@ -12,7 +12,7 @@ import { RoutingConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
-import { Surcharge, SysImage } from '@models';
+import { Surcharge } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { DataService } from '@services';
 
@@ -36,12 +36,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    //@ViewChild(ShareBussinessAttachFileV2Component) public attachRef: ShareBussinessAttachFileV2Component;
 
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
-    attachFiles: SysImage[] = [];
+    attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
 
@@ -145,6 +146,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
                     } else {
@@ -174,8 +176,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this._toastService.warning("Settlement not found");
                         return;
                     }
-                    this.settlementPayment = res;
-
+                    this.settlementPayment = res
                     // * Update store.
                     this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 

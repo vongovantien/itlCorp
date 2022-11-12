@@ -1,37 +1,35 @@
-import { Component, ViewChild, QueryList, ViewChildren } from '@angular/core';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
-import { Store } from '@ngrx/store';
+import { Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from '@app';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
+import { AccountingConstants, SystemConstants } from '@constants';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
+import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
-import { AccountingConstants, SystemConstants } from '@constants';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 
 
-import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
+import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 
-import { catchError, finalize, map, takeUntil, withLatestFrom, concatMap } from 'rxjs/operators';
-import {
-    LoadListAdvancePayment,
-    getAdvancePaymentListState,
-    getAdvancePaymentSearchParamsState,
-    getAdvancePaymentListLoadingState,
-    getAdvancePaymentListPagingState
-} from './store';
-import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
-import { of, forkJoin } from 'rxjs';
-import { delayTime } from '@decorators';
 import { HttpResponse } from '@angular/common/http';
+import { delayTime } from '@decorators';
+import { forkJoin, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
+import {
+    getAdvancePaymentListLoadingState,
+    getAdvancePaymentListPagingState, getAdvancePaymentListState,
+    getAdvancePaymentSearchParamsState, LoadListAdvancePayment
+} from './store';
 
 @Component({
     selector: 'app-advance-payment',

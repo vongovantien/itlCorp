@@ -54,19 +54,24 @@ namespace eFMS.API.Infrastructure
                 options.eFMSConnection
                     = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
             });
-            services.Configure<WebUrl>(option => {
+            services.Configure<WebUrl>(option =>
+            {
                 option.Url = configuration.GetSection("WebUrl").Value;
             });
-            services.Configure<ApiUrl>(option => {
+            services.Configure<ApiUrl>(option =>
+            {
                 option.Url = configuration.GetSection("ApiUrl").Value;
             });
-            services.Configure<ESBUrl>(option => {
+            services.Configure<ESBUrl>(option =>
+            {
                 option.Url = configuration.GetSection("ESB").Value;
             });
-            services.Configure<MsWebHookUrl>(option => {
+            services.Configure<MsWebHookUrl>(option =>
+            {
                 option.Url = configuration.GetSection("MsWebHookUrl").Value;
             });
-            services.Configure<AuthenticationSetting>(authSetting => {
+            services.Configure<AuthenticationSetting>(authSetting =>
+            {
 
                 authSetting.PartnerShareKey
                     = configuration.GetSection("Authentication:PartnerShareKey").Value;

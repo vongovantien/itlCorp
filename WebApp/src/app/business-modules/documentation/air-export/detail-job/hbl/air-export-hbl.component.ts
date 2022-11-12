@@ -1,17 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo, DocumentationRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
+import { takeUntil } from 'rxjs/operators';
 import { merge } from 'rxjs';
-import { HouseBill } from '@models';
 
 @Component({
     selector: 'app-air-export-hbl',
@@ -20,7 +17,6 @@ import { HouseBill } from '@models';
 
 export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
 
-
     serviceType: CommonType.SERVICE_TYPE = 'air';
 
     constructor(
@@ -28,58 +24,15 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         protected _store: Store<IShareBussinessState>,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
-        protected _progressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _sortService: SortService,
         protected _activedRoute: ActivatedRoute,
-        protected _catalogueRepo: CatalogueRepo
+        protected _catalogueRepo: CatalogueRepo,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo);
-    }
-
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`]);
-    }
-
-    gotoCreate() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/new`]);
-    }
-
-    gotoDetail(id: string) {
-        this._documentRepo.checkDetailShippmentPermission(this.shipmentDetail.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    if (res) {
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${id}`]);
-                    } else {
-                        this.info403Popup.show();
-                    }
-                },
-            );
-    }
-
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-            case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'SHIPMENT' } });
-                break;
-            case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
-                break;
-            case 'assignment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
-                break;
-            case 'files':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
-                break;
-            case 'advance-settle':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
-                break;
-        }
+        super(_sortService, _store, _spinner, _toastService, _documentRepo, _activedRoute, _router, _catalogueRepo, _exportRepo, _fileMngtRepo);
     }
 
     listenShortcutMovingTab() {
@@ -89,5 +42,4 @@ export class AirExportHBLComponent extends AppShareHBLBase implements OnInit {
         merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit4'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('assignment'); });
         merge(this.utility.createShortcut(['ControlLeft', 'ShiftLeft', 'Digit5'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this.onSelectTab('files'); });
     }
-
 }

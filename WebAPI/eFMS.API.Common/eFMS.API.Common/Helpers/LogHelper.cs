@@ -1,11 +1,7 @@
-﻿using eFMS.API.Common.Globals.Configs;
-using eFMS.API.Common.Models;
-using Microsoft.Extensions.Options;
+﻿using eFMS.API.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Common.Helpers

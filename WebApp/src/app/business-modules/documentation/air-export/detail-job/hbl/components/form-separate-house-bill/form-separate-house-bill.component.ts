@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
-import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -36,7 +36,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _exportRepo: ExportRepo
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
     ) {
         super(
             _activedRoute,
@@ -46,7 +47,8 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             _toastService,
             _actionStoreSubject,
             _router,
-            _exportRepo);
+            _exportRepo,
+            _fileMngtRepo);
     }
 
     ngOnInit() {

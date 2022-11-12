@@ -21,10 +21,10 @@ export class ExportRepo {
     constructor(private _api: ApiService) {
     }
 
-    exportCrystalReportPDF(data: any) {
+    exportCrystalReportPDF(data: any, observer: any = 'body', response: any = 'json') {
         var formData: any = new FormData();
         formData.append('crystal', JSON.stringify(data));
-        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, formData);
+        return this._api.postFormData(`${environment.HOST.EXPORT_CRYSTAL}`, formData, observer, response);
     }
 
     exportCustomClearance(searchObject: any = {}) {
@@ -213,25 +213,19 @@ export class ExportRepo {
         );
     }
 
-    exportSettlementPaymentDetail(settlementId: string, language: string) {
-        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
+    exportSettlementPaymentDetail(settlementId: string, language: string, action: string = "Preview") {
+        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}&action=${action}`);
+    }
+
+    exportSettlementPaymentDetailTemplate(settlementId: string, language: string, action: string = "Preview") {
+        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPaymentTemplate?settlementId=${settlementId}&language=${language}&action=${action}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
 
-    exportSettlementPaymentDetailTemplate(settlementId: string, language: string) {
-        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPaymentTemplate?settlementId=${settlementId}&language=${language}`).pipe(
-            catchError((error) => throwError(error)),
-            map(data => data)
-        );
-    }
-
-    exportGeneralSettlementPayment(settlementId: string) {
-        return this._api.get(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${settlementId}`).pipe(
-            catchError((error) => throwError(error)),
-            map(data => data)
-        );
+    exportGeneralSettlementPayment(settlementId: string, action: string = "Preview") {
+        return this._api.get(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${settlementId}&action=${action}`);
     }
 
     exportShipmentOverview(searchObject: any = {}) {
@@ -514,6 +508,10 @@ export class ExportRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    downloadExportUrl(url: string) {
+        return this._api.get(url);
     }
 }
 

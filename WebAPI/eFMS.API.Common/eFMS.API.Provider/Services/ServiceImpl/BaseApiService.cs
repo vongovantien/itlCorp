@@ -34,7 +34,8 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                 if (!String.IsNullOrEmpty(strResponse))
                     return JsonConvert.DeserializeObject<TResponse>(strResponse);
             }
-            catch {
+            catch
+            {
             }
             return default(TResponse);
         }
@@ -68,7 +69,7 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                         return JsonConvert.DeserializeObject<TResponse>(strResponse);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -39,5 +38,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string OfficeType { get; set; }
         public string InternalCode { get; set; }
+        public string PartnerMapping { get; set; }
     }
 }

@@ -73,6 +73,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IContextBase<SysSettingFlow> settingflowRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -115,6 +116,7 @@ namespace eFMS.API.Accounting.DL.Services
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<SysSettingFlow> settingflowRepo,
+            IContextBase<SysImageDetail> imageDetailRepo,
         IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -154,6 +156,7 @@ namespace eFMS.API.Accounting.DL.Services
             databaseUpdateService = _databaseUpdateService;
             csLinkChargeRepository = csLinkChargeRepo;
             settingflowRepository = settingflowRepo;
+            imageDetailRepository = imageDetailRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -579,6 +582,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var hs = DataContext.Delete(x => x.Id == settlement.Id);
                         if (hs.Success)
                         {
+                            imageDetailRepository.Delete(x => x.BillingNo == settlementNo);
                             trans.Commit();
                         }
                         else

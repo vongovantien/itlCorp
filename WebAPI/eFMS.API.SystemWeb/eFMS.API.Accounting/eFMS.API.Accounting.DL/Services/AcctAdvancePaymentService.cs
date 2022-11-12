@@ -62,7 +62,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
-
+        private readonly IContextBase<SysImageDetail> imagedetailRepository;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -97,6 +97,7 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<SysImageDetail> imageDetailRepo,
             IContextBase<SysSettingFlow> sysSettingFlowRepos,
             IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
         {
@@ -133,6 +134,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailSettingRepository = sysEmailSettingRepo;
             catChargeRepository = catChargeRepo;
             sysSettingFlowRepository = sysSettingFlowRepo;
+            imagedetailRepository = imageDetailRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1138,6 +1140,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.PaySoano)).Select(x => x.Id).ToList();
                                 var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
                             }
+                            imagedetailRepository.Delete(x => x.BillingNo == advanceNo);
                             acctAdvanceRequestRepo.SubmitChanges();
                             acctApproveAdvanceRepo.SubmitChanges();
                             csShipmentSurchargeRepo.SubmitChanges();

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace eFMS.API.Provider.Services.IService
 {
-    public interface IPermissionBaseService<TContext, TModel> 
+    public interface IPermissionBaseService<TContext, TModel>
         where TContext : class, new()
         where TModel : class, new()
     {
