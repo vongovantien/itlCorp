@@ -7,7 +7,7 @@ import { Crystal, CsTransactionDetail } from '@models';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { concatMap, mergeMap, switchMap, takeUntil, catchError } from 'rxjs/operators';
+import { concatMap, mergeMap, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
 

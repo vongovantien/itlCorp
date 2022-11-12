@@ -396,6 +396,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             _hblNo = _tranDeRepo.Get(y => y.Id == x.Hblid)?.FirstOrDefault()?.Hwbno;
                         }
                     }
+                    var jobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo;
+                    var tra = GetDocumentType(transactionType);
                     var imagedetail = new SysImageDetailModel
                     {
                         BillingNo = null,
@@ -403,13 +405,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DatetimeCreated = x.DatetimeCreated,
                         DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = GetDocumentType(transactionType),
+                        DocumentTypeId = tra,
                         ImageUrl = x.ImageUrl,
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
                         SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
-                        JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo,
+                        JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
                         TransactionType=transactionType,
@@ -767,7 +769,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             string code = null;
             for(int i=0;i<prefixs.Count; i++)
             {
-                if (fileName.Contains(prefixs[i]))
+                if (!string.IsNullOrEmpty(prefixs[i]) && fileName.Contains(prefixs[i]))
                 {
                     code = prefixs[i];
                 }

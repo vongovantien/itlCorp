@@ -31,6 +31,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using eFMS.API.Documentation.DL.Helpers;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 
 namespace eFMS.API.Documentation.DL.Services
 {
