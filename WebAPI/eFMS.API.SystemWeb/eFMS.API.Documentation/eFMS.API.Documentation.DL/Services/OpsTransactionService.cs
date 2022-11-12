@@ -883,15 +883,29 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                   && x.SaleService.Contains("CL")
-                   && x.Active == true
-                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                   )?.FirstOrDefault();
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+                    string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                    if (customerContract.IsExpired == true)
+                    {
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverDue == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverLimit == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                         return new HandleState(errorContract);
                     }
                 }
@@ -1144,13 +1158,28 @@ namespace eFMS.API.Documentation.DL.Services
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
                        && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                       )?.FirstOrDefault();
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                        
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
+                        string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                        if (customerContract.IsExpired == true)
+                        {
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverDue == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverLimit == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }
@@ -1278,7 +1307,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-        }
+         }
 
         private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd,
             CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
