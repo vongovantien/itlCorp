@@ -252,17 +252,18 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
-
-            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)contract.ExpiredDate).Date);
-            if (expiredCheck <= 0)
+            if (contract.ExpiredDate != null)
             {
-                contract.IsExpired = false;
+                var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)contract.ExpiredDate).Date);
+                if (expiredCheck <= 0)
+                {
+                    contract.IsExpired = false;
+                }
+                else if (expiredCheck > 0)
+                {
+                    contract.IsExpired = true;
+                }
             }
-            else if (expiredCheck > 0)
-            {
-                contract.IsExpired = true;
-            }
-
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
@@ -446,14 +447,17 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
 
-            var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
-            if (expiredCheck <= 0)
+            if (entity.ExpiredDate != null)
             {
-                entity.IsExpired = false;
-            }
-            else if (expiredCheck > 0)
-            {
-                entity.IsExpired = true;
+                var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                if (expiredCheck <= 0)
+                {
+                    entity.IsExpired = false;
+                }
+                else if (expiredCheck > 0)
+                {
+                    entity.IsExpired = true;
+                }
             }
 
             if (entity.ContractType == "Cash")
