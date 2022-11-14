@@ -265,10 +265,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.selectedEdoc = edoc;
         console.log(edoc);
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
-        const qContextMenuList = this.queryListMenuContext.toArray();
-        if (!!qContextMenuList.length) {
-            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
-        }
+        this.clearMenuContext(this.queryListMenuContext);
     }
     downloadEdoc() {
         this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
