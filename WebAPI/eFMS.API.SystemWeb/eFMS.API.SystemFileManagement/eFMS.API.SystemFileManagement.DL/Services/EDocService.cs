@@ -439,7 +439,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
+                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null, x.UserFileName)),
                         JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
