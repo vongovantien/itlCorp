@@ -28,7 +28,11 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
 
     ngOnInit(): void {
         this.formUpdateExtenDate = this._fb.group({
-            numberDaysExtend: [null, Validators.required],
+            numberDaysExtend: [null, Validators.required,
+                                    Validators.compose([
+                                    Validators.min(0),
+                                    Validators.max(32767)
+            ])],
             note: []
         });
 

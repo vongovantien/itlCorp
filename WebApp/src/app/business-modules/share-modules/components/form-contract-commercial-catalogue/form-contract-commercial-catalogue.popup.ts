@@ -69,6 +69,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     paymentTermObh: AbstractControl;
     paymentTerm: AbstractControl;
     firstShipmentDate: AbstractControl;
+    creditLimitRate: AbstractControl;
+    
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -227,14 +229,20 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialEffectDate: [],
             trialExpiredDate: [],
             trialCreditLimit: [],
-            trialCreditDays: [],
+            trialCreditDays: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(32767)
+            ])],
             paymentTerm: [null, Validators.compose([
                 Validators.min(0),
-                Validators.max(365)
+                Validators.max(32767)
             ])],
             baseOn: [null],
             creditLimit: [],
-            creditLimitRate: [],
+            creditLimitRate: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(32767)
+            ])],
             debitAmount: [],
             billingAmount: [],
             paidAmount: [],
@@ -255,7 +263,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             firstShipmentDate: [null],
             paymentTermObh: [null, Validators.compose([
                 Validators.min(0),
-                Validators.max(365)
+                Validators.max(32767)
             ])]
         });
         this.companyId = this.formGroup.controls['companyId'];
@@ -282,6 +290,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
         this.paymentTermObh = this.formGroup.controls['paymentTermObh'];
         this.paymentTerm = this.formGroup.controls['paymentTerm'];
+        this.creditLimitRate = this.formGroup.controls['creditLimitRate'];
     }
 
     initDataForm() {
