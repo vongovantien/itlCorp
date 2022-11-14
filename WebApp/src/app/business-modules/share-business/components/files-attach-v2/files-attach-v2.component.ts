@@ -407,6 +407,32 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.edocByAcc[index].eDocs = this._sortService.sort(this.edocByAcc[index].eDocs, sort, this.order);
         }
     }
+
+    downloadAllEdoc() {
+        console.log(this.edocByAcc);
+
+        // let fileName = "";
+
+        // if (this.fileNo.includes("/")) {
+        //     let arr = this.fileNo.split("/");
+        //     fileName = arr[0] + "_" + arr[1] + ".zip";
+        // } else {
+        //     fileName = this.fileNo + ".zip";
+        // }
+
+        let model = {
+            folderName: this.typeFrom,
+            objectId: this.billingId,
+            chillId: null,
+            fileName: 'eFMS_' + this.typeFrom
+        }
+        this._systemFileRepo.dowloadallAttach(model)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/zip", model.fileName);
+                }
+            )
+    }
 }
 interface IEDocItem {
     billingNo: string;

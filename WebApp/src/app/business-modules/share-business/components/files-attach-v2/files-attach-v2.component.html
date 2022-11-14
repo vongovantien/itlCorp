@@ -194,7 +194,8 @@
                                         <ng-container
                                             *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
                                             <tr [contextMenu]="edocAccountantShipmentTypeContext"
-                                                (onTouch)="onSelectEDoc(doc)">
+                                                (onTouch)="onSelectEDoc(doc)"
+                                                [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                                 <td>{{i + 1}}</td>
                                                 <td>
                                                     <span>{{doc.systemFileName}} </span>
@@ -293,7 +294,8 @@
                             </thead>
                             <tbody>
                                 <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
-                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)">
+                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
+                                        [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>
                                         <td>
                                             <a class="text-underline" [href]="doc.imageUrl"
@@ -414,6 +416,9 @@
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
         <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+    <div class="menu-context__item" (click)="downloadAllEdoc()">
+        <span><i class="la la-cloud align-middle text-primary"></i>Download all items</span>
     </div>
 </app-context-menu>
 
