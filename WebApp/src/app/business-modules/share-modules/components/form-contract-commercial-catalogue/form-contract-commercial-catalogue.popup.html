@@ -330,10 +330,10 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !trialCreditDays.valid }">
                                         <label>Trial Credit Days
                                         </label>
-                                        <input type="number" min="0" max="32767" (change)="onChageTrialCreditDays()"
+                                        <input type="number" (change)="onChageTrialCreditDays()"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays">
-                                            <p class="text-danger invalid" *ngIf="trialCreditDays.invalid">Number max is 32767</p>
+                                            <p class="text-danger invalid" *ngIf="trialCreditDays.invalid">The number is too long!</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -385,10 +385,10 @@
                                     <div class="form-group"
                                         [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentTerm.valid }">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" max="32767" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                        <input type="number" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                         'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
                                             class="form-control" formControlName="paymentTerm">
-                                        <p class="text-danger invalid" *ngIf="paymentTerm.invalid">Number max is 32767</p>
+                                        <p class="text-danger invalid" *ngIf="paymentTerm.invalid">The number is too long!</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -396,11 +396,11 @@
                                         [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTermObh.valid }">
                                         <label>Payment Term OBH</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input type="number" min="0" max="32767" numeric [decimals]="digitDecimal"
+                                            <input type="number" numeric [decimals]="digitDecimal"
                                                 [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                             'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
                                                 class="form-control" formControlName="paymentTermObh">
-                                            <p class="text-danger invalid" *ngIf="paymentTermObh.invalid">Number max is 32767</p>
+                                            <p class="text-danger invalid" *ngIf="paymentTermObh.invalid">The number is too long!</p>
                                         </div>
                                     </div>
                                 </div>
@@ -417,10 +417,10 @@
                                     <div class="form-group"
                                         [ngClass]="{'m-form__group has-danger':isSubmitted  && !creditLimitRate?.valid }">
                                         <label>Credit Limited Rate</label>
-                                        <input min="0" max="32767"
+                                        <input
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             type="number" class="form-control" formControlName="creditLimitRate">
-                                            <p class="text-danger invalid" *ngIf="creditLimitRate?.invalid">Number max is 32767</p>
+                                            <p class="text-danger invalid" *ngIf="creditLimitRate?.invalid">The number is too long!</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">

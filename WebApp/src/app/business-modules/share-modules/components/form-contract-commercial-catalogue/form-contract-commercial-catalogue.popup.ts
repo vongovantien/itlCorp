@@ -18,6 +18,7 @@ import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.pop
 import { ConfirmPopupComponent } from '@common';
 import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
 import { CommonEnum } from '@enums';
+import { numberValidation} from 'src/app/business-modules/accounting/advance-payment/store/index';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -25,7 +26,7 @@ import { CommonEnum } from '@enums';
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
-
+   
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
 
@@ -158,6 +159,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit() {
@@ -229,20 +231,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialEffectDate: [],
             trialExpiredDate: [],
             trialCreditLimit: [],
-            trialCreditDays: [null, Validators.compose([
-                Validators.min(0),
-                Validators.max(32767)
-            ])],
-            paymentTerm: [null, Validators.compose([
-                Validators.min(0),
-                Validators.max(32767)
-            ])],
+            trialCreditDays: [null,  [numberValidation]],       
+            paymentTerm: [null, [numberValidation]],
             baseOn: [null],
             creditLimit: [],
-            creditLimitRate: [null, Validators.compose([
-                Validators.min(0),
-                Validators.max(32767)
-            ])],
+            creditLimitRate: [null, [numberValidation]],
             debitAmount: [],
             billingAmount: [],
             paidAmount: [],
@@ -261,10 +254,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 Validators.pattern(SystemConstants.CPATTERN.EMAIL),
             ])],
             firstShipmentDate: [null],
-            paymentTermObh: [null, Validators.compose([
-                Validators.min(0),
-                Validators.max(32767)
-            ])]
+            paymentTermObh: [null, [numberValidation]],
         });
         this.companyId = this.formGroup.controls['companyId'];
         this.officeId = this.formGroup.controls['officeId'];

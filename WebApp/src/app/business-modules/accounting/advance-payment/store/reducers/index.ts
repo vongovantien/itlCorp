@@ -1,3 +1,4 @@
+import { Validators } from "@angular/forms";
 import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
 import { reducer, AdvancePaymentListState } from "./advance-payment.reducer";
 
@@ -6,7 +7,10 @@ export interface IAdvancePaymentState {
     list: AdvancePaymentListState;
 }
 
-
+export const numberValidation =  Validators.compose([
+    Validators.min(0),
+    Validators.max(32767)
+])
 // * SELECTOR
 export const advancePayment = createFeatureSelector<IAdvancePaymentState>('advance-payment');
 export const advancePaymentState = createSelector(advancePayment, (state: IAdvancePaymentState) => state.list);
