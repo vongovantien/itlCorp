@@ -128,7 +128,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dateTimeModified: string;
     userCreated: string;
     userModified: string;
-
+    shipmentType: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -188,7 +188,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 incotermId: shipment.incotermId,
                                 polDescription: shipment.polDescription,
                                 podDescription: shipment.podDescription,
-                                shipmenttype: shipment.shipmentType,
+                                shipmentType: shipment.shipmentType,
                             });
 
                             // *  CR 14501
@@ -492,7 +492,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             etd: !!data.etd ? { startDate: new Date(data.etd), endDate: new Date(data.etd) } : null,
             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : new Date(),
             hwbno: !!data.hwbno ? data.hwbno : null,
-            shipmenttype: data.shipmentType,
+            // shipmentType: data.shipmentType,
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,
             originBlnumber: data.originBlnumber,
@@ -510,7 +510,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
         this.totalHeightWeight = data.hw;
 
-        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AE_CODE, this.shipmenttype.value)
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AE_CODE, this.shipmentType)
             .subscribe((salesmans: any) => {
                 this.saleMans = salesmans;
             });
@@ -533,7 +533,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.shipperId.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AE_CODE, this.shipmenttype.value)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AE_CODE, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];
