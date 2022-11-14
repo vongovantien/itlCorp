@@ -599,8 +599,13 @@
                             <span> AR Confirmed </span>
                         </span>
                     </button>
-                    <ng-container *ngIf="currentUser?.userType === 'Super Admin' || contractType.value ==='Cash' || contractType.value ==='Guarantee' ||
-                        contractType.value === 'Prepaid' || selectedContract?.arconfirmed === true">
+
+                    {{contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !==
+                    'Prepaid'}}
+                    {{selectedContract?.arconfirmed === true}}
+                    {{currentUser?.userType === 'Super Admin'}}
+                    <ng-container
+                        *ngIf="(contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid') || selectedContract?.arconfirmed === true || currentUser?.userType === 'Super Admin'">
                         <button (click)="activeInactiveContract(selectedContract.id)"
                             *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -618,7 +623,6 @@
                             </span>
                         </button>
                     </ng-container>
-
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
