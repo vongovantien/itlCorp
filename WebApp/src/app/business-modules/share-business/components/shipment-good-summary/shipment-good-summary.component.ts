@@ -76,7 +76,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CsTransaction) => {
-                    console.log(res);
+                    // console.log(res);
                     if (!!res) {
                         this.shipment = new CsTransaction(res);
                         this.containerDetail = res.packageContainer;
@@ -126,15 +126,14 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        console.log(this.containers)
-        if (!!this.description && this.containers.length>0) {
+        if (!this.description && this.containers.length>0) {
             this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!!this.commodities && this.containers.length>0) {
+        if (!this.commodities && this.containers.length>0) {
             this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
@@ -177,7 +176,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     onRefresh() {
         this.confirmRefresh.hide();
-
+        this.containerDetail = '';
         this.updateData(this.containers);
     }
 

@@ -1,13 +1,16 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
-import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
+import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { ActivatedRoute } from '@angular/router';
+import { DocumentationRepo } from '@repositories';
+import { CsTransactionDetail } from './../../../../../shared/models/document/csTransactionDetail';
 
 import { PopupBase } from "src/app/popup.base";
-import { SystemRepo, OperationRepo } from "src/app/shared/repositories";
-import { User, Stage } from "src/app/shared/models";
+import { Stage, User } from "src/app/shared/models";
+import { OperationRepo, SystemRepo } from "src/app/shared/repositories";
 
-import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { ToastrService } from "ngx-toastr";
 import { formatDate } from "@angular/common";
+import { ToastrService } from "ngx-toastr";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
 
 @Component({
     selector: "detail-stage-popup",
@@ -27,6 +30,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     departmentName: AbstractControl;
     status: AbstractControl;
     deadLineDate: AbstractControl;
+    hblno: AbstractControl;
 
     statusStage: string[] = ['InSchedule', 'Processing', 'Done', 'Overdued', 'Pending', 'Deleted'];
 
@@ -34,7 +38,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     systemUsers: User[] = [];
     selectedMainPersonInCharge: IPersonInCharge = null;
     selectedRealPersonInCharge: IPersonInCharge = null;
-
+    selectedHbl: Partial<CommonInterface.IComboGridData> = {};
 
     // config for combo gird
     configComboGrid: any = {
@@ -47,13 +51,26 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         selectedDisplayFields: ['username'],
     };
 
-    isSummited: boolean = false;
+    configHbl: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'hwbno', label: 'HBL No' },
+            { field: 'customerName', label: 'Customer Name' },
+        ],
+        dataSource: [],
+        selectedDisplayFields: ['hwbno'],
+    };
+
+    isSubmitted: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
         private _operationRepo: OperationRepo,
         private _toaster: ToastrService,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _document: DocumentationRepo,
+        private _activedRouter: ActivatedRoute
+
     ) {
         super();
         this.initForm();
@@ -67,6 +84,11 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
 
     ngOnInit() {
         this.getListSystemUser();
+        this._activedRouter.params.subscribe((res: any) => {
+            if (!!res.jobId) {
+                this.getHblList(res.jobId);
+            }
+        });
     }
 
     initForm() {
@@ -87,7 +109,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 endDate: null
             }],
             'status': [this.statusStage[0]],
-            'hblNo': null
+            'hblno': [null]
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -96,6 +118,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
         this.status = this.form.controls['status'];
+        this.hblno = this.form.controls['hblno'];
     }
 
     initFormUpdate() {
@@ -107,12 +130,12 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             processTime: this.data.processTime,
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
             status: this.data.status,
-            hblNo: this.data.hblNo
+            hblno: this.data.hblno,
         });
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
         this.selectedRealPersonInCharge = Object.assign({}, { field: 'id', value: this.data.realPersonInCharge });
-
+        this.selectedHbl = Object.assign({}, { field: 'id', value: this.data.hblId });
     }
 
     onSelectMainPersonIncharge($event: User) {
@@ -123,8 +146,25 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.selectedRealPersonInCharge.value = $event.username;
     }
 
+    onSelectHouseBill($event: CsTransactionDetail) {
+        this.selectedHbl.value = $event.hwbno;
+        this.hblno.setValue($event.hwbno);
+    }
+
+
+    getHblList(jobId: string) {
+        this._document.getHBLOfJob({ jobId: jobId })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.configHbl.dataSource = res;
+                },
+                () => { }
+            );
+    }
+
     onSubmit(form: FormGroup) {
-        this.isSummited = true;
+        this.isSubmitted = true;
         if (form.invalid) {
             return;
         }
@@ -137,6 +177,8 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             const body = {
                 id: this.data.id,
                 jobId: this.data.jobId,
+                hblId: !!this.selectedHbl.value ? this.selectedHbl.value : null,
+                hblno: form.value.hblno,
                 stageId: this.data.stageId,
                 name: this.data.name,
                 orderNumberProcessed: this.data.orderNumberProcessed,
@@ -147,7 +189,8 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 description: form.value.description,
                 deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
                 status: form.value.status,
-                type: 'User'
+                type: 'User',
+                userCreated: this.data.userCreated
             };
             this._operationRepo.updateStageToJob(body).pipe(
                 takeUntil(this.ngUnsubscribe),
@@ -160,6 +203,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                     } else {
                         this.onSuccess.emit();
                         this._toaster.success(res.message);
+
                         this.hide();
                     }
                 },
@@ -168,11 +212,12 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 },
                 // complete
                 () => {
-                    this.isSummited = false;
+                    this.isSubmitted = false;
+                    this.form.reset();
+                    this.onResetValue();
                 }
             );
         }
-
     }
 
     getListSystemUser() {
@@ -197,11 +242,28 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     }
 
     onCancel() {
-        this.isSummited = false;
+        this.isSubmitted = false;
         this.hide();
+        this.onResetValue();
+    }
+
+    onResetValue() {
+        this.selectedHbl = {}
+        this.hblno.setValue(null);
+    }
+
+
+    onRemoveData(type: string) {
+        switch (type) {
+            case "hbl":
+                this.selectedHbl = {};
+                this.hblno.setValue(null)
+                break;
+            default:
+                break;
+        }
     }
 }
-
 
 interface IPersonInCharge {
     field: string;

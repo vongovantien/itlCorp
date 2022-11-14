@@ -9,7 +9,6 @@ import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
-
 @Component({
     selector: 'soa-add-charge-popup',
     templateUrl: './add-charge.popup.html',
@@ -91,6 +90,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
         ];
         this.initBasicData();
+
     }
 
     ngOnChanges() {
@@ -98,25 +98,24 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     initBasicData() {
         this.types = [
-            { text: 'Debit', id: 1 },
-            { text: 'Credit', id: 2 },
+            { text: 'Debit', id: 'Debit' },
+            { text: 'Credit', id: 'Credit' },
         ];
-        this.selectedType = this.types[0];
+        this.selectedType = this.types[0].id;
 
         this.obhs = [
             { text: 'Yes', id: true },
             { text: 'No', id: false }
         ];
-        this.selectedOBH = this.obhs[1];
+        this.selectedOBH = this.obhs[1].id;
 
         this.inSOAs = [
             { text: 'Yes', id: true },
             { text: 'No', id: false }
         ];
-        this.selectedInSOA = this.inSOAs[1];
+        this.selectedInSOA = this.inSOAs[1].id;
 
     }
-
     setSortBy(sort?: string, order?: boolean): void {
         this.sort = sort ? sort : 'code';
         this.order = order;
@@ -174,8 +173,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
 
     updateDefaultValue(dataSearch: SOASearchCharge) {
-        this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0];
-        this.selectedOBH = this.obhs.filter((i: any) => i.id === dataSearch.isOBH)[0];
+        this.selectedType = this.types.filter((i: any) => i.id === dataSearch.type)[0].id;
+        this.selectedOBH = this.obhs.filter((i: any) => i.id === dataSearch.isOBH)[0].id;
 
         if (dataSearch.serviceTypeId === '') {
             this.configCharge.dataSource = this.charges;
@@ -252,7 +251,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     onApplySearchCharge() {
         const body: ISearchMoreCharge = {
             chargeShipments: this.searchInfo.chargeShipments,
-            inSoa: this.selectedInSOA.id,
+            inSoa: this.selectedInSOA,
             jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : '',
             hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : '',
             mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : '',
@@ -262,8 +261,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             dateType: this.searchInfo.dateType,
             fromDate: this.searchInfo.fromDate,
             toDate: this.searchInfo.toDate,
-            type: this.selectedType.text,
-            isOBH: this.selectedOBH.id,
+            type: this.selectedType,
+            isOBH: this.selectedOBH,
             strCreators: this.searchInfo.strCreators,
             strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
             commondityGroupId: !!this.commodity ? this.commodity.id : null,
@@ -307,9 +306,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedShipment = {};
         this.selectedCDNote = null;
         this.selectedCharges = [];
-        this.selectedType = this.types[0];
-        this.selectedOBH = this.obhs[1];
-        this.selectedInSOA = this.inSOAs[1];
+        this.selectedType = this.types[0].id;
+        this.selectedOBH = this.obhs[1].id;
+        this.selectedInSOA = this.inSOAs[1].id;
 
         this.isCheckAllCharge = false;
 

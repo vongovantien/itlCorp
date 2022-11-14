@@ -1,31 +1,31 @@
+import { CommercialBankListComponent } from './../../../commercial/components/bank/commercial-bank-list.component';
 
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { SortService } from 'src/app/shared/services/sort.service';
-import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
-import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
-import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { RoutingConstants } from '@constants';
+import { Company } from '@models';
+import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import _merge from 'lodash/merge';
+import { ToastrService } from 'ngx-toastr';
+import { combineLatest, forkJoin, Observable } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
-import { ToastrService } from 'ngx-toastr';
-import { SalemanPopupComponent } from '../components/saleman-popup.component';
-import { forkJoin, Observable, combineLatest } from 'rxjs';
-import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
-import { NgProgress } from '@ngx-progressbar/core';
-import { SystemConstants } from 'src/constants/system.const';
-import { Company } from '@models';
-import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
-import _merge from 'lodash/merge';
-import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
-import { Store } from '@ngrx/store';
-import { RoutingConstants } from '@constants';
-import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
+import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
+import { Partner } from 'src/app/shared/models/catalogue/partner.model';
+import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services/sort.service';
+import { SystemConstants } from 'src/constants/system.const';
+import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
+import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
 
 
@@ -50,6 +50,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(CommercialBranchSubListComponent) listSubPartner: CommercialBranchSubListComponent;
     @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
     @ViewChild(UserCreatePopupComponent) userCreatePopup: UserCreatePopupComponent;
+    @ViewChild(CommercialBankListComponent) partnerBankList: CommercialBankListComponent;
 
     public originRoute: string = null;
     contracts: Contract[] = [];
@@ -175,7 +176,6 @@ export class PartnerDetailComponent extends AppList {
                             this.getParentCustomers();
                             this.formPartnerComponent.getACRefName(this.partner.parentId);
                         }
-                        console.log(this.partner.partnerMode);
                         if (this.partner.partnerMode === 'External') {
                             this.formPartnerComponent.isDisabledInternalCode = true;
                         }
@@ -183,7 +183,9 @@ export class PartnerDetailComponent extends AppList {
                             this.getSubListPartner(this.partner.id);
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
-
+                        this.partnerBankList.partnerId = this.partner.id;
+                        this.partnerBankList.partner = this.partner;
+                        this.partnerBankList.getListBank(this.partner.id);
                         this.userCreatePopup.partnerId = this.partner.id;
                         this._store.select(getMenuUserPermissionState)
                             .pipe(takeUntil(this.ngUnsubscribe))

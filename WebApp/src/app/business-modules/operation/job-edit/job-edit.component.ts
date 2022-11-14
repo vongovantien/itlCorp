@@ -77,7 +77,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        console.log(this.menuSpecialPermission);
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
     }

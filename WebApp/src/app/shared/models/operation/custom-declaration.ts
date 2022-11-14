@@ -30,6 +30,7 @@ export class CustomDeclaration {
     source: string = '';
     type: string = '';
     unitCode: string = '';
+    unitCodeId: number = 0;
     userCreated: string = '';
     userModified: string = '';
     accountNo: string = '';

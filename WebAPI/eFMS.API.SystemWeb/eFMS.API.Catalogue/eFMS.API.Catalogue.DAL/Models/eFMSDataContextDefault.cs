@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -122,6 +120,14 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("('(1)')");
 
+                entity.Property(e => e.BankAccountName).HasMaxLength(500);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(50);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(500);
+
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
                 entity.Property(e => e.BankNameEn)
                     .IsRequired()
                     .HasColumnName("BankName_EN")
@@ -142,6 +148,14 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+                entity.Property(e => e.Source).HasMaxLength(20);
+
+                entity.Property(e => e.SwiftCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -2570,6 +2584,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.StageId).HasColumnName("StageID");
 
                 entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -1886,7 +1884,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
-
             modelBuilder.Entity<CatStage>(entity =>
             {
                 entity.ToTable("catStage");
@@ -1940,6 +1937,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
+
+            
 
             modelBuilder.Entity<CatUnit>(entity =>
             {
@@ -3885,6 +3884,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Description).HasMaxLength(200);
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 

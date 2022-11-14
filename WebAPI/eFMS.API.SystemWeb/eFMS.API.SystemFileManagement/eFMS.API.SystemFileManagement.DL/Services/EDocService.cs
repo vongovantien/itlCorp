@@ -425,6 +425,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             _hblNo = _tranDeRepo.Get(y => y.Id == x.Hblid)?.FirstOrDefault()?.Hwbno;
                         }
                     }
+                    var jobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo;
+                    var tra = GetDocumentType(transactionType,null);
                     var imagedetail = new SysImageDetailModel
                     {
                         BillingNo = null,
@@ -432,13 +434,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DatetimeCreated = x.DatetimeCreated,
                         DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = GetDocumentType(transactionType,null),
+                        DocumentTypeId = tra,
                         ImageUrl = x.ImageUrl,
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = x.SystemFileName,//"OTH" + Path.GetFileNameWithoutExtension(clearPrefix(transactionType, x.UserFileName)),
-                        JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault()?.JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault()?.JobNo,
+                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null,x.UserFileName)),
+                        JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
                         TransactionType=transactionType,
@@ -472,7 +474,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var result = new EDocGroupByType();
             var lstEdoc = new List<SysImageDetailModel>();
             var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList(); // file goc co tren SM
-
+            var lstEdocOT = new List<SysImageDetailModel>();
             if (transactionType == "Settlement")
             {
                 var settle = _setleRepo.Get(z => z.Id == billingId).FirstOrDefault();
@@ -486,7 +488,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         Id = x.Id,
                         BillingNo = settle.SettlementNo,
-                        SystemFileName = "SM" + '_' + x.Name,
+                        SystemFileName = "OT" + '_' + x.Name,
                         ImageUrl = x.Url,
                         DatetimeCreated = x.DateTimeCreated,
                         BillingType = transactionType,
@@ -500,7 +502,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserModified = x.UserModified,
                         DocumentTypeName = "Other"
                     };
-                    lstEdoc.Add(edoc);
+                    lstEdocOT.Add(edoc);
                 });
                 var edosExisted = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo);
                 foreach (var x in edosExisted)
@@ -569,6 +571,30 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         lstEdocModel.Add(edoc);
                     }
                 });
+                lstEdocOT.ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        JobNo = null,
+                        HBLNo = null,
+                        JobId = Guid.Empty,
+                        Hblid = Guid.Empty,
+                        SystemFileName = x.SystemFileName,
+                        UserFileName = x.UserFileName,
+                        DocumentTypeName = x.DocumentTypeName,
+                        DocumentTypeId = x.DocumentTypeId,
+                        TransactionType = x.TransactionType,
+                        ImageUrl = x.ImageUrl,
+                        SysImageId = x.SysImageId,
+                        UserCreated = x.UserCreated,
+                        Source = x.Source,
+                        AccountingType = x.AccountingType,
+                        DatetimeCreated = x.DatetimeCreated,
+                        Note = x.Note,
+                        Id = x.Id,
+                    };
+                    lstEdocModel.Add(edoc);
+                });
                 //result.EDocs = lstEdoc.OrderBy(y => y.DatetimeCreated).ToList();
                 result.EDocs = lstEdocModel;
                 return result;
@@ -599,7 +625,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.Name,
                         UserModified = x.UserModified,
                     };
-                    lstEdoc.Add(edoc);
+                    lstEdocOT.Add(edoc);
                 });
                 foreach (var x in advEDoc)
                 {
@@ -628,6 +654,30 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     lstEdoc.Add(edoc);
                 }
+                lstEdocOT.ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        JobNo = null,
+                        HBLNo = null,
+                        JobId = Guid.Empty,
+                        Hblid = Guid.Empty,
+                        SystemFileName = x.SystemFileName,
+                        UserFileName = x.UserFileName,
+                        DocumentTypeName = x.DocumentTypeName,
+                        DocumentTypeId = x.DocumentTypeId,
+                        TransactionType = x.TransactionType,
+                        ImageUrl = x.ImageUrl,
+                        SysImageId = x.SysImageId,
+                        UserCreated = x.UserCreated,
+                        Source = x.Source,
+                        AccountingType = x.AccountingType,
+                        DatetimeCreated = x.DatetimeCreated,
+                        Note = x.Note,
+                        Id = x.Id,
+                    };
+                    lstEdoc.Add(edoc);
+                });
                 result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
             };
             return result;
@@ -814,21 +864,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList(); prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList();
             }
             string code = null;
-            if (fileName.Contains("OTH"))
+            for(int i=0;i<prefixs.Count; i++)
             {
-                code = "OTH";
-            }
-            else
-            {
-                for (int i = 0; i < prefixs.Count; i++)
+                if (!string.IsNullOrEmpty(prefixs[i]) && fileName.Contains(prefixs[i]))
                 {
-                    if (fileName.Contains(prefixs[i]))
-                    {
-                        code = prefixs[i];
-                    }
+                    code = prefixs[i];
                 }
             }
-         
             //prefixs.ForEach(x =>
             //{
             //    if (fileName.Contains(x))

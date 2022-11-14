@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ApiService } from "../services";
-import { environment } from "src/environments/environment";
-import { catchError, map } from "rxjs/operators";
 import { throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
+import { ApiService } from "../services";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentationRepo {
@@ -1260,6 +1260,23 @@ export class DocumentationRepo {
 
     getContainerListByJobId(jobId: string) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/GetContainerListByJobId/${jobId}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getHBLOfJob(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/Query`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+    }
+
+    syncGoodInforToReplicateJob(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

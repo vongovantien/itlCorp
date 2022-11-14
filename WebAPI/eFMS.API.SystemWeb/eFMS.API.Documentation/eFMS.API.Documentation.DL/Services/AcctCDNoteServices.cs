@@ -383,10 +383,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if (hasPrepaid)
-                        {
-                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-                        } else
+                        if(!hasPrepaid)
                         {
                             foreach (var item in dataGrpPartners)
                             {
@@ -401,6 +398,11 @@ namespace eFMS.API.Documentation.DL.Services
                                     break;
                                 }
                             }
+                        }
+
+                        if (hasPrepaid)
+                        {
+                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                         }
                     }
                 }

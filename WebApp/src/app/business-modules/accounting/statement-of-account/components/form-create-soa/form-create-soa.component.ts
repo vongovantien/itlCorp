@@ -51,7 +51,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     saleMans: any[] = [];
     itlBOD: any = [];
     salemanDisplay: string = '';
-    
+
     dateModes: any[] = [];
     selectedDateMode: any = null;
 
@@ -111,6 +111,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCharge();
         this.getService();
         this.getCommondity();
+ 
     }
 
     getUserLevel() {
@@ -193,9 +194,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrencyData(data: any) {
-        this.currencyList = (data).map((item: any) => ({ id: item.id, text: item.id }));
-        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
-        this.updateDataSearch('currency', this.selectedCurrency.id);
+        this.currencyList = (data || []);
+        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
+        this.updateDataSearch('currency', this.selectedCurrency);
         this.updateDataSearch('currencyLocal', 'VND');
     }
 
@@ -293,31 +294,31 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'Service Date', value: 'ServiceDate' },
             //{ title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' }, //Bỏ ra [20/01/2021]
         ];
-        this.selectedDateMode = this.dateModes[1];
+        this.selectedDateMode = this.dateModes[1].value;
 
         this.types = [
             // { title: 'All', value: 'All' }, Đã confirm không cần type All [13/10/2020]
             { title: 'Debit', value: 'Debit' },
             { title: 'Credit', value: 'Credit' },
         ];
-        this.selectedType = this.types[0];
+        this.selectedType = this.types[0].value;
 
         this.obhs = [
             { title: 'Yes', value: true },
             { title: 'No', value: false }
         ];
-        this.selectedObh = this.obhs[0];
+        this.selectedObh = this.obhs[0].value;
 
         this.staffTypes = [
             { value: 'PersonInCharge', title: 'Person In Charge' },
             { value: 'Salesman', title: 'Salesman' },
             { value: 'Creator', title: 'Creator' }
         ];
-        this.selectedStaffType = this.staffTypes[0];
+        this.selectedStaffType = this.staffTypes[0].value;
 
-        this.updateDataSearch('isOBH', this.selectedObh.value);
-        this.updateDataSearch('dateType', this.selectedDateMode.value);
-        this.updateDataSearch('type', this.selectedType.value);
+        this.updateDataSearch('isOBH', this.selectedObh);
+        this.updateDataSearch('dateType', this.selectedDateMode);
+        this.updateDataSearch('type', this.selectedType);
     }
 
     updateDataSearch(key: string, data: any) {
@@ -337,25 +338,25 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.updateDataSearch('customerShipmentId', this.selectedCustomerShipment.value);
                 break;
             case 'date-mode':
-                this.selectedDateMode = data;
-                this.updateDataSearch('dateType', this.selectedDateMode.value);
+                this.selectedDateMode = data.value;
+                this.updateDataSearch('dateType', this.selectedDateMode);
                 break;
             case 'type':
-                this.selectedType = data;
-                this.updateDataSearch('type', this.selectedType.value);
+                this.selectedType = data.value;
+                this.updateDataSearch('type', this.selectedType);
                 this.getInfoAgreement();
                 break;
             case 'obh':
-                this.selectedObh = data;
-                this.updateDataSearch('isOBH', this.selectedObh.value);
+                this.selectedObh = data.value;
+                this.updateDataSearch('isOBH', this.selectedObh);
                 break;
             case 'staff-style':
-                this.selectedStaffType = data;
-                this.updateDataSearch('staffType', this.selectedStaffType.value);
+                this.selectedStaffType = data.value;
+                this.updateDataSearch('staffType', this.selectedStaffType);
                 break;
             case 'currency':
-                this.selectedCurrency = data;
-                this.updateDataSearch('currency', this.selectedCurrency.id);
+                this.selectedCurrency = data.id;
+                this.updateDataSearch('currency', this.selectedCurrency);
                 break;
             case 'service':
                 // * reset selected charges & dataSource.
@@ -454,11 +455,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return false;
         }
-        if(this.selectedType.value === this.types[0].value){
+        if(this.selectedType === this.types[0].value){
             if(!this.salemanDisplay){
                 return false;
             }
-            if(this.selectedStaffType.value === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
+            if(this.selectedStaffType === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
                 this._toastService.warning("Selection Staff Saleman and Saleman must be the same.")
                 return false;
             }
@@ -473,13 +474,13 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         } else {
             const body = {
                 currencyLocal: 'VND',
-                currency: this.selectedCurrency.id,
+                currency: this.selectedCurrency,
                 customerID: this.selectedPartner.value || '',
-                dateType: this.selectedDateMode.value,
+                dateType: this.selectedDateMode,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'en'),
                 toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'en'),
-                type: this.selectedType.value,
-                isOBH: this.selectedObh.value,
+                type: this.selectedType,
+                isOBH: this.selectedObh,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.id).toString(),
                 note: this.note,
@@ -491,7 +492,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 mbls: this.mapShipment("MBL"),
                 customNo: this.mapShipment("CustomNo"),
                 airlineCode: this.airlineCode,
-                staffType: this.selectedStaffType.value,
+                staffType: this.selectedStaffType,
                 customerShipmentId: !!this.selectedCustomerShipment ? this.selectedCustomerShipment.value : null,
                 salemanId: !!this.salemanDisplay ? this.selectedSaleman.id : null
             };
@@ -581,7 +582,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         const agreementLst = this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id);
         let currency = this.currencyList.filter((curr) => agreementLst.map(x => x.creditCurrency).includes(curr.id));
         if (!currency) {
-            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
+            return;
         } else if (currency.length > 1) {
             if (this.selectedService[0] !== 'All') {
                 this.selectedService.forEach((item: any) => {
@@ -592,14 +594,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 })
             }
         }
-        this.selectedCurrency = currency[0];
+        this.selectedCurrency = currency[0].id;
         if (!this.selectedCurrency) {
-            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
         }
     }
 
     getInfoAgreement(){
-        if(this.selectedType.value === this.types[0].value && !!this.selectedPartner.value){
+        if(this.selectedType === this.types[0].value && !!this.selectedPartner.value){
             this.saleMans = [];
             this._catalogueRepo.getAgreement(
                 {
@@ -612,9 +614,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                             this.saleMans = _uniqBy(this.saleMans, 'id');
                         }else{
                             this.saleMans = this.itlBOD;
-                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
                         }
-                        this.updateDataSearch('currency', this.selectedCurrency.id);
+                        this.updateDataSearch('currency', this.selectedCurrency);
                         if(this.saleMans.length > 0){
                             this.onSelectDataFormInfo(this.saleMans[0], 'saleman');
                         }
@@ -623,9 +625,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                         }
                     }
                 );
-            }
-            else{
-                this.onSelectDataFormInfo(null, 'saleman');
-            }
+        }
+        else{
+            this.onSelectDataFormInfo(null, 'saleman');
+        }
     }
 }

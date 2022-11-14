@@ -1,20 +1,21 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using ITL.NetCore.Connection.Caching;
-using System.Collections.Generic;
-using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Common.Globals;
-using Microsoft.Extensions.Localization;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -23,17 +24,19 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IMapper mapper;
 
         public CatBankService(IContextBase<CatBank> repository,
             ICacheServiceBase<CatBank> cacheService,
-            IMapper mapper,
+            IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser currUser) : base(repository, cacheService, mapper)
+        ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
+            mapper = imapper;
         }
 
         #region CRUD
@@ -43,7 +46,7 @@ namespace eFMS.API.Catalogue.DL.Services
             bank.Id = Guid.NewGuid();
             bank.DatetimeCreated = bank.DatetimeModified = DateTime.Now;
             bank.Active = true;
-            bank.UserCreated = currentUser.UserID;
+            bank.UserCreated = bank.UserModified = currentUser.UserID;
             var result = DataContext.Add(bank, false);
             DataContext.SubmitChanges();
             if (result.Success)
@@ -64,6 +67,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.DatetimeModified = DateTime.Now;
                 entity.BankNameEn = model.BankNameEn;
                 entity.BankNameVn = model.BankNameVn;
+                entity.BankAccountName = model.BankAccountName;
+                entity.BankAccountNo = model.BankAccountNo;
+                entity.BankAddress = model.BankAddress;
+                entity.Source = model.Source;
+                entity.SwiftCode = model.SwiftCode;
+                entity.Code = model.Code;
+                entity.Note = model.Note;
                 entity.Active = model.Active;
 
                 if (entity.Active == false)
@@ -182,7 +192,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => (x.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             else if (criteria.BankNameEn != null)
                 query = (x => (x.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-            else if(criteria.Active != null)
+            else if (criteria.Active != null)
             {
                 query = (x => x.Active == criteria.Active);
             }
@@ -285,6 +295,39 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
+        {
+            var data = await DataContext.WhereAsync(x => x.PartnerId == id);
+            if (data.Count() == 0)
+            {
+                return Enumerable.Empty<CatBankModel>().AsQueryable();
+            }
+
+            var result = data.Select(x => new CatBankModel
+            {
+                Id = x.Id,
+                Code = x.Code,
+                BankNameEn = x.BankNameEn,
+                BankNameVn = x.BankNameVn,
+                UserCreated = x.UserCreated,
+                DatetimeCreated = x.DatetimeCreated,
+                UserModified = x.UserModified,
+                DatetimeModified = x.DatetimeModified,
+                Active = x.Active,
+                BankId = x.BankId,
+                PartnerId = x.PartnerId,
+                InactiveOn = x.InactiveOn,
+                BankAccountNo = x.BankAccountNo,
+                BankAddress = x.BankAddress,
+                BankAccountName = x.BankAccountName,
+                Note = x.Note,
+                Source = x.Source,
+                SwiftCode = x.SwiftCode
+            });
+
+            return result.AsQueryable();
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Operation.Service.Models
 {
@@ -1336,6 +1334,10 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.Description).HasMaxLength(200);
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
