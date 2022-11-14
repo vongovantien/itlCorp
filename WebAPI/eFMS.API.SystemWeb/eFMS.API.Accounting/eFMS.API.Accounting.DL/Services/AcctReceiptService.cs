@@ -2446,11 +2446,12 @@ namespace eFMS.API.Accounting.DL.Services
         public AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             AgencyDebitCreditDetailModel data = new AgencyDebitCreditDetailModel();
-            data.Invoices = new List<AgencyDebitCreditModel>();
+            //data.Invoices = new List<AgencyDebitCreditModel>();
 
             //IQueryable<AgencyDebitCreditModel> creditNote = null;
             IQueryable<AgencyDebitCreditModel> debits = null;
             IQueryable<AgencyDebitCreditModel> obhs = null;
+            IQueryable<AgencyDebitCreditModel> dataMerge = null;
             //IQueryable<AgencyDebitCreditModel> soaCredit = null;
             debits = GetDebitForIssueAgentPayment(criteria);
             obhs = GetObhForIssueAgencyPayment(criteria);
@@ -2486,29 +2487,35 @@ namespace eFMS.API.Accounting.DL.Services
             var debitAgents = new List<AgencyDebitCreditModel>();
             if (debits != null)
             {
-                debitAgents.AddRange(debits);
+                dataMerge = debits;
             }
             if (obhs != null)
             {
-                debitAgents.AddRange(obhs);
+                if (dataMerge == null)
+                {
+                    dataMerge = obhs;
+                }
+                else
+                {
+                    dataMerge = (dataMerge.Union(obhs));
+                }
             }
-            if(debitAgents.FirstOrDefault() == null)
+            if (dataMerge == null)
             {
-                data.GroupShipmentsAgency = new List<GroupShimentAgencyModel>();
+                var newItem = new List<GroupShimentAgencyModel>();
+                data.GroupShipmentsAgency = newItem.AsQueryable();
                 return data;
             }
-            data.Invoices = debitAgents;
-            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl, g.Hblid }).Select(s => new GroupShimentAgencyModel
+            var groupShipmentAgency = dataMerge.Select(s => new GroupShimentAgencyModel
             {
-                Hblid = s.Key.Hblid,
-                JobNo = s.Key.JobNo,
-                Mbl = s.Key.Mbl,
-                Hbl = s.Key.Hbl,
-                UnpaidAmountUsd = s.Sum(t => t.UnpaidAmountUsd ?? 0),
-                UnpaidAmountVnd = s.Sum(t => t.UnpaidAmountVnd ?? 0),
-                Invoices = s.AsQueryable()
-            }).ToList();
-
+                Hblid = s.Hblid,
+                JobNo = s.JobNo,
+                Mbl = s.Mbl,
+                Hbl = s.Hbl,
+                UnpaidAmountUsd = s.UnpaidAmountUsd ?? 0,
+                UnpaidAmountVnd = s.UnpaidAmountVnd ?? 0,
+                Invoices = new List<AgencyDebitCreditModel>() { s }
+            });
             data.GroupShipmentsAgency = groupShipmentAgency;
             return data;
         }
@@ -2815,30 +2822,30 @@ namespace eFMS.API.Accounting.DL.Services
                            ExchangeRateBilling = acct.TotalExchangeRate
                        };
 
-            var groupData = data.GroupBy(x => new { x.RefNo, x.Type, x.PartnerId, x.Hblid }).Select(x => new { x.Key, data = x.FirstOrDefault() });
+            var groupData = data.GroupBy(x => new { x.RefNo, x.Type, x.PartnerId, x.Hblid });//.Select(x => new { x.Key, data = x.FirstOrDefault() });
             var result = groupData.Select(inv => new AgencyDebitCreditModel
             {
                 RefNo = inv.Key.RefNo,
                 Type = inv.Key.Type,
                 PartnerId = inv.Key.PartnerId,
-                RefIds = inv.data.RefIds,
+                RefIds = inv.FirstOrDefault().RefIds,
                 Hblid = inv.Key.Hblid,
-                JobNo = inv.data.JobNo,
-                Mbl = inv.data.Mbl,
-                Hbl = inv.data.Hbl,
-                UnpaidAmount = inv.data.UnpaidAmount,
-                UnpaidAmountUsd = inv.data.UnpaidAmountUsd,
-                UnpaidAmountVnd = inv.data.UnpaidAmountVnd,
-                PaymentStatus = inv.data.PaymentStatus,
-                InvoiceNo = inv.data.InvoiceNo,
-                InvoiceDate = inv.data.InvoiceDate,
-                CurrencyId = inv.data.CurrencyId,
-                Amount = inv.data.Amount,
-                PaymentTerm = inv.data.PaymentTerm,
-                DueDate = inv.data.DueDate,
-                OfficeId = inv.data.OfficeId,
-                CompanyId = inv.data.CompanyId,
-                ExchangeRateBilling = inv.data.ExchangeRateBilling
+                JobNo = inv.FirstOrDefault().JobNo,
+                Mbl = inv.FirstOrDefault().Mbl,
+                Hbl = inv.FirstOrDefault().Hbl,
+                UnpaidAmount = inv.FirstOrDefault().UnpaidAmount,
+                UnpaidAmountUsd = inv.FirstOrDefault().UnpaidAmountUsd,
+                UnpaidAmountVnd = inv.FirstOrDefault().UnpaidAmountVnd,
+                PaymentStatus = inv.FirstOrDefault().PaymentStatus,
+                InvoiceNo = inv.FirstOrDefault().InvoiceNo,
+                InvoiceDate = inv.FirstOrDefault().InvoiceDate,
+                CurrencyId = inv.FirstOrDefault().CurrencyId,
+                Amount = inv.FirstOrDefault().Amount,
+                PaymentTerm = inv.FirstOrDefault().PaymentTerm,
+                DueDate = inv.FirstOrDefault().DueDate,
+                OfficeId = inv.FirstOrDefault().OfficeId,
+                CompanyId = inv.FirstOrDefault().CompanyId,
+                ExchangeRateBilling = inv.FirstOrDefault().ExchangeRateBilling
             });
             var partners = catPartnerRepository.Get();
             var offices = officeRepository.Get();
@@ -2921,8 +2928,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             var surcharges = surchargeRepository.Get(expQuerySurChg);
-            var partners = catPartnerRepository.Get();
-            var offices = officeRepository.Get();
 
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
@@ -2955,6 +2960,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo)
             });
 
+            var partners = catPartnerRepository.Get();
+            var offices = officeRepository.Get();
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
