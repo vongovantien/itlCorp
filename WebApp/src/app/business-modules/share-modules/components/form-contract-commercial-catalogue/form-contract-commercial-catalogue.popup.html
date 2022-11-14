@@ -599,11 +599,6 @@
                             <span> AR Confirmed </span>
                         </span>
                     </button>
-
-                    {{contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !==
-                    'Prepaid'}}
-                    {{selectedContract?.arconfirmed === true}}
-                    {{currentUser?.userType === 'Super Admin'}}
                     <ng-container
                         *ngIf="(contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid') || selectedContract?.arconfirmed === true || currentUser?.userType === 'Super Admin'">
                         <button (click)="activeInactiveContract(selectedContract.id)"
