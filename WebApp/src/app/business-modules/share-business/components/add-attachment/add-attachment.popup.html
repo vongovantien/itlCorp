@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
-    <div class="modal-dialog modal-xs" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Attachment</h5>
@@ -25,7 +25,7 @@
                                                     </h3>
                                                 </div>
                                                 <input type="file" multiple (change)="chooseFile($event)"
-                                                    title="Upload files" />
+                                                    title="Upload files" [accept]="accepctFilesUpload" />
                                             </div>
                                         </div>
                                     </div>
@@ -34,7 +34,7 @@
                         </div>
                     </ng-container>
                 </div>
-                <div class="table-wrapper table-scrollable" id="">
+                <div class="table-horizontal" id="" style="max-height:400px">
                     <table class="table table-hover table-brand dataTable">
                         <thead app-table-header [headers]="headers"
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -48,7 +48,9 @@
                         </thead>
                         <tbody>
                             <ng-container *ngIf="!isLoading && !!files.length">
-                                <tr *ngFor="let file of files; let i = index; trackBy: trackByFn">
+                                <tr *ngFor="let file of files; let i = index; trackBy: trackByFn"
+                                    [contextMenu]="menuContext" (onTouch)="onSelectFileMenuContext(file)"
+                                    [class.touch-row]="selectedFile?.id === file.id" (click)="selectFileItem(file)">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
@@ -59,15 +61,12 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a [href]="file.url" target="_blank" [title]="file.name"
-                                            download>{{file.name}}</a>
+                                        <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}
+                                            <icon-file [url]="file.url"></icon-file>
+                                        </a>
                                     </td>
-                                    <td>
-                                        <span class="pointer text-center">
-                                            <a title="Delete" (click)="deleteFile(file)">
-                                                <i class="la la-times fa-lg text-danger"></i>
-                                            </a>
-                                        </span>
+                                    <td class="text-success">
+                                        {{file.userCreated}}
                                     </td>
                                 </tr>
                                 <tr app-table-row-loading *ngIf="isLoading"></tr>
@@ -78,8 +77,7 @@
                 </div>
                 <div class="form-actions">
                     <div class="row">
-                        <div class="col-lg-6"></div>
-                        <div class="col-lg-6 m--align-right">
+                        <div class="col-lg-12 m--align-center">
                             <button (click)="onAddToMail()" type="button"
                                 class="btn btn-brand  m-btn--icon m-btn--uppercase">
                                 <span>
@@ -103,10 +101,24 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
     </div>
 </div>
 
-<confirm-popup #confirmDelete body="Are you sure to delete this file ?" labelConfirm="Yes" labelCancel="No" (onSubmit)="onDeleteFile()"></confirm-popup>
+<ng-template inject></ng-template>
+
+<app-context-menu #menuContext (clickOutside)="selectedFile = null">
+    <div class="menu-context__item" (click)="selectFile()">
+        <span><i class="la la-check align-middle text-primary"></i>Select this file</span>
+    </div>
+    <div class="menu-context__item" (click)="onAddToMail()">
+        <span><i class="la la-list-alt align-middle text-primary"></i>Select selected files</span>
+    </div>
+    <div class="menu-context__item" (click)="viewFile()">
+        <span><i class="la la-eye align-middle text-primary"></i>View</span>
+    </div>
+    <div class="menu-context__item" (click)="download()">
+        <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+</app-context-menu>

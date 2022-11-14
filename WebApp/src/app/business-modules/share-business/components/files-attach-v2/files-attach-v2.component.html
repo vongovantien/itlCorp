@@ -65,47 +65,9 @@
                                             </td>
                                             <td>
                                                 <a class="text-underline" [href]="doc.imageUrl"
-                                                    target="_blank">{{doc.userFileName}}</a>
-                                                <span class="m--margin-left-10">
-                                                    <ng-container [ngSwitch]="doc.imageUrl | extension">
-                                                        <ng-container *ngSwitchCase="'pdf'">
-                                                            <i class="fa fa-file-pdf-o fa-lg text-danger"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'doc'">
-                                                            <i class="fa fa-file-word-o fa-lg text-primary"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'docx'">
-                                                            <i class="fa fa-file-word-o fa-lg text-primary"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'xlsx'">
-                                                            <i class="fa fa-file-excel-o fa-lg text-success"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'xls'">
-                                                            <i class="fa fa-file-excel-o fa-lg text-success"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'txt'">
-                                                            <i class="fa fa-file-text-o fa-lg text-info"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'jpg'">
-                                                            <i class="fa fa-file-image-o fa-lg text-warning"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchCase="'png'">
-                                                            <i class="fa fa-file-image-o fa-lg text-warning"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                        <ng-container *ngSwitchDefault>
-                                                            <i class="fa fa-file fa-lg text-muted"
-                                                                aria-hidden="true"></i>
-                                                        </ng-container>
-                                                    </ng-container>
-                                                </span>
+                                                    download>{{doc.userFileName}}
+                                                    <icon-file [url]="doc.imageUrl"></icon-file>
+                                                </a>
                                             </td>
                                             <td>
                                                 <span>{{doc.hblNo}}</span>
@@ -194,54 +156,18 @@
                                         <ng-container
                                             *ngFor="let doc of docType?.eDocs; let i = index; trackBy: trackByFn">
                                             <tr [contextMenu]="edocAccountantShipmentTypeContext"
-                                                (onTouch)="onSelectEDoc(doc)">
+                                                (onTouch)="onSelectEDoc(doc)"
+                                                [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                                 <td>{{i + 1}}</td>
                                                 <td>
                                                     <span>{{doc.systemFileName}} </span>
                                                 </td>
                                                 <td>
                                                     <a class="text-underline" [href]="doc.imageUrl"
-                                                        target="_blank">{{doc.userFileName}}</a>
-                                                    <span class="m--margin-left-10">
-                                                        <ng-container [ngSwitch]="doc.imageUrl | extension">
-                                                            <ng-container *ngSwitchCase="'pdf'">
-                                                                <i class="fa fa-file-pdf-o fa-lg text-danger"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'doc'">
-                                                                <i class="fa fa-file-word-o fa-lg text-primary"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'docx'">
-                                                                <i class="fa fa-file-word-o fa-lg text-primary"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'xlsx'">
-                                                                <i class="fa fa-file-excel-o fa-lg text-success"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'xls'">
-                                                                <i class="fa fa-file-excel-o fa-lg text-success"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'txt'">
-                                                                <i class="fa fa-file-text-o fa-lg text-info"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'jpg'">
-                                                                <i class="fa fa-file-image-o fa-lg text-warning"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchCase="'png'">
-                                                                <i class="fa fa-file-image-o fa-lg text-warning"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                            <ng-container *ngSwitchDefault>
-                                                                <i class="fa fa-file fa-lg text-muted"
-                                                                    aria-hidden="true"></i>
-                                                            </ng-container>
-                                                        </ng-container>
-                                                    </span>
+                                                        target="_blank">{{doc.userFileName}}
+                                                        <icon-file [url]="doc.userFileName"></icon-file>
+                                                    </a>
+
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -293,50 +219,14 @@
                             </thead>
                             <tbody>
                                 <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
-                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)">
+                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
+                                        [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>
                                         <td>
-                                            <a class="text-underline" [href]="doc.imageUrl"
-                                                target="_blank">{{doc.systemFileName}}</a>
-                                            <span class="m--margin-left-10">
-                                                <ng-container [ngSwitch]="doc.imageUrl | extension">
-                                                    <ng-container *ngSwitchCase="'pdf'">
-                                                        <i class="fa fa-file-pdf-o fa-lg text-danger"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'doc'">
-                                                        <i class="fa fa-file-word-o fa-lg text-primary"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'docx'">
-                                                        <i class="fa fa-file-word-o fa-lg text-primary"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'xlsx'">
-                                                        <i class="fa fa-file-excel-o fa-lg text-success"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'xls'">
-                                                        <i class="fa fa-file-excel-o fa-lg text-success"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'txt'">
-                                                        <i class="fa fa-file-text-o fa-lg text-info"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'jpg'">
-                                                        <i class="fa fa-file-image-o fa-lg text-warning"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchCase="'png'">
-                                                        <i class="fa fa-file-image-o fa-lg text-warning"
-                                                            aria-hidden="true"></i>
-                                                    </ng-container>
-                                                    <ng-container *ngSwitchDefault>
-                                                        <i class="fa fa-file fa-lg text-muted" aria-hidden="true"></i>
-                                                    </ng-container>
-                                                </ng-container>
-                                            </span>
+                                            <a class="text-underline" [href]="doc.imageUrl" target="_blank"
+                                                download>{{doc.systemFileName}}
+                                                <icon-file [url]="doc.userFileName"></icon-file>
+                                            </a>
                                         </td>
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>
@@ -414,6 +304,9 @@
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
         <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+    <div class="menu-context__item" (click)="downloadAllEdoc()">
+        <span><i class="la la-cloud align-middle text-primary"></i>Download all items</span>
     </div>
 </app-context-menu>
 
