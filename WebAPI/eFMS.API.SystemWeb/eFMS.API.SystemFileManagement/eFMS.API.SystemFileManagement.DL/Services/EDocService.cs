@@ -818,7 +818,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             string code = null;
             for(int i=0;i<prefixs.Count; i++)
             {
-                if (fileName.Contains(prefixs[i]))
+                if (!string.IsNullOrEmpty(prefixs[i]) && fileName.Contains(prefixs[i]))
                 {
                     code = prefixs[i];
                 }
